@@ -1,6 +1,6 @@
 name: zikzak_inappwebview_web
 description: Web implementation of the zikzak_inappwebview plugin.
-version: 2.4.8
+version: 2.4.28
 homepage: https://inappwebview.dev/
 repository: https://github.com/arrrrny/zikzak_inappwebview/tree/master/zikzak_inappwebview_web
 issue_tracker: https://github.com/arrrrny/zikzak_inappwebview/issues
@@ -21,7 +21,7 @@ dependencies:
   flutter_web_plugins:
     sdk: flutter
   js: ^0.7.1
-  zikzak_inappwebview_platform_interface: ^2.4.8
+  zikzak_inappwebview_platform_interface: ^2.4.28
 
 dev_dependencies:
   flutter_test:

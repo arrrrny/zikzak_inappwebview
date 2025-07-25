@@ -50,11 +50,62 @@ check_package_on_pubdev() {
     fi
 }
 
+# Function to verify that a package dependency can actually be resolved by pub
+verify_dependency_resolution() {
+    local package_name=$1
+    local version=$2
+
+    echo -e "${BLUE}Verifying that $package_name version $version can be resolved by pub...${NC}"
+
+    # Create a temporary directory for testing dependency resolution
+    local temp_dir=$(mktemp -d)
+    cd "$temp_dir"
+
+    # Create a minimal pubspec.yaml to test dependency resolution
+    cat > pubspec.yaml << EOF
+name: dependency_test
+version: 1.0.0
+
+environment:
+  sdk: '>=2.17.0 <4.0.0'
+  flutter: ">=3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  $package_name: ^$version
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+EOF
+
+    # Try to resolve dependencies
+    local pub_get_output
+    local pub_get_exit_code
+
+    pub_get_output=$(flutter pub get 2>&1)
+    pub_get_exit_code=$?
+
+    # Clean up temporary directory
+    cd "$PROJECT_DIR"
+    rm -rf "$temp_dir"
+
+    if [ $pub_get_exit_code -eq 0 ]; then
+        echo -e "${GREEN}Dependency $package_name version $version is resolvable by pub!${NC}"
+        return 0
+    else
+        echo -e "${YELLOW}Dependency $package_name version $version is not yet resolvable by pub.${NC}"
+        echo -e "${YELLOW}Pub get output: $pub_get_output${NC}"
+        return 1
+    fi
+}
+
 # Function to check if all dependencies of a package are available on pub.dev
 check_dependencies() {
     local package_dir="$1"
-    local max_retries=60
-    local retry_interval=60
+    local max_retries=30
+    local retry_interval=120
 
     # Extract package version from pubspec.yaml
     local version=$(grep "^version:" "$PROJECT_DIR/$package_dir/pubspec.yaml" | sed 's/version: //' | tr -d '[:space:]')
@@ -80,65 +131,34 @@ check_dependencies() {
         # Try up to max_retries times with delay
         local retry_count=0
         while [ $retry_count -lt $max_retries ]; do
+            # First check if it's available via API
             if check_package_on_pubdev "$dep" "$version"; then
-                break
-            else
-                retry_count=$((retry_count + 1))
-                if [ $retry_count -lt $max_retries ]; then
-                    echo -e "${YELLOW}Dependency $dep not available yet. Waiting ${retry_interval}s before retry ($retry_count/$max_retries)...${NC}"
-                    sleep $retry_interval
+                # If API shows it's available, verify it can actually be resolved
+                if verify_dependency_resolution "$dep" "$version"; then
+                    break
                 else
-                    echo -e "${RED}Dependency $dep version $version is required but not available on pub.dev after $max_retries retries.${NC}"
-                    echo -e "${RED}Make sure it has been published before proceeding.${NC}"
-                    return 1
+                    echo -e "${YELLOW}Package $dep is in API but not yet resolvable. This is normal - pub.dev needs time to process.${NC}"
                 fi
+            fi
+
+            retry_count=$((retry_count + 1))
+            if [ $retry_count -lt $max_retries ]; then
+                echo -e "${YELLOW}Dependency $dep not fully available yet. Waiting ${retry_interval}s before retry ($retry_count/$max_retries)...${NC}"
+                echo -e "${BLUE}Note: There can be a delay between API availability and dependency resolution on pub.dev${NC}"
+                sleep $retry_interval
+            else
+                echo -e "${RED}Dependency $dep version $version is required but not resolvable after $max_retries retries ($(($max_retries * $retry_interval / 60)) minutes).${NC}"
+                echo -e "${RED}Make sure it has been published and fully processed by pub.dev before proceeding.${NC}"
+                return 1
             fi
         done
     done
 
-    echo -e "${GREEN}All dependencies for $package_dir are available on pub.dev!${NC}"
+    echo -e "${GREEN}All dependencies for $package_dir are available and resolvable on pub.dev!${NC}"
     return 0
 }
 
-# Function to publish a package to CocoaPods
-publish_to_cocoapods() {
-    local package_dir="$1"
-    local version="$2"
 
-    # Only publish iOS package to CocoaPods
-    if [ "$package_dir" != "zikzak_inappwebview_ios" ]; then
-        return 0
-    fi
-
-    echo -e "${BLUE}Publishing $package_dir to CocoaPods...${NC}"
-
-    # Stay in the root directory for validation and publishing
-    cd "$PROJECT_DIR"
-
-    # Check if podspec exists
-    if [ ! -f "$package_dir/ios/zikzak_inappwebview_ios.podspec" ]; then
-        echo -e "${RED}Podspec file not found at $package_dir/ios/zikzak_inappwebview_ios.podspec${NC}"
-        return 1
-    fi
-
-    # Validate podspec first (from root directory)
-    echo -e "${BLUE}Validating podspec...${NC}"
-    pod spec lint "$package_dir/ios/zikzak_inappwebview_ios.podspec" --allow-warnings || {
-        echo -e "${RED}Podspec validation failed.${NC}"
-        return 1
-    }
-
-    # Change to iOS directory for publishing
-    echo -e "${BLUE}Publishing to CocoaPods trunk...${NC}"
-    cd "$PROJECT_DIR/$package_dir/ios"
-    pod trunk push zikzak_inappwebview_ios.podspec --allow-warnings || {
-        echo -e "${RED}CocoaPods trunk push failed.${NC}"
-        return 1
-    }
-    echo -e "${GREEN}Package $package_dir published to CocoaPods successfully!${NC}"
-
-    return 0
-}
 
 # Function to publish a package
 publish_package() {
@@ -154,8 +174,6 @@ publish_package() {
     # Check if package is already published
     if check_package_on_pubdev "$package_dir" "$version"; then
         echo -e "${GREEN}Skipping $package_dir version $version (already published)${NC}"
-        # Still try to publish to CocoaPods if it's the iOS package
-        publish_to_cocoapods "$package_dir" "$version"
         return 0
     fi
 
@@ -165,8 +183,16 @@ publish_package() {
         return 1
     fi
 
-    # Navigate to the package directory
+    # Final verification: test pub get on the actual package
+    echo -e "${BLUE}Final verification: testing pub get on $package_dir...${NC}"
     cd "$PROJECT_DIR/$package_dir"
+
+    # Try pub get to ensure all dependencies can be resolved
+    if ! flutter pub get; then
+        echo -e "${RED}Failed to resolve dependencies for $package_dir. Cannot proceed with publishing.${NC}"
+        return 1
+    fi
+    echo -e "${GREEN}All dependencies resolved successfully for $package_dir!${NC}"
 
     # Format the Dart code
     echo -e "${BLUE}Formatting Dart code...${NC}"
@@ -185,9 +211,6 @@ publish_package() {
     echo -e "${BLUE}Publishing to pub.dev...${NC}"
     flutter pub publish -f
     echo -e "${GREEN}Package $package_dir published to pub.dev successfully!${NC}"
-
-    # Also publish to CocoaPods if it's the iOS package
-    publish_to_cocoapods "$package_dir" "$version"
 
     return 0
 }

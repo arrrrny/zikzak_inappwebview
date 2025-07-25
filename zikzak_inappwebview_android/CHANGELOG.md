@@ -1,3 +1,8 @@
+## 2.4.28 - 2025-07-25
+
+* fixed cocoapods issues
+* Updated dependencies to use hosted references
+
 ## 2.4.8 - 2025-06-16
 
 * cocoapads paths updated
