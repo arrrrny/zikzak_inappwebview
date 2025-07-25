@@ -17,11 +17,10 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
 
   InAppWebViewController? webViewController;
   InAppWebViewSettings settings = InAppWebViewSettings(
-      isInspectable: kDebugMode,
-      mediaPlaybackRequiresUserGesture: false,
-      allowsInlineMediaPlayback: true,
-      iframeAllow: "camera; microphone",
-      iframeAllowFullscreen: true);
+    javaScriptEnabled: true,
+    domStorageEnabled: true,
+    databaseEnabled: true,
+  );
 
   PullToRefreshController? pullToRefreshController;
 
@@ -115,6 +114,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
               children: [
                 InAppWebView(
                   key: webViewKey,
+
                   webViewEnvironment: webViewEnvironment,
                   initialUrlRequest:
                       URLRequest(url: WebUri('https://flutter.dev')),
@@ -129,6 +129,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     webViewController = controller;
                   },
                   onLoadStart: (controller, url) async {
+                    print("Starting to load: $url");
                     setState(() {
                       this.url = url.toString();
                       urlController.text = this.url;
@@ -166,6 +167,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   },
                   onLoadStop: (controller, url) async {
                     pullToRefreshController?.endRefreshing();
+                    print("Page loaded successfully: $url");
                     setState(() {
                       this.url = url.toString();
                       urlController.text = this.url;
@@ -173,6 +175,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   },
                   onReceivedError: (controller, request, error) {
                     pullToRefreshController?.endRefreshing();
+                    print("WebView Error: ${error.description}");
+                    print("Error Type: ${error.type}");
+                    print("Failed URL: ${request.url}");
                   },
                   onProgressChanged: (controller, progress) {
                     if (progress == 100) {
@@ -190,7 +195,12 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     });
                   },
                   onConsoleMessage: (controller, consoleMessage) {
-                    print(consoleMessage);
+                    print("Console: ${consoleMessage.message}");
+                  },
+                  onReceivedHttpError: (controller, request, errorResponse) {
+                    print(
+                        "HTTP Error: ${errorResponse.statusCode} - ${errorResponse.reasonPhrase}");
+                    print("Failed URL: ${request.url}");
                   },
                 ),
                 progress < 1.0
