@@ -1,3 +1,15 @@
+## 3.0.0 - 2025-11-05
+
+* **BREAKING CHANGE:** Removed macOS, Windows, Web, and Linux platform support
+* **BREAKING CHANGE:** Minimum Android SDK raised from 19 to 24 (Android 7.0 Nougat)
+* **BREAKING CHANGE:** Minimum iOS version raised from 13.0 to 15.0
+* **16KB page size support:** Compatible with Android 15+ devices using 16KB memory pages (AGP 8.5.2)
+* **Google Safe Browsing:** NOW ENABLED BY DEFAULT - Protects against phishing, malware, and unwanted software
+* Focus on mobile-first: iOS and Android only for cleaner, leaner, faster codebase
+* Removed all GitHub workflows from previous maintainer
+* Removed all test directories (comprehensive testing suite planned for future release)
+* Updated all publish scripts to support iOS and Android only
+
 ## 2.4.28 - 2025-07-25
 
 * fixed cocoapods issues
