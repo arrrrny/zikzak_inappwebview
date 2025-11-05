@@ -39,6 +39,7 @@ import wtf.zikzak.zikzak_inappwebview_android.credential_database.CredentialData
 import wtf.zikzak.zikzak_inappwebview_android.in_app_browser.InAppBrowserDelegate;
 import wtf.zikzak.zikzak_inappwebview_android.plugin_scripts_js.JavaScriptBridgeJS;
 import wtf.zikzak.zikzak_inappwebview_android.security.CertificatePinningManager;
+import wtf.zikzak.zikzak_inappwebview_android.security.HTTPSOnlyManager;
 import wtf.zikzak.zikzak_inappwebview_android.security.URLValidationManager;
 import wtf.zikzak.zikzak_inappwebview_android.types.ClientCertChallenge;
 import wtf.zikzak.zikzak_inappwebview_android.types.ClientCertResponse;
@@ -49,6 +50,7 @@ import wtf.zikzak.zikzak_inappwebview_android.types.NavigationAction;
 import wtf.zikzak.zikzak_inappwebview_android.types.NavigationActionPolicy;
 import wtf.zikzak.zikzak_inappwebview_android.types.ServerTrustAuthResponse;
 import wtf.zikzak.zikzak_inappwebview_android.types.ServerTrustChallenge;
+import wtf.zikzak.zikzak_inappwebview_android.security.ZikZakSecurityManager;
 import wtf.zikzak.zikzak_inappwebview_android.types.URLCredential;
 import wtf.zikzak.zikzak_inappwebview_android.types.URLProtectionSpace;
 import wtf.zikzak.zikzak_inappwebview_android.types.URLRequest;
@@ -56,6 +58,7 @@ import wtf.zikzak.zikzak_inappwebview_android.types.WebResourceErrorExt;
 import wtf.zikzak.zikzak_inappwebview_android.types.WebResourceRequestExt;
 import wtf.zikzak.zikzak_inappwebview_android.types.WebResourceResponseExt;
 import wtf.zikzak.zikzak_inappwebview_android.webview.WebViewChannelDelegate;
+import java.util.HashMap;
 
 public class InAppWebViewClient extends WebViewClient {
 
@@ -64,12 +67,14 @@ public class InAppWebViewClient extends WebViewClient {
     private static int previousAuthRequestFailureCount = 0;
     private static List<URLCredential> credentialsProposed = null;
     private final CertificatePinningManager certificatePinningManager;
+    private final HTTPSOnlyManager httpsOnlyManager;
     private final URLValidationManager urlValidator;
 
     public InAppWebViewClient(InAppBrowserDelegate inAppBrowserDelegate) {
         super();
         this.inAppBrowserDelegate = inAppBrowserDelegate;
         this.certificatePinningManager = new CertificatePinningManager();
+        this.httpsOnlyManager = new HTTPSOnlyManager();
         this.urlValidator = new URLValidationManager();
     }
 
@@ -79,6 +84,70 @@ public class InAppWebViewClient extends WebViewClient {
      */
     public CertificatePinningManager getCertificatePinningManager() {
         return certificatePinningManager;
+    }
+
+    /**
+     * Get the HTTPS-only manager for configuration
+     * @return HTTPSOnlyManager instance
+     */
+    public HTTPSOnlyManager getHTTPSOnlyManager() {
+        return httpsOnlyManager;
+    }
+
+    /**
+     * Get the URL validation manager for configuration
+     * @return URLValidationManager instance
+     */
+    public URLValidationManager getURLValidationManager() {
+        return urlValidator;
+    }
+
+    /**
+     * Add security headers to a WebResourceResponse
+     * This implements proper HTTP header-based CSP (not JavaScript injection)
+     *
+     * @param response Original WebResourceResponse (can be null)
+     * @param url URL being loaded
+     * @param webView The WebView instance
+     * @return Modified response with security headers, or null if input was null
+     */
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private WebResourceResponse addSecurityHeaders(
+        WebResourceResponse response,
+        String url,
+        InAppWebView webView
+    ) {
+        if (response == null) {
+            return null;
+        }
+
+        try {
+            // Get security manager instance
+            ZikZakSecurityManager securityManager =
+                ZikZakSecurityManager.getInstance(webView.getContext());
+
+            // Get existing headers or create new map
+            Map<String, String> headers = response.getResponseHeaders();
+            if (headers == null) {
+                headers = new HashMap<>();
+            }
+
+            // Add security headers via the security manager
+            headers = securityManager.addSecurityHeadersToResponse(headers, url);
+
+            // Create new response with updated headers
+            return new WebResourceResponse(
+                response.getMimeType(),
+                response.getEncoding(),
+                response.getStatusCode(),
+                response.getReasonPhrase(),
+                headers,
+                response.getData()
+            );
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "Error adding security headers: " + e.getMessage(), e);
+            return response; // Return original response if error occurs
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -96,6 +165,20 @@ public class InAppWebViewClient extends WebViewClient {
             Log.w(LOG_TAG, "Blocked navigation to unsafe URL: " + url +
                   " - Reason: " + validationResult.reason);
             return true; // Block navigation
+        }
+
+        // HTTPS-only enforcement
+        HTTPSOnlyManager.ValidationResult httpsResult = httpsOnlyManager.validateURL(url);
+        if (!httpsResult.isAllowed()) {
+            Log.w(LOG_TAG, "Blocked insecure HTTP navigation: " + url +
+                  " - Reason: " + httpsResult.getReason());
+            return true; // Block navigation
+        }
+        if (httpsResult.getUpgradedURL() != null) {
+            // URL was upgraded to HTTPS, load the upgraded version
+            Log.d(LOG_TAG, "Upgrading HTTP to HTTPS: " + url + " -> " + httpsResult.getUpgradedURL());
+            webView.loadUrl(httpsResult.getUpgradedURL());
+            return true; // Override to load upgraded URL
         }
 
         if (webView.customSettings.useShouldOverrideUrlLoading) {
@@ -159,6 +242,20 @@ public class InAppWebViewClient extends WebViewClient {
             Log.w(LOG_TAG, "Blocked navigation to unsafe URL: " + url +
                   " - Reason: " + validationResult.reason);
             return true; // Block navigation
+        }
+
+        // HTTPS-only enforcement
+        HTTPSOnlyManager.ValidationResult httpsResult = httpsOnlyManager.validateURL(url);
+        if (!httpsResult.isAllowed()) {
+            Log.w(LOG_TAG, "Blocked insecure HTTP navigation: " + url +
+                  " - Reason: " + httpsResult.getReason());
+            return true; // Block navigation
+        }
+        if (httpsResult.getUpgradedURL() != null) {
+            // URL was upgraded to HTTPS, load the upgraded version
+            Log.d(LOG_TAG, "Upgrading HTTP to HTTPS: " + url + " -> " + httpsResult.getUpgradedURL());
+            inAppWebView.loadUrl(httpsResult.getUpgradedURL());
+            return true; // Override to load upgraded URL
         }
 
         if (inAppWebView.customSettings.useShouldOverrideUrlLoading) {
@@ -966,6 +1063,10 @@ public class InAppWebViewClient extends WebViewClient {
                         uri
                     );
                 if (webResourceResponse != null) {
+                    // Add security headers to asset loader response
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        return addSecurityHeaders(webResourceResponse, request.getUrl(), webView);
+                    }
                     return webResourceResponse;
                 }
             } catch (Exception e) {
@@ -1003,6 +1104,10 @@ public class InAppWebViewClient extends WebViewClient {
                     statusCode != null &&
                     reasonPhrase != null
                 ) {
+                    // Add security headers to response
+                    responseHeaders = ZikZakSecurityManager.getInstance(webView.getContext())
+                        .addSecurityHeadersToResponse(responseHeaders, request.getUrl());
+
                     return new WebResourceResponse(
                         contentType,
                         contentEncoding,
@@ -1057,12 +1162,25 @@ public class InAppWebViewClient extends WebViewClient {
                 } catch (Exception e) {
                     Log.e(LOG_TAG, "", e);
                 }
-                if (response != null) return response;
-                return new WebResourceResponse(
+                if (response != null) {
+                    // Add security headers to content blocker response
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        return addSecurityHeaders(response, request.getUrl(), webView);
+                    }
+                    return response;
+                }
+
+                WebResourceResponse customResponse = new WebResourceResponse(
                     customSchemeResponse.getContentType(),
-                    customSchemeResponse.getContentType(),
+                    customSchemeResponse.getContentEncoding(),
                     new ByteArrayInputStream(customSchemeResponse.getData())
                 );
+
+                // Add security headers to custom scheme response
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    return addSecurityHeaders(customResponse, request.getUrl(), webView);
+                }
+                return customResponse;
             }
         }
 
@@ -1076,6 +1194,11 @@ public class InAppWebViewClient extends WebViewClient {
             } catch (Exception e) {
                 Log.e(LOG_TAG, "", e);
             }
+        }
+
+        // Add security headers to content blocker response before returning
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            return addSecurityHeaders(response, request.getUrl(), webView);
         }
         return response;
     }

@@ -244,18 +244,9 @@ public class ZikZakSecurityManager {
                     updatePolicyForSecurityLevel(policy);
 
                     try {
-                        // Apply Content-Security-Policy
-                        if (
-                            policy.enforceStrictCsp &&
-                            WebViewFeature.isFeatureSupported(
-                                WebViewFeature.FORCE_DARK_STRATEGY
-                            )
-                        ) {
-                            injectSecurityHeaders(
-                                webView,
-                                policy.securityHeaders
-                            );
-                        }
+                        // Content-Security-Policy is now applied via HTTP headers in shouldInterceptRequest
+                        // See InAppWebViewClient.addSecurityHeaders() for implementation
+                        // JavaScript-based CSP injection has been removed as it is fundamentally insecure
 
                         // Apply modern security settings
                         if (
@@ -358,8 +349,8 @@ public class ZikZakSecurityManager {
                             );
                         }
 
-                        // Inject security headers
-                        injectSecurityHeaders(webView, policy.securityHeaders);
+                        // CSP headers are now injected via HTTP headers in shouldInterceptRequest
+                        // JavaScript-based CSP injection is deprecated and insecure
 
                         Log.d(
                             TAG,
@@ -411,8 +402,8 @@ public class ZikZakSecurityManager {
                             .getSettings()
                             .setAllowUniversalAccessFromFileURLs(false);
 
-                        // Inject security headers with a more compatible approach
-                        injectBasicSecurityScript(webView);
+                        // JavaScript-based cookie security is deprecated
+                        // Cookie security should be handled server-side
 
                         Log.d(
                             TAG,
@@ -571,45 +562,68 @@ public class ZikZakSecurityManager {
     }
 
     /**
-     * Inject security headers into a WebView
+     * Add security headers to HTTP response headers
+     * This is the PROPER way to add CSP - via HTTP headers, not JavaScript injection
      *
-     * @param webView WebView to inject headers into
-     * @param csp Content-Security-Policy to inject
+     * @param responseHeaders Map of response headers to modify
+     * @param url URL being loaded (to determine appropriate policy)
+     * @return Modified headers map with security headers added
      */
-    private void injectSecurityHeaders(InAppWebView webView, String csp) {
-        final String script =
-            "javascript:(function() {" +
-            "  var meta = document.createElement('meta');" +
-            "  meta.httpEquiv = 'Content-Security-Policy';" +
-            "  meta.content = '" +
-            csp +
-            "';" +
-            "  document.head.appendChild(meta);" +
-            "})();";
+    public Map<String, String> addSecurityHeadersToResponse(
+        Map<String, String> responseHeaders,
+        String url
+    ) {
+        // Always create a new HashMap to avoid mutating the input map
+        Map<String, String> headers = new HashMap<>(
+            responseHeaders != null ? responseHeaders : new HashMap<>()
+        );
 
-        webView.evaluateJavascript(script, null);
+        // Get the security policy for this URL's domain
+        String domain = extractDomainFromUrl(url);
+        SecurityPolicy policy = securityPolicies.get(domain);
+
+        if (policy == null) {
+            policy = securityPolicies.get("*"); // Default policy
+        }
+
+        if (policy != null && policy.securityHeaders != null && !policy.securityHeaders.isEmpty()) {
+            // Add Content-Security-Policy header
+            headers.put("Content-Security-Policy", policy.securityHeaders);
+
+            // Add other security headers
+            headers.put("X-Content-Type-Options", "nosniff");
+            headers.put("X-Frame-Options", "SAMEORIGIN");
+            headers.put("X-XSS-Protection", "1; mode=block");
+
+            if (policy.enforceHttps) {
+                // Add HSTS header for HTTPS enforcement
+                headers.put("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+            }
+
+            Log.d(TAG, "Added security headers to response for: " + url);
+        }
+
+        return headers;
     }
 
     /**
-     * Inject basic security script for older Android versions
-     *
-     * @param webView WebView to inject script into
+     * @deprecated Use addSecurityHeadersToResponse instead - JavaScript-based CSP injection is insecure
+     * This method is kept for backward compatibility but should not be used
      */
-    private void injectBasicSecurityScript(InAppWebView webView) {
-        final String script =
-            "javascript:(function() {" +
-            "  // Set secure attributes on cookies" +
-            "  document.cookie = document.cookie.split('; ').map(function(c) {" +
-            "    var name = c.split('=')[0];" +
-            "    var value = c.split('=').slice(1).join('=');" +
-            "    if (document.location.protocol === 'https:') {" +
-            "      return name + '=' + value + ';secure;samesite=lax';" +
-            "    }" +
-            "    return c;" +
-            "  }).join('; ');" +
-            "})();";
+    @Deprecated
+    private void injectSecurityHeaders(InAppWebView webView, String csp) {
+        Log.w(TAG, "DEPRECATED: JavaScript-based CSP injection is insecure. Use HTTP header-based CSP instead.");
+        // Method body removed - this approach is fundamentally insecure
+    }
 
-        webView.evaluateJavascript(script, null);
+    /**
+     * @deprecated JavaScript-based cookie manipulation is insecure and unreliable
+     * Cookie security should be handled server-side or via proper WebView settings
+     */
+    @Deprecated
+    private void injectBasicSecurityScript(InAppWebView webView) {
+        Log.w(TAG, "DEPRECATED: JavaScript-based cookie manipulation. Use server-side cookie settings instead.");
+        // Method body removed - this approach is unreliable
     }
 
     /**
