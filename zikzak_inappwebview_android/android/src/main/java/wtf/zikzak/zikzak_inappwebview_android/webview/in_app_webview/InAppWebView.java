@@ -148,6 +148,7 @@ public final class InAppWebView
     public InAppWebViewSettings customSettings = new InAppWebViewSettings();
     public boolean isLoading = false;
     private boolean inFullscreen = false;
+    private boolean isDisposed = false;
     public float zoomScale = 1.0f;
     public ContentBlockerHandler contentBlockerHandler =
         new ContentBlockerHandler();
@@ -3236,6 +3237,12 @@ public final class InAppWebView
             });
             return;
         }
+
+        // Prevent multiple disposal attempts
+        if (isDisposed) {
+            return;
+        }
+        isDisposed = true;
 
         // Dispose channel delegate first
         if (channelDelegate != null) {
