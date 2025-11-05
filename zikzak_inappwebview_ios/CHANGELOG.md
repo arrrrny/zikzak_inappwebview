@@ -2,6 +2,7 @@
 
 * **BREAKING CHANGE:** Increased minimum iOS version from 13.0 to 15.0
 * **Security Audit Logging:** Privacy-safe logging for all security events using OSLog (certificate pinning, HTTPS-only, URL validation, SSL errors)
+* **Fixed zoom functionality:** Enabled native pinch-to-zoom gestures with proper multitouch and zoom scale configuration
 * Aligns with WKUIDelegate requirements for iOS 15.0+ APIs
 * Enables modern WebKit features without compatibility checks
 * Removed obsolete backward compatibility code for iOS < 15.0

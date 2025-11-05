@@ -342,8 +342,15 @@ public final class InAppWebView
         settings.setJavaScriptCanOpenWindowsAutomatically(
             customSettings.javaScriptCanOpenWindowsAutomatically
         );
+
+        // Zoom settings must be applied in correct order for proper functionality
+        // 1. Enable zoom support first
+        settings.setSupportZoom(customSettings.supportZoom);
+        // 2. Enable built-in zoom controls (required for pinch-to-zoom)
         settings.setBuiltInZoomControls(customSettings.builtInZoomControls);
+        // 3. Hide/show zoom control buttons (+/-)
         settings.setDisplayZoomControls(customSettings.displayZoomControls);
+
         settings.setSupportMultipleWindows(
             customSettings.supportMultipleWindows
         );
@@ -406,9 +413,9 @@ public final class InAppWebView
                 customSettings.thirdPartyCookiesEnabled
             );
 
-        settings.setLoadWithOverviewMode(customSettings.loadWithOverviewMode);
+        // Wide viewport and overview mode must be set for proper zoom behavior
         settings.setUseWideViewPort(customSettings.useWideViewPort);
-        settings.setSupportZoom(customSettings.supportZoom);
+        settings.setLoadWithOverviewMode(customSettings.loadWithOverviewMode);
         settings.setTextZoom(customSettings.textZoom);
 
         setVerticalScrollBarEnabled(
@@ -3219,14 +3226,57 @@ public final class InAppWebView
 
     @Override
     public void dispose() {
+        // Ensure dispose happens on UI thread to prevent race conditions
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                    dispose();
+                }
+            });
+            return;
+        }
+
+        // Dispose channel delegate first
         if (channelDelegate != null) {
             channelDelegate.dispose();
             channelDelegate = null;
         }
         super.dispose();
-        WebSettings settings = getSettings();
-        settings.setJavaScriptEnabled(false);
+
+        // STEP 1: Stop all loading immediately
+        stopLoading();
+
+        // STEP 2: Remove all callbacks and handlers to prevent memory leaks
+        if (checkContextMenuShouldBeClosedTask != null) {
+            removeCallbacks(checkContextMenuShouldBeClosedTask);
+            checkContextMenuShouldBeClosedTask = null;
+        }
+        if (checkScrollStoppedTask != null) {
+            removeCallbacks(checkScrollStoppedTask);
+            checkScrollStoppedTask = null;
+        }
+        mainLooperHandler.removeCallbacksAndMessages(null);
+        mHandler.removeCallbacksAndMessages(null);
+
+        // STEP 3: Clear all callbacks and interfaces
+        callAsyncJavaScriptCallbacks.clear();
+        evaluateJavaScriptContentWorldCallbacks.clear();
+
+        // STEP 4: Dispose web message channels and listeners
+        disposeWebMessageChannels();
+        disposeWebMessageListeners();
+
+        // STEP 5: Disable JavaScript and remove bridge
+        try {
+            WebSettings settings = getSettings();
+            settings.setJavaScriptEnabled(false);
+        } catch (Exception e) {
+            // WebSettings may throw if WebView is already being destroyed
+        }
         removeJavascriptInterface(JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME);
+
+        // STEP 6: Clear clients safely
         if (
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
             WebViewFeature.isFeatureSupported(
@@ -3235,14 +3285,12 @@ public final class InAppWebView
         ) {
             WebViewCompat.setWebViewRenderProcessClient(this, null);
         }
+
+        // Replace with dummy clients to prevent callbacks during destruction
         setWebChromeClient(new WebChromeClient());
-        setWebViewClient(
-            new WebViewClient() {
-                public void onPageFinished(WebView view, String url) {
-                    destroy();
-                }
-            }
-        );
+        setWebViewClient(new WebViewClient());
+
+        // STEP 7: Dispose plugin scripts and controllers
         interceptOnlyAsyncAjaxRequestsPluginScript = null;
         userContentController.dispose();
         if (findInteractionController != null) {
@@ -3253,6 +3301,8 @@ public final class InAppWebView
             webViewAssetLoaderExt.dispose();
             webViewAssetLoaderExt = null;
         }
+
+        // STEP 8: Clean up window references
         if (
             windowId != null &&
             plugin != null &&
@@ -3260,20 +3310,8 @@ public final class InAppWebView
         ) {
             plugin.inAppWebViewManager.windowWebViewMessages.remove(windowId);
         }
-        mainLooperHandler.removeCallbacksAndMessages(null);
-        mHandler.removeCallbacksAndMessages(null);
-        disposeWebMessageChannels();
-        disposeWebMessageListeners();
-        removeAllViews();
-        if (checkContextMenuShouldBeClosedTask != null) removeCallbacks(
-            checkContextMenuShouldBeClosedTask
-        );
-        if (checkScrollStoppedTask != null) removeCallbacks(
-            checkScrollStoppedTask
-        );
-        callAsyncJavaScriptCallbacks.clear();
-        evaluateJavaScriptContentWorldCallbacks.clear();
-        inAppBrowserDelegate = null;
+
+        // STEP 9: Dispose all client implementations
         if (inAppWebViewRenderProcessClient != null) {
             inAppWebViewRenderProcessClient.dispose();
             inAppWebViewRenderProcessClient = null;
@@ -3294,12 +3332,52 @@ public final class InAppWebView
             javaScriptBridgeInterface.dispose();
             javaScriptBridgeInterface = null;
         }
+
+        // STEP 10: Clear browser delegate
+        inAppBrowserDelegate = null;
+
+        // STEP 11: Remove all views
+        removeAllViews();
+
+        // STEP 12: Pause WebView lifecycle
+        onPause();
+        pauseTimers();
+
+        // STEP 13: Clear cache and history
+        clearHistory();
+        clearCache(true);
+
+        // STEP 14: Clear plugin reference
         plugin = null;
-        loadUrl("about:blank");
+
+        // STEP 15: Final destroy on next frame to ensure cleanup completes
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                destroy();
+            }
+        });
     }
 
     @Override
     public void destroy() {
-        super.destroy();
+        // Ensure destroy happens on UI thread
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                    destroy();
+                }
+            });
+            return;
+        }
+
+        try {
+            super.destroy();
+        } catch (Exception e) {
+            // Catch any exceptions during destroy to prevent crashes
+            // This can happen if WebView is in an invalid state
+            Log.e("InAppWebView", "Exception during destroy()", e);
+        }
     }
 }
