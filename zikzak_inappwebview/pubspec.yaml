@@ -21,8 +21,6 @@ dependencies:
   zikzak_inappwebview_platform_interface: ^2.4.28
   zikzak_inappwebview_android: ^2.4.28
   zikzak_inappwebview_ios: ^2.4.28
-  zikzak_inappwebview_macos: ^2.4.28
-  zikzak_inappwebview_web: ^2.4.28
 
 dev_dependencies:
   flutter_test:
@@ -45,10 +43,6 @@ flutter:
         default_package: zikzak_inappwebview_android
       ios:
         default_package: zikzak_inappwebview_ios
-      macos:
-        default_package: zikzak_inappwebview_macos
-      web:
-        default_package: zikzak_inappwebview_web
 
   assets:
     - packages/zikzak_inappwebview/assets/t_rex_runner/t-rex.html
