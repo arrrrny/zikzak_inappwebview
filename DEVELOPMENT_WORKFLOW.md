@@ -7,34 +7,34 @@ This repository uses a **development branch workflow** to ensure stability in pr
 ### Branches
 
 - **`master`** - Production-ready code. Stable releases only.
-- **`claude/dev-011CUpeFkCsKojcjNBK1eRo6`** - Development branch (default). All PRs merge here first.
+- **`claude/development-011CUpeFkCsKojcjNBK1eRo6`** - Development branch (default). All PRs merge here first.
 
 ## Workflow
 
 ### 1. Development & PRs
 
-All pull requests should target the **`claude/dev-011CUpeFkCsKojcjNBK1eRo6`** branch (this is now the default).
+All pull requests should target the **`claude/development-011CUpeFkCsKojcjNBK1eRo6`** branch (this is now the default).
 
 ```bash
 # Create feature branch
-git checkout claude/dev-011CUpeFkCsKojcjNBK1eRo6
-git pull origin claude/dev-011CUpeFkCsKojcjNBK1eRo6
+git checkout claude/development-011CUpeFkCsKojcjNBK1eRo6
+git pull origin claude/development-011CUpeFkCsKojcjNBK1eRo6
 git checkout -b claude/feature-name-011CUpeFkCsKojcjNBK1eRo6
 
 # Make changes, commit, push
 git push -u origin claude/feature-name-011CUpeFkCsKojcjNBK1eRo6
 
-# Create PR targeting claude/dev-011CUpeFkCsKojcjNBK1eRo6 (automatic default)
+# Create PR targeting claude/development-011CUpeFkCsKojcjNBK1eRo6 (automatic default)
 ```
 
 ### 2. Testing on Dev Branch
 
-After merging PRs to `claude/dev-011CUpeFkCsKojcjNBK1eRo6`:
+After merging PRs to `claude/development-011CUpeFkCsKojcjNBK1eRo6`:
 
 ```bash
 # Pull latest dev branch
-git checkout claude/dev-011CUpeFkCsKojcjNBK1eRo6
-git pull origin claude/dev-011CUpeFkCsKojcjNBK1eRo6
+git checkout claude/development-011CUpeFkCsKojcjNBK1eRo6
+git pull origin claude/development-011CUpeFkCsKojcjNBK1eRo6
 
 # Test thoroughly
 flutter pub get
@@ -49,7 +49,7 @@ flutter run
 
 ### 3. Promote to Master (Production)
 
-Once testing is complete on `claude/dev-011CUpeFkCsKojcjNBK1eRo6`:
+Once testing is complete on `claude/development-011CUpeFkCsKojcjNBK1eRo6`:
 
 ```bash
 # Checkout master
@@ -57,7 +57,7 @@ git checkout master
 git pull origin master
 
 # Merge dev into master
-git merge claude/dev-011CUpeFkCsKojcjNBK1eRo6 --no-ff -m "Merge dev to master: [describe changes]"
+git merge claude/development-011CUpeFkCsKojcjNBK1eRo6 --no-ff -m "Merge dev to master: [describe changes]"
 
 # Push to master
 git push origin master
@@ -69,7 +69,7 @@ git push origin v3.0.0
 
 ## Current PRs Status
 
-All open PRs have been updated to target `claude/dev-011CUpeFkCsKojcjNBK1eRo6`:
+All open PRs have been updated to target `claude/development-011CUpeFkCsKojcjNBK1eRo6`:
 
 - **PR #16**: [SECURITY] Remove JavaScript-based CSP injection
 - **PR #17**: [SECURITY] Implement URL validation with scheme checking
@@ -84,10 +84,10 @@ You can now merge all PRs safely to the dev branch:
 # Via GitHub UI (recommended)
 1. Go to each PR
 2. Click "Merge pull request"
-3. Confirm merge to claude/dev-011CUpeFkCsKojcjNBK1eRo6
+3. Confirm merge to claude/development-011CUpeFkCsKojcjNBK1eRo6
 
 # Via command line
-git checkout claude/dev-011CUpeFkCsKojcjNBK1eRo6
+git checkout claude/development-011CUpeFkCsKojcjNBK1eRo6
 gh pr merge 16 --merge  # Repeat for 17, 18, 19
 ```
 
@@ -126,7 +126,7 @@ Before promoting dev → master:
 ## Notes
 
 - **Branch Naming**: All branches must start with `claude/` and end with the session ID for push permissions
-- **Default Branch**: GitHub PRs will automatically target `claude/dev-011CUpeFkCsKojcjNBK1eRo6`
+- **Default Branch**: GitHub PRs will automatically target `claude/development-011CUpeFkCsKojcjNBK1eRo6`
 - **Master Protection**: Consider enabling branch protection rules on master for additional safety
 
 ---

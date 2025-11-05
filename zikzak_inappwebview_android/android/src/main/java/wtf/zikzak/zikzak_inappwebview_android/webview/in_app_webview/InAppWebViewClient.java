@@ -38,7 +38,9 @@ import wtf.zikzak.zikzak_inappwebview_android.Util;
 import wtf.zikzak.zikzak_inappwebview_android.credential_database.CredentialDatabase;
 import wtf.zikzak.zikzak_inappwebview_android.in_app_browser.InAppBrowserDelegate;
 import wtf.zikzak.zikzak_inappwebview_android.plugin_scripts_js.JavaScriptBridgeJS;
+import wtf.zikzak.zikzak_inappwebview_android.security.CertificatePinningManager;
 import wtf.zikzak.zikzak_inappwebview_android.security.HTTPSOnlyManager;
+import wtf.zikzak.zikzak_inappwebview_android.security.URLValidationManager;
 import wtf.zikzak.zikzak_inappwebview_android.types.ClientCertChallenge;
 import wtf.zikzak.zikzak_inappwebview_android.types.ClientCertResponse;
 import wtf.zikzak.zikzak_inappwebview_android.types.CustomSchemeResponse;
@@ -64,12 +66,24 @@ public class InAppWebViewClient extends WebViewClient {
     private InAppBrowserDelegate inAppBrowserDelegate;
     private static int previousAuthRequestFailureCount = 0;
     private static List<URLCredential> credentialsProposed = null;
+    private final CertificatePinningManager certificatePinningManager;
     private final HTTPSOnlyManager httpsOnlyManager;
+    private final URLValidationManager urlValidator;
 
     public InAppWebViewClient(InAppBrowserDelegate inAppBrowserDelegate) {
         super();
         this.inAppBrowserDelegate = inAppBrowserDelegate;
+        this.certificatePinningManager = new CertificatePinningManager();
         this.httpsOnlyManager = new HTTPSOnlyManager();
+        this.urlValidator = new URLValidationManager();
+    }
+
+    /**
+     * Get the certificate pinning manager for configuration
+     * @return CertificatePinningManager instance
+     */
+    public CertificatePinningManager getCertificatePinningManager() {
+        return certificatePinningManager;
     }
 
     /**
@@ -78,6 +92,14 @@ public class InAppWebViewClient extends WebViewClient {
      */
     public HTTPSOnlyManager getHTTPSOnlyManager() {
         return httpsOnlyManager;
+    }
+
+    /**
+     * Get the URL validation manager for configuration
+     * @return URLValidationManager instance
+     */
+    public URLValidationManager getURLValidationManager() {
+        return urlValidator;
     }
 
     /**
@@ -136,8 +158,16 @@ public class InAppWebViewClient extends WebViewClient {
     ) {
         InAppWebView webView = (InAppWebView) view;
 
-        // HTTPS-only enforcement
+        // Validate URL for security (prevent javascript: scheme attacks)
         String url = request.getUrl().toString();
+        URLValidationManager.ValidationResult validationResult = urlValidator.validateURL(url);
+        if (!validationResult.allowed) {
+            Log.w(LOG_TAG, "Blocked navigation to unsafe URL: " + url +
+                  " - Reason: " + validationResult.reason);
+            return true; // Block navigation
+        }
+
+        // HTTPS-only enforcement
         HTTPSOnlyManager.ValidationResult httpsResult = httpsOnlyManager.validateURL(url);
         if (!httpsResult.isAllowed()) {
             Log.w(LOG_TAG, "Blocked insecure HTTP navigation: " + url +
@@ -205,6 +235,14 @@ public class InAppWebViewClient extends WebViewClient {
     @Override
     public boolean shouldOverrideUrlLoading(WebView webView, String url) {
         InAppWebView inAppWebView = (InAppWebView) webView;
+
+        // Validate URL for security (prevent javascript: scheme attacks)
+        URLValidationManager.ValidationResult validationResult = urlValidator.validateURL(url);
+        if (!validationResult.allowed) {
+            Log.w(LOG_TAG, "Blocked navigation to unsafe URL: " + url +
+                  " - Reason: " + validationResult.reason);
+            return true; // Block navigation
+        }
 
         // HTTPS-only enforcement
         HTTPSOnlyManager.ValidationResult httpsResult = httpsOnlyManager.validateURL(url);
@@ -714,6 +752,19 @@ public class InAppWebViewClient extends WebViewClient {
             port = uri.getPort();
         } catch (URISyntaxException e) {
             Log.e(LOG_TAG, "", e);
+        }
+
+        // Certificate pinning validation
+        // Note: Android WebView doesn't expose the full certificate chain in onReceivedSslError
+        // For production use, certificate pinning should be implemented at the network layer
+        // This is a best-effort validation with available certificate info
+        if (certificatePinningManager.isEnabled() && host != null && !host.isEmpty()) {
+            Log.d(LOG_TAG, "Certificate pinning check for SSL error on: " + host);
+            // In a real implementation, you'd need to extract the X509Certificate from SslCertificate
+            // and validate it. This is a limitation of Android WebView's API.
+            // For now, we log and proceed with standard SSL error handling.
+            Log.w(LOG_TAG, "Certificate pinning in WebView has limitations. " +
+                          "Consider using OkHttp with CertificatePinner for proper pinning.");
         }
 
         URLProtectionSpace protectionSpace = new URLProtectionSpace(
