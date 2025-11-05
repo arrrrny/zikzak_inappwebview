@@ -3370,6 +3370,7 @@ public final class InAppWebView
         } catch (Exception e) {
             // Catch any exceptions during destroy to prevent crashes
             // This can happen if WebView is in an invalid state
+            Log.e("InAppWebView", "Exception during destroy()", e);
         }
     }
 }
