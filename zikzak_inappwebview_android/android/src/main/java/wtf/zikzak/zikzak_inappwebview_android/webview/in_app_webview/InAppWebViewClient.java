@@ -39,6 +39,7 @@ import wtf.zikzak.zikzak_inappwebview_android.credential_database.CredentialData
 import wtf.zikzak.zikzak_inappwebview_android.in_app_browser.InAppBrowserDelegate;
 import wtf.zikzak.zikzak_inappwebview_android.plugin_scripts_js.JavaScriptBridgeJS;
 import wtf.zikzak.zikzak_inappwebview_android.security.CertificatePinningManager;
+import wtf.zikzak.zikzak_inappwebview_android.security.URLValidationManager;
 import wtf.zikzak.zikzak_inappwebview_android.types.ClientCertChallenge;
 import wtf.zikzak.zikzak_inappwebview_android.types.ClientCertResponse;
 import wtf.zikzak.zikzak_inappwebview_android.types.CustomSchemeResponse;
@@ -63,11 +64,13 @@ public class InAppWebViewClient extends WebViewClient {
     private static int previousAuthRequestFailureCount = 0;
     private static List<URLCredential> credentialsProposed = null;
     private final CertificatePinningManager certificatePinningManager;
+    private final URLValidationManager urlValidator;
 
     public InAppWebViewClient(InAppBrowserDelegate inAppBrowserDelegate) {
         super();
         this.inAppBrowserDelegate = inAppBrowserDelegate;
         this.certificatePinningManager = new CertificatePinningManager();
+        this.urlValidator = new URLValidationManager();
     }
 
     /**
@@ -85,6 +88,16 @@ public class InAppWebViewClient extends WebViewClient {
         WebResourceRequest request
     ) {
         InAppWebView webView = (InAppWebView) view;
+
+        // Validate URL for security (prevent javascript: scheme attacks)
+        String url = request.getUrl().toString();
+        URLValidationManager.ValidationResult validationResult = urlValidator.validateURL(url);
+        if (!validationResult.allowed) {
+            Log.w(LOG_TAG, "Blocked navigation to unsafe URL: " + url +
+                  " - Reason: " + validationResult.reason);
+            return true; // Block navigation
+        }
+
         if (webView.customSettings.useShouldOverrideUrlLoading) {
             if (
                 webView.customSettings.regexToCancelOverrideUrlLoading != null
@@ -139,6 +152,15 @@ public class InAppWebViewClient extends WebViewClient {
     @Override
     public boolean shouldOverrideUrlLoading(WebView webView, String url) {
         InAppWebView inAppWebView = (InAppWebView) webView;
+
+        // Validate URL for security (prevent javascript: scheme attacks)
+        URLValidationManager.ValidationResult validationResult = urlValidator.validateURL(url);
+        if (!validationResult.allowed) {
+            Log.w(LOG_TAG, "Blocked navigation to unsafe URL: " + url +
+                  " - Reason: " + validationResult.reason);
+            return true; // Block navigation
+        }
+
         if (inAppWebView.customSettings.useShouldOverrideUrlLoading) {
             if (
                 inAppWebView.customSettings.regexToCancelOverrideUrlLoading !=
