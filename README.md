@@ -114,6 +114,38 @@ dependencies:
 
 ---
 
+## 🔒 Security Features (v3.0+)
+
+ZikZak InAppWebView includes enterprise-grade security features enabled by default:
+
+### Google Safe Browsing ✅ ENABLED BY DEFAULT
+Protects users from phishing, malware, and unwanted software using Google's threat intelligence.
+
+```dart
+InAppWebView(
+  initialSettings: InAppWebViewSettings(
+    safeBrowsingEnabled: true,  // ← Already enabled!
+  ),
+  onSafeBrowsingHit: (controller, url, threatType) async {
+    // Handle detected threats
+    return SafeBrowsingResponse(
+      action: SafeBrowsingResponseAction.BACK_TO_SAFETY,
+      report: true,
+    );
+  },
+)
+```
+
+### Other Security Features
+- **Certificate Pinning**: SHA-256 public key pinning for MITM prevention
+- **HTTPS-Only Mode**: Block or upgrade insecure HTTP requests
+- **URL Scheme Validation**: Block dangerous schemes (javascript:, file:, etc.)
+- **Content Security Policy**: Proper HTTP header-based CSP implementation
+
+📖 **Full Documentation**: [SECURITY_FEATURES.md](SECURITY_FEATURES.md)
+
+---
+
 ## 📋 Requirements
 
 ### Current (v2.x)
