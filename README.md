@@ -1,45 +1,255 @@
 <div align="center">
 
-A Flutter plugin that allows you to add an inline webview, to use an headless webview, and to open an in-app browser window.
+# 🚀 ZikZak InAppWebView
 
-This plugin is the fork of the original [flutter_inappwebview](https://pub.dev/packages/flutter_inappwebview) plugin.
+### *The WebView Plugin That Actually Gets Updates*
 
-Thanks to Lorenzo Pichilli and all the contributors for their hard work!
+<img src="https://img.shields.io/badge/Maintenance-Active%20AF-brightgreen" alt="Actively Maintained">
+<img src="https://img.shields.io/badge/Breaking%20Changes-Welcome-orange" alt="Breaking Changes Welcome">
+<img src="https://img.shields.io/badge/Maintained%20By-Human%20%2B%20AI-blueviolet" alt="Human + AI">
+<img src="https://img.shields.io/badge/Original%20Repo-RIP-lightgrey" alt="Original Repo Status">
+
+---
+
+A Flutter plugin for inline WebView, headless WebView, and in-app browser windows. But you already knew that. What you might not know is **this one actually gets maintained**. 🎉
+
+This is a fork of the incredibly popular [flutter_inappwebview](https://pub.dev/packages/flutter_inappwebview) which, despite having 3.6k stars and being used by thousands of developers, has been left to gather dust by its original maintainer who apparently has more important things to do than merge PRs or respond to critical bugs. 🤷
+
+**But fear not!** This fork exists because someone had to step up. That someone is me (a human) and my trusty AI sidekick. Together, we're like Batman and Robin, except we fix WebView bugs instead of fighting crime.
 
 </div>
 
-## New Plugin with a new maintainer 2.x.x is OUT NOW!
+---
 
-## Requirements
+## 🎭 The Origin Story
 
-- Dart sdk: ">=2.17.0 <4.0.0"
-- Flutter: ">=3.0.0"
-- Android: `minSdkVersion >= 19`, `compileSdk >= 34`, [AGP](https://developer.android.com/build/releases/gradle-plugin) version `>= 7.3.0` (use [Android Studio - Android Gradle plugin Upgrade Assistant](https://developer.android.com/build/agp-upgrade-assistant) for help), support for `androidx` (see [AndroidX Migration](https://flutter.dev/docs/development/androidx-migration) to migrate an existing app)
-- iOS 9.0+: `--ios-language swift`, Xcode version `>= 14.3`
-- MacOS 10.11+: Xcode version `>= 14.3`
+Picture this: A widely-used Flutter WebView plugin. Thousands of developers depending on it. Critical bugs piling up. iOS 18 crashes everywhere. Xcode 16 build failures. Pull requests aging like fine wine (but not in a good way).
 
-## Installation
+The original maintainer? MIA. High ego, low maintenance.
 
-Add `zikzak_inappwebview` as a [dependency in your pubspec.yaml file](https://flutter.io/using-packages/).
+So here we are. **ZikZak InAppWebView** - where:
+- ✅ Issues get responses (sometimes within hours, imagine that!)
+- ✅ PRs get reviewed (yes, really!)
+- ✅ Critical bugs get fixed (wild concept, I know)
+- ✅ The maintainer actually shows up (shocking!)
+- ✅ An AI helps maintain it (welcome to 2025, baby!)
 
-### Installation - Web support
+---
 
-To make it work properly on the Web platform, you need to add the `web_support.js` file inside the `<head>` of your `web/index.html` file:
+## 🤖 Meet Your Maintenance Team
 
-```html
-<head>
-    <!-- ... -->
-    <script type="application/javascript" src="/assets/packages/zikzak_inappwebview_web/assets/web/web_support.js" defer></script>
-    <!-- ... -->
-</head>
+**Human (ARRRRNY):** Brings the vision, coffee addiction, and occasional frustration
+**AI (Claude):** Brings the tireless code review, pattern recognition, and inability to drink coffee
+
+Together, we're modernizing this package with:
+- 🔒 **Security-first approach** (no more JavaScript-based CSP injection nonsense)
+- 🏗️ **Clean architecture** (SOLID principles are our love language)
+- 📱 **Android & iOS focus** (sorry macOS/Windows/Web, you're getting the boot in v3.0)
+- ⚡ **Modern WebView APIs** (WKContentWorld, WebMessageListener, the cool stuff)
+- 💥 **Breaking changes are welcome** (backward compatibility is overrated)
+
+---
+
+## 🆘 WANTED: Contributors (That's You!)
+
+Listen, I can't do this alone. Well, technically I can with my AI buddy, but wouldn't it be more fun with YOU?
+
+### 🐛 Found a Bug?
+**PLEASE open an issue!** Unlike the original repo, we actually read them. Crazy, right?
+
+### 💡 Have an Idea?
+Open an issue! Let's discuss it! We don't bite! (The AI can't bite, it has no mouth. I won't bite either, promise.)
+
+### 🛠️ Want to Contribute Code?
+**HELL YES!** PRs are welcome! We have:
+- 📋 A comprehensive [modernization plan](MODERNIZATION_PLAN.md) (35 tracked issues!)
+- 🎯 Clear guidelines (coming soon™)
+- 👀 Actual code reviews (not ghosting!)
+- 🎉 A maintainer who says "thank you" (revolutionary!)
+
+**We're especially looking for help with:**
+- iOS 18.4/18.5 crash fixes
+- Xcode 16 compatibility
+- Security improvements (certificate pinning, anyone?)
+- Android WebView modernization
+- Testing (we can dream, can't we?)
+
+---
+
+## 🎯 Roadmap to v3.0
+
+We're not just fixing bugs. We're **modernizing the entire codebase**. Check out our [comprehensive plan](MODERNIZATION_PLAN.md):
+
+### Phase 1: Critical Security & Bugs 🔴
+- Fix iOS 18 crashes (because Apple gonna Apple)
+- Fix Xcode 16 builds (because Apple really gonna Apple)
+- Add certificate pinning (MITM attacks are so 2010)
+- Implement HTTPS-only mode (HTTP is for dinosaurs)
+
+### Phase 2: Architecture Refactoring 🏗️
+- Break up monolithic 2000+ line classes (a class should do ONE thing, not EVERYTHING)
+- Apply SOLID principles (not just for furniture)
+- Remove platforms nobody asked us to support
+
+### Phase 3-6: More Awesome Stuff
+Read the [full plan](MODERNIZATION_PLAN.md). It's 400+ lines of pure modernization goodness.
+
+---
+
+## 📦 Installation
+
+```yaml
+dependencies:
+  zikzak_inappwebview: ^2.4.28
 ```
 
-## Support
+Or live on the edge:
+```yaml
+dependencies:
+  zikzak_inappwebview:
+    git:
+      url: https://github.com/arrrrny/zikzak_inappwebview.git
+      ref: main  # or whatever branch has the feature you desperately need
+```
 
+---
+
+## 📋 Requirements
+
+### Current (v2.x)
+- Dart: `>=2.17.0 <4.0.0`
+- Flutter: `>=3.0.0`
+- Android: `minSdk 19`, `compileSdk 36`
+- iOS: `13.0+`, Xcode `14.3+`
+
+### Coming Soon™ (v3.0)
+- Android: `minSdk 24` (bye bye Android 4.4-6.0, it's been real)
+- iOS: `14.0+` (iOS 13 had a good run)
+- Platforms: **Android & iOS ONLY** (macOS, Windows, Web... it's not you, it's us)
+
+---
+
+## 🚨 Breaking Changes Ahead
+
+v3.0 is going to break things. Intentionally. Because sometimes you need to break eggs to make an omelet. Or in this case, break backward compatibility to make a secure, modern, maintainable plugin.
+
+Expected casualties:
+- ❌ macOS/Windows/Web support (focus is everything)
+- ❌ Old Android versions (Android 6 and below, RIP)
+- ❌ 30+ redundant settings (because 70 settings was insane)
+- ❌ JavaScript enabled by default (security first, convenience second)
+
+See [MODERNIZATION_PLAN.md](MODERNIZATION_PLAN.md) for the full hit list.
+
+---
+
+## 🤝 How to Contribute
+
+### 1. Check Existing Issues
+Don't waste time on duplicates. We have [35 tracked issues](https://github.com/arrrrny/zikzak_inappwebview/issues) waiting for heroes like you.
+
+### 2. Open a Discussion First (for Big Changes)
+Got a wild idea? Let's chat about it before you spend 3 weeks coding something we might not merge.
+
+### 3. Write Tests (Please!)
+We're trying to be adults here. Tests are good. Tests are your friends.
+
+### 4. Follow the Architecture
+We're going full Clean Architecture + SOLID. If you don't know what that means, that's okay! We'll help you learn.
+
+### 5. Be Patient (But Not Too Patient)
+We're fast, but we're not instant. Give us a day or two. Unlike the original maintainer, we WILL respond.
+
+---
+
+## 💬 Communication
+
+- 🐛 **Bugs:** [Open an issue](https://github.com/arrrrny/zikzak_inappwebview/issues/new)
+- 💡 **Feature Requests:** [Open an issue](https://github.com/arrrrny/zikzak_inappwebview/issues/new)
+- 🤔 **Questions:** [Discussions](https://github.com/arrrrny/zikzak_inappwebview/discussions) (coming soon) or [open an issue](https://github.com/arrrrny/zikzak_inappwebview/issues/new)
+- 🎉 **Success Stories:** We love hearing these! Open an issue titled "This plugin is awesome because..."
+
+---
+
+## 🙏 Thanks & Credits
+
+### Original Creator & Contributors
+Massive shoutout to [Lorenzo Pichilli](https://github.com/pichillilorenzo) for creating the original flutter_inappwebview. It was (and still is) an incredible piece of work. You built something thousands of developers rely on.
+
+Also thanks to the **80+ contributors** who helped build the original plugin. Your work lives on in this fork. (See full contributor list below)
+
+### Why This Fork Exists
+Not out of disrespect, but out of necessity. When a critical plugin is no longer maintained, someone has to step up. This is me stepping up.
+
+---
+
+## 📚 Documentation
+
+- **[Modernization Plan](MODERNIZATION_PLAN.md)** - The master plan for v3.0
+- **[Modernization Summary](MODERNIZATION_SUMMARY.md)** - TL;DR version
+- **[Issue Templates](ISSUE_TEMPLATES.md)** - How we track work
+- **API Documentation** - Coming soon (we're working on it, I swear!)
+
+---
+
+## 📊 Project Status
+
+| Metric | Status |
+|--------|--------|
+| Actively Maintained | ✅ YES |
+| Issues Responded To | ✅ Within 24-48hrs usually |
+| PRs Reviewed | ✅ Yes, actually! |
+| Security Updates | ✅ Priority |
+| Breaking Changes | ✅ Welcomed in v3.0 |
+| Coffee Consumption | ☕☕☕ High |
+| AI Assistance | 🤖 Active |
+
+---
+
+## ⚖️ License
+
+Apache License 2.0 (same as the original)
+
+---
+
+## 🎬 The Bottom Line
+
+This plugin is:
+- ✅ **Actively maintained** (shocking, I know)
+- ✅ **Open to contributions** (please help us!)
+- ✅ **Focused on security** (no more JS-based hacks)
+- ✅ **Modern architecture** (Clean Code isn't just a book title)
+- ✅ **Maintained by human + AI** (the future is now)
+
+Unlike the original repo:
+- ✅ We respond to issues
+- ✅ We review PRs
+- ✅ We fix critical bugs
+- ✅ We show up
+
+---
+
+## 🌟 Star This Repo!
+
+If you find this useful (or just enjoy the humor), give us a star! ⭐
+
+It helps others find this maintained fork instead of the abandoned original.
+
+---
+
+## 💼 Maintainer
+
+**ARRRRNY** ([GitHub](https://github.com/arrrrny)) + **Claude AI**
+
+*"The dynamic duo nobody asked for, but everyone needed."*
+
+---
+
+<div align="center">
 
 ## Contributors ✨
 
-Thanks goes to these wonderful people ✨✨:
+Thanks goes to these wonderful people from the original repo and this fork:
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
@@ -153,7 +363,7 @@ Thanks goes to these wonderful people ✨✨:
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/daisukeueta"><img src="https://avatars.githubusercontent.com/u/122339799?v=4?s=100" width="100px;" alt="daisukeueta"/><br /><sub><b>daisukeueta</b></sub></a><br /><a href="https://github.com/arrrrny/zikzak_inappwebview/commits?author=daisukeueta" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ryanhz"><img src="https://avatars.githubusercontent.com/u/1142612?v=4?s=100" width="100px;" alt="Ryan"/><br /><sub><b>Ryan</b></sub></a><br /><a href="https://github.com/arrrrny/zikzak_inappwebview/commits?author=ryanhz" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/MrLightful"><img src="https://avatars.githubusercontent.com/u/14923964?v=4?s=100" width="100px;" alt="Roman"/><br /><sub><b>Roman</b></sub></a><br /><a href="https://github.com/arrrrny/zikzak_inappwebview/commits?author=MrLightful" title="Code">💻</a></td>
-      </tr>
+    </tr>
   </tbody>
 </table>
 
@@ -162,4 +372,18 @@ Thanks goes to these wonderful people ✨✨:
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
-This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification.
+
+**YOUR NAME COULD BE HERE!** Contributions of any kind welcome!
+
+</div>
+
+---
+
+<div align="center">
+
+**Made with 💙 (and a healthy dose of caffeine) by the ZikZak Team**
+
+⭐ **Star this repo if you believe in maintained open source!** ⭐
+
+</div>
