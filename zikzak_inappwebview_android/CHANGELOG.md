@@ -6,6 +6,8 @@
 * Enables modern Android security APIs and features
 * Better support for androidx.webkit modern features
 * Comprehensive security features: Certificate Pinning, HTTPS-Only Mode, URL Validation
+* Enables modern Android security APIs and features
+* Better support for androidx.webkit modern features
 * Major version release for modernization
 * Updated dependencies to use hosted references
 
