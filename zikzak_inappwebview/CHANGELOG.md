@@ -1,5 +1,10 @@
 ## 3.0.0 - 2025-11-05
 
+* removed macos,linux,web,windows support. implemented fixes for issues with Claude AI
+* Updated dependencies to use hosted references
+
+## 3.0.0 - 2025-11-05
+
 * **BREAKING CHANGE:** Removed macOS, Windows, Web, and Linux platform support
 * **BREAKING CHANGE:** Minimum Android SDK raised from 19 to 24 (Android 7.0 Nougat)
 * **BREAKING CHANGE:** Minimum iOS version raised from 13.0 to 15.0

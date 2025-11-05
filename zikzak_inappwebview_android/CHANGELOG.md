@@ -1,5 +1,10 @@
 ## 3.0.0 - 2025-11-05
 
+* removed macos,linux,web,windows support. implemented fixes for issues with Claude AI
+* Updated dependencies to use hosted references
+
+## 3.0.0 - 2025-11-05
+
 * **BREAKING CHANGE:** Increased minimum Android SDK from 19 to 24 (Android 7.0 Nougat)
 * **16KB page size support:** Compatible with Android 15+ devices using 16KB memory pages (AGP 8.5.2)
 * **Google Safe Browsing:** NOW ENABLED BY DEFAULT - Protects against phishing, malware, and unwanted software
