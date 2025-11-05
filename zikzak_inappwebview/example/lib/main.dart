@@ -8,7 +8,6 @@ import 'package:zikzak_inappwebview_example/chrome_safari_browser_example.screen
 import 'package:zikzak_inappwebview_example/headless_in_app_webview.screen.dart';
 import 'package:zikzak_inappwebview_example/in_app_webiew_example.screen.dart';
 import 'package:zikzak_inappwebview_example/in_app_browser_example.screen.dart';
-import 'package:zikzak_inappwebview_example/web_authentication_session_example.screen.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 // import 'package:path_provider/path_provider.dart';
@@ -60,12 +59,6 @@ PointerInterceptor myDrawer({required BuildContext context}) {
       },
     ),
     ListTile(
-      title: Text('WebAuthenticationSession'),
-      onTap: () {
-        Navigator.pushReplacementNamed(context, '/WebAuthenticationSession');
-      },
-    ),
-    ListTile(
       title: Text('HeadlessInAppWebView'),
       onTap: () {
         Navigator.pushReplacementNamed(context, '/HeadlessInAppWebView');
@@ -99,12 +92,6 @@ PointerInterceptor myDrawer({required BuildContext context}) {
         title: Text('InAppBrowser'),
         onTap: () {
           Navigator.pushReplacementNamed(context, '/');
-        },
-      ),
-      ListTile(
-        title: Text('WebAuthenticationSession'),
-        onTap: () {
-          Navigator.pushReplacementNamed(context, '/WebAuthenticationSession');
         },
       ),
       ListTile(
@@ -185,8 +172,6 @@ class _MyAppState extends State<MyApp> {
         '/': (context) => InAppBrowserExampleScreen(),
         '/HeadlessInAppWebView': (context) =>
             HeadlessInAppWebViewExampleScreen(),
-        '/WebAuthenticationSession': (context) =>
-            WebAuthenticationSessionExampleScreen(),
       });
     } else if (defaultTargetPlatform == TargetPlatform.windows ||
         defaultTargetPlatform == TargetPlatform.linux) {
@@ -202,8 +187,6 @@ class _MyAppState extends State<MyApp> {
       '/InAppBrowser': (context) => InAppBrowserExampleScreen(),
       '/ChromeSafariBrowser': (context) => ChromeSafariBrowserExampleScreen(),
       '/HeadlessInAppWebView': (context) => HeadlessInAppWebViewExampleScreen(),
-      '/WebAuthenticationSession': (context) =>
-          WebAuthenticationSessionExampleScreen(),
     });
   }
 }

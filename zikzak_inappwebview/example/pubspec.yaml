@@ -44,12 +44,6 @@ dependency_overrides:
     path: ../../zikzak_inappwebview_android
   zikzak_inappwebview_ios:
     path: ../../zikzak_inappwebview_ios
-  zikzak_inappwebview_macos:
-    path: ../../zikzak_inappwebview_macos
-  zikzak_inappwebview_web:
-    path: ../../zikzak_inappwebview_web
-  zikzak_inappwebview_windows:
-    path: ../../zikzak_inappwebview_windows
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
