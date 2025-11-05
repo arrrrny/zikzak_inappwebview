@@ -16,6 +16,7 @@ iOS implementation of the Flutter inappwebview plugin. A feature-rich WebView pl
   s.source           = { :git => 'https://github.com/arrrrny/zikzak_inappwebview.git', :tag => s.version.to_s }
   s.source_files = 'Classes/**/*'
   s.public_header_files = 'Classes/**/*.h'
+  s.resource_bundles = { 'zikzak_inappwebview_ios_privacy' => ['PrivacyInfo.xcprivacy'] }
 
   s.dependency 'Flutter'
 
