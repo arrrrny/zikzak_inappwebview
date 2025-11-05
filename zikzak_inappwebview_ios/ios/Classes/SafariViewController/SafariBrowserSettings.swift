@@ -7,7 +7,6 @@
 
 import Foundation
 
-@available(iOS 9.0, *)
 @objcMembers
 public class SafariBrowserSettings: ISettings<SafariViewController> {
     
@@ -35,15 +34,11 @@ public class SafariBrowserSettings: ISettings<SafariViewController> {
     override func getRealSettings(obj: SafariViewController?) -> [String: Any?] {
         var realOptions: [String: Any?] = toMap()
         if let safariViewController = obj {
-            if #available(iOS 11.0, *) {
-                realOptions["entersReaderIfAvailable"] = safariViewController.configuration.entersReaderIfAvailable
-                realOptions["barCollapsingEnabled"] = safariViewController.configuration.barCollapsingEnabled
-                realOptions["dismissButtonStyle"] = safariViewController.dismissButtonStyle.rawValue
-            }
-            if #available(iOS 10.0, *) {
-                realOptions["preferredBarTintColor"] = safariViewController.preferredBarTintColor?.hexString
-                realOptions["preferredControlTintColor"] = safariViewController.preferredControlTintColor?.hexString
-            }
+            realOptions["entersReaderIfAvailable"] = safariViewController.configuration.entersReaderIfAvailable
+            realOptions["barCollapsingEnabled"] = safariViewController.configuration.barCollapsingEnabled
+            realOptions["dismissButtonStyle"] = safariViewController.dismissButtonStyle.rawValue
+            realOptions["preferredBarTintColor"] = safariViewController.preferredBarTintColor?.hexString
+            realOptions["preferredControlTintColor"] = safariViewController.preferredControlTintColor?.hexString
             realOptions["presentationStyle"] = safariViewController.modalPresentationStyle.rawValue
             realOptions["transitionStyle"] = safariViewController.modalTransitionStyle.rawValue
         }

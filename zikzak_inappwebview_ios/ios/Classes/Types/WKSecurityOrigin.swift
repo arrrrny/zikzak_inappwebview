@@ -8,7 +8,6 @@
 import Foundation
 import WebKit
 
-@available(iOS 9.0, *)
 extension WKSecurityOrigin {
     public func toMap () -> [String:Any?] {
         return [

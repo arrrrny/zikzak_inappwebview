@@ -8,7 +8,6 @@
 import Foundation
 import SafariServices
 
-@available(iOS 9.0, *)
 public class SafariViewController: SFSafariViewController, SFSafariViewControllerDelegate, Disposable {
     static let METHOD_CHANNEL_NAME_PREFIX = "wtf.zikzak/flutter_chromesafaribrowser_"
     var channelDelegate: SafariViewControllerChannelDelegate?
@@ -17,7 +16,6 @@ public class SafariViewController: SFSafariViewController, SFSafariViewControlle
     var plugin: SwiftFlutterPlugin?
     var menuItemList: [[String: Any]] = []
 
-    @available(iOS 11.0, *)
     public init(plugin: SwiftFlutterPlugin, id: String, url: URL, configuration: SFSafariViewController.Configuration, menuItemList: [[String: Any]] = [], safariSettings: SafariBrowserSettings) {
         self.id = id
         self.plugin = plugin
@@ -55,17 +53,13 @@ public class SafariViewController: SFSafariViewController, SFSafariViewControlle
     }
 
     func prepareSafariBrowser() {
-        if #available(iOS 11.0, *) {
-            self.dismissButtonStyle = SFSafariViewController.DismissButtonStyle(rawValue: safariSettings.dismissButtonStyle)!
-        }
+        self.dismissButtonStyle = SFSafariViewController.DismissButtonStyle(rawValue: safariSettings.dismissButtonStyle)!
 
-        if #available(iOS 10.0, *) {
-            if let preferredBarTintColor = safariSettings.preferredBarTintColor, !preferredBarTintColor.isEmpty {
-                self.preferredBarTintColor = UIColor(hexString: preferredBarTintColor)
-            }
-            if let preferredControlTintColor = safariSettings.preferredControlTintColor, !preferredControlTintColor.isEmpty {
-                self.preferredControlTintColor = UIColor(hexString: preferredControlTintColor)
-            }
+        if let preferredBarTintColor = safariSettings.preferredBarTintColor, !preferredBarTintColor.isEmpty {
+            self.preferredBarTintColor = UIColor(hexString: preferredBarTintColor)
+        }
+        if let preferredControlTintColor = safariSettings.preferredControlTintColor, !preferredControlTintColor.isEmpty {
+            self.preferredControlTintColor = UIColor(hexString: preferredControlTintColor)
         }
 
         self.modalPresentationStyle = UIModalPresentationStyle(rawValue: safariSettings.presentationStyle)!
