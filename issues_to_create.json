@@ -1,0 +1,27 @@
+[
+  {
+    "title": "[SECURITY] Remove JavaScript-based CSP injection",
+    "body": "## Problem\nThe current ZikZakSecurityManager injects Content-Security-Policy via JavaScript (`evaluateJavascript`), which is fundamentally insecure and bypassable.\n\n**File:** `ZikZakSecurityManager.java:579-591`\n\n## Security Risk\n- JavaScript-based CSP can be bypassed by attackers\n- Not as reliable as HTTP header-based CSP\n- False sense of security\n\n## Solution\nImplement proper HTTP header-based Content Security Policy:\n1. Intercept requests using `shouldInterceptRequest`\n2. Add CSP headers to responses\n3. Remove JavaScript-based injection code\n\n## Priority\n🔴 CRITICAL\n\n## References\n- [OWASP CSP](https://owasp.org/www-community/controls/Content_Security_Policy)\n- [MDN CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)",
+    "labels": ["security", "breaking-change", "android"]
+  },
+  {
+    "title": "[SECURITY] Implement SSL/TLS certificate pinning",
+    "body": "## Problem\nNo certificate pinning support for secure connections, leaving applications vulnerable to MITM attacks.\n\n## Solution\n### Android\nImplement certificate pinning using:\n- `onReceivedSslError` override with certificate validation\n- Pin public keys or certificates\n\n### iOS\n✅ **ALREADY IMPLEMENTED** in PR - See `CertificatePinningManager.swift`\n- `WKNavigationDelegate.didReceive(challenge:)`\n- Pin public keys using Security framework\n\n## API Design\n```dart\nInAppWebView(\n  certificatePinningConfig: CertificatePinningConfig(\n    certs: [\n      CertificatePin(\n        hostname: 'example.com',\n        publicKeyHashes: ['sha256/AAAAAAAAAAAAAAAA...'],\n        includeSubdomains: true,\n      ),\n    ],\n  ),\n)\n```\n\n## Priority\n🔴 CRITICAL\n\n## Status\n- ✅ iOS: Implementation complete\n- ⏳ Android: Needs implementation\n- ⏳ Dart API: Needs implementation",
+    "labels": ["security", "enhancement", "android", "ios"]
+  },
+  {
+    "title": "[SECURITY] Implement HTTPS-only mode",
+    "body": "## Problem\nHTTP connections are allowed by default, exposing users to MITM attacks and unencrypted data transmission.\n\n## Solution\n✅ **iOS ALREADY IMPLEMENTED** - See `HTTPSOnlyManager.swift`\n\nAdd `enforceHTTPS` option with three strategies:\n- **disabled**: Allow both HTTP and HTTPS\n- **upgrade**: Automatically upgrade HTTP to HTTPS\n- **strict**: Block all HTTP requests\n\n## API Design\n```dart\nInAppWebView(\n  initialSettings: InAppWebViewSettings(\n    enforceHTTPS: true,\n    httpsUpgradeStrategy: HTTPSUpgradeStrategy.strict,\n  ),\n)\n```\n\n## Priority\n🔴 HIGH\n\n## Status\n- ✅ iOS: Implementation complete\n- ⏳ Android: Needs implementation\n- ⏳ Dart API: Needs implementation",
+    "labels": ["security", "enhancement", "android", "ios"]
+  },
+  {
+    "title": "[SECURITY] Fix URL validation - Add scheme checking",
+    "body": "## Problem\nCurrent URL validation only checks the host, forgetting about the scheme. This leaves the app vulnerable to `javascript:` scheme attacks.\n\n**Vulnerability:**\n```javascript\njavascript:alert(document.cookie)\n```\n\n## Solution\n✅ **iOS ALREADY IMPLEMENTED** - See `URLValidationManager.swift`\n\nImplement comprehensive URL validation:\n- Check scheme first (block javascript:, vbscript:, etc.)\n- Safe scheme whitelist\n- XSS pattern detection\n- Directory traversal prevention\n\n## Priority\n🔴 CRITICAL\n\n## Status\n- ✅ iOS: Implementation complete\n- ⏳ Android: Needs implementation\n- ⏳ Dart API: Needs implementation\n\n## References\n- [OWASP URL Validation](https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html)\n- [Oversecured Android WebView Checklist](https://blog.oversecured.com/Android-security-checklist-webview/)",
+    "labels": ["security", "bug", "android", "ios"]
+  },
+  {
+    "title": "✅ [iOS] Add Privacy Manifest (PrivacyInfo.xcprivacy)",
+    "body": "## ✅ COMPLETED\n\nAdded iOS Privacy Manifest for App Store compliance.\n\n**Implemented in commit:** Add iOS Privacy Manifest for App Store compliance\n\n### What was added:\n- `PrivacyInfo.xcprivacy` file\n- Updated podspec to include privacy manifest\n- Declared all API usages (UserDefaults, FileTimestamp, DiskSpace)\n\n## Priority\n🔴 CRITICAL (App Store requirement)\n\n**Status:** ✅ Complete and merged",
+    "labels": ["enhancement", "ios", "documentation"]
+  }
+]
