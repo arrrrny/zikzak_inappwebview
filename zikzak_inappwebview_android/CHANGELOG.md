@@ -5,6 +5,7 @@
 * **Google Safe Browsing:** NOW ENABLED BY DEFAULT - Protects against phishing, malware, and unwanted software
 * **Security Audit Logging:** Privacy-safe logging for all security events (certificate pinning, HTTPS-only, URL validation, SSL errors, Safe Browsing)
 * **Fixed WebView closing crashes:** Proper lifecycle management with thread-safe dispose sequence, prevents memory leaks and race conditions
+* **Fixed zoom functionality:** Corrected settings application order for proper pinch-to-zoom, zoom controls, and scale limits
 * Enables modern Android security APIs and features
 * Better support for androidx.webkit modern features
 * Comprehensive security features: Certificate Pinning, HTTPS-Only Mode, URL Validation

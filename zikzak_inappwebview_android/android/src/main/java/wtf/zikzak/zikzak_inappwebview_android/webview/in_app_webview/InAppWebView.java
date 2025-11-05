@@ -342,8 +342,15 @@ public final class InAppWebView
         settings.setJavaScriptCanOpenWindowsAutomatically(
             customSettings.javaScriptCanOpenWindowsAutomatically
         );
+
+        // Zoom settings must be applied in correct order for proper functionality
+        // 1. Enable zoom support first
+        settings.setSupportZoom(customSettings.supportZoom);
+        // 2. Enable built-in zoom controls (required for pinch-to-zoom)
         settings.setBuiltInZoomControls(customSettings.builtInZoomControls);
+        // 3. Hide/show zoom control buttons (+/-)
         settings.setDisplayZoomControls(customSettings.displayZoomControls);
+
         settings.setSupportMultipleWindows(
             customSettings.supportMultipleWindows
         );
@@ -406,9 +413,9 @@ public final class InAppWebView
                 customSettings.thirdPartyCookiesEnabled
             );
 
-        settings.setLoadWithOverviewMode(customSettings.loadWithOverviewMode);
+        // Wide viewport and overview mode must be set for proper zoom behavior
         settings.setUseWideViewPort(customSettings.useWideViewPort);
-        settings.setSupportZoom(customSettings.supportZoom);
+        settings.setLoadWithOverviewMode(customSettings.loadWithOverviewMode);
         settings.setTextZoom(customSettings.textZoom);
 
         setVerticalScrollBarEnabled(

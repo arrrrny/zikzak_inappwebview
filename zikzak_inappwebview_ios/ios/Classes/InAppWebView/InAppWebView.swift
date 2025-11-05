@@ -460,8 +460,15 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             scrollView.alwaysBounceHorizontal = settings.alwaysBounceHorizontal
             scrollView.scrollsToTop = settings.scrollsToTop
             scrollView.isPagingEnabled = settings.isPagingEnabled
-            scrollView.maximumZoomScale = CGFloat(settings.maximumZoomScale)
+
+            // Configure zoom settings in correct order for proper functionality
+            // 1. Enable multitouch for pinch-to-zoom gesture
+            scrollView.isMultipleTouchEnabled = settings.supportZoom
+            // 2. Set zoom scale limits
             scrollView.minimumZoomScale = CGFloat(settings.minimumZoomScale)
+            scrollView.maximumZoomScale = CGFloat(settings.maximumZoomScale)
+            // 3. Zoom is enabled when maximumZoomScale > minimumZoomScale
+            scrollView.bouncesZoom = settings.supportZoom
 
             if #available(iOS 14.0, *) {
                 mediaType = settings.mediaType
@@ -1034,6 +1041,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         }
 
         if newSettingsMap["supportZoom"] != nil && settings?.supportZoom != newSettings.supportZoom {
+            // Update native scroll view zoom support
+            scrollView.isMultipleTouchEnabled = newSettings.supportZoom
+            scrollView.bouncesZoom = newSettings.supportZoom
+
+            // Update JavaScript-based zoom control
             if newSettings.supportZoom {
                 if configuration.userContentController.userScripts.contains(NOT_SUPPORT_ZOOM_JS_PLUGIN_SCRIPT) {
                     configuration.userContentController.removePluginScript(NOT_SUPPORT_ZOOM_JS_PLUGIN_SCRIPT)
