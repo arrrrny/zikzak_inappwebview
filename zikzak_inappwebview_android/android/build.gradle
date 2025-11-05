@@ -8,6 +8,8 @@ buildscript {
     }
 
     dependencies {
+        // AGP 8.5.2 automatically enables 16KB page size alignment (requires >= 8.5.1)
+        // This ensures compatibility with Android 15+ devices using 16KB memory pages
         classpath 'com.android.tools.build:gradle:8.5.2'
     }
 }
