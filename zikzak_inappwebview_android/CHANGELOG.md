@@ -4,6 +4,7 @@
 * **16KB page size support:** Compatible with Android 15+ devices using 16KB memory pages (AGP 8.5.2)
 * **Google Safe Browsing:** NOW ENABLED BY DEFAULT - Protects against phishing, malware, and unwanted software
 * **Security Audit Logging:** Privacy-safe logging for all security events (certificate pinning, HTTPS-only, URL validation, SSL errors, Safe Browsing)
+* **Fixed zoom functionality:** Corrected settings application order for proper pinch-to-zoom, zoom controls, and scale limits
 * Enables modern Android security APIs and features
 * Better support for androidx.webkit modern features
 * Comprehensive security features: Certificate Pinning, HTTPS-Only Mode, URL Validation
