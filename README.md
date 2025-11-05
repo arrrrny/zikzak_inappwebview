@@ -148,28 +148,33 @@ InAppWebView(
 
 ## 📋 Requirements
 
-### Current (v2.x)
+### Current (v3.0)
 - Dart: `>=2.17.0 <4.0.0`
 - Flutter: `>=3.0.0`
-- Android: `minSdk 19`, `compileSdk 36`
-- iOS: `13.0+`, Xcode `14.3+`
+- Android: `minSdk 24` (Android 7.0+), `compileSdk 36`
+- iOS: `15.0+`, Xcode `14.3+`
+- Platforms: **Android & iOS ONLY** (mobile-first, lean and clean)
 
-### Coming Soon™ (v3.0)
-- Android: `minSdk 24` (bye bye Android 4.4-6.0, it's been real)
-- iOS: `14.0+` (iOS 13 had a good run)
-- Platforms: **Android & iOS ONLY** (macOS, Windows, Web... it's not you, it's us)
+### Legacy (v2.x)
+- Android: `minSdk 19`, `compileSdk 36`
+- iOS: `13.0+`
+- Platforms: Android, iOS, macOS, Web (deprecated)
 
 ---
 
-## 🚨 Breaking Changes Ahead
+## 🚨 Breaking Changes in v3.0
 
-v3.0 is going to break things. Intentionally. Because sometimes you need to break eggs to make an omelet. Or in this case, break backward compatibility to make a secure, modern, maintainable plugin.
+v3.0 breaks things. Intentionally. Because sometimes you need to break eggs to make an omelet. Or in this case, break backward compatibility to make a secure, modern, maintainable plugin.
 
-Expected casualties:
-- ❌ macOS/Windows/Web support (focus is everything)
-- ❌ Old Android versions (Android 6 and below, RIP)
-- ❌ 30+ redundant settings (because 70 settings was insane)
-- ❌ JavaScript enabled by default (security first, convenience second)
+Completed changes:
+- ✅ macOS/Windows/Web support removed (focus is everything)
+- ✅ Minimum Android SDK raised to 24 - Android 7.0+ (bye bye Android 4.4-6.0)
+- ✅ Minimum iOS raised to 15.0+ (iOS 13-14 had a good run)
+- ✅ Google Safe Browsing enabled by default (security first)
+
+Coming soon:
+- ⏳ 30+ redundant settings removal (because 70 settings was insane)
+- ⏳ JavaScript disabled by default (security first, convenience second)
 
 See [MODERNIZATION_PLAN.md](MODERNIZATION_PLAN.md) for the full hit list.
 
