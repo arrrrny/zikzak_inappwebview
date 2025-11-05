@@ -1,3 +1,12 @@
+## 3.0.0 - 2025-11-05
+
+* **BREAKING CHANGE:** Increased minimum Android SDK from 19 to 24 (Android 7.0 Nougat)
+* **16KB page size support:** Compatible with Android 15+ devices using 16KB memory pages (AGP 8.5.2)
+* Enables modern Android security APIs and features
+* Better support for androidx.webkit modern features
+* Major version release for modernization
+* Updated dependencies to use hosted references
+
 ## 2.4.28 - 2025-07-25
 
 * fixed cocoapods issues
