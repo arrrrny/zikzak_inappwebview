@@ -12,7 +12,6 @@ public class UserScript: WKUserScript {
     var groupName: String?
 
     private var contentWorldWrapper: Any?
-    @available(iOS 14.0, *)
     var contentWorld: WKContentWorld {
       get {
         if let value = contentWorldWrapper as? WKContentWorld {
@@ -31,14 +30,12 @@ public class UserScript: WKUserScript {
         super.init(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly)
         self.groupName = groupName
     }
-    
-    @available(iOS 14.0, *)
+
     public override init(source: String, injectionTime: WKUserScriptInjectionTime, forMainFrameOnly: Bool, in contentWorld: WKContentWorld) {
         super.init(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly, in: contentWorld)
         self.contentWorld = contentWorld
     }
 
-    @available(iOS 14.0, *)
     public init(groupName: String?, source: String, injectionTime: WKUserScriptInjectionTime, forMainFrameOnly: Bool, in contentWorld: WKContentWorld) {
         super.init(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly, in: contentWorld)
         self.groupName = groupName
@@ -49,9 +46,9 @@ public class UserScript: WKUserScript {
         guard let map = map else {
             return nil
         }
-        
+
         let contentWorldMap = map["contentWorld"] as? [String:Any?]
-        if #available(iOS 14.0, *), let contentWorldMap = contentWorldMap {
+        if let contentWorldMap = contentWorldMap {
             let contentWorld = WKContentWorld.fromMap(map: contentWorldMap, windowId: windowId)!
             return UserScript(
                 groupName: map["groupName"] as? String,

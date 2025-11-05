@@ -51,7 +51,6 @@ public class Util {
         return ""
     }
     
-    @available(iOS 14.0, *)
     public static func getContentWorld(name: String) -> WKContentWorld {
         switch name {
         case "defaultClient":
@@ -63,7 +62,6 @@ public class Util {
         }
     }
     
-    @available(iOS 10.0, *)
     public static func getDataDetectorType(type: String) -> WKDataDetectorTypes {
         switch type {
             case "NONE":
@@ -91,7 +89,6 @@ public class Util {
         }
     }
     
-    @available(iOS 10.0, *)
     public static func getDataDetectorTypeString(type: WKDataDetectorTypes) -> [String] {
         var dataDetectorTypeString: [String] = []
         if type.contains(.all) {
