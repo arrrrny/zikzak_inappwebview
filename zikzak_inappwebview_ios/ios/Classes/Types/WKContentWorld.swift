@@ -8,7 +8,6 @@
 import Foundation
 import WebKit
 
-@available(iOS 14.0, *)
 extension WKContentWorld {
     // Workaround to create stored properties in an extension:
     // https://valv0.medium.com/computed-properties-and-extensions-a-pure-swift-approach-64733768112c

@@ -21,21 +21,18 @@ public class PluginScript: UserScript {
         self.requiredInAllContentWorlds = requiredInAllContentWorlds
         self.messageHandlerNames = messageHandlerNames
     }
-    
-    @available(iOS 14.0, *)
+
     public override init(source: String, injectionTime: WKUserScriptInjectionTime, forMainFrameOnly: Bool, in contentWorld: WKContentWorld) {
         super.init(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly, in: contentWorld)
         self.contentWorld = contentWorld
     }
-    
-    @available(iOS 14.0, *)
+
     public init(source: String, injectionTime: WKUserScriptInjectionTime, forMainFrameOnly: Bool, in contentWorld: WKContentWorld, requiredInAllContentWorlds: Bool = false, messageHandlerNames: [String] = []) {
         super.init(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly, in: contentWorld)
         self.requiredInAllContentWorlds = requiredInAllContentWorlds
         self.messageHandlerNames = messageHandlerNames
     }
 
-    @available(iOS 14.0, *)
     public init(groupName: String, source: String, injectionTime: WKUserScriptInjectionTime, forMainFrameOnly: Bool, in contentWorld: WKContentWorld, requiredInAllContentWorlds: Bool = false, messageHandlerNames: [String] = []) {
         super.init(groupName: groupName, source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly, in: contentWorld)
         self.requiredInAllContentWorlds = requiredInAllContentWorlds
@@ -48,28 +45,17 @@ public class PluginScript: UserScript {
                            forMainFrameOnly: Bool? = nil,
                            requiredInAllContentWorlds: Bool? = nil,
                            messageHandlerNames: [String]? = nil) -> PluginScript {
-        if #available(iOS 14.0, *) {
-            return PluginScript(
-                groupName: groupName ?? self.groupName!,
-                source: source ?? self.source,
-                injectionTime: injectionTime ?? self.injectionTime,
-                forMainFrameOnly: forMainFrameOnly ?? self.isForMainFrameOnly,
-                in: self.contentWorld,
-                requiredInAllContentWorlds: requiredInAllContentWorlds ?? self.requiredInAllContentWorlds,
-                messageHandlerNames: messageHandlerNames ?? self.messageHandlerNames
-            )
-        }
         return PluginScript(
             groupName: groupName ?? self.groupName!,
             source: source ?? self.source,
             injectionTime: injectionTime ?? self.injectionTime,
             forMainFrameOnly: forMainFrameOnly ?? self.isForMainFrameOnly,
+            in: self.contentWorld,
             requiredInAllContentWorlds: requiredInAllContentWorlds ?? self.requiredInAllContentWorlds,
             messageHandlerNames: messageHandlerNames ?? self.messageHandlerNames
         )
     }
-    
-    @available(iOS 14.0, *)
+
     public func copyAndSet(groupName: String? = nil,
                            source: String? = nil,
                            injectionTime: WKUserScriptInjectionTime? = nil,
@@ -89,21 +75,12 @@ public class PluginScript: UserScript {
     }
 
     static func == (lhs: PluginScript, rhs: PluginScript) -> Bool {
-        if #available(iOS 14.0, *) {
-            return lhs.groupName == rhs.groupName &&
-                lhs.source == rhs.source &&
-                lhs.injectionTime == rhs.injectionTime &&
-                lhs.isForMainFrameOnly == rhs.isForMainFrameOnly &&
-                lhs.contentWorld == rhs.contentWorld &&
-                lhs.requiredInAllContentWorlds == rhs.requiredInAllContentWorlds &&
-                lhs.messageHandlerNames == rhs.messageHandlerNames
-        } else {
-            return lhs.groupName == rhs.groupName &&
-                lhs.source == rhs.source &&
-                lhs.injectionTime == rhs.injectionTime &&
-                lhs.isForMainFrameOnly == rhs.isForMainFrameOnly &&
-                lhs.requiredInAllContentWorlds == rhs.requiredInAllContentWorlds &&
-                lhs.messageHandlerNames == rhs.messageHandlerNames
-        }
+        return lhs.groupName == rhs.groupName &&
+            lhs.source == rhs.source &&
+            lhs.injectionTime == rhs.injectionTime &&
+            lhs.isForMainFrameOnly == rhs.isForMainFrameOnly &&
+            lhs.contentWorld == rhs.contentWorld &&
+            lhs.requiredInAllContentWorlds == rhs.requiredInAllContentWorlds &&
+            lhs.messageHandlerNames == rhs.messageHandlerNames
     }
 }

@@ -23,7 +23,6 @@ public class CustomUIPrintPageRenderer: UIPrintPageRenderer {
         }
     }
     
-    @available(iOS 14.5, *)
     open override func currentRenderingQuality(forRequested requestedRenderingQuality: UIPrintRenderingQuality) -> UIPrintRenderingQuality {
         if let forceRenderingQuality = forceRenderingQuality,
            let quality = UIPrintRenderingQuality.init(rawValue: forceRenderingQuality) {
