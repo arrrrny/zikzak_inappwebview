@@ -92,6 +92,7 @@ public class URLValidationManager {
         if (customValidator != null) {
             ValidationResult result = customValidator.apply(url);
             if (!result.allowed) {
+                Log.d(TAG, "Custom validator blocked URL: " + url);
                 return result;
             }
         }
@@ -101,12 +102,14 @@ public class URLValidationManager {
         try {
             uri = Uri.parse(url);
         } catch (Exception e) {
+            Log.w(TAG, "Failed to parse URL: " + url + " - " + e.getMessage());
             return new ValidationResult(false, "Invalid URL format: " + e.getMessage());
         }
 
         // Check scheme
         String scheme = uri.getScheme();
         if (scheme == null || scheme.isEmpty()) {
+            Log.w(TAG, "URL has no scheme: " + url);
             return new ValidationResult(false, "URL has no scheme");
         }
 
@@ -114,6 +117,7 @@ public class URLValidationManager {
 
         // Check if scheme is explicitly blocked
         if (blockedSchemes.contains(scheme)) {
+            Log.w(TAG, "Blocked dangerous URL scheme '" + scheme + "': " + url);
             return new ValidationResult(
                 false,
                 "URL scheme '" + scheme + "' is blocked for security reasons"
@@ -127,6 +131,7 @@ public class URLValidationManager {
         }
 
         // Unknown scheme - be conservative and block
+        Log.w(TAG, "Blocked unknown URL scheme '" + scheme + "': " + url);
         return new ValidationResult(
             false,
             "URL scheme '" + scheme + "' is not in the safe schemes list"
@@ -189,7 +194,8 @@ public class URLValidationManager {
         }
 
         // Check for suspicious patterns
-        if (path.contains("//")) {
+        // Allow double slashes at the start (e.g., UNC paths), but not elsewhere
+        if (path.indexOf("//") > 0) {
             return new ValidationResult(
                 false,
                 "File URL contains suspicious path patterns"
