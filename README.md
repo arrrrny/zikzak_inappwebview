@@ -114,30 +114,67 @@ dependencies:
 
 ---
 
-## 📋 Requirements
+## 🔒 Security Features (v3.0+)
 
-### Current (v2.x)
-- Dart: `>=2.17.0 <4.0.0`
-- Flutter: `>=3.0.0`
-- Android: `minSdk 19`, `compileSdk 36`
-- iOS: `13.0+`, Xcode `14.3+`
+ZikZak InAppWebView includes enterprise-grade security features enabled by default:
 
-### Coming Soon™ (v3.0)
-- Android: `minSdk 24` (bye bye Android 4.4-6.0, it's been real)
-- iOS: `14.0+` (iOS 13 had a good run)
-- Platforms: **Android & iOS ONLY** (macOS, Windows, Web... it's not you, it's us)
+### Google Safe Browsing ✅ ENABLED BY DEFAULT
+Protects users from phishing, malware, and unwanted software using Google's threat intelligence.
+
+```dart
+InAppWebView(
+  initialSettings: InAppWebViewSettings(
+    safeBrowsingEnabled: true,  // ← Already enabled!
+  ),
+  onSafeBrowsingHit: (controller, url, threatType) async {
+    // Handle detected threats
+    return SafeBrowsingResponse(
+      action: SafeBrowsingResponseAction.BACK_TO_SAFETY,
+      report: true,
+    );
+  },
+)
+```
+
+### Other Security Features
+- **Certificate Pinning**: SHA-256 public key pinning for MITM prevention
+- **HTTPS-Only Mode**: Block or upgrade insecure HTTP requests
+- **URL Scheme Validation**: Block dangerous schemes (javascript:, file:, etc.)
+- **Content Security Policy**: Proper HTTP header-based CSP implementation
+
+📖 **Full Documentation**: [SECURITY_FEATURES.md](SECURITY_FEATURES.md)
 
 ---
 
-## 🚨 Breaking Changes Ahead
+## 📋 Requirements
 
-v3.0 is going to break things. Intentionally. Because sometimes you need to break eggs to make an omelet. Or in this case, break backward compatibility to make a secure, modern, maintainable plugin.
+### Current (v3.0)
+- Dart: `>=2.17.0 <4.0.0`
+- Flutter: `>=3.0.0`
+- Android: `minSdk 24` (Android 7.0+), `compileSdk 36`
+- iOS: `15.0+`, Xcode `14.3+`
+- Platforms: **Android & iOS ONLY** (mobile-first, lean and clean)
 
-Expected casualties:
-- ❌ macOS/Windows/Web support (focus is everything)
-- ❌ Old Android versions (Android 6 and below, RIP)
-- ❌ 30+ redundant settings (because 70 settings was insane)
-- ❌ JavaScript enabled by default (security first, convenience second)
+### Legacy (v2.x)
+- Android: `minSdk 19`, `compileSdk 36`
+- iOS: `13.0+`
+- Platforms: Android, iOS, macOS, Web (deprecated)
+
+---
+
+## 🚨 Breaking Changes in v3.0
+
+v3.0 breaks things. Intentionally. Because sometimes you need to break eggs to make an omelet. Or in this case, break backward compatibility to make a secure, modern, maintainable plugin.
+
+Completed changes:
+- ✅ macOS/Windows/Web support removed (focus is everything)
+- ✅ Minimum Android SDK raised to 24 - Android 7.0+ (bye bye Android 4.4-6.0)
+- ✅ Minimum iOS raised to 15.0+ (iOS 13-14 had a good run)
+- ✅ Google Safe Browsing enabled by default (security first)
+
+Coming soon:
+- ⏳ 30+ redundant settings removal (because 70 settings was insane)
+- ⏳ JavaScript disabled by default (security first, convenience second)
 
 See [MODERNIZATION_PLAN.md](MODERNIZATION_PLAN.md) for the full hit list.
 

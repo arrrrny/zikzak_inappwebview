@@ -1,3 +1,8 @@
+## 3.0.0 - 2025-11-05
+
+* removed macos,linux,web,windows support. implemented fixes for issues with Claude AI
+* Updated dependencies to use hosted references
+
 ## 2.4.28 - 2025-07-25
 
 * fixed cocoapods issues

@@ -256,7 +256,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         return super.hitTest(point, with: event)
     }
 
-    @available(iOS 13.0, *)
     public override func buildMenu(with builder: UIMenuBuilder) {
         if #available(iOS 16.0, *) {
             if let menu = contextMenu {
@@ -290,10 +289,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     }
 
     public override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
-        var needCheck = sender is UIMenuController
-        if #available(iOS 13.0, *) {
-            needCheck = sender is UIMenuElement || sender is UIMenuController
-        }
+        var needCheck = sender is UIMenuElement || sender is UIMenuController
 
         if needCheck {
             if settings?.disableContextMenu == true {
@@ -464,8 +460,15 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             scrollView.alwaysBounceHorizontal = settings.alwaysBounceHorizontal
             scrollView.scrollsToTop = settings.scrollsToTop
             scrollView.isPagingEnabled = settings.isPagingEnabled
-            scrollView.maximumZoomScale = CGFloat(settings.maximumZoomScale)
+
+            // Configure zoom settings in correct order for proper functionality
+            // 1. Enable multitouch for pinch-to-zoom gesture
+            scrollView.isMultipleTouchEnabled = settings.supportZoom
+            // 2. Set zoom scale limits
             scrollView.minimumZoomScale = CGFloat(settings.minimumZoomScale)
+            scrollView.maximumZoomScale = CGFloat(settings.maximumZoomScale)
+            // 3. Zoom is enabled when maximumZoomScale > minimumZoomScale
+            scrollView.bouncesZoom = settings.supportZoom
 
             if #available(iOS 14.0, *) {
                 mediaType = settings.mediaType
@@ -809,7 +812,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             : currentIndex + steps >= 0
     }
 
-    @available(iOS 11.0, *)
     public func takeScreenshot (with: [String: Any?]?, completionHandler: @escaping (_ screenshot: Data?) -> Void) {
         var snapshotConfiguration: WKSnapshotConfiguration? = nil
         if let with = with {
@@ -820,7 +822,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             if let snapshotWidth = with["snapshotWidth"] as? Double {
                 snapshotConfiguration!.snapshotWidth = NSNumber(value: snapshotWidth)
             }
-            if #available(iOS 13.0, *), let afterScreenUpdates = with["afterScreenUpdates"] as? Bool {
+            if let afterScreenUpdates = with["afterScreenUpdates"] as? Bool {
                 snapshotConfiguration!.afterScreenUpdates = afterScreenUpdates
             }
         }
@@ -848,7 +850,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         })
     }
 
-    @available(iOS 14.0, *)
     public func createPdf (configuration: [String: Any?]?, completionHandler: @escaping (_ pdf: Data?) -> Void) {
         let pdfConfiguration: WKPDFConfiguration = .init()
         if let configuration = configuration {
@@ -869,7 +870,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         }
     }
 
-    @available(iOS 14.0, *)
     public func createWebArchiveData (dataCompletionHandler: @escaping (_ webArchiveData: Data?) -> Void) {
         createWebArchiveData(completionHandler: { (result) in
             switch (result) {
@@ -884,7 +884,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         })
     }
 
-    @available(iOS 14.0, *)
     public func saveWebArchive (filePath: String, autoname: Bool, completionHandler: @escaping (_ path: String?) -> Void) {
         createWebArchiveData(dataCompletionHandler: { (webArchiveData) in
             if let webArchiveData = webArchiveData {
@@ -1042,6 +1041,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         }
 
         if newSettingsMap["supportZoom"] != nil && settings?.supportZoom != newSettings.supportZoom {
+            // Update native scroll view zoom support
+            scrollView.isMultipleTouchEnabled = newSettings.supportZoom
+            scrollView.bouncesZoom = newSettings.supportZoom
+
+            // Update JavaScript-based zoom control
             if newSettings.supportZoom {
                 if configuration.userContentController.userScripts.contains(NOT_SUPPORT_ZOOM_JS_PLUGIN_SCRIPT) {
                     configuration.userContentController.removePluginScript(NOT_SUPPORT_ZOOM_JS_PLUGIN_SCRIPT)
@@ -1395,7 +1399,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         }
     }
 
-    @available(iOS 14.0, *)
     public func injectDeferredObject(source: String, contentWorld: WKContentWorld, withWrapper jsWrapper: String?, completionHandler: ((Any?) -> Void)? = nil) {
         var jsToInject = source
         if let wrapper = jsWrapper {
@@ -1437,7 +1440,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         super.evaluateJavaScript(javaScriptString, completionHandler: completionHandler)
     }
 
-    @available(iOS 14.0, *)
     public func evaluateJavaScript(_ javaScript: String, frame: WKFrameInfo? = nil, contentWorld: WKContentWorld, completionHandler: ((Result<Any, Error>) -> Void)? = nil) {
         if let applePayAPIEnabled = settings?.applePayAPIEnabled, applePayAPIEnabled {
             return
@@ -1449,12 +1451,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         injectDeferredObject(source: source, withWrapper: nil, completionHandler: completionHandler)
     }
 
-    @available(iOS 14.0, *)
     public func evaluateJavascript(source: String, contentWorld: WKContentWorld, completionHandler: ((Any?) -> Void)? = nil) {
         injectDeferredObject(source: source, contentWorld: contentWorld, withWrapper: nil, completionHandler: completionHandler)
     }
 
-    @available(iOS 14.0, *)
     public func callAsyncJavaScript(_ functionBody: String, arguments: [String : Any] = [:], frame: WKFrameInfo? = nil, contentWorld: WKContentWorld, completionHandler: ((Result<Any, Error>) -> Void)? = nil) {
         if let applePayAPIEnabled = settings?.applePayAPIEnabled, applePayAPIEnabled {
             return
@@ -1462,7 +1462,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         super.callAsyncJavaScript(functionBody, arguments: arguments, in: frame, in: contentWorld, completionHandler: completionHandler)
     }
 
-    @available(iOS 14.0, *)
     public func callAsyncJavaScript(functionBody: String, arguments: [String:Any], contentWorld: WKContentWorld, completionHandler: ((Any?) -> Void)? = nil) {
         let jsToInject = configuration.userContentController.generateCodeForScriptEvaluation(scriptMessageHandler: self, source: functionBody, contentWorld: contentWorld)
 
@@ -1493,7 +1492,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         }
     }
 
-    @available(iOS 10.3, *)
     public func callAsyncJavaScript(functionBody: String, arguments: [String:Any], completionHandler: ((Any?) -> Void)? = nil) {
         if let applePayAPIEnabled = settings?.applePayAPIEnabled, applePayAPIEnabled {
             completionHandler?(nil)
@@ -1742,7 +1740,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         }
     }
 
-    @available(iOS 13.0, *)
     public func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction,
                  preferences: WKWebpagePreferences,
@@ -1752,7 +1749,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         })
     }
 
-    @available(iOS 14.5, *)
     public func download(_ download: WKDownload, decideDestinationUsing response: URLResponse, suggestedFilename: String, completionHandler: @escaping (URL?) -> Void) {
         if let url = response.url, let useOnDownloadStart = settings?.useOnDownloadStart, useOnDownloadStart {
             let downloadStartRequest = DownloadStartRequest(url: url.absoluteString,
@@ -1769,7 +1765,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         completionHandler(nil)
     }
 
-    @available(iOS 14.5, *)
     public func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecome download: WKDownload) {
         let response = navigationResponse.response
         if let url = response.url, let useOnDownloadStart = settings?.useOnDownloadStart, useOnDownloadStart {

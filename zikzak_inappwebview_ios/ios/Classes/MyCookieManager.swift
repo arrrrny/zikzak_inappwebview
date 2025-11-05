@@ -8,7 +8,6 @@
 import Foundation
 import WebKit
 
-@available(iOS 11.0, *)
 public class MyCookieManager: ChannelDelegate {
     static let METHOD_CHANNEL_NAME = "wtf.zikzak/zikzak_inappwebview_cookiemanager"
     static let httpCookieStore = WKWebsiteDataStore.default().httpCookieStore
@@ -116,20 +115,16 @@ public class MyCookieManager: ChannelDelegate {
             properties[.init("HttpOnly")] = "YES"
         }
         if sameSite != nil {
-            if #available(iOS 13.0, *) {
-                var sameSiteValue = HTTPCookieStringPolicy(rawValue: "None")
-                switch sameSite {
-                case "Lax":
-                    sameSiteValue = HTTPCookieStringPolicy.sameSiteLax
-                case "Strict":
-                    sameSiteValue = HTTPCookieStringPolicy.sameSiteStrict
-                default:
-                    break
-                }
-                properties[.sameSitePolicy] = sameSiteValue
-            } else {
-                properties[.init("SameSite")] = sameSite
+            var sameSiteValue = HTTPCookieStringPolicy(rawValue: "None")
+            switch sameSite {
+            case "Lax":
+                sameSiteValue = HTTPCookieStringPolicy.sameSiteLax
+            case "Strict":
+                sameSiteValue = HTTPCookieStringPolicy.sameSiteStrict
+            default:
+                break
             }
+            properties[.sameSitePolicy] = sameSiteValue
         }
 
 
@@ -150,10 +145,8 @@ public class MyCookieManager: ChannelDelegate {
                 for cookie in cookies {
                     if urlHost.hasSuffix(cookie.domain) || ".\(urlHost)".hasSuffix(cookie.domain) {
                         var sameSite: String? = nil
-                        if #available(iOS 13.0, *) {
-                            if let sameSiteValue = cookie.sameSitePolicy?.rawValue {
-                                sameSite = sameSiteValue.prefix(1).capitalized + sameSiteValue.dropFirst()
-                            }
+                        if let sameSiteValue = cookie.sameSitePolicy?.rawValue {
+                            sameSite = sameSiteValue.prefix(1).capitalized + sameSiteValue.dropFirst()
                         }
 
                         var expiresDateTimestamp: Int64 = -1
@@ -191,10 +184,8 @@ public class MyCookieManager: ChannelDelegate {
         MyCookieManager.httpCookieStore.getAllCookies { (cookies) in
             for cookie in cookies {
                 var sameSite: String? = nil
-                if #available(iOS 13.0, *) {
-                    if let sameSiteValue = cookie.sameSitePolicy?.rawValue {
-                        sameSite = sameSiteValue.prefix(1).capitalized + sameSiteValue.dropFirst()
-                    }
+                if let sameSiteValue = cookie.sameSitePolicy?.rawValue {
+                    sameSite = sameSiteValue.prefix(1).capitalized + sameSiteValue.dropFirst()
                 }
 
                 var expiresDateTimestamp: Int64 = -1

@@ -1,6 +1,6 @@
 name: zikzak_inappwebview
 description: A Flutter plugin that allows you to add an inline webview, to use an headless webview, and to open an in-app browser window.
-version: 2.4.28
+version: 3.0.0
 homepage: https://inappwebview.dev/
 repository: https://github.com/arrrrny/zikzak_inappwebview
 issue_tracker: https://github.com/arrrrny/zikzak_inappwebview/issues
@@ -18,11 +18,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  zikzak_inappwebview_platform_interface: ^2.4.28
-  zikzak_inappwebview_android: ^2.4.28
-  zikzak_inappwebview_ios: ^2.4.28
-  zikzak_inappwebview_macos: ^2.4.28
-  zikzak_inappwebview_web: ^2.4.28
+  zikzak_inappwebview_platform_interface: ^3.0.0
+  zikzak_inappwebview_android: ^3.0.0
+  zikzak_inappwebview_ios: ^3.0.0
 
 dev_dependencies:
   flutter_test:
@@ -45,10 +43,6 @@ flutter:
         default_package: zikzak_inappwebview_android
       ios:
         default_package: zikzak_inappwebview_ios
-      macos:
-        default_package: zikzak_inappwebview_macos
-      web:
-        default_package: zikzak_inappwebview_web
 
   assets:
     - packages/zikzak_inappwebview/assets/t_rex_runner/t-rex.html

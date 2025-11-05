@@ -8,6 +8,8 @@ buildscript {
     }
 
     dependencies {
+        // AGP 8.5.2 automatically enables 16KB page size alignment (requires >= 8.5.1)
+        // This ensures compatibility with Android 15+ devices using 16KB memory pages
         classpath 'com.android.tools.build:gradle:8.5.2'
     }
 }
@@ -34,7 +36,7 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 19
+        minSdkVersion 24  // Android 7.0 (Nougat) - v3.0 minimum for modern security APIs
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         vectorDrawables.useSupportLibrary = true

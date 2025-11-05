@@ -22,7 +22,6 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     var progressBar: UIProgressView!
     var menuButton: UIBarButtonItem?
     private var _menu: Any?
-    @available(iOS 13.0, *)
     var menu: UIMenu? {
         set {
             _menu = newValue
@@ -118,60 +117,40 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         webView?.translatesAutoresizingMaskIntoConstraints = false
         progressBar.translatesAutoresizingMaskIntoConstraints = false
 
-        if #available(iOS 9.0, *) {
-            webView?.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 0.0).isActive = true
-            webView?.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: 0.0).isActive = true
-            webView?.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 0.0).isActive = true
-            webView?.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: 0.0).isActive = true
+        webView?.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 0.0).isActive = true
+        webView?.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: 0.0).isActive = true
+        webView?.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 0.0).isActive = true
+        webView?.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: 0.0).isActive = true
 
-            progressBar.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 0.0).isActive = true
-            progressBar.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 0.0).isActive = true
-            progressBar.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: 0.0).isActive = true
-        } else {
-            if let webView = webView {
-                view.addConstraints([
-                    NSLayoutConstraint(item: webView, attribute: .top, relatedBy: .equal, toItem: view, attribute: .top, multiplier: 1, constant: 0),
-                    NSLayoutConstraint(item: webView, attribute: .bottom, relatedBy: .equal, toItem: view, attribute: .bottom, multiplier: 1, constant: 0),
-                    NSLayoutConstraint(item: webView, attribute: .left, relatedBy: .equal, toItem: view, attribute: .left, multiplier: 1, constant: 0),
-                    NSLayoutConstraint(item: webView, attribute: .right, relatedBy: .equal, toItem: view, attribute: .right, multiplier: 1, constant: 0)
-                ])
-            }
-            if let progressBar = progressBar {
-                view.addConstraints([
-                    NSLayoutConstraint(item: progressBar, attribute: .top, relatedBy: .equal, toItem: view, attribute: .top, multiplier: 1, constant: 0),
-                    NSLayoutConstraint(item: progressBar, attribute: .left, relatedBy: .equal, toItem: view, attribute: .left, multiplier: 1, constant: 0),
-                    NSLayoutConstraint(item: progressBar, attribute: .right, relatedBy: .equal, toItem: view, attribute: .right, multiplier: 1, constant: 0)
-                ])
-            }
-        }
+        progressBar.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 0.0).isActive = true
+        progressBar.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 0.0).isActive = true
+        progressBar.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: 0.0).isActive = true
 
         if windowId != nil {
             channelDelegate?.onBrowserCreated()
             webView?.runWindowBeforeCreatedCallbacks()
         } else {
-            if #available(iOS 11.0, *) {
-                if let contentBlockers = webView?.settings?.contentBlockers, contentBlockers.count > 0 {
-                    do {
-                        let jsonData = try JSONSerialization.data(withJSONObject: contentBlockers, options: [])
-                        let blockRules = String(data: jsonData, encoding: .utf8)
-                        WKContentRuleListStore.default().compileContentRuleList(
-                            forIdentifier: "ContentBlockingRules",
-                            encodedContentRuleList: blockRules) { (contentRuleList, error) in
+            if let contentBlockers = webView?.settings?.contentBlockers, contentBlockers.count > 0 {
+                do {
+                    let jsonData = try JSONSerialization.data(withJSONObject: contentBlockers, options: [])
+                    let blockRules = String(data: jsonData, encoding: .utf8)
+                    WKContentRuleListStore.default().compileContentRuleList(
+                        forIdentifier: "ContentBlockingRules",
+                        encodedContentRuleList: blockRules) { (contentRuleList, error) in
 
-                                if let error = error {
-                                    print(error.localizedDescription)
-                                    return
-                                }
+                            if let error = error {
+                                print(error.localizedDescription)
+                                return
+                            }
 
-                                let configuration = self.webView!.configuration
-                                configuration.userContentController.add(contentRuleList!)
+                            let configuration = self.webView!.configuration
+                            configuration.userContentController.add(contentRuleList!)
 
-                                self.initLoad()
-                        }
-                        return
-                    } catch {
-                        print(error.localizedDescription)
+                            self.initLoad()
                     }
+                    return
+                } catch {
+                    print(error.localizedDescription)
                 }
             }
 
@@ -315,7 +294,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
                 navigationItem.rightBarButtonItems = [closeButton]
             }
 
-            if #available(iOS 14.0, *), !menuItems.isEmpty {
+            if !menuItems.isEmpty {
                 var uiActions: [UIAction] = []
                 menuItems = menuItems.sorted(by: {$0.order ?? 0 < $1.order ?? 0})
                 for menuItem in menuItems {
@@ -348,10 +327,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
             closeButton.target = nil
             closeButton.action = nil
         }
-        var barButtonSystemItem = UIBarButtonItem.SystemItem.cancel
-        if #available(iOS 13.0, *) {
-            barButtonSystemItem = UIBarButtonItem.SystemItem.close
-        }
+        var barButtonSystemItem = UIBarButtonItem.SystemItem.close
         closeButton = UIBarButtonItem(barButtonSystemItem: barButtonSystemItem, target: self, action: #selector(close))
     }
 
