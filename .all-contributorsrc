@@ -747,6 +747,17 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "arrrrny",
+      "name": "Ahmet TOK",
+      "avatar_url": "https://avatars.githubusercontent.com/u/48218623?v=4",
+      "profile": "https://zuzu.dev",
+      "contributions": [
+        "infra",
+        "maintenance",
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
