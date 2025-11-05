@@ -38,6 +38,7 @@ import wtf.zikzak.zikzak_inappwebview_android.Util;
 import wtf.zikzak.zikzak_inappwebview_android.credential_database.CredentialDatabase;
 import wtf.zikzak.zikzak_inappwebview_android.in_app_browser.InAppBrowserDelegate;
 import wtf.zikzak.zikzak_inappwebview_android.plugin_scripts_js.JavaScriptBridgeJS;
+import wtf.zikzak.zikzak_inappwebview_android.security.HTTPSOnlyManager;
 import wtf.zikzak.zikzak_inappwebview_android.types.ClientCertChallenge;
 import wtf.zikzak.zikzak_inappwebview_android.types.ClientCertResponse;
 import wtf.zikzak.zikzak_inappwebview_android.types.CustomSchemeResponse;
@@ -61,10 +62,20 @@ public class InAppWebViewClient extends WebViewClient {
     private InAppBrowserDelegate inAppBrowserDelegate;
     private static int previousAuthRequestFailureCount = 0;
     private static List<URLCredential> credentialsProposed = null;
+    private final HTTPSOnlyManager httpsOnlyManager;
 
     public InAppWebViewClient(InAppBrowserDelegate inAppBrowserDelegate) {
         super();
         this.inAppBrowserDelegate = inAppBrowserDelegate;
+        this.httpsOnlyManager = new HTTPSOnlyManager();
+    }
+
+    /**
+     * Get the HTTPS-only manager for configuration
+     * @return HTTPSOnlyManager instance
+     */
+    public HTTPSOnlyManager getHTTPSOnlyManager() {
+        return httpsOnlyManager;
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -74,6 +85,22 @@ public class InAppWebViewClient extends WebViewClient {
         WebResourceRequest request
     ) {
         InAppWebView webView = (InAppWebView) view;
+
+        // HTTPS-only enforcement
+        String url = request.getUrl().toString();
+        HTTPSOnlyManager.ValidationResult httpsResult = httpsOnlyManager.validateURL(url);
+        if (!httpsResult.isAllowed()) {
+            Log.w(LOG_TAG, "Blocked insecure HTTP navigation: " + url +
+                  " - Reason: " + httpsResult.getReason());
+            return true; // Block navigation
+        }
+        if (httpsResult.getUpgradedURL() != null) {
+            // URL was upgraded to HTTPS, load the upgraded version
+            Log.d(LOG_TAG, "Upgrading HTTP to HTTPS: " + url + " -> " + httpsResult.getUpgradedURL());
+            webView.loadUrl(httpsResult.getUpgradedURL());
+            return true; // Override to load upgraded URL
+        }
+
         if (webView.customSettings.useShouldOverrideUrlLoading) {
             if (
                 webView.customSettings.regexToCancelOverrideUrlLoading != null
@@ -128,6 +155,21 @@ public class InAppWebViewClient extends WebViewClient {
     @Override
     public boolean shouldOverrideUrlLoading(WebView webView, String url) {
         InAppWebView inAppWebView = (InAppWebView) webView;
+
+        // HTTPS-only enforcement
+        HTTPSOnlyManager.ValidationResult httpsResult = httpsOnlyManager.validateURL(url);
+        if (!httpsResult.isAllowed()) {
+            Log.w(LOG_TAG, "Blocked insecure HTTP navigation: " + url +
+                  " - Reason: " + httpsResult.getReason());
+            return true; // Block navigation
+        }
+        if (httpsResult.getUpgradedURL() != null) {
+            // URL was upgraded to HTTPS, load the upgraded version
+            Log.d(LOG_TAG, "Upgrading HTTP to HTTPS: " + url + " -> " + httpsResult.getUpgradedURL());
+            inAppWebView.loadUrl(httpsResult.getUpgradedURL());
+            return true; // Override to load upgraded URL
+        }
+
         if (inAppWebView.customSettings.useShouldOverrideUrlLoading) {
             if (
                 inAppWebView.customSettings.regexToCancelOverrideUrlLoading !=
