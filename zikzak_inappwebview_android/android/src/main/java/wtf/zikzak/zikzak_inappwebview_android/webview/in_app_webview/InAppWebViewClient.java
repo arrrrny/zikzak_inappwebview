@@ -1079,7 +1079,7 @@ public class InAppWebViewClient extends WebViewClient {
 
                 WebResourceResponse customResponse = new WebResourceResponse(
                     customSchemeResponse.getContentType(),
-                    customSchemeResponse.getContentType(),
+                    customSchemeResponse.getContentEncoding(),
                     new ByteArrayInputStream(customSchemeResponse.getData())
                 );
 

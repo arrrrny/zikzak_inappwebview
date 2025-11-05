@@ -573,9 +573,10 @@ public class ZikZakSecurityManager {
         Map<String, String> responseHeaders,
         String url
     ) {
-        if (responseHeaders == null) {
-            responseHeaders = new HashMap<>();
-        }
+        // Always create a new HashMap to avoid mutating the input map
+        Map<String, String> headers = new HashMap<>(
+            responseHeaders != null ? responseHeaders : new HashMap<>()
+        );
 
         // Get the security policy for this URL's domain
         String domain = extractDomainFromUrl(url);
@@ -587,22 +588,22 @@ public class ZikZakSecurityManager {
 
         if (policy != null && policy.securityHeaders != null && !policy.securityHeaders.isEmpty()) {
             // Add Content-Security-Policy header
-            responseHeaders.put("Content-Security-Policy", policy.securityHeaders);
+            headers.put("Content-Security-Policy", policy.securityHeaders);
 
             // Add other security headers
-            responseHeaders.put("X-Content-Type-Options", "nosniff");
-            responseHeaders.put("X-Frame-Options", "SAMEORIGIN");
-            responseHeaders.put("X-XSS-Protection", "1; mode=block");
+            headers.put("X-Content-Type-Options", "nosniff");
+            headers.put("X-Frame-Options", "SAMEORIGIN");
+            headers.put("X-XSS-Protection", "1; mode=block");
 
             if (policy.enforceHttps) {
                 // Add HSTS header for HTTPS enforcement
-                responseHeaders.put("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+                headers.put("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
             }
 
             Log.d(TAG, "Added security headers to response for: " + url);
         }
 
-        return responseHeaders;
+        return headers;
     }
 
     /**
