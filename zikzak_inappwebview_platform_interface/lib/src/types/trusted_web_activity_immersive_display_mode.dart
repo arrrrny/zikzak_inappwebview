@@ -21,8 +21,7 @@ class TrustedWebActivityImmersiveDisplayMode_
   @ExchangeableObjectConstructor()
   TrustedWebActivityImmersiveDisplayMode_(
       {required this.isSticky,
-      this.displayCutoutMode = LayoutInDisplayCutoutMode_.DEFAULT}) {
-  }
+      this.displayCutoutMode = LayoutInDisplayCutoutMode_.DEFAULT}) {}
 
   @ExchangeableObjectMethod(toMapMergeWith: true)
   // ignore: unused_element

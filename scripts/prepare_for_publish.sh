@@ -92,6 +92,7 @@ done
 convert_path_to_versioned() {
     local file="$1"
     local version="$2"
+    local exclude_pkg="$3"
 
     echo -e "${YELLOW}Converting path dependencies and updating versioned dependencies to $version in $file${NC}"
 
@@ -105,6 +106,7 @@ convert_path_to_versioned() {
         "zikzak_inappwebview_macos"
         "zikzak_inappwebview_windows"
         "zikzak_inappwebview_linux"
+        "zikzak_inappwebview"
     )
 
     # Create a temporary file
@@ -113,6 +115,11 @@ convert_path_to_versioned() {
 
     # Process each zikzak package
     for pkg in "${packages[@]}"; do
+        # Skip excluded package (useful for examples that must keep path dependency on their parent)
+        if [ "$pkg" == "$exclude_pkg" ]; then
+            continue
+        fi
+
         # Method 1: Replace single-line versioned dependencies (package: ^1.2.3)
         sed -i '' "s/^[[:space:]]*${pkg}:[[:space:]]*\^[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*[[:space:]]*$/  ${pkg}: ^${version}/" "$temp_file"
 
@@ -149,6 +156,10 @@ convert_path_to_versioned() {
             print $0
         }' "$temp_file" > "${temp_file}.fixed"
         mv "${temp_file}.fixed" "$temp_file"
+
+        # Remove generators dependency from dev_dependencies (it causes conflicts during publish)
+        sed -i '' '/^[[:space:]]*generators:/d' "$temp_file"
+        sed -i '' '/path:.*dev_packages\/generators/d' "$temp_file"
     done
 
     mv "$temp_file" "$file"
@@ -166,6 +177,13 @@ for pkg in "${PACKAGES[@]}"; do
         convert_path_to_versioned "$ROOT_DIR/$pkg/pubspec.yaml" "$VERSION"
     else
         echo -e "${RED}Warning: pubspec.yaml not found in $pkg. Skipping.${NC}"
+    fi
+
+    # Also update dependencies in example app if it exists
+    if [ -f "$ROOT_DIR/$pkg/example/pubspec.yaml" ]; then
+        echo -e "${BLUE}Updating dependencies in $pkg example${NC}"
+        # Pass the current package name as exclude_pkg so its path dependency is preserved
+        convert_path_to_versioned "$ROOT_DIR/$pkg/example/pubspec.yaml" "$VERSION" "$pkg"
     fi
 done
 

@@ -11,32 +11,32 @@ type FeatureItem = {
 
 const FeatureList: FeatureItem[] = [
   {
-    title: 'Actively Maintained',
+    title: 'True Cross-Platform',
     Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
     description: (
       <>
-        Unlike the original plugin, ZikZak InAppWebView is actively maintained with regular updates,
-        bug fixes, and responses to issues within 24-48 hours. We actually show up!
+        Write once, run everywhere. Full support for Android, iOS, Web, macOS, Windows, and Linux
+        with a unified API surface.
       </>
     ),
   },
   {
-    title: 'Security First',
+    title: 'Rich Feature Set',
     Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
     description: (
       <>
-        Enterprise-grade security features enabled by default: Google Safe Browsing, certificate pinning,
-        HTTPS-only mode, and proper Content Security Policy implementation.
+        Everything you need: Cookie Management, JavaScript Injection, Custom User Agents,
+        Content Blockers, Download Management, and much more.
       </>
     ),
   },
   {
-    title: 'Modern & Clean',
+    title: 'Enterprise Ready',
     Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
     description: (
       <>
-        Built with modern WebView APIs, SOLID principles, and clean architecture.
-        Breaking changes are welcome in v3.0 to keep the codebase lean and maintainable.
+        Built for production with security best practices, type-safe APIs,
+        and comprehensive documentation for every platform.
       </>
     ),
   },

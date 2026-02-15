@@ -7,7 +7,8 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 import 'in_app_webview_windows_controller.dart';
 
 class InAppWebViewWindowsPlatform extends PlatformInAppWebViewController {
-  InAppWebViewWindowsPlatform(PlatformInAppWebViewControllerCreationParams params)
+  InAppWebViewWindowsPlatform(
+      PlatformInAppWebViewControllerCreationParams params)
       : super.implementation(params);
 
   // TODO: Implement platform controller logic for Windows
@@ -55,7 +56,7 @@ class _InAppWebViewWindowsWidgetStateImpl
   Future<void> initPlatformState() async {
     try {
       await _controller.initialize();
-      
+
       // Setup listeners
       _controller.url.listen((url) {
         // TODO: handle url change
@@ -76,19 +77,20 @@ class _InAppWebViewWindowsWidgetStateImpl
 
       // Load initial URL
       if (widget.params.initialUrlRequest != null) {
-        await _controller.loadUrl(widget.params.initialUrlRequest!.url.toString());
+        await _controller
+            .loadUrl(widget.params.initialUrlRequest!.url.toString());
       }
-      
+
       // Create controller
       final controllerParams = PlatformInAppWebViewControllerCreationParams(
           id: widget.params.windowId, webviewParams: widget.params);
-      
-      final controller = InAppWebViewWindowsController(controllerParams, _controller);
-      
+
+      final controller =
+          InAppWebViewWindowsController(controllerParams, _controller);
+
       if (widget.params.onWebViewCreated != null) {
         widget.params.onWebViewCreated!(controller);
       }
-
     } on PlatformException catch (e) {
       // WidgetsBinding.instance.addPostFrameCallback((_) {
       //   showDialog(
@@ -123,7 +125,7 @@ class _InAppWebViewWindowsWidgetStateImpl
         ? Webview(_controller)
         : const Center(child: CircularProgressIndicator());
   }
-  
+
   @override
   void dispose() {
     _controller.dispose();

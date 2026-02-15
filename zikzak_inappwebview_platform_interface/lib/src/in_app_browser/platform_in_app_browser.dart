@@ -208,8 +208,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///- Windows
   ///{@endtemplate}
   Future<void> openUrlRequest(
-      {required URLRequest urlRequest,
-      InAppBrowserClassSettings? settings}) {
+      {required URLRequest urlRequest, InAppBrowserClassSettings? settings}) {
     throw UnimplementedError(
         'openUrlRequest is not implemented on the current platform');
   }
@@ -258,8 +257,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///- Windows
   ///{@endtemplate}
   Future<void> openFile(
-      {required String assetFilePath,
-      InAppBrowserClassSettings? settings}) {
+      {required String assetFilePath, InAppBrowserClassSettings? settings}) {
     throw UnimplementedError(
         'openFile is not implemented on the current platform');
   }
@@ -1264,6 +1262,6 @@ abstract class PlatformInAppBrowserEvents {
   ///[numberOfMatches] represents the number of matches found.
   ///
   ///[isDoneCounting] represents whether the counting is done.
-  void onFindResultReceived(int activeMatchOrdinal, int numberOfMatches,
-      bool isDoneCounting) {}
+  void onFindResultReceived(
+      int activeMatchOrdinal, int numberOfMatches, bool isDoneCounting) {}
 }

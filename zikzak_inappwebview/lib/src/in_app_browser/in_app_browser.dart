@@ -97,20 +97,16 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppBrowser.openUrlRequest}
   Future<void> openUrlRequest(
-      {required URLRequest urlRequest,
-      InAppBrowserClassSettings? settings}) {
+      {required URLRequest urlRequest, InAppBrowserClassSettings? settings}) {
     this.platform.eventHandler = this;
-    return platform.openUrlRequest(
-        urlRequest: urlRequest, settings: settings);
+    return platform.openUrlRequest(urlRequest: urlRequest, settings: settings);
   }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppBrowser.openFile}
   Future<void> openFile(
-      {required String assetFilePath,
-      InAppBrowserClassSettings? settings}) {
+      {required String assetFilePath, InAppBrowserClassSettings? settings}) {
     this.platform.eventHandler = this;
-    return platform.openFile(
-        assetFilePath: assetFilePath, settings: settings);
+    return platform.openFile(assetFilePath: assetFilePath, settings: settings);
   }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppBrowser.openData}
@@ -342,7 +338,6 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
   Future<JsPromptResponse?>? onJsPrompt(JsPromptRequest jsPromptRequest) {
     return null;
   }
-
 
   @override
   void onLoadResource(LoadedResource resource) {}

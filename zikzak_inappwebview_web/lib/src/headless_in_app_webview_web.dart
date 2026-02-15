@@ -30,30 +30,30 @@ class HeadlessInAppWebViewWeb extends PlatformHeadlessInAppWebView {
     _iframe!.style.left = '-9999px';
     _iframe!.style.top = '-9999px';
     _iframe!.style.border = 'none';
-    
+
     if (params.initialSize.width != -1) {
-       _iframe!.style.width = '${params.initialSize.width}px';
+      _iframe!.style.width = '${params.initialSize.width}px';
     } else {
-       _iframe!.style.width = '0px';
+      _iframe!.style.width = '0px';
     }
     if (params.initialSize.height != -1) {
-       _iframe!.style.height = '${params.initialSize.height}px';
+      _iframe!.style.height = '${params.initialSize.height}px';
     } else {
-       _iframe!.style.height = '0px';
+      _iframe!.style.height = '0px';
     }
 
     // Create controller
     final controllerParams = PlatformInAppWebViewControllerCreationParams(
         id: params.windowId, webviewParams: params);
-    
+
     _webViewController = InAppWebViewWebController(controllerParams, _iframe!);
 
     // Setup listeners
     _iframe!.onLoad.listen((event) {
       if (params.onLoadStop != null) {
-         final url = _iframe!.src != null ? WebUri(_iframe!.src!) : null;
-         final controller = _convertController(_webViewController!);
-         params.onLoadStop!(controller, url);
+        final url = _iframe!.src != null ? WebUri(_iframe!.src!) : null;
+        final controller = _convertController(_webViewController!);
+        params.onLoadStop!(controller, url);
       }
     });
 
@@ -80,7 +80,7 @@ class HeadlessInAppWebViewWeb extends PlatformHeadlessInAppWebView {
     }
 
     html.document.body!.append(_iframe!);
-    
+
     if (params.onWebViewCreated != null) {
       final controller = _convertController(_webViewController!);
       params.onWebViewCreated!(controller);

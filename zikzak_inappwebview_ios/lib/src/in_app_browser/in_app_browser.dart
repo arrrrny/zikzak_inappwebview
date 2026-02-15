@@ -145,8 +145,8 @@ class IOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
     _isOpened = true;
     _init();
 
-    var initialSettings = settings?.toMap() ??
-        InAppBrowserClassSettings().toMap();
+    var initialSettings =
+        settings?.toMap() ?? InAppBrowserClassSettings().toMap();
 
     Map<String, dynamic> pullToRefreshSettings =
         _iosParams.pullToRefreshController?.settings?.toMap() ??
@@ -175,8 +175,7 @@ class IOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
       InAppBrowserClassSettings? settings}) async {
     assert(urlRequest.url != null && urlRequest.url.toString().isNotEmpty);
 
-    Map<String, dynamic> args =
-        _prepareOpenRequest(settings: settings);
+    Map<String, dynamic> args = _prepareOpenRequest(settings: settings);
     args.putIfAbsent('urlRequest', () => urlRequest.toMap());
     await _staticChannel.invokeMethod('open', args);
   }
@@ -187,8 +186,7 @@ class IOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
       InAppBrowserClassSettings? settings}) async {
     assert(assetFilePath.isNotEmpty);
 
-    Map<String, dynamic> args =
-        _prepareOpenRequest(settings: settings);
+    Map<String, dynamic> args = _prepareOpenRequest(settings: settings);
     args.putIfAbsent('assetFilePath', () => assetFilePath);
     await _staticChannel.invokeMethod('open', args);
   }
@@ -201,14 +199,13 @@ class IOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
       WebUri? baseUrl,
       WebUri? historyUrl,
       InAppBrowserClassSettings? settings}) async {
-    Map<String, dynamic> args =
-        _prepareOpenRequest(settings: settings);
+    Map<String, dynamic> args = _prepareOpenRequest(settings: settings);
     args.putIfAbsent('data', () => data);
     args.putIfAbsent('mimeType', () => mimeType);
     args.putIfAbsent('encoding', () => encoding);
     args.putIfAbsent('baseUrl', () => baseUrl?.toString() ?? "about:blank");
-    args.putIfAbsent('historyUrl',
-        () => historyUrl?.toString() ?? "about:blank");
+    args.putIfAbsent(
+        'historyUrl', () => historyUrl?.toString() ?? "about:blank");
     await _staticChannel.invokeMethod('open', args);
   }
 

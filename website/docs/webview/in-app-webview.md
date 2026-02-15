@@ -9,14 +9,15 @@ InAppWebView is a Flutter Widget for adding an **inline native WebView** integra
 
 ## Platform Implementations
 
-- **Android:** AndroidViewSurface
+- **Android:** AndroidView / Hybrid Composition
 - **iOS:** UiKitView
-- **macOS:** AppKitView (deprecated in v3.0)
-- **Windows:** Custom implementation (deprecated in v3.0)
-- **Web:** HtmlElementView via iframe (deprecated in v3.0)
+- **macOS:** AppKitView
+- **Windows:** WebView2
+- **Linux:** WebKitGTK
+- **Web:** HtmlElementView (Iframe)
 
 :::info
-ZikZak InAppWebView v3.0+ focuses exclusively on **Android and iOS** platforms for better quality and maintenance.
+ZikZak InAppWebView v4.0.0+ supports **Android, iOS, macOS, Windows, Linux, and Web**.
 :::
 
 ## Basic Usage
@@ -34,7 +35,7 @@ class MyInAppBrowser extends StatelessWidget {
       ),
       initialSettings: InAppWebViewSettings(
         javaScriptEnabled: true,
-        safeBrowsingEnabled: true, // Enabled by default in v3.0
+        safeBrowsingEnabled: true,
       ),
       onWebViewCreated: (controller) {
         print('WebView created');

@@ -749,7 +749,7 @@ class PlatformWebViewCreationParams<T> {
   ///- Android native WebView ([Official API - WebViewClient.onSafeBrowsingHit](https://developer.android.com/reference/android/webkit/WebViewClient#onSafeBrowsingHit(android.webkit.WebView,%20android.webkit.WebResourceRequest,%20int,%20android.webkit.SafeBrowsingResponse)))
   ///{@endtemplate}
   final Future<SafeBrowsingResponse?> Function(
-      T controller, WebUri url, SafeBrowsingThreat? threatType)?
+          T controller, WebUri url, SafeBrowsingThreat? threatType)?
       onSafeBrowsingHit;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onPermissionRequest}
@@ -769,8 +769,7 @@ class PlatformWebViewCreationParams<T> {
   ///- MacOS ([Official API - WKUIDelegate.webView](https://developer.apple.com/documentation/webkit/wkuidelegate/3763033-webview))
   ///{@endtemplate}
   final Future<PermissionResponse?> Function(
-          T controller, PermissionRequest permissionRequest)?
-      onPermissionRequest;
+      T controller, PermissionRequest permissionRequest)? onPermissionRequest;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onGeolocationPermissionsShowPrompt}
   ///Event fired when the webview is requesting a permission to access the geolocation.
@@ -804,7 +803,7 @@ class PlatformWebViewCreationParams<T> {
   ///- Android native WebView ([Official API - WebViewClient.shouldInterceptRequest](https://developer.android.com/reference/android/webkit/WebViewClient#shouldInterceptRequest(android.webkit.WebView,%20android.webkit.WebResourceRequest)))
   ///{@endtemplate}
   final Future<WebResourceResponse?> Function(
-          T controller, WebResourceRequest request)? shouldInterceptRequest;
+      T controller, WebResourceRequest request)? shouldInterceptRequest;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onRenderProcessGone}
   ///Event fired when the given WebView's render process has exited.
@@ -993,9 +992,8 @@ class PlatformWebViewCreationParams<T> {
   ///[isDoneCounting] represents whether the counting is done.
   ///{@endtemplate}
   final void Function(
-      int activeMatchOrdinal,
-      int numberOfMatches,
-      bool isDoneCounting)? onFindResultReceived;
+          int activeMatchOrdinal, int numberOfMatches, bool isDoneCounting)?
+      onFindResultReceived;
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams}
   const PlatformWebViewCreationParams(

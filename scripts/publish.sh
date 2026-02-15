@@ -106,7 +106,7 @@ EOF
 check_dependencies() {
     local package_dir="$1"
     local max_retries=30
-    local retry_interval=120
+    local retry_interval=30
 
     # Extract package version from pubspec.yaml
     local version=$(grep "^version:" "$PROJECT_DIR/$package_dir/pubspec.yaml" | sed 's/version: //' | tr -d '[:space:]')
@@ -130,7 +130,7 @@ check_dependencies() {
         fi
 
         # Try up to max_retries times with delay
-        local retry_count=0
+        retry_count=0
         while [ $retry_count -lt $max_retries ]; do
             # First check if it's available via API
             if check_package_on_pubdev "$dep" "$version"; then

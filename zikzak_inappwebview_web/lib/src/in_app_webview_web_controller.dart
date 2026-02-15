@@ -19,7 +19,7 @@ class InAppWebViewWebController extends PlatformInAppWebViewController {
         _injectConsoleInterception();
       });
     });
-    
+
     html.window.onMessage.listen((event) {
       if (event.data is! String) return;
       final raw = event.data as String;
@@ -27,33 +27,35 @@ class InAppWebViewWebController extends PlatformInAppWebViewController {
       try {
         final data = jsonDecode(raw);
         if (data is Map && data['type'] == 'console') {
-            final message = data['message'];
-            final level = data['level'];
-            ConsoleMessageLevel consoleLevel = ConsoleMessageLevel.LOG;
-            switch (level) {
-              case 'WARNING':
-                consoleLevel = ConsoleMessageLevel.WARNING;
-                break;
-              case 'ERROR':
-                consoleLevel = ConsoleMessageLevel.ERROR;
-                break;
-              case 'DEBUG':
-                consoleLevel = ConsoleMessageLevel.DEBUG;
-                break;
-              case 'INFO':
-                consoleLevel = ConsoleMessageLevel.LOG; // Fallback to LOG if INFO is missing in the enum
-                break;
-            }
-            
-            if (params.webviewParams?.onConsoleMessage != null) {
-               params.webviewParams!.onConsoleMessage!(this, ConsoleMessage(message: message, messageLevel: consoleLevel));
-            }
+          final message = data['message'];
+          final level = data['level'];
+          ConsoleMessageLevel consoleLevel = ConsoleMessageLevel.LOG;
+          switch (level) {
+            case 'WARNING':
+              consoleLevel = ConsoleMessageLevel.WARNING;
+              break;
+            case 'ERROR':
+              consoleLevel = ConsoleMessageLevel.ERROR;
+              break;
+            case 'DEBUG':
+              consoleLevel = ConsoleMessageLevel.DEBUG;
+              break;
+            case 'INFO':
+              consoleLevel = ConsoleMessageLevel
+                  .LOG; // Fallback to LOG if INFO is missing in the enum
+              break;
           }
-        } catch (_) {
-          // Ignore invalid JSON
+
+          if (params.webviewParams?.onConsoleMessage != null) {
+            params.webviewParams!.onConsoleMessage!(this,
+                ConsoleMessage(message: message, messageLevel: consoleLevel));
+          }
         }
+      } catch (_) {
+        // Ignore invalid JSON
+      }
     });
-   }
+  }
 
   void _injectConsoleInterception() {
     try {
@@ -117,19 +119,21 @@ class InAppWebViewWebController extends PlatformInAppWebViewController {
       } else {
         // Fallback for cases where Dart might wrap it differently, though about:blank should be fine.
         // If we are here, it might be Cross-Origin or Dart's type system being tricky.
-        print("Content window is not an html.Window (likely cross-origin blocked or type mismatch)");
-        
+        print(
+            "Content window is not an html.Window (likely cross-origin blocked or type mismatch)");
+
         // Strategy 2: Try accessing contentDocument directly from the iframe element via JS interop
         // This bypasses the contentWindow wrapper which might be causing issues.
-        print("Attempting to access contentDocument via JS interop on iframe element...");
+        print(
+            "Attempting to access contentDocument via JS interop on iframe element...");
         try {
           final jsIframe = js.JsObject.fromBrowserObject(_iframe);
           if (jsIframe.hasProperty('contentDocument')) {
-             final doc = jsIframe['contentDocument'];
-             if (doc != null) {
-                print("Successfully accessed contentDocument via JS interop");
-                final script = doc.callMethod('createElement', ['script']);
-                script['text'] = """
+            final doc = jsIframe['contentDocument'];
+            if (doc != null) {
+              print("Successfully accessed contentDocument via JS interop");
+              final script = doc.callMethod('createElement', ['script']);
+              script['text'] = """
                 (function() {
                   var oldLog = console.log;
                   var oldWarn = console.warn;
@@ -173,42 +177,44 @@ class InAppWebViewWebController extends PlatformInAppWebViewController {
                   console.log("ZikZak: Console interception active");
                 })();
                 """;
-                
-                // Try to append to body or head or documentElement
-                var appended = false;
-                if (doc.hasProperty('body') && doc['body'] != null) {
-                   doc['body'].callMethod('appendChild', [script]);
-                   appended = true;
-                } else if (doc.hasProperty('head') && doc['head'] != null) {
-                   doc['head'].callMethod('appendChild', [script]);
-                   appended = true;
-                } else if (doc.hasProperty('documentElement') && doc['documentElement'] != null) {
-                   doc['documentElement'].callMethod('appendChild', [script]);
-                   appended = true;
-                }
-                
-                if (appended) {
-                   print("Script appended successfully via contentDocument");
-                   return;
-                } else {
-                   print("Could not find body/head/documentElement to append script");
-                }
-             }
+
+              // Try to append to body or head or documentElement
+              var appended = false;
+              if (doc.hasProperty('body') && doc['body'] != null) {
+                doc['body'].callMethod('appendChild', [script]);
+                appended = true;
+              } else if (doc.hasProperty('head') && doc['head'] != null) {
+                doc['head'].callMethod('appendChild', [script]);
+                appended = true;
+              } else if (doc.hasProperty('documentElement') &&
+                  doc['documentElement'] != null) {
+                doc['documentElement'].callMethod('appendChild', [script]);
+                appended = true;
+              }
+
+              if (appended) {
+                print("Script appended successfully via contentDocument");
+                return;
+              } else {
+                print(
+                    "Could not find body/head/documentElement to append script");
+              }
+            }
           }
         } catch (e) {
-           print("Failed to access contentDocument: $e");
+          print("Failed to access contentDocument: $e");
         }
 
         // Strategy 3: Original JS interop fallback (as last resort)
         if (window != null) {
-             print("Attempting JS interop fallback on window...");
-             final jsWindow = js.JsObject.fromBrowserObject(window);
-             
-             // Check for document property
-             if (jsWindow.hasProperty('document')) {
-                final doc = jsWindow['document'];
-                final script = doc.callMethod('createElement', ['script']);
-                script['text'] = """
+          print("Attempting JS interop fallback on window...");
+          final jsWindow = js.JsObject.fromBrowserObject(window);
+
+          // Check for document property
+          if (jsWindow.hasProperty('document')) {
+            final doc = jsWindow['document'];
+            final script = doc.callMethod('createElement', ['script']);
+            script['text'] = """
                 (function() {
                   var oldLog = console.log;
                   var oldWarn = console.warn;
@@ -252,11 +258,11 @@ class InAppWebViewWebController extends PlatformInAppWebViewController {
                   console.log("ZikZak: Console interception active");
                 })();
                 """;
-                final body = doc['body'];
-                body.callMethod('appendChild', [script]);
-             } else {
-               print("JS Interop: Window has no 'document' property");
-             }
+            final body = doc['body'];
+            body.callMethod('appendChild', [script]);
+          } else {
+            print("JS Interop: Window has no 'document' property");
+          }
         }
       }
     } catch (e) {
@@ -265,7 +271,8 @@ class InAppWebViewWebController extends PlatformInAppWebViewController {
   }
 
   @override
-  Future<void> loadUrl({required URLRequest urlRequest, WebUri? allowingReadAccessTo}) async {
+  Future<void> loadUrl(
+      {required URLRequest urlRequest, WebUri? allowingReadAccessTo}) async {
     if (urlRequest.url != null) {
       if (onLoadStartCallback != null) {
         onLoadStartCallback!(urlRequest.url);
@@ -341,7 +348,8 @@ class InAppWebViewWebController extends PlatformInAppWebViewController {
   }
 
   @override
-  Future<dynamic> evaluateJavascript({required String source, ContentWorld? contentWorld}) async {
+  Future<dynamic> evaluateJavascript(
+      {required String source, ContentWorld? contentWorld}) async {
     try {
       final window = _iframe.contentWindow;
       if (window != null) {
@@ -352,16 +360,16 @@ class InAppWebViewWebController extends PlatformInAppWebViewController {
         // However, dart:html's window.location.href access throws on cross-origin.
         // There is no standard way to inject arbitrary JS into a cross-origin iframe from the parent
         // due to security policies (SOP).
-        
+
         // Assuming same-origin for now or accepting the limitation.
         // We can try to use `window.eval(source)` if available/accessible.
         // Note: dart:html Window doesn't expose eval directly easily.
-        
+
         // A common workaround in Flutter Web for "eval" is using dart:js_interop or similar,
         // but here we are targeting a specific iframe window.
-        
+
         // We can try using postMessage if we had a listener inside, but we don't control the page content generally.
-        
+
         // Best effort:
         // Create a script element in the iframe's document (only works for same-origin).
         final doc = (window as html.Window).document as html.HtmlDocument;

@@ -14,7 +14,8 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
       : super.implementation(params);
 
   @override
-  Future<void> loadUrl({required URLRequest urlRequest, WebUri? allowingReadAccessTo}) async {
+  Future<void> loadUrl(
+      {required URLRequest urlRequest, WebUri? allowingReadAccessTo}) async {
     if (urlRequest.url != null) {
       await _controller.loadUrl(urlRequest.url.toString());
     }
@@ -28,15 +29,18 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
       WebUri? baseUrl,
       WebUri? historyUrl,
       WebUri? allowingReadAccessTo}) async {
-      final dataUri = Uri.dataFromString(data, mimeType: mimeType, encoding: Encoding.getByName(encoding)).toString();
-      await _controller.loadUrl(dataUri);
+    final dataUri = Uri.dataFromString(data,
+            mimeType: mimeType, encoding: Encoding.getByName(encoding))
+        .toString();
+    await _controller.loadUrl(dataUri);
   }
 
   @override
   Future<void> loadFile({required String assetFilePath}) async {
-    final assetsDir = p.join(p.dirname(Platform.resolvedExecutable), 'data', 'flutter_assets');
+    final assetsDir = p.join(
+        p.dirname(Platform.resolvedExecutable), 'data', 'flutter_assets');
     final filePath = p.join(assetsDir, assetFilePath);
-    
+
     // Windows file uri
     final fileUri = Uri.file(filePath).toString();
     await _controller.loadUrl(fileUri);
@@ -61,7 +65,8 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
   }
 
   @override
-  Future<dynamic> evaluateJavascript({required String source, ContentWorld? contentWorld}) async {
+  Future<dynamic> evaluateJavascript(
+      {required String source, ContentWorld? contentWorld}) async {
     return await _controller.executeScript(source);
   }
 

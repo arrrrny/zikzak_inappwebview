@@ -144,8 +144,7 @@ class MacOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
       onConsoleMessage: (controller, consoleMessage) =>
           eventHandler?.onConsoleMessage(consoleMessage),
       shouldOverrideUrlLoading: (controller, navigationAction) async {
-        return await eventHandler
-            ?.shouldOverrideUrlLoading(navigationAction);
+        return await eventHandler?.shouldOverrideUrlLoading(navigationAction);
       },
       onJsAlert: (controller, jsAlertRequest) async {
         return await eventHandler?.onJsAlert(jsAlertRequest);
@@ -184,8 +183,8 @@ class MacOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
     args.putIfAbsent('windowId', () => windowId);
     args.putIfAbsent('initialUserScripts',
         () => initialUserScripts?.map((e) => e.toMap()).toList() ?? []);
-    args.putIfAbsent('menuItems',
-        () => _menuItems.values.map((e) => e.toMap()).toList());
+    args.putIfAbsent(
+        'menuItems', () => _menuItems.values.map((e) => e.toMap()).toList());
 
     return args;
   }
@@ -224,8 +223,8 @@ class MacOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
     args.putIfAbsent('mimeType', () => mimeType);
     args.putIfAbsent('encoding', () => encoding);
     args.putIfAbsent('baseUrl', () => baseUrl?.toString() ?? "about:blank");
-    args.putIfAbsent('historyUrl',
-        () => historyUrl?.toString() ?? "about:blank");
+    args.putIfAbsent(
+        'historyUrl', () => historyUrl?.toString() ?? "about:blank");
     await _staticChannel.invokeMethod('open', args);
   }
 

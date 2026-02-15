@@ -82,9 +82,7 @@ class CookieManager {
           required String name,
           InAppWebViewController? webViewController}) =>
       platform.getCookie(
-          url: url,
-          name: name,
-          webViewController: webViewController?.platform);
+          url: url, name: name, webViewController: webViewController?.platform);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformCookieManager.deleteCookie}
   Future<bool> deleteCookie(

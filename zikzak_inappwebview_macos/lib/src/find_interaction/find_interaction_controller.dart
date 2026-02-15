@@ -65,19 +65,13 @@ class MacOSFindInteractionController extends PlatformFindInteractionController
   }
 
   @override
-  Future<void> updateResultCount() async {
-    
-  }
+  Future<void> updateResultCount() async {}
 
   @override
-  Future<void> presentFindNavigator() async {
-    
-  }
+  Future<void> presentFindNavigator() async {}
 
   @override
-  Future<void> dismissFindNavigator() async {
-    
-  }
+  Future<void> dismissFindNavigator() async {}
 
   @override
   Future<FindSession?> getActiveFindSession() async {
@@ -88,7 +82,7 @@ class MacOSFindInteractionController extends PlatformFindInteractionController
   void dispose({bool isKeepAlive = false}) {
     disposeChannel();
   }
-  
+
   /// Helper to set up the method handler
   void setupMethodHandler() {
     handler = _handleMethod;

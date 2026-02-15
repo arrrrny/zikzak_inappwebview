@@ -32,8 +32,7 @@ abstract class PlatformJavaScriptDelegate extends PlatformInterface {
   }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.injectJavascriptFileFromAsset}
-  Future<void> injectJavascriptFileFromAsset(
-      {required String assetFilePath}) {
+  Future<void> injectJavascriptFileFromAsset({required String assetFilePath}) {
     throw UnimplementedError(
         'injectJavascriptFileFromAsset is not implemented on the current platform');
   }
@@ -47,8 +46,7 @@ abstract class PlatformJavaScriptDelegate extends PlatformInterface {
   }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.injectCSSFileFromAsset}
-  Future<void> injectCSSFileFromAsset(
-      {required String assetFilePath}) {
+  Future<void> injectCSSFileFromAsset({required String assetFilePath}) {
     throw UnimplementedError(
         'injectCSSFileFromAsset is not implemented on the current platform');
   }

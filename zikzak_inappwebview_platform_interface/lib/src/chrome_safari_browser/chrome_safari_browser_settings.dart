@@ -278,6 +278,4 @@ class ChromeSafariBrowserSettings_ {
           "exit animations must be have 2 android resources");
     }
   }
-
-
 }

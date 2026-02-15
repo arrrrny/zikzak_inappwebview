@@ -4,7 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
 class MacOSInAppWebViewController extends PlatformInAppWebViewController {
-  MacOSInAppWebViewController(PlatformInAppWebViewControllerCreationParams params)
+  MacOSInAppWebViewController(
+      PlatformInAppWebViewControllerCreationParams params)
       : super.implementation(params) {
     _channel = MethodChannel('dev.zuzu/zikzak_inappwebview_${params.id}');
     _channel.setMethodCallHandler((call) async {
@@ -58,8 +59,7 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
 
           params.webviewParams!.onReceivedError!(
               controller,
-              WebResourceRequest(
-                  url: url != null ? WebUri(url) : WebUri('')),
+              WebResourceRequest(url: url != null ? WebUri(url) : WebUri('')),
               WebResourceError(
                   type: WebResourceErrorType.fromNativeValue(code) ??
                       WebResourceErrorType.UNKNOWN,
@@ -88,47 +88,61 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
         break;
       case 'shouldOverrideUrlLoading':
         if (params.webviewParams?.shouldOverrideUrlLoading != null) {
-          Map<String, dynamic> arguments = call.arguments.cast<String, dynamic>();
-          var navigationAction = NavigationAction.fromMap(arguments['navigationAction'].cast<String, dynamic>())!;
-          var policy = await params.webviewParams!.shouldOverrideUrlLoading!(controller, navigationAction);
-          return policy?.toNativeValue() ?? NavigationActionPolicy.CANCEL.toNativeValue();
+          Map<String, dynamic> arguments =
+              call.arguments.cast<String, dynamic>();
+          var navigationAction = NavigationAction.fromMap(
+              arguments['navigationAction'].cast<String, dynamic>())!;
+          var policy = await params.webviewParams!.shouldOverrideUrlLoading!(
+              controller, navigationAction);
+          return policy?.toNativeValue() ??
+              NavigationActionPolicy.CANCEL.toNativeValue();
         }
         return NavigationActionPolicy.ALLOW.toNativeValue();
       case 'onConsoleMessage':
         if (params.webviewParams?.onConsoleMessage != null) {
-          var consoleMessage = ConsoleMessage.fromMap(call.arguments.cast<String, dynamic>())!;
+          var consoleMessage =
+              ConsoleMessage.fromMap(call.arguments.cast<String, dynamic>())!;
           params.webviewParams!.onConsoleMessage!(controller, consoleMessage);
         }
         break;
       case 'onReceivedHttpError':
         if (params.webviewParams?.onReceivedHttpError != null) {
           String? url = call.arguments['request']['url'];
-          var request = WebResourceRequest(url: url != null ? WebUri(url) : WebUri(''));
-          var errorResponse = WebResourceResponse.fromMap(call.arguments['errorResponse'].cast<String, dynamic>())!;
-          params.webviewParams!.onReceivedHttpError!(controller, request, errorResponse);
+          var request =
+              WebResourceRequest(url: url != null ? WebUri(url) : WebUri(''));
+          var errorResponse = WebResourceResponse.fromMap(
+              call.arguments['errorResponse'].cast<String, dynamic>())!;
+          params.webviewParams!.onReceivedHttpError!(
+              controller, request, errorResponse);
         }
         break;
       case 'onJsAlert':
         if (params.webviewParams?.onJsAlert != null) {
-          Map<String, dynamic> arguments = call.arguments.cast<String, dynamic>();
+          Map<String, dynamic> arguments =
+              call.arguments.cast<String, dynamic>();
           var request = JsAlertRequest.fromMap(arguments)!;
-          var response = await params.webviewParams!.onJsAlert!(controller, request);
+          var response =
+              await params.webviewParams!.onJsAlert!(controller, request);
           return response?.toMap();
         }
         return null;
       case 'onJsConfirm':
         if (params.webviewParams?.onJsConfirm != null) {
-          Map<String, dynamic> arguments = call.arguments.cast<String, dynamic>();
+          Map<String, dynamic> arguments =
+              call.arguments.cast<String, dynamic>();
           var request = JsConfirmRequest.fromMap(arguments)!;
-          var response = await params.webviewParams!.onJsConfirm!(controller, request);
+          var response =
+              await params.webviewParams!.onJsConfirm!(controller, request);
           return response?.toMap();
         }
         return null;
       case 'onJsPrompt':
         if (params.webviewParams?.onJsPrompt != null) {
-          Map<String, dynamic> arguments = call.arguments.cast<String, dynamic>();
+          Map<String, dynamic> arguments =
+              call.arguments.cast<String, dynamic>();
           var request = JsPromptRequest.fromMap(arguments)!;
-          var response = await params.webviewParams!.onJsPrompt!(controller, request);
+          var response =
+              await params.webviewParams!.onJsPrompt!(controller, request);
           return response?.toMap();
         }
         return null;
@@ -158,7 +172,8 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
       {required URLRequest urlRequest, WebUri? allowingReadAccessTo}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('urlRequest', () => urlRequest.toMap());
-    args.putIfAbsent('allowingReadAccessTo', () => allowingReadAccessTo.toString());
+    args.putIfAbsent(
+        'allowingReadAccessTo', () => allowingReadAccessTo.toString());
     await _channel.invokeMethod('loadUrl', args);
   }
 
@@ -198,13 +213,14 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
   }
 
   @override
-  Future<dynamic> evaluateJavascript({required String source, ContentWorld? contentWorld}) async {
+  Future<dynamic> evaluateJavascript(
+      {required String source, ContentWorld? contentWorld}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('source', () => source);
     args.putIfAbsent('contentWorld', () => contentWorld?.toMap());
     return await _channel.invokeMethod('evaluateJavascript', args);
   }
-  
+
   @override
   void dispose({bool isKeepAlive = false}) {
     // _channel.setMethodCallHandler(null);

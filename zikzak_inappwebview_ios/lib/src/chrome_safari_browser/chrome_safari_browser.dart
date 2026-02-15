@@ -132,8 +132,8 @@ class IOSChromeSafariBrowser extends PlatformChromeSafariBrowser
       menuItemList.add(value.toMap());
     });
 
-    var initialSettings = settings?.toMap() ??
-        ChromeSafariBrowserSettings().toMap();
+    var initialSettings =
+        settings?.toMap() ?? ChromeSafariBrowserSettings().toMap();
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('id', () => id);

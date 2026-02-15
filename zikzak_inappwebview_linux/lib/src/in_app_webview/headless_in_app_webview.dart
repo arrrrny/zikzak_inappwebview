@@ -161,7 +161,6 @@ class LinuxHeadlessInAppWebViewCreationParams
 
 class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     with ChannelController {
-
   bool _started = false;
   bool _running = false;
 
@@ -196,11 +195,11 @@ class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
         params.controllerFromPlatform?.call(_webViewController!) ??
             _webViewController!;
     if (_linuxParams.findInteractionController != null) {
-      _linuxParams.findInteractionController!.channel = MethodChannel(
-          'wtf.zikzak/zikzak_inappwebview_find_interaction_$id');
+      _linuxParams.findInteractionController!.channel =
+          MethodChannel('wtf.zikzak/zikzak_inappwebview_find_interaction_$id');
       _linuxParams.findInteractionController!.setupMethodHandler();
     }
-    
+
     channel = MethodChannel('wtf.zikzak/flutter_headless_inappwebview_$id');
     handler = _handleMethod;
     initMethodCallHandler();

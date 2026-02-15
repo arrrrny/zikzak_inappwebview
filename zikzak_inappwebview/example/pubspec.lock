@@ -358,10 +358,11 @@ packages:
   zikzak_inappwebview_internal_annotations:
     dependency: transitive
     description:
-      path: "../../zikzak_inappwebview_internal_annotations"
-      relative: true
-    source: path
-    version: "3.0.0"
+      name: zikzak_inappwebview_internal_annotations
+      sha256: "67d8fce809dbae2391991a4377212dddffcdbe564f4c852011124ee636c8ae2d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.0"
   zikzak_inappwebview_ios:
     dependency: "direct overridden"
     description:
@@ -386,17 +387,18 @@ packages:
   zikzak_inappwebview_web:
     dependency: transitive
     description:
-      path: "../../zikzak_inappwebview_web"
-      relative: true
-    source: path
-    version: "1.0.0"
+      name: zikzak_inappwebview_web
+      sha256: b0181f9125f630ef5368abfcb31370e19a6fd0e2611092aaae50d5a59a331e21
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.0"
   zikzak_inappwebview_windows:
     dependency: "direct overridden"
     description:
       path: "../../zikzak_inappwebview_windows"
       relative: true
     source: path
-    version: "1.0.0"
+    version: "4.0.0"
 sdks:
   dart: ">=3.8.0-0 <4.0.0"
   flutter: ">=3.24.0"

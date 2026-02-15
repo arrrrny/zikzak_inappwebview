@@ -227,6 +227,4 @@ class InAppBrowserSettings_ {
       this.windowStyleMask,
       this.windowTitlebarSeparatorStyle,
       this.windowFrame});
-
-
 }

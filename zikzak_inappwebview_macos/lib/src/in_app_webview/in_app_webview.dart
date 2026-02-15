@@ -34,14 +34,15 @@ class MacOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
 
   void _onPlatformViewCreated(int id) {
     _controller = MacOSInAppWebViewController(
-      PlatformInAppWebViewControllerCreationParams(id: id, webviewParams: params),
+      PlatformInAppWebViewControllerCreationParams(
+          id: id, webviewParams: params),
     );
 
     if (params.findInteractionController != null) {
       var findInteractionController =
           params.findInteractionController as MacOSFindInteractionController;
-      findInteractionController.channel = MethodChannel(
-          'wtf.zikzak/zikzak_inappwebview_find_interaction_$id');
+      findInteractionController.channel =
+          MethodChannel('wtf.zikzak/zikzak_inappwebview_find_interaction_$id');
       findInteractionController.setupMethodHandler();
     }
 

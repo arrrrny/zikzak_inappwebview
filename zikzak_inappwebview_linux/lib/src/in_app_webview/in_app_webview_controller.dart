@@ -4,7 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
 class LinuxInAppWebViewController extends PlatformInAppWebViewController {
-  LinuxInAppWebViewController(PlatformInAppWebViewControllerCreationParams params)
+  LinuxInAppWebViewController(
+      PlatformInAppWebViewControllerCreationParams params)
       : super.implementation(params) {
     _channel = MethodChannel('dev.zuzu/zikzak_inappwebview_${params.id}');
     _channel.setMethodCallHandler((call) async {
@@ -57,8 +58,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
 
           params.webviewParams!.onReceivedError!(
               controller,
-              WebResourceRequest(
-                  url: url != null ? WebUri(url) : WebUri('')),
+              WebResourceRequest(url: url != null ? WebUri(url) : WebUri('')),
               WebResourceError(
                   type: WebResourceErrorType.fromNativeValue(code) ??
                       WebResourceErrorType.UNKNOWN,
@@ -88,15 +88,20 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
       case 'shouldOverrideUrlLoading':
         // Linux might not support this fully yet, but we'll include it.
         if (params.webviewParams?.shouldOverrideUrlLoading != null) {
-          Map<String, dynamic> arguments = call.arguments.cast<String, dynamic>();
-          var navigationAction = NavigationAction.fromMap(arguments['navigationAction'].cast<String, dynamic>())!;
-          var policy = await params.webviewParams!.shouldOverrideUrlLoading!(controller, navigationAction);
-          return policy?.toNativeValue() ?? NavigationActionPolicy.CANCEL.toNativeValue();
+          Map<String, dynamic> arguments =
+              call.arguments.cast<String, dynamic>();
+          var navigationAction = NavigationAction.fromMap(
+              arguments['navigationAction'].cast<String, dynamic>())!;
+          var policy = await params.webviewParams!.shouldOverrideUrlLoading!(
+              controller, navigationAction);
+          return policy?.toNativeValue() ??
+              NavigationActionPolicy.CANCEL.toNativeValue();
         }
         return NavigationActionPolicy.ALLOW.toNativeValue();
       case 'onConsoleMessage':
         if (params.webviewParams?.onConsoleMessage != null) {
-          var consoleMessage = ConsoleMessage.fromMap(call.arguments.cast<String, dynamic>())!;
+          var consoleMessage =
+              ConsoleMessage.fromMap(call.arguments.cast<String, dynamic>())!;
           params.webviewParams!.onConsoleMessage!(controller, consoleMessage);
         }
         break;
@@ -126,7 +131,8 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
       {required URLRequest urlRequest, WebUri? allowingReadAccessTo}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('urlRequest', () => urlRequest.toMap());
-    args.putIfAbsent('allowingReadAccessTo', () => allowingReadAccessTo.toString());
+    args.putIfAbsent(
+        'allowingReadAccessTo', () => allowingReadAccessTo.toString());
     await _channel.invokeMethod('loadUrl', args);
   }
 
@@ -180,7 +186,8 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
       ScriptHtmlTagAttributes? scriptHtmlTagAttributes}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('urlFile', () => urlFile.toString());
-    args.putIfAbsent('scriptHtmlTagAttributes', () => scriptHtmlTagAttributes?.toMap());
+    args.putIfAbsent(
+        'scriptHtmlTagAttributes', () => scriptHtmlTagAttributes?.toMap());
     await _channel.invokeMethod('injectJavascriptFileFromUrl', args);
   }
 
@@ -205,7 +212,8 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
       CSSLinkHtmlTagAttributes? cssLinkHtmlTagAttributes}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('urlFile', () => urlFile.toString());
-    args.putIfAbsent('cssLinkHtmlTagAttributes', () => cssLinkHtmlTagAttributes?.toMap());
+    args.putIfAbsent(
+        'cssLinkHtmlTagAttributes', () => cssLinkHtmlTagAttributes?.toMap());
     await _channel.invokeMethod('injectCSSFileFromUrl', args);
   }
 
@@ -219,7 +227,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
   @override
   void dispose({bool isKeepAlive = false}) {
     if (!isKeepAlive) {
-       _channel.setMethodCallHandler(null);
+      _channel.setMethodCallHandler(null);
     }
   }
 }

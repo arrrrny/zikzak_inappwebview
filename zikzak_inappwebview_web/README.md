@@ -1,6 +1,6 @@
-# zikzak_inappwebview_linux
+# zikzak_inappwebview_web
 
-The Linux implementation of the [zikzak_inappwebview](https://pub.dev/packages/zikzak_inappwebview) plugin.
+The Web implementation of the [zikzak_inappwebview](https://pub.dev/packages/zikzak_inappwebview) plugin.
 
 ## Usage
 

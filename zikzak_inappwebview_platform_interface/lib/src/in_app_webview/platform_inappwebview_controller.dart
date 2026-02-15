@@ -964,9 +964,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- Android native WebView ([Official API - WebView.zoomBy](https://developer.android.com/reference/android/webkit/WebView#zoomBy(float)))
   ///- iOS ([Official API - UIScrollView.setZoomScale](https://developer.apple.com/documentation/uikit/uiscrollview/1619412-setzoomscale))
   ///{@endtemplate}
-  Future<void> zoomBy(
-      {required double zoomFactor,
-      bool animated = false}) {
+  Future<void> zoomBy({required double zoomFactor, bool animated = false}) {
     throw UnimplementedError(
         'zoomBy is not implemented on the current platform');
   }

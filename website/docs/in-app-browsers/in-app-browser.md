@@ -7,11 +7,7 @@ title: InAppBrowser
 
 `InAppBrowser` represents a native WebView displayed **on top of your Flutter app**, outside the Flutter widget tree.
 
-**Supported Platforms:** Android, iOS
-
-:::info v3.0 Changes
-macOS and Windows support has been removed in v3.0 to focus on mobile platforms.
-:::
+**Supported Platforms:** Android, iOS, macOS, Windows, Linux, Web
 
 ## Basic Usage
 

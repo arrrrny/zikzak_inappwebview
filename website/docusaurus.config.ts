@@ -6,7 +6,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
   title: 'ZikZak InAppWebView',
-  tagline: 'The WebView Plugin That Actually Gets Updates',
+  tagline: 'The Feature-Rich WebView Plugin for Flutter (Android, iOS, Web, macOS, Windows, Linux)',
   favicon: 'img/favicon.ico',
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
@@ -24,6 +24,7 @@ const config: Config = {
   // If you aren't using GitHub pages, you don't need these.
   organizationName: 'arrrrny', // Usually your GitHub org/user name.
   projectName: 'zikzak_inappwebview', // Usually your repo name.
+  trailingSlash: false,
 
   onBrokenLinks: 'throw',
 
@@ -46,21 +47,7 @@ const config: Config = {
           editUrl:
             'https://github.com/arrrrny/zikzak_inappwebview/tree/main/website/',
         },
-        blog: {
-          showReadingTime: true,
-          feedOptions: {
-            type: ['rss', 'atom'],
-            xslt: true,
-          },
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/arrrrny/zikzak_inappwebview/tree/main/website/',
-          // Useful options to enforce blogging best practices
-          onInlineTags: 'warn',
-          onInlineAuthors: 'warn',
-          onUntruncatedBlogPosts: 'warn',
-        },
+        blog: false,
         theme: {
           customCss: './src/css/custom.css',
         },
@@ -87,7 +74,6 @@ const config: Config = {
           position: 'left',
           label: 'Docs',
         },
-        {to: '/blog', label: 'Blog', position: 'left'},
         {
           href: 'https://pub.dev/packages/zikzak_inappwebview',
           label: 'pub.dev',
@@ -107,12 +93,8 @@ const config: Config = {
           title: 'Docs',
           items: [
             {
-              label: 'Getting Started',
+              label: 'Intro',
               to: '/docs/intro',
-            },
-            {
-              label: 'Modernization Plan',
-              to: '/docs/modernization-plan',
             },
             {
               label: 'Security Features',
@@ -140,10 +122,6 @@ const config: Config = {
         {
           title: 'More',
           items: [
-            {
-              label: 'Blog',
-              to: '/blog',
-            },
             {
               label: 'GitHub',
               href: 'https://github.com/arrrrny/zikzak_inappwebview',

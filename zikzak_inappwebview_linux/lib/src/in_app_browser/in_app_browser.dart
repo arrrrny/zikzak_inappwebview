@@ -27,8 +27,6 @@ class LinuxInAppBrowserCreationParams
 }
 
 class LinuxInAppBrowser extends PlatformInAppBrowser with ChannelController {
-  
-
   MethodChannel? _channel;
 
   static const MethodChannel _staticChannel =
@@ -122,12 +120,12 @@ class LinuxInAppBrowser extends PlatformInAppBrowser with ChannelController {
     // This is a simplified delegation for now
     // We would need to implement all callbacks to properly delegate
     // For now we just create the controller
-    
+
     _webViewController = LinuxInAppWebViewController.fromInAppBrowser(
       PlatformInAppWebViewControllerCreationParams(
-          id: id, webviewParams: PlatformInAppWebViewWidgetCreationParams(
-              controllerFromPlatform: (controller) => controller
-          )),
+          id: id,
+          webviewParams: PlatformInAppWebViewWidgetCreationParams(
+              controllerFromPlatform: (controller) => controller)),
       _channel!,
     );
   }
@@ -150,8 +148,8 @@ class LinuxInAppBrowser extends PlatformInAppBrowser with ChannelController {
     args.putIfAbsent('windowId', () => windowId);
     args.putIfAbsent('initialUserScripts',
         () => initialUserScripts?.map((e) => e.toMap()).toList() ?? []);
-    args.putIfAbsent('menuItems',
-        () => _menuItems.values.map((e) => e.toMap()).toList());
+    args.putIfAbsent(
+        'menuItems', () => _menuItems.values.map((e) => e.toMap()).toList());
 
     return args;
   }
@@ -187,7 +185,8 @@ class LinuxInAppBrowser extends PlatformInAppBrowser with ChannelController {
     args.putIfAbsent('mimeType', () => mimeType);
     args.putIfAbsent('encoding', () => encoding);
     args.putIfAbsent('baseUrl', () => baseUrl?.toString() ?? "about:blank");
-    args.putIfAbsent('historyUrl', () => historyUrl?.toString() ?? "about:blank");
+    args.putIfAbsent(
+        'historyUrl', () => historyUrl?.toString() ?? "about:blank");
     await _staticChannel.invokeMethod('open', args);
   }
 
@@ -219,7 +218,8 @@ class LinuxInAppBrowser extends PlatformInAppBrowser with ChannelController {
   }
 
   @override
-  Future<void> setSettings({required InAppBrowserClassSettings settings}) async {
+  Future<void> setSettings(
+      {required InAppBrowserClassSettings settings}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('settings', () => settings.toMap());
     await _channel?.invokeMethod('setSettings', args);

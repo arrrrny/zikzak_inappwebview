@@ -1768,5 +1768,3 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
         "minimumViewportInset cannot be larger than maximumViewportInset");
   }
 }
-
-

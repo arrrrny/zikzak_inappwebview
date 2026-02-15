@@ -1,10 +1,10 @@
 ---
-sidebar_position: 3
+sidebar_position: 2
 ---
 
 # Security Features
 
-This document describes the security features available in `zikzak_inappwebview` v3.0+.
+This document describes the security features available in `zikzak_inappwebview` v4.0.0+.
 
 ## Overview
 

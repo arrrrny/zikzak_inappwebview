@@ -39,8 +39,7 @@ class IOSWebStorageManager {
   ///
   ///[date] represents a date. All website data modified after this date will be removed.
   Future<void> removeDataModifiedSince(
-      {required Set<WebsiteDataType> dataTypes,
-      required DateTime date}) async {
+      {required Set<WebsiteDataType> dataTypes, required DateTime date}) async {
     await WebStorageManager.instance()
         .removeDataModifiedSince(dataTypes: dataTypes, date: date);
   }

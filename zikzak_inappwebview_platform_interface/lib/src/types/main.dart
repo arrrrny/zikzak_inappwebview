@@ -1,5 +1,4 @@
-export 'action_mode_menu_item.dart'
-    show ActionModeMenuItem;
+export 'action_mode_menu_item.dart' show ActionModeMenuItem;
 export 'ajax_request.dart' show AjaxRequest;
 export 'ajax_request_action.dart' show AjaxRequestAction;
 export 'ajax_request_event.dart' show AjaxRequestEvent;
@@ -29,10 +28,8 @@ export 'cross_origin.dart' show CrossOrigin;
 export 'css_link_html_tag_attributes.dart' show CSSLinkHtmlTagAttributes;
 export 'custom_scheme_response.dart' show CustomSchemeResponse;
 export 'custom_tabs_share_state.dart' show CustomTabsShareState;
-export 'data_detector_types.dart'
-    show DataDetectorTypes;
-export 'dismiss_button_style.dart'
-    show DismissButtonStyle;
+export 'data_detector_types.dart' show DataDetectorTypes;
+export 'dismiss_button_style.dart' show DismissButtonStyle;
 export 'download_start_request.dart' show DownloadStartRequest;
 export 'favicon.dart' show Favicon;
 export 'fetch_request.dart' show FetchRequest;
@@ -74,8 +71,7 @@ export 'js_prompt_request.dart' show JsPromptRequest;
 export 'js_prompt_response.dart' show JsPromptResponse;
 export 'js_prompt_response_action.dart' show JsPromptResponseAction;
 export 'layout_algorithm.dart' show LayoutAlgorithm;
-export 'layout_in_display_cutout_mode.dart'
-    show LayoutInDisplayCutoutMode;
+export 'layout_in_display_cutout_mode.dart' show LayoutInDisplayCutoutMode;
 export 'loaded_resource.dart' show LoadedResource;
 export 'login_request.dart' show LoginRequest;
 export 'media_capture_state.dart' show MediaCaptureState;
@@ -83,26 +79,20 @@ export 'media_playback_state.dart' show MediaPlaybackState;
 export 'meta_tag.dart' show MetaTag;
 export 'meta_tag_attribute.dart' show MetaTagAttribute;
 export 'mixed_content_mode.dart' show MixedContentMode;
-export 'modal_presentation_style.dart'
-    show ModalPresentationStyle;
-export 'modal_transition_style.dart'
-    show ModalTransitionStyle;
+export 'modal_presentation_style.dart' show ModalPresentationStyle;
+export 'modal_transition_style.dart' show ModalTransitionStyle;
 export 'navigation_action.dart' show NavigationAction;
 export 'navigation_action_policy.dart' show NavigationActionPolicy;
-export 'navigation_response.dart'
-    show NavigationResponse;
-export 'navigation_response_action.dart'
-    show NavigationResponseAction;
+export 'navigation_response.dart' show NavigationResponse;
+export 'navigation_response_action.dart' show NavigationResponseAction;
 export 'navigation_type.dart' show NavigationType;
 export 'on_post_message_callback.dart' show OnPostMessageCallback;
 export 'over_scroll_mode.dart' show OverScrollMode;
 export 'pdf_configuration.dart' show PDFConfiguration;
 export 'permission_request.dart' show PermissionRequest;
 export 'permission_resource_type.dart' show PermissionResourceType;
-export 'permission_response.dart'
-    show PermissionResponse;
-export 'permission_response_action.dart'
-    show PermissionResponseAction;
+export 'permission_response.dart' show PermissionResponse;
+export 'permission_response_action.dart' show PermissionResponseAction;
 export 'print_job_attributes.dart' show PrintJobAttributes;
 export 'print_job_color_mode.dart' show PrintJobColorMode;
 export 'print_job_duplex_mode.dart' show PrintJobDuplexMode;
@@ -115,8 +105,7 @@ export 'print_job_resolution.dart' show PrintJobResolution;
 export 'print_job_state.dart' show PrintJobState;
 export 'proxy_rule.dart' show ProxyRule;
 export 'proxy_scheme_filter.dart' show ProxySchemeFilter;
-export 'pull_to_refresh_size.dart'
-    show PullToRefreshSize;
+export 'pull_to_refresh_size.dart' show PullToRefreshSize;
 export 'referrer_policy.dart' show ReferrerPolicy;
 export 'render_process_gone_detail.dart' show RenderProcessGoneDetail;
 export 'renderer_priority.dart' show RendererPriority;
@@ -131,13 +120,10 @@ export 'screenshot_configuration.dart' show ScreenshotConfiguration;
 export 'script_html_tag_attributes.dart' show ScriptHtmlTagAttributes;
 export 'scrollbar_style.dart' show ScrollBarStyle;
 export 'scrollview_content_inset_adjustment_behavior.dart'
-    show
-        ScrollViewContentInsetAdjustmentBehavior;
-export 'scrollview_deceleration_rate.dart'
-    show ScrollViewDecelerationRate;
+    show ScrollViewContentInsetAdjustmentBehavior;
+export 'scrollview_deceleration_rate.dart' show ScrollViewDecelerationRate;
 export 'security_origin.dart' show SecurityOrigin;
-export 'selection_granularity.dart'
-    show SelectionGranularity;
+export 'selection_granularity.dart' show SelectionGranularity;
 export 'server_trust_auth_response.dart' show ServerTrustAuthResponse;
 export 'server_trust_auth_response_action.dart'
     show ServerTrustAuthResponseAction;
@@ -159,28 +145,23 @@ export 'trusted_web_activity_screen_orientation.dart'
 export 'underline_style.dart' show UnderlineStyle;
 export 'url_authentication_challenge.dart' show URLAuthenticationChallenge;
 export 'url_credential.dart' show URLCredential;
-export 'url_credential_persistence.dart'
-    show URLCredentialPersistence;
+export 'url_credential_persistence.dart' show URLCredentialPersistence;
 export 'url_protection_space.dart' show URLProtectionSpace;
 export 'url_protection_space_authentication_method.dart'
-    show
-        URLProtectionSpaceAuthenticationMethod;
+    show URLProtectionSpaceAuthenticationMethod;
 export 'url_protection_space_http_auth_credentials.dart'
     show URLProtectionSpaceHttpAuthCredentials;
-export 'url_protection_space_proxy_type.dart'
-    show URLProtectionSpaceProxyType;
+export 'url_protection_space_proxy_type.dart' show URLProtectionSpaceProxyType;
 export 'url_request.dart' show URLRequest;
 export 'url_request_attribution.dart' show URLRequestAttribution;
-export 'url_request_cache_policy.dart'
-    show URLRequestCachePolicy;
+export 'url_request_cache_policy.dart' show URLRequestCachePolicy;
 export 'url_request_network_service_type.dart'
     show URLRequestNetworkServiceType;
 export 'url_response.dart' show URLResponse;
 export 'user_preferred_content_mode.dart' show UserPreferredContentMode;
 export 'user_script.dart' show UserScript;
 export 'user_script_injection_time.dart' show UserScriptInjectionTime;
-export 'vertical_scrollbar_position.dart'
-    show VerticalScrollbarPosition;
+export 'vertical_scrollbar_position.dart' show VerticalScrollbarPosition;
 export 'web_archive_format.dart' show WebArchiveFormat;
 export 'web_authentication_session_error.dart'
     show WebAuthenticationSessionError;
@@ -193,11 +174,9 @@ export 'web_resource_request.dart' show WebResourceRequest;
 export 'web_resource_response.dart' show WebResourceResponse;
 export 'web_storage_origin.dart' show WebStorageOrigin;
 export 'web_storage_type.dart' show WebStorageType;
-export 'website_data_record.dart'
-    show WebsiteDataRecord;
+export 'website_data_record.dart' show WebsiteDataRecord;
 export 'website_data_type.dart' show WebsiteDataType;
-export 'webview_package_info.dart'
-    show WebViewPackageInfo;
+export 'webview_package_info.dart' show WebViewPackageInfo;
 export 'webview_render_process_action.dart' show WebViewRenderProcessAction;
 export 'window_features.dart' show WindowFeatures;
 export 'find_session.dart' show FindSession;

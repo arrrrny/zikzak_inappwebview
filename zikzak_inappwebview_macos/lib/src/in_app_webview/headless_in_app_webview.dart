@@ -209,11 +209,11 @@ class MacOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
             _webViewController!;
     // _macosParams.pullToRefreshController?.init(id);
     if (_macosParams.findInteractionController != null) {
-      _macosParams.findInteractionController!.channel = MethodChannel(
-          'wtf.zikzak/zikzak_inappwebview_find_interaction_$id');
+      _macosParams.findInteractionController!.channel =
+          MethodChannel('wtf.zikzak/zikzak_inappwebview_find_interaction_$id');
       _macosParams.findInteractionController!.setupMethodHandler();
     }
-    
+
     channel = MethodChannel('wtf.zikzak/flutter_headless_inappwebview_$id');
     handler = _handleMethod;
     initMethodCallHandler();

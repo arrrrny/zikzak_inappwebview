@@ -38,7 +38,8 @@ class _LinuxInAppWebView extends StatefulWidget {
 class _LinuxInAppWebViewState extends State<_LinuxInAppWebView> {
   LinuxInAppWebViewController? _controller;
   int? _textureId;
-  static const MethodChannel _sharedChannel = MethodChannel('zikzak_inappwebview_linux');
+  static const MethodChannel _sharedChannel =
+      MethodChannel('zikzak_inappwebview_linux');
 
   @override
   void initState() {
@@ -51,31 +52,32 @@ class _LinuxInAppWebViewState extends State<_LinuxInAppWebView> {
     // In MacOS implementation, platform view ID is provided by the platform.
     // Here we generate it to match our custom create logic.
     var id = DateTime.now().microsecondsSinceEpoch.toString();
-    
+
     try {
-        var textureId = await _sharedChannel.invokeMethod('create', {'id': id});
-        if (textureId != null && mounted) {
-           setState(() {
-             _textureId = textureId;
-           });
-           // Use the ID we generated to create the controller, as the native side used it too.
-           _onPlatformViewCreated(id);
-        }
-    } catch(e) {
-        print("Error creating webview: $e");
+      var textureId = await _sharedChannel.invokeMethod('create', {'id': id});
+      if (textureId != null && mounted) {
+        setState(() {
+          _textureId = textureId;
+        });
+        // Use the ID we generated to create the controller, as the native side used it too.
+        _onPlatformViewCreated(id);
+      }
+    } catch (e) {
+      print("Error creating webview: $e");
     }
   }
 
   void _onPlatformViewCreated(String id) {
     _controller = LinuxInAppWebViewController(
-      PlatformInAppWebViewControllerCreationParams(id: id, webviewParams: widget.params),
+      PlatformInAppWebViewControllerCreationParams(
+          id: id, webviewParams: widget.params),
     );
 
     if (widget.params.findInteractionController != null) {
-      var findInteractionController =
-          widget.params.findInteractionController as LinuxFindInteractionController;
-      findInteractionController.channel = MethodChannel(
-          'wtf.zikzak/zikzak_inappwebview_find_interaction_$id');
+      var findInteractionController = widget.params.findInteractionController
+          as LinuxFindInteractionController;
+      findInteractionController.channel =
+          MethodChannel('wtf.zikzak/zikzak_inappwebview_find_interaction_$id');
       findInteractionController.setupMethodHandler();
     }
 
@@ -94,12 +96,13 @@ class _LinuxInAppWebViewState extends State<_LinuxInAppWebView> {
   @override
   Widget build(BuildContext context) {
     if (_textureId != null) {
-        return Texture(textureId: _textureId!);
+      return Texture(textureId: _textureId!);
     }
     // Return a placeholder or empty container
     return Container(
         color: const Color(0xFFFFFFFF),
-        child: const Center(child: Text("Linux InAppWebView (Implemented via Texture/Native)"))
-    );
+        child: const Center(
+            child:
+                Text("Linux InAppWebView (Implemented via Texture/Native)")));
   }
 }

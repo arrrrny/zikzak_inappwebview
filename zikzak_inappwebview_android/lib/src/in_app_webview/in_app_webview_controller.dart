@@ -463,7 +463,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
             return null;
           } else {
             return (await _inAppBrowserEventHandler!
-                        .onRenderProcessUnresponsive(uri))
+                    .onRenderProcessUnresponsive(uri))
                 ?.toNativeValue();
           }
         }
@@ -484,7 +484,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
             return null;
           } else {
             return (await _inAppBrowserEventHandler!
-                        .onRenderProcessResponsive(uri))
+                    .onRenderProcessResponsive(uri))
                 ?.toNativeValue();
           }
         }
@@ -500,13 +500,15 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
 
           if (webviewParams != null &&
               webviewParams!.onRenderProcessGone != null)
-            webviewParams!.onRenderProcessGone!(_controllerFromPlatform, detail);
+            webviewParams!.onRenderProcessGone!(
+                _controllerFromPlatform, detail);
           else if (_inAppBrowserEventHandler != null)
             _inAppBrowserEventHandler!.onRenderProcessGone(detail);
         }
         break;
       case "onFormResubmission":
-        if ((webviewParams != null && webviewParams!.onFormResubmission != null) ||
+        if ((webviewParams != null &&
+                webviewParams!.onFormResubmission != null) ||
             _inAppBrowserEventHandler != null) {
           String? url = call.arguments["url"];
           WebUri? uri = url != null ? WebUri(url) : null;
@@ -522,7 +524,8 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
         }
         break;
       case "onZoomScaleChanged":
-        if ((webviewParams != null && webviewParams!.onZoomScaleChanged != null) ||
+        if ((webviewParams != null &&
+                webviewParams!.onZoomScaleChanged != null) ||
             _inAppBrowserEventHandler != null) {
           double oldScale = call.arguments["oldScale"];
           double newScale = call.arguments["newScale"];
@@ -616,7 +619,8 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
         }
         break;
       case "onJsBeforeUnload":
-        if ((webviewParams != null && webviewParams!.onJsBeforeUnload != null) ||
+        if ((webviewParams != null &&
+                webviewParams!.onJsBeforeUnload != null) ||
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments =
               call.arguments.cast<String, dynamic>();
@@ -635,7 +639,8 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
         }
         break;
       case "onSafeBrowsingHit":
-        if ((webviewParams != null && webviewParams!.onSafeBrowsingHit != null) ||
+        if ((webviewParams != null &&
+                webviewParams!.onSafeBrowsingHit != null) ||
             _inAppBrowserEventHandler != null) {
           String url = call.arguments["url"];
           SafeBrowsingThreat? threatType =
@@ -647,8 +652,8 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
                     _controllerFromPlatform, uri, threatType))
                 ?.toMap();
           } else {
-            return (await _inAppBrowserEventHandler!.onSafeBrowsingHit(
-                    uri, threatType))
+            return (await _inAppBrowserEventHandler!
+                    .onSafeBrowsingHit(uri, threatType))
                 ?.toMap();
           }
         }
@@ -759,14 +764,14 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
       case "onFindResultReceived":
         if (webviewParams != null &&
             webviewParams!.findInteractionController != null &&
-            webviewParams!.findInteractionController!.params
-                    .onFindResultReceived !=
+            webviewParams!
+                    .findInteractionController!.params.onFindResultReceived !=
                 null) {
           int activeMatchOrdinal = call.arguments["activeMatchOrdinal"];
           int numberOfMatches = call.arguments["numberOfMatches"];
           bool isDoneCounting = call.arguments["isDoneCounting"];
           webviewParams!
-              .findInteractionController!.params.onFindResultReceived!(
+                  .findInteractionController!.params.onFindResultReceived!(
               webviewParams!.findInteractionController!,
               activeMatchOrdinal,
               numberOfMatches,
@@ -800,8 +805,8 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
                 ?.toMap();
           } else {
             return (await _inAppBrowserEventHandler!
-                        .onPermissionRequest(permissionRequest))
-                    ?.toMap();
+                    .onPermissionRequest(permissionRequest))
+                ?.toMap();
           }
         }
         break;
@@ -844,8 +849,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
         break;
       case "onDidReceiveServerRedirectForProvisionalNavigation":
         if (webviewParams != null &&
-            webviewParams!
-                    .onDidReceiveServerRedirectForProvisionalNavigation !=
+            webviewParams!.onDidReceiveServerRedirectForProvisionalNavigation !=
                 null) {
           webviewParams!.onDidReceiveServerRedirectForProvisionalNavigation!(
               _controllerFromPlatform);
@@ -869,8 +873,8 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
                 ?.toNativeValue();
           } else {
             return (await _inAppBrowserEventHandler!
-                        .onNavigationResponse(navigationResponse))
-                    ?.toNativeValue();
+                    .onNavigationResponse(navigationResponse))
+                ?.toNativeValue();
           }
         }
         break;
@@ -889,8 +893,8 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
                 ?.toNativeValue();
           } else {
             return (await _inAppBrowserEventHandler!
-                        .shouldAllowDeprecatedTLS(challenge))
-                    ?.toNativeValue();
+                    .shouldAllowDeprecatedTLS(challenge))
+                ?.toNativeValue();
           }
         }
         break;
@@ -955,10 +959,8 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
           dynamic id = call.arguments["id"];
           String title = call.arguments["title"];
 
-          ContextMenuItem menuItemClicked = ContextMenuItem(
-              id: id,
-              title: title,
-              action: null);
+          ContextMenuItem menuItemClicked =
+              ContextMenuItem(id: id, title: title, action: null);
 
           for (var menuItem in contextMenu.menuItems) {
             if (menuItem.id == id) {

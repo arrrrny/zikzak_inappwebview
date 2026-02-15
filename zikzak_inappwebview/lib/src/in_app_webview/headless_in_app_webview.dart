@@ -404,8 +404,7 @@ class HeadlessInAppWebView {
                   onRenderProcessGone.call(controller, detail)
               : null,
           onRenderProcessResponsive: onRenderProcessResponsive != null
-              ? (controller) =>
-                  onRenderProcessResponsive.call(controller, null)
+              ? (controller) => onRenderProcessResponsive.call(controller, null)
               : null,
           onRenderProcessUnresponsive: onRenderProcessUnresponsive != null
               ? (controller) =>

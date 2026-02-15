@@ -77,8 +77,8 @@ class InAppWebView extends StatefulWidget {
     Future<JsAlertResponse?> Function(
             InAppWebViewController controller, JsAlertRequest jsAlertRequest)?
         onJsAlert,
-    Future<JsConfirmResponse?> Function(
-            InAppWebViewController controller, JsConfirmRequest jsConfirmRequest)?
+    Future<JsConfirmResponse?> Function(InAppWebViewController controller,
+            JsConfirmRequest jsConfirmRequest)?
         onJsConfirm,
     Future<JsPromptResponse?> Function(
             InAppWebViewController controller, JsPromptRequest jsPromptRequest)?
@@ -454,7 +454,6 @@ class InAppWebView extends StatefulWidget {
               headlessWebView: headlessWebView?.platform,
               preventGestureDelay: preventGestureDelay,
             ));
-
 
   @override
   _InAppWebViewState createState() => _InAppWebViewState();
