@@ -1,0 +1,95 @@
+Analyzing zikzak_inappwebview...                                
+
+   info • Don't invoke 'print' in production code • example/lib/chrome_safari_browser_example.screen.dart:11:5 • avoid_print
+   info • Don't invoke 'print' in production code • example/lib/chrome_safari_browser_example.screen.dart:16:5 • avoid_print
+   info • Don't invoke 'print' in production code • example/lib/chrome_safari_browser_example.screen.dart:21:5 • avoid_print
+   info • Constructors for public widgets should have a named 'key' parameter • example/lib/chrome_safari_browser_example.screen.dart:25:7 • use_key_in_widget_constructors
+   info • Invalid use of a private type in a public API • example/lib/chrome_safari_browser_example.screen.dart:29:3 • library_private_types_in_public_api
+   info • Don't invoke 'print' in production code • example/lib/chrome_safari_browser_example.screen.dart:44:15 • avoid_print
+   info • Don't invoke 'print' in production code • example/lib/chrome_safari_browser_example.screen.dart:45:15 • avoid_print
+   info • Don't invoke 'print' in production code • example/lib/chrome_safari_browser_example.screen.dart:46:15 • avoid_print
+   info • Don't invoke 'print' in production code • example/lib/chrome_safari_browser_example.screen.dart:56:11 • avoid_print
+   info • Don't invoke 'print' in production code • example/lib/chrome_safari_browser_example.screen.dart:57:11 • avoid_print
+   info • Don't invoke 'print' in production code • example/lib/chrome_safari_browser_example.screen.dart:58:11 • avoid_print
+   info • Don't invoke 'print' in production code • example/lib/chrome_safari_browser_example.screen.dart:65:11 • avoid_print
+   info • Don't invoke 'print' in production code • example/lib/chrome_safari_browser_example.screen.dart:66:11 • avoid_print
+   info • Don't invoke 'print' in production code • example/lib/chrome_safari_browser_example.screen.dart:67:11 • avoid_print
+   info • Use 'const' with the constructor to improve performance • example/lib/chrome_safari_browser_example.screen.dart:76:20 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • example/lib/chrome_safari_browser_example.screen.dart:110:22 • prefer_const_constructors
+   info • Constructors for public widgets should have a named 'key' parameter • example/lib/headless_in_app_webview.screen.dart:7:7 • use_key_in_widget_constructors
+   info • Invalid use of a private type in a public API • example/lib/headless_in_app_webview.screen.dart:9:3 • library_private_types_in_public_api
+   info • Don't invoke 'print' in production code • example/lib/headless_in_app_webview.screen.dart:33:9 • avoid_print
+   info • Don't invoke 'print' in production code • example/lib/headless_in_app_webview.screen.dart:36:9 • avoid_print
+   info • Use interpolation to compose strings and values • example/lib/headless_in_app_webview.screen.dart:36:15 • prefer_interpolation_to_compose_strings
+   info • Use 'const' with the constructor to improve performance • example/lib/headless_in_app_webview.screen.dart:66:20 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • example/lib/headless_in_app_webview.screen.dart:73:22 • prefer_const_constructors
+   info • Use interpolation to compose strings and values • example/lib/headless_in_app_webview.screen.dart:75:53 • prefer_interpolation_to_compose_strings
+   info • Use 'const' with the constructor to improve performance • example/lib/headless_in_app_webview.screen.dart:83:24 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • example/lib/headless_in_app_webview.screen.dart:96:64 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • example/lib/headless_in_app_webview.screen.dart:97:32 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • example/lib/headless_in_app_webview.screen.dart:102:24 • prefer_const_constructors
+   info • Unnecessary 'this.' qualifier • example/lib/headless_in_app_webview.screen.dart:112:21 • unnecessary_this
+   info • Use 'const' with the constructor to improve performance • example/lib/headless_in_app_webview.screen.dart:115:24 • prefer_const_constructors
+   info • The import of 'package:flutter/services.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/foundation.dart' • example/lib/in_app_browser_example.screen.dart:7:8 • unnecessary_import
+   info • Parameters ''windowId', 'initialUserScripts', and 'pullToRefreshController'' could be super parameters • example/lib/in_app_browser_example.screen.dart:13:3 • use_super_parameters
+   info • Don't invoke 'print' in production code • example/lib/in_app_browser_example.screen.dart:26:5 • avoid_print
+   info • The parameter name 'request' doesn't match the name 'permissionRequest' in the overridden method • example/lib/in_app_browser_example.screen.dart:38:50 • avoid_renaming_method_parameters
+warning • The method doesn't override an inherited method • example/lib/in_app_browser_example.screen.dart:44:8 • override_on_non_overriding_member
+   info • Don't invoke 'print' in production code • example/lib/in_app_browser_example.screen.dart:57:5 • avoid_print
+   info • Don't invoke 'print' in production code • example/lib/in_app_browser_example.screen.dart:63:5 • avoid_print
+   info • The member 'onMainWindowWillClose' overrides an inherited member but isn't annotated with '@override' • example/lib/in_app_browser_example.screen.dart:67:8 • annotate_overrides
+   info • Constructors for public widgets should have a named 'key' parameter • example/lib/in_app_browser_example.screen.dart:72:7 • use_key_in_widget_constructors
+   info • Invalid use of a private type in a public API • example/lib/in_app_browser_example.screen.dart:74:3 • library_private_types_in_public_api
+   info • Use 'const' with the constructor to improve performance • example/lib/in_app_browser_example.screen.dart:111:20 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • example/lib/in_app_browser_example.screen.dart:136:26 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • example/lib/in_app_browser_example.screen.dart:143:26 • prefer_const_constructors
+   info • Constructors for public widgets should have a named 'key' parameter • example/lib/in_app_webiew_example.screen.dart:9:7 • use_key_in_widget_constructors
+   info • Invalid use of a private type in a public API • example/lib/in_app_webiew_example.screen.dart:11:3 • library_private_types_in_public_api
+   info • Don't invoke 'print' in production code • example/lib/in_app_webiew_example.screen.dart:42:17 • avoid_print
+   info • Don't invoke 'print' in production code • example/lib/in_app_webiew_example.screen.dart:43:17 • avoid_print
+   info • Don't invoke 'print' in production code • example/lib/in_app_webiew_example.screen.dart:49:11 • avoid_print
+   info • Don't invoke 'print' in production code • example/lib/in_app_webiew_example.screen.dart:50:11 • avoid_print
+   info • Don't invoke 'print' in production code • example/lib/in_app_webiew_example.screen.dart:51:11 • avoid_print
+   info • Don't invoke 'print' in production code • example/lib/in_app_webiew_example.screen.dart:54:11 • avoid_print
+   info • Don't invoke 'print' in production code • example/lib/in_app_webiew_example.screen.dart:58:11 • avoid_print
+   info • Use interpolation to compose strings and values • example/lib/in_app_webiew_example.screen.dart:58:17 • prefer_interpolation_to_compose_strings
+   info • Use interpolation to compose strings and values • example/lib/in_app_webiew_example.screen.dart:60:15 • prefer_interpolation_to_compose_strings
+   info • Use 'const' with the constructor to improve performance • example/lib/in_app_webiew_example.screen.dart:93:31 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • example/lib/in_app_webiew_example.screen.dart:98:25 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • example/lib/in_app_webiew_example.screen.dart:98:53 • prefer_const_constructors
+   info • Don't invoke 'print' in production code • example/lib/in_app_webiew_example.screen.dart:132:21 • avoid_print
+   info • Don't invoke 'print' in production code • example/lib/in_app_webiew_example.screen.dart:170:21 • avoid_print
+   info • Don't invoke 'print' in production code • example/lib/in_app_webiew_example.screen.dart:178:21 • avoid_print
+   info • Don't invoke 'print' in production code • example/lib/in_app_webiew_example.screen.dart:179:21 • avoid_print
+   info • Don't invoke 'print' in production code • example/lib/in_app_webiew_example.screen.dart:180:21 • avoid_print
+   info • Unnecessary 'this.' qualifier • example/lib/in_app_webiew_example.screen.dart:188:44 • unnecessary_this
+   info • Don't invoke 'print' in production code • example/lib/in_app_webiew_example.screen.dart:198:21 • avoid_print
+   info • Don't invoke 'print' in production code • example/lib/in_app_webiew_example.screen.dart:201:21 • avoid_print
+   info • Don't invoke 'print' in production code • example/lib/in_app_webiew_example.screen.dart:203:21 • avoid_print
+   info • 'ButtonBar' is deprecated and shouldn't be used. Use OverflowBar instead. This feature was deprecated after v3.21.0-10.0.pre • example/lib/in_app_webiew_example.screen.dart:212:11 • deprecated_member_use
+   info • Use 'const' with the constructor to improve performance • example/lib/in_app_webiew_example.screen.dart:216:24 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • example/lib/in_app_webiew_example.screen.dart:222:24 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • example/lib/in_app_webiew_example.screen.dart:228:24 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • example/lib/main.dart:44:14 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • example/lib/main.dart:50:14 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • example/lib/main.dart:56:14 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • example/lib/main.dart:62:14 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • example/lib/main.dart:71:16 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • example/lib/main.dart:92:16 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • example/lib/main.dart:98:16 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • example/lib/main.dart:108:16 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • example/lib/main.dart:114:16 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • example/lib/main.dart:120:16 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • example/lib/main.dart:132:11 • prefer_const_constructors
+   info • The 'child' argument should be last in widget constructor invocations • example/lib/main.dart:133:13 • sort_child_properties_last
+   info • Use 'const' with the constructor to improve performance • example/lib/main.dart:133:20 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • example/lib/main.dart:134:25 • prefer_const_constructors
+   info • Constructors for public widgets should have a named 'key' parameter • example/lib/main.dart:145:7 • use_key_in_widget_constructors
+   info • Invalid use of a private type in a public API • example/lib/main.dart:147:3 • library_private_types_in_public_api
+   info • The constant name 'IN_APP_WEBVIEW_STATIC_CHANNEL' isn't a lowerCamelCase identifier • lib/src/in_app_webview/_static_channel.dart:3:7 • constant_identifier_names
+warning • Unused import: 'android/in_app_webview_controller.dart' • lib/src/in_app_webview/in_app_webview_controller.dart:11:8 • unused_import
+warning • Unused import: 'apple/in_app_webview_controller.dart' • lib/src/in_app_webview/in_app_webview_controller.dart:12:8 • unused_import
+warning • Publishable packages can't have 'path' dependencies • pubspec.yaml:22:5 • invalid_dependency
+warning • Publishable packages can't have 'path' dependencies • pubspec.yaml:24:5 • invalid_dependency
+warning • Publishable packages can't have 'path' dependencies • pubspec.yaml:26:5 • invalid_dependency
+

@@ -1,0 +1,30 @@
+name: zikzak_inappwebview_web
+description: The web implementation of zikzak_inappwebview.
+version: 1.0.0
+homepage: https://github.com/arrrrny/zikzak_inappwebview
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.10.0"
+
+flutter:
+  plugin:
+    implements: zikzak_inappwebview
+    platforms:
+      web:
+        pluginClass: ZikzakInAppWebViewWeb
+        fileName: zikzak_inappwebview_web.dart
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_web_plugins:
+    sdk: flutter
+  zikzak_inappwebview_platform_interface:
+    path: ../zikzak_inappwebview_platform_interface
+  web: ^0.5.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
