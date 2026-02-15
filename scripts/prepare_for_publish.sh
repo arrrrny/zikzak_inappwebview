@@ -32,12 +32,16 @@ echo -e "${BLUE}=== Preparing to publish version $VERSION ===${NC}"
 git checkout -b $BRANCH_NAME
 echo -e "${GREEN}Created branch: $BRANCH_NAME${NC}"
 
-# List of all packages to update (v3.0: iOS and Android only)
+# List of all packages to update (v3.0: all platforms)
 PACKAGES=(
     "zikzak_inappwebview_internal_annotations"
     "zikzak_inappwebview_platform_interface"
     "zikzak_inappwebview_android"
     "zikzak_inappwebview_ios"
+    "zikzak_inappwebview_web"
+    "zikzak_inappwebview_macos"
+    "zikzak_inappwebview_windows"
+    "zikzak_inappwebview_linux"
     "zikzak_inappwebview"
 )
 
@@ -91,12 +95,16 @@ convert_path_to_versioned() {
 
     echo -e "${YELLOW}Converting path dependencies and updating versioned dependencies to $version in $file${NC}"
 
-    # List of zikzak packages to convert/update (v3.0: iOS and Android only)
+    # List of zikzak packages to convert/update (v3.0: all platforms)
     local packages=(
         "zikzak_inappwebview_internal_annotations"
         "zikzak_inappwebview_platform_interface"
         "zikzak_inappwebview_android"
         "zikzak_inappwebview_ios"
+        "zikzak_inappwebview_web"
+        "zikzak_inappwebview_macos"
+        "zikzak_inappwebview_windows"
+        "zikzak_inappwebview_linux"
     )
 
     # Create a temporary file

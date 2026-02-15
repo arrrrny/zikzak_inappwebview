@@ -40,6 +40,10 @@ update_for_dev_mode() {
     packages["zikzak_inappwebview_internal_annotations"] = 1;
     packages["zikzak_inappwebview_android"] = 1;
     packages["zikzak_inappwebview_ios"] = 1;
+    packages["zikzak_inappwebview_web"] = 1;
+    packages["zikzak_inappwebview_macos"] = 1;
+    packages["zikzak_inappwebview_windows"] = 1;
+    packages["zikzak_inappwebview_linux"] = 1;
   }
 
   # Track when we enter dev_dependencies section
@@ -92,14 +96,26 @@ update_for_dev_mode() {
   # Replace iOS dependency
   sed -i.tmp -E 's|zikzak_inappwebview_ios: \^[0-9]+\.[0-9]+\.[0-9]+|zikzak_inappwebview_ios:\n    path: ../zikzak_inappwebview_ios|g' "$pubspec_file"
 
+  # Replace web dependency
+  sed -i.tmp -E 's|zikzak_inappwebview_web: \^[0-9]+\.[0-9]+\.[0-9]+|zikzak_inappwebview_web:\n    path: ../zikzak_inappwebview_web|g' "$pubspec_file"
+
+  # Replace macos dependency
+  sed -i.tmp -E 's|zikzak_inappwebview_macos: \^[0-9]+\.[0-9]+\.[0-9]+|zikzak_inappwebview_macos:\n    path: ../zikzak_inappwebview_macos|g' "$pubspec_file"
+
+  # Replace windows dependency
+  sed -i.tmp -E 's|zikzak_inappwebview_windows: \^[0-9]+\.[0-9]+\.[0-9]+|zikzak_inappwebview_windows:\n    path: ../zikzak_inappwebview_windows|g' "$pubspec_file"
+
+  # Replace linux dependency
+  sed -i.tmp -E 's|zikzak_inappwebview_linux: \^[0-9]+\.[0-9]+\.[0-9]+|zikzak_inappwebview_linux:\n    path: ../zikzak_inappwebview_linux|g' "$pubspec_file"
+
   # Clean up temporary files
   rm -f "${pubspec_file}.tmp"
 
   echo "✅ Updated $pubspec_file to use path dependencies"
 }
 
-# Process each package (v3.0: iOS and Android only)
-for package in zikzak_inappwebview zikzak_inappwebview_android zikzak_inappwebview_ios zikzak_inappwebview_platform_interface; do
+# Process each package (v3.0: all platforms)
+for package in zikzak_inappwebview zikzak_inappwebview_android zikzak_inappwebview_ios zikzak_inappwebview_web zikzak_inappwebview_macos zikzak_inappwebview_windows zikzak_inappwebview_linux zikzak_inappwebview_platform_interface; do
   if [ -d "$ROOT_DIR/$package" ]; then
     update_for_dev_mode "$ROOT_DIR/$package"
   else
@@ -109,9 +125,9 @@ done
 
 
 
-# Run flutter pub get on all packages (v3.0: iOS and Android only)
+# Run flutter pub get on all packages (v3.0: all platforms)
 echo "Running 'flutter pub get' on all packages..."
-for package in zikzak_inappwebview zikzak_inappwebview_platform_interface zikzak_inappwebview_android zikzak_inappwebview_ios; do
+for package in zikzak_inappwebview zikzak_inappwebview_platform_interface zikzak_inappwebview_android zikzak_inappwebview_ios zikzak_inappwebview_web zikzak_inappwebview_macos zikzak_inappwebview_windows zikzak_inappwebview_linux; do
   if [ -d "$ROOT_DIR/$package" ]; then
     echo "Getting dependencies for $package..."
     (cd "$ROOT_DIR/$package" && flutter pub get)
@@ -139,8 +155,8 @@ if [[ "$deep_clean_choice" == "y" || "$deep_clean_choice" == "Y" ]]; then
   echo "Purging Dart pub cache..."
   dart pub cache clean --all
 
-  # Run Flutter clean on each package (v3.0: iOS and Android only)
-  for package in zikzak_inappwebview zikzak_inappwebview_platform_interface zikzak_inappwebview_android zikzak_inappwebview_ios; do
+  # Run Flutter clean on each package (v3.0: all platforms)
+  for package in zikzak_inappwebview zikzak_inappwebview_platform_interface zikzak_inappwebview_android zikzak_inappwebview_ios zikzak_inappwebview_web zikzak_inappwebview_macos zikzak_inappwebview_windows zikzak_inappwebview_linux; do
     if [ -d "$ROOT_DIR/$package" ]; then
       echo "Running flutter clean in $package..."
       (cd "$ROOT_DIR/$package" && flutter clean)
@@ -155,8 +171,8 @@ echo ""
 echo "🔬 VERIFYING DEVELOPMENT SETUP 🔬"
 verify_issues=0
 
-# Verify each package has proper path dependencies (v3.0: iOS and Android only)
-for package in zikzak_inappwebview zikzak_inappwebview_android zikzak_inappwebview_ios; do
+# Verify each package has proper path dependencies (v3.0: all platforms)
+for package in zikzak_inappwebview zikzak_inappwebview_android zikzak_inappwebview_ios zikzak_inappwebview_web zikzak_inappwebview_macos zikzak_inappwebview_windows zikzak_inappwebview_linux; do
   if [ -f "$ROOT_DIR/$package/pubspec.yaml" ]; then
     # Check that the package has path dependencies and NO versioned dependencies
     # More robust pattern matching for commented path dependencies
@@ -174,12 +190,12 @@ for package in zikzak_inappwebview zikzak_inappwebview_android zikzak_inappwebvi
 
     # Check if this is the main package that needs other dependencies
     if [ "$package" = "zikzak_inappwebview" ]; then
-      # Main package should have several path dependencies to platform packages (v3.0: 2 platforms)
-      expected_deps=2 # iOS and Android only
-      if [ "$actual_path_deps" -lt 2 ]; then
+      # Main package should have several path dependencies to platform packages (v3.0: all platforms)
+      expected_deps=6 # iOS, Android, Web, MacOS, Windows, Linux
+      if [ "$actual_path_deps" -lt 6 ]; then
         missing_path_deps=1
       fi
-    elif [[ "$package" = *"_android"* || "$package" = *"_ios"* ]]; then
+    elif [[ "$package" = *"_android"* || "$package" = *"_ios"* || "$package" = *"_web"* || "$package" = *"_macos"* || "$package" = *"_windows"* || "$package" = *"_linux"* ]]; then
       # Platform packages need at least platform_interface
       expected_deps=1
       if [ "$actual_path_deps" -lt 1 ]; then

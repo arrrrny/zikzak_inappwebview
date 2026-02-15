@@ -11,12 +11,16 @@ NC='\033[0m' # No Color
 readonly SCRIPT_PATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 readonly PROJECT_DIR="$(dirname $SCRIPT_PATH)"
 
-# The order of packages for publishing (v3.0: iOS and Android only)
+# The order of packages for publishing (v3.0: all platforms)
 PACKAGES=(
     "zikzak_inappwebview_internal_annotations"
     "zikzak_inappwebview_platform_interface"
     "zikzak_inappwebview_android"
     "zikzak_inappwebview_ios"
+    "zikzak_inappwebview_web"
+    "zikzak_inappwebview_macos"
+    "zikzak_inappwebview_windows"
+    "zikzak_inappwebview_linux"
     "zikzak_inappwebview"
 )
 
