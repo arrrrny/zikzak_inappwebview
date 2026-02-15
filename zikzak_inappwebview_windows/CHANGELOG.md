@@ -3,6 +3,3 @@
 * Refactored with Gemini-3-Flash
 * Updated dependencies to use hosted references
 
-## 0.0.1
-
-* TODO: Describe initial release.

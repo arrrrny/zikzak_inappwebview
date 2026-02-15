@@ -1,3 +1,8 @@
+## 4.0.0 - 2026-02-16
+
+* Refactored with Gemini-3-Flash
+* Updated dependencies to use hosted references
+
 ## 3.0.0 - 2025-11-05
 
 * removed macos,linux,web,windows support. implemented fixes for issues with Claude AI
