@@ -1,3 +1,7 @@
+## 4.0.6 - 2026-02-16
+
+* Fixed: GetHtml is tested on mac/web
+
 ## 4.0.5 - 2026-02-16
 
 * Fix: updated missing linux package reference
