@@ -199,9 +199,7 @@ class InAppWebViewWebController extends PlatformInAppWebViewController {
   }
 
   @override
-  Future<Uint8List?> createPdf({
-    PDFConfiguration? pdfConfiguration,
-  }) async {
+  Future<Uint8List?> createPdf({PDFConfiguration? pdfConfiguration}) async {
     return null;
   }
 
@@ -362,7 +360,9 @@ class InAppWebViewWebController extends PlatformInAppWebViewController {
   }
 
   @override
-  Future<PlatformPrintJobController?> printCurrentPage({PrintJobSettings? settings}) async {
+  Future<PlatformPrintJobController?> printCurrentPage({
+    PrintJobSettings? settings,
+  }) async {
     try {
       _iframe.contentWindow?.print();
     } catch (e) {
