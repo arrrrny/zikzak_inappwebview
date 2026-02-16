@@ -5,8 +5,9 @@ import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:zikzak_inappwebview_internal_annotations/zikzak_inappwebview_internal_annotations.dart';
 
-final _coreCheckerObjectMethod =
-    const TypeChecker.fromRuntime(ExchangeableObjectMethod);
+final _coreCheckerObjectMethod = const TypeChecker.fromRuntime(
+  ExchangeableObjectMethod,
+);
 
 abstract class Util {
   static bool typeIsNullable(DartType type) {
@@ -25,7 +26,8 @@ abstract class Util {
   static String? getSupportedDocs(TypeChecker checker, Element element) {
     final platformNoteList = <String>[];
     final platformSupportedList = <String>[];
-    final platforms = checker
+    final platforms =
+        checker
             .firstAnnotationOfExact(element)
             ?.getField('platforms')
             ?.toListValue() ??

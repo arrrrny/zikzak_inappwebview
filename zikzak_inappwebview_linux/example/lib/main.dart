@@ -19,26 +19,30 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Linux InAppWebView Example'),
+      appBar: AppBar(title: const Text('Linux InAppWebView Example')),
+      body: Column(
+        children: [
+          Expanded(
+            child: Builder(
+              builder: (context) {
+                return LinuxInAppWebViewWidget(
+                  PlatformInAppWebViewWidgetCreationParams(
+                    initialUrlRequest: URLRequest(
+                      url: WebUri("https://flutter.dev"),
+                    ),
+                    onWebViewCreated: (controller) {
+                      print("WebView created");
+                    },
+                    onLoadStop: (controller, url) {
+                      print("Page loaded: $url");
+                    },
+                  ),
+                ).build(context);
+              },
+            ),
+          ),
+        ],
       ),
-      body: Column(children: [
-        Expanded(
-          child: Builder(builder: (context) {
-            return LinuxInAppWebViewWidget(
-              PlatformInAppWebViewWidgetCreationParams(
-                initialUrlRequest: URLRequest(url: WebUri("https://flutter.dev")),
-                onWebViewCreated: (controller) {
-                  print("WebView created");
-                },
-                onLoadStop: (controller, url) {
-                  print("Page loaded: $url");
-                },
-              ),
-            ).build(context);
-          }),
-        ),
-      ]),
     );
   }
 }

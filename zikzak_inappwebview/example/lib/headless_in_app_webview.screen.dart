@@ -21,9 +21,7 @@ class _HeadlessInAppWebViewExampleScreenState
   void initState() {
     super.initState();
 
-    var url = !kIsWeb
-        ? WebUri("https://flutter.dev")
-        : WebUri("about:blank");
+    var url = !kIsWeb ? WebUri("https://flutter.dev") : WebUri("about:blank");
 
     headlessWebView = HeadlessInAppWebView(
       webViewEnvironment: webViewEnvironment,

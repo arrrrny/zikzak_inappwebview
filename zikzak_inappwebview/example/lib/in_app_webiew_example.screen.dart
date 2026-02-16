@@ -49,7 +49,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
               title: "Special",
               action: () async {
                 debugPrint("Menu item Special clicked!");
-                debugPrint((await webViewController?.getSelectedText()).toString());
+                debugPrint(
+                    (await webViewController?.getSelectedText()).toString());
                 await webViewController?.clearFocus();
               })
         ],
@@ -122,8 +123,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                             children: [
                               SwitchListTile(
                                 title: const Text("Find Interaction"),
-                                value: currentSettings.isFindInteractionEnabled ??
-                                    false,
+                                value:
+                                    currentSettings.isFindInteractionEnabled ??
+                                        false,
                                 onChanged: (value) async {
                                   currentSettings.isFindInteractionEnabled =
                                       value;
@@ -137,7 +139,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                               SwitchListTile(
                                 title: const Text("Element Fullscreen"),
                                 subtitle: const Text("iOS 15.4+"),
-                                value: currentSettings.isElementFullscreenEnabled ??
+                                value: currentSettings
+                                        .isElementFullscreenEnabled ??
                                     false,
                                 onChanged: (value) async {
                                   currentSettings.isElementFullscreenEnabled =
@@ -152,8 +155,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                               SwitchListTile(
                                 title: const Text("HTTPS Only"),
                                 subtitle: const Text("Requires Restart"),
-                                value: currentSettings.upgradeKnownHostsToHTTPS ??
-                                    false,
+                                value:
+                                    currentSettings.upgradeKnownHostsToHTTPS ??
+                                        false,
                                 onChanged: (value) {
                                   setState(() {
                                     currentSettings.upgradeKnownHostsToHTTPS =
@@ -162,23 +166,23 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                                   });
                                   this.setState(() {
                                     webViewKey = GlobalKey();
-                                   });
-                                 },
-                               ),
-                               ListTile(
-                                 title: const Text("Clear All Data"),
-                                 onTap: () async {
-                                   await WebStorageManager.instance()
-                                       .deleteAllData();
-                                   ScaffoldMessenger.of(context).showSnackBar(
-                                     const SnackBar(
-                                       content: Text("Data cleared"),
-                                     ),
-                                   );
-                                 },
-                               ),
-                             ],
-                           ),
+                                  });
+                                },
+                              ),
+                              ListTile(
+                                title: const Text("Clear All Data"),
+                                onTap: () async {
+                                  await WebStorageManager.instance()
+                                      .deleteAllData();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text("Data cleared"),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
                         ),
                         actions: [
                           TextButton(

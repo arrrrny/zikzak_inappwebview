@@ -8,17 +8,22 @@ import 'package:analyzer/dart/constant/value.dart';
 import 'model_visitor.dart';
 import 'util.dart';
 
-final _coreCheckerEnumSupportedPlatforms =
-    const TypeChecker.fromRuntime(EnumSupportedPlatforms);
+final _coreCheckerEnumSupportedPlatforms = const TypeChecker.fromRuntime(
+  EnumSupportedPlatforms,
+);
 final _coreCheckerDeprecated = const TypeChecker.fromRuntime(Deprecated);
-final _coreCheckerEnumCustomValue =
-    const TypeChecker.fromRuntime(ExchangeableEnumCustomValue);
+final _coreCheckerEnumCustomValue = const TypeChecker.fromRuntime(
+  ExchangeableEnumCustomValue,
+);
 
 class ExchangeableEnumGenerator
     extends GeneratorForAnnotation<ExchangeableEnum> {
   @override
   String generateForAnnotatedElement(
-      Element element, ConstantReader annotation, BuildStep buildStep) {
+    Element element,
+    ConstantReader annotation,
+    BuildStep buildStep,
+  ) {
     final visitor = ModelVisitor();
     // Visits all the children of element in no particular order.
     element.visitChildren(visitor);
@@ -34,14 +39,16 @@ class ExchangeableEnumGenerator
       classBuffer.writeln(classDocs);
     }
     final classSupportedDocs = Util.getSupportedDocs(
-        _coreCheckerEnumSupportedPlatforms,
-        visitor.constructor.returnType.element);
+      _coreCheckerEnumSupportedPlatforms,
+      visitor.constructor.returnType.element,
+    );
     if (classSupportedDocs != null) {
       classBuffer.writeln(classSupportedDocs);
     }
     if (visitor.constructor.returnType.element.hasDeprecated) {
       classBuffer.writeln(
-          "@Deprecated('${_coreCheckerDeprecated.firstAnnotationOfExact(visitor.constructor.returnType.element)?.getField("message")?.toStringValue()}')");
+        "@Deprecated('${_coreCheckerDeprecated.firstAnnotationOfExact(visitor.constructor.returnType.element)?.getField("message")?.toStringValue()}')",
+      );
     }
     classBuffer.writeln('class $extClassName {');
 
@@ -55,18 +62,22 @@ class ExchangeableEnumGenerator
         .firstWhere((element) => element.key == "_value")
         .value;
     final FieldElement enumNativeValue = fieldEntriesSorted
-        .firstWhere((element) => element.key == "_nativeValue",
-            orElse: () => MapEntry("_nativeValue", enumValue))
+        .firstWhere(
+          (element) => element.key == "_nativeValue",
+          orElse: () => MapEntry("_nativeValue", enumValue),
+        )
         .value;
 
     classBuffer.writeln("final ${enumValue.type} _value;");
     classBuffer.writeln("final ${enumNativeValue.type} _nativeValue;");
 
     classBuffer.writeln(
-        "const $extClassName._internal(this._value, this._nativeValue);");
+      "const $extClassName._internal(this._value, this._nativeValue);",
+    );
     classBuffer.writeln("// ignore: unused_element");
     classBuffer.writeln(
-        "factory $extClassName._internalMultiPlatform(${enumValue.type} value, Function nativeValue) => $extClassName._internal(value, nativeValue());");
+      "factory $extClassName._internalMultiPlatform(${enumValue.type} value, Function nativeValue) => $extClassName._internal(value, nativeValue());",
+    );
 
     for (final entry in fieldEntriesSorted) {
       final fieldName = entry.key;
@@ -77,9 +88,11 @@ class ExchangeableEnumGenerator
       final isEnumCustomValue =
           _coreCheckerEnumCustomValue.firstAnnotationOf(fieldElement) != null;
       if (isEnumCustomValue) {
-        ParsedLibraryResult parsed = fieldElement.session
-                ?.getParsedLibraryByElement(fieldElement.library)
-            as ParsedLibraryResult;
+        ParsedLibraryResult parsed =
+            fieldElement.session?.getParsedLibraryByElement(
+                  fieldElement.library,
+                )
+                as ParsedLibraryResult;
         final fieldBody = parsed
             .getElementDeclaration(fieldElement)
             ?.node
@@ -111,16 +124,20 @@ class ExchangeableEnumGenerator
         classBuffer.writeln(docs);
       }
       final fieldSupportedDocs = Util.getSupportedDocs(
-          _coreCheckerEnumSupportedPlatforms, fieldElement);
+        _coreCheckerEnumSupportedPlatforms,
+        fieldElement,
+      );
       if (fieldSupportedDocs != null) {
         classBuffer.writeln(fieldSupportedDocs);
       }
       if (fieldName == '_value' || fieldName == '_nativeValue') {
         classBuffer.writeln(
-            "final ${fieldElement.type.toString().replaceFirst("_", "")} $fieldName;");
+          "final ${fieldElement.type.toString().replaceFirst("_", "")} $fieldName;",
+        );
       } else {
-        final fieldValue =
-            fieldElement.computeConstantValue()?.getField("_value");
+        final fieldValue = fieldElement.computeConstantValue()?.getField(
+          "_value",
+        );
         final constantValue = fieldValue != null && !fieldValue.isNull
             ? fieldValue.toIntValue() ?? "\'${fieldValue.toStringValue()}\'"
             : null;
@@ -137,20 +154,21 @@ class ExchangeableEnumGenerator
           nativeValueBody += "switch (defaultTargetPlatform) {";
           final platforms =
               fieldAnnotation.getField('platforms')?.toListValue() ??
-                  <DartObject>[];
+              <DartObject>[];
           var hasWebSupport = false;
           var webSupportValue = null;
           var allPlatformsWithoutValue = true;
           if (platforms.isNotEmpty) {
             for (var platform in platforms) {
-              final targetPlatformName =
-                  platform.getField("targetPlatformName")!.toStringValue();
+              final targetPlatformName = platform
+                  .getField("targetPlatformName")!
+                  .toStringValue();
               final platformValueField = platform.getField('value');
               final platformValue =
                   platformValueField != null && !platformValueField.isNull
-                      ? platformValueField.toIntValue() ??
-                          "'${platformValueField.toStringValue()}'"
-                      : null;
+                  ? platformValueField.toIntValue() ??
+                        "'${platformValueField.toStringValue()}'"
+                  : null;
               if (allPlatformsWithoutValue && platformValue != null) {
                 allPlatformsWithoutValue = false;
               }
@@ -176,14 +194,17 @@ class ExchangeableEnumGenerator
 
           if (!allPlatformsWithoutValue) {
             classBuffer.writeln(
-                "static final $fieldName = $extClassName._internalMultiPlatform($constantValue, $nativeValueBody);");
+              "static final $fieldName = $extClassName._internalMultiPlatform($constantValue, $nativeValueBody);",
+            );
           } else {
             classBuffer.writeln(
-                "static const $fieldName = $extClassName._internal($constantValue, ${defaultValue ?? constantValue});");
+              "static const $fieldName = $extClassName._internal($constantValue, ${defaultValue ?? constantValue});",
+            );
           }
         } else {
           classBuffer.writeln(
-              "static const $fieldName = $extClassName._internal($constantValue, $constantValue);");
+            "static const $fieldName = $extClassName._internal($constantValue, $constantValue);",
+          );
         }
       }
     }
@@ -208,8 +229,9 @@ class ExchangeableEnumGenerator
     if (annotation.read("fromValueMethod").boolValue &&
         (!visitor.methods.containsKey("fromValue") ||
             Util.methodHasIgnore(visitor.methods['fromNativeValue']!))) {
-      final hasBitwiseOrOperator =
-          annotation.read("bitwiseOrOperator").boolValue;
+      final hasBitwiseOrOperator = annotation
+          .read("bitwiseOrOperator")
+          .boolValue;
       classBuffer.writeln("""
       ///Gets a possible [$extClassName] instance from [${enumValue.type}] value.
       static $extClassName? fromValue(${enumValue.type}${!Util.typeIsNullable(enumValue.type) ? '?' : ''} value) {
@@ -229,8 +251,9 @@ class ExchangeableEnumGenerator
     if (annotation.read("fromNativeValueMethod").boolValue &&
         (!visitor.methods.containsKey("fromNativeValue") ||
             Util.methodHasIgnore(visitor.methods['fromNativeValue']!))) {
-      final hasBitwiseOrOperator =
-          annotation.read("bitwiseOrOperator").boolValue;
+      final hasBitwiseOrOperator = annotation
+          .read("bitwiseOrOperator")
+          .boolValue;
       classBuffer.writeln("""
       ///Gets a possible [$extClassName] instance from a native value.
       static $extClassName? fromNativeValue(${enumNativeValue.type}${!Util.typeIsNullable(enumNativeValue.type) ? '?' : ''} value) {
@@ -252,9 +275,11 @@ class ExchangeableEnumGenerator
       if (Util.methodHasIgnore(methodElement)) {
         continue;
       }
-      ParsedLibraryResult parsed = methodElement.session
-              ?.getParsedLibraryByElement(methodElement.library)
-          as ParsedLibraryResult;
+      ParsedLibraryResult parsed =
+          methodElement.session?.getParsedLibraryByElement(
+                methodElement.library,
+              )
+              as ParsedLibraryResult;
       final methodBody = parsed
           .getElementDeclaration(methodElement)
           ?.node
@@ -266,7 +291,9 @@ class ExchangeableEnumGenerator
           classBuffer.writeln(docs);
         }
         final fieldSupportedDocs = Util.getSupportedDocs(
-            _coreCheckerEnumSupportedPlatforms, methodElement);
+          _coreCheckerEnumSupportedPlatforms,
+          methodElement,
+        );
         if (fieldSupportedDocs != null) {
           classBuffer.writeln(fieldSupportedDocs);
         }
@@ -310,10 +337,12 @@ class ExchangeableEnumGenerator
 
     if (annotation.read("bitwiseOrOperator").boolValue) {
       classBuffer.writeln(
-          "$extClassName operator |($extClassName value) => $extClassName._internal(value.toValue() | _value, ");
+        "$extClassName operator |($extClassName value) => $extClassName._internal(value.toValue() | _value, ",
+      );
       if (Util.typeIsNullable(enumNativeValue.type)) {
         classBuffer.write(
-            "value.toNativeValue() != null && _nativeValue != null ? value.toNativeValue()! | _nativeValue! : _nativeValue");
+          "value.toNativeValue() != null && _nativeValue != null ? value.toNativeValue()! | _nativeValue! : _nativeValue",
+        );
       } else {
         classBuffer.write("value.toNativeValue() | _nativeValue");
       }
@@ -333,8 +362,9 @@ class ExchangeableEnumGenerator
           final fieldName = entry.key;
           final fieldElement = entry.value;
           if (!fieldElement.isPrivate && fieldElement.isStatic) {
-            final fieldValue =
-                fieldElement.computeConstantValue()?.getField("_value");
+            final fieldValue = fieldElement.computeConstantValue()?.getField(
+              "_value",
+            );
             final constantValue = fieldValue?.toIntValue();
             classBuffer.writeln("case $constantValue: return '$fieldName';");
           }

@@ -24,6 +24,7 @@ dependencies:
   zikzak_inappwebview_macos: ^4.0.4
   zikzak_inappwebview_web: ^4.0.4
   zikzak_inappwebview_windows: ^4.0.4
+  zikzak_inappwebview_linux: ^4.0.4
 
 dev_dependencies:
   flutter_test:
@@ -98,4 +99,4 @@ dependency_overrides:
   zikzak_inappwebview_web: ^4.0.4
   zikzak_inappwebview_macos: ^4.0.4
   zikzak_inappwebview_windows: ^4.0.4
-  zikzak_inappwebview_platform_interface: ^4.0.4
+  zikzak_inappwebview_linux: ^4.0.4

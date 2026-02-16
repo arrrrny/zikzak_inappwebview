@@ -372,6 +372,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.4"
+  zikzak_inappwebview_linux:
+    dependency: transitive
+    description:
+      name: zikzak_inappwebview_linux
+      sha256: "1fdee99c255bb12dea571e19019ae7e66d7e1928635166d2c8fcf8c5b987283d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.4"
   zikzak_inappwebview_macos:
     dependency: "direct overridden"
     description:

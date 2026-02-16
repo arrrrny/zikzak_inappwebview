@@ -9,9 +9,7 @@ import 'main.dart';
 
 class MyInAppBrowser extends InAppBrowser {
   MyInAppBrowser(
-      {super.windowId,
-      super.initialUserScripts,
-      super.pullToRefreshController})
+      {super.windowId, super.initialUserScripts, super.pullToRefreshController})
       : super(
           webViewEnvironment: webViewEnvironment,
         );

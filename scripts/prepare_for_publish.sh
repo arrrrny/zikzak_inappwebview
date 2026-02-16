@@ -9,14 +9,23 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 # Check if version argument is provided
-if [ "$#" -ne 1 ]; then
-    echo -e "${RED}Error: Version number is required.${NC}"
-    echo -e "Usage: $0 <version_number>"
-    echo -e "Example: $0 1.2.5"
-    exit 1
+if [ "$#" -eq 0 ]; then
+    echo -e "${YELLOW}No version argument provided. Attempting to detect version from zikzak_inappwebview/pubspec.yaml...${NC}"
+    # Use full path to pubspec, and ensure PROJECT_DIR is defined before use
+    PROJECT_DIR_FIXED="$( cd "$(dirname "$0")/.." >/dev/null 2>&1 ; pwd -P )"
+    DETECTED_VERSION=$(grep "^version:" "$PROJECT_DIR_FIXED/zikzak_inappwebview/pubspec.yaml" | sed 's/version: //' | tr -d '[:space:]')
+    
+    if [ -n "$DETECTED_VERSION" ]; then
+        echo -e "${GREEN}Detected version: $DETECTED_VERSION${NC}"
+        VERSION=$DETECTED_VERSION
+    else
+        echo -e "${RED}Error: Could not detect version from pubspec.yaml.${NC}"
+        echo -e "Usage: $0 <version_number>"
+        exit 1
+    fi
+else
+    VERSION=$1
 fi
-
-VERSION=$1
 BRANCH_NAME="publish-$VERSION"
 ROOT_DIR="$(pwd)"
 

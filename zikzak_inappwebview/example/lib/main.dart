@@ -189,7 +189,8 @@ class _MyAppState extends State<MyApp> {
       '/': (context) => const InAppWebViewExampleScreen(),
       '/InAppBrowser': (context) => const InAppBrowserExampleScreen(),
       '/ChromeSafariBrowser': (context) => ChromeSafariBrowserExampleScreen(),
-      '/HeadlessInAppWebView': (context) => const HeadlessInAppWebViewExampleScreen(),
+      '/HeadlessInAppWebView': (context) =>
+          const HeadlessInAppWebViewExampleScreen(),
     });
   }
 }
