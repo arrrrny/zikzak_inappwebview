@@ -1368,12 +1368,12 @@ class InAppWebViewSettings {
               map['iframeSandbox'].map((e) => Sandbox.fromNativeValue(e)!))
           : null,
       layoutAlgorithm: LayoutAlgorithm.fromNativeValue(map['layoutAlgorithm']),
-      maximumViewportInset:
-          MapEdgeInsets.fromMap(map['maximumViewportInset']?.cast<String, dynamic>()),
+      maximumViewportInset: MapEdgeInsets.fromMap(
+          map['maximumViewportInset']?.cast<String, dynamic>()),
       mediaType: map['mediaType'],
       minimumFontSize: map['minimumFontSize'],
-      minimumViewportInset:
-          MapEdgeInsets.fromMap(map['minimumViewportInset']?.cast<String, dynamic>()),
+      minimumViewportInset: MapEdgeInsets.fromMap(
+          map['minimumViewportInset']?.cast<String, dynamic>()),
       mixedContentMode:
           MixedContentMode.fromNativeValue(map['mixedContentMode']),
       networkAvailable: map['networkAvailable'],

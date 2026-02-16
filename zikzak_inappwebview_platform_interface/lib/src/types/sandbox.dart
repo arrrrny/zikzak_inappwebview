@@ -44,7 +44,7 @@ class Sandbox_ {
   String toString() {
     if (_value == null) return 'allow-all';
     if (_value == '') return 'allow-none';
-    return _value ?? '';
+    return _value;
   }
 
   static const _ALL = const Sandbox_._internal(null);

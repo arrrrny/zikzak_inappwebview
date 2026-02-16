@@ -12,21 +12,21 @@ topics:
   - browser
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
-  flutter: ">=3.10.0"
+  sdk: ">=3.8.0 <4.0.0"
+  flutter: ">=3.29.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  plugin_platform_interface: ^2.1.6
+  plugin_platform_interface: ^2.1.8
   zikzak_inappwebview_internal_annotations: ^4.0.3
-  meta: ^1.11.0
+  meta: ^1.15.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.0
-  build_runner: ^2.4.0
+  flutter_lints: ^6.0.0
+  build_runner: ^2.4.13
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -56,10 +56,14 @@ dev_dependencies:
 #       - asset: fonts/Schyler-Italic.ttf
 #         style: italic
 #   - family: Trajan Pro
-#     fonts:
-#       - asset: fonts/TrajanPro.ttf
-#       - asset: fonts/TrajanPro_Bold.ttf
-#         weight: 700
-#
-# For details regarding fonts in packages, see
-# https://flutter.dev/custom-fonts/#from-packages
+  #     fonts:
+  #       - asset: fonts/TrajanPro.ttf
+  #       - asset: fonts/TrajanPro_Bold.ttf
+  #         weight: 700
+  #
+  # For details regarding fonts in packages, see
+  # https://flutter.dev/custom-fonts/#from-packages
+
+dependency_overrides:
+  zikzak_inappwebview_internal_annotations:
+    path: ../zikzak_inappwebview_internal_annotations

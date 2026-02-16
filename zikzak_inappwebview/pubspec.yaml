@@ -12,8 +12,8 @@ topics:
   - browser
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
-  flutter: ">=3.10.0"
+  sdk: ">=3.8.0 <4.0.0"
+  flutter: ">=3.29.0"
 
 dependencies:
   flutter:
@@ -30,8 +30,8 @@ dev_dependencies:
     sdk: flutter
   flutter_driver:
     sdk: flutter
-  flutter_lints: ^2.0.1
-  build_runner: ^2.4.0
+  flutter_lints: ^6.0.0
+  build_runner: ^2.4.13
   # generators:
 
 # For information on the generic Dart part of this file, see the
@@ -91,3 +91,17 @@ flutter:
 false_secrets:
   - /test_node_server/*.pem
   - /test_node_server/*.pfx
+
+dependency_overrides:
+  zikzak_inappwebview_android:
+    path: ../zikzak_inappwebview_android
+  zikzak_inappwebview_ios:
+    path: ../zikzak_inappwebview_ios
+  zikzak_inappwebview_web:
+    path: ../zikzak_inappwebview_web
+  zikzak_inappwebview_macos:
+    path: ../zikzak_inappwebview_macos
+  zikzak_inappwebview_windows:
+    path: ../zikzak_inappwebview_windows
+  zikzak_inappwebview_platform_interface:
+    path: ../zikzak_inappwebview_platform_interface

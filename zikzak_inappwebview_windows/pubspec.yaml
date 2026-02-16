@@ -4,8 +4,8 @@ version: 4.0.3
 homepage: https://github.com/arrrrny/zikzak_inappwebview
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
-  flutter: ">=3.10.0"
+  sdk: ">=3.8.0 <4.0.0"
+  flutter: ">=3.29.0"
 
 flutter:
   plugin:
@@ -21,9 +21,15 @@ dependencies:
     sdk: flutter
   zikzak_inappwebview_platform_interface: ^4.0.3
   webview_windows: ^0.4.0
-  path: ^1.9.1
+  path: ^1.9.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.0
+  flutter_lints: ^6.0.0
+
+dependency_overrides:
+  zikzak_inappwebview_platform_interface:
+    path: ../zikzak_inappwebview_platform_interface
+  zikzak_inappwebview_internal_annotations:
+    path: ../zikzak_inappwebview_internal_annotations

@@ -123,7 +123,7 @@ class Sandbox {
   String toString() {
     if (_value == null) return 'allow-all';
     if (_value == '') return 'allow-none';
-    return _value ?? '';
+    return _value;
   }
 
   ///Gets [String?] native value.

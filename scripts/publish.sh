@@ -240,6 +240,22 @@ for package in "${PACKAGES[@]}"; do
     fi
 done
 
+# Create and push git tag
+echo -e "${BLUE}Creating and pushing git tag...${NC}"
+MAIN_PACKAGE="zikzak_inappwebview"
+VERSION=$(grep "^version:" "$PROJECT_DIR/$MAIN_PACKAGE/pubspec.yaml" | sed 's/version: //' | tr -d '[:space:]')
+
+if git tag "$VERSION"; then
+    echo -e "${GREEN}Git tag $VERSION created successfully!${NC}"
+    if git push origin "$VERSION"; then
+        echo -e "${GREEN}Git tag $VERSION pushed to origin successfully!${NC}"
+    else
+        echo -e "${RED}Failed to push git tag $VERSION to origin.${NC}"
+    fi
+else
+    echo -e "${YELLOW}Git tag $VERSION already exists or could not be created.${NC}"
+fi
+
 echo -e "${GREEN}All packages published successfully!${NC}"
 echo -e ""
 echo -e "${BLUE}Options for next steps:${NC}"

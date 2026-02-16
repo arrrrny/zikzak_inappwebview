@@ -232,7 +232,7 @@ class WindowStyleMask {
       WindowStyleMask._internal(
           value.toValue() | _value,
           value.toNativeValue() != null && _nativeValue != null
-              ? value.toNativeValue()! | _nativeValue!
+              ? value.toNativeValue()! | _nativeValue
               : _nativeValue);
   @override
   String toString() {
