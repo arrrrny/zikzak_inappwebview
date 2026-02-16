@@ -187,8 +187,49 @@ for pkg in "${PACKAGES[@]}"; do
     fi
 done
 
+# Generate changelog content from git history
+echo -e "${BLUE}Generating changelog from git history...${NC}"
+CHANGELOG_CONTENT=""
+LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+
+if [ -z "$LAST_TAG" ]; then
+    echo -e "${YELLOW}No tags found. Analyzing all commits...${NC}"
+    LOGS=$(git log --pretty=format:"%s")
+else
+    echo -e "${YELLOW}Analyzing commits since $LAST_TAG...${NC}"
+    LOGS=$(git log --pretty=format:"%s" "$LAST_TAG..HEAD")
+fi
+
+# Extract Features, Changes, and Fixes
+# We use grep with ignore-case (-i) and look for lines starting with the keywords
+# We use || true to prevent script exit if grep finds nothing (due to set -e)
+FEATURES=$(echo "$LOGS" | grep -i "^Feature:" | sed 's/^/* /' || true)
+CHANGES=$(echo "$LOGS" | grep -i "^Changed:\|^Change:" | sed 's/^/* /' || true)
+FIXES=$(echo "$LOGS" | grep -i "^Fixed:\|^Fix:" | sed 's/^/* /' || true)
+
+if [ ! -z "$FEATURES" ]; then
+    CHANGELOG_CONTENT="${CHANGELOG_CONTENT}${FEATURES}
+"
+fi
+if [ ! -z "$CHANGES" ]; then
+    CHANGELOG_CONTENT="${CHANGELOG_CONTENT}${CHANGES}
+"
+fi
+if [ ! -z "$FIXES" ]; then
+    CHANGELOG_CONTENT="${CHANGELOG_CONTENT}${FIXES}
+"
+fi
+
+# If no content found, use a default message
+if [ -z "$CHANGELOG_CONTENT" ]; then
+    CHANGELOG_CONTENT="* Prepare for publishing version $VERSION"
+fi
+
+echo -e "${YELLOW}Generated Changelog Content:${NC}"
+echo -e "$CHANGELOG_CONTENT"
+
 # Ask for the commit message that will be used for both Git commit and CHANGELOG files
-echo -e "${YELLOW}Enter a commit/changelog message for version $VERSION (default: 'Prepare for publishing version $VERSION'):${NC}"
+echo -e "${YELLOW}Enter a commit message title for version $VERSION (default: 'Prepare for publishing version $VERSION'):${NC}"
 read -r COMMIT_MESSAGE
 if [ -z "$COMMIT_MESSAGE" ]; then
     COMMIT_MESSAGE="Prepare for publishing version $VERSION"
@@ -199,11 +240,19 @@ CURRENT_DATE=$(date +"%Y-%m-%d")
 for pkg in "${PACKAGES[@]}"; do
     if [ -f "$ROOT_DIR/$pkg/CHANGELOG.md" ]; then
         echo -e "${BLUE}Updating CHANGELOG.md in $pkg${NC}"
-        # Add new version entry at the top of the CHANGELOG with the commit message
-        sed -i '' "1s/^/## $VERSION - $CURRENT_DATE\n\n* $COMMIT_MESSAGE\n* Updated dependencies to use hosted references\n\n/" "$ROOT_DIR/$pkg/CHANGELOG.md"
+        # Add new version entry at the top of the CHANGELOG
+        # We use a temporary file to handle the multiline insertion correctly
+        TEMP_CHANGELOG="$ROOT_DIR/$pkg/CHANGELOG.md.tmp"
+        echo -e "## $VERSION - $CURRENT_DATE\n" > "$TEMP_CHANGELOG"
+        echo -e "$CHANGELOG_CONTENT" >> "$TEMP_CHANGELOG"
+        echo -e "* Updated dependencies to use hosted references\n" >> "$TEMP_CHANGELOG"
+        cat "$ROOT_DIR/$pkg/CHANGELOG.md" >> "$TEMP_CHANGELOG"
+        mv "$TEMP_CHANGELOG" "$ROOT_DIR/$pkg/CHANGELOG.md"
     else
         echo -e "${RED}Warning: CHANGELOG.md not found in $pkg. Creating new CHANGELOG.md${NC}"
-        echo -e "## $VERSION - $CURRENT_DATE\n\n* $COMMIT_MESSAGE\n* Updated dependencies to use hosted references\n" > "$ROOT_DIR/$pkg/CHANGELOG.md"
+        echo -e "## $VERSION - $CURRENT_DATE\n" > "$ROOT_DIR/$pkg/CHANGELOG.md"
+        echo -e "$CHANGELOG_CONTENT" >> "$ROOT_DIR/$pkg/CHANGELOG.md"
+        echo -e "* Updated dependencies to use hosted references\n" >> "$ROOT_DIR/$pkg/CHANGELOG.md"
     fi
 done
 
@@ -277,7 +326,7 @@ echo -e "${GREEN}All packages updated to version $VERSION with versioned depende
 # Automatically commit changes
 echo -e "${BLUE}Committing changes...${NC}"
 git add .
-git commit -m "Prepare for publishing version $VERSION"
+git commit -m "$COMMIT_MESSAGE" -m "$CHANGELOG_CONTENT"
 echo -e "${GREEN}Changes committed successfully!${NC}"
 
 
