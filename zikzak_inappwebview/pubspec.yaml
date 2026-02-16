@@ -1,6 +1,6 @@
 name: zikzak_inappwebview
 description: A Flutter plugin that allows you to add an inline webview, to use an headless webview, and to open an in-app browser window.
-version: 4.0.3
+version: 4.0.4
 homepage: https://arrrrny.github.io/zikzak_inappwebview
 repository: https://github.com/arrrrny/zikzak_inappwebview
 issue_tracker: https://github.com/arrrrny/zikzak_inappwebview/issues
@@ -18,12 +18,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  zikzak_inappwebview_platform_interface: ^4.0.3
-  zikzak_inappwebview_android: ^4.0.3
-  zikzak_inappwebview_ios: ^4.0.3
-  zikzak_inappwebview_macos: ^4.0.3
-  zikzak_inappwebview_web: ^4.0.3
-  zikzak_inappwebview_windows: ^4.0.3
+  zikzak_inappwebview_platform_interface: ^4.0.4
+  zikzak_inappwebview_android: ^4.0.4
+  zikzak_inappwebview_ios: ^4.0.4
+  zikzak_inappwebview_macos: ^4.0.4
+  zikzak_inappwebview_web: ^4.0.4
+  zikzak_inappwebview_windows: ^4.0.4
 
 dev_dependencies:
   flutter_test:
@@ -51,8 +51,8 @@ flutter:
         default_package: zikzak_inappwebview_web
       windows:
         default_package: zikzak_inappwebview_windows
-      # linux:
-      #   default_package: zikzak_inappwebview_linux
+      linux:
+        default_package: zikzak_inappwebview_linux
 
   assets:
     - packages/zikzak_inappwebview/assets/t_rex_runner/t-rex.html
@@ -93,15 +93,9 @@ false_secrets:
   - /test_node_server/*.pfx
 
 dependency_overrides:
-  zikzak_inappwebview_android:
-    path: ../zikzak_inappwebview_android
-  zikzak_inappwebview_ios:
-    path: ../zikzak_inappwebview_ios
-  zikzak_inappwebview_web:
-    path: ../zikzak_inappwebview_web
-  zikzak_inappwebview_macos:
-    path: ../zikzak_inappwebview_macos
-  zikzak_inappwebview_windows:
-    path: ../zikzak_inappwebview_windows
-  zikzak_inappwebview_platform_interface:
-    path: ../zikzak_inappwebview_platform_interface
+  zikzak_inappwebview_android: ^4.0.4
+  zikzak_inappwebview_ios: ^4.0.4
+  zikzak_inappwebview_web: ^4.0.4
+  zikzak_inappwebview_macos: ^4.0.4
+  zikzak_inappwebview_windows: ^4.0.4
+  zikzak_inappwebview_platform_interface: ^4.0.4
