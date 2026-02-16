@@ -1,278 +1,161 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:html' as html;
-import 'dart:js' as js;
+import 'dart:js_interop';
+import 'dart:js_interop_unsafe';
 
+import 'package:web/web.dart' as web;
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
 class InAppWebViewWebController extends PlatformInAppWebViewController {
-  final html.IFrameElement _iframe;
+  final web.HTMLIFrameElement _iframe;
   Function(WebUri? url)? onLoadStartCallback;
 
   InAppWebViewWebController(
     PlatformInAppWebViewControllerCreationParams params,
     this._iframe,
   ) : super.implementation(params) {
-    _iframe.onLoad.listen((event) {
-      // print("Iframe loaded: ${_iframe.src}");
-      // Use a small delay to ensure the window object is ready and accessible
-      Future.delayed(const Duration(milliseconds: 100), () {
-        _injectConsoleInterception();
-      });
-    });
+    _iframe.addEventListener(
+      'load',
+      ((web.Event event) {
+        // Use a small delay to ensure the window object is ready and accessible
+        Future.delayed(const Duration(milliseconds: 100), () {
+          _injectConsoleInterception();
+        });
+      }).toJS,
+    );
 
-    html.window.onMessage.listen((event) {
-      if (event.data is! String) return;
-      final raw = event.data as String;
-      if (!raw.contains('"type":"console"')) return;
-      try {
-        final data = jsonDecode(raw);
-        if (data is Map && data['type'] == 'console') {
-          final message = data['message'];
-          final level = data['level'];
-          ConsoleMessageLevel consoleLevel = ConsoleMessageLevel.LOG;
-          switch (level) {
-            case 'WARNING':
-              consoleLevel = ConsoleMessageLevel.WARNING;
-              break;
-            case 'ERROR':
-              consoleLevel = ConsoleMessageLevel.ERROR;
-              break;
-            case 'DEBUG':
-              consoleLevel = ConsoleMessageLevel.DEBUG;
-              break;
-            case 'INFO':
-              consoleLevel = ConsoleMessageLevel
-                  .LOG; // Fallback to LOG if INFO is missing in the enum
-              break;
-          }
-
-          if (params.webviewParams?.onConsoleMessage != null) {
-            params.webviewParams!.onConsoleMessage!(
-              this,
-              ConsoleMessage(message: message, messageLevel: consoleLevel),
-            );
-          }
-        }
-      } catch (_) {
-        // Ignore invalid JSON
-      }
-    });
-  }
-
-  void _injectConsoleInterception() {
-    try {
-      final window = _iframe.contentWindow;
-      // When using about:blank, contentWindow is accessible as a same-origin Window.
-      // We can cast it to html.Window directly.
-      if (window is html.Window) {
-        print("Injecting console interception script...");
-        final doc = window.document;
-        final script = doc.createElement('script');
-        script.text = """
-          (function() {
-            var oldLog = console.log;
-            var oldWarn = console.warn;
-            var oldError = console.error;
-            var oldDebug = console.debug;
-            var oldInfo = console.info;
-
-            function sendConsoleMessage(message, level) {
-              try {
-                window.parent.postMessage(JSON.stringify({
-                  'type': 'console',
-                  'message': message,
-                  'level': level
-                }), '*');
-              } catch(e) {
-                oldError.call(console, "Failed to send console message: " + e);
-              }
+    web.window.addEventListener(
+      'message',
+      ((web.MessageEvent event) {
+        final data = event.data;
+        if (data == null) return;
+        final raw = data.dartify();
+        if (raw is! String) return;
+        if (!raw.contains('"type":"console"')) return;
+        try {
+          final decoded = jsonDecode(raw);
+          if (decoded is Map && decoded['type'] == 'console') {
+            final message = decoded['message'];
+            final level = decoded['level'];
+            ConsoleMessageLevel consoleLevel = ConsoleMessageLevel.LOG;
+            switch (level) {
+              case 'WARNING':
+                consoleLevel = ConsoleMessageLevel.WARNING;
+                break;
+              case 'ERROR':
+                consoleLevel = ConsoleMessageLevel.ERROR;
+                break;
+              case 'DEBUG':
+                consoleLevel = ConsoleMessageLevel.DEBUG;
+                break;
+              case 'INFO':
+                consoleLevel = ConsoleMessageLevel.LOG;
+                break;
             }
 
-            console.log = function(message) {
-              oldLog.apply(console, arguments);
-              sendConsoleMessage(Array.from(arguments).join(' '), 'LOG');
-            };
-            console.warn = function(message) {
-              oldWarn.apply(console, arguments);
-              sendConsoleMessage(Array.from(arguments).join(' '), 'WARNING');
-            };
-            console.error = function(message) {
-              oldError.apply(console, arguments);
-              sendConsoleMessage(Array.from(arguments).join(' '), 'ERROR');
-            };
-            console.debug = function(message) {
-              oldDebug.apply(console, arguments);
-              sendConsoleMessage(Array.from(arguments).join(' '), 'DEBUG');
-            };
-            console.info = function(message) {
-              oldInfo.apply(console, arguments);
-              sendConsoleMessage(Array.from(arguments).join(' '), 'INFO');
-            };
-            
-            console.log("ZikZak: Console interception active");
-          })();
-        """;
-        // Type casting to HtmlDocument to access body
-        if (doc is html.HtmlDocument && doc.body != null) {
-          doc.body!.append(script);
-        } else {
-          doc.documentElement?.append(script);
-        }
-      } else {
-        // Fallback for cases where Dart might wrap it differently, though about:blank should be fine.
-        // If we are here, it might be Cross-Origin or Dart's type system being tricky.
-        print(
-          "Content window is not an html.Window (likely cross-origin blocked or type mismatch)",
-        );
-
-        // Strategy 2: Try accessing contentDocument directly from the iframe element via JS interop
-        // This bypasses the contentWindow wrapper which might be causing issues.
-        print(
-          "Attempting to access contentDocument via JS interop on iframe element...",
-        );
-        try {
-          final jsIframe = js.JsObject.fromBrowserObject(_iframe);
-          if (jsIframe.hasProperty('contentDocument')) {
-            final doc = jsIframe['contentDocument'];
-            if (doc != null) {
-              print("Successfully accessed contentDocument via JS interop");
-              final script = doc.callMethod('createElement', ['script']);
-              script['text'] = """
-                (function() {
-                  var oldLog = console.log;
-                  var oldWarn = console.warn;
-                  var oldError = console.error;
-                  var oldDebug = console.debug;
-                  var oldInfo = console.info;
-      
-                  function sendConsoleMessage(message, level) {
-                    try {
-                      window.parent.postMessage(JSON.stringify({
-                        'type': 'console',
-                        'message': message,
-                        'level': level
-                      }), '*');
-                    } catch(e) {
-                      oldError.call(console, "Failed to send console message: " + e);
-                    }
-                  }
-      
-                  console.log = function(message) {
-                    oldLog.apply(console, arguments);
-                    sendConsoleMessage(Array.from(arguments).join(' '), 'LOG');
-                  };
-                  console.warn = function(message) {
-                    oldWarn.apply(console, arguments);
-                    sendConsoleMessage(Array.from(arguments).join(' '), 'WARNING');
-                  };
-                  console.error = function(message) {
-                    oldError.apply(console, arguments);
-                    sendConsoleMessage(Array.from(arguments).join(' '), 'ERROR');
-                  };
-                  console.debug = function(message) {
-                    oldDebug.apply(console, arguments);
-                    sendConsoleMessage(Array.from(arguments).join(' '), 'DEBUG');
-                  };
-                  console.info = function(message) {
-                    oldInfo.apply(console, arguments);
-                    sendConsoleMessage(Array.from(arguments).join(' '), 'INFO');
-                  };
-                  
-                  console.log("ZikZak: Console interception active");
-                })();
-                """;
-
-              // Try to append to body or head or documentElement
-              var appended = false;
-              if (doc.hasProperty('body') && doc['body'] != null) {
-                doc['body'].callMethod('appendChild', [script]);
-                appended = true;
-              } else if (doc.hasProperty('head') && doc['head'] != null) {
-                doc['head'].callMethod('appendChild', [script]);
-                appended = true;
-              } else if (doc.hasProperty('documentElement') &&
-                  doc['documentElement'] != null) {
-                doc['documentElement'].callMethod('appendChild', [script]);
-                appended = true;
-              }
-
-              if (appended) {
-                print("Script appended successfully via contentDocument");
-                return;
-              } else {
-                print(
-                  "Could not find body/head/documentElement to append script",
-                );
-              }
+            if (params.webviewParams?.onConsoleMessage != null) {
+              params.webviewParams!.onConsoleMessage!(
+                this,
+                ConsoleMessage(
+                  message: message?.toString() ?? '',
+                  messageLevel: consoleLevel,
+                ),
+              );
             }
           }
         } catch (e) {
-          print("Failed to access contentDocument: $e");
+          // Ignore JSON parse errors
         }
+      }).toJS,
+    );
+  }
 
-        // Strategy 3: Original JS interop fallback (as last resort)
-        if (window != null) {
-          print("Attempting JS interop fallback on window...");
-          final jsWindow = js.JsObject.fromBrowserObject(window);
+  static const String _consoleInterceptionScript = """
+    (function() {
+      var oldLog = console.log;
+      var oldWarn = console.warn;
+      var oldError = console.error;
+      var oldDebug = console.debug;
+      var oldInfo = console.info;
 
-          // Check for document property
-          if (jsWindow.hasProperty('document')) {
-            final doc = jsWindow['document'];
-            final script = doc.callMethod('createElement', ['script']);
-            script['text'] = """
-                (function() {
-                  var oldLog = console.log;
-                  var oldWarn = console.warn;
-                  var oldError = console.error;
-                  var oldDebug = console.debug;
-                  var oldInfo = console.info;
-      
-                  function sendConsoleMessage(message, level) {
-                    try {
-                      window.parent.postMessage(JSON.stringify({
-                        'type': 'console',
-                        'message': message,
-                        'level': level
-                      }), '*');
-                    } catch(e) {
-                      oldError.call(console, "Failed to send console message: " + e);
-                    }
-                  }
-      
-                  console.log = function(message) {
-                    oldLog.apply(console, arguments);
-                    sendConsoleMessage(Array.from(arguments).join(' '), 'LOG');
-                  };
-                  console.warn = function(message) {
-                    oldWarn.apply(console, arguments);
-                    sendConsoleMessage(Array.from(arguments).join(' '), 'WARNING');
-                  };
-                  console.error = function(message) {
-                    oldError.apply(console, arguments);
-                    sendConsoleMessage(Array.from(arguments).join(' '), 'ERROR');
-                  };
-                  console.debug = function(message) {
-                    oldDebug.apply(console, arguments);
-                    sendConsoleMessage(Array.from(arguments).join(' '), 'DEBUG');
-                  };
-                  console.info = function(message) {
-                    oldInfo.apply(console, arguments);
-                    sendConsoleMessage(Array.from(arguments).join(' '), 'INFO');
-                  };
-                  
-                  console.log("ZikZak: Console interception active");
-                })();
-                """;
-            final body = doc['body'];
-            body.callMethod('appendChild', [script]);
-          } else {
-            print("JS Interop: Window has no 'document' property");
+      function sendConsoleMessage(message, level) {
+        try {
+          window.parent.postMessage(JSON.stringify({
+            'type': 'console',
+            'message': message,
+            'level': level
+          }), '*');
+        } catch(e) {
+          oldError.call(console, "Failed to send console message: " + e);
+        }
+      }
+
+      console.log = function(message) {
+        oldLog.apply(console, arguments);
+        sendConsoleMessage(Array.from(arguments).join(' '), 'LOG');
+      };
+      console.warn = function(message) {
+        oldWarn.apply(console, arguments);
+        sendConsoleMessage(Array.from(arguments).join(' '), 'WARNING');
+      };
+      console.error = function(message) {
+        oldError.apply(console, arguments);
+        sendConsoleMessage(Array.from(arguments).join(' '), 'ERROR');
+      };
+      console.debug = function(message) {
+        oldDebug.apply(console, arguments);
+        sendConsoleMessage(Array.from(arguments).join(' '), 'DEBUG');
+      };
+      console.info = function(message) {
+        oldInfo.apply(console, arguments);
+        sendConsoleMessage(Array.from(arguments).join(' '), 'INFO');
+      };
+    })();
+  """;
+
+  void _injectConsoleInterception() {
+    try {
+      final doc = _iframe.contentDocument;
+      if (doc != null) {
+        final script =
+            doc.createElement('script') as web.HTMLScriptElement;
+        script.text = _consoleInterceptionScript;
+        final body = doc.body;
+        if (body != null) {
+          body.appendChild(script);
+        } else {
+          doc.documentElement?.appendChild(script);
+        }
+        return;
+      }
+    } catch (e) {
+      // Likely cross-origin
+    }
+
+    // Fallback: try via JS interop on the iframe object
+    try {
+      final jsIframe = _iframe as JSObject;
+      if (jsIframe.has('contentDocument')) {
+        final doc = jsIframe['contentDocument'] as JSObject?;
+        if (doc != null) {
+          final script = doc.callMethod('createElement'.toJS,
+              'script'.toJS) as JSObject;
+          script['text'] = _consoleInterceptionScript.toJS;
+
+          JSObject? target;
+          if (doc.has('body') && doc['body'] != null) {
+            target = doc['body'] as JSObject;
+          } else if (doc.has('head') && doc['head'] != null) {
+            target = doc['head'] as JSObject;
+          } else if (doc.has('documentElement') &&
+              doc['documentElement'] != null) {
+            target = doc['documentElement'] as JSObject;
           }
+          target?.callMethod('appendChild'.toJS, script);
         }
       }
     } catch (e) {
-      print("Failed to inject console interception: $e");
+      // Ignore
     }
   }
 
@@ -327,25 +210,24 @@ class InAppWebViewWebController extends PlatformInAppWebViewController {
 
   @override
   Future<WebUri?> getUrl() async {
-    // Note: Cross-origin restrictions might prevent accessing contentWindow.location.href
-    // if the iframe content is on a different domain.
     try {
-      final window = _iframe.contentWindow as html.Window?;
-      final href = window?.location.href;
-      return href != null ? WebUri(href) : null;
+      final window = _iframe.contentWindow;
+      if (window != null) {
+        final href = window.location.href;
+        return WebUri(href);
+      }
     } catch (e) {
       // Fallback for cross-origin or other errors
-      final src = _iframe.src;
-      return src != null ? WebUri(src) : null;
     }
+    final src = _iframe.src;
+    return src.isNotEmpty ? WebUri(src) : null;
   }
 
   @override
   Future<String?> getTitle() async {
     try {
-      final window = _iframe.contentWindow as html.Window?;
-      final document = window?.document as html.HtmlDocument?;
-      return document?.title;
+      final doc = _iframe.contentDocument;
+      return doc?.title;
     } catch (e) {
       // Not accessible for cross-origin iframes
       return null;
@@ -364,39 +246,16 @@ class InAppWebViewWebController extends PlatformInAppWebViewController {
     ContentWorld? contentWorld,
   }) async {
     try {
-      final window = _iframe.contentWindow;
-      if (window != null) {
-        // This only works for same-origin iframes.
-        // For cross-origin iframes, you would typically need postMessage,
-        // but standard evaluateJavascript implies direct execution.
-        // We'll use JS interop to execute in the context of the iframe window if possible.
-        // However, dart:html's window.location.href access throws on cross-origin.
-        // There is no standard way to inject arbitrary JS into a cross-origin iframe from the parent
-        // due to security policies (SOP).
-
-        // Assuming same-origin for now or accepting the limitation.
-        // We can try to use `window.eval(source)` if available/accessible.
-        // Note: dart:html Window doesn't expose eval directly easily.
-
-        // A common workaround in Flutter Web for "eval" is using dart:js_interop or similar,
-        // but here we are targeting a specific iframe window.
-
-        // We can try using postMessage if we had a listener inside, but we don't control the page content generally.
-
-        // Best effort:
-        // Create a script element in the iframe's document (only works for same-origin).
-        final doc = (window as html.Window).document as html.HtmlDocument;
-        final script = doc.createElement('script');
+      final doc = _iframe.contentDocument;
+      if (doc != null) {
+        final script =
+            doc.createElement('script') as web.HTMLScriptElement;
         script.text = source;
-        doc.body?.append(script);
-        // Getting the result is harder with this method.
-        // For 'eval' with return value, we might try:
-        // return (window as dynamic).eval(source);
+        doc.body?.appendChild(script);
         return "Executed (Return value capture not supported)";
       }
     } catch (e) {
       // Likely SecurityError due to cross-origin
-      // print("evaluateJavascript failed (likely due to Cross-Origin restrictions): $e");
     }
     return null;
   }
@@ -404,12 +263,12 @@ class InAppWebViewWebController extends PlatformInAppWebViewController {
   @override
   Future<void> reload() async {
     try {
-      final window = _iframe.contentWindow as html.Window?;
+      final window = _iframe.contentWindow;
       window?.location.reload();
     } catch (e) {
       // Fallback for cross-origin
       final src = _iframe.src;
-      if (src != null) {
+      if (src.isNotEmpty) {
         _iframe.src = src;
       }
     }
@@ -436,18 +295,68 @@ class InAppWebViewWebController extends PlatformInAppWebViewController {
   @override
   Future<void> stopLoading() async {
     try {
-      final window = _iframe.contentWindow as html.Window?;
-      window?.stop();
-    } catch (e) {
+      _iframe.contentWindow?.stop();
+    } catch (_) {
       // Ignore
     }
   }
 
   @override
-  void dispose({bool isKeepAlive = false}) {
-    if (isKeepAlive) {
-      // Handle keep alive logic if necessary
+  Future<String?> getHtml() async {
+    // Strategy 1: Use contentDocument directly (works for same-origin / srcdoc)
+    try {
+      final doc = _iframe.contentDocument;
+      if (doc != null) {
+        final outerHTML = doc.documentElement?.outerHTML;
+        if (outerHTML != null) {
+          final html = (outerHTML as JSString).toDart;
+          if (html.isNotEmpty) return html;
+        }
+      }
+    } catch (e) {
+      // Cross-origin or other errors
     }
+
+    // Strategy 2: Use contentWindow.document
+    try {
+      final window = _iframe.contentWindow;
+      if (window != null) {
+        final outerHTML = window.document.documentElement?.outerHTML;
+        if (outerHTML != null) {
+          final html = (outerHTML as JSString).toDart;
+          if (html.isNotEmpty) return html;
+        }
+      }
+    } catch (e) {
+      // Cross-origin or other errors
+    }
+
+    // Strategy 3: JS interop fallback
+    try {
+      final jsIframe = _iframe as JSObject;
+      if (jsIframe.has('contentDocument')) {
+        final doc = jsIframe['contentDocument'] as JSObject?;
+        if (doc != null &&
+            doc.has('documentElement') &&
+            doc['documentElement'] != null) {
+          final docEl = doc['documentElement'] as JSObject;
+          if (docEl.has('outerHTML')) {
+            final result = docEl['outerHTML'];
+            if (result != null) {
+              return (result as JSString).toDart;
+            }
+          }
+        }
+      }
+    } catch (e) {
+      // Ignore errors
+    }
+
+    return null;
+  }
+
+  @override
+  void dispose({bool isKeepAlive = false}) {
     // Cleanup if needed
   }
 }

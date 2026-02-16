@@ -1,5 +1,3 @@
-library zikzak_inappwebview_web;
-
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 

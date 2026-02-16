@@ -16,16 +16,22 @@ class _HeadlessInAppWebViewExampleScreenState
     extends State<HeadlessInAppWebViewExampleScreen> {
   HeadlessInAppWebView? headlessWebView;
   String url = "";
+  String htmlResult = "";
 
   @override
   void initState() {
     super.initState();
 
-    var url = !kIsWeb ? WebUri("https://flutter.dev") : WebUri("about:blank");
-
     headlessWebView = HeadlessInAppWebView(
       webViewEnvironment: webViewEnvironment,
-      initialUrlRequest: URLRequest(url: url),
+      initialUrlRequest: kIsWeb
+          ? null
+          : URLRequest(url: WebUri("https://flutter.dev")),
+      initialData: kIsWeb
+          ? InAppWebViewInitialData(
+              data:
+                  '<html><head><title>Test</title></head><body><h1>Hello from getHtml test</h1></body></html>')
+          : null,
       initialSettings: InAppWebViewSettings(
         isInspectable: kDebugMode,
       ),
@@ -110,10 +116,73 @@ class _HeadlessInAppWebViewExampleScreenState
                   headlessWebView?.dispose();
                   setState(() {
                     url = "";
+                    htmlResult = "";
                   });
                 },
                 child: const Text("Dispose HeadlessInAppWebView")),
-          )
+          ),
+          Container(height: 10),
+          Center(
+            child: ElevatedButton(
+                onPressed: () async {
+                  if (headlessWebView?.isRunning() ?? false) {
+                    final html = await headlessWebView?.webViewController
+                        ?.getHtml();
+                    setState(() {
+                      htmlResult = html ?? 'null (getHtml returned null)';
+                    });
+                    debugPrint('getHtml result: $html');
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text(
+                          'HeadlessInAppWebView is not running. Click on "Run HeadlessInAppWebView"!'),
+                    ));
+                  }
+                },
+                child: const Text("Test getHtml()")),
+          ),
+          if (htmlResult.isNotEmpty) ...[
+            Container(height: 10),
+            Container(
+              padding: const EdgeInsets.all(10.0),
+              margin: const EdgeInsets.symmetric(horizontal: 20.0),
+              decoration: BoxDecoration(
+                color: htmlResult.contains('<html')
+                    ? Colors.green.shade50
+                    : Colors.red.shade50,
+                border: Border.all(
+                  color: htmlResult.contains('<html')
+                      ? Colors.green
+                      : Colors.red,
+                ),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    htmlResult.contains('<html')
+                        ? '✅ getHtml() SUCCESS'
+                        : '❌ getHtml() FAILED',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: htmlResult.contains('<html')
+                          ? Colors.green
+                          : Colors.red,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    htmlResult.length > 500
+                        ? '${htmlResult.substring(0, 500)}...'
+                        : htmlResult,
+                    style: const TextStyle(
+                        fontSize: 12, fontFamily: 'monospace'),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ])));
   }
 }

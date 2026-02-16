@@ -201,6 +201,32 @@ void in_app_webview_handle_method_call(InAppWebView* self, FlMethodCall* method_
         const gchar* uri = webkit_web_view_get_uri(WEBKIT_WEB_VIEW(self->web_view));
         g_autoptr(FlValue) result = uri ? fl_value_new_string(uri) : fl_value_new_null();
         fl_method_call_respond(method_call, FL_METHOD_RESPONSE(fl_method_success_response_new(result)), nullptr);
+    } else if (strcmp(method, "getHtml") == 0) {
+        webkit_web_view_run_javascript(WEBKIT_WEB_VIEW(self->web_view),
+            "document.documentElement.outerHTML",
+            nullptr,
+            [](GObject* object, GAsyncResult* result, gpointer user_data) {
+                FlMethodCall* method_call = FL_METHOD_CALL(user_data);
+                GError* error = nullptr;
+                WebKitJavascriptResult* js_result = webkit_web_view_run_javascript_finish(WEBKIT_WEB_VIEW(object), result, &error);
+                
+                if (!js_result) {
+                    fl_method_call_respond(method_call, FL_METHOD_RESPONSE(fl_method_error_response_new("error", error->message, nullptr)), nullptr);
+                    g_error_free(error);
+                } else {
+                    JSCValue* value = webkit_javascript_result_get_js_value(js_result);
+                    if (jsc_value_is_string(value)) {
+                        g_autofree gchar* str_value = jsc_value_to_string(value);
+                        fl_method_call_respond(method_call, FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_string(str_value))), nullptr);
+                    } else {
+                        fl_method_call_respond(method_call, FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_null())), nullptr);
+                    }
+                    webkit_javascript_result_unref(js_result);
+                }
+                g_object_unref(method_call);
+            },
+            g_object_ref(method_call));
+        return;
     } else if (strcmp(method, "loadUrl") == 0) {
         if (fl_value_get_type(args) == FL_VALUE_TYPE_MAP) {
              FlValue* urlRequest = fl_value_lookup_string(args, "urlRequest");

@@ -130,6 +130,15 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             } else {
                 result(FlutterError(code: "InAppWebView", message: "Invalid arguments", details: nil))
             }
+        case "loadData":
+            if let args = call.arguments as? [String: Any],
+               let data = args["data"] as? String,
+               let baseUrl = args["baseUrl"] as? String {
+                self.loadHTMLString(data, baseURL: URL(string: baseUrl))
+                result(true)
+            } else {
+                result(FlutterError(code: "InAppWebView", message: "Invalid arguments", details: nil))
+            }
         case "reload":
             self.reload()
             result(true)
@@ -152,6 +161,14 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         case "stopLoading":
             self.stopLoading()
             result(true)
+        case "getHtml":
+            self.evaluateJavaScript("document.documentElement.outerHTML") { (value, error) in
+                if let error = error {
+                    result(FlutterError(code: "InAppWebView", message: error.localizedDescription, details: nil))
+                } else {
+                    result(value)
+                }
+            }
         case "evaluateJavascript":
             if let args = call.arguments as? [String: Any],
                let source = args["source"] as? String {

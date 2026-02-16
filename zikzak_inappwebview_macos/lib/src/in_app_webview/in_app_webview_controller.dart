@@ -208,6 +208,31 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
   }
 
   @override
+  Future<void> loadData({
+    required String data,
+    String mimeType = "text/html",
+    String encoding = "utf8",
+    WebUri? baseUrl,
+    WebUri? historyUrl,
+    WebUri? allowingReadAccessTo,
+  }) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('data', () => data);
+    args.putIfAbsent('mimeType', () => mimeType);
+    args.putIfAbsent('encoding', () => encoding);
+    args.putIfAbsent('baseUrl', () => baseUrl?.toString() ?? "about:blank");
+    args.putIfAbsent('historyUrl', () => historyUrl?.toString() ?? "about:blank");
+    args.putIfAbsent(
+        'allowingReadAccessTo', () => allowingReadAccessTo?.toString());
+    await _channel.invokeMethod('loadData', args);
+  }
+
+  @override
+  Future<String?> getHtml() async {
+    return await _channel.invokeMethod<String>('getHtml');
+  }
+
+  @override
   Future<void> reload() async {
     await _channel.invokeMethod('reload');
   }

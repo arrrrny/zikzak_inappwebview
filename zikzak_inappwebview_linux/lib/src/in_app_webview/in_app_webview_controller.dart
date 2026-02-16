@@ -253,6 +253,11 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
   }
 
   @override
+  Future<String?> getHtml() async {
+    return await _channel.invokeMethod<String>('getHtml');
+  }
+
+  @override
   void dispose({bool isKeepAlive = false}) {
     if (!isKeepAlive) {
       _channel.setMethodCallHandler(null);

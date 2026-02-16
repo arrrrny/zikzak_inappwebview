@@ -74,6 +74,12 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
   }
 
   @override
+  Future<String?> getHtml() async {
+    final result = await evaluateJavascript(source: "document.documentElement.outerHTML");
+    return result?.toString();
+  }
+
+  @override
   Future<dynamic> evaluateJavascript({
     required String source,
     ContentWorld? contentWorld,

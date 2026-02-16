@@ -1,7 +1,8 @@
 import 'dart:async';
-import 'dart:html' as html;
+import 'dart:js_interop';
 import 'dart:ui';
 
+import 'package:web/web.dart' as web;
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
 import 'in_app_webview_web_controller.dart';
@@ -10,7 +11,7 @@ class HeadlessInAppWebViewWeb extends PlatformHeadlessInAppWebView {
   HeadlessInAppWebViewWeb(PlatformHeadlessInAppWebViewCreationParams params)
     : super.implementation(params);
 
-  html.IFrameElement? _iframe;
+  web.HTMLIFrameElement? _iframe;
   InAppWebViewWebController? _webViewController;
 
   @override
@@ -23,7 +24,7 @@ class HeadlessInAppWebViewWeb extends PlatformHeadlessInAppWebView {
   Future<void> run() async {
     if (_iframe != null) return;
 
-    _iframe = html.IFrameElement();
+    _iframe = web.HTMLIFrameElement();
     // Hide the iframe but keep it active
     _iframe!.style.visibility = 'hidden';
     _iframe!.style.position = 'absolute';
@@ -51,13 +52,16 @@ class HeadlessInAppWebViewWeb extends PlatformHeadlessInAppWebView {
     _webViewController = InAppWebViewWebController(controllerParams, _iframe!);
 
     // Setup listeners
-    _iframe!.onLoad.listen((event) {
-      if (params.onLoadStop != null) {
-        final url = _iframe!.src != null ? WebUri(_iframe!.src!) : null;
-        final controller = _convertController(_webViewController!);
-        params.onLoadStop!(controller, url);
-      }
-    });
+    _iframe!.addEventListener(
+      'load',
+      ((web.Event event) {
+        if (params.onLoadStop != null) {
+          final url = _resolveCurrentUrl();
+          final controller = _convertController(_webViewController!);
+          params.onLoadStop!(controller, url);
+        }
+      }).toJS,
+    );
 
     _webViewController!.onLoadStartCallback = (url) {
       if (params.onLoadStart != null) {
@@ -81,12 +85,21 @@ class HeadlessInAppWebViewWeb extends PlatformHeadlessInAppWebView {
       _webViewController!.loadFile(assetFilePath: params.initialFile!);
     }
 
-    html.document.body!.append(_iframe!);
+    web.document.body!.appendChild(_iframe!);
 
     if (params.onWebViewCreated != null) {
       final controller = _convertController(_webViewController!);
       params.onWebViewCreated!(controller);
     }
+  }
+
+  WebUri? _resolveCurrentUrl() {
+    try {
+      final href = _iframe!.contentWindow?.location.href;
+      if (href != null && href.isNotEmpty) return WebUri(href);
+    } catch (_) {}
+    final src = _iframe!.src;
+    return src.isNotEmpty ? WebUri(src) : null;
   }
 
   dynamic _convertController(PlatformInAppWebViewController controller) {

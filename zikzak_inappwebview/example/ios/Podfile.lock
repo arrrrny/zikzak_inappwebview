@@ -1,20 +1,27 @@
 PODS:
   - Flutter (1.0.0)
+  - integration_test (0.0.1):
+    - Flutter
   - OrderedSet (6.0.3)
+  - path_provider_foundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
   - pointer_interceptor_ios (0.0.1):
     - Flutter
   - url_launcher_ios (0.0.1):
     - Flutter
-  - zikzak_inappwebview_ios (4.0.0):
+  - zikzak_inappwebview_ios (4.0.5):
     - Flutter
     - OrderedSet (>= 6.0.3)
-    - zikzak_inappwebview_ios/Core (= 4.0.0)
-  - zikzak_inappwebview_ios/Core (4.0.0):
+    - zikzak_inappwebview_ios/Core (= 4.0.5)
+  - zikzak_inappwebview_ios/Core (4.0.5):
     - Flutter
     - OrderedSet (>= 6.0.3)
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
+  - integration_test (from `.symlinks/plugins/integration_test/ios`)
+  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - pointer_interceptor_ios (from `.symlinks/plugins/pointer_interceptor_ios/ios`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
   - zikzak_inappwebview_ios (from `.symlinks/plugins/zikzak_inappwebview_ios/ios`)
@@ -26,6 +33,10 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
+  integration_test:
+    :path: ".symlinks/plugins/integration_test/ios"
+  path_provider_foundation:
+    :path: ".symlinks/plugins/path_provider_foundation/darwin"
   pointer_interceptor_ios:
     :path: ".symlinks/plugins/pointer_interceptor_ios/ios"
   url_launcher_ios:
@@ -35,10 +46,12 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  integration_test: 4a889634ef21a45d28d50d622cf412dc6d9f586e
   OrderedSet: e539b66b644ff081c73a262d24ad552a69be3a94
+  path_provider_foundation: bb55f6dbba17d0dccd6737fe6f7f34fbd0376880
   pointer_interceptor_ios: ec847ef8b0915778bed2b2cef636f4d177fa8eed
   url_launcher_ios: 694010445543906933d732453a59da0a173ae33d
-  zikzak_inappwebview_ios: be285a4733f0ff1e5a410da81ac1932000e5bbfb
+  zikzak_inappwebview_ios: c9ad0217915a11dfc098ed0dfe8eb624f46d84fb
 
 PODFILE CHECKSUM: 4c438addb11b6da45ed7ae408823d68256222460
 
