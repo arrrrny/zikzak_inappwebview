@@ -1,3 +1,6 @@
+## 4.0.8 - 2026-02-16
+
+* Prepare for publishing version 4.0.8
 ## 4.0.7 - 2026-02-16
 
 * Fixed: getHtml works on macos, tested on ios,android
