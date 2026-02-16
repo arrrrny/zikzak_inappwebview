@@ -2,6 +2,7 @@ import 'package:flutter/rendering.dart';
 import 'package:zikzak_inappwebview_internal_annotations/zikzak_inappwebview_internal_annotations.dart';
 
 import '../print_job/main.dart';
+import '../util.dart';
 import '../web_uri.dart';
 import 'in_app_webview_rect.dart';
 import 'print_job_color_mode.dart';
@@ -19,175 +20,176 @@ part 'print_job_attributes.g.dart';
 @ExchangeableObject()
 class PrintJobAttributes_ {
   ///The color mode.
-  @SupportedPlatforms(platforms: [AndroidPlatform(), MacOSPlatform()])
-  PrintJobColorMode_? colorMode;
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- MacOS
+  PrintJobColorMode? colorMode;
 
   ///The duplex mode to use for the print job.
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(available: "23"),
-    IOSPlatform(),
-    MacOSPlatform()
-  ])
-  PrintJobDuplexMode_? duplex;
+  ///
+  ///**NOTE for Android native WebView**: available only on Android 23+.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
+  PrintJobDuplexMode? duplexMode;
 
   ///The orientation of the printed content, portrait or landscape.
-  PrintJobOrientation_? orientation;
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- MacOS
+  PrintJobOrientation? orientation;
 
   ///The media size.
-  @SupportedPlatforms(platforms: [AndroidPlatform()])
-  PrintJobMediaSize_? mediaSize;
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- MacOS
+  PrintJobMediaSize? mediaSize;
 
   ///The supported resolution in DPI (dots per inch).
-  @SupportedPlatforms(platforms: [AndroidPlatform()])
-  PrintJobResolution_? resolution;
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- MacOS
+  PrintJobResolution? resolution;
 
-  ///The margins for each printed page.
-  ///Margins define the white space around the content where the left margin defines
-  ///the amount of white space on the left of the content and so on.
-  @SupportedPlatforms(platforms: [IOSPlatform(), MacOSPlatform()])
+  ///The margins for the printed content.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- iOS
+  ///- MacOS
   EdgeInsets? margins;
 
   ///The height of the page footer.
   ///
   ///The footer is measured in points from the bottom of [printableRect] and is below the content area.
   ///The default footer height is `0.0`.
-  @SupportedPlatforms(platforms: [IOSPlatform()])
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- iOS
   double? footerHeight;
 
   ///The height of the page header.
   ///
   ///The header is measured in points from the top of [printableRect] and is above the content area.
   ///The default header height is `0.0`.
-  @SupportedPlatforms(platforms: [IOSPlatform()])
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- iOS
   double? headerHeight;
+
+  ///The kind of paper used for the print job.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- MacOS
+  String? paperName;
+
+  ///The name of the currently selected paper size, suitable for presenting in a user interface.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- MacOS
+  String? localizedPaperName;
 
   ///The area in which printing can occur.
   ///
   ///The value of this property is a rectangle that defines the area in which the printer can print content.
-  ///Sometimes this is referred to as the imageable area of the paper.
-  @SupportedPlatforms(platforms: [IOSPlatform(), MacOSPlatform()])
-  InAppWebViewRect_? printableRect;
-
-  ///The size of the paper used for printing.
+  ///Sometimes this area is smaller than the [paperRect].
   ///
-  ///The value of this property is a rectangle that defines the size of paper chosen for the print job.
-  ///The origin is always (0,0).
-  @SupportedPlatforms(platforms: [IOSPlatform(), MacOSPlatform()])
-  InAppWebViewRect_? paperRect;
+  ///**Officially Supported Platforms/Implementations**:
+  ///- MacOS
+  InAppWebViewRect? printableRect;
 
-  ///The maximum height of the content area.
+  ///The size and position of the paper.
   ///
-  ///The Print Formatter uses this value to determine where the content rectangle begins on the first page.
-  ///It compares the value of this property with the printing rectangle’s height minus the header and footer heights and
-  ///the top inset value; it uses the lower of the two values.
-  ///The default value of this property is the maximum float value.
-  @SupportedPlatforms(platforms: [IOSPlatform()])
-  double? maximumContentHeight;
-
-  ///The maximum width of the content area.
+  ///The value of this property is a rectangle that defines the size and position of the paper.
+  ///The origin is (0,0).
   ///
-  ///The Print Formatter uses this value to determine the maximum width of the content rectangle.
-  ///It compares the value of this property with the printing rectangle’s width minus the left and right inset values and uses the lower of the two.
-  ///The default value of this property is the maximum float value.
-  @SupportedPlatforms(platforms: [IOSPlatform()])
-  double? maximumContentWidth;
-
-  ///The name of the currently selected paper size.
-  @SupportedPlatforms(platforms: [MacOSPlatform()])
-  String? paperName;
-
-  ///The human-readable name of the currently selected paper size, suitable for presentation in user interfaces.
-  @SupportedPlatforms(platforms: [MacOSPlatform()])
-  String? localizedPaperName;
-
-  ///The horizontal pagination mode.
-  @SupportedPlatforms(platforms: [MacOSPlatform()])
-  PrintJobPaginationMode_? horizontalPagination;
-
-  ///The vertical pagination to the specified mode.
-  @SupportedPlatforms(platforms: [MacOSPlatform()])
-  PrintJobPaginationMode_? verticalPagination;
-
-  ///The action specified for the job.
-  @SupportedPlatforms(platforms: [MacOSPlatform()])
-  PrintJobDisposition_? jobDisposition;
-
-  ///Indicates whether the image is centered horizontally.
-  @SupportedPlatforms(platforms: [MacOSPlatform()])
-  bool? isHorizontallyCentered;
-
-  ///Indicates whether the image is centered vertically.
-  @SupportedPlatforms(platforms: [MacOSPlatform()])
-  bool? isVerticallyCentered;
-
-  ///Indicates whether only the currently selected contents should be printed.
-  @SupportedPlatforms(platforms: [MacOSPlatform()])
-  bool? isSelectionOnly;
-
-  ///The current scaling factor.
-  @SupportedPlatforms(platforms: [MacOSPlatform()])
-  double? scalingFactor;
-
-  ///An URL containing the location to which the job file will be saved when the [jobDisposition] is [PrintJobDisposition.SAVE].
-  @SupportedPlatforms(platforms: [MacOSPlatform()])
-  WebUri? jobSavingURL;
+  ///**Officially Supported Platforms/Implementations**:
+  ///- MacOS
+  InAppWebViewRect? paperRect;
 
   ///If `true`, produce detailed reports when an error occurs.
-  @SupportedPlatforms(platforms: [MacOSPlatform()])
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- MacOS
   bool? detailedErrorReporting;
 
   ///A fax number.
-  @SupportedPlatforms(platforms: [MacOSPlatform()])
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- MacOS
   String? faxNumber;
 
   ///If `true`, a standard header and footer are added outside the margins of each page.
-  @SupportedPlatforms(platforms: [MacOSPlatform()])
+  ///The default value is `true`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- MacOS
   bool? headerAndFooter;
 
-  ///If `true`, collates output.
-  @SupportedPlatforms(platforms: [MacOSPlatform()])
-  bool? mustCollate;
+  ///The horizontal pagination mode.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- MacOS
+  PrintJobPaginationMode? horizontalPagination;
 
-  ///The number of logical pages to be tiled horizontally on a physical sheet of paper.
-  @SupportedPlatforms(platforms: [MacOSPlatform()])
-  int? pagesAcross;
+  ///Indicates whether the image is centered horizontally.
+  ///The default value is `true`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- MacOS
+  bool? isHorizontallyCentered;
 
-  ///The number of logical pages to be tiled vertically on a physical sheet of paper.
-  @SupportedPlatforms(platforms: [MacOSPlatform()])
-  int? pagesDown;
+  ///Indicates whether the image is centered vertically.
+  ///The default value is `true`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- MacOS
+  bool? isVerticallyCentered;
 
-  ///A timestamp that specifies the time at which printing should begin.
-  @SupportedPlatforms(platforms: [MacOSPlatform()])
-  int? time;
+  ///The action specified for the job.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- MacOS
+  PrintJobDisposition? jobDisposition;
 
-  PrintJobAttributes_(
-      {this.colorMode,
-      this.duplex,
-      this.orientation,
-      this.mediaSize,
-      this.resolution,
-      this.margins,
-      this.maximumContentHeight,
-      this.maximumContentWidth,
-      this.footerHeight,
-      this.headerHeight,
-      this.paperRect,
-      this.printableRect,
-      this.paperName,
-      this.localizedPaperName,
-      this.horizontalPagination,
-      this.verticalPagination,
-      this.jobDisposition,
-      this.isHorizontallyCentered,
-      this.isVerticallyCentered,
-      this.isSelectionOnly,
-      this.scalingFactor,
-      this.jobSavingURL,
-      this.detailedErrorReporting,
-      this.faxNumber,
-      this.headerAndFooter,
-      this.mustCollate,
-      this.pagesAcross,
-      this.pagesDown,
-      this.time});
+  ///An URL containing the location to which the job file will be saved when the [jobDisposition] is [PrintJobDisposition.SAVE].
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- MacOS
+  WebUri? jobSavingURL;
+
+  ///The vertical pagination mode.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- MacOS
+  PrintJobPaginationMode? verticalPagination;
+
+  ///The maximum height of the content.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- MacOS
+  double? maximumContentHeight;
+
+  ///The maximum width of the content.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- MacOS
+  double? maximumContentWidth;
+
+  ///An integer value that specifies the first page in the print job.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- MacOS
+  int? firstPage;
+
+  ///An integer value that specifies the last page in the print job.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- MacOS
+  int? lastPage;
 }

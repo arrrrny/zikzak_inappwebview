@@ -426,7 +426,7 @@ class PrintJobSettings {
       jobSavingURL:
           map['jobSavingURL'] != null ? WebUri(map['jobSavingURL']) : null,
       lastPage: map['lastPage'],
-      margins: map['margins'],
+      margins: MapEdgeInsets.fromMap(map['margins']?.cast<String, dynamic>()),
       maximumContentHeight: map['maximumContentHeight'],
       maximumContentWidth: map['maximumContentWidth'],
       mediaSize:

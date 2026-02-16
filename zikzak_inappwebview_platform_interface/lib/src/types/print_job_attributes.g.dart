@@ -262,7 +262,7 @@ class PrintJobAttributes {
       jobSavingURL:
           map['jobSavingURL'] != null ? WebUri(map['jobSavingURL']) : null,
       localizedPaperName: map['localizedPaperName'],
-      margins: map['margins'],
+      margins: MapEdgeInsets.fromMap(map['margins']?.cast<String, dynamic>()),
       maximumContentHeight: map['maximumContentHeight'],
       maximumContentWidth: map['maximumContentWidth'],
       mediaSize:
