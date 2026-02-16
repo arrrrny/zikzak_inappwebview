@@ -254,14 +254,12 @@ for pkg in "${PACKAGES[@]}"; do
         TEMP_CHANGELOG="$ROOT_DIR/$pkg/CHANGELOG.md.tmp"
         echo -e "## $VERSION - $CURRENT_DATE\n" > "$TEMP_CHANGELOG"
         echo -e "$CHANGELOG_CONTENT" >> "$TEMP_CHANGELOG"
-        echo -e "* Updated dependencies to use hosted references\n" >> "$TEMP_CHANGELOG"
         cat "$ROOT_DIR/$pkg/CHANGELOG.md" >> "$TEMP_CHANGELOG"
         mv "$TEMP_CHANGELOG" "$ROOT_DIR/$pkg/CHANGELOG.md"
     else
         echo -e "${RED}Warning: CHANGELOG.md not found in $pkg. Creating new CHANGELOG.md${NC}"
         echo -e "## $VERSION - $CURRENT_DATE\n" > "$ROOT_DIR/$pkg/CHANGELOG.md"
         echo -e "$CHANGELOG_CONTENT" >> "$ROOT_DIR/$pkg/CHANGELOG.md"
-        echo -e "* Updated dependencies to use hosted references\n" >> "$ROOT_DIR/$pkg/CHANGELOG.md"
     fi
 done
 
