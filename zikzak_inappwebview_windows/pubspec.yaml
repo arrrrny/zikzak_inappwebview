@@ -19,7 +19,8 @@ flutter:
 dependencies:
   flutter:
     sdk: flutter
-  zikzak_inappwebview_platform_interface: ^4.0.5
+  zikzak_inappwebview_platform_interface:
+    path: ../zikzak_inappwebview_platform_interface
   webview_windows: ^0.4.0
   path: ^1.9.0
 
@@ -29,5 +30,7 @@ dev_dependencies:
   flutter_lints: ^6.0.0
 
 dependency_overrides:
-  zikzak_inappwebview_platform_interface: ^4.0.5
-  zikzak_inappwebview_internal_annotations: ^4.0.5
+  zikzak_inappwebview_platform_interface:
+    path: ../zikzak_inappwebview_platform_interface
+  zikzak_inappwebview_internal_annotations:
+    path: ../zikzak_inappwebview_internal_annotations
