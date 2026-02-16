@@ -1,3 +1,9 @@
+## 4.0.5 - 2026-02-16
+
+* Fix: updated missing linux package reference
+
+* Updated dependencies to use hosted references
+
 ## 4.0.3 - 2026-02-16
 
 * Fixed: EdgeInsets conversion issue on getHtml

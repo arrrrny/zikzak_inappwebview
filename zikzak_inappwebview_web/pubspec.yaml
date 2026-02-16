@@ -1,6 +1,6 @@
 name: zikzak_inappwebview_web
 description: The web implementation of zikzak_inappwebview.
-version: 4.0.4
+version: 4.0.5
 homepage: https://github.com/arrrrny/zikzak_inappwebview
 
 environment:
@@ -20,7 +20,7 @@ dependencies:
     sdk: flutter
   flutter_web_plugins:
     sdk: flutter
-  zikzak_inappwebview_platform_interface: ^4.0.4
+  zikzak_inappwebview_platform_interface: ^4.0.5
   web: ^1.1.1
 
 dev_dependencies:
@@ -29,5 +29,5 @@ dev_dependencies:
   flutter_lints: ^6.0.0
 
 dependency_overrides:
-  zikzak_inappwebview_platform_interface: ^4.0.4
-  zikzak_inappwebview_internal_annotations: ^4.0.4
+  zikzak_inappwebview_platform_interface: ^4.0.5
+  zikzak_inappwebview_internal_annotations: ^4.0.5
