@@ -106,6 +106,22 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  http:
+    dependency: "direct main"
+    description:
+      name: http
+      sha256: "87721a4a50b19c7f1d49001e51409bddc46303966ce89a65af4f4e6004896412"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.6.0"
+  http_parser:
+    dependency: transitive
+    description:
+      name: http_parser
+      sha256: "178d74305e7866013777bab2c3d8726205dc5a4dd935297175b19a23a2e66571"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.1.2"
   integration_test:
     dependency: "direct dev"
     description: flutter
@@ -348,6 +364,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.7"
+  typed_data:
+    dependency: transitive
+    description:
+      name: typed_data
+      sha256: f9049c039ebfeb4cf7a7104a675823cd72dba8297f264b6637062516699fa006
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.4.0"
   url_launcher:
     dependency: "direct main"
     description:
@@ -466,63 +490,63 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "4.0.5"
+    version: "4.0.6"
   zikzak_inappwebview_android:
     dependency: "direct overridden"
     description:
       path: "../../zikzak_inappwebview_android"
       relative: true
     source: path
-    version: "4.0.5"
+    version: "4.0.6"
   zikzak_inappwebview_internal_annotations:
     dependency: transitive
     description:
       path: "../../zikzak_inappwebview_internal_annotations"
       relative: true
     source: path
-    version: "4.0.5"
+    version: "4.0.6"
   zikzak_inappwebview_ios:
     dependency: "direct overridden"
     description:
       path: "../../zikzak_inappwebview_ios"
       relative: true
     source: path
-    version: "4.0.5"
+    version: "4.0.6"
   zikzak_inappwebview_linux:
     dependency: "direct overridden"
     description:
       path: "../../zikzak_inappwebview_linux"
       relative: true
     source: path
-    version: "4.0.5"
+    version: "4.0.6"
   zikzak_inappwebview_macos:
     dependency: "direct overridden"
     description:
       path: "../../zikzak_inappwebview_macos"
       relative: true
     source: path
-    version: "4.0.5"
+    version: "4.0.6"
   zikzak_inappwebview_platform_interface:
     dependency: "direct overridden"
     description:
       path: "../../zikzak_inappwebview_platform_interface"
       relative: true
     source: path
-    version: "4.0.5"
+    version: "4.0.6"
   zikzak_inappwebview_web:
     dependency: "direct overridden"
     description:
       path: "../../zikzak_inappwebview_web"
       relative: true
     source: path
-    version: "4.0.5"
+    version: "4.0.6"
   zikzak_inappwebview_windows:
     dependency: "direct overridden"
     description:
       path: "../../zikzak_inappwebview_windows"
       relative: true
     source: path
-    version: "4.0.5"
+    version: "4.0.6"
 sdks:
   dart: ">=3.9.0 <4.0.0"
   flutter: ">=3.35.0"

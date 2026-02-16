@@ -27,6 +27,11 @@ void main() {
     // 3. Create controller
     final controller = InAppWebViewWebController(controllerParams, iframe);
 
+    // Wait for initial iframe load (about:blank) to avoid race conditions
+    // The iframe is appended to body, so it will load about:blank immediately.
+    // We want to make sure that initial load doesn't interfere with our loadData.
+    await Future.delayed(const Duration(milliseconds: 200));
+
     // 4. Load data
     final htmlData = """
 <!DOCTYPE html>

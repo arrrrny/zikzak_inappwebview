@@ -117,8 +117,7 @@ class InAppWebViewWebController extends PlatformInAppWebViewController {
     try {
       final doc = _iframe.contentDocument;
       if (doc != null) {
-        final script =
-            doc.createElement('script') as web.HTMLScriptElement;
+        final script = doc.createElement('script') as web.HTMLScriptElement;
         script.text = _consoleInterceptionScript;
         final body = doc.body;
         if (body != null) {
@@ -138,8 +137,8 @@ class InAppWebViewWebController extends PlatformInAppWebViewController {
       if (jsIframe.has('contentDocument')) {
         final doc = jsIframe['contentDocument'] as JSObject?;
         if (doc != null) {
-          final script = doc.callMethod('createElement'.toJS,
-              'script'.toJS) as JSObject;
+          final script =
+              doc.callMethod('createElement'.toJS, 'script'.toJS) as JSObject;
           script['text'] = _consoleInterceptionScript.toJS;
 
           JSObject? target;
@@ -187,7 +186,7 @@ class InAppWebViewWebController extends PlatformInAppWebViewController {
     // Use srcdoc for HTML content to keep the iframe same-origin,
     // which allows console interception and JS evaluation to work.
     if (mimeType == "text/html") {
-      _iframe.setAttribute('srcdoc', data);
+      _iframe.srcdoc = data.toJS;
     } else {
       final dataUri = Uri.dataFromString(
         data,
@@ -248,8 +247,7 @@ class InAppWebViewWebController extends PlatformInAppWebViewController {
     try {
       final doc = _iframe.contentDocument;
       if (doc != null) {
-        final script =
-            doc.createElement('script') as web.HTMLScriptElement;
+        final script = doc.createElement('script') as web.HTMLScriptElement;
         script.text = source;
         doc.body?.appendChild(script);
         return "Executed (Return value capture not supported)";

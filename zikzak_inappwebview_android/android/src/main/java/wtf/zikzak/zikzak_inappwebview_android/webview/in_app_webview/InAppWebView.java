@@ -1932,6 +1932,7 @@ public final class InAppWebView
             );
         }
 
+/*
         if (
             newSettingsMap.get("stylusHandwritingEnabled") != null &&
             !Util.objEquals(
@@ -1944,6 +1945,7 @@ public final class InAppWebView
                 newCustomSettings.stylusHandwritingEnabled
             );
         }
+*/
 
         if (plugin != null) {
             if (webViewAssetLoaderExt != null) {

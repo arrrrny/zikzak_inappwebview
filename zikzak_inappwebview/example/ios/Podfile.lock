@@ -10,11 +10,11 @@ PODS:
     - Flutter
   - url_launcher_ios (0.0.1):
     - Flutter
-  - zikzak_inappwebview_ios (4.0.5):
+  - zikzak_inappwebview_ios (4.0.6):
     - Flutter
     - OrderedSet (>= 6.0.3)
-    - zikzak_inappwebview_ios/Core (= 4.0.5)
-  - zikzak_inappwebview_ios/Core (4.0.5):
+    - zikzak_inappwebview_ios/Core (= 4.0.6)
+  - zikzak_inappwebview_ios/Core (4.0.6):
     - Flutter
     - OrderedSet (>= 6.0.3)
 
@@ -51,7 +51,7 @@ SPEC CHECKSUMS:
   path_provider_foundation: bb55f6dbba17d0dccd6737fe6f7f34fbd0376880
   pointer_interceptor_ios: ec847ef8b0915778bed2b2cef636f4d177fa8eed
   url_launcher_ios: 694010445543906933d732453a59da0a173ae33d
-  zikzak_inappwebview_ios: c9ad0217915a11dfc098ed0dfe8eb624f46d84fb
+  zikzak_inappwebview_ios: c92496a266e6fc9cd3039dd763336820c6336c51
 
 PODFILE CHECKSUM: 4c438addb11b6da45ed7ae408823d68256222460
 

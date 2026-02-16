@@ -221,9 +221,14 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
     args.putIfAbsent('mimeType', () => mimeType);
     args.putIfAbsent('encoding', () => encoding);
     args.putIfAbsent('baseUrl', () => baseUrl?.toString() ?? "about:blank");
-    args.putIfAbsent('historyUrl', () => historyUrl?.toString() ?? "about:blank");
     args.putIfAbsent(
-        'allowingReadAccessTo', () => allowingReadAccessTo?.toString());
+      'historyUrl',
+      () => historyUrl?.toString() ?? "about:blank",
+    );
+    args.putIfAbsent(
+      'allowingReadAccessTo',
+      () => allowingReadAccessTo?.toString(),
+    );
     await _channel.invokeMethod('loadData', args);
   }
 
