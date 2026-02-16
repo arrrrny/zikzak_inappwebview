@@ -675,6 +675,21 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
           webView.clearFormData();
         }
         result.success(true);
+        break;
+      case createPdf:
+        if (webView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+          PrintJobSettings settings = new PrintJobSettings();
+          Map<String, Object> settingsMap = (Map<String, Object>) call.argument("pdfConfiguration");
+          if (settingsMap != null) {
+            settings.parse(settingsMap);
+          }
+          webView.createPdf(settings, result);
+        } else {
+          result.success(null);
+        }
+        break;
+      default:
+        result.notImplemented();
     }
   }
 

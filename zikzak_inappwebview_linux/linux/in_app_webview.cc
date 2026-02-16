@@ -193,6 +193,48 @@ int64_t in_app_webview_get_texture_id(InAppWebView* self) {
     return self->texture_id;
 }
 
+typedef struct {
+    FlMethodCall* method_call;
+    char* filename;
+} PrintContext;
+
+static void print_finished_callback(WebKitPrintOperation* operation, gpointer user_data) {
+    PrintContext* context = (PrintContext*)user_data;
+    FlMethodCall* method_call = context->method_call;
+    char* filename = context->filename;
+
+    GError* error = nullptr;
+    gchar* contents = nullptr;
+    gsize length = 0;
+
+    if (g_file_get_contents(filename, &contents, &length, &error)) {
+        FlValue* result = fl_value_new_uint8_list((const uint8_t*)contents, length);
+        fl_method_call_respond(method_call, FL_METHOD_RESPONSE(fl_method_success_response_new(result)), nullptr);
+        g_free(contents);
+    } else {
+        fl_method_call_respond(method_call, FL_METHOD_RESPONSE(fl_method_error_response_new("error", error->message, nullptr)), nullptr);
+        g_error_free(error);
+    }
+
+    g_unlink(filename);
+    g_free(filename);
+    g_free(context);
+    g_object_unref(method_call);
+}
+
+static void print_failed_callback(WebKitPrintOperation* operation, GError* error, gpointer user_data) {
+    PrintContext* context = (PrintContext*)user_data;
+    FlMethodCall* method_call = context->method_call;
+    char* filename = context->filename;
+
+    fl_method_call_respond(method_call, FL_METHOD_RESPONSE(fl_method_error_response_new("error", error->message, nullptr)), nullptr);
+
+    g_unlink(filename);
+    g_free(filename);
+    g_free(context);
+    g_object_unref(method_call);
+}
+
 void in_app_webview_handle_method_call(InAppWebView* self, FlMethodCall* method_call) {
     const gchar* method = fl_method_call_get_name(method_call);
     FlValue* args = fl_method_call_get_args(method_call);
@@ -241,6 +283,32 @@ void in_app_webview_handle_method_call(InAppWebView* self, FlMethodCall* method_
              }
         }
         fl_method_call_respond(method_call, FL_METHOD_RESPONSE(fl_method_error_response_new("error", "Invalid arguments", nullptr)), nullptr);
+    } else if (strcmp(method, "createPdf") == 0) {
+        WebKitPrintOperation* operation = webkit_print_operation_new(WEBKIT_WEB_VIEW(self->web_view));
+        
+        GtkPrintSettings* settings = gtk_print_settings_new();
+        
+        gchar* filename = g_strdup_printf("/tmp/flutter_inappwebview_print_%p_%ld.pdf", self, g_get_real_time());
+        gchar* uri = g_strdup_printf("file://%s", filename);
+        
+        gtk_print_settings_set(settings, GTK_PRINT_SETTINGS_OUTPUT_URI, uri);
+        gtk_print_settings_set(settings, GTK_PRINT_SETTINGS_OUTPUT_FILE_FORMAT, "pdf");
+        
+        webkit_print_operation_set_print_settings(operation, settings);
+        
+        PrintContext* context = g_new(PrintContext, 1);
+        context->method_call = method_call;
+        g_object_ref(context->method_call);
+        context->filename = filename;
+        
+        g_signal_connect(operation, "finished", G_CALLBACK(print_finished_callback), context);
+        g_signal_connect(operation, "failed", G_CALLBACK(print_failed_callback), context);
+        
+        webkit_print_operation_print(operation);
+        
+        g_object_unref(settings);
+        g_free(uri);
+        return;
     } else {
         fl_method_call_respond(method_call, FL_METHOD_RESPONSE(fl_method_not_implemented_response_new()), nullptr);
     }

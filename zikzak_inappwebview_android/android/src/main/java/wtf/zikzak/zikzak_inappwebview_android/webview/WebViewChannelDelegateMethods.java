@@ -82,5 +82,6 @@ public enum WebViewChannelDelegateMethods {
   canScrollVertically,
   canScrollHorizontally,
   isInFullscreen,
-  clearFormData
+  clearFormData,
+  createPdf
 }

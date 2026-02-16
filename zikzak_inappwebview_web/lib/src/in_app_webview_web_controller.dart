@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:js_interop';
 import 'dart:js_interop_unsafe';
+import 'dart:typed_data';
 
 import 'package:web/web.dart' as web;
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
@@ -198,6 +199,13 @@ class InAppWebViewWebController extends PlatformInAppWebViewController {
   }
 
   @override
+  Future<Uint8List?> createPdf({
+    PDFConfiguration? pdfConfiguration,
+  }) async {
+    return null;
+  }
+
+  @override
   Future<void> loadFile({required String assetFilePath}) async {
     // On web, assets are served under assets/
     final url = WebUri('assets/$assetFilePath');
@@ -350,6 +358,16 @@ class InAppWebViewWebController extends PlatformInAppWebViewController {
       // Ignore errors
     }
 
+    return null;
+  }
+
+  @override
+  Future<PlatformPrintJobController?> printCurrentPage({PrintJobSettings? settings}) async {
+    try {
+      _iframe.contentWindow?.print();
+    } catch (e) {
+      // Ignore cross-origin errors
+    }
     return null;
   }
 

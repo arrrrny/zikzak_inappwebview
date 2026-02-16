@@ -20,8 +20,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.ParcelFileDescriptor;
+import android.print.PageRange;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
+import android.print.PrintDocumentInfo;
 import android.print.PrintManager;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -62,6 +65,9 @@ import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 import io.flutter.plugin.common.MethodChannel;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -2495,8 +2501,158 @@ public final class InAppWebView
                 Log.e(LOG_TAG, "No PrintManager available");
             }
         }
-        return null;
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void createPdf(@Nullable PrintJobSettings settings, @NonNull final MethodChannel.Result result) {
+        PrintAttributes.Builder builder = new PrintAttributes.Builder();
+        builder.setMediaSize(PrintAttributes.MediaSize.ISO_A4);
+        builder.setResolution(new PrintAttributes.Resolution("id", "id", 300, 300));
+        builder.setMinMargins(PrintAttributes.Margins.NO_MARGINS);
+
+        if (settings != null) {
+            if (settings.orientation != null) {
+                int orientation = settings.orientation;
+                switch (orientation) {
+                    case 0:
+                        // PORTRAIT
+                        builder.setMediaSize(
+                            PrintAttributes.MediaSize.UNKNOWN_PORTRAIT
+                        );
+                        break;
+                    case 1:
+                        // LANDSCAPE
+                        builder.setMediaSize(
+                            PrintAttributes.MediaSize.UNKNOWN_LANDSCAPE
+                        );
+                        break;
+                }
+            }
+            if (settings.mediaSize != null) {
+                builder.setMediaSize(settings.mediaSize.toMediaSize());
+            }
+            if (settings.colorMode != null) {
+                builder.setColorMode(settings.colorMode);
+            }
+            if (
+                settings.duplexMode != null &&
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+            ) {
+                builder.setDuplexMode(settings.duplexMode);
+            }
+            if (settings.resolution != null) {
+                builder.setResolution(settings.resolution.toResolution());
+            }
+        }
+
+        PrintAttributes attributes = builder.build();
+
+        String jobName = "PDF Document";
+        if (
+            settings != null &&
+            settings.jobName != null &&
+            !settings.jobName.isEmpty()
+        ) {
+            jobName = settings.jobName;
+        }
+
+        PrintDocumentAdapter printAdapter = createPrintDocumentAdapter(jobName);
+
+        printAdapter.onLayout(
+            null,
+            attributes,
+            null,
+            new PrintDocumentAdapter.LayoutResultCallback() {
+                @Override
+                public void onLayoutFinished(
+                    PrintDocumentInfo info,
+                    boolean changed
+                ) {
+                    PrintDocumentAdapter.WriteResultCallback writeResultCallback = new PrintDocumentAdapter.WriteResultCallback() {
+                        @Override
+                        public void onWriteFinished(PageRange[] pages) {
+                            super.onWriteFinished(pages);
+                        }
+                    };
+
+                    final File outputFile;
+                    try {
+                        outputFile = File.createTempFile(
+                            "webview-pdf-",
+                            ".pdf",
+                            getContext().getCacheDir()
+                        );
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        result.error(LOG_TAG, e.getMessage(), null);
+                        return;
+                    }
+
+                    ParcelFileDescriptor descriptor;
+                    try {
+                        descriptor = ParcelFileDescriptor.open(
+                            outputFile,
+                            ParcelFileDescriptor.MODE_READ_WRITE
+                        );
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                        outputFile.delete();
+                        result.error(LOG_TAG, e.getMessage(), null);
+                        return;
+                    }
+
+                    printAdapter.onWrite(
+                        new PageRange[] { PageRange.ALL_PAGES },
+                        descriptor,
+                        null,
+                        new PrintDocumentAdapter.WriteResultCallback() {
+                            @Override
+                            public void onWriteFinished(PageRange[] pages) {
+                                super.onWriteFinished(pages);
+                                try {
+                                    FileInputStream input = new FileInputStream(
+                                        outputFile
+                                    );
+                                    ByteArrayOutputStream output = new ByteArrayOutputStream();
+                                    byte[] buffer = new byte[4096];
+                                    int n;
+                                    while ((n = input.read(buffer)) != -1) {
+                                        output.write(buffer, 0, n);
+                                    }
+                                    input.close();
+                                    byte[] bytes = output.toByteArray();
+                                    output.close();
+                                    result.success(bytes);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                    result.error(
+                                        LOG_TAG,
+                                        e.getMessage(),
+                                        null
+                                    );
+                                } finally {
+                                    outputFile.delete();
+                                }
+                            }
+
+                            @Override
+                            public void onWriteFailed(CharSequence error) {
+                                super.onWriteFailed(error);
+                                result.success(null);
+                                    outputFile.delete();
+                                }
+                            }
+                        );
+                    }
+
+                    @Override
+                    public void onLayoutFailed(CharSequence error) {
+                        super.onLayoutFailed(error);
+                        result.success(null);
+                    }
+            },
+            null
+        );
     }
+
 
     @Override
     public void onCreateContextMenu(ContextMenu menu) {

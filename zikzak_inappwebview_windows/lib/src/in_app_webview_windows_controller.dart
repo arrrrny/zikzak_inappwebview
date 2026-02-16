@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:path/path.dart' as p;
 import 'package:webview_windows/webview_windows.dart';
@@ -100,6 +101,14 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
   }
 
   @override
+  Future<Uint8List?> createPdf({
+    PDFConfiguration? pdfConfiguration,
+  }) async {
+    // TODO: Implement createPdf for Windows when webview_windows supports it
+    return null;
+  }
+
+  @override
   Future<void> goForward() async {
     await _controller.goForward();
   }
@@ -107,6 +116,12 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
   @override
   Future<void> stopLoading() async {
     await _controller.stop();
+  }
+
+  @override
+  Future<PlatformPrintJobController?> printCurrentPage({PrintJobSettings? settings}) async {
+    // TODO: Implement printCurrentPage for Windows
+    return null;
   }
 
   @override

@@ -238,6 +238,13 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
   }
 
   @override
+  Future<Uint8List?> createPdf({PDFConfiguration? pdfConfiguration}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('pdfConfiguration', () => pdfConfiguration?.toMap());
+    return await _channel.invokeMethod<Uint8List?>('createPdf', args);
+  }
+
+  @override
   Future<void> reload() async {
     await _channel.invokeMethod('reload');
   }

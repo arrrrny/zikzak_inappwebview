@@ -169,6 +169,31 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                     result(value)
                 }
             }
+        case "createPdf":
+            if #available(macOS 11.0, *) {
+                let pdfConfiguration = WKPDFConfiguration()
+                if let args = call.arguments as? [String: Any],
+                   let configMap = args["pdfConfiguration"] as? [String: Any] {
+                    if let rectMap = configMap["rect"] as? [String: Double] {
+                        let x = rectMap["x"] ?? 0
+                        let y = rectMap["y"] ?? 0
+                        let width = rectMap["width"] ?? 0
+                        let height = rectMap["height"] ?? 0
+                        pdfConfiguration.rect = CGRect(x: x, y: y, width: width, height: height)
+                    }
+                }
+                
+                self.createPDF(configuration: pdfConfiguration) { res in
+                    switch res {
+                    case .success(let data):
+                        result(data)
+                    case .failure(let error):
+                        result(nil)
+                    }
+                }
+            } else {
+                result(nil)
+            }
         case "evaluateJavascript":
             if let args = call.arguments as? [String: Any],
                let source = args["source"] as? String {
