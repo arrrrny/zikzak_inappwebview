@@ -1,3 +1,7 @@
+## 4.0.7 - 2026-02-16
+
+* Fixed: getHtml works on macos, tested on ios,android
+
 ## 4.0.6 - 2026-02-16
 
 * Fixed: GetHtml is tested on mac/web
