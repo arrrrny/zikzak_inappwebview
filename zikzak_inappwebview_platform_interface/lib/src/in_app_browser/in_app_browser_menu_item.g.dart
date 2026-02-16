@@ -44,14 +44,15 @@ class InAppBrowserMenuItem {
   ///- Android native WebView
   ///- iOS
   ///- MacOS
-  InAppBrowserMenuItem(
-      {this.icon,
-      this.iconColor,
-      required this.id,
-      this.onClick,
-      this.order,
-      this.showAsAction = false,
-      required this.title});
+  InAppBrowserMenuItem({
+    this.icon,
+    this.iconColor,
+    required this.id,
+    this.onClick,
+    this.order,
+    this.showAsAction = false,
+    required this.title,
+  });
 
   ///Gets a possible [InAppBrowserMenuItem] instance from a [Map] value.
   static InAppBrowserMenuItem? fromMap(Map<String, dynamic>? map) {

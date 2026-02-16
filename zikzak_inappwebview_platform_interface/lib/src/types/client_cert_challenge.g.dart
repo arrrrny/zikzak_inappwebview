@@ -20,11 +20,11 @@ class ClientCertChallenge extends URLAuthenticationChallenge {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView 21+ ([Official API - ClientCertRequest.getPrincipals](https://developer.android.com/reference/android/webkit/ClientCertRequest#getPrincipals()))
   List<String>? principals;
-  ClientCertChallenge(
-      {this.keyTypes,
-      this.principals,
-      required URLProtectionSpace protectionSpace})
-      : super(protectionSpace: protectionSpace);
+  ClientCertChallenge({
+    this.keyTypes,
+    this.principals,
+    required URLProtectionSpace protectionSpace,
+  }) : super(protectionSpace: protectionSpace);
 
   ///Gets a possible [ClientCertChallenge] instance from a [Map] value.
   static ClientCertChallenge? fromMap(Map<String, dynamic>? map) {
@@ -33,7 +33,8 @@ class ClientCertChallenge extends URLAuthenticationChallenge {
     }
     final instance = ClientCertChallenge(
       protectionSpace: URLProtectionSpace.fromMap(
-          map['protectionSpace']?.cast<String, dynamic>())!,
+        map['protectionSpace']?.cast<String, dynamic>(),
+      )!,
       keyTypes: map['keyTypes'] != null
           ? List<String>.from(map['keyTypes']!.cast<String>())
           : null,

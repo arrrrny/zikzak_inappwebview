@@ -6,8 +6,8 @@ import '../types/disposable.dart';
 import '../types/print_job_info.dart';
 
 ///A completion handler for the [PlatformPrintJobController].
-typedef PrintJobCompletionHandler = Future<void> Function(
-    bool completed, String? error)?;
+typedef PrintJobCompletionHandler =
+    Future<void> Function(bool completed, String? error)?;
 
 /// Object specifying creation parameters for creating a [PlatformPrintJobController].
 ///
@@ -16,8 +16,10 @@ typedef PrintJobCompletionHandler = Future<void> Function(
 @immutable
 class PlatformPrintJobControllerCreationParams {
   /// Used by the platform implementation to create a new [PlatformPrintJobController].
-  const PlatformPrintJobControllerCreationParams(
-      {required this.id, this.onComplete});
+  const PlatformPrintJobControllerCreationParams({
+    required this.id,
+    this.onComplete,
+  });
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformPrintJobController.id}
   final String id;
@@ -38,7 +40,8 @@ abstract class PlatformPrintJobController extends PlatformInterface
     implements Disposable {
   /// Creates a new [PlatformPrintJobController]
   factory PlatformPrintJobController(
-      PlatformPrintJobControllerCreationParams params) {
+    PlatformPrintJobControllerCreationParams params,
+  ) {
     assert(
       InAppWebViewPlatform.instance != null,
       'A platform implementation for `zikzak_inappwebview` has not been set. Please '
@@ -46,8 +49,9 @@ abstract class PlatformPrintJobController extends PlatformInterface
       '`InAppWebViewPlatform.instance` before use. For unit testing, '
       '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
-    final PlatformPrintJobController printJobController =
-        InAppWebViewPlatform.instance!.createPlatformPrintJobController(params);
+    final PlatformPrintJobController printJobController = InAppWebViewPlatform
+        .instance!
+        .createPlatformPrintJobController(params);
     PlatformInterface.verify(printJobController, _token);
     return printJobController;
   }
@@ -87,7 +91,8 @@ abstract class PlatformPrintJobController extends PlatformInterface
   ///{@endtemplate}
   Future<void> cancel() {
     throw UnimplementedError(
-        'cancel is not implemented on the current platform');
+      'cancel is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformPrintJobController.restart}
@@ -99,7 +104,8 @@ abstract class PlatformPrintJobController extends PlatformInterface
   ///{@endtemplate}
   Future<void> restart() {
     throw UnimplementedError(
-        'restart is not implemented on the current platform');
+      'restart is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformPrintJobController.dismiss}
@@ -115,7 +121,8 @@ abstract class PlatformPrintJobController extends PlatformInterface
   ///{@endtemplate}
   Future<void> dismiss({bool animated = true}) {
     throw UnimplementedError(
-        'dismiss is not implemented on the current platform');
+      'dismiss is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformPrintJobController.getInfo}
@@ -132,7 +139,8 @@ abstract class PlatformPrintJobController extends PlatformInterface
   ///{@endtemplate}
   Future<PrintJobInfo?> getInfo() {
     throw UnimplementedError(
-        'getInfo is not implemented on the current platform');
+      'getInfo is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformPrintJobController.dispose}
@@ -146,6 +154,7 @@ abstract class PlatformPrintJobController extends PlatformInterface
   @override
   void dispose() {
     throw UnimplementedError(
-        'dispose is not implemented on the current platform');
+      'dispose is not implemented on the current platform',
+    );
   }
 }

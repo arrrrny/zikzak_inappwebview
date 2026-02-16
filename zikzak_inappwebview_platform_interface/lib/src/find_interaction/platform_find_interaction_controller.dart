@@ -13,15 +13,18 @@ import '../types/main.dart';
 @immutable
 class PlatformFindInteractionControllerCreationParams {
   /// Used by the platform implementation to create a new [PlatformFindInteractionController].
-  const PlatformFindInteractionControllerCreationParams(
-      {this.onFindResultReceived});
+  const PlatformFindInteractionControllerCreationParams({
+    this.onFindResultReceived,
+  });
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformFindInteractionController.onFindResultReceived}
   final void Function(
-      PlatformFindInteractionController controller,
-      int activeMatchOrdinal,
-      int numberOfMatches,
-      bool isDoneCounting)? onFindResultReceived;
+    PlatformFindInteractionController controller,
+    int activeMatchOrdinal,
+    int numberOfMatches,
+    bool isDoneCounting,
+  )?
+  onFindResultReceived;
 }
 
 ///{@template zikzak_inappwebview_platform_interface.PlatformFindInteractionController}
@@ -40,7 +43,8 @@ abstract class PlatformFindInteractionController extends PlatformInterface
 
   /// Creates a new [PlatformFindInteractionController]
   factory PlatformFindInteractionController(
-      PlatformFindInteractionControllerCreationParams params) {
+    PlatformFindInteractionControllerCreationParams params,
+  ) {
     assert(
       InAppWebViewPlatform.instance != null,
       'A platform implementation for `zikzak_inappwebview` has not been set. Please '
@@ -49,8 +53,9 @@ abstract class PlatformFindInteractionController extends PlatformInterface
       '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformFindInteractionController webViewControllerDelegate =
-        InAppWebViewPlatform.instance!
-            .createPlatformFindInteractionController(params);
+        InAppWebViewPlatform.instance!.createPlatformFindInteractionController(
+          params,
+        );
     PlatformInterface.verify(webViewControllerDelegate, _token);
     return webViewControllerDelegate;
   }
@@ -61,7 +66,7 @@ abstract class PlatformFindInteractionController extends PlatformInterface
   /// a class that only contains a factory constructor.
   @protected
   PlatformFindInteractionController.implementation(this.params)
-      : super(token: _token);
+    : super(token: _token);
 
   static final Object _token = Object();
 
@@ -85,9 +90,13 @@ abstract class PlatformFindInteractionController extends PlatformInterface
   ///- iOS
   ///- MacOS
   ///{@endtemplate}
-  void Function(PlatformFindInteractionController controller,
-          int activeMatchOrdinal, int numberOfMatches, bool isDoneCounting)?
-      get onFindResultReceived => params.onFindResultReceived;
+  void Function(
+    PlatformFindInteractionController controller,
+    int activeMatchOrdinal,
+    int numberOfMatches,
+    bool isDoneCounting,
+  )?
+  get onFindResultReceived => params.onFindResultReceived;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformFindInteractionController.findAll}
   ///Finds all instances of find on the page and highlights them. Notifies [PlatformFindInteractionController.onFindResultReceived] listener.
@@ -107,7 +116,8 @@ abstract class PlatformFindInteractionController extends PlatformInterface
   ///{@endtemplate}
   Future<void> findAll({String? find}) {
     throw UnimplementedError(
-        'findAll is not implemented on the current platform');
+      'findAll is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformFindInteractionController.findNext}
@@ -126,7 +136,8 @@ abstract class PlatformFindInteractionController extends PlatformInterface
   ///{@endtemplate}
   Future<void> findNext({bool forward = true}) {
     throw UnimplementedError(
-        'findNext is not implemented on the current platform');
+      'findNext is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformFindInteractionController.clearMatches}
@@ -143,7 +154,8 @@ abstract class PlatformFindInteractionController extends PlatformInterface
   ///{@endtemplate}
   Future<void> clearMatches() {
     throw UnimplementedError(
-        'clearMatches is not implemented on the current platform');
+      'clearMatches is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformFindInteractionController.setSearchText}
@@ -159,7 +171,8 @@ abstract class PlatformFindInteractionController extends PlatformInterface
   ///{@endtemplate}
   Future<void> setSearchText(String? searchText) {
     throw UnimplementedError(
-        'setSearchText is not implemented on the current platform');
+      'setSearchText is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformFindInteractionController.getSearchText}
@@ -175,7 +188,8 @@ abstract class PlatformFindInteractionController extends PlatformInterface
   ///{@endtemplate}
   Future<String?> getSearchText() {
     throw UnimplementedError(
-        'getSearchText is not implemented on the current platform');
+      'getSearchText is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformFindInteractionController.isFindNavigatorVisible}
@@ -188,7 +202,8 @@ abstract class PlatformFindInteractionController extends PlatformInterface
   ///{@endtemplate}
   Future<bool?> isFindNavigatorVisible() {
     throw UnimplementedError(
-        'isFindNavigatorVisible is not implemented on the current platform');
+      'isFindNavigatorVisible is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformFindInteractionController.updateResultCount}
@@ -201,7 +216,8 @@ abstract class PlatformFindInteractionController extends PlatformInterface
   ///{@endtemplate}
   Future<void> updateResultCount() {
     throw UnimplementedError(
-        'updateResultCount is not implemented on the current platform');
+      'updateResultCount is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformFindInteractionController.presentFindNavigator}
@@ -214,7 +230,8 @@ abstract class PlatformFindInteractionController extends PlatformInterface
   ///{@endtemplate}
   Future<void> presentFindNavigator() {
     throw UnimplementedError(
-        'presentFindNavigator is not implemented on the current platform');
+      'presentFindNavigator is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformFindInteractionController.dismissFindNavigator}
@@ -227,7 +244,8 @@ abstract class PlatformFindInteractionController extends PlatformInterface
   ///{@endtemplate}
   Future<void> dismissFindNavigator() {
     throw UnimplementedError(
-        'dismissFindNavigator is not implemented on the current platform');
+      'dismissFindNavigator is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformFindInteractionController.getActiveFindSession}
@@ -240,7 +258,8 @@ abstract class PlatformFindInteractionController extends PlatformInterface
   ///{@endtemplate}
   Future<FindSession?> getActiveFindSession() {
     throw UnimplementedError(
-        'getActiveFindSession is not implemented on the current platform');
+      'getActiveFindSession is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformFindInteractionController.dispose}
@@ -249,6 +268,7 @@ abstract class PlatformFindInteractionController extends PlatformInterface
   @override
   void dispose({bool isKeepAlive = false}) {
     throw UnimplementedError(
-        'dispose is not implemented on the current platform');
+      'dispose is not implemented on the current platform',
+    );
   }
 }

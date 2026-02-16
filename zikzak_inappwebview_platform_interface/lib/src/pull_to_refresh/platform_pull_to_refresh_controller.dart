@@ -16,8 +16,10 @@ import '../in_app_browser/platform_in_app_browser.dart';
 /// this class.
 class PlatformPullToRefreshControllerCreationParams {
   /// Used by the platform implementation to create a new [PlatformPullToRefreshController].
-  PlatformPullToRefreshControllerCreationParams(
-      {this.settings, this.onRefresh}) {
+  PlatformPullToRefreshControllerCreationParams({
+    this.settings,
+    this.onRefresh,
+  }) {
     this.settings = this.settings ?? PullToRefreshSettings();
   }
 
@@ -48,7 +50,8 @@ abstract class PlatformPullToRefreshController extends PlatformInterface
 
   /// Creates a new [PlatformPullToRefreshController]
   factory PlatformPullToRefreshController(
-      PlatformPullToRefreshControllerCreationParams params) {
+    PlatformPullToRefreshControllerCreationParams params,
+  ) {
     assert(
       InAppWebViewPlatform.instance != null,
       'A platform implementation for `zikzak_inappwebview` has not been set. Please '
@@ -57,8 +60,9 @@ abstract class PlatformPullToRefreshController extends PlatformInterface
       '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformPullToRefreshController webViewControllerDelegate =
-        InAppWebViewPlatform.instance!
-            .createPlatformPullToRefreshController(params);
+        InAppWebViewPlatform.instance!.createPlatformPullToRefreshController(
+          params,
+        );
     PlatformInterface.verify(webViewControllerDelegate, _token);
     return webViewControllerDelegate;
   }
@@ -69,7 +73,7 @@ abstract class PlatformPullToRefreshController extends PlatformInterface
   /// a class that only contains a factory constructor.
   @protected
   PlatformPullToRefreshController.implementation(this.params)
-      : super(token: _token);
+    : super(token: _token);
 
   static final Object _token = Object();
 
@@ -95,7 +99,8 @@ abstract class PlatformPullToRefreshController extends PlatformInterface
   ///{@endtemplate}
   Future<void> setEnabled(bool enabled) {
     throw UnimplementedError(
-        'setEnabled is not implemented on the current platform');
+      'setEnabled is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformPullToRefreshController.isEnabled}
@@ -107,7 +112,8 @@ abstract class PlatformPullToRefreshController extends PlatformInterface
   ///{@endtemplate}
   Future<bool> isEnabled() {
     throw UnimplementedError(
-        'isEnabled is not implemented on the current platform');
+      'isEnabled is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformPullToRefreshController.beginRefreshing}
@@ -123,7 +129,8 @@ abstract class PlatformPullToRefreshController extends PlatformInterface
   ///{@endtemplate}
   Future<void> beginRefreshing() {
     throw UnimplementedError(
-        'beginRefreshing is not implemented on the current platform');
+      'beginRefreshing is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformPullToRefreshController.endRefreshing}
@@ -140,7 +147,8 @@ abstract class PlatformPullToRefreshController extends PlatformInterface
   ///{@endtemplate}
   Future<void> endRefreshing() {
     throw UnimplementedError(
-        'endRefreshing is not implemented on the current platform');
+      'endRefreshing is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformPullToRefreshController.isRefreshing}
@@ -152,7 +160,8 @@ abstract class PlatformPullToRefreshController extends PlatformInterface
   ///{@endtemplate}
   Future<bool> isRefreshing() {
     throw UnimplementedError(
-        'isRefreshing is not implemented on the current platform');
+      'isRefreshing is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformPullToRefreshController.setColor}
@@ -164,7 +173,8 @@ abstract class PlatformPullToRefreshController extends PlatformInterface
   ///{@endtemplate}
   Future<void> setColor(Color color) {
     throw UnimplementedError(
-        'setColor is not implemented on the current platform');
+      'setColor is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformPullToRefreshController.setBackgroundColor}
@@ -176,7 +186,8 @@ abstract class PlatformPullToRefreshController extends PlatformInterface
   ///{@endtemplate}
   Future<void> setBackgroundColor(Color color) {
     throw UnimplementedError(
-        'setBackgroundColor is not implemented on the current platform');
+      'setBackgroundColor is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformPullToRefreshController.setDistanceToTriggerSync}
@@ -187,7 +198,8 @@ abstract class PlatformPullToRefreshController extends PlatformInterface
   ///{@endtemplate}
   Future<void> setDistanceToTriggerSync(int distanceToTriggerSync) {
     throw UnimplementedError(
-        'setDistanceToTriggerSync is not implemented on the current platform');
+      'setDistanceToTriggerSync is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformPullToRefreshController.setSlingshotDistance}
@@ -198,7 +210,8 @@ abstract class PlatformPullToRefreshController extends PlatformInterface
   ///{@endtemplate}
   Future<void> setSlingshotDistance(int slingshotDistance) {
     throw UnimplementedError(
-        'setSlingshotDistance is not implemented on the current platform');
+      'setSlingshotDistance is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformPullToRefreshController.getDefaultSlingshotDistance}
@@ -209,7 +222,8 @@ abstract class PlatformPullToRefreshController extends PlatformInterface
   ///{@endtemplate}
   Future<int> getDefaultSlingshotDistance() {
     throw UnimplementedError(
-        'getDefaultSlingshotDistance is not implemented on the current platform');
+      'getDefaultSlingshotDistance is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformPullToRefreshController.setIndicatorSize}
@@ -220,7 +234,8 @@ abstract class PlatformPullToRefreshController extends PlatformInterface
   ///{@endtemplate}
   Future<void> setIndicatorSize(PullToRefreshSize size) {
     throw UnimplementedError(
-        'setIndicatorSize is not implemented on the current platform');
+      'setIndicatorSize is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformPullToRefreshController.setStyledTitle}
@@ -231,7 +246,8 @@ abstract class PlatformPullToRefreshController extends PlatformInterface
   ///{@endtemplate}
   Future<void> setStyledTitle(AttributedString attributedTitle) {
     throw UnimplementedError(
-        'setStyledTitle is not implemented on the current platform');
+      'setStyledTitle is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformPullToRefreshController.dispose}
@@ -240,6 +256,7 @@ abstract class PlatformPullToRefreshController extends PlatformInterface
   @override
   void dispose({bool isKeepAlive = false}) {
     throw UnimplementedError(
-        'dispose is not implemented on the current platform');
+      'dispose is not implemented on the current platform',
+    );
   }
 }

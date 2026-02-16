@@ -3,13 +3,19 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 ///{@macro zikzak_inappwebview_platform_interface.PlatformFindInteractionController}
 class FindInteractionController {
   ///{@macro zikzak_inappwebview_platform_interface.PlatformFindInteractionController}
-  FindInteractionController(
-      {void Function(PlatformFindInteractionController controller,
-              int activeMatchOrdinal, int numberOfMatches, bool isDoneCounting)?
-          onFindResultReceived})
-      : this.fromPlatformCreationParams(
-            params: PlatformFindInteractionControllerCreationParams(
-                onFindResultReceived: onFindResultReceived));
+  FindInteractionController({
+    void Function(
+      PlatformFindInteractionController controller,
+      int activeMatchOrdinal,
+      int numberOfMatches,
+      bool isDoneCounting,
+    )?
+    onFindResultReceived,
+  }) : this.fromPlatformCreationParams(
+         params: PlatformFindInteractionControllerCreationParams(
+           onFindResultReceived: onFindResultReceived,
+         ),
+       );
 
   /// Constructs a [FindInteractionController].
   ///
@@ -26,9 +32,13 @@ class FindInteractionController {
   final PlatformFindInteractionController platform;
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformFindInteractionController.onFindResultReceived}
-  void Function(PlatformFindInteractionController controller,
-          int activeMatchOrdinal, int numberOfMatches, bool isDoneCounting)?
-      get onFindResultReceived => platform.onFindResultReceived;
+  void Function(
+    PlatformFindInteractionController controller,
+    int activeMatchOrdinal,
+    int numberOfMatches,
+    bool isDoneCounting,
+  )?
+  get onFindResultReceived => platform.onFindResultReceived;
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformFindInteractionController.findAll}
   Future<void> findAll({String? find}) => platform.findAll(find: find);

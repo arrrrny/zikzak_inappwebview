@@ -5,9 +5,9 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 class ProcessGlobalConfig {
   ///{@macro zikzak_inappwebview_platform_interface.PlatformProcessGlobalConfig}
   ProcessGlobalConfig()
-      : this.fromPlatformCreationParams(
-          const PlatformProcessGlobalConfigCreationParams(),
-        );
+    : this.fromPlatformCreationParams(
+        const PlatformProcessGlobalConfigCreationParams(),
+      );
 
   /// Constructs a [ProcessGlobalConfig] from creation params for a specific
   /// platform.

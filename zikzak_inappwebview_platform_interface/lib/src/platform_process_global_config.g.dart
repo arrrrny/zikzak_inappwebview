@@ -54,8 +54,10 @@ class ProcessGlobalConfigSettings {
   ///
   ///**NOTE**: available only if [WebViewFeature.STARTUP_FEATURE_SET_DIRECTORY_BASE_PATHS] feature is supported.
   ProcessGlobalConfigDirectoryBasePaths? directoryBasePaths;
-  ProcessGlobalConfigSettings(
-      {this.dataDirectorySuffix, this.directoryBasePaths});
+  ProcessGlobalConfigSettings({
+    this.dataDirectorySuffix,
+    this.directoryBasePaths,
+  });
 
   ///Gets a possible [ProcessGlobalConfigSettings] instance from a [Map] value.
   static ProcessGlobalConfigSettings? fromMap(Map<String, dynamic>? map) {
@@ -65,7 +67,8 @@ class ProcessGlobalConfigSettings {
     final instance = ProcessGlobalConfigSettings(
       dataDirectorySuffix: map['dataDirectorySuffix'],
       directoryBasePaths: ProcessGlobalConfigDirectoryBasePaths.fromMap(
-          map['directoryBasePaths']?.cast<String, dynamic>()),
+        map['directoryBasePaths']?.cast<String, dynamic>(),
+      ),
     );
     return instance;
   }
@@ -105,13 +108,15 @@ class ProcessGlobalConfigDirectoryBasePaths {
 
   ///The absolute base path for the WebView data directory.
   String dataDirectoryBasePath;
-  ProcessGlobalConfigDirectoryBasePaths(
-      {required this.cacheDirectoryBasePath,
-      required this.dataDirectoryBasePath});
+  ProcessGlobalConfigDirectoryBasePaths({
+    required this.cacheDirectoryBasePath,
+    required this.dataDirectoryBasePath,
+  });
 
   ///Gets a possible [ProcessGlobalConfigDirectoryBasePaths] instance from a [Map] value.
   static ProcessGlobalConfigDirectoryBasePaths? fromMap(
-      Map<String, dynamic>? map) {
+    Map<String, dynamic>? map,
+  ) {
     if (map == null) {
       return null;
     }

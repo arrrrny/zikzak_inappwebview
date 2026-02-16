@@ -18,7 +18,7 @@ import '../print_job/main.dart';
 ///{@endtemplate}
 class PlatformWebViewCreationParams<T> {
   final T Function(PlatformInAppWebViewController controller)?
-      controllerFromPlatform;
+  controllerFromPlatform;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.windowId}
   ///The window id of a [CreateWindowAction.windowId].
@@ -84,8 +84,11 @@ class PlatformWebViewCreationParams<T> {
   ///- Windows ([Official API - ICoreWebView2.add_NavigationCompleted](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/iwebview2webview?view=webview2-0.8.355#add_navigationcompleted))
   ///{@endtemplate}
   final void Function(
-          T controller, WebResourceRequest request, WebResourceError error)?
-      onReceivedError;
+    T controller,
+    WebResourceRequest request,
+    WebResourceError error,
+  )?
+  onReceivedError;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onReceivedHttpError}
   ///Event fired when the `WebView` receives an HTTP error.
@@ -102,8 +105,12 @@ class PlatformWebViewCreationParams<T> {
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview))
   ///- Windows ([Official API - ICoreWebView2.add_NavigationCompleted](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/iwebview2webview?view=webview2-0.8.355#add_navigationcompleted))
   ///{@endtemplate}
-  final void Function(T controller, WebResourceRequest request,
-      WebResourceResponse errorResponse)? onReceivedHttpError;
+  final void Function(
+    T controller,
+    WebResourceRequest request,
+    WebResourceResponse errorResponse,
+  )?
+  onReceivedHttpError;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onProgressChanged}
   ///Event fired when the current [progress] of loading a page is changed.
@@ -127,7 +134,7 @@ class PlatformWebViewCreationParams<T> {
   ///- Web
   ///{@endtemplate}
   final void Function(T controller, ConsoleMessage consoleMessage)?
-      onConsoleMessage;
+  onConsoleMessage;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.shouldOverrideUrlLoading}
   ///Give the host application a chance to take control when a URL is about to be loaded in the current WebView.
@@ -143,8 +150,10 @@ class PlatformWebViewCreationParams<T> {
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455641-webview))
   ///{@endtemplate}
   final Future<NavigationActionPolicy?> Function(
-          T controller, NavigationAction navigationAction)?
-      shouldOverrideUrlLoading;
+    T controller,
+    NavigationAction navigationAction,
+  )?
+  shouldOverrideUrlLoading;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onLoadResource}
   ///Event fired when the `WebView` loads a resource.
@@ -191,7 +200,7 @@ class PlatformWebViewCreationParams<T> {
   ///- MacOS
   ///{@endtemplate}
   final void Function(T controller, DownloadStartRequest downloadStartRequest)?
-      onDownloadStartRequest;
+  onDownloadStartRequest;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onLoadResourceWithCustomScheme}
   ///Event fired when the `WebView` finds the `custom-scheme` while loading a resource.
@@ -203,7 +212,10 @@ class PlatformWebViewCreationParams<T> {
   ///- MacOS ([Official API - WKURLSchemeHandler](https://developer.apple.com/documentation/webkit/wkurlschemehandler))
   ///{@endtemplate}
   final Future<CustomSchemeResponse?> Function(
-      T controller, WebResourceRequest request)? onLoadResourceWithCustomScheme;
+    T controller,
+    WebResourceRequest request,
+  )?
+  onLoadResourceWithCustomScheme;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onCreateWindow}
   ///Event fired when the `WebView` requests the host application to create a new window,
@@ -245,7 +257,10 @@ class PlatformWebViewCreationParams<T> {
   ///- Web
   ///{@endtemplate}
   final Future<bool?> Function(
-      T controller, CreateWindowAction createWindowAction)? onCreateWindow;
+    T controller,
+    CreateWindowAction createWindowAction,
+  )?
+  onCreateWindow;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onCloseWindow}
   ///Event fired when the host application should close the given WebView and remove it from the view system if necessary.
@@ -298,7 +313,10 @@ class PlatformWebViewCreationParams<T> {
   ///- MacOS ([Official API - WKUIDelegate.webView](https://developer.apple.com/documentation/webkit/wkuidelegate/1537406-webview))
   ///{@endtemplate}
   final Future<JsAlertResponse?> Function(
-      T controller, JsAlertRequest jsAlertRequest)? onJsAlert;
+    T controller,
+    JsAlertRequest jsAlertRequest,
+  )?
+  onJsAlert;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onJsConfirm}
   ///Event fired when javascript calls the `confirm()` method to display a confirm dialog.
@@ -312,7 +330,10 @@ class PlatformWebViewCreationParams<T> {
   ///- MacOS ([Official API - WKUIDelegate.webView](https://developer.apple.com/documentation/webkit/wkuidelegate/1536489-webview))
   ///{@endtemplate}
   final Future<JsConfirmResponse?> Function(
-      T controller, JsConfirmRequest jsConfirmRequest)? onJsConfirm;
+    T controller,
+    JsConfirmRequest jsConfirmRequest,
+  )?
+  onJsConfirm;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onJsPrompt}
   ///Event fired when javascript calls the `prompt()` method to display a prompt dialog.
@@ -326,7 +347,10 @@ class PlatformWebViewCreationParams<T> {
   ///- MacOS ([Official API - WKUIDelegate.webView](https://developer.apple.com/documentation/webkit/wkuidelegate/1538086-webview))
   ///{@endtemplate}
   final Future<JsPromptResponse?> Function(
-      T controller, JsPromptRequest jsPromptRequest)? onJsPrompt;
+    T controller,
+    JsPromptRequest jsPromptRequest,
+  )?
+  onJsPrompt;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onReceivedHttpAuthRequest}
   ///Event fired when the WebView received an HTTP authentication request. The default behavior is to cancel the request.
@@ -339,8 +363,10 @@ class PlatformWebViewCreationParams<T> {
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview))
   ///{@endtemplate}
   final Future<HttpAuthResponse?> Function(
-          T controller, HttpAuthenticationChallenge challenge)?
-      onReceivedHttpAuthRequest;
+    T controller,
+    HttpAuthenticationChallenge challenge,
+  )?
+  onReceivedHttpAuthRequest;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onReceivedServerTrustAuthRequest}
   ///Event fired when the WebView need to perform server trust authentication (certificate validation).
@@ -354,8 +380,10 @@ class PlatformWebViewCreationParams<T> {
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview))
   ///{@endtemplate}
   final Future<ServerTrustAuthResponse?> Function(
-          T controller, ServerTrustChallenge challenge)?
-      onReceivedServerTrustAuthRequest;
+    T controller,
+    ServerTrustChallenge challenge,
+  )?
+  onReceivedServerTrustAuthRequest;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onReceivedClientCertRequest}
   ///Notify the host application to handle an SSL client certificate request.
@@ -371,7 +399,10 @@ class PlatformWebViewCreationParams<T> {
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview))
   ///{@endtemplate}
   final Future<ClientCertResponse?> Function(
-      T controller, ClientCertChallenge challenge)? onReceivedClientCertRequest;
+    T controller,
+    ClientCertChallenge challenge,
+  )?
+  onReceivedClientCertRequest;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.shouldInterceptAjaxRequest}
   ///Event fired when an `XMLHttpRequest` is sent to a server.
@@ -394,7 +425,7 @@ class PlatformWebViewCreationParams<T> {
   ///- MacOS
   ///{@endtemplate}
   final Future<AjaxRequest?> Function(T controller, AjaxRequest ajaxRequest)?
-      shouldInterceptAjaxRequest;
+  shouldInterceptAjaxRequest;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onAjaxReadyStateChange}
   ///Event fired whenever the `readyState` attribute of an `XMLHttpRequest` changes.
@@ -414,7 +445,10 @@ class PlatformWebViewCreationParams<T> {
   ///- MacOS
   ///{@endtemplate}
   final Future<AjaxRequestAction?> Function(
-      T controller, AjaxRequest ajaxRequest)? onAjaxReadyStateChange;
+    T controller,
+    AjaxRequest ajaxRequest,
+  )?
+  onAjaxReadyStateChange;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onAjaxProgress}
   ///Event fired as an `XMLHttpRequest` progress.
@@ -434,7 +468,10 @@ class PlatformWebViewCreationParams<T> {
   ///- MacOS
   ///{@endtemplate}
   final Future<AjaxRequestAction?> Function(
-      T controller, AjaxRequest ajaxRequest)? onAjaxProgress;
+    T controller,
+    AjaxRequest ajaxRequest,
+  )?
+  onAjaxProgress;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.shouldInterceptFetchRequest}
   ///Event fired when a request is sent to a server through [Fetch API](https://developer.mozilla.org/it/docs/Web/API/Fetch_API).
@@ -454,7 +491,7 @@ class PlatformWebViewCreationParams<T> {
   ///- MacOS
   ///{@endtemplate}
   final Future<FetchRequest?> Function(T controller, FetchRequest fetchRequest)?
-      shouldInterceptFetchRequest;
+  shouldInterceptFetchRequest;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onUpdateVisitedHistory}
   ///Event fired when the host application updates its visited links database.
@@ -476,7 +513,7 @@ class PlatformWebViewCreationParams<T> {
   ///- Windows ([Official API - ICoreWebView2.add_HistoryChanged](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_historychanged))
   ///{@endtemplate}
   final void Function(T controller, WebUri? url, bool? isReload)?
-      onUpdateVisitedHistory;
+  onUpdateVisitedHistory;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onPrintRequest}
   ///Event fired when `window.print()` is called from JavaScript side.
@@ -496,8 +533,12 @@ class PlatformWebViewCreationParams<T> {
   ///- MacOS
   ///- Web
   ///{@endtemplate}
-  final Future<bool?> Function(T controller, WebUri? url,
-      PlatformPrintJobController? printJobController)? onPrintRequest;
+  final Future<bool?> Function(
+    T controller,
+    WebUri? url,
+    PlatformPrintJobController? printJobController,
+  )?
+  onPrintRequest;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onLongPressHitTestResult}
   ///Event fired when an HTML element of the webview has been clicked and held.
@@ -509,7 +550,7 @@ class PlatformWebViewCreationParams<T> {
   ///- iOS ([Official API - UILongPressGestureRecognizer](https://developer.apple.com/documentation/uikit/uilongpressgesturerecognizer))
   ///{@endtemplate}
   final void Function(T controller, InAppWebViewHitTestResult hitTestResult)?
-      onLongPressHitTestResult;
+  onLongPressHitTestResult;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onEnterFullscreen}
   ///Event fired when the current page has entered full screen mode.
@@ -584,7 +625,7 @@ class PlatformWebViewCreationParams<T> {
   ///- iOS
   ///{@endtemplate}
   final void Function(T controller, int x, int y, bool clampedX, bool clampedY)?
-      onOverScrolled;
+  onOverScrolled;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onJsBeforeUnload}
   ///Event fired when the client should display a dialog to confirm navigation away from the current page.
@@ -601,8 +642,10 @@ class PlatformWebViewCreationParams<T> {
   ///- Android native WebView ([Official API - WebChromeClient.onJsBeforeUnload](https://developer.android.com/reference/android/webkit/WebChromeClient#onJsBeforeUnload(android.webkit.WebView,%20java.lang.String,%20java.lang.String,%20android.webkit.JsResult)))
   ///{@endtemplate}
   final Future<JsBeforeUnloadResponse?> Function(
-          T controller, JsBeforeUnloadRequest jsBeforeUnloadRequest)?
-      onJsBeforeUnload;
+    T controller,
+    JsBeforeUnloadRequest jsBeforeUnloadRequest,
+  )?
+  onJsBeforeUnload;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onReceivedLoginRequest}
   ///Event fired when a request to automatically log in the user has been processed.
@@ -613,7 +656,7 @@ class PlatformWebViewCreationParams<T> {
   ///- Android native WebView ([Official API - WebViewClient.onReceivedLoginRequest](https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedLoginRequest(android.webkit.WebView,%20java.lang.String,%20java.lang.String,%20java.lang.String)))
   ///{@endtemplate}
   final void Function(T controller, LoginRequest loginRequest)?
-      onReceivedLoginRequest;
+  onReceivedLoginRequest;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onPermissionRequestCanceled}
   ///Notify the host application that the given permission request has been canceled. Any related UI should therefore be hidden.
@@ -628,7 +671,7 @@ class PlatformWebViewCreationParams<T> {
   ///- Android native WebView ([Official API - WebChromeClient.onPermissionRequestCanceled](https://developer.android.com/reference/android/webkit/WebChromeClient#onPermissionRequestCanceled(android.webkit.PermissionRequest)))
   ///{@endtemplate}
   final void Function(T controller, PermissionRequest permissionRequest)?
-      onPermissionRequestCanceled;
+  onPermissionRequestCanceled;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onRequestFocus}
   ///Request display and focus for this WebView.
@@ -656,7 +699,7 @@ class PlatformWebViewCreationParams<T> {
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455627-webview))
   ///{@endtemplate}
   final void Function(T controller)?
-      onDidReceiveServerRedirectForProvisionalNavigation;
+  onDidReceiveServerRedirectForProvisionalNavigation;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onNavigationResponse}
   ///Called when a web view asks for permission to navigate to new content after the response to the navigation request is known.
@@ -670,8 +713,10 @@ class PlatformWebViewCreationParams<T> {
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview))
   ///{@endtemplate}
   final Future<NavigationResponseAction?> Function(
-          T controller, NavigationResponse navigationResponse)?
-      onNavigationResponse;
+    T controller,
+    NavigationResponse navigationResponse,
+  )?
+  onNavigationResponse;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.shouldAllowDeprecatedTLS}
   ///Called when a web view asks whether to continue with a connection that uses a deprecated version of TLS (v1.0 and v1.1).
@@ -687,8 +732,10 @@ class PlatformWebViewCreationParams<T> {
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/3601237-webview))
   ///{@endtemplate}
   final Future<ShouldAllowDeprecatedTLSAction?> Function(
-          T controller, URLAuthenticationChallenge challenge)?
-      shouldAllowDeprecatedTLS;
+    T controller,
+    URLAuthenticationChallenge challenge,
+  )?
+  shouldAllowDeprecatedTLS;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onCameraCaptureStateChanged}
   ///Event fired when a change in the camera capture state occurred.
@@ -705,7 +752,8 @@ class PlatformWebViewCreationParams<T> {
     T controller,
     MediaCaptureState? oldState,
     MediaCaptureState? newState,
-  )? onCameraCaptureStateChanged;
+  )?
+  onCameraCaptureStateChanged;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onMicrophoneCaptureStateChanged}
   ///Event fired when a change in the microphone capture state occurred.
@@ -722,7 +770,8 @@ class PlatformWebViewCreationParams<T> {
     T controller,
     MediaCaptureState? oldState,
     MediaCaptureState? newState,
-  )? onMicrophoneCaptureStateChanged;
+  )?
+  onMicrophoneCaptureStateChanged;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onZoomScaleChanged}
   ///Event fired when the zoom scale of the `WebView` changes.
@@ -735,7 +784,7 @@ class PlatformWebViewCreationParams<T> {
   ///- iOS
   ///{@endtemplate}
   final void Function(T controller, double oldScale, double newScale)?
-      onZoomScaleChanged;
+  onZoomScaleChanged;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onSafeBrowsingHit}
   ///Event fired when the webview notifies that a loading has been flagged by Safe Browsing.
@@ -749,8 +798,11 @@ class PlatformWebViewCreationParams<T> {
   ///- Android native WebView ([Official API - WebViewClient.onSafeBrowsingHit](https://developer.android.com/reference/android/webkit/WebViewClient#onSafeBrowsingHit(android.webkit.WebView,%20android.webkit.WebResourceRequest,%20int,%20android.webkit.SafeBrowsingResponse)))
   ///{@endtemplate}
   final Future<SafeBrowsingResponse?> Function(
-          T controller, WebUri url, SafeBrowsingThreat? threatType)?
-      onSafeBrowsingHit;
+    T controller,
+    WebUri url,
+    SafeBrowsingThreat? threatType,
+  )?
+  onSafeBrowsingHit;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onPermissionRequest}
   ///Event fired when the webview is requesting a permission to access a specific resource.
@@ -769,7 +821,10 @@ class PlatformWebViewCreationParams<T> {
   ///- MacOS ([Official API - WKUIDelegate.webView](https://developer.apple.com/documentation/webkit/wkuidelegate/3763033-webview))
   ///{@endtemplate}
   final Future<PermissionResponse?> Function(
-      T controller, PermissionRequest permissionRequest)? onPermissionRequest;
+    T controller,
+    PermissionRequest permissionRequest,
+  )?
+  onPermissionRequest;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onGeolocationPermissionsShowPrompt}
   ///Event fired when the webview is requesting a permission to access the geolocation.
@@ -780,7 +835,10 @@ class PlatformWebViewCreationParams<T> {
   ///- Android native WebView ([Official API - WebChromeClient.onGeolocationPermissionsShowPrompt](https://developer.android.com/reference/android/webkit/WebChromeClient#onGeolocationPermissionsShowPrompt(java.lang.String,%20android.webkit.GeolocationPermissions.Callback)))
   ///{@endtemplate}
   final Future<GeolocationPermissionShowPromptResponse?> Function(
-      T controller, String origin)? onGeolocationPermissionsShowPrompt;
+    T controller,
+    String origin,
+  )?
+  onGeolocationPermissionsShowPrompt;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onGeolocationPermissionsHidePrompt}
   ///Event fired when the webview is hiding the geolocation permission prompt.
@@ -803,7 +861,10 @@ class PlatformWebViewCreationParams<T> {
   ///- Android native WebView ([Official API - WebViewClient.shouldInterceptRequest](https://developer.android.com/reference/android/webkit/WebViewClient#shouldInterceptRequest(android.webkit.WebView,%20android.webkit.WebResourceRequest)))
   ///{@endtemplate}
   final Future<WebResourceResponse?> Function(
-      T controller, WebResourceRequest request)? shouldInterceptRequest;
+    T controller,
+    WebResourceRequest request,
+  )?
+  shouldInterceptRequest;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onRenderProcessGone}
   ///Event fired when the given WebView's render process has exited.
@@ -817,7 +878,7 @@ class PlatformWebViewCreationParams<T> {
   ///- Android native WebView ([Official API - WebViewClient.onRenderProcessGone](https://developer.android.com/reference/android/webkit/WebViewClient#onRenderProcessGone(android.webkit.WebView,%20android.webkit.RenderProcessGoneDetail)))
   ///{@endtemplate}
   final void Function(T controller, RenderProcessGoneDetail detail)?
-      onRenderProcessGone;
+  onRenderProcessGone;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onRenderProcessResponsive}
   ///Event fired when the WebView's render process has become responsive again.
@@ -848,7 +909,7 @@ class PlatformWebViewCreationParams<T> {
   ///- Android native WebView ([Official API - WebViewClient.onFormResubmission](https://developer.android.com/reference/android/webkit/WebViewClient#onFormResubmission(android.webkit.WebView,%20android.os.Message,%20android.os.Message)))
   ///{@endtemplate}
   final Future<FormResubmissionAction?> Function(T controller, WebUri? url)?
-      onFormResubmission;
+  onFormResubmission;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onReceivedIcon}
   ///Event fired when the document title of the current page has been received.
@@ -871,7 +932,7 @@ class PlatformWebViewCreationParams<T> {
   ///- Android native WebView ([Official API - WebChromeClient.onReceivedTouchIconUrl](https://developer.android.com/reference/android/webkit/WebChromeClient#onReceivedTouchIconUrl(android.webkit.WebView,%20java.lang.String,%20boolean)))
   ///{@endtemplate}
   final void Function(T controller, WebUri url, bool precomposed)?
-      onReceivedTouchIconUrl;
+  onReceivedTouchIconUrl;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onContentSizeChanged}
   ///Event fired when the content size of the `WebView` changes.
@@ -884,7 +945,7 @@ class PlatformWebViewCreationParams<T> {
   ///- iOS
   ///{@endtemplate}
   final void Function(T controller, Size oldContentSize, Size newContentSize)?
-      onContentSizeChanged;
+  onContentSizeChanged;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.initialUrlRequest}
   ///Initial url request that will be loaded.
@@ -992,77 +1053,81 @@ class PlatformWebViewCreationParams<T> {
   ///[isDoneCounting] represents whether the counting is done.
   ///{@endtemplate}
   final void Function(
-          int activeMatchOrdinal, int numberOfMatches, bool isDoneCounting)?
-      onFindResultReceived;
+    int activeMatchOrdinal,
+    int numberOfMatches,
+    bool isDoneCounting,
+  )?
+  onFindResultReceived;
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams}
-  const PlatformWebViewCreationParams(
-      {this.controllerFromPlatform,
-      this.windowId,
-      this.onWebViewCreated,
-      this.onLoadStart,
-      this.onLoadStop,
-      this.onReceivedError,
-      this.onReceivedHttpError,
-      this.onProgressChanged,
-      this.onConsoleMessage,
-      this.shouldOverrideUrlLoading,
-      this.onLoadResource,
-      this.onScrollChanged,
-      this.onDownloadStartRequest,
-      this.onLoadResourceWithCustomScheme,
-      this.onCreateWindow,
-      this.onCloseWindow,
-      this.onJsAlert,
-      this.onJsConfirm,
-      this.onJsPrompt,
-      this.onReceivedHttpAuthRequest,
-      this.onReceivedServerTrustAuthRequest,
-      this.onReceivedClientCertRequest,
-      this.shouldInterceptAjaxRequest,
-      this.onAjaxReadyStateChange,
-      this.onAjaxProgress,
-      this.shouldInterceptFetchRequest,
-      this.onUpdateVisitedHistory,
-      this.onPrintRequest,
-      this.onLongPressHitTestResult,
-      this.onEnterFullscreen,
-      this.onExitFullscreen,
-      this.onPageCommitVisible,
-      this.onTitleChanged,
-      this.onWindowFocus,
-      this.onWindowBlur,
-      this.onOverScrolled,
-      this.onZoomScaleChanged,
-      this.onSafeBrowsingHit,
-      this.onPermissionRequest,
-      this.onGeolocationPermissionsShowPrompt,
-      this.onGeolocationPermissionsHidePrompt,
-      this.shouldInterceptRequest,
-      this.onRenderProcessGone,
-      this.onRenderProcessResponsive,
-      this.onRenderProcessUnresponsive,
-      this.onFormResubmission,
-      this.onReceivedIcon,
-      this.onReceivedTouchIconUrl,
-      this.onJsBeforeUnload,
-      this.onReceivedLoginRequest,
-      this.onPermissionRequestCanceled,
-      this.onRequestFocus,
-      this.onWebContentProcessDidTerminate,
-      this.onDidReceiveServerRedirectForProvisionalNavigation,
-      this.onNavigationResponse,
-      this.shouldAllowDeprecatedTLS,
-      this.onCameraCaptureStateChanged,
-      this.onMicrophoneCaptureStateChanged,
-      this.onContentSizeChanged,
-      this.initialUrlRequest,
-      this.initialFile,
-      this.initialData,
-      this.initialSettings,
-      this.contextMenu,
-      this.initialUserScripts,
-      this.pullToRefreshController,
-      this.findInteractionController,
-      this.onFindResultReceived});
+  const PlatformWebViewCreationParams({
+    this.controllerFromPlatform,
+    this.windowId,
+    this.onWebViewCreated,
+    this.onLoadStart,
+    this.onLoadStop,
+    this.onReceivedError,
+    this.onReceivedHttpError,
+    this.onProgressChanged,
+    this.onConsoleMessage,
+    this.shouldOverrideUrlLoading,
+    this.onLoadResource,
+    this.onScrollChanged,
+    this.onDownloadStartRequest,
+    this.onLoadResourceWithCustomScheme,
+    this.onCreateWindow,
+    this.onCloseWindow,
+    this.onJsAlert,
+    this.onJsConfirm,
+    this.onJsPrompt,
+    this.onReceivedHttpAuthRequest,
+    this.onReceivedServerTrustAuthRequest,
+    this.onReceivedClientCertRequest,
+    this.shouldInterceptAjaxRequest,
+    this.onAjaxReadyStateChange,
+    this.onAjaxProgress,
+    this.shouldInterceptFetchRequest,
+    this.onUpdateVisitedHistory,
+    this.onPrintRequest,
+    this.onLongPressHitTestResult,
+    this.onEnterFullscreen,
+    this.onExitFullscreen,
+    this.onPageCommitVisible,
+    this.onTitleChanged,
+    this.onWindowFocus,
+    this.onWindowBlur,
+    this.onOverScrolled,
+    this.onZoomScaleChanged,
+    this.onSafeBrowsingHit,
+    this.onPermissionRequest,
+    this.onGeolocationPermissionsShowPrompt,
+    this.onGeolocationPermissionsHidePrompt,
+    this.shouldInterceptRequest,
+    this.onRenderProcessGone,
+    this.onRenderProcessResponsive,
+    this.onRenderProcessUnresponsive,
+    this.onFormResubmission,
+    this.onReceivedIcon,
+    this.onReceivedTouchIconUrl,
+    this.onJsBeforeUnload,
+    this.onReceivedLoginRequest,
+    this.onPermissionRequestCanceled,
+    this.onRequestFocus,
+    this.onWebContentProcessDidTerminate,
+    this.onDidReceiveServerRedirectForProvisionalNavigation,
+    this.onNavigationResponse,
+    this.shouldAllowDeprecatedTLS,
+    this.onCameraCaptureStateChanged,
+    this.onMicrophoneCaptureStateChanged,
+    this.onContentSizeChanged,
+    this.initialUrlRequest,
+    this.initialFile,
+    this.initialData,
+    this.initialSettings,
+    this.contextMenu,
+    this.initialUserScripts,
+    this.pullToRefreshController,
+    this.findInteractionController,
+    this.onFindResultReceived,
+  });
 }

@@ -11,16 +11,21 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 class AndroidPrintJobControllerCreationParams
     extends PlatformPrintJobControllerCreationParams {
   /// Creates a new [AndroidPrintJobControllerCreationParams] instance.
-  const AndroidPrintJobControllerCreationParams(
-      {required super.id, super.onComplete});
+  const AndroidPrintJobControllerCreationParams({
+    required super.id,
+    super.onComplete,
+  });
 
   /// Creates a [AndroidPrintJobControllerCreationParams] instance based on [PlatformPrintJobControllerCreationParams].
   factory AndroidPrintJobControllerCreationParams.fromPlatformPrintJobControllerCreationParams(
-      // Recommended placeholder to prevent being broken by platform interface.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformPrintJobControllerCreationParams params) {
+    // Recommended placeholder to prevent being broken by platform interface.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformPrintJobControllerCreationParams params,
+  ) {
     return AndroidPrintJobControllerCreationParams(
-        id: params.id, onComplete: params.onComplete);
+      id: params.id,
+      onComplete: params.onComplete,
+    );
   }
 }
 
@@ -29,14 +34,16 @@ class AndroidPrintJobController extends PlatformPrintJobController
     with ChannelController {
   /// Constructs a [AndroidPrintJobController].
   AndroidPrintJobController(PlatformPrintJobControllerCreationParams params)
-      : super.implementation(
-          params is AndroidPrintJobControllerCreationParams
-              ? params
-              : AndroidPrintJobControllerCreationParams
-                  .fromPlatformPrintJobControllerCreationParams(params),
-        ) {
+    : super.implementation(
+        params is AndroidPrintJobControllerCreationParams
+            ? params
+            : AndroidPrintJobControllerCreationParams.fromPlatformPrintJobControllerCreationParams(
+                params,
+              ),
+      ) {
     channel = MethodChannel(
-        'wtf.zikzak/zikzak_inappwebview_printjobcontroller_${params.id}');
+      'wtf.zikzak/zikzak_inappwebview_printjobcontroller_${params.id}',
+    );
     handler = _handleMethod;
     initMethodCallHandler();
   }
@@ -63,8 +70,10 @@ class AndroidPrintJobController extends PlatformPrintJobController
   @override
   Future<PrintJobInfo?> getInfo() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    Map<String, dynamic>? infoMap =
-        (await channel?.invokeMethod('getInfo', args))?.cast<String, dynamic>();
+    Map<String, dynamic>? infoMap = (await channel?.invokeMethod(
+      'getInfo',
+      args,
+    ))?.cast<String, dynamic>();
     return PrintJobInfo.fromMap(infoMap);
   }
 

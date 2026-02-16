@@ -33,11 +33,7 @@ class RequestFocusNodeHrefResult {
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
-    return {
-      "src": src,
-      "title": title,
-      "url": url?.toString(),
-    };
+    return {"src": src, "title": title, "url": url?.toString()};
   }
 
   ///Converts instance to a map.

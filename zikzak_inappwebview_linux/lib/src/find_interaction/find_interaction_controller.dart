@@ -4,8 +4,8 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 class LinuxFindInteractionController extends PlatformFindInteractionController
     with ChannelController {
   LinuxFindInteractionController(
-      PlatformFindInteractionControllerCreationParams params)
-      : super.implementation(params);
+    PlatformFindInteractionControllerCreationParams params,
+  ) : super.implementation(params);
 
   Future<dynamic> _handleMethod(MethodCall call) async {
     switch (call.method) {
@@ -15,7 +15,11 @@ class LinuxFindInteractionController extends PlatformFindInteractionController
           int numberOfMatches = call.arguments["numberOfMatches"];
           bool isDoneCounting = call.arguments["isDoneCounting"];
           onFindResultReceived!(
-              this, activeMatchOrdinal, numberOfMatches, isDoneCounting);
+            this,
+            activeMatchOrdinal,
+            numberOfMatches,
+            isDoneCounting,
+          );
         }
         break;
       default:

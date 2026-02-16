@@ -11,10 +11,11 @@ class ModalTransitionStyle {
   final int _value;
   final int _nativeValue;
   const ModalTransitionStyle._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory ModalTransitionStyle._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      ModalTransitionStyle._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => ModalTransitionStyle._internal(value, nativeValue());
 
   ///When the view controller is presented, its view slides up from the bottom of the screen.
   ///On dismissal, the view slides back down. This is the default transition style.
@@ -46,8 +47,9 @@ class ModalTransitionStyle {
   static ModalTransitionStyle? fromValue(int? value) {
     if (value != null) {
       try {
-        return ModalTransitionStyle.values
-            .firstWhere((element) => element.toValue() == value);
+        return ModalTransitionStyle.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -59,8 +61,9 @@ class ModalTransitionStyle {
   static ModalTransitionStyle? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return ModalTransitionStyle.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return ModalTransitionStyle.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }

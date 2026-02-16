@@ -57,12 +57,13 @@ class PullToRefreshSettings_ {
   ///- iOS
   AttributedString_? attributedTitle;
 
-  PullToRefreshSettings_(
-      {this.enabled = true,
-      this.color,
-      this.backgroundColor,
-      this.distanceToTriggerSync,
-      this.slingshotDistance,
-      this.size,
-      this.attributedTitle});
+  PullToRefreshSettings_({
+    this.enabled = true,
+    this.color,
+    this.backgroundColor,
+    this.distanceToTriggerSync,
+    this.slingshotDistance,
+    this.size,
+    this.attributedTitle,
+  });
 }

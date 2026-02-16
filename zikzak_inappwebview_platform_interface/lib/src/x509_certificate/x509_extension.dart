@@ -158,10 +158,7 @@ class BasicConstraintExtension extends X509Extension {
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      "isCA": isCA,
-      "pathLenConstraint": pathLenConstraint,
-    };
+    return {"isCA": isCA, "pathLenConstraint": pathLenConstraint};
   }
 
   Map<String, dynamic> toJson() {
@@ -188,9 +185,7 @@ class SubjectKeyIdentifierExtension extends X509Extension {
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      "value": value,
-    };
+    return {"value": value};
   }
 
   Map<String, dynamic> toJson() {
@@ -210,10 +205,7 @@ class AuthorityInfoAccess {
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      "method": method,
-      "location": location,
-    };
+    return {"method": method, "location": location};
   }
 
   Map<String, dynamic> toJson() {
@@ -252,9 +244,7 @@ class AuthorityInfoAccessExtension extends X509Extension {
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      "infoAccess": infoAccess?.map((e) => e.toMap()).toList(),
-    };
+    return {"infoAccess": infoAccess?.map((e) => e.toMap()).toList()};
   }
 
   Map<String, dynamic> toJson() {
@@ -278,7 +268,8 @@ class AuthorityKeyIdentifierExtension extends X509Extension {
     ASN1Object? sub;
     try {
       sub = sequence.firstWhere(
-          (element) => element.identifier?.tagNumber().toValue() == 0);
+        (element) => element.identifier?.tagNumber().toValue() == 0,
+      );
       return sub.encoded;
     } catch (e) {}
     return null;
@@ -292,7 +283,8 @@ class AuthorityKeyIdentifierExtension extends X509Extension {
     ASN1Object? sub;
     try {
       sub = sequence.firstWhere(
-          (element) => element.identifier?.tagNumber().toValue() == 1);
+        (element) => element.identifier?.tagNumber().toValue() == 1,
+      );
       List<String>? result;
       if (sub.sub != null) {
         result = <String>[];
@@ -316,7 +308,8 @@ class AuthorityKeyIdentifierExtension extends X509Extension {
     ASN1Object? sub;
     try {
       sub = sequence.firstWhere(
-          (element) => element.identifier?.tagNumber().toValue() == 2);
+        (element) => element.identifier?.tagNumber().toValue() == 2,
+      );
       return sub.encoded;
     } catch (e) {}
     return null;
@@ -352,10 +345,7 @@ class CertificatePolicyQualifier {
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      "oid": oid,
-      "value": value,
-    };
+    return {"oid": oid, "value": value};
   }
 
   Map<String, dynamic> toJson() {
@@ -437,9 +427,7 @@ class CertificatePoliciesExtension extends X509Extension {
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      "policies": policies?.map((e) => e.toMap()).toList(),
-    };
+    return {"policies": policies?.map((e) => e.toMap()).toList()};
   }
 
   Map<String, dynamic> toJson() {
@@ -471,9 +459,7 @@ class CRLDistributionPointsExtension extends X509Extension {
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      "crls": crls,
-    };
+    return {"crls": crls};
   }
 
   Map<String, dynamic> toJson() {

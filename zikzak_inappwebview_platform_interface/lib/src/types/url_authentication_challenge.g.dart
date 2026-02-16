@@ -20,16 +20,15 @@ class URLAuthenticationChallenge {
     }
     final instance = URLAuthenticationChallenge(
       protectionSpace: URLProtectionSpace.fromMap(
-          map['protectionSpace']?.cast<String, dynamic>())!,
+        map['protectionSpace']?.cast<String, dynamic>(),
+      )!,
     );
     return instance;
   }
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
-    return {
-      "protectionSpace": protectionSpace.toMap(),
-    };
+    return {"protectionSpace": protectionSpace.toMap()};
   }
 
   ///Converts instance to a map.

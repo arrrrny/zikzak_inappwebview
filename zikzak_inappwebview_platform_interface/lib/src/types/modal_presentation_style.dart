@@ -28,8 +28,9 @@ class ModalPresentationStyle_ {
   static const OVER_FULL_SCREEN = const ModalPresentationStyle_._internal(5);
 
   ///A presentation style where the content is displayed over another view controller’s content.
-  static const OVER_CURRENT_CONTEXT =
-      const ModalPresentationStyle_._internal(6);
+  static const OVER_CURRENT_CONTEXT = const ModalPresentationStyle_._internal(
+    6,
+  );
 
   ///A presentation style where the content is displayed in a popover view.
   static const POPOVER = const ModalPresentationStyle_._internal(7);

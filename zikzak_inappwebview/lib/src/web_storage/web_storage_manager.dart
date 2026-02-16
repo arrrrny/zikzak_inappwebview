@@ -9,9 +9,9 @@ import 'ios/web_storage_manager.dart';
 class WebStorageManager {
   ///{@macro zikzak_inappwebview_platform_interface.PlatformWebStorageManager}
   WebStorageManager()
-      : this.fromPlatformCreationParams(
-          const PlatformWebStorageManagerCreationParams(),
-        );
+    : this.fromPlatformCreationParams(
+        const PlatformWebStorageManagerCreationParams(),
+      );
 
   /// Constructs a [WebStorageManager] from creation params for a specific
   /// platform.
@@ -63,18 +63,19 @@ class WebStorageManager {
       platform.getUsageForOrigin(origin: origin);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformWebStorageManager.fetchDataRecords}
-  Future<List<WebsiteDataRecord>> fetchDataRecords(
-          {required Set<WebsiteDataType> dataTypes}) =>
-      platform.fetchDataRecords(dataTypes: dataTypes);
+  Future<List<WebsiteDataRecord>> fetchDataRecords({
+    required Set<WebsiteDataType> dataTypes,
+  }) => platform.fetchDataRecords(dataTypes: dataTypes);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformWebStorageManager.removeDataFor}
-  Future<void> removeDataFor(
-          {required Set<WebsiteDataType> dataTypes,
-          required List<WebsiteDataRecord> dataRecords}) =>
-      platform.removeDataFor(dataTypes: dataTypes, dataRecords: dataRecords);
+  Future<void> removeDataFor({
+    required Set<WebsiteDataType> dataTypes,
+    required List<WebsiteDataRecord> dataRecords,
+  }) => platform.removeDataFor(dataTypes: dataTypes, dataRecords: dataRecords);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformWebStorageManager.removeDataModifiedSince}
-  Future<void> removeDataModifiedSince(
-          {required Set<WebsiteDataType> dataTypes, required DateTime date}) =>
-      platform.removeDataModifiedSince(dataTypes: dataTypes, date: date);
+  Future<void> removeDataModifiedSince({
+    required Set<WebsiteDataType> dataTypes,
+    required DateTime date,
+  }) => platform.removeDataModifiedSince(dataTypes: dataTypes, date: date);
 }

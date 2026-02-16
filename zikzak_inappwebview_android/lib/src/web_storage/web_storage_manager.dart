@@ -21,7 +21,8 @@ class AndroidWebStorageManagerCreationParams
 
   /// Creates a [AndroidWebStorageManagerCreationParams] instance based on [PlatformWebStorageManagerCreationParams].
   factory AndroidWebStorageManagerCreationParams.fromPlatformWebStorageManagerCreationParams(
-      PlatformWebStorageManagerCreationParams params) {
+    PlatformWebStorageManagerCreationParams params,
+  ) {
     return AndroidWebStorageManagerCreationParams(params);
   }
 }
@@ -31,14 +32,16 @@ class AndroidWebStorageManager extends PlatformWebStorageManager
     with ChannelController {
   /// Creates a new [AndroidWebStorageManager].
   AndroidWebStorageManager(PlatformWebStorageManagerCreationParams params)
-      : super.implementation(
-          params is AndroidWebStorageManagerCreationParams
-              ? params
-              : AndroidWebStorageManagerCreationParams
-                  .fromPlatformWebStorageManagerCreationParams(params),
-        ) {
-    channel =
-        const MethodChannel('wtf.zikzak/zikzak_inappwebview_webstoragemanager');
+    : super.implementation(
+        params is AndroidWebStorageManagerCreationParams
+            ? params
+            : AndroidWebStorageManagerCreationParams.fromPlatformWebStorageManagerCreationParams(
+                params,
+              ),
+      ) {
+    channel = const MethodChannel(
+      'wtf.zikzak/zikzak_inappwebview_webstoragemanager',
+    );
     handler = handleMethod;
     initMethodCallHandler();
   }
@@ -51,8 +54,11 @@ class AndroidWebStorageManager extends PlatformWebStorageManager
   }
 
   static AndroidWebStorageManager _init() {
-    _instance = AndroidWebStorageManager(AndroidWebStorageManagerCreationParams(
-        const PlatformWebStorageManagerCreationParams()));
+    _instance = AndroidWebStorageManager(
+      AndroidWebStorageManagerCreationParams(
+        const PlatformWebStorageManagerCreationParams(),
+      ),
+    );
     return _instance!;
   }
 
@@ -64,15 +70,20 @@ class AndroidWebStorageManager extends PlatformWebStorageManager
 
     Map<String, dynamic> args = <String, dynamic>{};
     List<Map<dynamic, dynamic>> origins =
-        (await channel?.invokeMethod<List>('getOrigins', args))
-                ?.cast<Map<dynamic, dynamic>>() ??
-            [];
+        (await channel?.invokeMethod<List>(
+          'getOrigins',
+          args,
+        ))?.cast<Map<dynamic, dynamic>>() ??
+        [];
 
     for (var origin in origins) {
-      originsList.add(WebStorageOrigin(
+      originsList.add(
+        WebStorageOrigin(
           origin: origin["origin"],
           quota: origin["quota"],
-          usage: origin["usage"]));
+          usage: origin["usage"],
+        ),
+      );
     }
 
     return originsList;

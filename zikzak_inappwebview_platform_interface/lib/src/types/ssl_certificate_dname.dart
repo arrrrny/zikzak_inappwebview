@@ -19,6 +19,10 @@ class SslCertificateDName_ {
   ///Organizational Unit (OU) component of the name
   String? UName;
 
-  SslCertificateDName_(
-      {this.CName = "", this.DName = "", this.OName = "", this.UName = ""});
+  SslCertificateDName_({
+    this.CName = "",
+    this.DName = "",
+    this.OName = "",
+    this.UName = "",
+  });
 }

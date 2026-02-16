@@ -20,6 +20,10 @@ class JsPromptRequest_ {
   @SupportedPlatforms(platforms: [IOSPlatform(), MacOSPlatform()])
   bool? isMainFrame;
 
-  JsPromptRequest_(
-      {this.url, this.message, this.defaultValue, this.isMainFrame});
+  JsPromptRequest_({
+    this.url,
+    this.message,
+    this.defaultValue,
+    this.isMainFrame,
+  });
 }

@@ -59,13 +59,14 @@ class ProxySettings {
   ///
   ///**NOTE**: available only if [WebViewFeature.PROXY_OVERRIDE_REVERSE_BYPASS] feature is supported.
   bool reverseBypassEnabled;
-  ProxySettings(
-      {this.bypassRules = const [],
-      this.bypassSimpleHostnames,
-      this.directs = const [],
-      this.proxyRules = const [],
-      this.removeImplicitRules,
-      this.reverseBypassEnabled = false});
+  ProxySettings({
+    this.bypassRules = const [],
+    this.bypassSimpleHostnames,
+    this.directs = const [],
+    this.proxyRules = const [],
+    this.removeImplicitRules,
+    this.reverseBypassEnabled = false,
+  });
 
   ///Gets a possible [ProxySettings] instance from a [Map] value.
   static ProxySettings? fromMap(Map<String, dynamic>? map) {
@@ -76,11 +77,15 @@ class ProxySettings {
       bypassSimpleHostnames: map['bypassSimpleHostnames'],
       removeImplicitRules: map['removeImplicitRules'],
     );
-    instance.bypassRules =
-        List<String>.from(map['bypassRules']!.cast<String>());
+    instance.bypassRules = List<String>.from(
+      map['bypassRules']!.cast<String>(),
+    );
     instance.directs = List<String>.from(map['directs']!.cast<String>());
-    instance.proxyRules = List<ProxyRule>.from(map['proxyRules']
-        .map((e) => ProxyRule.fromMap(e?.cast<String, dynamic>())!));
+    instance.proxyRules = List<ProxyRule>.from(
+      map['proxyRules'].map(
+        (e) => ProxyRule.fromMap(e?.cast<String, dynamic>())!,
+      ),
+    );
     instance.reverseBypassEnabled = map['reverseBypassEnabled'];
     return instance;
   }

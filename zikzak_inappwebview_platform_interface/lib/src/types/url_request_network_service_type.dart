@@ -27,8 +27,9 @@ class URLRequestNetworkServiceType_ {
   ///A service type for data that the user is actively waiting for.
   ///
   ///Use this service type for interactive situations where the user is anticipating a quick response, like instant messaging or completing a purchase.
-  static const RESPONSIVE_DATA =
-      const URLRequestNetworkServiceType_._internal(6);
+  static const RESPONSIVE_DATA = const URLRequestNetworkServiceType_._internal(
+    6,
+  );
 
   ///A service type for streaming audio/video data.
   static const AV_STREAMING = const URLRequestNetworkServiceType_._internal(8);
@@ -39,6 +40,7 @@ class URLRequestNetworkServiceType_ {
   ///A service type for call signaling.
   ///
   ///Use this service type with network traffic that establishes, maintains, or tears down a VoIP call.
-  static const CALL_SIGNALING =
-      const URLRequestNetworkServiceType_._internal(11);
+  static const CALL_SIGNALING = const URLRequestNetworkServiceType_._internal(
+    11,
+  );
 }

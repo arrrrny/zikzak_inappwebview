@@ -15,168 +15,167 @@ import '../pull_to_refresh/pull_to_refresh_controller.dart';
 /// this class.
 class IOSInAppWebViewWidgetCreationParams
     extends PlatformInAppWebViewWidgetCreationParams {
-  IOSInAppWebViewWidgetCreationParams(
-      {super.controllerFromPlatform,
-      super.key,
-      super.layoutDirection,
-      super.gestureRecognizers,
-      super.headlessWebView,
-      super.keepAlive,
-      super.preventGestureDelay,
-      super.windowId,
-      super.onWebViewCreated,
-      super.onLoadStart,
-      super.onLoadStop,
-      super.onReceivedError,
-      super.onReceivedHttpError,
-      super.onProgressChanged,
-      super.onConsoleMessage,
-      super.shouldOverrideUrlLoading,
-      super.onLoadResource,
-      super.onScrollChanged,
-      super.onDownloadStartRequest,
-      super.onLoadResourceWithCustomScheme,
-      super.onCreateWindow,
-      super.onCloseWindow,
-      super.onJsAlert,
-      super.onJsConfirm,
-      super.onJsPrompt,
-      super.onReceivedHttpAuthRequest,
-      super.onReceivedServerTrustAuthRequest,
-      super.onReceivedClientCertRequest,
-      super.shouldInterceptAjaxRequest,
-      super.onAjaxReadyStateChange,
-      super.onAjaxProgress,
-      super.shouldInterceptFetchRequest,
-      super.onUpdateVisitedHistory,
-      super.onPrintRequest,
-      super.onLongPressHitTestResult,
-      super.onEnterFullscreen,
-      super.onExitFullscreen,
-      super.onPageCommitVisible,
-      super.onTitleChanged,
-      super.onWindowFocus,
-      super.onWindowBlur,
-      super.onOverScrolled,
-      super.onZoomScaleChanged,
-      super.onSafeBrowsingHit,
-      super.onPermissionRequest,
-      super.onGeolocationPermissionsShowPrompt,
-      super.onGeolocationPermissionsHidePrompt,
-      super.shouldInterceptRequest,
-      super.onRenderProcessGone,
-      super.onRenderProcessResponsive,
-      super.onRenderProcessUnresponsive,
-      super.onFormResubmission,
-      super.onReceivedIcon,
-      super.onReceivedTouchIconUrl,
-      super.onJsBeforeUnload,
-      super.onReceivedLoginRequest,
-      super.onPermissionRequestCanceled,
-      super.onRequestFocus,
-      super.onWebContentProcessDidTerminate,
-      super.onDidReceiveServerRedirectForProvisionalNavigation,
-      super.onNavigationResponse,
-      super.shouldAllowDeprecatedTLS,
-      super.onCameraCaptureStateChanged,
-      super.onMicrophoneCaptureStateChanged,
-      super.onContentSizeChanged,
-      super.initialUrlRequest,
-      super.initialFile,
-      super.initialData,
-      super.initialSettings,
-      super.contextMenu,
-      super.initialUserScripts,
-      this.pullToRefreshController,
-      this.findInteractionController});
+  IOSInAppWebViewWidgetCreationParams({
+    super.controllerFromPlatform,
+    super.key,
+    super.layoutDirection,
+    super.gestureRecognizers,
+    super.headlessWebView,
+    super.keepAlive,
+    super.preventGestureDelay,
+    super.windowId,
+    super.onWebViewCreated,
+    super.onLoadStart,
+    super.onLoadStop,
+    super.onReceivedError,
+    super.onReceivedHttpError,
+    super.onProgressChanged,
+    super.onConsoleMessage,
+    super.shouldOverrideUrlLoading,
+    super.onLoadResource,
+    super.onScrollChanged,
+    super.onDownloadStartRequest,
+    super.onLoadResourceWithCustomScheme,
+    super.onCreateWindow,
+    super.onCloseWindow,
+    super.onJsAlert,
+    super.onJsConfirm,
+    super.onJsPrompt,
+    super.onReceivedHttpAuthRequest,
+    super.onReceivedServerTrustAuthRequest,
+    super.onReceivedClientCertRequest,
+    super.shouldInterceptAjaxRequest,
+    super.onAjaxReadyStateChange,
+    super.onAjaxProgress,
+    super.shouldInterceptFetchRequest,
+    super.onUpdateVisitedHistory,
+    super.onPrintRequest,
+    super.onLongPressHitTestResult,
+    super.onEnterFullscreen,
+    super.onExitFullscreen,
+    super.onPageCommitVisible,
+    super.onTitleChanged,
+    super.onWindowFocus,
+    super.onWindowBlur,
+    super.onOverScrolled,
+    super.onZoomScaleChanged,
+    super.onSafeBrowsingHit,
+    super.onPermissionRequest,
+    super.onGeolocationPermissionsShowPrompt,
+    super.onGeolocationPermissionsHidePrompt,
+    super.shouldInterceptRequest,
+    super.onRenderProcessGone,
+    super.onRenderProcessResponsive,
+    super.onRenderProcessUnresponsive,
+    super.onFormResubmission,
+    super.onReceivedIcon,
+    super.onReceivedTouchIconUrl,
+    super.onJsBeforeUnload,
+    super.onReceivedLoginRequest,
+    super.onPermissionRequestCanceled,
+    super.onRequestFocus,
+    super.onWebContentProcessDidTerminate,
+    super.onDidReceiveServerRedirectForProvisionalNavigation,
+    super.onNavigationResponse,
+    super.shouldAllowDeprecatedTLS,
+    super.onCameraCaptureStateChanged,
+    super.onMicrophoneCaptureStateChanged,
+    super.onContentSizeChanged,
+    super.initialUrlRequest,
+    super.initialFile,
+    super.initialData,
+    super.initialSettings,
+    super.contextMenu,
+    super.initialUserScripts,
+    this.pullToRefreshController,
+    this.findInteractionController,
+  });
 
   /// Constructs a [IOSInAppWebViewWidgetCreationParams] using a
   /// [PlatformInAppWebViewWidgetCreationParams].
   IOSInAppWebViewWidgetCreationParams.fromPlatformInAppWebViewWidgetCreationParams(
-      PlatformInAppWebViewWidgetCreationParams params)
-      : this(
-            controllerFromPlatform: params.controllerFromPlatform,
-            key: params.key,
-            layoutDirection: params.layoutDirection,
-            gestureRecognizers: params.gestureRecognizers,
-            headlessWebView: params.headlessWebView,
-            keepAlive: params.keepAlive,
-            preventGestureDelay: params.preventGestureDelay,
-            windowId: params.windowId,
-            onWebViewCreated: params.onWebViewCreated,
-            onLoadStart: params.onLoadStart,
-            onLoadStop: params.onLoadStop,
-            onReceivedError: params.onReceivedError,
-            onReceivedHttpError: params.onReceivedHttpError,
-            onProgressChanged: params.onProgressChanged,
-            onConsoleMessage: params.onConsoleMessage,
-            shouldOverrideUrlLoading: params.shouldOverrideUrlLoading,
-            onLoadResource: params.onLoadResource,
-            onScrollChanged: params.onScrollChanged,
-            onDownloadStartRequest: params.onDownloadStartRequest,
-            onLoadResourceWithCustomScheme:
-                params.onLoadResourceWithCustomScheme,
-            onCreateWindow: params.onCreateWindow,
-            onCloseWindow: params.onCloseWindow,
-            onJsAlert: params.onJsAlert,
-            onJsConfirm: params.onJsConfirm,
-            onJsPrompt: params.onJsPrompt,
-            onReceivedHttpAuthRequest: params.onReceivedHttpAuthRequest,
-            onReceivedServerTrustAuthRequest:
-                params.onReceivedServerTrustAuthRequest,
-            onReceivedClientCertRequest: params.onReceivedClientCertRequest,
-            shouldInterceptAjaxRequest: params.shouldInterceptAjaxRequest,
-            onAjaxReadyStateChange: params.onAjaxReadyStateChange,
-            onAjaxProgress: params.onAjaxProgress,
-            shouldInterceptFetchRequest: params.shouldInterceptFetchRequest,
-            onUpdateVisitedHistory: params.onUpdateVisitedHistory,
-            onPrintRequest: params.onPrintRequest,
-            onLongPressHitTestResult: params.onLongPressHitTestResult,
-            onEnterFullscreen: params.onEnterFullscreen,
-            onExitFullscreen: params.onExitFullscreen,
-            onPageCommitVisible: params.onPageCommitVisible,
-            onTitleChanged: params.onTitleChanged,
-            onWindowFocus: params.onWindowFocus,
-            onWindowBlur: params.onWindowBlur,
-            onOverScrolled: params.onOverScrolled,
-            onZoomScaleChanged: params.onZoomScaleChanged,
-            onSafeBrowsingHit: params.onSafeBrowsingHit,
-            onPermissionRequest: params.onPermissionRequest,
-            onGeolocationPermissionsShowPrompt:
-                params.onGeolocationPermissionsShowPrompt,
-            onGeolocationPermissionsHidePrompt:
-                params.onGeolocationPermissionsHidePrompt,
-            shouldInterceptRequest: params.shouldInterceptRequest,
-            onRenderProcessGone: params.onRenderProcessGone,
-            onRenderProcessResponsive: params.onRenderProcessResponsive,
-            onRenderProcessUnresponsive: params.onRenderProcessUnresponsive,
-            onFormResubmission: params.onFormResubmission,
-            onReceivedIcon: params.onReceivedIcon,
-            onReceivedTouchIconUrl: params.onReceivedTouchIconUrl,
-            onJsBeforeUnload: params.onJsBeforeUnload,
-            onReceivedLoginRequest: params.onReceivedLoginRequest,
-            onPermissionRequestCanceled: params.onPermissionRequestCanceled,
-            onRequestFocus: params.onRequestFocus,
-            onWebContentProcessDidTerminate:
-                params.onWebContentProcessDidTerminate,
-            onDidReceiveServerRedirectForProvisionalNavigation:
-                params.onDidReceiveServerRedirectForProvisionalNavigation,
-            onNavigationResponse: params.onNavigationResponse,
-            shouldAllowDeprecatedTLS: params.shouldAllowDeprecatedTLS,
-            onCameraCaptureStateChanged: params.onCameraCaptureStateChanged,
-            onMicrophoneCaptureStateChanged:
-                params.onMicrophoneCaptureStateChanged,
-            onContentSizeChanged: params.onContentSizeChanged,
-            initialUrlRequest: params.initialUrlRequest,
-            initialFile: params.initialFile,
-            initialData: params.initialData,
-            initialSettings: params.initialSettings,
-            contextMenu: params.contextMenu,
-            initialUserScripts: params.initialUserScripts,
-            pullToRefreshController:
-                params.pullToRefreshController as IOSPullToRefreshController?,
-            findInteractionController: params.findInteractionController
-                as IOSFindInteractionController?);
+    PlatformInAppWebViewWidgetCreationParams params,
+  ) : this(
+        controllerFromPlatform: params.controllerFromPlatform,
+        key: params.key,
+        layoutDirection: params.layoutDirection,
+        gestureRecognizers: params.gestureRecognizers,
+        headlessWebView: params.headlessWebView,
+        keepAlive: params.keepAlive,
+        preventGestureDelay: params.preventGestureDelay,
+        windowId: params.windowId,
+        onWebViewCreated: params.onWebViewCreated,
+        onLoadStart: params.onLoadStart,
+        onLoadStop: params.onLoadStop,
+        onReceivedError: params.onReceivedError,
+        onReceivedHttpError: params.onReceivedHttpError,
+        onProgressChanged: params.onProgressChanged,
+        onConsoleMessage: params.onConsoleMessage,
+        shouldOverrideUrlLoading: params.shouldOverrideUrlLoading,
+        onLoadResource: params.onLoadResource,
+        onScrollChanged: params.onScrollChanged,
+        onDownloadStartRequest: params.onDownloadStartRequest,
+        onLoadResourceWithCustomScheme: params.onLoadResourceWithCustomScheme,
+        onCreateWindow: params.onCreateWindow,
+        onCloseWindow: params.onCloseWindow,
+        onJsAlert: params.onJsAlert,
+        onJsConfirm: params.onJsConfirm,
+        onJsPrompt: params.onJsPrompt,
+        onReceivedHttpAuthRequest: params.onReceivedHttpAuthRequest,
+        onReceivedServerTrustAuthRequest:
+            params.onReceivedServerTrustAuthRequest,
+        onReceivedClientCertRequest: params.onReceivedClientCertRequest,
+        shouldInterceptAjaxRequest: params.shouldInterceptAjaxRequest,
+        onAjaxReadyStateChange: params.onAjaxReadyStateChange,
+        onAjaxProgress: params.onAjaxProgress,
+        shouldInterceptFetchRequest: params.shouldInterceptFetchRequest,
+        onUpdateVisitedHistory: params.onUpdateVisitedHistory,
+        onPrintRequest: params.onPrintRequest,
+        onLongPressHitTestResult: params.onLongPressHitTestResult,
+        onEnterFullscreen: params.onEnterFullscreen,
+        onExitFullscreen: params.onExitFullscreen,
+        onPageCommitVisible: params.onPageCommitVisible,
+        onTitleChanged: params.onTitleChanged,
+        onWindowFocus: params.onWindowFocus,
+        onWindowBlur: params.onWindowBlur,
+        onOverScrolled: params.onOverScrolled,
+        onZoomScaleChanged: params.onZoomScaleChanged,
+        onSafeBrowsingHit: params.onSafeBrowsingHit,
+        onPermissionRequest: params.onPermissionRequest,
+        onGeolocationPermissionsShowPrompt:
+            params.onGeolocationPermissionsShowPrompt,
+        onGeolocationPermissionsHidePrompt:
+            params.onGeolocationPermissionsHidePrompt,
+        shouldInterceptRequest: params.shouldInterceptRequest,
+        onRenderProcessGone: params.onRenderProcessGone,
+        onRenderProcessResponsive: params.onRenderProcessResponsive,
+        onRenderProcessUnresponsive: params.onRenderProcessUnresponsive,
+        onFormResubmission: params.onFormResubmission,
+        onReceivedIcon: params.onReceivedIcon,
+        onReceivedTouchIconUrl: params.onReceivedTouchIconUrl,
+        onJsBeforeUnload: params.onJsBeforeUnload,
+        onReceivedLoginRequest: params.onReceivedLoginRequest,
+        onPermissionRequestCanceled: params.onPermissionRequestCanceled,
+        onRequestFocus: params.onRequestFocus,
+        onWebContentProcessDidTerminate: params.onWebContentProcessDidTerminate,
+        onDidReceiveServerRedirectForProvisionalNavigation:
+            params.onDidReceiveServerRedirectForProvisionalNavigation,
+        onNavigationResponse: params.onNavigationResponse,
+        shouldAllowDeprecatedTLS: params.shouldAllowDeprecatedTLS,
+        onCameraCaptureStateChanged: params.onCameraCaptureStateChanged,
+        onMicrophoneCaptureStateChanged: params.onMicrophoneCaptureStateChanged,
+        onContentSizeChanged: params.onContentSizeChanged,
+        initialUrlRequest: params.initialUrlRequest,
+        initialFile: params.initialFile,
+        initialData: params.initialData,
+        initialSettings: params.initialSettings,
+        contextMenu: params.contextMenu,
+        initialUserScripts: params.initialUserScripts,
+        pullToRefreshController:
+            params.pullToRefreshController as IOSPullToRefreshController?,
+        findInteractionController:
+            params.findInteractionController as IOSFindInteractionController?,
+      );
 
   @override
   final IOSFindInteractionController? findInteractionController;
@@ -191,12 +190,13 @@ class IOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
   ///
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewWidget}
   IOSInAppWebViewWidget(PlatformInAppWebViewWidgetCreationParams params)
-      : super.implementation(
-          params is IOSInAppWebViewWidgetCreationParams
-              ? params
-              : IOSInAppWebViewWidgetCreationParams
-                  .fromPlatformInAppWebViewWidgetCreationParams(params),
-        );
+    : super.implementation(
+        params is IOSInAppWebViewWidgetCreationParams
+            ? params
+            : IOSInAppWebViewWidgetCreationParams.fromPlatformInAppWebViewWidgetCreationParams(
+                params,
+              ),
+      );
 
   IOSInAppWebViewWidgetCreationParams get _iosParams =>
       params as IOSInAppWebViewWidgetCreationParams;
@@ -213,11 +213,11 @@ class IOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
 
     Map<String, dynamic> settingsMap =
         (params.initialSettings != null ? initialSettings.toMap() : null) ??
-            initialSettings.toMap();
+        initialSettings.toMap();
 
     Map<String, dynamic> pullToRefreshSettings =
         params.pullToRefreshController?.params.settings?.toMap() ??
-            PullToRefreshSettings(enabled: false).toMap();
+        PullToRefreshSettings(enabled: false).toMap();
 
     if ((params.headlessWebView?.isRunning() ?? false) &&
         params.keepAlive != null) {
@@ -246,7 +246,7 @@ class IOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
             params.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
         'pullToRefreshSettings': pullToRefreshSettings,
         'keepAliveId': params.keepAlive?.id,
-        'preventGestureDelay': params.preventGestureDelay
+        'preventGestureDelay': params.preventGestureDelay,
       },
       creationParamsCodec: const StandardMessageCodec(),
     );
@@ -260,20 +260,24 @@ class IOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
     viewId = params.keepAlive?.id ?? viewId ?? id;
     _iosHeadlessInAppWebView?.internalDispose();
     _controller = IOSInAppWebViewController(
-        PlatformInAppWebViewControllerCreationParams(
-            id: viewId, webviewParams: params));
+      PlatformInAppWebViewControllerCreationParams(
+        id: viewId,
+        webviewParams: params,
+      ),
+    );
     _iosParams.pullToRefreshController?.init(viewId);
     _iosParams.findInteractionController?.init(viewId);
     debugLog(
-        className: runtimeType.toString(),
-        id: viewId?.toString(),
-        debugLoggingSettings:
-            PlatformInAppWebViewController.debugLoggingSettings,
-        method: "onWebViewCreated",
-        args: []);
+      className: runtimeType.toString(),
+      id: viewId?.toString(),
+      debugLoggingSettings: PlatformInAppWebViewController.debugLoggingSettings,
+      method: "onWebViewCreated",
+      args: [],
+    );
     if (params.onWebViewCreated != null) {
       params.onWebViewCreated!(
-          params.controllerFromPlatform?.call(_controller!) ?? _controller!);
+        params.controllerFromPlatform?.call(_controller!) ?? _controller!,
+      );
     }
   }
 
@@ -317,12 +321,12 @@ class IOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
   void dispose() {
     dynamic viewId = _controller?.getViewId();
     debugLog(
-        className: runtimeType.toString(),
-        id: viewId?.toString(),
-        debugLoggingSettings:
-            PlatformInAppWebViewController.debugLoggingSettings,
-        method: "dispose",
-        args: []);
+      className: runtimeType.toString(),
+      id: viewId?.toString(),
+      debugLoggingSettings: PlatformInAppWebViewController.debugLoggingSettings,
+      method: "dispose",
+      args: [],
+    );
     final isKeepAlive = params.keepAlive != null;
     _controller?.dispose(isKeepAlive: isKeepAlive);
     _controller = null;

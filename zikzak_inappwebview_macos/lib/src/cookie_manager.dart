@@ -2,7 +2,7 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 
 class MacOSCookieManager extends PlatformCookieManager {
   MacOSCookieManager(PlatformCookieManagerCreationParams params)
-      : super.implementation(params);
+    : super.implementation(params);
 
   @override
   Future<void> dispose() async {

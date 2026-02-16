@@ -29,12 +29,13 @@ class DownloadStartRequest_ {
   ///The name of the text encoding of the receiver, or `null` if no text encoding was specified.
   String? textEncodingName;
 
-  DownloadStartRequest_(
-      {required this.url,
-      this.userAgent,
-      this.contentDisposition,
-      this.mimeType,
-      required this.contentLength,
-      this.suggestedFilename,
-      this.textEncodingName});
+  DownloadStartRequest_({
+    required this.url,
+    this.userAgent,
+    this.contentDisposition,
+    this.mimeType,
+    required this.contentLength,
+    this.suggestedFilename,
+    this.textEncodingName,
+  });
 }

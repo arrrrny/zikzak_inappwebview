@@ -15,10 +15,12 @@ class IOSWebStorageManager {
   ///Fetches data records containing the given website data types.
   ///
   ///[dataTypes] represents the website data types to fetch records for.
-  Future<List<WebsiteDataRecord>> fetchDataRecords(
-      {required Set<WebsiteDataType> dataTypes}) async {
-    return await WebStorageManager.instance()
-        .fetchDataRecords(dataTypes: dataTypes);
+  Future<List<WebsiteDataRecord>> fetchDataRecords({
+    required Set<WebsiteDataType> dataTypes,
+  }) async {
+    return await WebStorageManager.instance().fetchDataRecords(
+      dataTypes: dataTypes,
+    );
   }
 
   ///Removes website data of the given types for the given data records.
@@ -26,11 +28,14 @@ class IOSWebStorageManager {
   ///[dataTypes] represents the website data types that should be removed.
   ///
   ///[dataRecords] represents the website data records to delete website data for.
-  Future<void> removeDataFor(
-      {required Set<WebsiteDataType> dataTypes,
-      required List<WebsiteDataRecord> dataRecords}) async {
-    await WebStorageManager.instance()
-        .removeDataFor(dataRecords: dataRecords, dataTypes: dataTypes);
+  Future<void> removeDataFor({
+    required Set<WebsiteDataType> dataTypes,
+    required List<WebsiteDataRecord> dataRecords,
+  }) async {
+    await WebStorageManager.instance().removeDataFor(
+      dataRecords: dataRecords,
+      dataTypes: dataTypes,
+    );
   }
 
   ///Removes all website data of the given types that has been modified since the given date.
@@ -38,9 +43,13 @@ class IOSWebStorageManager {
   ///[dataTypes] represents the website data types that should be removed.
   ///
   ///[date] represents a date. All website data modified after this date will be removed.
-  Future<void> removeDataModifiedSince(
-      {required Set<WebsiteDataType> dataTypes, required DateTime date}) async {
-    await WebStorageManager.instance()
-        .removeDataModifiedSince(dataTypes: dataTypes, date: date);
+  Future<void> removeDataModifiedSince({
+    required Set<WebsiteDataType> dataTypes,
+    required DateTime date,
+  }) async {
+    await WebStorageManager.instance().removeDataModifiedSince(
+      dataTypes: dataTypes,
+      date: date,
+    );
   }
 }

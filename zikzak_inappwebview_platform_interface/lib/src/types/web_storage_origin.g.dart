@@ -34,11 +34,7 @@ class WebStorageOrigin {
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
-    return {
-      "origin": origin,
-      "quota": quota,
-      "usage": usage,
-    };
+    return {"origin": origin, "quota": quota, "usage": usage};
   }
 
   ///Converts instance to a map.

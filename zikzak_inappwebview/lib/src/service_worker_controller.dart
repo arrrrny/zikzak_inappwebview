@@ -5,9 +5,9 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 class ServiceWorkerController {
   ///{@macro zikzak_inappwebview_platform_interface.PlatformServiceWorkerController}
   ServiceWorkerController()
-      : this.fromPlatformCreationParams(
-          const PlatformServiceWorkerControllerCreationParams(),
-        );
+    : this.fromPlatformCreationParams(
+        const PlatformServiceWorkerControllerCreationParams(),
+      );
 
   /// Constructs a [ServiceWorkerController] from creation params for a specific
   /// platform.
@@ -105,10 +105,12 @@ class AndroidServiceWorkerController {
   ///Sets the service worker client
   setServiceWorkerClient(AndroidServiceWorkerClient? value) async {
     await ServiceWorkerController.instance().setServiceWorkerClient(
-        value != null
-            ? ServiceWorkerClient(
-                shouldInterceptRequest: value.shouldInterceptRequest)
-            : null);
+      value != null
+          ? ServiceWorkerClient(
+              shouldInterceptRequest: value.shouldInterceptRequest,
+            )
+          : null,
+    );
     _serviceWorkerClient = value;
   }
 
@@ -212,7 +214,7 @@ class AndroidServiceWorkerClient {
   ///
   ///**NOTE**: available on Android 24+.
   final Future<WebResourceResponse?> Function(WebResourceRequest request)?
-      shouldInterceptRequest;
+  shouldInterceptRequest;
 
   AndroidServiceWorkerClient({this.shouldInterceptRequest});
 }

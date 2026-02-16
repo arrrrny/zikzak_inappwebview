@@ -17,7 +17,8 @@ import '../util.dart';
 part 'chrome_safari_browser_settings.g.dart';
 
 TrustedWebActivityDisplayMode? _deserializeDisplayMode(
-    Map<String, dynamic>? displayMode) {
+  Map<String, dynamic>? displayMode,
+) {
   if (displayMode == null) {
     return null;
   }
@@ -240,42 +241,47 @@ class ChromeSafariBrowserSettings_ {
   UIEventAttribution_? eventAttribution;
 
   @ExchangeableObjectConstructor()
-  ChromeSafariBrowserSettings_(
-      {this.shareState = CustomTabsShareState_.SHARE_STATE_DEFAULT,
-      this.showTitle = true,
-      this.toolbarBackgroundColor,
-      this.navigationBarColor,
-      this.navigationBarDividerColor,
-      this.secondaryToolbarColor,
-      this.enableUrlBarHiding = false,
-      this.instantAppsEnabled = false,
-      this.packageName,
-      this.keepAliveEnabled = false,
-      this.isSingleInstance = false,
-      this.noHistory = false,
-      this.isTrustedWebActivity = false,
-      this.additionalTrustedOrigins = const [],
-      this.displayMode,
-      this.screenOrientation = TrustedWebActivityScreenOrientation_.DEFAULT,
-      this.startAnimations,
-      this.exitAnimations,
-      this.alwaysUseBrowserUI = false,
-      this.entersReaderIfAvailable = false,
-      this.barCollapsingEnabled = false,
-      this.dismissButtonStyle = DismissButtonStyle_.DONE,
-      this.preferredBarTintColor,
-      this.preferredControlTintColor,
-      this.presentationStyle = ModalPresentationStyle_.FULL_SCREEN,
-      this.transitionStyle = ModalTransitionStyle_.COVER_VERTICAL,
-      this.activityButton,
-      this.eventAttribution}) {
+  ChromeSafariBrowserSettings_({
+    this.shareState = CustomTabsShareState_.SHARE_STATE_DEFAULT,
+    this.showTitle = true,
+    this.toolbarBackgroundColor,
+    this.navigationBarColor,
+    this.navigationBarDividerColor,
+    this.secondaryToolbarColor,
+    this.enableUrlBarHiding = false,
+    this.instantAppsEnabled = false,
+    this.packageName,
+    this.keepAliveEnabled = false,
+    this.isSingleInstance = false,
+    this.noHistory = false,
+    this.isTrustedWebActivity = false,
+    this.additionalTrustedOrigins = const [],
+    this.displayMode,
+    this.screenOrientation = TrustedWebActivityScreenOrientation_.DEFAULT,
+    this.startAnimations,
+    this.exitAnimations,
+    this.alwaysUseBrowserUI = false,
+    this.entersReaderIfAvailable = false,
+    this.barCollapsingEnabled = false,
+    this.dismissButtonStyle = DismissButtonStyle_.DONE,
+    this.preferredBarTintColor,
+    this.preferredControlTintColor,
+    this.presentationStyle = ModalPresentationStyle_.FULL_SCREEN,
+    this.transitionStyle = ModalTransitionStyle_.COVER_VERTICAL,
+    this.activityButton,
+    this.eventAttribution,
+  }) {
     if (startAnimations != null) {
-      assert(startAnimations!.length == 2,
-          "start animations must be have 2 android resources");
+      assert(
+        startAnimations!.length == 2,
+        "start animations must be have 2 android resources",
+      );
     }
     if (exitAnimations != null) {
-      assert(exitAnimations!.length == 2,
-          "exit animations must be have 2 android resources");
+      assert(
+        exitAnimations!.length == 2,
+        "exit animations must be have 2 android resources",
+      );
     }
   }
 }

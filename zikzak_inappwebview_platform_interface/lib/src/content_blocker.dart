@@ -22,10 +22,13 @@ class ContentBlocker {
 
   static ContentBlocker fromMap(Map<dynamic, Map<dynamic, dynamic>> map) {
     return ContentBlocker(
-        trigger: ContentBlockerTrigger.fromMap(
-            Map<String, dynamic>.from(map["trigger"]!)),
-        action: ContentBlockerAction.fromMap(
-            Map<String, dynamic>.from(map["action"]!)));
+      trigger: ContentBlockerTrigger.fromMap(
+        Map<String, dynamic>.from(map["trigger"]!),
+      ),
+      action: ContentBlockerAction.fromMap(
+        Map<String, dynamic>.from(map["action"]!),
+      ),
+    );
   }
 
   @override
@@ -122,17 +125,18 @@ class ContentBlockerTrigger {
   ///- MacOS
   List<ContentBlockerTriggerLoadContext> loadContext;
 
-  ContentBlockerTrigger(
-      {required this.urlFilter,
-      this.ifFrameUrl = const <String>[],
-      this.urlFilterIsCaseSensitive = false,
-      this.resourceType = const <ContentBlockerTriggerResourceType>[],
-      this.ifDomain = const <String>[],
-      this.unlessDomain = const <String>[],
-      this.loadType = const <ContentBlockerTriggerLoadType>[],
-      this.ifTopUrl = const <String>[],
-      this.unlessTopUrl = const <String>[],
-      this.loadContext = const <ContentBlockerTriggerLoadContext>[]}) {
+  ContentBlockerTrigger({
+    required this.urlFilter,
+    this.ifFrameUrl = const <String>[],
+    this.urlFilterIsCaseSensitive = false,
+    this.resourceType = const <ContentBlockerTriggerResourceType>[],
+    this.ifDomain = const <String>[],
+    this.unlessDomain = const <String>[],
+    this.loadType = const <ContentBlockerTriggerLoadType>[],
+    this.ifTopUrl = const <String>[],
+    this.unlessTopUrl = const <String>[],
+    this.loadContext = const <ContentBlockerTriggerLoadContext>[],
+  }) {
     assert(!(this.ifDomain.isEmpty || this.unlessDomain.isEmpty) == false);
     assert(this.loadType.length <= 2);
     assert(!(this.ifTopUrl.isEmpty || this.unlessTopUrl.isEmpty) == false);
@@ -162,13 +166,15 @@ class ContentBlockerTrigger {
       "load-type": loadTypeStringList,
       "if-top-url": ifTopUrl,
       "unless-top-url": unlessTopUrl,
-      "load-context": loadContextStringList
+      "load-context": loadContextStringList,
     };
 
     map.keys
-        .where((key) =>
-            map[key] == null ||
-            (map[key] is List && (map[key] as List).length == 0)) // filter keys
+        .where(
+          (key) =>
+              map[key] == null ||
+              (map[key] is List && (map[key] as List).length == 0),
+        ) // filter keys
         .toList() // create a copy to avoid concurrent modifications
         .forEach(map.remove);
 
@@ -180,8 +186,9 @@ class ContentBlockerTrigger {
     List<ContentBlockerTriggerLoadType> loadType = [];
     List<ContentBlockerTriggerLoadContext> loadContext = [];
 
-    List<String> resourceTypeStringList =
-        List<String>.from(map["resource-type"] ?? []);
+    List<String> resourceTypeStringList = List<String>.from(
+      map["resource-type"] ?? [],
+    );
     resourceTypeStringList.forEach((typeValue) {
       var type = ContentBlockerTriggerResourceType.fromNativeValue(typeValue);
       if (type != null) {
@@ -197,8 +204,9 @@ class ContentBlockerTrigger {
       }
     });
 
-    List<String> loadContextStringList =
-        List<String>.from(map["load-context"] ?? []);
+    List<String> loadContextStringList = List<String>.from(
+      map["load-context"] ?? [],
+    );
     loadContextStringList.forEach((typeValue) {
       var context = ContentBlockerTriggerLoadContext.fromNativeValue(typeValue);
       if (context != null) {
@@ -207,16 +215,17 @@ class ContentBlockerTrigger {
     });
 
     return ContentBlockerTrigger(
-        urlFilter: map["url-filter"],
-        ifFrameUrl: List<String>.from(map["if-frame-url"] ?? []),
-        urlFilterIsCaseSensitive: map["url-filter-is-case-sensitive"],
-        ifDomain: List<String>.from(map["if-domain"] ?? []),
-        unlessDomain: List<String>.from(map["unless-domain"] ?? []),
-        resourceType: resourceType,
-        loadType: loadType,
-        ifTopUrl: List<String>.from(map["if-top-url"] ?? []),
-        unlessTopUrl: List<String>.from(map["unless-top-url"] ?? []),
-        loadContext: loadContext);
+      urlFilter: map["url-filter"],
+      ifFrameUrl: List<String>.from(map["if-frame-url"] ?? []),
+      urlFilterIsCaseSensitive: map["url-filter-is-case-sensitive"],
+      ifDomain: List<String>.from(map["if-domain"] ?? []),
+      unlessDomain: List<String>.from(map["unless-domain"] ?? []),
+      resourceType: resourceType,
+      loadType: loadType,
+      ifTopUrl: List<String>.from(map["if-top-url"] ?? []),
+      unlessTopUrl: List<String>.from(map["unless-top-url"] ?? []),
+      loadContext: loadContext,
+    );
   }
 
   @override
@@ -247,13 +256,15 @@ class ContentBlockerAction {
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = {
       "type": type.toNativeValue(),
-      "selector": selector
+      "selector": selector,
     };
 
     map.keys
-        .where((key) =>
-            map[key] == null ||
-            (map[key] is List && (map[key] as List).length == 0)) // filter keys
+        .where(
+          (key) =>
+              map[key] == null ||
+              (map[key] is List && (map[key] as List).length == 0),
+        ) // filter keys
         .toList() // create a copy to avoid concurrent modifications
         .forEach(map.remove);
 
@@ -262,8 +273,9 @@ class ContentBlockerAction {
 
   static ContentBlockerAction fromMap(Map<String, dynamic> map) {
     return ContentBlockerAction(
-        type: ContentBlockerActionType.fromNativeValue(map["type"])!,
-        selector: map["selector"]);
+      type: ContentBlockerActionType.fromNativeValue(map["type"])!,
+      selector: map["selector"],
+    );
   }
 
   @override

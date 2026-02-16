@@ -11,10 +11,11 @@ class PermissionResponseAction {
   final int _value;
   final int _nativeValue;
   const PermissionResponseAction._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory PermissionResponseAction._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      PermissionResponseAction._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => PermissionResponseAction._internal(value, nativeValue());
 
   ///Denies the request.
   static const DENY = PermissionResponseAction._internal(0, 0);
@@ -36,8 +37,9 @@ class PermissionResponseAction {
   static PermissionResponseAction? fromValue(int? value) {
     if (value != null) {
       try {
-        return PermissionResponseAction.values
-            .firstWhere((element) => element.toValue() == value);
+        return PermissionResponseAction.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -49,8 +51,9 @@ class PermissionResponseAction {
   static PermissionResponseAction? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return PermissionResponseAction.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return PermissionResponseAction.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }

@@ -3,8 +3,8 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 
 class FindInteractionControllerWeb extends PlatformFindInteractionController {
   FindInteractionControllerWeb(
-      PlatformFindInteractionControllerCreationParams params)
-      : super.implementation(params);
+    PlatformFindInteractionControllerCreationParams params,
+  ) : super.implementation(params);
 
   @override
   Future<void> findAll({String? find}) async {

@@ -5,8 +5,8 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 
 class MacOSInAppWebViewController extends PlatformInAppWebViewController {
   MacOSInAppWebViewController(
-      PlatformInAppWebViewControllerCreationParams params)
-      : super.implementation(params) {
+    PlatformInAppWebViewControllerCreationParams params,
+  ) : super.implementation(params) {
     _channel = MethodChannel('dev.zuzu/zikzak_inappwebview_${params.id}');
     _channel.setMethodCallHandler((call) async {
       try {
@@ -19,15 +19,16 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
   }
 
   MacOSInAppWebViewController.fromInAppBrowser(
-      PlatformInAppWebViewControllerCreationParams params,
-      MethodChannel channel)
-      : super.implementation(params) {
+    PlatformInAppWebViewControllerCreationParams params,
+    MethodChannel channel,
+  ) : super.implementation(params) {
     _channel = channel;
   }
 
   MacOSInAppWebViewController.static()
-      : super.implementation(
-            PlatformInAppWebViewControllerCreationParams(id: 'static'));
+    : super.implementation(
+        PlatformInAppWebViewControllerCreationParams(id: 'static'),
+      );
 
   late MethodChannel _channel;
 
@@ -41,14 +42,18 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
         if (params.webviewParams?.onLoadStart != null) {
           String? url = call.arguments['url'];
           params.webviewParams!.onLoadStart!(
-              controller, url != null ? WebUri(url) : null);
+            controller,
+            url != null ? WebUri(url) : null,
+          );
         }
         break;
       case 'onLoadStop':
         if (params.webviewParams?.onLoadStop != null) {
           String? url = call.arguments['url'];
           params.webviewParams!.onLoadStop!(
-              controller, url != null ? WebUri(url) : null);
+            controller,
+            url != null ? WebUri(url) : null,
+          );
         }
         break;
       case 'onReceivedError':
@@ -58,12 +63,15 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
           String message = call.arguments['message'];
 
           params.webviewParams!.onReceivedError!(
-              controller,
-              WebResourceRequest(url: url != null ? WebUri(url) : WebUri('')),
-              WebResourceError(
-                  type: WebResourceErrorType.fromNativeValue(code) ??
-                      WebResourceErrorType.UNKNOWN,
-                  description: message));
+            controller,
+            WebResourceRequest(url: url != null ? WebUri(url) : WebUri('')),
+            WebResourceError(
+              type:
+                  WebResourceErrorType.fromNativeValue(code) ??
+                  WebResourceErrorType.UNKNOWN,
+              description: message,
+            ),
+          );
         }
         break;
       case 'onProgressChanged':
@@ -77,7 +85,10 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
           String? url = call.arguments['url'];
           bool? isReload = call.arguments['isReload'];
           params.webviewParams!.onUpdateVisitedHistory!(
-              controller, url != null ? WebUri(url) : null, isReload);
+            controller,
+            url != null ? WebUri(url) : null,
+            isReload,
+          );
         }
         break;
       case 'onTitleChanged':
@@ -88,61 +99,76 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
         break;
       case 'shouldOverrideUrlLoading':
         if (params.webviewParams?.shouldOverrideUrlLoading != null) {
-          Map<String, dynamic> arguments =
-              call.arguments.cast<String, dynamic>();
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
           var navigationAction = NavigationAction.fromMap(
-              arguments['navigationAction'].cast<String, dynamic>())!;
+            arguments['navigationAction'].cast<String, dynamic>(),
+          )!;
           var policy = await params.webviewParams!.shouldOverrideUrlLoading!(
-              controller, navigationAction);
+            controller,
+            navigationAction,
+          );
           return policy?.toNativeValue() ??
               NavigationActionPolicy.CANCEL.toNativeValue();
         }
         return NavigationActionPolicy.ALLOW.toNativeValue();
       case 'onConsoleMessage':
         if (params.webviewParams?.onConsoleMessage != null) {
-          var consoleMessage =
-              ConsoleMessage.fromMap(call.arguments.cast<String, dynamic>())!;
+          var consoleMessage = ConsoleMessage.fromMap(
+            call.arguments.cast<String, dynamic>(),
+          )!;
           params.webviewParams!.onConsoleMessage!(controller, consoleMessage);
         }
         break;
       case 'onReceivedHttpError':
         if (params.webviewParams?.onReceivedHttpError != null) {
           String? url = call.arguments['request']['url'];
-          var request =
-              WebResourceRequest(url: url != null ? WebUri(url) : WebUri(''));
+          var request = WebResourceRequest(
+            url: url != null ? WebUri(url) : WebUri(''),
+          );
           var errorResponse = WebResourceResponse.fromMap(
-              call.arguments['errorResponse'].cast<String, dynamic>())!;
+            call.arguments['errorResponse'].cast<String, dynamic>(),
+          )!;
           params.webviewParams!.onReceivedHttpError!(
-              controller, request, errorResponse);
+            controller,
+            request,
+            errorResponse,
+          );
         }
         break;
       case 'onJsAlert':
         if (params.webviewParams?.onJsAlert != null) {
-          Map<String, dynamic> arguments =
-              call.arguments.cast<String, dynamic>();
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
           var request = JsAlertRequest.fromMap(arguments)!;
-          var response =
-              await params.webviewParams!.onJsAlert!(controller, request);
+          var response = await params.webviewParams!.onJsAlert!(
+            controller,
+            request,
+          );
           return response?.toMap();
         }
         return null;
       case 'onJsConfirm':
         if (params.webviewParams?.onJsConfirm != null) {
-          Map<String, dynamic> arguments =
-              call.arguments.cast<String, dynamic>();
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
           var request = JsConfirmRequest.fromMap(arguments)!;
-          var response =
-              await params.webviewParams!.onJsConfirm!(controller, request);
+          var response = await params.webviewParams!.onJsConfirm!(
+            controller,
+            request,
+          );
           return response?.toMap();
         }
         return null;
       case 'onJsPrompt':
         if (params.webviewParams?.onJsPrompt != null) {
-          Map<String, dynamic> arguments =
-              call.arguments.cast<String, dynamic>();
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
           var request = JsPromptRequest.fromMap(arguments)!;
-          var response =
-              await params.webviewParams!.onJsPrompt!(controller, request);
+          var response = await params.webviewParams!.onJsPrompt!(
+            controller,
+            request,
+          );
           return response?.toMap();
         }
         return null;
@@ -168,12 +194,16 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
   }
 
   @override
-  Future<void> loadUrl(
-      {required URLRequest urlRequest, WebUri? allowingReadAccessTo}) async {
+  Future<void> loadUrl({
+    required URLRequest urlRequest,
+    WebUri? allowingReadAccessTo,
+  }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('urlRequest', () => urlRequest.toMap());
     args.putIfAbsent(
-        'allowingReadAccessTo', () => allowingReadAccessTo.toString());
+      'allowingReadAccessTo',
+      () => allowingReadAccessTo.toString(),
+    );
     await _channel.invokeMethod('loadUrl', args);
   }
 
@@ -213,8 +243,10 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
   }
 
   @override
-  Future<dynamic> evaluateJavascript(
-      {required String source, ContentWorld? contentWorld}) async {
+  Future<dynamic> evaluateJavascript({
+    required String source,
+    ContentWorld? contentWorld,
+  }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('source', () => source);
     args.putIfAbsent('contentWorld', () => contentWorld?.toMap());

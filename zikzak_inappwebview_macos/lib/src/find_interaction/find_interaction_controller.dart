@@ -6,8 +6,8 @@ class MacOSFindInteractionController extends PlatformFindInteractionController
     with ChannelController {
   /// Constructs a [MacOSFindInteractionController].
   MacOSFindInteractionController(
-      PlatformFindInteractionControllerCreationParams params)
-      : super.implementation(params);
+    PlatformFindInteractionControllerCreationParams params,
+  ) : super.implementation(params);
 
   Future<dynamic> _handleMethod(MethodCall call) async {
     switch (call.method) {
@@ -17,7 +17,11 @@ class MacOSFindInteractionController extends PlatformFindInteractionController
           int numberOfMatches = call.arguments["numberOfMatches"];
           bool isDoneCounting = call.arguments["isDoneCounting"];
           onFindResultReceived!(
-              this, activeMatchOrdinal, numberOfMatches, isDoneCounting);
+            this,
+            activeMatchOrdinal,
+            numberOfMatches,
+            isDoneCounting,
+          );
         }
         break;
       default:

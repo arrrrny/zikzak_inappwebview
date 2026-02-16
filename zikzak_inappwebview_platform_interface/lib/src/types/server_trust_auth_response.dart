@@ -10,6 +10,7 @@ class ServerTrustAuthResponse_ {
   ///Indicate the [ServerTrustAuthResponseAction] to take in response of the server trust authentication challenge.
   ServerTrustAuthResponseAction_? action;
 
-  ServerTrustAuthResponse_(
-      {this.action = ServerTrustAuthResponseAction_.CANCEL});
+  ServerTrustAuthResponse_({
+    this.action = ServerTrustAuthResponseAction_.CANCEL,
+  });
 }

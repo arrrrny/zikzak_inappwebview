@@ -11,10 +11,11 @@ class ModalPresentationStyle {
   final int _value;
   final int _nativeValue;
   const ModalPresentationStyle._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory ModalPresentationStyle._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      ModalPresentationStyle._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => ModalPresentationStyle._internal(value, nativeValue());
 
   ///The default presentation style chosen by the system.
   ///
@@ -66,8 +67,9 @@ class ModalPresentationStyle {
   static ModalPresentationStyle? fromValue(int? value) {
     if (value != null) {
       try {
-        return ModalPresentationStyle.values
-            .firstWhere((element) => element.toValue() == value);
+        return ModalPresentationStyle.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -79,8 +81,9 @@ class ModalPresentationStyle {
   static ModalPresentationStyle? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return ModalPresentationStyle.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return ModalPresentationStyle.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }

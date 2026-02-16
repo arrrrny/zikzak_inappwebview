@@ -46,20 +46,21 @@ class FetchRequest {
 
   ///The URL of the request.
   WebUri? url;
-  FetchRequest(
-      {this.action = FetchRequestAction.PROCEED,
-      this.body,
-      this.cache,
-      this.credentials,
-      this.headers,
-      this.integrity,
-      this.keepalive,
-      this.method,
-      this.mode,
-      this.redirect,
-      this.referrer,
-      this.referrerPolicy,
-      this.url});
+  FetchRequest({
+    this.action = FetchRequestAction.PROCEED,
+    this.body,
+    this.cache,
+    this.credentials,
+    this.headers,
+    this.integrity,
+    this.keepalive,
+    this.method,
+    this.mode,
+    this.redirect,
+    this.referrer,
+    this.referrerPolicy,
+    this.url,
+  });
 
   ///Gets a possible [FetchRequest] instance from a [Map] value.
   static FetchRequest? fromMap(Map<String, dynamic>? map) {

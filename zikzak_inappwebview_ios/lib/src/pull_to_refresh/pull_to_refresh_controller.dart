@@ -15,11 +15,14 @@ class IOSPullToRefreshControllerCreationParams
 
   /// Creates a [IOSPullToRefreshControllerCreationParams] instance based on [PlatformPullToRefreshControllerCreationParams].
   factory IOSPullToRefreshControllerCreationParams.fromPlatformPullToRefreshControllerCreationParams(
-      // Recommended placeholder to prevent being broken by platform interface.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformPullToRefreshControllerCreationParams params) {
+    // Recommended placeholder to prevent being broken by platform interface.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformPullToRefreshControllerCreationParams params,
+  ) {
     return IOSPullToRefreshControllerCreationParams(
-        onRefresh: params.onRefresh, settings: params.settings);
+      onRefresh: params.onRefresh,
+      settings: params.settings,
+    );
   }
 }
 
@@ -28,21 +31,23 @@ class IOSPullToRefreshController extends PlatformPullToRefreshController
     with ChannelController {
   /// Constructs a [IOSPullToRefreshController].
   IOSPullToRefreshController(
-      PlatformPullToRefreshControllerCreationParams params)
-      : super.implementation(
-          params is IOSPullToRefreshControllerCreationParams
-              ? params
-              : IOSPullToRefreshControllerCreationParams
-                  .fromPlatformPullToRefreshControllerCreationParams(params),
-        );
+    PlatformPullToRefreshControllerCreationParams params,
+  ) : super.implementation(
+        params is IOSPullToRefreshControllerCreationParams
+            ? params
+            : IOSPullToRefreshControllerCreationParams.fromPlatformPullToRefreshControllerCreationParams(
+                params,
+              ),
+      );
 
   _debugLog(String method, dynamic args) {
     debugLog(
-        className: this.runtimeType.toString(),
-        debugLoggingSettings:
-            PlatformPullToRefreshController.debugLoggingSettings,
-        method: method,
-        args: args);
+      className: this.runtimeType.toString(),
+      debugLoggingSettings:
+          PlatformPullToRefreshController.debugLoggingSettings,
+      method: method,
+      args: args,
+    );
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {
@@ -122,8 +127,9 @@ class IOSPullToRefreshController extends PlatformPullToRefreshController
 
 extension InternalPullToRefreshController on IOSPullToRefreshController {
   void init(dynamic id) {
-    channel =
-        MethodChannel('wtf.zikzak/zikzak_inappwebview_pull_to_refresh_$id');
+    channel = MethodChannel(
+      'wtf.zikzak/zikzak_inappwebview_pull_to_refresh_$id',
+    );
     handler = _handleMethod;
     initMethodCallHandler();
   }

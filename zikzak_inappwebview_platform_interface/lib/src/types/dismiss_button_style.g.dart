@@ -11,10 +11,11 @@ class DismissButtonStyle {
   final int _value;
   final int _nativeValue;
   const DismissButtonStyle._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory DismissButtonStyle._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      DismissButtonStyle._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => DismissButtonStyle._internal(value, nativeValue());
 
   ///Makes the button title the localized string "Cancel".
   static const CANCEL = DismissButtonStyle._internal(2, 2);
@@ -36,8 +37,9 @@ class DismissButtonStyle {
   static DismissButtonStyle? fromValue(int? value) {
     if (value != null) {
       try {
-        return DismissButtonStyle.values
-            .firstWhere((element) => element.toValue() == value);
+        return DismissButtonStyle.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -49,8 +51,9 @@ class DismissButtonStyle {
   static DismissButtonStyle? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return DismissButtonStyle.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return DismissButtonStyle.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }

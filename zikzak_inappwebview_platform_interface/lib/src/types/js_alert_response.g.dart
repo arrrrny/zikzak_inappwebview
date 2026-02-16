@@ -19,11 +19,12 @@ class JsAlertResponse {
 
   ///Message to be displayed in the window.
   String message;
-  JsAlertResponse(
-      {this.action = JsAlertResponseAction.CONFIRM,
-      this.confirmButtonTitle = "",
-      this.handledByClient = false,
-      this.message = ""});
+  JsAlertResponse({
+    this.action = JsAlertResponseAction.CONFIRM,
+    this.confirmButtonTitle = "",
+    this.handledByClient = false,
+    this.message = "",
+  });
 
   ///Gets a possible [JsAlertResponse] instance from a [Map] value.
   static JsAlertResponse? fromMap(Map<String, dynamic>? map) {

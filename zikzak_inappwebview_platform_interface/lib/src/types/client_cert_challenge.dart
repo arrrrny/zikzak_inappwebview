@@ -11,28 +11,34 @@ part 'client_cert_challenge.g.dart';
 @ExchangeableObject()
 class ClientCertChallenge_ extends URLAuthenticationChallenge_ {
   ///The acceptable certificate issuers for the certificate matching the private key.
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
         apiName: "ClientCertRequest.getPrincipals",
         apiUrl:
             "https://developer.android.com/reference/android/webkit/ClientCertRequest#getPrincipals()",
-        available: "21")
-  ])
+        available: "21",
+      ),
+    ],
+  )
   List<String>? principals;
 
   ///Returns the acceptable types of asymmetric keys.
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
         apiName: "ClientCertRequest.getKeyTypes",
         apiUrl:
             "https://developer.android.com/reference/android/webkit/ClientCertRequest#getKeyTypes()",
-        available: "21")
-  ])
+        available: "21",
+      ),
+    ],
+  )
   List<String>? keyTypes;
 
-  ClientCertChallenge_(
-      {required URLProtectionSpace_ protectionSpace,
-      this.principals,
-      this.keyTypes})
-      : super(protectionSpace: protectionSpace);
+  ClientCertChallenge_({
+    required URLProtectionSpace_ protectionSpace,
+    this.principals,
+    this.keyTypes,
+  }) : super(protectionSpace: protectionSpace);
 }

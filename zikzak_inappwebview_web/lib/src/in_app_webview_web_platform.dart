@@ -14,19 +14,22 @@ class ZikzakInAppWebViewWebPlatform extends InAppWebViewPlatform {
 
   @override
   PlatformInAppWebViewWidget createPlatformInAppWebViewWidget(
-      PlatformInAppWebViewWidgetCreationParams params) {
+    PlatformInAppWebViewWidgetCreationParams params,
+  ) {
     return InAppWebViewWebElement(params);
   }
 
   @override
   PlatformFindInteractionController createPlatformFindInteractionController(
-      PlatformFindInteractionControllerCreationParams params) {
+    PlatformFindInteractionControllerCreationParams params,
+  ) {
     return FindInteractionControllerWeb(params);
   }
 
   @override
   PlatformHeadlessInAppWebView createPlatformHeadlessInAppWebView(
-      PlatformHeadlessInAppWebViewCreationParams params) {
+    PlatformHeadlessInAppWebViewCreationParams params,
+  ) {
     return HeadlessInAppWebViewWeb(params);
   }
 }

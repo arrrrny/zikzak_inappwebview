@@ -11,8 +11,9 @@ import '../in_app_webview_controller.dart';
 class IOSInAppWebViewController {
   PlatformInAppWebViewController? _controller;
 
-  IOSInAppWebViewController(
-      {required PlatformInAppWebViewController controller}) {
+  IOSInAppWebViewController({
+    required PlatformInAppWebViewController controller,
+  }) {
     this._controller = controller;
   }
 

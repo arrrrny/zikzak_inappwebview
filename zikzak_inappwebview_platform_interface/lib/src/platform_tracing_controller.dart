@@ -34,7 +34,8 @@ abstract class PlatformTracingController extends PlatformInterface
     implements Disposable {
   /// Creates a new [PlatformTracingController]
   factory PlatformTracingController(
-      PlatformTracingControllerCreationParams params) {
+    PlatformTracingControllerCreationParams params,
+  ) {
     assert(
       InAppWebViewPlatform.instance != null,
       'A platform implementation for `zikzak_inappwebview` has not been set. Please '
@@ -42,8 +43,9 @@ abstract class PlatformTracingController extends PlatformInterface
       '`WebViewPlatform.instance` before use. For unit testing, '
       '`WebViewPlatform.instance` can be set with your own test implementation.',
     );
-    final PlatformTracingController tracingController =
-        InAppWebViewPlatform.instance!.createPlatformTracingController(params);
+    final PlatformTracingController tracingController = InAppWebViewPlatform
+        .instance!
+        .createPlatformTracingController(params);
     PlatformInterface.verify(tracingController, _token);
     return tracingController;
   }
@@ -73,7 +75,8 @@ abstract class PlatformTracingController extends PlatformInterface
   ///{@endtemplate}
   Future<void> start({required TracingSettings settings}) {
     throw UnimplementedError(
-        'start is not implemented on the current platform');
+      'start is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformTracingController.stop}
@@ -99,7 +102,8 @@ abstract class PlatformTracingController extends PlatformInterface
   ///{@endtemplate}
   Future<bool> isTracing() {
     throw UnimplementedError(
-        'isTracing is not implemented on the current platform');
+      'isTracing is not implemented on the current platform',
+    );
   }
 }
 
@@ -145,7 +149,9 @@ class TracingSettings_ {
   ///
   ///A category pattern can contain wildcards, e.g. `"blink*"` or full category name e.g. `"renderer.scheduler"`.
   @ExchangeableObjectProperty(
-      deserializer: _deserializeCategories, serializer: _serializeCategories)
+    deserializer: _deserializeCategories,
+    serializer: _serializeCategories,
+  )
   List<dynamic> categories;
 
   ///The tracing mode for this configuration.
@@ -155,11 +161,12 @@ class TracingSettings_ {
   @ExchangeableObjectConstructor()
   TracingSettings_({this.categories = const [], this.tracingMode}) {
     assert(
-        this
-            .categories
-            .map((e) =>
-                e.runtimeType is String || e.runtimeType is TracingCategory)
-            .contains(false),
-        "categories must contain only String or TracingCategory items");
+      this.categories
+          .map(
+            (e) => e.runtimeType is String || e.runtimeType is TracingCategory,
+          )
+          .contains(false),
+      "categories must contain only String or TracingCategory items",
+    );
   }
 }

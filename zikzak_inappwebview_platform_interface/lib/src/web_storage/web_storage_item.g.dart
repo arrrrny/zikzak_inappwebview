@@ -20,19 +20,13 @@ class WebStorageItem {
     if (map == null) {
       return null;
     }
-    final instance = WebStorageItem(
-      key: map['key'],
-      value: map['value'],
-    );
+    final instance = WebStorageItem(key: map['key'], value: map['value']);
     return instance;
   }
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
-    return {
-      "key": key,
-      "value": value,
-    };
+    return {"key": key, "value": value};
   }
 
   ///Converts instance to a map.

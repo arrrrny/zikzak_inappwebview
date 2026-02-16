@@ -27,9 +27,10 @@ class PrintJobResolution_ {
   ///The horizontal resolution in DPI (dots per inch).
   final int horizontalDpi;
 
-  const PrintJobResolution_(
-      {required this.id,
-      required this.label,
-      required this.verticalDpi,
-      required this.horizontalDpi});
+  const PrintJobResolution_({
+    required this.id,
+    required this.label,
+    required this.verticalDpi,
+    required this.horizontalDpi,
+  });
 }

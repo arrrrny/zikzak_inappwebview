@@ -21,6 +21,8 @@ class ActivityButton_ {
   String extensionIdentifier;
 
   @ExchangeableObjectConstructor()
-  ActivityButton_(
-      {required this.templateImage, required this.extensionIdentifier});
+  ActivityButton_({
+    required this.templateImage,
+    required this.extensionIdentifier,
+  });
 }

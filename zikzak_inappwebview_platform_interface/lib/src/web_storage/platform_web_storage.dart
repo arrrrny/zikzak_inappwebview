@@ -14,8 +14,10 @@ import 'web_storage_item.dart';
 @immutable
 class PlatformWebStorageCreationParams {
   /// Used by the platform implementation to create a new [PlatformWebStorage].
-  const PlatformWebStorageCreationParams(
-      {required this.localStorage, required this.sessionStorage});
+  const PlatformWebStorageCreationParams({
+    required this.localStorage,
+    required this.sessionStorage,
+  });
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformWebStorage.localStorage}
   final PlatformLocalStorage localStorage;
@@ -46,8 +48,8 @@ abstract class PlatformWebStorage extends PlatformInterface
       '`InAppWebViewPlatform.instance` before use. For unit testing, '
       '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
-    final PlatformWebStorage webStorage =
-        InAppWebViewPlatform.instance!.createPlatformWebStorage(params);
+    final PlatformWebStorage webStorage = InAppWebViewPlatform.instance!
+        .createPlatformWebStorage(params);
     PlatformInterface.verify(webStorage, _token);
     return webStorage;
   }
@@ -79,7 +81,8 @@ abstract class PlatformWebStorage extends PlatformInterface
   ///{@endtemplate}
   void dispose() {
     throw UnimplementedError(
-        'dispose is not implemented on the current platform');
+      'dispose is not implemented on the current platform',
+    );
   }
 }
 
@@ -90,8 +93,10 @@ abstract class PlatformWebStorage extends PlatformInterface
 @immutable
 class PlatformStorageCreationParams {
   /// Used by the platform implementation to create a new [PlatformStorage].
-  const PlatformStorageCreationParams(
-      {required this.controller, required this.webStorageType});
+  const PlatformStorageCreationParams({
+    required this.controller,
+    required this.webStorageType,
+  });
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformStorage.controller}
   final PlatformInAppWebViewController? controller;
@@ -115,7 +120,8 @@ abstract mixin class PlatformStorage implements Disposable {
   ///{@endtemplate}
   WebStorageType get webStorageType {
     throw UnimplementedError(
-        'webStorageType is not implemented on the current platform');
+      'webStorageType is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformStorage.length}
@@ -131,7 +137,8 @@ abstract mixin class PlatformStorage implements Disposable {
   ///{@endtemplate}
   Future<int?> length() {
     throw UnimplementedError(
-        'length is not implemented on the current platform');
+      'length is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformStorage.setItem}
@@ -147,7 +154,8 @@ abstract mixin class PlatformStorage implements Disposable {
   ///{@endtemplate}
   Future<void> setItem({required String key, required dynamic value}) {
     throw UnimplementedError(
-        'setItem is not implemented on the current platform');
+      'setItem is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformStorage.getItem}
@@ -163,7 +171,8 @@ abstract mixin class PlatformStorage implements Disposable {
   ///{@endtemplate}
   Future<dynamic> getItem({required String key}) {
     throw UnimplementedError(
-        'getItem is not implemented on the current platform');
+      'getItem is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformStorage.removeItem}
@@ -179,7 +188,8 @@ abstract mixin class PlatformStorage implements Disposable {
   ///{@endtemplate}
   Future<void> removeItem({required String key}) {
     throw UnimplementedError(
-        'removeItem is not implemented on the current platform');
+      'removeItem is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformStorage.getItems}
@@ -195,7 +205,8 @@ abstract mixin class PlatformStorage implements Disposable {
   ///{@endtemplate}
   Future<List<WebStorageItem>> getItems() {
     throw UnimplementedError(
-        'getItems is not implemented on the current platform');
+      'getItems is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformStorage.clear}
@@ -211,7 +222,8 @@ abstract mixin class PlatformStorage implements Disposable {
   ///{@endtemplate}
   Future<void> clear() {
     throw UnimplementedError(
-        'clear is not implemented on the current platform');
+      'clear is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformStorage.key}
@@ -233,7 +245,8 @@ abstract mixin class PlatformStorage implements Disposable {
   @override
   void dispose() {
     throw UnimplementedError(
-        'dispose is not implemented on the current platform');
+      'dispose is not implemented on the current platform',
+    );
   }
 }
 
@@ -249,12 +262,14 @@ class PlatformLocalStorageCreationParams extends PlatformStorageCreationParams {
     // ignore: avoid_unused_constructor_parameters
     PlatformStorageCreationParams params,
   ) : super(
-            controller: params.controller,
-            webStorageType: WebStorageType.LOCAL_STORAGE);
+        controller: params.controller,
+        webStorageType: WebStorageType.LOCAL_STORAGE,
+      );
 
   /// Creates a [AndroidCookieManagerCreationParams] instance based on [PlatformCookieManagerCreationParams].
   factory PlatformLocalStorageCreationParams.fromPlatformStorageCreationParams(
-      PlatformStorageCreationParams params) {
+    PlatformStorageCreationParams params,
+  ) {
     return PlatformLocalStorageCreationParams(params);
   }
 }
@@ -274,8 +289,8 @@ abstract class PlatformLocalStorage extends PlatformInterface
       '`InAppWebViewPlatform.instance` before use. For unit testing, '
       '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
-    final PlatformLocalStorage localStorage =
-        InAppWebViewPlatform.instance!.createPlatformLocalStorage(params);
+    final PlatformLocalStorage localStorage = InAppWebViewPlatform.instance!
+        .createPlatformLocalStorage(params);
     PlatformInterface.verify(localStorage, _token);
     return localStorage;
   }
@@ -309,12 +324,14 @@ class PlatformSessionStorageCreationParams
     // ignore: avoid_unused_constructor_parameters
     PlatformStorageCreationParams params,
   ) : super(
-            controller: params.controller,
-            webStorageType: WebStorageType.SESSION_STORAGE);
+        controller: params.controller,
+        webStorageType: WebStorageType.SESSION_STORAGE,
+      );
 
   /// Creates a [AndroidCookieManagerCreationParams] instance based on [PlatformCookieManagerCreationParams].
   factory PlatformSessionStorageCreationParams.fromPlatformStorageCreationParams(
-      PlatformStorageCreationParams params) {
+    PlatformStorageCreationParams params,
+  ) {
     return PlatformSessionStorageCreationParams(params);
   }
 }
@@ -334,8 +351,8 @@ abstract class PlatformSessionStorage extends PlatformInterface
       '`InAppWebViewPlatform.instance` before use. For unit testing, '
       '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
-    final PlatformSessionStorage sessionStorage =
-        InAppWebViewPlatform.instance!.createPlatformSessionStorage(params);
+    final PlatformSessionStorage sessionStorage = InAppWebViewPlatform.instance!
+        .createPlatformSessionStorage(params);
     PlatformInterface.verify(sessionStorage, _token);
     return sessionStorage;
   }

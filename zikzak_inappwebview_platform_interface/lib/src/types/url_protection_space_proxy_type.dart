@@ -12,20 +12,24 @@ class URLProtectionSpaceProxyType_ {
   ///The proxy type for HTTP proxies.
   static const URL_PROTECTION_SPACE_HTTP_PROXY =
       const URLProtectionSpaceProxyType_._internal(
-          "NSURLProtectionSpaceHTTPProxy");
+        "NSURLProtectionSpaceHTTPProxy",
+      );
 
   ///The proxy type for HTTPS proxies.
   static const URL_PROTECTION_SPACE_HTTPS_PROXY =
       const URLProtectionSpaceProxyType_._internal(
-          "NSURLProtectionSpaceHTTPSProxy");
+        "NSURLProtectionSpaceHTTPSProxy",
+      );
 
   ///The proxy type for FTP proxies.
   static const URL_PROTECTION_SPACE_FTP_PROXY =
       const URLProtectionSpaceProxyType_._internal(
-          "NSURLProtectionSpaceFTPProxy");
+        "NSURLProtectionSpaceFTPProxy",
+      );
 
   ///The proxy type for SOCKS proxies.
   static const URL_PROTECTION_SPACE_SOCKS_PROXY =
       const URLProtectionSpaceProxyType_._internal(
-          "NSURLProtectionSpaceSOCKSProxy");
+        "NSURLProtectionSpaceSOCKSProxy",
+      );
 }

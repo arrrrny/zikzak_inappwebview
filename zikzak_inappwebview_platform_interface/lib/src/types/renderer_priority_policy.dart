@@ -18,7 +18,8 @@ class RendererPriorityPolicy_ {
   ///If `true`, this flag specifies that when this WebView is not visible, it will be treated as if it had requested a priority of [RendererPriority.RENDERER_PRIORITY_WAIVED].
   bool waivedWhenNotVisible;
 
-  RendererPriorityPolicy_(
-      {required this.rendererRequestedPriority,
-      required this.waivedWhenNotVisible});
+  RendererPriorityPolicy_({
+    required this.rendererRequestedPriority,
+    required this.waivedWhenNotVisible,
+  });
 }

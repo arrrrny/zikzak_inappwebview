@@ -101,16 +101,17 @@ class Cookie {
   ///- Web but iframe requires same origin
   ///- Windows
   dynamic value;
-  Cookie(
-      {this.domain,
-      this.expiresDate,
-      this.isHttpOnly,
-      this.isSecure,
-      this.isSessionOnly,
-      required this.name,
-      this.path,
-      this.sameSite,
-      this.value});
+  Cookie({
+    this.domain,
+    this.expiresDate,
+    this.isHttpOnly,
+    this.isSecure,
+    this.isSessionOnly,
+    required this.name,
+    this.path,
+    this.sameSite,
+    this.value,
+  });
 
   ///Gets a possible [Cookie] instance from a [Map] value.
   static Cookie? fromMap(Map<String, dynamic>? map) {

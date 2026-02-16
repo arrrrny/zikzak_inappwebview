@@ -4,8 +4,9 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 class WebMessagePort implements IWebMessagePort {
   ///{@macro zikzak_inappwebview_platform_interface.PlatformWebMessagePort}
   WebMessagePort({required int index})
-      : this.fromPlatformCreationParams(
-            params: PlatformWebMessagePortCreationParams(index: index));
+    : this.fromPlatformCreationParams(
+        params: PlatformWebMessagePortCreationParams(index: index),
+      );
 
   /// Constructs a [WebMessagePort].
   ///

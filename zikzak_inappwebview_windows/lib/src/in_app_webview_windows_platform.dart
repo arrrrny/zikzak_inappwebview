@@ -8,15 +8,15 @@ import 'in_app_webview_windows_controller.dart';
 
 class InAppWebViewWindowsPlatform extends PlatformInAppWebViewController {
   InAppWebViewWindowsPlatform(
-      PlatformInAppWebViewControllerCreationParams params)
-      : super.implementation(params);
+    PlatformInAppWebViewControllerCreationParams params,
+  ) : super.implementation(params);
 
   // TODO: Implement platform controller logic for Windows
 }
 
 class InAppWebViewWindowsWidget extends PlatformInAppWebViewWidget {
   InAppWebViewWindowsWidget(PlatformInAppWebViewWidgetCreationParams params)
-      : super.implementation(params);
+    : super.implementation(params);
 
   @override
   Widget build(BuildContext context) {
@@ -77,16 +77,21 @@ class _InAppWebViewWindowsWidgetStateImpl
 
       // Load initial URL
       if (widget.params.initialUrlRequest != null) {
-        await _controller
-            .loadUrl(widget.params.initialUrlRequest!.url.toString());
+        await _controller.loadUrl(
+          widget.params.initialUrlRequest!.url.toString(),
+        );
       }
 
       // Create controller
       final controllerParams = PlatformInAppWebViewControllerCreationParams(
-          id: widget.params.windowId, webviewParams: widget.params);
+        id: widget.params.windowId,
+        webviewParams: widget.params,
+      );
 
-      final controller =
-          InAppWebViewWindowsController(controllerParams, _controller);
+      final controller = InAppWebViewWindowsController(
+        controllerParams,
+        _controller,
+      );
 
       if (widget.params.onWebViewCreated != null) {
         widget.params.onWebViewCreated!(controller);

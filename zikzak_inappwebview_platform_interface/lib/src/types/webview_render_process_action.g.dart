@@ -12,10 +12,11 @@ class WebViewRenderProcessAction {
   final int _value;
   final int _nativeValue;
   const WebViewRenderProcessAction._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory WebViewRenderProcessAction._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      WebViewRenderProcessAction._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => WebViewRenderProcessAction._internal(value, nativeValue());
 
   ///Cause this renderer to terminate.
   static const TERMINATE = WebViewRenderProcessAction._internal(0, 0);
@@ -29,8 +30,9 @@ class WebViewRenderProcessAction {
   static WebViewRenderProcessAction? fromValue(int? value) {
     if (value != null) {
       try {
-        return WebViewRenderProcessAction.values
-            .firstWhere((element) => element.toValue() == value);
+        return WebViewRenderProcessAction.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -42,8 +44,9 @@ class WebViewRenderProcessAction {
   static WebViewRenderProcessAction? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return WebViewRenderProcessAction.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return WebViewRenderProcessAction.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }

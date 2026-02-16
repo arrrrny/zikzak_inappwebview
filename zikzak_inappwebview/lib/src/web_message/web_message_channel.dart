@@ -4,13 +4,17 @@ import 'web_message_port.dart';
 ///{@macro zikzak_inappwebview_platform_interface.PlatformWebMessageChannel}
 class WebMessageChannel {
   ///{@macro zikzak_inappwebview_platform_interface.PlatformWebMessageChannel}
-  WebMessageChannel(
-      {required String id,
-      required WebMessagePort port1,
-      required WebMessagePort port2})
-      : this.fromPlatformCreationParams(
-            params: PlatformWebMessageChannelCreationParams(
-                id: id, port1: port1.platform, port2: port2.platform));
+  WebMessageChannel({
+    required String id,
+    required WebMessagePort port1,
+    required WebMessagePort port2,
+  }) : this.fromPlatformCreationParams(
+         params: PlatformWebMessageChannelCreationParams(
+           id: id,
+           port1: port1.platform,
+           port2: port2.platform,
+         ),
+       );
 
   /// Constructs a [WebMessageChannel].
   ///
@@ -27,8 +31,8 @@ class WebMessageChannel {
   final PlatformWebMessageChannel platform;
 
   static WebMessageChannel? fromMap(Map<String, dynamic>? map) {
-    PlatformWebMessageChannel? platform =
-        PlatformWebMessageChannel.static().fromMap(map);
+    PlatformWebMessageChannel? platform = PlatformWebMessageChannel.static()
+        .fromMap(map);
     if (platform == null) {
       return null;
     }

@@ -11,9 +11,9 @@ class ChromeSafariBrowser implements PlatformChromeSafariBrowserEvents {
   ///
   /// {@macro zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser}
   ChromeSafariBrowser()
-      : this.fromPlatformCreationParams(
-          PlatformChromeSafariBrowserCreationParams(),
-        );
+    : this.fromPlatformCreationParams(
+        PlatformChromeSafariBrowserCreationParams(),
+      );
 
   /// Constructs a [ChromeSafariBrowser] from creation params for a specific
   /// platform.
@@ -34,18 +34,20 @@ class ChromeSafariBrowser implements PlatformChromeSafariBrowserEvents {
   String get id => platform.id;
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.open}
-  Future<void> open(
-      {WebUri? url,
-      Map<String, String>? headers,
-      List<WebUri>? otherLikelyURLs,
-      WebUri? referrer,
-      ChromeSafariBrowserSettings? settings}) {
+  Future<void> open({
+    WebUri? url,
+    Map<String, String>? headers,
+    List<WebUri>? otherLikelyURLs,
+    WebUri? referrer,
+    ChromeSafariBrowserSettings? settings,
+  }) {
     this.platform.eventHandler = this;
     return platform.open(
-        url: url,
-        headers: headers,
-        otherLikelyURLs: otherLikelyURLs,
-        settings: settings);
+      url: url,
+      headers: headers,
+      otherLikelyURLs: otherLikelyURLs,
+      settings: settings,
+    );
   }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.launchUrl}
@@ -54,21 +56,22 @@ class ChromeSafariBrowser implements PlatformChromeSafariBrowserEvents {
     Map<String, String>? headers,
     List<WebUri>? otherLikelyURLs,
     WebUri? referrer,
-  }) =>
-      platform.launchUrl(
-          url: url,
-          headers: headers,
-          otherLikelyURLs: otherLikelyURLs,
-          referrer: referrer);
+  }) => platform.launchUrl(
+    url: url,
+    headers: headers,
+    otherLikelyURLs: otherLikelyURLs,
+    referrer: referrer,
+  );
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.mayLaunchUrl}
   Future<bool> mayLaunchUrl({WebUri? url, List<WebUri>? otherLikelyURLs}) =>
       platform.mayLaunchUrl(url: url, otherLikelyURLs: otherLikelyURLs);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.validateRelationship}
-  Future<bool> validateRelationship(
-          {required CustomTabsRelationType relation, required WebUri origin}) =>
-      platform.validateRelationship(relation: relation, origin: origin);
+  Future<bool> validateRelationship({
+    required CustomTabsRelationType relation,
+    required WebUri origin,
+  }) => platform.validateRelationship(relation: relation, origin: origin);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.close}
   Future<void> close() => platform.close();
@@ -81,19 +84,20 @@ class ChromeSafariBrowser implements PlatformChromeSafariBrowserEvents {
       platform.setActionButton(actionButton);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.updateActionButton}
-  Future<void> updateActionButton(
-          {required Uint8List icon, required String description}) =>
-      platform.updateActionButton(icon: icon, description: description);
+  Future<void> updateActionButton({
+    required Uint8List icon,
+    required String description,
+  }) => platform.updateActionButton(icon: icon, description: description);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.setSecondaryToolbar}
   void setSecondaryToolbar(
-          ChromeSafariBrowserSecondaryToolbar secondaryToolbar) =>
-      platform.setSecondaryToolbar(secondaryToolbar);
+    ChromeSafariBrowserSecondaryToolbar secondaryToolbar,
+  ) => platform.setSecondaryToolbar(secondaryToolbar);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.updateSecondaryToolbar}
   Future<void> updateSecondaryToolbar(
-          ChromeSafariBrowserSecondaryToolbar secondaryToolbar) =>
-      platform.updateSecondaryToolbar(secondaryToolbar);
+    ChromeSafariBrowserSecondaryToolbar secondaryToolbar,
+  ) => platform.updateSecondaryToolbar(secondaryToolbar);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.addMenuItem}
   void addMenuItem(ChromeSafariBrowserMenuItem menuItem) =>
@@ -104,10 +108,13 @@ class ChromeSafariBrowser implements PlatformChromeSafariBrowserEvents {
       platform.addMenuItems(menuItems);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.requestPostMessageChannel}
-  Future<bool> requestPostMessageChannel(
-          {required WebUri sourceOrigin, WebUri? targetOrigin}) =>
-      platform.requestPostMessageChannel(
-          sourceOrigin: sourceOrigin, targetOrigin: targetOrigin);
+  Future<bool> requestPostMessageChannel({
+    required WebUri sourceOrigin,
+    WebUri? targetOrigin,
+  }) => platform.requestPostMessageChannel(
+    sourceOrigin: sourceOrigin,
+    targetOrigin: targetOrigin,
+  );
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.postMessage}
   Future<CustomTabsPostMessageResultType> postMessage(String message) =>
@@ -126,10 +133,13 @@ class ChromeSafariBrowser implements PlatformChromeSafariBrowserEvents {
       PlatformChromeSafariBrowser.static().getMaxToolbarItems();
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.getPackageName}
-  static Future<String?> getPackageName(
-          {List<String>? packages, bool ignoreDefault = false}) =>
-      PlatformChromeSafariBrowser.static()
-          .getPackageName(packages: packages, ignoreDefault: ignoreDefault);
+  static Future<String?> getPackageName({
+    List<String>? packages,
+    bool ignoreDefault = false,
+  }) => PlatformChromeSafariBrowser.static().getPackageName(
+    packages: packages,
+    ignoreDefault: ignoreDefault,
+  );
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.clearWebsiteData}
   static Future<void> clearWebsiteData() =>
@@ -141,9 +151,10 @@ class ChromeSafariBrowser implements PlatformChromeSafariBrowserEvents {
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.invalidatePrewarmingToken}
   static Future<void> invalidatePrewarmingToken(
-          PrewarmingToken prewarmingToken) =>
-      PlatformChromeSafariBrowser.static()
-          .invalidatePrewarmingToken(prewarmingToken);
+    PrewarmingToken prewarmingToken,
+  ) => PlatformChromeSafariBrowser.static().invalidatePrewarmingToken(
+    prewarmingToken,
+  );
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.dispose}
   @mustCallSuper
@@ -175,7 +186,10 @@ class ChromeSafariBrowser implements PlatformChromeSafariBrowserEvents {
 
   @override
   void onRelationshipValidationResult(
-      CustomTabsRelationType? relation, WebUri? requestedOrigin, bool result) {}
+    CustomTabsRelationType? relation,
+    WebUri? requestedOrigin,
+    bool result,
+  ) {}
 
   @override
   void onServiceConnected() {}

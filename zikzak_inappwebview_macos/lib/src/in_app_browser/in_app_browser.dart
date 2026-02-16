@@ -9,24 +9,26 @@ import '../in_app_webview/in_app_webview_controller.dart';
 class MacOSInAppBrowserCreationParams
     extends PlatformInAppBrowserCreationParams {
   /// Creates a new [MacOSInAppBrowserCreationParams] instance.
-  MacOSInAppBrowserCreationParams(
-      {super.contextMenu,
-      super.pullToRefreshController,
-      super.findInteractionController,
-      super.initialUserScripts,
-      super.windowId,
-      super.webViewEnvironment});
+  MacOSInAppBrowserCreationParams({
+    super.contextMenu,
+    super.pullToRefreshController,
+    super.findInteractionController,
+    super.initialUserScripts,
+    super.windowId,
+    super.webViewEnvironment,
+  });
 
   /// Creates a [MacOSInAppBrowserCreationParams] instance based on [PlatformInAppBrowserCreationParams].
   MacOSInAppBrowserCreationParams.fromPlatformInAppBrowserCreationParams(
-      PlatformInAppBrowserCreationParams params)
-      : this(
-            contextMenu: params.contextMenu,
-            pullToRefreshController: params.pullToRefreshController,
-            findInteractionController: params.findInteractionController,
-            initialUserScripts: params.initialUserScripts,
-            windowId: params.windowId,
-            webViewEnvironment: params.webViewEnvironment);
+    PlatformInAppBrowserCreationParams params,
+  ) : this(
+        contextMenu: params.contextMenu,
+        pullToRefreshController: params.pullToRefreshController,
+        findInteractionController: params.findInteractionController,
+        initialUserScripts: params.initialUserScripts,
+        windowId: params.windowId,
+        webViewEnvironment: params.webViewEnvironment,
+      );
 }
 
 /// Implementation of [PlatformInAppBrowser] for macOS.
@@ -38,8 +40,9 @@ class MacOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
   MethodChannel? get channel => _channel;
   MethodChannel? _channel;
 
-  static const MethodChannel _staticChannel =
-      MethodChannel('dev.zuzu/flutter_inappbrowser');
+  static const MethodChannel _staticChannel = MethodChannel(
+    'dev.zuzu/flutter_inappbrowser',
+  );
 
   MacOSInAppWebViewController? _webViewController;
   bool _isOpened = false;
@@ -49,15 +52,17 @@ class MacOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
 
   /// Creates a new [MacOSInAppBrowser] instance.
   MacOSInAppBrowser(PlatformInAppBrowserCreationParams params)
-      : super.implementation(
-          params is MacOSInAppBrowserCreationParams
-              ? params
-              : MacOSInAppBrowserCreationParams
-                  .fromPlatformInAppBrowserCreationParams(params),
-        );
+    : super.implementation(
+        params is MacOSInAppBrowserCreationParams
+            ? params
+            : MacOSInAppBrowserCreationParams.fromPlatformInAppBrowserCreationParams(
+                params,
+              ),
+      );
 
-  static final MacOSInAppBrowser _staticValue =
-      MacOSInAppBrowser(MacOSInAppBrowserCreationParams());
+  static final MacOSInAppBrowser _staticValue = MacOSInAppBrowser(
+    MacOSInAppBrowserCreationParams(),
+  );
 
   /// Provide static access.
   factory MacOSInAppBrowser.static() {
@@ -160,13 +165,16 @@ class MacOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
 
     _webViewController = MacOSInAppWebViewController.fromInAppBrowser(
       PlatformInAppWebViewControllerCreationParams(
-          id: id, webviewParams: webviewParams),
+        id: id,
+        webviewParams: webviewParams,
+      ),
       _channel!,
     );
   }
 
-  Map<String, dynamic> _prepareOpenRequest(
-      {InAppBrowserClassSettings? settings}) {
+  Map<String, dynamic> _prepareOpenRequest({
+    InAppBrowserClassSettings? settings,
+  }) {
     if (_isOpened) {
       return {};
     }
@@ -181,18 +189,23 @@ class MacOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
     args.putIfAbsent('settings', () => initialSettings);
     args.putIfAbsent('contextMenu', () => contextMenu?.toMap() ?? {});
     args.putIfAbsent('windowId', () => windowId);
-    args.putIfAbsent('initialUserScripts',
-        () => initialUserScripts?.map((e) => e.toMap()).toList() ?? []);
     args.putIfAbsent(
-        'menuItems', () => _menuItems.values.map((e) => e.toMap()).toList());
+      'initialUserScripts',
+      () => initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
+    );
+    args.putIfAbsent(
+      'menuItems',
+      () => _menuItems.values.map((e) => e.toMap()).toList(),
+    );
 
     return args;
   }
 
   @override
-  Future<void> openUrlRequest(
-      {required URLRequest urlRequest,
-      InAppBrowserClassSettings? settings}) async {
+  Future<void> openUrlRequest({
+    required URLRequest urlRequest,
+    InAppBrowserClassSettings? settings,
+  }) async {
     Map<String, dynamic> args = _prepareOpenRequest(settings: settings);
     if (args.isEmpty) return; // Already opened
     args.putIfAbsent('urlRequest', () => urlRequest.toMap());
@@ -200,9 +213,10 @@ class MacOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
   }
 
   @override
-  Future<void> openFile(
-      {required String assetFilePath,
-      InAppBrowserClassSettings? settings}) async {
+  Future<void> openFile({
+    required String assetFilePath,
+    InAppBrowserClassSettings? settings,
+  }) async {
     Map<String, dynamic> args = _prepareOpenRequest(settings: settings);
     if (args.isEmpty) return;
     args.putIfAbsent('assetFilePath', () => assetFilePath);
@@ -210,13 +224,14 @@ class MacOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
   }
 
   @override
-  Future<void> openData(
-      {required String data,
-      String mimeType = "text/html",
-      String encoding = "utf8",
-      WebUri? baseUrl,
-      WebUri? historyUrl,
-      InAppBrowserClassSettings? settings}) async {
+  Future<void> openData({
+    required String data,
+    String mimeType = "text/html",
+    String encoding = "utf8",
+    WebUri? baseUrl,
+    WebUri? historyUrl,
+    InAppBrowserClassSettings? settings,
+  }) async {
     Map<String, dynamic> args = _prepareOpenRequest(settings: settings);
     if (args.isEmpty) return;
     args.putIfAbsent('data', () => data);
@@ -224,7 +239,9 @@ class MacOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
     args.putIfAbsent('encoding', () => encoding);
     args.putIfAbsent('baseUrl', () => baseUrl?.toString() ?? "about:blank");
     args.putIfAbsent(
-        'historyUrl', () => historyUrl?.toString() ?? "about:blank");
+      'historyUrl',
+      () => historyUrl?.toString() ?? "about:blank",
+    );
     await _staticChannel.invokeMethod('open', args);
   }
 

@@ -53,8 +53,8 @@ abstract class PlatformCookieManager extends PlatformInterface
       '`WebViewPlatform.instance` before use. For unit testing, '
       '`WebViewPlatform.instance` can be set with your own test implementation.',
     );
-    final PlatformCookieManager cookieManager =
-        InAppWebViewPlatform.instance!.createPlatformCookieManager(params);
+    final PlatformCookieManager cookieManager = InAppWebViewPlatform.instance!
+        .createPlatformCookieManager(params);
     PlatformInterface.verify(cookieManager, _token);
     return cookieManager;
   }
@@ -98,20 +98,22 @@ abstract class PlatformCookieManager extends PlatformInterface
   ///- Web
   ///- Windows
   ///{@endtemplate}
-  Future<bool> setCookie(
-      {required WebUri url,
-      required String name,
-      required String value,
-      String path = "/",
-      String? domain,
-      int? expiresDate,
-      int? maxAge,
-      bool? isSecure,
-      bool? isHttpOnly,
-      HTTPCookieSameSitePolicy? sameSite,
-      PlatformInAppWebViewController? webViewController}) {
+  Future<bool> setCookie({
+    required WebUri url,
+    required String name,
+    required String value,
+    String path = "/",
+    String? domain,
+    int? expiresDate,
+    int? maxAge,
+    bool? isSecure,
+    bool? isHttpOnly,
+    HTTPCookieSameSitePolicy? sameSite,
+    PlatformInAppWebViewController? webViewController,
+  }) {
     throw UnimplementedError(
-        'setCookie is not implemented on the current platform');
+      'setCookie is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformCookieManager.getCookies}
@@ -136,11 +138,13 @@ abstract class PlatformCookieManager extends PlatformInterface
   ///- Web
   ///- Windows
   ///{@endtemplate}
-  Future<List<Cookie>> getCookies(
-      {required WebUri url,
-      PlatformInAppWebViewController? webViewController}) {
+  Future<List<Cookie>> getCookies({
+    required WebUri url,
+    PlatformInAppWebViewController? webViewController,
+  }) {
     throw UnimplementedError(
-        'getCookies is not implemented on the current platform');
+      'getCookies is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformCookieManager.getCookie}
@@ -165,12 +169,14 @@ abstract class PlatformCookieManager extends PlatformInterface
   ///- Web
   ///- Windows
   ///{@endtemplate}
-  Future<Cookie?> getCookie(
-      {required WebUri url,
-      required String name,
-      PlatformInAppWebViewController? webViewController}) {
+  Future<Cookie?> getCookie({
+    required WebUri url,
+    required String name,
+    PlatformInAppWebViewController? webViewController,
+  }) {
     throw UnimplementedError(
-        'getCookie is not implemented on the current platform');
+      'getCookie is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformCookieManager.deleteCookie}
@@ -199,14 +205,16 @@ abstract class PlatformCookieManager extends PlatformInterface
   ///- Web
   ///- Windows
   ///{@endtemplate}
-  Future<bool> deleteCookie(
-      {required WebUri url,
-      required String name,
-      String path = "/",
-      String? domain,
-      PlatformInAppWebViewController? webViewController}) {
+  Future<bool> deleteCookie({
+    required WebUri url,
+    required String name,
+    String path = "/",
+    String? domain,
+    PlatformInAppWebViewController? webViewController,
+  }) {
     throw UnimplementedError(
-        'deleteCookie is not implemented on the current platform');
+      'deleteCookie is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformCookieManager.deleteCookies}
@@ -235,13 +243,15 @@ abstract class PlatformCookieManager extends PlatformInterface
   ///- Web
   ///- Windows
   ///{@endtemplate}
-  Future<bool> deleteCookies(
-      {required WebUri url,
-      String path = "/",
-      String? domain,
-      PlatformInAppWebViewController? webViewController}) {
+  Future<bool> deleteCookies({
+    required WebUri url,
+    String path = "/",
+    String? domain,
+    PlatformInAppWebViewController? webViewController,
+  }) {
     throw UnimplementedError(
-        'deleteCookies is not implemented on the current platform');
+      'deleteCookies is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformCookieManager.deleteAllCookies}
@@ -262,7 +272,8 @@ abstract class PlatformCookieManager extends PlatformInterface
   ///{@endtemplate}
   Future<bool> deleteAllCookies() {
     throw UnimplementedError(
-        'deleteAllCookies is not implemented on the current platform');
+      'deleteAllCookies is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformCookieManager.getAllCookies}
@@ -278,7 +289,8 @@ abstract class PlatformCookieManager extends PlatformInterface
   ///{@endtemplate}
   Future<List<Cookie>> getAllCookies() {
     throw UnimplementedError(
-        'getAllCookies is not implemented on the current platform');
+      'getAllCookies is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformCookieManager.removeSessionCookies}
@@ -291,6 +303,7 @@ abstract class PlatformCookieManager extends PlatformInterface
   ///{@endtemplate}
   Future<bool> removeSessionCookies() {
     throw UnimplementedError(
-        'removeSessionCookies is not implemented on the current platform');
+      'removeSessionCookies is not implemented on the current platform',
+    );
   }
 }

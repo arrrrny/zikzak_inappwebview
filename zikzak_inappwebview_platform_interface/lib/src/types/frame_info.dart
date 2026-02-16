@@ -17,6 +17,9 @@ class FrameInfo_ {
   ///The frame’s security origin.
   SecurityOrigin_? securityOrigin;
 
-  FrameInfo_(
-      {required this.isMainFrame, required this.request, this.securityOrigin});
+  FrameInfo_({
+    required this.isMainFrame,
+    required this.request,
+    this.securityOrigin,
+  });
 }

@@ -12,33 +12,39 @@ class WebsiteDataType_ {
   ///On-disk Fetch caches.
   ///
   ///**NOTE**: available on iOS 11.3+.
-  static const WKWebsiteDataTypeFetchCache =
-      const WebsiteDataType_._internal("WKWebsiteDataTypeFetchCache");
+  static const WKWebsiteDataTypeFetchCache = const WebsiteDataType_._internal(
+    "WKWebsiteDataTypeFetchCache",
+  );
 
   ///On-disk caches.
-  static const WKWebsiteDataTypeDiskCache =
-      const WebsiteDataType_._internal("WKWebsiteDataTypeDiskCache");
+  static const WKWebsiteDataTypeDiskCache = const WebsiteDataType_._internal(
+    "WKWebsiteDataTypeDiskCache",
+  );
 
   ///In-memory caches.
-  static const WKWebsiteDataTypeMemoryCache =
-      const WebsiteDataType_._internal("WKWebsiteDataTypeMemoryCache");
+  static const WKWebsiteDataTypeMemoryCache = const WebsiteDataType_._internal(
+    "WKWebsiteDataTypeMemoryCache",
+  );
 
   ///HTML offline web application caches.
   static const WKWebsiteDataTypeOfflineWebApplicationCache =
       const WebsiteDataType_._internal(
-          "WKWebsiteDataTypeOfflineWebApplicationCache");
+        "WKWebsiteDataTypeOfflineWebApplicationCache",
+      );
 
   ///Cookies.
-  static const WKWebsiteDataTypeCookies =
-      const WebsiteDataType_._internal("WKWebsiteDataTypeCookies");
+  static const WKWebsiteDataTypeCookies = const WebsiteDataType_._internal(
+    "WKWebsiteDataTypeCookies",
+  );
 
   ///HTML session storage.
   static const WKWebsiteDataTypeSessionStorage =
       const WebsiteDataType_._internal("WKWebsiteDataTypeSessionStorage");
 
   ///HTML local storage.
-  static const WKWebsiteDataTypeLocalStorage =
-      const WebsiteDataType_._internal("WKWebsiteDataTypeLocalStorage");
+  static const WKWebsiteDataTypeLocalStorage = const WebsiteDataType_._internal(
+    "WKWebsiteDataTypeLocalStorage",
+  );
 
   ///WebSQL databases.
   static const WKWebsiteDataTypeWebSQLDatabases =
@@ -53,7 +59,8 @@ class WebsiteDataType_ {
   ///**NOTE**: available on iOS 11.3+.
   static const WKWebsiteDataTypeServiceWorkerRegistrations =
       const WebsiteDataType_._internal(
-          "WKWebsiteDataTypeServiceWorkerRegistrations");
+        "WKWebsiteDataTypeServiceWorkerRegistrations",
+      );
 
   ///Returns a set of all available website data types.
   @ExchangeableEnumCustomValue()
@@ -68,6 +75,6 @@ class WebsiteDataType_ {
     WebsiteDataType_.WKWebsiteDataTypeLocalStorage,
     WebsiteDataType_.WKWebsiteDataTypeWebSQLDatabases,
     WebsiteDataType_.WKWebsiteDataTypeIndexedDBDatabases,
-    WebsiteDataType_.WKWebsiteDataTypeServiceWorkerRegistrations
+    WebsiteDataType_.WKWebsiteDataTypeServiceWorkerRegistrations,
   ].toSet();
 }

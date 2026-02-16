@@ -36,9 +36,11 @@ abstract class PathHandler
 class AssetsPathHandler extends PathHandler {
   ///{@macro zikzak_inappwebview_platform_interface.PlatformAssetsPathHandler}
   AssetsPathHandler({required String path})
-      : this.fromPlatformCreationParams(
-            params: PlatformAssetsPathHandlerCreationParams(
-                PlatformPathHandlerCreationParams(path: path)));
+    : this.fromPlatformCreationParams(
+        params: PlatformAssetsPathHandlerCreationParams(
+          PlatformPathHandlerCreationParams(path: path),
+        ),
+      );
 
   /// Constructs a [AssetsPathHandler].
   ///
@@ -50,7 +52,7 @@ class AssetsPathHandler extends PathHandler {
 
   /// Constructs a [AssetsPathHandler] from a specific platform implementation.
   AssetsPathHandler.fromPlatform({required this.platform})
-      : super.fromPlatform(platform: platform);
+    : super.fromPlatform(platform: platform);
 
   /// Implementation of [PlatformAssetsPathHandler] for the current platform.
   final PlatformAssetsPathHandler platform;
@@ -60,9 +62,11 @@ class AssetsPathHandler extends PathHandler {
 class ResourcesPathHandler extends PathHandler {
   ///{@macro zikzak_inappwebview_platform_interface.PlatformResourcesPathHandler}
   ResourcesPathHandler({required String path})
-      : this.fromPlatformCreationParams(
-            params: PlatformResourcesPathHandlerCreationParams(
-                PlatformPathHandlerCreationParams(path: path)));
+    : this.fromPlatformCreationParams(
+        params: PlatformResourcesPathHandlerCreationParams(
+          PlatformPathHandlerCreationParams(path: path),
+        ),
+      );
 
   /// Constructs a [ResourcesPathHandler].
   ///
@@ -74,7 +78,7 @@ class ResourcesPathHandler extends PathHandler {
 
   /// Constructs a [ResourcesPathHandler] from a specific platform implementation.
   ResourcesPathHandler.fromPlatform({required this.platform})
-      : super.fromPlatform(platform: platform);
+    : super.fromPlatform(platform: platform);
 
   /// Implementation of [PlatformResourcesPathHandler] for the current platform.
   final PlatformResourcesPathHandler platform;
@@ -84,10 +88,12 @@ class ResourcesPathHandler extends PathHandler {
 class InternalStoragePathHandler extends PathHandler {
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInternalStoragePathHandler}
   InternalStoragePathHandler({required String path, required String directory})
-      : this.fromPlatformCreationParams(
-            params: PlatformInternalStoragePathHandlerCreationParams(
-                PlatformPathHandlerCreationParams(path: path),
-                directory: directory));
+    : this.fromPlatformCreationParams(
+        params: PlatformInternalStoragePathHandlerCreationParams(
+          PlatformPathHandlerCreationParams(path: path),
+          directory: directory,
+        ),
+      );
 
   /// Constructs a [InternalStoragePathHandler].
   ///
@@ -99,7 +105,7 @@ class InternalStoragePathHandler extends PathHandler {
 
   /// Constructs a [InternalStoragePathHandler] from a specific platform implementation.
   InternalStoragePathHandler.fromPlatform({required this.platform})
-      : super.fromPlatform(platform: platform);
+    : super.fromPlatform(platform: platform);
 
   /// Implementation of [PlatformInternalStoragePathHandler] for the current platform.
   final PlatformInternalStoragePathHandler platform;
@@ -111,9 +117,11 @@ class InternalStoragePathHandler extends PathHandler {
 abstract class CustomPathHandler extends PathHandler {
   ///{@macro zikzak_inappwebview_platform_interface.PlatformCustomPathHandler}
   CustomPathHandler({required String path})
-      : this.fromPlatformCreationParams(
-            params: PlatformCustomPathHandlerCreationParams(
-                PlatformPathHandlerCreationParams(path: path)));
+    : this.fromPlatformCreationParams(
+        params: PlatformCustomPathHandlerCreationParams(
+          PlatformPathHandlerCreationParams(path: path),
+        ),
+      );
 
   /// Constructs a [CustomPathHandler].
   ///
@@ -125,7 +133,7 @@ abstract class CustomPathHandler extends PathHandler {
 
   /// Constructs a [CustomPathHandler] from a specific platform implementation.
   CustomPathHandler.fromPlatform({required this.platform})
-      : super.fromPlatform(platform: platform);
+    : super.fromPlatform(platform: platform);
 
   /// Implementation of [PlatformCustomPathHandler] for the current platform.
   final PlatformCustomPathHandler platform;

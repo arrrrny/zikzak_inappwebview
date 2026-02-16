@@ -7,7 +7,7 @@ import 'in_app_webview_controller.dart';
 
 class LinuxInAppWebViewWidget extends PlatformInAppWebViewWidget {
   LinuxInAppWebViewWidget(PlatformInAppWebViewWidgetCreationParams params)
-      : super.implementation(params);
+    : super.implementation(params);
 
   @override
   Widget build(BuildContext context) {
@@ -38,8 +38,9 @@ class _LinuxInAppWebView extends StatefulWidget {
 class _LinuxInAppWebViewState extends State<_LinuxInAppWebView> {
   LinuxInAppWebViewController? _controller;
   int? _textureId;
-  static const MethodChannel _sharedChannel =
-      MethodChannel('zikzak_inappwebview_linux');
+  static const MethodChannel _sharedChannel = MethodChannel(
+    'zikzak_inappwebview_linux',
+  );
 
   @override
   void initState() {
@@ -70,14 +71,18 @@ class _LinuxInAppWebViewState extends State<_LinuxInAppWebView> {
   void _onPlatformViewCreated(String id) {
     _controller = LinuxInAppWebViewController(
       PlatformInAppWebViewControllerCreationParams(
-          id: id, webviewParams: widget.params),
+        id: id,
+        webviewParams: widget.params,
+      ),
     );
 
     if (widget.params.findInteractionController != null) {
-      var findInteractionController = widget.params.findInteractionController
-          as LinuxFindInteractionController;
-      findInteractionController.channel =
-          MethodChannel('wtf.zikzak/zikzak_inappwebview_find_interaction_$id');
+      var findInteractionController =
+          widget.params.findInteractionController
+              as LinuxFindInteractionController;
+      findInteractionController.channel = MethodChannel(
+        'wtf.zikzak/zikzak_inappwebview_find_interaction_$id',
+      );
       findInteractionController.setupMethodHandler();
     }
 
@@ -100,9 +105,10 @@ class _LinuxInAppWebViewState extends State<_LinuxInAppWebView> {
     }
     // Return a placeholder or empty container
     return Container(
-        color: const Color(0xFFFFFFFF),
-        child: const Center(
-            child:
-                Text("Linux InAppWebView (Implemented via Texture/Native)")));
+      color: const Color(0xFFFFFFFF),
+      child: const Center(
+        child: Text("Linux InAppWebView (Implemented via Texture/Native)"),
+      ),
+    );
   }
 }

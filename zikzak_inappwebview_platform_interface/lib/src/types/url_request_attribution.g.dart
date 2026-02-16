@@ -11,10 +11,11 @@ class URLRequestAttribution {
   final int _value;
   final int _nativeValue;
   const URLRequestAttribution._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory URLRequestAttribution._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      URLRequestAttribution._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => URLRequestAttribution._internal(value, nativeValue());
 
   ///A developer-initiated network request.
   ///
@@ -38,8 +39,9 @@ class URLRequestAttribution {
   static URLRequestAttribution? fromValue(int? value) {
     if (value != null) {
       try {
-        return URLRequestAttribution.values
-            .firstWhere((element) => element.toValue() == value);
+        return URLRequestAttribution.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -51,8 +53,9 @@ class URLRequestAttribution {
   static URLRequestAttribution? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return URLRequestAttribution.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return URLRequestAttribution.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }

@@ -23,11 +23,12 @@ class ClientCertResponse_ {
   ClientCertResponseAction_? action;
 
   @ExchangeableObjectConstructor()
-  ClientCertResponse_(
-      {required this.certificatePath,
-      this.certificatePassword = "",
-      this.keyStoreType = "PKCS12",
-      this.action = ClientCertResponseAction_.CANCEL}) {
+  ClientCertResponse_({
+    required this.certificatePath,
+    this.certificatePassword = "",
+    this.keyStoreType = "PKCS12",
+    this.action = ClientCertResponseAction_.CANCEL,
+  }) {
     if (this.action == ClientCertResponseAction_.PROCEED)
       assert(certificatePath.isNotEmpty);
 

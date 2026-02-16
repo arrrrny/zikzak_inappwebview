@@ -35,15 +35,17 @@ class UserScript_ {
   late ContentWorld contentWorld;
 
   @ExchangeableObjectConstructor()
-  UserScript_(
-      {this.groupName,
-      required this.source,
-      required this.injectionTime,
-      this.forMainFrameOnly = true,
-      Set<String>? allowedOriginRules,
-      ContentWorld? contentWorld}) {
-    this.allowedOriginRules =
-        allowedOriginRules != null ? allowedOriginRules : Set.from(["*"]);
+  UserScript_({
+    this.groupName,
+    required this.source,
+    required this.injectionTime,
+    this.forMainFrameOnly = true,
+    Set<String>? allowedOriginRules,
+    ContentWorld? contentWorld,
+  }) {
+    this.allowedOriginRules = allowedOriginRules != null
+        ? allowedOriginRules
+        : Set.from(["*"]);
     this.contentWorld = contentWorld ?? ContentWorld.PAGE;
   }
 }

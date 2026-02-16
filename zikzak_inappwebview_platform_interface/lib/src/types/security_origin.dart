@@ -14,6 +14,9 @@ class SecurityOrigin_ {
   ///The security origin's protocol.
   String protocol;
 
-  SecurityOrigin_(
-      {required this.host, required this.port, required this.protocol});
+  SecurityOrigin_({
+    required this.host,
+    required this.port,
+    required this.protocol,
+  });
 }

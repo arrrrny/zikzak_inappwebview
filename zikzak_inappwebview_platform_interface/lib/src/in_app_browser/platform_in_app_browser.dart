@@ -149,7 +149,8 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///{@endtemplate}
   PlatformInAppWebViewController? get webViewController {
     throw UnimplementedError(
-        'webViewController is not implemented on the current platform');
+      'webViewController is not implemented on the current platform',
+    );
   }
 
   /// Creates a new [PlatformInAppBrowser]
@@ -161,8 +162,8 @@ abstract class PlatformInAppBrowser extends PlatformInterface
       '`InAppWebViewPlatform.instance` before use. For unit testing, '
       '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
-    final PlatformInAppBrowser inAppBrowser =
-        InAppWebViewPlatform.instance!.createPlatformInAppBrowser(params);
+    final PlatformInAppBrowser inAppBrowser = InAppWebViewPlatform.instance!
+        .createPlatformInAppBrowser(params);
     PlatformInterface.verify(inAppBrowser, _token);
     return inAppBrowser;
   }
@@ -176,8 +177,9 @@ abstract class PlatformInAppBrowser extends PlatformInterface
       '`InAppWebViewPlatform.instance` before use. For unit testing, '
       '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
-    final PlatformInAppBrowser inAppBrowserStatic =
-        InAppWebViewPlatform.instance!.createPlatformInAppBrowserStatic();
+    final PlatformInAppBrowser inAppBrowserStatic = InAppWebViewPlatform
+        .instance!
+        .createPlatformInAppBrowserStatic();
     PlatformInterface.verify(inAppBrowserStatic, _token);
     return inAppBrowserStatic;
   }
@@ -207,10 +209,13 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///- MacOS
   ///- Windows
   ///{@endtemplate}
-  Future<void> openUrlRequest(
-      {required URLRequest urlRequest, InAppBrowserClassSettings? settings}) {
+  Future<void> openUrlRequest({
+    required URLRequest urlRequest,
+    InAppBrowserClassSettings? settings,
+  }) {
     throw UnimplementedError(
-        'openUrlRequest is not implemented on the current platform');
+      'openUrlRequest is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppBrowser.openFile}
@@ -256,10 +261,13 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///- MacOS
   ///- Windows
   ///{@endtemplate}
-  Future<void> openFile(
-      {required String assetFilePath, InAppBrowserClassSettings? settings}) {
+  Future<void> openFile({
+    required String assetFilePath,
+    InAppBrowserClassSettings? settings,
+  }) {
     throw UnimplementedError(
-        'openFile is not implemented on the current platform');
+      'openFile is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppBrowser.openData}
@@ -277,15 +285,17 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///- MacOS
   ///- Windows
   ///{@endtemplate}
-  Future<void> openData(
-      {required String data,
-      String mimeType = "text/html",
-      String encoding = "utf8",
-      WebUri? baseUrl,
-      WebUri? historyUrl,
-      InAppBrowserClassSettings? settings}) {
+  Future<void> openData({
+    required String data,
+    String mimeType = "text/html",
+    String encoding = "utf8",
+    WebUri? baseUrl,
+    WebUri? historyUrl,
+    InAppBrowserClassSettings? settings,
+  }) {
     throw UnimplementedError(
-        'openData is not implemented on the current platform');
+      'openData is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppBrowser.openWithSystemBrowser}
@@ -299,7 +309,8 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///{@endtemplate}
   Future<void> openWithSystemBrowser({required WebUri url}) {
     throw UnimplementedError(
-        'openWithSystemBrowser is not implemented on the current platform');
+      'openWithSystemBrowser is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppBrowser.addMenuItem}
@@ -313,7 +324,8 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///{@endtemplate}
   void addMenuItem(InAppBrowserMenuItem menuItem) {
     throw UnimplementedError(
-        'addMenuItem is not implemented on the current platform');
+      'addMenuItem is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppBrowser.addMenuItems}
@@ -327,7 +339,8 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///{@endtemplate}
   void addMenuItems(List<InAppBrowserMenuItem> menuItems) {
     throw UnimplementedError(
-        'addMenuItems is not implemented on the current platform');
+      'addMenuItems is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppBrowser.removeMenuItem}
@@ -342,7 +355,8 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///{@endtemplate}
   bool removeMenuItem(InAppBrowserMenuItem menuItem) {
     throw UnimplementedError(
-        'removeMenuItem is not implemented on the current platform');
+      'removeMenuItem is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppBrowser.removeMenuItems}
@@ -356,7 +370,8 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///{@endtemplate}
   void removeMenuItems(List<InAppBrowserMenuItem> menuItems) {
     throw UnimplementedError(
-        'removeMenuItems is not implemented on the current platform');
+      'removeMenuItems is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppBrowser.removeAllMenuItem}
@@ -370,7 +385,8 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///{@endtemplate}
   void removeAllMenuItem() {
     throw UnimplementedError(
-        'removeAllMenuItem is not implemented on the current platform');
+      'removeAllMenuItem is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppBrowser.hasMenuItem}
@@ -382,7 +398,8 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///{@endtemplate}
   bool hasMenuItem(InAppBrowserMenuItem menuItem) {
     throw UnimplementedError(
-        'hasMenuItem is not implemented on the current platform');
+      'hasMenuItem is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppBrowser.show}
@@ -422,7 +439,8 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///{@endtemplate}
   Future<void> close() {
     throw UnimplementedError(
-        'close is not implemented on the current platform');
+      'close is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppBrowser.isHidden}
@@ -436,7 +454,8 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///{@endtemplate}
   Future<bool> isHidden() {
     throw UnimplementedError(
-        'isHidden is not implemented on the current platform');
+      'isHidden is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppBrowser.setSettings}
@@ -449,7 +468,8 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///{@endtemplate}
   Future<void> setSettings({required InAppBrowserClassSettings settings}) {
     throw UnimplementedError(
-        'setSettings is not implemented on the current platform');
+      'setSettings is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppBrowser.getSettings}
@@ -462,7 +482,8 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///{@endtemplate}
   Future<InAppBrowserClassSettings?> getSettings() {
     throw UnimplementedError(
-        'getSettings is not implemented on the current platform');
+      'getSettings is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppBrowser.isOpened}
@@ -476,7 +497,8 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///{@endtemplate}
   bool isOpened() {
     throw UnimplementedError(
-        'isOpened is not implemented on the current platform');
+      'isOpened is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppBrowser.dispose}
@@ -555,7 +577,9 @@ abstract class PlatformInAppBrowserEvents {
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview))
   ///- Windows ([Official API - ICoreWebView2.add_NavigationCompleted](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/iwebview2webview?view=webview2-0.8.355#add_navigationcompleted))
   void onReceivedHttpError(
-      WebResourceRequest request, WebResourceResponse errorResponse) {}
+    WebResourceRequest request,
+    WebResourceResponse errorResponse,
+  ) {}
 
   ///Event fired when the current [progress] (range 0-100) of loading a page is changed.
   ///
@@ -590,7 +614,8 @@ abstract class PlatformInAppBrowserEvents {
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455641-webview))
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455641-webview))
   Future<NavigationActionPolicy?>? shouldOverrideUrlLoading(
-      NavigationAction navigationAction) {
+    NavigationAction navigationAction,
+  ) {
     return null;
   }
 
@@ -639,7 +664,8 @@ abstract class PlatformInAppBrowserEvents {
   ///- iOS ([Official API - WKURLSchemeHandler](https://developer.apple.com/documentation/webkit/wkurlschemehandler))
   ///- MacOS ([Official API - WKURLSchemeHandler](https://developer.apple.com/documentation/webkit/wkurlschemehandler))
   Future<CustomSchemeResponse?>? onLoadResourceWithCustomScheme(
-      WebResourceRequest request) {
+    WebResourceRequest request,
+  ) {
     return null;
   }
 
@@ -754,7 +780,8 @@ abstract class PlatformInAppBrowserEvents {
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview))
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview))
   Future<HttpAuthResponse?>? onReceivedHttpAuthRequest(
-      URLAuthenticationChallenge challenge) {
+    URLAuthenticationChallenge challenge,
+  ) {
     return null;
   }
 
@@ -768,7 +795,8 @@ abstract class PlatformInAppBrowserEvents {
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview))
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview))
   Future<ServerTrustAuthResponse?>? onReceivedServerTrustAuthRequest(
-      URLAuthenticationChallenge challenge) {
+    URLAuthenticationChallenge challenge,
+  ) {
     return null;
   }
 
@@ -784,7 +812,8 @@ abstract class PlatformInAppBrowserEvents {
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview))
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview))
   Future<ClientCertResponse?>? onReceivedClientCertRequest(
-      URLAuthenticationChallenge challenge) {
+    URLAuthenticationChallenge challenge,
+  ) {
     return null;
   }
 
@@ -861,7 +890,8 @@ abstract class PlatformInAppBrowserEvents {
   ///- iOS
   ///- MacOS
   Future<FetchRequest?>? shouldInterceptFetchRequest(
-      FetchRequest fetchRequest) {
+    FetchRequest fetchRequest,
+  ) {
     return null;
   }
 
@@ -894,7 +924,9 @@ abstract class PlatformInAppBrowserEvents {
   ///- iOS
   ///- MacOS
   Future<bool?>? onPrintRequest(
-      WebUri? url, PlatformPrintJobController? printJobController) {
+    WebUri? url,
+    PlatformPrintJobController? printJobController,
+  ) {
     return null;
   }
 
@@ -985,7 +1017,9 @@ abstract class PlatformInAppBrowserEvents {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.onSafeBrowsingHit](https://developer.android.com/reference/android/webkit/WebViewClient#onSafeBrowsingHit(android.webkit.WebView,%20android.webkit.WebResourceRequest,%20int,%20android.webkit.SafeBrowsingResponse)))
   Future<SafeBrowsingResponse?>? onSafeBrowsingHit(
-      WebUri url, SafeBrowsingThreat? threatType) {
+    WebUri url,
+    SafeBrowsingThreat? threatType,
+  ) {
     return null;
   }
 
@@ -1005,7 +1039,8 @@ abstract class PlatformInAppBrowserEvents {
   ///- iOS
   ///- MacOS
   Future<PermissionResponse?>? onPermissionRequest(
-      PermissionRequest permissionRequest) {
+    PermissionRequest permissionRequest,
+  ) {
     return null;
   }
 
@@ -1018,7 +1053,7 @@ abstract class PlatformInAppBrowserEvents {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onGeolocationPermissionsShowPrompt](https://developer.android.com/reference/android/webkit/WebChromeClient#onGeolocationPermissionsShowPrompt(java.lang.String,%20android.webkit.GeolocationPermissions.Callback)))
   Future<GeolocationPermissionShowPromptResponse?>?
-      onGeolocationPermissionsShowPrompt(String origin) {
+  onGeolocationPermissionsShowPrompt(String origin) {
     return null;
   }
 
@@ -1046,7 +1081,8 @@ abstract class PlatformInAppBrowserEvents {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.shouldInterceptRequest](https://developer.android.com/reference/android/webkit/WebViewClient#shouldInterceptRequest(android.webkit.WebView,%20android.webkit.WebResourceRequest)))
   Future<WebResourceResponse?>? shouldInterceptRequest(
-      WebResourceRequest request) {
+    WebResourceRequest request,
+  ) {
     return null;
   }
 
@@ -1070,7 +1106,8 @@ abstract class PlatformInAppBrowserEvents {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewRenderProcessClient.onRenderProcessUnresponsive](https://developer.android.com/reference/android/webkit/WebViewRenderProcessClient#onRenderProcessUnresponsive(android.webkit.WebView,%20android.webkit.WebViewRenderProcess)))
   Future<WebViewRenderProcessAction?>? onRenderProcessUnresponsive(
-      WebUri? url) {
+    WebUri? url,
+  ) {
     return null;
   }
 
@@ -1141,7 +1178,8 @@ abstract class PlatformInAppBrowserEvents {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onJsBeforeUnload](https://developer.android.com/reference/android/webkit/WebChromeClient#onJsBeforeUnload(android.webkit.WebView,%20java.lang.String,%20java.lang.String,%20android.webkit.JsResult)))
   Future<JsBeforeUnloadResponse?>? onJsBeforeUnload(
-      JsBeforeUnloadRequest jsBeforeUnloadRequest) {
+    JsBeforeUnloadRequest jsBeforeUnloadRequest,
+  ) {
     return null;
   }
 
@@ -1196,7 +1234,8 @@ abstract class PlatformInAppBrowserEvents {
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview))
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview))
   Future<NavigationResponseAction?>? onNavigationResponse(
-      NavigationResponse navigationResponse) {
+    NavigationResponse navigationResponse,
+  ) {
     return null;
   }
 
@@ -1212,7 +1251,8 @@ abstract class PlatformInAppBrowserEvents {
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/3601237-webview))
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/3601237-webview))
   Future<ShouldAllowDeprecatedTLSAction?>? shouldAllowDeprecatedTLS(
-      URLAuthenticationChallenge challenge) {
+    URLAuthenticationChallenge challenge,
+  ) {
     return null;
   }
 
@@ -1263,5 +1303,8 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///[isDoneCounting] represents whether the counting is done.
   void onFindResultReceived(
-      int activeMatchOrdinal, int numberOfMatches, bool isDoneCounting) {}
+    int activeMatchOrdinal,
+    int numberOfMatches,
+    bool isDoneCounting,
+  ) {}
 }

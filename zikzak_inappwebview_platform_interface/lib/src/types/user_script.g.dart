@@ -32,15 +32,17 @@ class UserScript {
 
   ///The script’s source code.
   String source;
-  UserScript(
-      {this.groupName,
-      required this.source,
-      required this.injectionTime,
-      this.forMainFrameOnly = true,
-      Set<String>? allowedOriginRules,
-      ContentWorld? contentWorld}) {
-    this.allowedOriginRules =
-        allowedOriginRules != null ? allowedOriginRules : Set.from(["*"]);
+  UserScript({
+    this.groupName,
+    required this.source,
+    required this.injectionTime,
+    this.forMainFrameOnly = true,
+    Set<String>? allowedOriginRules,
+    ContentWorld? contentWorld,
+  }) {
+    this.allowedOriginRules = allowedOriginRules != null
+        ? allowedOriginRules
+        : Set.from(["*"]);
     this.contentWorld = contentWorld ?? ContentWorld.PAGE;
   }
 
@@ -51,12 +53,14 @@ class UserScript {
     }
     final instance = UserScript(
       groupName: map['groupName'],
-      injectionTime:
-          UserScriptInjectionTime.fromNativeValue(map['injectionTime'])!,
+      injectionTime: UserScriptInjectionTime.fromNativeValue(
+        map['injectionTime'],
+      )!,
       source: map['source'],
     );
-    instance.allowedOriginRules =
-        Set<String>.from(map['allowedOriginRules']!.cast<String>());
+    instance.allowedOriginRules = Set<String>.from(
+      map['allowedOriginRules']!.cast<String>(),
+    );
     instance.contentWorld = map['contentWorld'];
     instance.forMainFrameOnly = map['forMainFrameOnly'];
     return instance;

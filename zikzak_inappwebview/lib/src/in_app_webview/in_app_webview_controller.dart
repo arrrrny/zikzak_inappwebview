@@ -47,30 +47,34 @@ class InAppWebViewController {
   Future<List<Favicon>> getFavicons() => platform.getFavicons();
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.loadUrl}
-  Future<void> loadUrl(
-          {required URLRequest urlRequest, WebUri? allowingReadAccessTo}) =>
-      platform.loadUrl(
-          urlRequest: urlRequest, allowingReadAccessTo: allowingReadAccessTo);
+  Future<void> loadUrl({
+    required URLRequest urlRequest,
+    WebUri? allowingReadAccessTo,
+  }) => platform.loadUrl(
+    urlRequest: urlRequest,
+    allowingReadAccessTo: allowingReadAccessTo,
+  );
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.postUrl}
   Future<void> postUrl({required WebUri url, required Uint8List postData}) =>
       platform.postUrl(url: url, postData: postData);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.loadData}
-  Future<void> loadData(
-          {required String data,
-          String mimeType = "text/html",
-          String encoding = "utf8",
-          WebUri? baseUrl,
-          WebUri? historyUrl,
-          WebUri? allowingReadAccessTo}) =>
-      platform.loadData(
-          data: data,
-          mimeType: mimeType,
-          encoding: encoding,
-          baseUrl: baseUrl,
-          historyUrl: historyUrl,
-          allowingReadAccessTo: allowingReadAccessTo);
+  Future<void> loadData({
+    required String data,
+    String mimeType = "text/html",
+    String encoding = "utf8",
+    WebUri? baseUrl,
+    WebUri? historyUrl,
+    WebUri? allowingReadAccessTo,
+  }) => platform.loadData(
+    data: data,
+    mimeType: mimeType,
+    encoding: encoding,
+    baseUrl: baseUrl,
+    historyUrl: historyUrl,
+    allowingReadAccessTo: allowingReadAccessTo,
+  );
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.loadFile}
   Future<void> loadFile({required String assetFilePath}) =>
@@ -110,56 +114,64 @@ class InAppWebViewController {
   Future<void> stopLoading() => platform.stopLoading();
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.evaluateJavascript}
-  Future<dynamic> evaluateJavascript(
-          {required String source, ContentWorld? contentWorld}) =>
-      platform.evaluateJavascript(source: source, contentWorld: contentWorld);
+  Future<dynamic> evaluateJavascript({
+    required String source,
+    ContentWorld? contentWorld,
+  }) => platform.evaluateJavascript(source: source, contentWorld: contentWorld);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.injectJavascriptFileFromUrl}
-  Future<void> injectJavascriptFileFromUrl(
-          {required WebUri urlFile,
-          ScriptHtmlTagAttributes? scriptHtmlTagAttributes}) =>
-      platform.injectJavascriptFileFromUrl(
-          urlFile: urlFile, scriptHtmlTagAttributes: scriptHtmlTagAttributes);
+  Future<void> injectJavascriptFileFromUrl({
+    required WebUri urlFile,
+    ScriptHtmlTagAttributes? scriptHtmlTagAttributes,
+  }) => platform.injectJavascriptFileFromUrl(
+    urlFile: urlFile,
+    scriptHtmlTagAttributes: scriptHtmlTagAttributes,
+  );
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.injectJavascriptFileFromAsset}
-  Future<dynamic> injectJavascriptFileFromAsset(
-          {required String assetFilePath}) =>
-      platform.injectJavascriptFileFromAsset(assetFilePath: assetFilePath);
+  Future<dynamic> injectJavascriptFileFromAsset({
+    required String assetFilePath,
+  }) => platform.injectJavascriptFileFromAsset(assetFilePath: assetFilePath);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.injectCSSCode}
   Future<void> injectCSSCode({required String source}) =>
       platform.injectCSSCode(source: source);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.injectCSSFileFromUrl}
-  Future<void> injectCSSFileFromUrl(
-          {required WebUri urlFile,
-          CSSLinkHtmlTagAttributes? cssLinkHtmlTagAttributes}) =>
-      platform.injectCSSFileFromUrl(
-          urlFile: urlFile, cssLinkHtmlTagAttributes: cssLinkHtmlTagAttributes);
+  Future<void> injectCSSFileFromUrl({
+    required WebUri urlFile,
+    CSSLinkHtmlTagAttributes? cssLinkHtmlTagAttributes,
+  }) => platform.injectCSSFileFromUrl(
+    urlFile: urlFile,
+    cssLinkHtmlTagAttributes: cssLinkHtmlTagAttributes,
+  );
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.injectCSSFileFromAsset}
   Future<void> injectCSSFileFromAsset({required String assetFilePath}) =>
       platform.injectCSSFileFromAsset(assetFilePath: assetFilePath);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.addJavaScriptHandler}
-  void addJavaScriptHandler(
-          {required String handlerName,
-          required JavaScriptHandlerCallback callback}) =>
-      platform.addJavaScriptHandler(
-          handlerName: handlerName, callback: callback);
+  void addJavaScriptHandler({
+    required String handlerName,
+    required JavaScriptHandlerCallback callback,
+  }) => platform.addJavaScriptHandler(
+    handlerName: handlerName,
+    callback: callback,
+  );
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.removeJavaScriptHandler}
-  JavaScriptHandlerCallback? removeJavaScriptHandler(
-          {required String handlerName}) =>
-      platform.removeJavaScriptHandler(handlerName: handlerName);
+  JavaScriptHandlerCallback? removeJavaScriptHandler({
+    required String handlerName,
+  }) => platform.removeJavaScriptHandler(handlerName: handlerName);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.hasJavaScriptHandler}
   bool hasJavaScriptHandler({required String handlerName}) =>
       platform.hasJavaScriptHandler(handlerName: handlerName);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.takeScreenshot}
-  Future<Uint8List?> takeScreenshot(
-          {ScreenshotConfiguration? screenshotConfiguration}) =>
+  Future<Uint8List?> takeScreenshot({
+    ScreenshotConfiguration? screenshotConfiguration,
+  }) =>
       platform.takeScreenshot(screenshotConfiguration: screenshotConfiguration);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.setSettings}
@@ -174,14 +186,18 @@ class InAppWebViewController {
       platform.getCopyBackForwardList();
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.scrollTo}
-  Future<void> scrollTo(
-          {required int x, required int y, bool animated = false}) =>
-      platform.scrollTo(x: x, y: y, animated: animated);
+  Future<void> scrollTo({
+    required int x,
+    required int y,
+    bool animated = false,
+  }) => platform.scrollTo(x: x, y: y, animated: animated);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.scrollBy}
-  Future<void> scrollBy(
-          {required int x, required int y, bool animated = false}) =>
-      platform.scrollBy(x: x, y: y, animated: animated);
+  Future<void> scrollBy({
+    required int x,
+    required int y,
+    bool animated = false,
+  }) => platform.scrollBy(x: x, y: y, animated: animated);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.pauseTimers}
   Future<void> pauseTimers() => platform.pauseTimers();
@@ -190,15 +206,18 @@ class InAppWebViewController {
   Future<void> resumeTimers() => platform.resumeTimers();
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.printCurrentPage}
-  Future<PrintJobController?> printCurrentPage(
-      {PrintJobSettings? settings}) async {
-    final printJobControllerPlatform =
-        await platform.printCurrentPage(settings: settings);
+  Future<PrintJobController?> printCurrentPage({
+    PrintJobSettings? settings,
+  }) async {
+    final printJobControllerPlatform = await platform.printCurrentPage(
+      settings: settings,
+    );
     if (printJobControllerPlatform == null) {
       return null;
     }
     return PrintJobController.fromPlatform(
-        platform: printJobControllerPlatform);
+      platform: printJobControllerPlatform,
+    );
   }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getContentHeight}
@@ -282,19 +301,21 @@ class InAppWebViewController {
       platform.hasUserScript(userScript: userScript);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.callAsyncJavaScript}
-  Future<CallAsyncJavaScriptResult?> callAsyncJavaScript(
-          {required String functionBody,
-          Map<String, dynamic> arguments = const <String, dynamic>{},
-          ContentWorld? contentWorld}) =>
-      platform.callAsyncJavaScript(
-          functionBody: functionBody,
-          arguments: arguments,
-          contentWorld: contentWorld);
+  Future<CallAsyncJavaScriptResult?> callAsyncJavaScript({
+    required String functionBody,
+    Map<String, dynamic> arguments = const <String, dynamic>{},
+    ContentWorld? contentWorld,
+  }) => platform.callAsyncJavaScript(
+    functionBody: functionBody,
+    arguments: arguments,
+    contentWorld: contentWorld,
+  );
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.saveWebArchive}
-  Future<String?> saveWebArchive(
-          {required String filePath, bool autoname = false}) =>
-      platform.saveWebArchive(filePath: filePath, autoname: autoname);
+  Future<String?> saveWebArchive({
+    required String filePath,
+    bool autoname = false,
+  }) => platform.saveWebArchive(filePath: filePath, autoname: autoname);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.isSecureContext}
   Future<bool> isSecureContext() => platform.isSecureContext();
@@ -309,9 +330,10 @@ class InAppWebViewController {
   }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.postWebMessage}
-  Future<void> postWebMessage(
-          {required WebMessage message, WebUri? targetOrigin}) =>
-      platform.postWebMessage(message: message, targetOrigin: targetOrigin);
+  Future<void> postWebMessage({
+    required WebMessage message,
+    WebUri? targetOrigin,
+  }) => platform.postWebMessage(message: message, targetOrigin: targetOrigin);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.addWebMessageListener}
   Future<void> addWebMessageListener(WebMessageListener webMessageListener) =>
@@ -406,32 +428,37 @@ class InAppWebViewController {
       platform.setMicrophoneCaptureState(state: state);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.loadSimulatedRequest}
-  Future<void> loadSimulatedRequest(
-          {required URLRequest urlRequest,
-          required Uint8List data,
-          URLResponse? urlResponse}) =>
-      platform.loadSimulatedRequest(urlRequest: urlRequest, data: data);
+  Future<void> loadSimulatedRequest({
+    required URLRequest urlRequest,
+    required Uint8List data,
+    URLResponse? urlResponse,
+  }) => platform.loadSimulatedRequest(urlRequest: urlRequest, data: data);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.openDevTools}
   Future<void> openDevTools() => platform.openDevTools();
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.callDevToolsProtocolMethod}
-  Future<dynamic> callDevToolsProtocolMethod(
-          {required String methodName, Map<String, dynamic>? parameters}) =>
-      platform.callDevToolsProtocolMethod(
-          methodName: methodName, parameters: parameters);
+  Future<dynamic> callDevToolsProtocolMethod({
+    required String methodName,
+    Map<String, dynamic>? parameters,
+  }) => platform.callDevToolsProtocolMethod(
+    methodName: methodName,
+    parameters: parameters,
+  );
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.addDevToolsProtocolEventListener}
-  Future<void> addDevToolsProtocolEventListener(
-          {required String eventName,
-          required Function(dynamic data) callback}) =>
-      platform.addDevToolsProtocolEventListener(
-          eventName: eventName, callback: callback);
+  Future<void> addDevToolsProtocolEventListener({
+    required String eventName,
+    required Function(dynamic data) callback,
+  }) => platform.addDevToolsProtocolEventListener(
+    eventName: eventName,
+    callback: callback,
+  );
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.removeDevToolsProtocolEventListener}
-  Future<void> removeDevToolsProtocolEventListener(
-          {required String eventName}) =>
-      platform.removeDevToolsProtocolEventListener(eventName: eventName);
+  Future<void> removeDevToolsProtocolEventListener({
+    required String eventName,
+  }) => platform.removeDevToolsProtocolEventListener(eventName: eventName);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getIFrameId}
   Future<String?> getIFrameId() => platform.getIFrameId();
@@ -450,8 +477,9 @@ class InAppWebViewController {
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.setSafeBrowsingAllowlist}
   static Future<bool> setSafeBrowsingAllowlist({required List<String> hosts}) =>
-      PlatformInAppWebViewController.static()
-          .setSafeBrowsingAllowlist(hosts: hosts);
+      PlatformInAppWebViewController.static().setSafeBrowsingAllowlist(
+        hosts: hosts,
+      );
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getCurrentWebViewPackage}
   static Future<WebViewPackageInfo?> getCurrentWebViewPackage() =>
@@ -459,8 +487,9 @@ class InAppWebViewController {
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.setWebContentsDebuggingEnabled}
   static Future<void> setWebContentsDebuggingEnabled(bool debuggingEnabled) =>
-      PlatformInAppWebViewController.static()
-          .setWebContentsDebuggingEnabled(debuggingEnabled);
+      PlatformInAppWebViewController.static().setWebContentsDebuggingEnabled(
+        debuggingEnabled,
+      );
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getVariationsHeader}
   static Future<String?> getVariationsHeader() =>
@@ -484,8 +513,9 @@ class InAppWebViewController {
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.clearAllCache}
   static Future<void> clearAllCache({bool includeDiskFiles = true}) =>
-      PlatformInAppWebViewController.static()
-          .clearAllCache(includeDiskFiles: includeDiskFiles);
+      PlatformInAppWebViewController.static().clearAllCache(
+        includeDiskFiles: includeDiskFiles,
+      );
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.tRexRunnerHtml}
   static Future<String> get tRexRunnerHtml =>

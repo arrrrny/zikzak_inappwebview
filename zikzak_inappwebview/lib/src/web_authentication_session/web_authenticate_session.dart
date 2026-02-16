@@ -6,8 +6,9 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 class WebAuthenticationSession {
   ///{@macro zikzak_inappwebview_platform_interface.PlatformWebAuthenticationSession}
   WebAuthenticationSession()
-      : this.fromPlatformCreationParams(
-            params: PlatformWebAuthenticationSessionCreationParams());
+    : this.fromPlatformCreationParams(
+        params: PlatformWebAuthenticationSessionCreationParams(),
+      );
 
   /// Constructs a [WebAuthenticationSession].
   ///
@@ -41,17 +42,20 @@ class WebAuthenticationSession {
       platform.onComplete;
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformWebAuthenticationSession.create}
-  static Future<WebAuthenticationSession> create(
-      {required WebUri url,
-      String? callbackURLScheme,
-      WebAuthenticationSessionCompletionHandler onComplete,
-      WebAuthenticationSessionSettings? initialSettings}) async {
+  static Future<WebAuthenticationSession> create({
+    required WebUri url,
+    String? callbackURLScheme,
+    WebAuthenticationSessionCompletionHandler onComplete,
+    WebAuthenticationSessionSettings? initialSettings,
+  }) async {
     return WebAuthenticationSession.fromPlatform(
-        platform: await PlatformWebAuthenticationSession.static().create(
-            url: url,
-            callbackURLScheme: callbackURLScheme,
-            onComplete: onComplete,
-            initialSettings: initialSettings));
+      platform: await PlatformWebAuthenticationSession.static().create(
+        url: url,
+        callbackURLScheme: callbackURLScheme,
+        onComplete: onComplete,
+        initialSettings: initialSettings,
+      ),
+    );
   }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformWebAuthenticationSession.canStart}

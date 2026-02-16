@@ -23,27 +23,28 @@ class CreateWindowAction extends NavigationAction {
 
   ///The window id. Used by `WebView` to create a new WebView.
   int windowId;
-  CreateWindowAction(
-      {this.isDialog,
-      this.windowFeatures,
-      required this.windowId,
-      required URLRequest request,
-      required bool isForMainFrame,
-      bool? hasGesture,
-      bool? isRedirect,
-      NavigationType? navigationType,
-      FrameInfo? sourceFrame,
-      FrameInfo? targetFrame,
-      bool? shouldPerformDownload})
-      : super(
-            request: request,
-            isForMainFrame: isForMainFrame,
-            hasGesture: hasGesture,
-            isRedirect: isRedirect,
-            navigationType: navigationType,
-            sourceFrame: sourceFrame,
-            targetFrame: targetFrame,
-            shouldPerformDownload: shouldPerformDownload);
+  CreateWindowAction({
+    this.isDialog,
+    this.windowFeatures,
+    required this.windowId,
+    required URLRequest request,
+    required bool isForMainFrame,
+    bool? hasGesture,
+    bool? isRedirect,
+    NavigationType? navigationType,
+    FrameInfo? sourceFrame,
+    FrameInfo? targetFrame,
+    bool? shouldPerformDownload,
+  }) : super(
+         request: request,
+         isForMainFrame: isForMainFrame,
+         hasGesture: hasGesture,
+         isRedirect: isRedirect,
+         navigationType: navigationType,
+         sourceFrame: sourceFrame,
+         targetFrame: targetFrame,
+         shouldPerformDownload: shouldPerformDownload,
+       );
 
   ///Gets a possible [CreateWindowAction] instance from a [Map] value.
   static CreateWindowAction? fromMap(Map<String, dynamic>? map) {
@@ -55,17 +56,21 @@ class CreateWindowAction extends NavigationAction {
       isForMainFrame: map['isForMainFrame'],
       isDialog: map['isDialog'],
       windowFeatures: WindowFeatures.fromMap(
-          map['windowFeatures']?.cast<String, dynamic>()),
+        map['windowFeatures']?.cast<String, dynamic>(),
+      ),
       windowId: map['windowId'],
     );
     instance.hasGesture = map['hasGesture'];
     instance.isRedirect = map['isRedirect'];
-    instance.navigationType =
-        NavigationType.fromNativeValue(map['navigationType']);
-    instance.sourceFrame =
-        FrameInfo.fromMap(map['sourceFrame']?.cast<String, dynamic>());
-    instance.targetFrame =
-        FrameInfo.fromMap(map['targetFrame']?.cast<String, dynamic>());
+    instance.navigationType = NavigationType.fromNativeValue(
+      map['navigationType'],
+    );
+    instance.sourceFrame = FrameInfo.fromMap(
+      map['sourceFrame']?.cast<String, dynamic>(),
+    );
+    instance.targetFrame = FrameInfo.fromMap(
+      map['targetFrame']?.cast<String, dynamic>(),
+    );
     instance.shouldPerformDownload = map['shouldPerformDownload'];
     return instance;
   }

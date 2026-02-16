@@ -11,7 +11,5 @@ class URLAuthenticationChallenge_ {
   ///The protection space requiring authentication.
   URLProtectionSpace_ protectionSpace;
 
-  URLAuthenticationChallenge_({
-    required this.protectionSpace,
-  });
+  URLAuthenticationChallenge_({required this.protectionSpace});
 }

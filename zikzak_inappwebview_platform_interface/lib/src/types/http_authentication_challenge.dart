@@ -35,11 +35,11 @@ class HttpAuthenticationChallenge_ extends URLAuthenticationChallenge_ {
   ///**NOTE**: available only on iOS.
   String? error;
 
-  HttpAuthenticationChallenge_(
-      {required this.previousFailureCount,
-      required URLProtectionSpace_ protectionSpace,
-      this.failureResponse,
-      this.proposedCredential,
-      this.error})
-      : super(protectionSpace: protectionSpace);
+  HttpAuthenticationChallenge_({
+    required this.previousFailureCount,
+    required URLProtectionSpace_ protectionSpace,
+    this.failureResponse,
+    this.proposedCredential,
+    this.error,
+  }) : super(protectionSpace: protectionSpace);
 }

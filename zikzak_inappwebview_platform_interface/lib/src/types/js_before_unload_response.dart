@@ -22,10 +22,11 @@ class JsBeforeUnloadResponse_ {
   ///Action used to confirm that the user hit confirm or cancel button.
   JsBeforeUnloadResponseAction_? action;
 
-  JsBeforeUnloadResponse_(
-      {this.message = "",
-      this.handledByClient = false,
-      this.confirmButtonTitle = "",
-      this.cancelButtonTitle = "",
-      this.action = JsBeforeUnloadResponseAction_.CONFIRM});
+  JsBeforeUnloadResponse_({
+    this.message = "",
+    this.handledByClient = false,
+    this.confirmButtonTitle = "",
+    this.cancelButtonTitle = "",
+    this.action = JsBeforeUnloadResponseAction_.CONFIRM,
+  });
 }

@@ -5,9 +5,9 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 class TracingController {
   ///{@macro zikzak_inappwebview_platform_interface.PlatformTracingController}
   TracingController()
-      : this.fromPlatformCreationParams(
-          const PlatformTracingControllerCreationParams(),
-        );
+    : this.fromPlatformCreationParams(
+        const PlatformTracingControllerCreationParams(),
+      );
 
   /// Constructs a [TracingController] from creation params for a specific
   /// platform.

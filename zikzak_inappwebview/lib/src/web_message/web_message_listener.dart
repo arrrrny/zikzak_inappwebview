@@ -3,15 +3,17 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 ///{@macro zikzak_inappwebview_platform_interface.PlatformWebMessageListener}
 class WebMessageListener {
   ///{@macro zikzak_inappwebview_platform_interface.PlatformWebMessageListener}
-  WebMessageListener(
-      {required String jsObjectName,
-      Set<String>? allowedOriginRules,
-      OnPostMessageCallback? onPostMessage})
-      : this.fromPlatformCreationParams(
-            params: PlatformWebMessageListenerCreationParams(
-                jsObjectName: jsObjectName,
-                allowedOriginRules: allowedOriginRules,
-                onPostMessage: onPostMessage));
+  WebMessageListener({
+    required String jsObjectName,
+    Set<String>? allowedOriginRules,
+    OnPostMessageCallback? onPostMessage,
+  }) : this.fromPlatformCreationParams(
+         params: PlatformWebMessageListenerCreationParams(
+           jsObjectName: jsObjectName,
+           allowedOriginRules: allowedOriginRules,
+           onPostMessage: onPostMessage,
+         ),
+       );
 
   /// Constructs a [WebMessageListener].
   ///
@@ -51,9 +53,11 @@ class WebMessageListener {
 class JavaScriptReplyProxy {
   ///{@macro zikzak_inappwebview_platform_interface.PlatformJavaScriptReplyProxy}
   JavaScriptReplyProxy({required PlatformWebMessageListener webMessageListener})
-      : this.fromPlatformCreationParams(
-            params: PlatformJavaScriptReplyProxyCreationParams(
-                webMessageListener: webMessageListener));
+    : this.fromPlatformCreationParams(
+        params: PlatformJavaScriptReplyProxyCreationParams(
+          webMessageListener: webMessageListener,
+        ),
+      );
 
   /// Constructs a [JavaScriptReplyProxy].
   ///

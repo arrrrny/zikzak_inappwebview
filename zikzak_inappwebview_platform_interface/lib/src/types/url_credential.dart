@@ -42,6 +42,10 @@ class URLCredential_ {
   @SupportedPlatforms(platforms: [IOSPlatform(), MacOSPlatform()])
   URLCredentialPersistence_? persistence;
 
-  URLCredential_(
-      {this.username, this.password, this.persistence, this.certificates});
+  URLCredential_({
+    this.username,
+    this.password,
+    this.persistence,
+    this.certificates,
+  });
 }

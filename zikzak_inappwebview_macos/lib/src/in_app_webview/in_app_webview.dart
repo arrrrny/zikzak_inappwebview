@@ -7,7 +7,7 @@ import 'in_app_webview_controller.dart';
 
 class MacOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
   MacOSInAppWebViewWidget(PlatformInAppWebViewWidgetCreationParams params)
-      : super.implementation(params);
+    : super.implementation(params);
 
   MacOSInAppWebViewController? _controller;
 
@@ -16,8 +16,9 @@ class MacOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
     final Map<String, dynamic> creationParams = <String, dynamic>{
       'initialUrlRequest': params.initialUrlRequest?.toMap(),
       'initialSettings': params.initialSettings?.toMap(),
-      'initialUserScripts':
-          params.initialUserScripts?.map((e) => e.toMap()).toList(),
+      'initialUserScripts': params.initialUserScripts
+          ?.map((e) => e.toMap())
+          .toList(),
       'contextMenu': params.contextMenu?.toMap(),
       'windowId': params.windowId,
       'initialData': params.initialData?.toMap(),
@@ -35,14 +36,17 @@ class MacOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
   void _onPlatformViewCreated(int id) {
     _controller = MacOSInAppWebViewController(
       PlatformInAppWebViewControllerCreationParams(
-          id: id, webviewParams: params),
+        id: id,
+        webviewParams: params,
+      ),
     );
 
     if (params.findInteractionController != null) {
       var findInteractionController =
           params.findInteractionController as MacOSFindInteractionController;
-      findInteractionController.channel =
-          MethodChannel('wtf.zikzak/zikzak_inappwebview_find_interaction_$id');
+      findInteractionController.channel = MethodChannel(
+        'wtf.zikzak/zikzak_inappwebview_find_interaction_$id',
+      );
       findInteractionController.setupMethodHandler();
     }
 

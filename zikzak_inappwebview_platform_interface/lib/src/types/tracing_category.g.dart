@@ -11,10 +11,11 @@ class TracingCategory {
   final int _value;
   final int _nativeValue;
   const TracingCategory._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory TracingCategory._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      TracingCategory._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => TracingCategory._internal(value, nativeValue());
 
   ///Predefined set of categories, includes all categories enabled by default in chromium.
   ///Use with caution: this setting may produce large trace output.
@@ -35,8 +36,10 @@ class TracingCategory {
 
   ///Predefined set of categories for analyzing javascript and rendering issues.
   ///Typically includes "blink", "compositor", "gpu", "renderer.scheduler" and "v8" categories.
-  static const CATEGORIES_JAVASCRIPT_AND_RENDERING =
-      TracingCategory._internal(32, 32);
+  static const CATEGORIES_JAVASCRIPT_AND_RENDERING = TracingCategory._internal(
+    32,
+    32,
+  );
 
   ///Indicates that there are no predefined categories.
   static const CATEGORIES_NONE = TracingCategory._internal(0, 0);
@@ -65,8 +68,9 @@ class TracingCategory {
   static TracingCategory? fromValue(int? value) {
     if (value != null) {
       try {
-        return TracingCategory.values
-            .firstWhere((element) => element.toValue() == value);
+        return TracingCategory.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -78,8 +82,9 @@ class TracingCategory {
   static TracingCategory? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return TracingCategory.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return TracingCategory.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }

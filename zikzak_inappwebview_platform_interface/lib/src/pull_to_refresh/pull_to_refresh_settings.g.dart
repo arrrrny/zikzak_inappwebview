@@ -53,14 +53,15 @@ class PullToRefreshSettings {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   int? slingshotDistance;
-  PullToRefreshSettings(
-      {this.attributedTitle,
-      this.backgroundColor,
-      this.color,
-      this.distanceToTriggerSync,
-      this.enabled = true,
-      this.size,
-      this.slingshotDistance});
+  PullToRefreshSettings({
+    this.attributedTitle,
+    this.backgroundColor,
+    this.color,
+    this.distanceToTriggerSync,
+    this.enabled = true,
+    this.size,
+    this.slingshotDistance,
+  });
 
   ///Gets a possible [PullToRefreshSettings] instance from a [Map] value.
   static PullToRefreshSettings? fromMap(Map<String, dynamic>? map) {
@@ -69,7 +70,8 @@ class PullToRefreshSettings {
     }
     final instance = PullToRefreshSettings(
       attributedTitle: AttributedString.fromMap(
-          map['attributedTitle']?.cast<String, dynamic>()),
+        map['attributedTitle']?.cast<String, dynamic>(),
+      ),
       backgroundColor: map['backgroundColor'] != null
           ? UtilColor.fromStringRepresentation(map['backgroundColor'])
           : null,

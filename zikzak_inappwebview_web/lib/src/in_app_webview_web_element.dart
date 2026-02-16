@@ -11,13 +11,15 @@ class InAppWebViewWebElement extends PlatformInAppWebViewWidget {
   late final InAppWebViewWebController _controller;
 
   InAppWebViewWebElement(PlatformInAppWebViewWidgetCreationParams params)
-      : _iframe = html.IFrameElement()
-          ..style.width = '100%'
-          ..style.height = '100%'
-          ..style.border = 'none',
-        super.implementation(params) {
+    : _iframe = html.IFrameElement()
+        ..style.width = '100%'
+        ..style.height = '100%'
+        ..style.border = 'none',
+      super.implementation(params) {
     final controllerParams = PlatformInAppWebViewControllerCreationParams(
-        id: params.windowId, webviewParams: params);
+      id: params.windowId,
+      webviewParams: params,
+    );
     _controller = InAppWebViewWebController(controllerParams, _iframe);
 
     _controller.onLoadStartCallback = (url) {

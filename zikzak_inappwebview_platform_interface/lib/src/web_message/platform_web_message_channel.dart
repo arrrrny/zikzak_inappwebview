@@ -11,8 +11,11 @@ import 'platform_web_message_port.dart';
 @immutable
 class PlatformWebMessageChannelCreationParams {
   /// Used by the platform implementation to create a new [PlatformWebMessageChannel].
-  const PlatformWebMessageChannelCreationParams(
-      {required this.id, required this.port1, required this.port2});
+  const PlatformWebMessageChannelCreationParams({
+    required this.id,
+    required this.port1,
+    required this.port2,
+  });
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformWebMessageChannel.id}
   final String id;
@@ -41,7 +44,8 @@ abstract class PlatformWebMessageChannel extends PlatformInterface
     implements Disposable {
   /// Creates a new [PlatformWebMessageChannel]
   factory PlatformWebMessageChannel(
-      PlatformWebMessageChannelCreationParams params) {
+    PlatformWebMessageChannelCreationParams params,
+  ) {
     assert(
       InAppWebViewPlatform.instance != null,
       'A platform implementation for `zikzak_inappwebview` has not been set. Please '
@@ -49,8 +53,9 @@ abstract class PlatformWebMessageChannel extends PlatformInterface
       '`InAppWebViewPlatform.instance` before use. For unit testing, '
       '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
-    final PlatformWebMessageChannel webMessageChannel =
-        InAppWebViewPlatform.instance!.createPlatformWebMessageChannel(params);
+    final PlatformWebMessageChannel webMessageChannel = InAppWebViewPlatform
+        .instance!
+        .createPlatformWebMessageChannel(params);
     PlatformInterface.verify(webMessageChannel, _token);
     return webMessageChannel;
   }
@@ -99,7 +104,8 @@ abstract class PlatformWebMessageChannel extends PlatformInterface
 
   PlatformWebMessageChannel? fromMap(Map<String, dynamic>? map) {
     throw UnimplementedError(
-        'fromMap is not implemented on the current platform');
+      'fromMap is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebMessageChannel}
@@ -108,7 +114,8 @@ abstract class PlatformWebMessageChannel extends PlatformInterface
   @override
   void dispose() {
     throw UnimplementedError(
-        'dispose is not implemented on the current platform');
+      'dispose is not implemented on the current platform',
+    );
   }
 
   @override

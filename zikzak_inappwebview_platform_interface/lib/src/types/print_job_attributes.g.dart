@@ -208,36 +208,37 @@ class PrintJobAttributes {
   ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   PrintJobPaginationMode? verticalPagination;
-  PrintJobAttributes(
-      {this.colorMode,
-      this.detailedErrorReporting,
-      this.duplex,
-      this.faxNumber,
-      this.footerHeight,
-      this.headerAndFooter,
-      this.headerHeight,
-      this.horizontalPagination,
-      this.isHorizontallyCentered,
-      this.isSelectionOnly,
-      this.isVerticallyCentered,
-      this.jobDisposition,
-      this.jobSavingURL,
-      this.localizedPaperName,
-      this.margins,
-      this.maximumContentHeight,
-      this.maximumContentWidth,
-      this.mediaSize,
-      this.mustCollate,
-      this.orientation,
-      this.pagesAcross,
-      this.pagesDown,
-      this.paperName,
-      this.paperRect,
-      this.printableRect,
-      this.resolution,
-      this.scalingFactor,
-      this.time,
-      this.verticalPagination});
+  PrintJobAttributes({
+    this.colorMode,
+    this.detailedErrorReporting,
+    this.duplex,
+    this.faxNumber,
+    this.footerHeight,
+    this.headerAndFooter,
+    this.headerHeight,
+    this.horizontalPagination,
+    this.isHorizontallyCentered,
+    this.isSelectionOnly,
+    this.isVerticallyCentered,
+    this.jobDisposition,
+    this.jobSavingURL,
+    this.localizedPaperName,
+    this.margins,
+    this.maximumContentHeight,
+    this.maximumContentWidth,
+    this.mediaSize,
+    this.mustCollate,
+    this.orientation,
+    this.pagesAcross,
+    this.pagesDown,
+    this.paperName,
+    this.paperRect,
+    this.printableRect,
+    this.resolution,
+    this.scalingFactor,
+    this.time,
+    this.verticalPagination,
+  });
 
   ///Gets a possible [PrintJobAttributes] instance from a [Map] value.
   static PrintJobAttributes? fromMap(Map<String, dynamic>? map) {
@@ -252,36 +253,44 @@ class PrintJobAttributes {
       footerHeight: map['footerHeight'],
       headerAndFooter: map['headerAndFooter'],
       headerHeight: map['headerHeight'],
-      horizontalPagination:
-          PrintJobPaginationMode.fromNativeValue(map['horizontalPagination']),
+      horizontalPagination: PrintJobPaginationMode.fromNativeValue(
+        map['horizontalPagination'],
+      ),
       isHorizontallyCentered: map['isHorizontallyCentered'],
       isSelectionOnly: map['isSelectionOnly'],
       isVerticallyCentered: map['isVerticallyCentered'],
-      jobDisposition:
-          PrintJobDisposition.fromNativeValue(map['jobDisposition']),
-      jobSavingURL:
-          map['jobSavingURL'] != null ? WebUri(map['jobSavingURL']) : null,
+      jobDisposition: PrintJobDisposition.fromNativeValue(
+        map['jobDisposition'],
+      ),
+      jobSavingURL: map['jobSavingURL'] != null
+          ? WebUri(map['jobSavingURL'])
+          : null,
       localizedPaperName: map['localizedPaperName'],
       margins: MapEdgeInsets.fromMap(map['margins']?.cast<String, dynamic>()),
       maximumContentHeight: map['maximumContentHeight'],
       maximumContentWidth: map['maximumContentWidth'],
-      mediaSize:
-          PrintJobMediaSize.fromMap(map['mediaSize']?.cast<String, dynamic>()),
+      mediaSize: PrintJobMediaSize.fromMap(
+        map['mediaSize']?.cast<String, dynamic>(),
+      ),
       mustCollate: map['mustCollate'],
       orientation: PrintJobOrientation.fromNativeValue(map['orientation']),
       pagesAcross: map['pagesAcross'],
       pagesDown: map['pagesDown'],
       paperName: map['paperName'],
-      paperRect:
-          InAppWebViewRect.fromMap(map['paperRect']?.cast<String, dynamic>()),
+      paperRect: InAppWebViewRect.fromMap(
+        map['paperRect']?.cast<String, dynamic>(),
+      ),
       printableRect: InAppWebViewRect.fromMap(
-          map['printableRect']?.cast<String, dynamic>()),
+        map['printableRect']?.cast<String, dynamic>(),
+      ),
       resolution: PrintJobResolution.fromMap(
-          map['resolution']?.cast<String, dynamic>()),
+        map['resolution']?.cast<String, dynamic>(),
+      ),
       scalingFactor: map['scalingFactor'],
       time: map['time'],
-      verticalPagination:
-          PrintJobPaginationMode.fromNativeValue(map['verticalPagination']),
+      verticalPagination: PrintJobPaginationMode.fromNativeValue(
+        map['verticalPagination'],
+      ),
     );
     return instance;
   }

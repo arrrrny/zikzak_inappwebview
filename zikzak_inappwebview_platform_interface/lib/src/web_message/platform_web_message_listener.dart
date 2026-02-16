@@ -13,10 +13,11 @@ import 'web_message.dart';
 @immutable
 class PlatformWebMessageListenerCreationParams {
   /// Used by the platform implementation to create a new [PlatformWebMessageListener].
-  const PlatformWebMessageListenerCreationParams(
-      {required this.jsObjectName,
-      this.allowedOriginRules,
-      this.onPostMessage});
+  const PlatformWebMessageListenerCreationParams({
+    required this.jsObjectName,
+    this.allowedOriginRules,
+    this.onPostMessage,
+  });
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformWebMessageListener.jsObjectName}
   final String jsObjectName;
@@ -45,7 +46,8 @@ abstract class PlatformWebMessageListener extends PlatformInterface
     implements Disposable {
   /// Creates a new [PlatformWebMessageListener]
   factory PlatformWebMessageListener(
-      PlatformWebMessageListenerCreationParams params) {
+    PlatformWebMessageListenerCreationParams params,
+  ) {
     assert(
       InAppWebViewPlatform.instance != null,
       'A platform implementation for `zikzak_inappwebview` has not been set. Please '
@@ -53,8 +55,9 @@ abstract class PlatformWebMessageListener extends PlatformInterface
       '`InAppWebViewPlatform.instance` before use. For unit testing, '
       '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
-    final PlatformWebMessageListener webMessageListener =
-        InAppWebViewPlatform.instance!.createPlatformWebMessageListener(params);
+    final PlatformWebMessageListener webMessageListener = InAppWebViewPlatform
+        .instance!
+        .createPlatformWebMessageListener(params);
     PlatformInterface.verify(webMessageListener, _token);
     return webMessageListener;
   }
@@ -97,12 +100,14 @@ abstract class PlatformWebMessageListener extends PlatformInterface
 
   Map<String, dynamic> toMap() {
     throw UnimplementedError(
-        'toMap is not implemented on the current platform.');
+      'toMap is not implemented on the current platform.',
+    );
   }
 
   Map<String, dynamic> toJson() {
     throw UnimplementedError(
-        'toJson is not implemented on the current platform.');
+      'toJson is not implemented on the current platform.',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebMessageListener.dispose}
@@ -111,7 +116,8 @@ abstract class PlatformWebMessageListener extends PlatformInterface
   @override
   void dispose() {
     throw UnimplementedError(
-        'dispose is not implemented on the current platform.');
+      'dispose is not implemented on the current platform.',
+    );
   }
 
   @override
@@ -127,8 +133,9 @@ abstract class PlatformWebMessageListener extends PlatformInterface
 @immutable
 class PlatformJavaScriptReplyProxyCreationParams {
   /// Used by the platform implementation to create a new [PlatformJavaScriptReplyProxy].
-  const PlatformJavaScriptReplyProxyCreationParams(
-      {required this.webMessageListener});
+  const PlatformJavaScriptReplyProxyCreationParams({
+    required this.webMessageListener,
+  });
 
   final PlatformWebMessageListener webMessageListener;
 }
@@ -143,7 +150,8 @@ class PlatformJavaScriptReplyProxyCreationParams {
 abstract class PlatformJavaScriptReplyProxy extends PlatformInterface {
   /// Creates a new [PlatformWebMessageListener]
   factory PlatformJavaScriptReplyProxy(
-      PlatformJavaScriptReplyProxyCreationParams params) {
+    PlatformJavaScriptReplyProxyCreationParams params,
+  ) {
     assert(
       InAppWebViewPlatform.instance != null,
       'A platform implementation for `zikzak_inappwebview` has not been set. Please '
@@ -152,8 +160,9 @@ abstract class PlatformJavaScriptReplyProxy extends PlatformInterface {
       '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformJavaScriptReplyProxy javaScriptReplyProxy =
-        InAppWebViewPlatform.instance!
-            .createPlatformJavaScriptReplyProxy(params);
+        InAppWebViewPlatform.instance!.createPlatformJavaScriptReplyProxy(
+          params,
+        );
     PlatformInterface.verify(javaScriptReplyProxy, _token);
     return javaScriptReplyProxy;
   }
@@ -164,7 +173,7 @@ abstract class PlatformJavaScriptReplyProxy extends PlatformInterface {
   /// a class that only contains a factory constructor.
   @protected
   PlatformJavaScriptReplyProxy.implementation(this.params)
-      : super(token: _token);
+    : super(token: _token);
 
   static final Object _token = Object();
 
@@ -180,7 +189,8 @@ abstract class PlatformJavaScriptReplyProxy extends PlatformInterface {
   ///{@endtemplate}
   Future<void> postMessage(WebMessage message) {
     throw UnimplementedError(
-        'postMessage is not implemented on the current platform.');
+      'postMessage is not implemented on the current platform.',
+    );
   }
 
   @override

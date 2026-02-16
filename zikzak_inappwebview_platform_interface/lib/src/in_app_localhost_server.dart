@@ -25,7 +25,8 @@ class DefaultInAppLocalhostServerCreationParams
 
   /// Creates a [DefaultInAppLocalhostServerCreationParams] instance based on [PlatformInAppLocalhostServerCreationParams].
   factory DefaultInAppLocalhostServerCreationParams.fromPlatformInAppLocalhostServerCreationParams(
-      PlatformInAppLocalhostServerCreationParams params) {
+    PlatformInAppLocalhostServerCreationParams params,
+  ) {
     return DefaultInAppLocalhostServerCreationParams(params);
   }
 }
@@ -41,12 +42,13 @@ class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
 
   /// Creates a new [DefaultInAppLocalhostServer].
   DefaultInAppLocalhostServer(PlatformInAppLocalhostServerCreationParams params)
-      : super.implementation(
-          params is DefaultInAppLocalhostServerCreationParams
-              ? params
-              : DefaultInAppLocalhostServerCreationParams
-                  .fromPlatformInAppLocalhostServerCreationParams(params),
-        ) {
+    : super.implementation(
+        params is DefaultInAppLocalhostServerCreationParams
+            ? params
+            : DefaultInAppLocalhostServerCreationParams.fromPlatformInAppLocalhostServerCreationParams(
+                params,
+              ),
+      ) {
     this._port = params.port;
     this._directoryIndex = params.directoryIndex;
     this._documentRoot = (params.documentRoot.endsWith('/'))
@@ -95,9 +97,9 @@ class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
           path = _documentRoot + path;
 
           try {
-            body = (await rootBundle.load(Uri.decodeFull(path)))
-                .buffer
-                .asUint8List();
+            body = (await rootBundle.load(
+              Uri.decodeFull(path),
+            )).buffer.asUint8List();
           } catch (e) {
             print(Uri.decodeFull(path));
             print(e.toString());

@@ -47,7 +47,8 @@ abstract class PlatformProcessGlobalConfig extends PlatformInterface
     implements Disposable {
   /// Creates a new [PlatformProcessGlobalConfig]
   factory PlatformProcessGlobalConfig(
-      PlatformProcessGlobalConfigCreationParams params) {
+    PlatformProcessGlobalConfigCreationParams params,
+  ) {
     assert(
       InAppWebViewPlatform.instance != null,
       'A platform implementation for `zikzak_inappwebview` has not been set. Please '
@@ -69,7 +70,7 @@ abstract class PlatformProcessGlobalConfig extends PlatformInterface
   /// a class that only contains a factory constructor.
   @protected
   PlatformProcessGlobalConfig.implementation(this.params)
-      : super(token: _token);
+    : super(token: _token);
 
   static final Object _token = Object();
 
@@ -87,7 +88,8 @@ abstract class PlatformProcessGlobalConfig extends PlatformInterface
   ///{@endtemplate}
   Future<void> apply({required ProcessGlobalConfigSettings settings}) {
     throw UnimplementedError(
-        'apply is not implemented on the current platform');
+      'apply is not implemented on the current platform',
+    );
   }
 }
 
@@ -141,8 +143,10 @@ class ProcessGlobalConfigSettings_ {
   ///**NOTE**: available only if [WebViewFeature.STARTUP_FEATURE_SET_DIRECTORY_BASE_PATHS] feature is supported.
   ProcessGlobalConfigDirectoryBasePaths_? directoryBasePaths;
 
-  ProcessGlobalConfigSettings_(
-      {this.dataDirectorySuffix, this.directoryBasePaths});
+  ProcessGlobalConfigSettings_({
+    this.dataDirectorySuffix,
+    this.directoryBasePaths,
+  });
 }
 
 ///Class that represents the settings used to configure the [ProcessGlobalConfigSettings.directoryBasePaths].
@@ -157,7 +161,8 @@ class ProcessGlobalConfigDirectoryBasePaths_ {
   ///The absolute base path for the WebView cache directory.
   String cacheDirectoryBasePath;
 
-  ProcessGlobalConfigDirectoryBasePaths_(
-      {required this.dataDirectoryBasePath,
-      required this.cacheDirectoryBasePath});
+  ProcessGlobalConfigDirectoryBasePaths_({
+    required this.dataDirectoryBasePath,
+    required this.cacheDirectoryBasePath,
+  });
 }

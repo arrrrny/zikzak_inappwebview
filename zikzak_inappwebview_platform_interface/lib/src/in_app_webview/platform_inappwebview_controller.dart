@@ -34,8 +34,10 @@ import '../print_job/main.dart';
 @immutable
 class PlatformInAppWebViewControllerCreationParams {
   /// Used by the platform implementation to create a new [PlatformInAppWebViewController].
-  const PlatformInAppWebViewControllerCreationParams(
-      {required this.id, this.webviewParams});
+  const PlatformInAppWebViewControllerCreationParams({
+    required this.id,
+    this.webviewParams,
+  });
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.id}
   final dynamic id;
@@ -53,16 +55,18 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///Debug settings used by [PlatformInAppWebViewWidget], [PlatformHeadlessInAppWebView] and [PlatformInAppBrowser].
   ///The default value excludes the [PlatformWebViewCreationParams.onScrollChanged], [PlatformWebViewCreationParams.onOverScrolled] and [PlatformWebViewCreationParams.onReceivedIcon] events.
   static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings(
-      maxLogMessageLength: 1000,
-      excludeFilter: [
-        RegExp(r"onScrollChanged"),
-        RegExp(r"onOverScrolled"),
-        RegExp(r"onReceivedIcon")
-      ]);
+    maxLogMessageLength: 1000,
+    excludeFilter: [
+      RegExp(r"onScrollChanged"),
+      RegExp(r"onOverScrolled"),
+      RegExp(r"onReceivedIcon"),
+    ],
+  );
 
   /// Creates a new [PlatformInAppWebViewController]
   factory PlatformInAppWebViewController(
-      PlatformInAppWebViewControllerCreationParams params) {
+    PlatformInAppWebViewControllerCreationParams params,
+  ) {
     assert(
       InAppWebViewPlatform.instance != null,
       'A platform implementation for `zikzak_inappwebview` has not been set. Please '
@@ -71,8 +75,9 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
       '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformInAppWebViewController inAppWebViewController =
-        InAppWebViewPlatform.instance!
-            .createPlatformInAppWebViewController(params);
+        InAppWebViewPlatform.instance!.createPlatformInAppWebViewController(
+          params,
+        );
     PlatformInterface.verify(inAppWebViewController, _token);
     return inAppWebViewController;
   }
@@ -99,7 +104,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   /// a class that only contains a factory constructor.
   @protected
   PlatformInAppWebViewController.implementation(this.params)
-      : super(token: _token);
+    : super(token: _token);
 
   static final Object _token = Object();
 
@@ -126,7 +131,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///Provides access to the JavaScript [Web Storage API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API): `window.sessionStorage` and `window.localStorage`.
   ///{@endtemplate}
   PlatformWebStorage get webStorage => throw UnimplementedError(
-      'webStorage is not implemented on the current platform');
+    'webStorage is not implemented on the current platform',
+  );
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getUrl}
   ///Gets the URL for the current page.
@@ -144,7 +150,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<WebUri?> getUrl() {
     throw UnimplementedError(
-        'getUrl is not implemented on the current platform');
+      'getUrl is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getTitle}
@@ -161,7 +168,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<String?> getTitle() {
     throw UnimplementedError(
-        'getTitle is not implemented on the current platform');
+      'getTitle is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getProgress}
@@ -174,7 +182,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<int?> getProgress() {
     throw UnimplementedError(
-        'getProgress is not implemented on the current platform');
+      'getProgress is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getHtml}
@@ -193,7 +202,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<String?> getHtml() {
     throw UnimplementedError(
-        'getHtml is not implemented on the current platform');
+      'getHtml is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getFavicons}
@@ -209,7 +219,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<List<Favicon>> getFavicons() {
     throw UnimplementedError(
-        'getFavicons is not implemented on the current platform');
+      'getFavicons is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.loadUrl}
@@ -234,10 +245,13 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- Web
   ///- Windows ([Official API - ICoreWebView2_2.NavigateWithWebResourceRequest](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_2?view=webview2-1.0.2210.55#navigatewithwebresourcerequest))
   ///{@endtemplate}
-  Future<void> loadUrl(
-      {required URLRequest urlRequest, WebUri? allowingReadAccessTo}) {
+  Future<void> loadUrl({
+    required URLRequest urlRequest,
+    WebUri? allowingReadAccessTo,
+  }) {
     throw UnimplementedError(
-        'loadUrl is not implemented on the current platform');
+      'loadUrl is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.postUrl}
@@ -259,7 +273,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> postUrl({required WebUri url, required Uint8List postData}) {
     throw UnimplementedError(
-        'postUrl is not implemented on the current platform');
+      'postUrl is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.loadData}
@@ -286,15 +301,17 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- Web
   ///- Windows ([Official API - ICoreWebView2.NavigateToString](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#navigatetostring))
   ///{@endtemplate}
-  Future<void> loadData(
-      {required String data,
-      String mimeType = "text/html",
-      String encoding = "utf8",
-      WebUri? baseUrl,
-      WebUri? historyUrl,
-      WebUri? allowingReadAccessTo}) {
+  Future<void> loadData({
+    required String data,
+    String mimeType = "text/html",
+    String encoding = "utf8",
+    WebUri? baseUrl,
+    WebUri? historyUrl,
+    WebUri? allowingReadAccessTo,
+  }) {
     throw UnimplementedError(
-        'loadData is not implemented on the current platform');
+      'loadData is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.loadFile}
@@ -337,7 +354,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> loadFile({required String assetFilePath}) {
     throw UnimplementedError(
-        'loadFile is not implemented on the current platform');
+      'loadFile is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.reload}
@@ -354,7 +372,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> reload() {
     throw UnimplementedError(
-        'reload is not implemented on the current platform');
+      'reload is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.goBack}
@@ -371,7 +390,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> goBack() {
     throw UnimplementedError(
-        'goBack is not implemented on the current platform');
+      'goBack is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.canGoBack}
@@ -385,7 +405,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<bool> canGoBack() {
     throw UnimplementedError(
-        'canGoBack is not implemented on the current platform');
+      'canGoBack is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.goForward}
@@ -402,7 +423,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> goForward() {
     throw UnimplementedError(
-        'goForward is not implemented on the current platform');
+      'goForward is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.canGoForward}
@@ -416,7 +438,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<bool> canGoForward() {
     throw UnimplementedError(
-        'canGoForward is not implemented on the current platform');
+      'canGoForward is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.goBackOrForward}
@@ -433,7 +456,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> goBackOrForward({required int steps}) {
     throw UnimplementedError(
-        'goBackOrForward is not implemented on the current platform');
+      'goBackOrForward is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.canGoBackOrForward}
@@ -447,7 +471,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<bool> canGoBackOrForward({required int steps}) {
     throw UnimplementedError(
-        'canGoBackOrForward is not implemented on the current platform');
+      'canGoBackOrForward is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.goTo}
@@ -478,7 +503,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<bool> isLoading() {
     throw UnimplementedError(
-        'isLoading is not implemented on the current platform');
+      'isLoading is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.stopLoading}
@@ -495,7 +521,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> stopLoading() {
     throw UnimplementedError(
-        'stopLoading is not implemented on the current platform');
+      'stopLoading is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.evaluateJavascript}
@@ -523,10 +550,13 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- Web ([Official API - Window.eval](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval?retiredLocale=it))
   ///- Windows
   ///{@endtemplate}
-  Future<dynamic> evaluateJavascript(
-      {required String source, ContentWorld? contentWorld}) {
+  Future<dynamic> evaluateJavascript({
+    required String source,
+    ContentWorld? contentWorld,
+  }) {
     throw UnimplementedError(
-        'evaluateJavascript is not implemented on the current platform');
+      'evaluateJavascript is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.injectJavascriptFileFromUrl}
@@ -547,11 +577,13 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- MacOS
   ///- Web
   ///{@endtemplate}
-  Future<void> injectJavascriptFileFromUrl(
-      {required WebUri urlFile,
-      ScriptHtmlTagAttributes? scriptHtmlTagAttributes}) {
+  Future<void> injectJavascriptFileFromUrl({
+    required WebUri urlFile,
+    ScriptHtmlTagAttributes? scriptHtmlTagAttributes,
+  }) {
     throw UnimplementedError(
-        'injectJavascriptFileFromUrl is not implemented on the current platform');
+      'injectJavascriptFileFromUrl is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.injectJavascriptFileFromAsset}
@@ -571,10 +603,12 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- Web
   ///- Windows
   ///{@endtemplate}
-  Future<dynamic> injectJavascriptFileFromAsset(
-      {required String assetFilePath}) {
+  Future<dynamic> injectJavascriptFileFromAsset({
+    required String assetFilePath,
+  }) {
     throw UnimplementedError(
-        'injectJavascriptFileFromAsset is not implemented on the current platform');
+      'injectJavascriptFileFromAsset is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.injectCSSCode}
@@ -595,7 +629,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> injectCSSCode({required String source}) {
     throw UnimplementedError(
-        'injectCSSCode is not implemented on the current platform');
+      'injectCSSCode is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.injectCSSFileFromUrl}
@@ -616,11 +651,13 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- MacOS
   ///- Web
   ///{@endtemplate}
-  Future<void> injectCSSFileFromUrl(
-      {required WebUri urlFile,
-      CSSLinkHtmlTagAttributes? cssLinkHtmlTagAttributes}) {
+  Future<void> injectCSSFileFromUrl({
+    required WebUri urlFile,
+    CSSLinkHtmlTagAttributes? cssLinkHtmlTagAttributes,
+  }) {
     throw UnimplementedError(
-        'injectCSSFileFromUrl is not implemented on the current platform');
+      'injectCSSFileFromUrl is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.injectCSSFileFromAsset}
@@ -641,7 +678,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> injectCSSFileFromAsset({required String assetFilePath}) {
     throw UnimplementedError(
-        'injectCSSFileFromAsset is not implemented on the current platform');
+      'injectCSSFileFromAsset is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.addJavaScriptHandler}
@@ -701,11 +739,13 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- iOS
   ///- MacOS
   ///{@endtemplate}
-  void addJavaScriptHandler(
-      {required String handlerName,
-      required JavaScriptHandlerCallback callback}) {
+  void addJavaScriptHandler({
+    required String handlerName,
+    required JavaScriptHandlerCallback callback,
+  }) {
     throw UnimplementedError(
-        'addJavaScriptHandler is not implemented on the current platform');
+      'addJavaScriptHandler is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.removeJavaScriptHandler}
@@ -718,10 +758,12 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- iOS
   ///- MacOS
   ///{@endtemplate}
-  JavaScriptHandlerCallback? removeJavaScriptHandler(
-      {required String handlerName}) {
+  JavaScriptHandlerCallback? removeJavaScriptHandler({
+    required String handlerName,
+  }) {
     throw UnimplementedError(
-        'removeJavaScriptHandler is not implemented on the current platform');
+      'removeJavaScriptHandler is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.hasJavaScriptHandler}
@@ -734,7 +776,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   bool hasJavaScriptHandler({required String handlerName}) {
     throw UnimplementedError(
-        'hasJavaScriptHandler is not implemented on the current platform');
+      'hasJavaScriptHandler is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.takeScreenshot}
@@ -752,10 +795,12 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- MacOS ([Official API - WKWebView.takeSnapshot](https://developer.apple.com/documentation/webkit/wkwebview/2873260-takesnapshot))
   ///- Windows
   ///{@endtemplate}
-  Future<Uint8List?> takeScreenshot(
-      {ScreenshotConfiguration? screenshotConfiguration}) {
+  Future<Uint8List?> takeScreenshot({
+    ScreenshotConfiguration? screenshotConfiguration,
+  }) {
     throw UnimplementedError(
-        'takeScreenshot is not implemented on the current platform');
+      'takeScreenshot is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.setSettings}
@@ -769,7 +814,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> setSettings({required InAppWebViewSettings settings}) {
     throw UnimplementedError(
-        'setSettings is not implemented on the current platform');
+      'setSettings is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getSettings}
@@ -783,7 +829,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<InAppWebViewSettings?> getSettings() {
     throw UnimplementedError(
-        'getSettings is not implemented on the current platform');
+      'getSettings is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getCopyBackForwardList}
@@ -800,7 +847,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<WebHistory?> getCopyBackForwardList() {
     throw UnimplementedError(
-        'getCopyBackForwardList is not implemented on the current platform');
+      'getCopyBackForwardList is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.scrollTo}
@@ -822,10 +870,14 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- MacOS
   ///- Web ([Official API - Window.scrollTo](https://developer.mozilla.org/en-US/docs/Web/API/Window/scrollTo))
   ///{@endtemplate}
-  Future<void> scrollTo(
-      {required int x, required int y, bool animated = false}) {
+  Future<void> scrollTo({
+    required int x,
+    required int y,
+    bool animated = false,
+  }) {
     throw UnimplementedError(
-        'scrollTo is not implemented on the current platform');
+      'scrollTo is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.scrollBy}
@@ -847,10 +899,14 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- MacOS
   ///- Web ([Official API - Window.scrollBy](https://developer.mozilla.org/en-US/docs/Web/API/Window/scrollBy))
   ///{@endtemplate}
-  Future<void> scrollBy(
-      {required int x, required int y, bool animated = false}) {
+  Future<void> scrollBy({
+    required int x,
+    required int y,
+    bool animated = false,
+  }) {
     throw UnimplementedError(
-        'scrollBy is not implemented on the current platform');
+      'scrollBy is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.pauseTimers}
@@ -868,7 +924,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> pauseTimers() {
     throw UnimplementedError(
-        'pauseTimers is not implemented on the current platform');
+      'pauseTimers is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.resumeTimers}
@@ -885,7 +942,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> resumeTimers() {
     throw UnimplementedError(
-        'resumeTimers is not implemented on the current platform');
+      'resumeTimers is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.printCurrentPage}
@@ -906,10 +964,12 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- MacOS (if 11.0+, [Official API - WKWebView.printOperation](https://developer.apple.com/documentation/webkit/wkwebview/3516861-printoperation), else [Official API - NSView.printView](https://developer.apple.com/documentation/appkit/nsview/1483705-printview))
   ///- Web ([Official API - Window.print](https://developer.mozilla.org/en-US/docs/Web/API/Window/print))
   ///{@endtemplate}
-  Future<PlatformPrintJobController?> printCurrentPage(
-      {PrintJobSettings? settings}) {
+  Future<PlatformPrintJobController?> printCurrentPage({
+    PrintJobSettings? settings,
+  }) {
     throw UnimplementedError(
-        'printCurrentPage is not implemented on the current platform');
+      'printCurrentPage is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getContentHeight}
@@ -927,7 +987,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<int?> getContentHeight() {
     throw UnimplementedError(
-        'getContentHeight is not implemented on the current platform');
+      'getContentHeight is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getContentWidth}
@@ -947,7 +1008,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<int?> getContentWidth() {
     throw UnimplementedError(
-        'getContentWidth is not implemented on the current platform');
+      'getContentWidth is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.zoomBy}
@@ -966,7 +1028,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> zoomBy({required double zoomFactor, bool animated = false}) {
     throw UnimplementedError(
-        'zoomBy is not implemented on the current platform');
+      'zoomBy is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getOriginalUrl}
@@ -984,7 +1047,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<WebUri?> getOriginalUrl() {
     throw UnimplementedError(
-        'getOriginalUrl is not implemented on the current platform');
+      'getOriginalUrl is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getZoomScale}
@@ -996,7 +1060,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<double?> getZoomScale() {
     throw UnimplementedError(
-        'getZoomScale is not implemented on the current platform');
+      'getZoomScale is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getSelectedText}
@@ -1016,7 +1081,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<String?> getSelectedText() {
     throw UnimplementedError(
-        'getSelectedText is not implemented on the current platform');
+      'getSelectedText is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getHitTestResult}
@@ -1030,7 +1096,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<InAppWebViewHitTestResult?> getHitTestResult() {
     throw UnimplementedError(
-        'getHitTestResult is not implemented on the current platform');
+      'getHitTestResult is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.clearFocus}
@@ -1042,7 +1109,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> clearFocus() {
     throw UnimplementedError(
-        'clearFocus is not implemented on the current platform');
+      'clearFocus is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.setContextMenu}
@@ -1054,7 +1122,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> setContextMenu(ContextMenu? contextMenu) {
     throw UnimplementedError(
-        'setContextMenu is not implemented on the current platform');
+      'setContextMenu is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.requestFocusNodeHref}
@@ -1068,7 +1137,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<RequestFocusNodeHrefResult?> requestFocusNodeHref() {
     throw UnimplementedError(
-        'requestFocusNodeHref is not implemented on the current platform');
+      'requestFocusNodeHref is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.requestImageRef}
@@ -1082,7 +1152,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<RequestImageRefResult?> requestImageRef() {
     throw UnimplementedError(
-        'requestImageRef is not implemented on the current platform');
+      'requestImageRef is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getMetaTags}
@@ -1100,7 +1171,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<List<MetaTag>> getMetaTags() {
     throw UnimplementedError(
-        'getMetaTags is not implemented on the current platform');
+      'getMetaTags is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getMetaThemeColor}
@@ -1119,7 +1191,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<Color?> getMetaThemeColor() {
     throw UnimplementedError(
-        'getMetaThemeColor is not implemented on the current platform');
+      'getMetaThemeColor is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getScrollX}
@@ -1137,7 +1210,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<int?> getScrollX() {
     throw UnimplementedError(
-        'getScrollX is not implemented on the current platform');
+      'getScrollX is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getScrollY}
@@ -1155,7 +1229,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<int?> getScrollY() {
     throw UnimplementedError(
-        'getScrollY is not implemented on the current platform');
+      'getScrollY is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getCertificate}
@@ -1168,7 +1243,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<SslCertificate?> getCertificate() {
     throw UnimplementedError(
-        'getCertificate is not implemented on the current platform');
+      'getCertificate is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.addUserScript}
@@ -1186,7 +1262,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> addUserScript({required UserScript userScript}) {
     throw UnimplementedError(
-        'addUserScript is not implemented on the current platform');
+      'addUserScript is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.addUserScripts}
@@ -1204,7 +1281,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> addUserScripts({required List<UserScript> userScripts}) {
     throw UnimplementedError(
-        'addUserScripts is not implemented on the current platform');
+      'addUserScripts is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.removeUserScript}
@@ -1224,7 +1302,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<bool> removeUserScript({required UserScript userScript}) {
     throw UnimplementedError(
-        'removeUserScript is not implemented on the current platform');
+      'removeUserScript is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.removeUserScriptsByGroupName}
@@ -1243,7 +1322,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> removeUserScriptsByGroupName({required String groupName}) {
     throw UnimplementedError(
-        'removeUserScriptsByGroupName is not implemented on the current platform');
+      'removeUserScriptsByGroupName is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.removeUserScripts}
@@ -1262,7 +1342,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> removeUserScripts({required List<UserScript> userScripts}) {
     throw UnimplementedError(
-        'removeUserScripts is not implemented on the current platform');
+      'removeUserScripts is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.removeAllUserScripts}
@@ -1280,7 +1361,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> removeAllUserScripts() {
     throw UnimplementedError(
-        'removeAllUserScripts is not implemented on the current platform');
+      'removeAllUserScripts is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.hasUserScript}
@@ -1294,7 +1376,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   bool hasUserScript({required UserScript userScript}) {
     throw UnimplementedError(
-        'hasUserScript is not implemented on the current platform');
+      'hasUserScript is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.callAsyncJavaScript}
@@ -1333,12 +1416,14 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- MacOS ([Official API - WKWebView.callAsyncJavaScript](https://developer.apple.com/documentation/webkit/wkwebview/3656441-callasyncjavascript))
   ///- Windows
   ///{@endtemplate}
-  Future<CallAsyncJavaScriptResult?> callAsyncJavaScript(
-      {required String functionBody,
-      Map<String, dynamic> arguments = const <String, dynamic>{},
-      ContentWorld? contentWorld}) {
+  Future<CallAsyncJavaScriptResult?> callAsyncJavaScript({
+    required String functionBody,
+    Map<String, dynamic> arguments = const <String, dynamic>{},
+    ContentWorld? contentWorld,
+  }) {
     throw UnimplementedError(
-        'callAsyncJavaScript is not implemented on the current platform');
+      'callAsyncJavaScript is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.saveWebArchive}
@@ -1361,10 +1446,13 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- iOS
   ///- MacOS
   ///{@endtemplate}
-  Future<String?> saveWebArchive(
-      {required String filePath, bool autoname = false}) {
+  Future<String?> saveWebArchive({
+    required String filePath,
+    bool autoname = false,
+  }) {
     throw UnimplementedError(
-        'saveWebArchive is not implemented on the current platform');
+      'saveWebArchive is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.isSecureContext}
@@ -1383,7 +1471,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<bool> isSecureContext() {
     throw UnimplementedError(
-        'isSecureContext is not implemented on the current platform');
+      'isSecureContext is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.createWebMessageChannel}
@@ -1407,7 +1496,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<PlatformWebMessageChannel?> createWebMessageChannel() {
     throw UnimplementedError(
-        'createWebMessageChannel is not implemented on the current platform');
+      'createWebMessageChannel is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.postWebMessage}
@@ -1427,10 +1517,13 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- iOS
   ///- MacOS
   ///{@endtemplate}
-  Future<void> postWebMessage(
-      {required WebMessage message, WebUri? targetOrigin}) {
+  Future<void> postWebMessage({
+    required WebMessage message,
+    WebUri? targetOrigin,
+  }) {
     throw UnimplementedError(
-        'postWebMessage is not implemented on the current platform');
+      'postWebMessage is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.addWebMessageListener}
@@ -1600,9 +1693,11 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- MacOS
   ///{@endtemplate}
   Future<void> addWebMessageListener(
-      PlatformWebMessageListener webMessageListener) {
+    PlatformWebMessageListener webMessageListener,
+  ) {
     throw UnimplementedError(
-        'addWebMessageListener is not implemented on the current platform');
+      'addWebMessageListener is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.hasWebMessageListener}
@@ -1615,7 +1710,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   bool hasWebMessageListener(PlatformWebMessageListener webMessageListener) {
     throw UnimplementedError(
-        'hasWebMessageListener is not implemented on the current platform');
+      'hasWebMessageListener is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.canScrollVertically}
@@ -1633,7 +1729,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<bool> canScrollVertically() {
     throw UnimplementedError(
-        'canScrollVertically is not implemented on the current platform');
+      'canScrollVertically is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.canScrollHorizontally}
@@ -1651,7 +1748,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<bool> canScrollHorizontally() {
     throw UnimplementedError(
-        'canScrollHorizontally is not implemented on the current platform');
+      'canScrollHorizontally is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.startSafeBrowsing}
@@ -1670,7 +1768,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<bool> startSafeBrowsing() {
     throw UnimplementedError(
-        'startSafeBrowsing is not implemented on the current platform');
+      'startSafeBrowsing is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.clearSslPreferences}
@@ -1681,7 +1780,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> clearSslPreferences() {
     throw UnimplementedError(
-        'clearSslPreferences is not implemented on the current platform');
+      'clearSslPreferences is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.pause}
@@ -1693,7 +1793,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> pause() {
     throw UnimplementedError(
-        'pause is not implemented on the current platform');
+      'pause is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.resume}
@@ -1704,7 +1805,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> resume() {
     throw UnimplementedError(
-        'resume is not implemented on the current platform');
+      'resume is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.pageDown}
@@ -1718,7 +1820,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<bool> pageDown({required bool bottom}) {
     throw UnimplementedError(
-        'pageDown is not implemented on the current platform');
+      'pageDown is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.pageUp}
@@ -1732,7 +1835,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<bool> pageUp({required bool top}) {
     throw UnimplementedError(
-        'pageUp is not implemented on the current platform');
+      'pageUp is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.zoomIn}
@@ -1744,7 +1848,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<bool> zoomIn() {
     throw UnimplementedError(
-        'zoomIn is not implemented on the current platform');
+      'zoomIn is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.zoomOut}
@@ -1756,7 +1861,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<bool> zoomOut() {
     throw UnimplementedError(
-        'zoomOut is not implemented on the current platform');
+      'zoomOut is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.clearHistory}
@@ -1767,7 +1873,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> clearHistory() {
     throw UnimplementedError(
-        'clearHistory is not implemented on the current platform');
+      'clearHistory is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.clearFormData}
@@ -1780,7 +1887,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> clearFormData() {
     throw UnimplementedError(
-        'clearFormData is not implemented on the current platform');
+      'clearFormData is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.reloadFromOrigin}
@@ -1792,7 +1900,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> reloadFromOrigin() {
     throw UnimplementedError(
-        'reloadFromOrigin is not implemented on the current platform');
+      'reloadFromOrigin is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.createPdf}
@@ -1811,7 +1920,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<Uint8List?> createPdf({PDFConfiguration? pdfConfiguration}) {
     throw UnimplementedError(
-        'createPdf is not implemented on the current platform');
+      'createPdf is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.createWebArchiveData}
@@ -1828,7 +1938,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<Uint8List?> createWebArchiveData() {
     throw UnimplementedError(
-        'createWebArchiveData is not implemented on the current platform');
+      'createWebArchiveData is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.hasOnlySecureContent}
@@ -1840,7 +1951,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<bool> hasOnlySecureContent() {
     throw UnimplementedError(
-        'hasOnlySecureContent is not implemented on the current platform');
+      'hasOnlySecureContent is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.pauseAllMediaPlayback}
@@ -1856,7 +1968,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> pauseAllMediaPlayback() {
     throw UnimplementedError(
-        'pauseAllMediaPlayback is not implemented on the current platform');
+      'pauseAllMediaPlayback is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.setAllMediaPlaybackSuspended}
@@ -1875,7 +1988,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> setAllMediaPlaybackSuspended({required bool suspended}) {
     throw UnimplementedError(
-        'setAllMediaPlaybackSuspended is not implemented on the current platform');
+      'setAllMediaPlaybackSuspended is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.closeAllMediaPresentations}
@@ -1891,7 +2005,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> closeAllMediaPresentations() {
     throw UnimplementedError(
-        'closeAllMediaPresentations is not implemented on the current platform');
+      'closeAllMediaPresentations is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.requestMediaPlaybackState}
@@ -1909,7 +2024,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<MediaPlaybackState?> requestMediaPlaybackState() {
     throw UnimplementedError(
-        'requestMediaPlaybackState is not implemented on the current platform');
+      'requestMediaPlaybackState is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.isInFullscreen}
@@ -1922,7 +2038,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<bool> isInFullscreen() {
     throw UnimplementedError(
-        'isInFullscreen is not implemented on the current platform');
+      'isInFullscreen is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getCameraCaptureState}
@@ -1938,7 +2055,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<MediaCaptureState?> getCameraCaptureState() {
     throw UnimplementedError(
-        'getCameraCaptureState is not implemented on the current platform');
+      'getCameraCaptureState is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.setCameraCaptureState}
@@ -1954,7 +2072,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> setCameraCaptureState({required MediaCaptureState state}) {
     throw UnimplementedError(
-        'setCameraCaptureState is not implemented on the current platform');
+      'setCameraCaptureState is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getMicrophoneCaptureState}
@@ -1970,7 +2089,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<MediaCaptureState?> getMicrophoneCaptureState() {
     throw UnimplementedError(
-        'getMicrophoneCaptureState is not implemented on the current platform');
+      'getMicrophoneCaptureState is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.setMicrophoneCaptureState}
@@ -1986,7 +2106,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> setMicrophoneCaptureState({required MediaCaptureState state}) {
     throw UnimplementedError(
-        'setMicrophoneCaptureState is not implemented on the current platform');
+      'setMicrophoneCaptureState is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.loadSimulatedRequest}
@@ -2016,12 +2137,14 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- iOS ([Official API - WKWebView.loadSimulatedRequest(_:response:responseData:)](https://developer.apple.com/documentation/webkit/wkwebview/3763094-loadsimulatedrequest) and [Official API - WKWebView.loadSimulatedRequest(_:responseHTML:)](https://developer.apple.com/documentation/webkit/wkwebview/3763095-loadsimulatedrequest))
   ///- MacOS ([Official API - WKWebView.loadSimulatedRequest(_:response:responseData:)](https://developer.apple.com/documentation/webkit/wkwebview/3763094-loadsimulatedrequest) and [Official API - WKWebView.loadSimulatedRequest(_:responseHTML:)](https://developer.apple.com/documentation/webkit/wkwebview/3763095-loadsimulatedrequest))
   ///{@endtemplate}
-  Future<void> loadSimulatedRequest(
-      {required URLRequest urlRequest,
-      required Uint8List data,
-      URLResponse? urlResponse}) {
+  Future<void> loadSimulatedRequest({
+    required URLRequest urlRequest,
+    required Uint8List data,
+    URLResponse? urlResponse,
+  }) {
     throw UnimplementedError(
-        'loadSimulatedRequest is not implemented on the current platform');
+      'loadSimulatedRequest is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.openDevTools}
@@ -2033,7 +2156,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> openDevTools() {
     throw UnimplementedError(
-        'openDevTools is not implemented on the current platform');
+      'openDevTools is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.callDevToolsProtocolMethod}
@@ -2053,10 +2177,13 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows ([Official API - ICoreWebView2.CallDevToolsProtocolMethod](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#calldevtoolsprotocolmethod))
   ///{@endtemplate}
-  Future<dynamic> callDevToolsProtocolMethod(
-      {required String methodName, Map<String, dynamic>? parameters}) {
+  Future<dynamic> callDevToolsProtocolMethod({
+    required String methodName,
+    Map<String, dynamic>? parameters,
+  }) {
     throw UnimplementedError(
-        'callDevToolsProtocolMethod is not implemented on the current platform');
+      'callDevToolsProtocolMethod is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.addDevToolsProtocolEventListener}
@@ -2065,10 +2192,13 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows ([Official API - ICoreWebView2DevToolsProtocolEventReceiver.add_DevToolsProtocolEventReceived](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2devtoolsprotocoleventreceiver?view=webview2-1.0.2210.55#add_devtoolsprotocoleventreceived))
   ///{@endtemplate}
-  Future<void> addDevToolsProtocolEventListener(
-      {required String eventName, required Function(dynamic data) callback}) {
+  Future<void> addDevToolsProtocolEventListener({
+    required String eventName,
+    required Function(dynamic data) callback,
+  }) {
     throw UnimplementedError(
-        'addDevToolsProtocolEventListener is not implemented on the current platform');
+      'addDevToolsProtocolEventListener is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.removeDevToolsProtocolEventListener}
@@ -2077,10 +2207,12 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows ([Official API - ICoreWebView2DevToolsProtocolEventReceiver.remove_DevToolsProtocolEventReceived](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2devtoolsprotocoleventreceiver?view=webview2-1.0.2210.55#remove_devtoolsprotocoleventreceived))
   ///{@endtemplate}
-  Future<void> removeDevToolsProtocolEventListener(
-      {required String eventName}) {
+  Future<void> removeDevToolsProtocolEventListener({
+    required String eventName,
+  }) {
     throw UnimplementedError(
-        'removeDevToolsProtocolEventListener is not implemented on the current platform');
+      'removeDevToolsProtocolEventListener is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getIFrameId}
@@ -2091,7 +2223,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<String?> getIFrameId() {
     throw UnimplementedError(
-        'getIFrameId is not implemented on the current platform');
+      'getIFrameId is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getViewId}
@@ -2099,7 +2232,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   dynamic getViewId() {
     throw UnimplementedError(
-        'getViewId is not implemented on the current platform');
+      'getViewId is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getDefaultUserAgent}
@@ -2112,7 +2246,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<String> getDefaultUserAgent() {
     throw UnimplementedError(
-        'getDefaultUserAgent is not implemented on the current platform');
+      'getDefaultUserAgent is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.clearClientCertPreferences}
@@ -2129,7 +2264,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> clearClientCertPreferences() {
     throw UnimplementedError(
-        'clearClientCertPreferences is not implemented on the current platform');
+      'clearClientCertPreferences is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getSafeBrowsingPrivacyPolicyUrl}
@@ -2142,7 +2278,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<WebUri?> getSafeBrowsingPrivacyPolicyUrl() {
     throw UnimplementedError(
-        'getSafeBrowsingPrivacyPolicyUrl is not implemented on the current platform');
+      'getSafeBrowsingPrivacyPolicyUrl is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.setSafeBrowsingAllowlist}
@@ -2167,7 +2304,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<bool> setSafeBrowsingAllowlist({required List<String> hosts}) {
     throw UnimplementedError(
-        'setSafeBrowsingAllowlist is not implemented on the current platform');
+      'setSafeBrowsingAllowlist is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getCurrentWebViewPackage}
@@ -2186,7 +2324,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<WebViewPackageInfo?> getCurrentWebViewPackage() {
     throw UnimplementedError(
-        'getCurrentWebViewPackage is not implemented on the current platform');
+      'getCurrentWebViewPackage is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.setWebContentsDebuggingEnabled}
@@ -2203,7 +2342,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> setWebContentsDebuggingEnabled(bool debuggingEnabled) {
     throw UnimplementedError(
-        'setWebContentsDebuggingEnabled is not implemented on the current platform');
+      'setWebContentsDebuggingEnabled is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getVariationsHeader}
@@ -2223,7 +2363,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<String?> getVariationsHeader() {
     throw UnimplementedError(
-        'getVariationsHeader is not implemented on the current platform');
+      'getVariationsHeader is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.isMultiProcessEnabled}
@@ -2242,7 +2383,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<bool> isMultiProcessEnabled() {
     throw UnimplementedError(
-        'isMultiProcessEnabled is not implemented on the current platform');
+      'isMultiProcessEnabled is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.disableWebView}
@@ -2262,7 +2404,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> disableWebView() {
     throw UnimplementedError(
-        'disableWebView is not implemented on the current platform');
+      'disableWebView is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.handlesURLScheme}
@@ -2280,7 +2423,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<bool> handlesURLScheme(String urlScheme) {
     throw UnimplementedError(
-        'handlesURLScheme is not implemented on the current platform');
+      'handlesURLScheme is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.disposeKeepAlive}
@@ -2293,7 +2437,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> disposeKeepAlive(InAppWebViewKeepAlive keepAlive) {
     throw UnimplementedError(
-        'disposeKeepAlive is not implemented on the current platform');
+      'disposeKeepAlive is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.clearAllCache}
@@ -2308,7 +2453,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   Future<void> clearAllCache({bool includeDiskFiles = true}) {
     throw UnimplementedError(
-        'clearAllCache is not implemented on the current platform');
+      'clearAllCache is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.tRexRunnerHtml}
@@ -2320,7 +2466,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- MacOS
   ///{@endtemplate}
   Future<String> get tRexRunnerHtml => throw UnimplementedError(
-      'tRexRunnerHtml is not implemented on the current platform');
+    'tRexRunnerHtml is not implemented on the current platform',
+  );
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.tRexRunnerCss}
   ///Gets the css of the Chromium's t-rex runner game. Used in combination with [tRexRunnerHtml].
@@ -2331,13 +2478,15 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- MacOS
   ///{@endtemplate}
   Future<String> get tRexRunnerCss => throw UnimplementedError(
-      'tRexRunnerCss is not implemented on the current platform');
+    'tRexRunnerCss is not implemented on the current platform',
+  );
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.dispose}
   ///Disposes the controller.
   ///{@endtemplate}
   void dispose({bool isKeepAlive = false}) {
     throw UnimplementedError(
-        'dispose is not implemented on the current platform');
+      'dispose is not implemented on the current platform',
+    );
   }
 }

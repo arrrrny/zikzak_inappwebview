@@ -19,7 +19,8 @@ class AndroidPathHandlerCreationParams
 
   /// Creates a [AndroidPathHandlerCreationParams] instance based on [PlatformPathHandlerCreationParams].
   factory AndroidPathHandlerCreationParams.fromPlatformPathHandlerCreationParams(
-      PlatformPathHandlerCreationParams params) {
+    PlatformPathHandlerCreationParams params,
+  ) {
     return AndroidPathHandlerCreationParams(params);
   }
 }
@@ -37,7 +38,8 @@ mixin AndroidPathHandler implements ChannelController, PlatformPathHandler {
   void _init(PlatformPathHandlerCreationParams params) {
     this.path = params.path;
     channel = MethodChannel(
-        'wtf.zikzak/zikzak_inappwebview_custompathhandler_${_id}');
+      'wtf.zikzak/zikzak_inappwebview_custompathhandler_${_id}',
+    );
     handler = _handleMethod;
     initMethodCallHandler();
   }
@@ -91,7 +93,8 @@ class AndroidAssetsPathHandlerCreationParams
 
   /// Creates a [AndroidAssetsPathHandlerCreationParams] instance based on [PlatformAssetsPathHandlerCreationParams].
   factory AndroidAssetsPathHandlerCreationParams.fromPlatformAssetsPathHandlerCreationParams(
-      PlatformAssetsPathHandlerCreationParams params) {
+    PlatformAssetsPathHandlerCreationParams params,
+  ) {
     return AndroidAssetsPathHandlerCreationParams(params);
   }
 }
@@ -101,12 +104,13 @@ class AndroidAssetsPathHandler extends PlatformAssetsPathHandler
     with AndroidPathHandler, ChannelController {
   /// Constructs a [AndroidAssetsPathHandler].
   AndroidAssetsPathHandler(PlatformAssetsPathHandlerCreationParams params)
-      : super.implementation(
-          params is AndroidAssetsPathHandlerCreationParams
-              ? params
-              : AndroidAssetsPathHandlerCreationParams
-                  .fromPlatformAssetsPathHandlerCreationParams(params),
-        ) {
+    : super.implementation(
+        params is AndroidAssetsPathHandlerCreationParams
+            ? params
+            : AndroidAssetsPathHandlerCreationParams.fromPlatformAssetsPathHandlerCreationParams(
+                params,
+              ),
+      ) {
     _init(params);
   }
 }
@@ -128,7 +132,8 @@ class AndroidResourcesPathHandlerCreationParams
 
   /// Creates a [AndroidResourcesPathHandlerCreationParams] instance based on [PlatformResourcesPathHandlerCreationParams].
   factory AndroidResourcesPathHandlerCreationParams.fromPlatformResourcesPathHandlerCreationParams(
-      PlatformResourcesPathHandlerCreationParams params) {
+    PlatformResourcesPathHandlerCreationParams params,
+  ) {
     return AndroidResourcesPathHandlerCreationParams(params);
   }
 }
@@ -138,12 +143,13 @@ class AndroidResourcesPathHandler extends PlatformResourcesPathHandler
     with AndroidPathHandler, ChannelController {
   /// Constructs a [AndroidResourcesPathHandler].
   AndroidResourcesPathHandler(PlatformResourcesPathHandlerCreationParams params)
-      : super.implementation(
-          params is AndroidResourcesPathHandlerCreationParams
-              ? params
-              : AndroidResourcesPathHandlerCreationParams
-                  .fromPlatformResourcesPathHandlerCreationParams(params),
-        ) {
+    : super.implementation(
+        params is AndroidResourcesPathHandlerCreationParams
+            ? params
+            : AndroidResourcesPathHandlerCreationParams.fromPlatformResourcesPathHandlerCreationParams(
+                params,
+              ),
+      ) {
     _init(params);
   }
 }
@@ -165,7 +171,8 @@ class AndroidInternalStoragePathHandlerCreationParams
 
   /// Creates a [AndroidInternalStoragePathHandlerCreationParams] instance based on [PlatformInternalStoragePathHandlerCreationParams].
   factory AndroidInternalStoragePathHandlerCreationParams.fromPlatformInternalStoragePathHandlerCreationParams(
-      PlatformInternalStoragePathHandlerCreationParams params) {
+    PlatformInternalStoragePathHandlerCreationParams params,
+  ) {
     return AndroidInternalStoragePathHandlerCreationParams(params);
   }
 }
@@ -176,13 +183,14 @@ class AndroidInternalStoragePathHandler
     with AndroidPathHandler, ChannelController {
   /// Constructs a [AndroidInternalStoragePathHandler].
   AndroidInternalStoragePathHandler(
-      PlatformInternalStoragePathHandlerCreationParams params)
-      : super.implementation(
-          params is AndroidInternalStoragePathHandlerCreationParams
-              ? params
-              : AndroidInternalStoragePathHandlerCreationParams
-                  .fromPlatformInternalStoragePathHandlerCreationParams(params),
-        ) {
+    PlatformInternalStoragePathHandlerCreationParams params,
+  ) : super.implementation(
+        params is AndroidInternalStoragePathHandlerCreationParams
+            ? params
+            : AndroidInternalStoragePathHandlerCreationParams.fromPlatformInternalStoragePathHandlerCreationParams(
+                params,
+              ),
+      ) {
     _init(params);
   }
 
@@ -215,7 +223,8 @@ class AndroidCustomPathHandlerCreationParams
 
   /// Creates a [AndroidCustomPathHandlerCreationParams] instance based on [PlatformCustomPathHandlerCreationParams].
   factory AndroidCustomPathHandlerCreationParams.fromPlatformCustomPathHandlerCreationParams(
-      PlatformCustomPathHandlerCreationParams params) {
+    PlatformCustomPathHandlerCreationParams params,
+  ) {
     return AndroidCustomPathHandlerCreationParams(params);
   }
 }
@@ -225,12 +234,13 @@ class AndroidCustomPathHandler extends PlatformCustomPathHandler
     with AndroidPathHandler, ChannelController {
   /// Constructs a [AndroidCustomPathHandler].
   AndroidCustomPathHandler(PlatformCustomPathHandlerCreationParams params)
-      : super.implementation(
-          params is AndroidCustomPathHandlerCreationParams
-              ? params
-              : AndroidCustomPathHandlerCreationParams
-                  .fromPlatformCustomPathHandlerCreationParams(params),
-        ) {
+    : super.implementation(
+        params is AndroidCustomPathHandlerCreationParams
+            ? params
+            : AndroidCustomPathHandlerCreationParams.fromPlatformCustomPathHandlerCreationParams(
+                params,
+              ),
+      ) {
     _init(params);
   }
 }

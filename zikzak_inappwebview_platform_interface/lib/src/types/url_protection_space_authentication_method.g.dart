@@ -11,34 +11,42 @@ class URLProtectionSpaceAuthenticationMethod {
   final String _value;
   final String _nativeValue;
   const URLProtectionSpaceAuthenticationMethod._internal(
-      this._value, this._nativeValue);
-// ignore: unused_element
+    this._value,
+    this._nativeValue,
+  );
+  // ignore: unused_element
   factory URLProtectionSpaceAuthenticationMethod._internalMultiPlatform(
-          String value, Function nativeValue) =>
-      URLProtectionSpaceAuthenticationMethod._internal(value, nativeValue());
+    String value,
+    Function nativeValue,
+  ) => URLProtectionSpaceAuthenticationMethod._internal(value, nativeValue());
 
   ///Use client certificate authentication for this protection space.
   static const NSURL_AUTHENTICATION_METHOD_CLIENT_CERTIFICATE =
       URLProtectionSpaceAuthenticationMethod._internal(
-          'NSURLAuthenticationMethodClientCertificate',
-          'NSURLAuthenticationMethodClientCertificate');
+        'NSURLAuthenticationMethodClientCertificate',
+        'NSURLAuthenticationMethodClientCertificate',
+      );
 
   ///Negotiate whether to use Kerberos or NTLM authentication for this protection space.
   static const NSURL_AUTHENTICATION_METHOD_NEGOTIATE =
       URLProtectionSpaceAuthenticationMethod._internal(
-          'NSURLAuthenticationMethodNegotiate',
-          'NSURLAuthenticationMethodNegotiate');
+        'NSURLAuthenticationMethodNegotiate',
+        'NSURLAuthenticationMethodNegotiate',
+      );
 
   ///Use NTLM authentication for this protection space.
   static const NSURL_AUTHENTICATION_METHOD_NTLM =
       URLProtectionSpaceAuthenticationMethod._internal(
-          'NSURLAuthenticationMethodNTLM', 'NSURLAuthenticationMethodNTLM');
+        'NSURLAuthenticationMethodNTLM',
+        'NSURLAuthenticationMethodNTLM',
+      );
 
   ///Perform server trust authentication (certificate validation) for this protection space.
   static const NSURL_AUTHENTICATION_METHOD_SERVER_TRUST =
       URLProtectionSpaceAuthenticationMethod._internal(
-          'NSURLAuthenticationMethodServerTrust',
-          'NSURLAuthenticationMethodServerTrust');
+        'NSURLAuthenticationMethodServerTrust',
+        'NSURLAuthenticationMethodServerTrust',
+      );
 
   ///Set of all values of [URLProtectionSpaceAuthenticationMethod].
   static final Set<URLProtectionSpaceAuthenticationMethod> values = [
@@ -55,8 +63,9 @@ class URLProtectionSpaceAuthenticationMethod {
   static URLProtectionSpaceAuthenticationMethod? fromValue(String? value) {
     if (value != null) {
       try {
-        return URLProtectionSpaceAuthenticationMethod.values
-            .firstWhere((element) => element.toValue() == value);
+        return URLProtectionSpaceAuthenticationMethod.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -66,11 +75,13 @@ class URLProtectionSpaceAuthenticationMethod {
 
   ///Gets a possible [URLProtectionSpaceAuthenticationMethod] instance from a native value.
   static URLProtectionSpaceAuthenticationMethod? fromNativeValue(
-      String? value) {
+    String? value,
+  ) {
     if (value != null) {
       try {
-        return URLProtectionSpaceAuthenticationMethod.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return URLProtectionSpaceAuthenticationMethod.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }

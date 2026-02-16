@@ -35,7 +35,8 @@ abstract class PlatformProxyController extends PlatformInterface
     implements Disposable {
   /// Creates a new [PlatformProxyController]
   factory PlatformProxyController(
-      PlatformProxyControllerCreationParams params) {
+    PlatformProxyControllerCreationParams params,
+  ) {
     assert(
       InAppWebViewPlatform.instance != null,
       'A platform implementation for `zikzak_inappwebview` has not been set. Please '
@@ -43,8 +44,9 @@ abstract class PlatformProxyController extends PlatformInterface
       '`WebViewPlatform.instance` before use. For unit testing, '
       '`WebViewPlatform.instance` can be set with your own test implementation.',
     );
-    final PlatformProxyController proxyController =
-        InAppWebViewPlatform.instance!.createPlatformProxyController(params);
+    final PlatformProxyController proxyController = InAppWebViewPlatform
+        .instance!
+        .createPlatformProxyController(params);
     PlatformInterface.verify(proxyController, _token);
     return proxyController;
   }
@@ -73,7 +75,8 @@ abstract class PlatformProxyController extends PlatformInterface
   ///{@endtemplate}
   Future<void> setProxyOverride({required ProxySettings settings}) {
     throw UnimplementedError(
-        'setProxyOverride is not implemented on the current platform');
+      'setProxyOverride is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformProxyController.clearProxyOverride}
@@ -85,7 +88,8 @@ abstract class PlatformProxyController extends PlatformInterface
   ///{@endtemplate}
   Future<void> clearProxyOverride() {
     throw UnimplementedError(
-        'clearProxyOverride is not implemented on the current platform');
+      'clearProxyOverride is not implemented on the current platform',
+    );
   }
 }
 
@@ -144,11 +148,12 @@ class ProxySettings_ {
   ///**NOTE**: available only if [WebViewFeature.PROXY_OVERRIDE_REVERSE_BYPASS] feature is supported.
   bool reverseBypassEnabled;
 
-  ProxySettings_(
-      {this.bypassRules = const [],
-      this.directs = const [],
-      this.proxyRules = const [],
-      this.bypassSimpleHostnames,
-      this.removeImplicitRules,
-      this.reverseBypassEnabled = false});
+  ProxySettings_({
+    this.bypassRules = const [],
+    this.directs = const [],
+    this.proxyRules = const [],
+    this.bypassSimpleHostnames,
+    this.removeImplicitRules,
+    this.reverseBypassEnabled = false,
+  });
 }

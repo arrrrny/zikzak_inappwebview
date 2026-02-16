@@ -11,14 +11,16 @@ class AndroidWebViewFeature extends PlatformWebViewFeature
 
   /// Creates a new [AndroidWebViewFeature].
   AndroidWebViewFeature(PlatformWebViewFeatureCreationParams params)
-      : super.implementation(
-          params is AndroidWebViewFeatureCreationParams
-              ? params
-              : AndroidWebViewFeatureCreationParams
-                  .fromPlatformWebViewFeatureCreationParams(params),
-        ) {
-    channel =
-        const MethodChannel('wtf.zikzak/zikzak_inappwebview_webviewfeature');
+    : super.implementation(
+        params is AndroidWebViewFeatureCreationParams
+            ? params
+            : AndroidWebViewFeatureCreationParams.fromPlatformWebViewFeatureCreationParams(
+                params,
+              ),
+      ) {
+    channel = const MethodChannel(
+      'wtf.zikzak/zikzak_inappwebview_webviewfeature',
+    );
     handler = handleMethod;
     initMethodCallHandler();
   }
@@ -44,7 +46,9 @@ class AndroidWebViewFeature extends PlatformWebViewFeature
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("startupFeature", () => startupFeature.toNativeValue());
     return await channel?.invokeMethod<bool>(
-            'isStartupFeatureSupported', args) ??
+          'isStartupFeatureSupported',
+          args,
+        ) ??
         false;
   }
 
@@ -56,8 +60,11 @@ class AndroidWebViewFeature extends PlatformWebViewFeature
   }
 
   static AndroidWebViewFeature _init() {
-    _instance = AndroidWebViewFeature(AndroidWebViewFeatureCreationParams(
-        const PlatformWebViewFeatureCreationParams()));
+    _instance = AndroidWebViewFeature(
+      AndroidWebViewFeatureCreationParams(
+        const PlatformWebViewFeatureCreationParams(),
+      ),
+    );
     return _instance!;
   }
 }
@@ -79,7 +86,8 @@ class AndroidWebViewFeatureCreationParams
 
   /// Creates a [AndroidWebViewFeatureCreationParams] instance based on [PlatformWebViewFeatureCreationParams].
   factory AndroidWebViewFeatureCreationParams.fromPlatformWebViewFeatureCreationParams(
-      PlatformWebViewFeatureCreationParams params) {
+    PlatformWebViewFeatureCreationParams params,
+  ) {
     return AndroidWebViewFeatureCreationParams(params);
   }
 }

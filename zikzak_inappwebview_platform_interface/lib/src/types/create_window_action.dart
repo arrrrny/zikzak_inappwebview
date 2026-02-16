@@ -20,35 +20,40 @@ class CreateWindowAction_ extends NavigationAction_ {
   bool? isDialog;
 
   ///Window features requested by the webpage.
-  @SupportedPlatforms(platforms: [
-    IOSPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      IOSPlatform(
         apiName: "WKWindowFeatures",
         apiUrl:
-            "https://developer.apple.com/documentation/webkit/wkwindowfeatures"),
-    MacOSPlatform(
+            "https://developer.apple.com/documentation/webkit/wkwindowfeatures",
+      ),
+      MacOSPlatform(
         apiName: "WKWindowFeatures",
         apiUrl:
-            "https://developer.apple.com/documentation/webkit/wkwindowfeatures")
-  ])
+            "https://developer.apple.com/documentation/webkit/wkwindowfeatures",
+      ),
+    ],
+  )
   WindowFeatures_? windowFeatures;
 
-  CreateWindowAction_(
-      {required this.windowId,
-      this.isDialog,
-      this.windowFeatures,
-      required URLRequest_ request,
-      required bool isForMainFrame,
-      bool? hasGesture,
-      bool? isRedirect,
-      NavigationType_? navigationType,
-      FrameInfo_? sourceFrame,
-      FrameInfo_? targetFrame})
-      : super(
-            request: request,
-            isForMainFrame: isForMainFrame,
-            hasGesture: hasGesture,
-            isRedirect: isRedirect,
-            navigationType: navigationType,
-            sourceFrame: sourceFrame,
-            targetFrame: targetFrame);
+  CreateWindowAction_({
+    required this.windowId,
+    this.isDialog,
+    this.windowFeatures,
+    required URLRequest_ request,
+    required bool isForMainFrame,
+    bool? hasGesture,
+    bool? isRedirect,
+    NavigationType_? navigationType,
+    FrameInfo_? sourceFrame,
+    FrameInfo_? targetFrame,
+  }) : super(
+         request: request,
+         isForMainFrame: isForMainFrame,
+         hasGesture: hasGesture,
+         isRedirect: isRedirect,
+         navigationType: navigationType,
+         sourceFrame: sourceFrame,
+         targetFrame: targetFrame,
+       );
 }

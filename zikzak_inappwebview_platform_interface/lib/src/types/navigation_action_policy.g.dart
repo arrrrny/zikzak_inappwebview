@@ -12,10 +12,11 @@ class NavigationActionPolicy {
   final int _value;
   final int _nativeValue;
   const NavigationActionPolicy._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory NavigationActionPolicy._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      NavigationActionPolicy._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => NavigationActionPolicy._internal(value, nativeValue());
 
   ///Allow the navigation to continue.
   static const ALLOW = NavigationActionPolicy._internal(1, 1);
@@ -39,8 +40,9 @@ class NavigationActionPolicy {
   static NavigationActionPolicy? fromValue(int? value) {
     if (value != null) {
       try {
-        return NavigationActionPolicy.values
-            .firstWhere((element) => element.toValue() == value);
+        return NavigationActionPolicy.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -52,8 +54,9 @@ class NavigationActionPolicy {
   static NavigationActionPolicy? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return NavigationActionPolicy.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return NavigationActionPolicy.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }

@@ -9,8 +9,8 @@ import '../web_uri.dart';
 import 'web_authenticate_session_settings.dart';
 
 ///A completion handler for the [PlatformWebAuthenticationSession].
-typedef WebAuthenticationSessionCompletionHandler = Future<void> Function(
-    WebUri? url, WebAuthenticationSessionError? error)?;
+typedef WebAuthenticationSessionCompletionHandler =
+    Future<void> Function(WebUri? url, WebAuthenticationSessionError? error)?;
 
 /// Object specifying creation parameters for creating a [PlatformWebAuthenticationSession].
 ///
@@ -53,7 +53,8 @@ abstract class PlatformWebAuthenticationSession extends PlatformInterface
 
   /// Creates a new [PlatformWebAuthenticationSession]
   factory PlatformWebAuthenticationSession(
-      PlatformWebAuthenticationSessionCreationParams params) {
+    PlatformWebAuthenticationSessionCreationParams params,
+  ) {
     assert(
       InAppWebViewPlatform.instance != null,
       'A platform implementation for `zikzak_inappwebview` has not been set. Please '
@@ -62,8 +63,9 @@ abstract class PlatformWebAuthenticationSession extends PlatformInterface
       '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformWebAuthenticationSession webAuthenticationSession =
-        InAppWebViewPlatform.instance!
-            .createPlatformWebAuthenticationSession(params);
+        InAppWebViewPlatform.instance!.createPlatformWebAuthenticationSession(
+          params,
+        );
     PlatformInterface.verify(webAuthenticationSession, _token);
     return webAuthenticationSession;
   }
@@ -90,7 +92,7 @@ abstract class PlatformWebAuthenticationSession extends PlatformInterface
   /// a class that only contains a factory constructor.
   @protected
   PlatformWebAuthenticationSession.implementation(this.params)
-      : super(token: _token);
+    : super(token: _token);
 
   static final Object _token = Object();
 
@@ -107,27 +109,31 @@ abstract class PlatformWebAuthenticationSession extends PlatformInterface
   ///A URL with the `http` or `https` scheme pointing to the authentication webpage.
   ///{@endtemplate}
   WebUri get url => throw UnimplementedError(
-      'url is not implemented on the current platform');
+    'url is not implemented on the current platform',
+  );
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebAuthenticationSession.callbackURLScheme}
   ///The custom URL scheme that the app expects in the callback URL.
   ///{@endtemplate}
   String? get callbackURLScheme => throw UnimplementedError(
-      'callbackURLScheme is not implemented on the current platform');
+    'callbackURLScheme is not implemented on the current platform',
+  );
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebAuthenticationSession.initialSettings}
   ///Initial settings.
   ///{@endtemplate}
   WebAuthenticationSessionSettings? get initialSettings =>
       throw UnimplementedError(
-          'initialSettings is not implemented on the current platform');
+        'initialSettings is not implemented on the current platform',
+      );
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebAuthenticationSession.onComplete}
   ///A completion handler the session calls when it completes successfully, or when the user cancels the session.
   ///{@endtemplate}
   WebAuthenticationSessionCompletionHandler get onComplete =>
       throw UnimplementedError(
-          'onComplete is not implemented on the current platform');
+        'onComplete is not implemented on the current platform',
+      );
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebAuthenticationSession.create}
   ///Used to create and initialize a session.
@@ -140,13 +146,15 @@ abstract class PlatformWebAuthenticationSession extends PlatformInterface
   ///
   ///[initialSettings] represents initial settings.
   ///{@endtemplate}
-  Future<PlatformWebAuthenticationSession> create(
-      {required WebUri url,
-      String? callbackURLScheme,
-      WebAuthenticationSessionCompletionHandler onComplete,
-      WebAuthenticationSessionSettings? initialSettings}) {
+  Future<PlatformWebAuthenticationSession> create({
+    required WebUri url,
+    String? callbackURLScheme,
+    WebAuthenticationSessionCompletionHandler onComplete,
+    WebAuthenticationSessionSettings? initialSettings,
+  }) {
     throw UnimplementedError(
-        'create is not implemented on the current platform');
+      'create is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebAuthenticationSession.canStart}
@@ -158,7 +166,8 @@ abstract class PlatformWebAuthenticationSession extends PlatformInterface
   ///{@endtemplate}
   Future<bool> canStart() {
     throw UnimplementedError(
-        'canStart is not implemented on the current platform');
+      'canStart is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebAuthenticationSession.start}
@@ -175,7 +184,8 @@ abstract class PlatformWebAuthenticationSession extends PlatformInterface
   ///{@endtemplate}
   Future<bool> start() {
     throw UnimplementedError(
-        'start is not implemented on the current platform');
+      'start is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebAuthenticationSession.cancel}
@@ -190,7 +200,8 @@ abstract class PlatformWebAuthenticationSession extends PlatformInterface
   ///{@endtemplate}
   Future<void> cancel() {
     throw UnimplementedError(
-        'cancel is not implemented on the current platform');
+      'cancel is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebAuthenticationSession.dispose}
@@ -203,7 +214,8 @@ abstract class PlatformWebAuthenticationSession extends PlatformInterface
   @override
   Future<void> dispose() {
     throw UnimplementedError(
-        'cancel is not implemented on the current platform');
+      'cancel is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebAuthenticationSession.isAvailable}
@@ -217,6 +229,7 @@ abstract class PlatformWebAuthenticationSession extends PlatformInterface
   ///{@endtemplate}
   Future<bool> isAvailable() {
     throw UnimplementedError(
-        'isAvailable is not implemented on the current platform');
+      'isAvailable is not implemented on the current platform',
+    );
   }
 }

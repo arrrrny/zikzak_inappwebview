@@ -11,10 +11,11 @@ class MixedContentMode {
   final int _value;
   final int _nativeValue;
   const MixedContentMode._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory MixedContentMode._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      MixedContentMode._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => MixedContentMode._internal(value, nativeValue());
 
   ///In this mode, the WebView will allow a secure origin to load content from any other origin, even if that origin is insecure.
   ///This is the least secure mode of operation for the WebView, and where possible apps should not set this mode.
@@ -25,8 +26,10 @@ class MixedContentMode {
   ///The types of content are allowed or blocked may change release to release and are not explicitly defined.
   ///This mode is intended to be used by apps that are not in control of the content that they render but desire to operate in a reasonably secure environment.
   ///For highest security, apps are recommended to use [MixedContentMode.MIXED_CONTENT_NEVER_ALLOW].
-  static const MIXED_CONTENT_COMPATIBILITY_MODE =
-      MixedContentMode._internal(2, 2);
+  static const MIXED_CONTENT_COMPATIBILITY_MODE = MixedContentMode._internal(
+    2,
+    2,
+  );
 
   ///In this mode, the WebView will not allow a secure origin to load content from an insecure origin.
   ///This is the preferred and most secure mode of operation for the WebView and apps are strongly advised to use this mode.
@@ -43,8 +46,9 @@ class MixedContentMode {
   static MixedContentMode? fromValue(int? value) {
     if (value != null) {
       try {
-        return MixedContentMode.values
-            .firstWhere((element) => element.toValue() == value);
+        return MixedContentMode.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -56,8 +60,9 @@ class MixedContentMode {
   static MixedContentMode? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return MixedContentMode.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return MixedContentMode.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }

@@ -13,13 +13,15 @@ class ZikzakInAppWebViewWindows extends InAppWebViewPlatform {
 
   @override
   PlatformInAppWebViewController createPlatformInAppWebViewController(
-      PlatformInAppWebViewControllerCreationParams params) {
+    PlatformInAppWebViewControllerCreationParams params,
+  ) {
     return InAppWebViewWindowsPlatform(params);
   }
 
   @override
   PlatformInAppWebViewWidget createPlatformInAppWebViewWidget(
-      PlatformInAppWebViewWidgetCreationParams params) {
+    PlatformInAppWebViewWidgetCreationParams params,
+  ) {
     return InAppWebViewWindowsWidget(params);
   }
 }

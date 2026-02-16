@@ -9,9 +9,9 @@ import 'webview_environment/webview_environment.dart';
 class CookieManager {
   ///{@macro zikzak_inappwebview_platform_interface.PlatformCookieManager}
   CookieManager()
-      : this.fromPlatformCreationParams(
-          const PlatformCookieManagerCreationParams(),
-        );
+    : this.fromPlatformCreationParams(
+        const PlatformCookieManagerCreationParams(),
+      );
 
   /// Constructs a [CookieManager] from creation params for a specific
   /// platform.
@@ -39,76 +39,87 @@ class CookieManager {
       return _instance!;
     } else {
       return CookieManager.fromPlatformCreationParams(
-          PlatformCookieManagerCreationParams(
-              webViewEnvironment: webViewEnvironment.platform));
+        PlatformCookieManagerCreationParams(
+          webViewEnvironment: webViewEnvironment.platform,
+        ),
+      );
     }
   }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformCookieManager.setCookie}
-  Future<bool> setCookie(
-          {required WebUri url,
-          required String name,
-          required String value,
-          String path = "/",
-          String? domain,
-          int? expiresDate,
-          int? maxAge,
-          bool? isSecure,
-          bool? isHttpOnly,
-          HTTPCookieSameSitePolicy? sameSite,
-          InAppWebViewController? webViewController}) =>
-      platform.setCookie(
-          url: url,
-          name: name,
-          value: value,
-          path: path,
-          domain: domain,
-          expiresDate: expiresDate,
-          maxAge: maxAge,
-          isSecure: isSecure,
-          isHttpOnly: isHttpOnly,
-          sameSite: sameSite,
-          webViewController: webViewController?.platform);
+  Future<bool> setCookie({
+    required WebUri url,
+    required String name,
+    required String value,
+    String path = "/",
+    String? domain,
+    int? expiresDate,
+    int? maxAge,
+    bool? isSecure,
+    bool? isHttpOnly,
+    HTTPCookieSameSitePolicy? sameSite,
+    InAppWebViewController? webViewController,
+  }) => platform.setCookie(
+    url: url,
+    name: name,
+    value: value,
+    path: path,
+    domain: domain,
+    expiresDate: expiresDate,
+    maxAge: maxAge,
+    isSecure: isSecure,
+    isHttpOnly: isHttpOnly,
+    sameSite: sameSite,
+    webViewController: webViewController?.platform,
+  );
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformCookieManager.getCookies}
-  Future<List<Cookie>> getCookies(
-          {required WebUri url, InAppWebViewController? webViewController}) =>
-      platform.getCookies(
-          url: url, webViewController: webViewController?.platform);
+  Future<List<Cookie>> getCookies({
+    required WebUri url,
+    InAppWebViewController? webViewController,
+  }) => platform.getCookies(
+    url: url,
+    webViewController: webViewController?.platform,
+  );
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformCookieManager.getCookie}
-  Future<Cookie?> getCookie(
-          {required WebUri url,
-          required String name,
-          InAppWebViewController? webViewController}) =>
-      platform.getCookie(
-          url: url, name: name, webViewController: webViewController?.platform);
+  Future<Cookie?> getCookie({
+    required WebUri url,
+    required String name,
+    InAppWebViewController? webViewController,
+  }) => platform.getCookie(
+    url: url,
+    name: name,
+    webViewController: webViewController?.platform,
+  );
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformCookieManager.deleteCookie}
-  Future<bool> deleteCookie(
-          {required WebUri url,
-          required String name,
-          String path = "/",
-          String? domain,
-          InAppWebViewController? webViewController}) =>
-      platform.deleteCookie(
-          url: url,
-          name: name,
-          path: path,
-          domain: domain,
-          webViewController: webViewController?.platform);
+  Future<bool> deleteCookie({
+    required WebUri url,
+    required String name,
+    String path = "/",
+    String? domain,
+    InAppWebViewController? webViewController,
+  }) => platform.deleteCookie(
+    url: url,
+    name: name,
+    path: path,
+    domain: domain,
+    webViewController: webViewController?.platform,
+  );
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformCookieManager.deleteCookies}
-  Future<bool> deleteCookies(
-          {required WebUri url,
-          String path = "/",
-          String? domain,
-          InAppWebViewController? webViewController}) =>
-      platform.deleteCookies(
-          url: url,
-          path: path,
-          domain: domain,
-          webViewController: webViewController?.platform);
+  Future<bool> deleteCookies({
+    required WebUri url,
+    String path = "/",
+    String? domain,
+    InAppWebViewController? webViewController,
+  }) => platform.deleteCookies(
+    url: url,
+    path: path,
+    domain: domain,
+    webViewController: webViewController?.platform,
+  );
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformCookieManager.deleteAllCookies}
   Future<bool> deleteAllCookies() => platform.deleteAllCookies();

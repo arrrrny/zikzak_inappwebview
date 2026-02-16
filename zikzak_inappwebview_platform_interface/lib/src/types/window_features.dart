@@ -29,13 +29,14 @@ class WindowFeatures_ {
   ///A Double value specifying the y-coordinate of the containing window, or `null` if the y-coordinate is not specified.
   double? y;
 
-  WindowFeatures_(
-      {this.allowsResizing,
-      this.height,
-      this.menuBarVisibility,
-      this.statusBarVisibility,
-      this.toolbarsVisibility,
-      this.width,
-      this.x,
-      this.y});
+  WindowFeatures_({
+    this.allowsResizing,
+    this.height,
+    this.menuBarVisibility,
+    this.statusBarVisibility,
+    this.toolbarsVisibility,
+    this.width,
+    this.x,
+    this.y,
+  });
 }

@@ -11,10 +11,11 @@ class WindowStyleMask {
   final int _value;
   final int? _nativeValue;
   const WindowStyleMask._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory WindowStyleMask._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      WindowStyleMask._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => WindowStyleMask._internal(value, nativeValue());
 
   ///The window displays none of the usual peripheral elements. Useful only for display or caching purposes.
   ///
@@ -48,16 +49,18 @@ class WindowStyleMask {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- MacOS ([Official API - NSWindow.StyleMask.docModalWindow](https://developer.apple.com/documentation/appkit/nswindow/stylemask/1644253-docmodalwindow))
-  static final DOC_MODAL_WINDOW =
-      WindowStyleMask._internalMultiPlatform(64, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.macOS:
-        return 64;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final DOC_MODAL_WINDOW = WindowStyleMask._internalMultiPlatform(
+    64,
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.macOS:
+          return 64;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///The window can appear full screen. A fullscreen window does not draw its title bar, and may have special handling for its toolbar.
   ///
@@ -79,16 +82,18 @@ class WindowStyleMask {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- MacOS ([Official API - NSWindow.StyleMask.fullSizeContentView](https://developer.apple.com/documentation/appkit/nswindow/stylemask/1644646-fullsizecontentview))
-  static final FULL_SIZE_CONTENT_VIEW =
-      WindowStyleMask._internalMultiPlatform(32768, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.macOS:
-        return 32768;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final FULL_SIZE_CONTENT_VIEW = WindowStyleMask._internalMultiPlatform(
+    32768,
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.macOS:
+          return 32768;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///The window is a HUD panel.
   ///
@@ -122,16 +127,18 @@ class WindowStyleMask {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- MacOS ([Official API - NSWindow.StyleMask.nonactivatingPanel](https://developer.apple.com/documentation/appkit/nswindow/stylemask/1644696-nonactivatingpanel))
-  static final NONACTIVATING_PANEL =
-      WindowStyleMask._internalMultiPlatform(128, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.macOS:
-        return 128;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final NONACTIVATING_PANEL = WindowStyleMask._internalMultiPlatform(
+    128,
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.macOS:
+          return 128;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///The window can be resized by the user.
   ///
@@ -194,8 +201,9 @@ class WindowStyleMask {
   static WindowStyleMask? fromValue(int? value) {
     if (value != null) {
       try {
-        return WindowStyleMask.values
-            .firstWhere((element) => element.toValue() == value);
+        return WindowStyleMask.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return WindowStyleMask._internal(value, value);
       }
@@ -207,8 +215,9 @@ class WindowStyleMask {
   static WindowStyleMask? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return WindowStyleMask.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return WindowStyleMask.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return WindowStyleMask._internal(value, value);
       }
@@ -230,10 +239,11 @@ class WindowStyleMask {
 
   WindowStyleMask operator |(WindowStyleMask value) =>
       WindowStyleMask._internal(
-          value.toValue() | _value,
-          value.toNativeValue() != null && _nativeValue != null
-              ? value.toNativeValue()! | _nativeValue
-              : _nativeValue);
+        value.toValue() | _value,
+        value.toNativeValue() != null && _nativeValue != null
+            ? value.toNativeValue()! | _nativeValue
+            : _nativeValue,
+      );
   @override
   String toString() {
     switch (_value) {

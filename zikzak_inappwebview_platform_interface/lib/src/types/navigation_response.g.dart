@@ -16,10 +16,11 @@ class NavigationResponse {
 
   ///The URL for the response.
   URLResponse? response;
-  NavigationResponse(
-      {required this.canShowMIMEType,
-      required this.isForMainFrame,
-      this.response});
+  NavigationResponse({
+    required this.canShowMIMEType,
+    required this.isForMainFrame,
+    this.response,
+  });
 
   ///Gets a possible [NavigationResponse] instance from a [Map] value.
   static NavigationResponse? fromMap(Map<String, dynamic>? map) {

@@ -20,7 +20,8 @@ class AndroidTracingControllerCreationParams
 
   /// Creates a [AndroidTracingControllerCreationParams] instance based on [PlatformTracingControllerCreationParams].
   factory AndroidTracingControllerCreationParams.fromPlatformTracingControllerCreationParams(
-      PlatformTracingControllerCreationParams params) {
+    PlatformTracingControllerCreationParams params,
+  ) {
     return AndroidTracingControllerCreationParams(params);
   }
 }
@@ -31,14 +32,16 @@ class AndroidTracingController extends PlatformTracingController
     implements Disposable {
   /// Creates a new [AndroidTracingController].
   AndroidTracingController(PlatformTracingControllerCreationParams params)
-      : super.implementation(
-          params is AndroidTracingControllerCreationParams
-              ? params
-              : AndroidTracingControllerCreationParams
-                  .fromPlatformTracingControllerCreationParams(params),
-        ) {
-    channel =
-        const MethodChannel('wtf.zikzak/zikzak_inappwebview_tracingcontroller');
+    : super.implementation(
+        params is AndroidTracingControllerCreationParams
+            ? params
+            : AndroidTracingControllerCreationParams.fromPlatformTracingControllerCreationParams(
+                params,
+              ),
+      ) {
+    channel = const MethodChannel(
+      'wtf.zikzak/zikzak_inappwebview_tracingcontroller',
+    );
     handler = handleMethod;
     initMethodCallHandler();
   }
@@ -51,8 +54,11 @@ class AndroidTracingController extends PlatformTracingController
   }
 
   static AndroidTracingController _init() {
-    _instance = AndroidTracingController(AndroidTracingControllerCreationParams(
-        const PlatformTracingControllerCreationParams()));
+    _instance = AndroidTracingController(
+      AndroidTracingControllerCreationParams(
+        const PlatformTracingControllerCreationParams(),
+      ),
+    );
     return _instance!;
   }
 

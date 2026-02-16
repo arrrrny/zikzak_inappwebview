@@ -68,18 +68,19 @@ class FetchRequest_ {
   ///Indicates the [FetchRequestAction] that can be used to control the request.
   FetchRequestAction_? action;
 
-  FetchRequest_(
-      {this.url,
-      this.method,
-      this.headers,
-      this.body,
-      this.mode,
-      this.credentials,
-      this.cache,
-      this.redirect,
-      this.referrer,
-      this.referrerPolicy,
-      this.integrity,
-      this.keepalive,
-      this.action = FetchRequestAction_.PROCEED});
+  FetchRequest_({
+    this.url,
+    this.method,
+    this.headers,
+    this.body,
+    this.mode,
+    this.credentials,
+    this.cache,
+    this.redirect,
+    this.referrer,
+    this.referrerPolicy,
+    this.integrity,
+    this.keepalive,
+    this.action = FetchRequestAction_.PROCEED,
+  });
 }

@@ -32,7 +32,8 @@ abstract class PlatformWebStorageManager extends PlatformInterface
     implements Disposable {
   /// Creates a new [PlatformCookieManager]
   factory PlatformWebStorageManager(
-      PlatformWebStorageManagerCreationParams params) {
+    PlatformWebStorageManagerCreationParams params,
+  ) {
     assert(
       InAppWebViewPlatform.instance != null,
       'A platform implementation for `zikzak_inappwebview` has not been set. Please '
@@ -40,8 +41,9 @@ abstract class PlatformWebStorageManager extends PlatformInterface
       '`WebViewPlatform.instance` before use. For unit testing, '
       '`WebViewPlatform.instance` can be set with your own test implementation.',
     );
-    final PlatformWebStorageManager cookieManager =
-        InAppWebViewPlatform.instance!.createPlatformWebStorageManager(params);
+    final PlatformWebStorageManager cookieManager = InAppWebViewPlatform
+        .instance!
+        .createPlatformWebStorageManager(params);
     PlatformInterface.verify(cookieManager, _token);
     return cookieManager;
   }
@@ -67,7 +69,8 @@ abstract class PlatformWebStorageManager extends PlatformInterface
   ///{@endtemplate}
   Future<List<WebStorageOrigin>> getOrigins() {
     throw UnimplementedError(
-        'getOrigins is not implemented on the current platform');
+      'getOrigins is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebStorageManager.deleteAllData}
@@ -79,7 +82,8 @@ abstract class PlatformWebStorageManager extends PlatformInterface
   ///{@endtemplate}
   Future<void> deleteAllData() {
     throw UnimplementedError(
-        'deleteAllData is not implemented on the current platform');
+      'deleteAllData is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebStorageManager.deleteOrigin}
@@ -91,7 +95,8 @@ abstract class PlatformWebStorageManager extends PlatformInterface
   ///{@endtemplate}
   Future<void> deleteOrigin({required String origin}) {
     throw UnimplementedError(
-        'deleteOrigin is not implemented on the current platform');
+      'deleteOrigin is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebStorageManager.getQuotaForOrigin}
@@ -104,7 +109,8 @@ abstract class PlatformWebStorageManager extends PlatformInterface
   ///{@endtemplate}
   Future<int> getQuotaForOrigin({required String origin}) {
     throw UnimplementedError(
-        'getQuotaForOrigin is not implemented on the current platform');
+      'getQuotaForOrigin is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebStorageManager.getUsageForOrigin}
@@ -116,7 +122,8 @@ abstract class PlatformWebStorageManager extends PlatformInterface
   ///{@endtemplate}
   Future<int> getUsageForOrigin({required String origin}) {
     throw UnimplementedError(
-        'getUsageForOrigin is not implemented on the current platform');
+      'getUsageForOrigin is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebStorageManager.fetchDataRecords}
@@ -128,10 +135,12 @@ abstract class PlatformWebStorageManager extends PlatformInterface
   ///- iOS ([Official API - WKWebsiteDataStore.fetchDataRecords](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532932-fetchdatarecords))
   ///- MacOS ([Official API - WKWebsiteDataStore.fetchDataRecords](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532932-fetchdatarecords))
   ///{@endtemplate}
-  Future<List<WebsiteDataRecord>> fetchDataRecords(
-      {required Set<WebsiteDataType> dataTypes}) {
+  Future<List<WebsiteDataRecord>> fetchDataRecords({
+    required Set<WebsiteDataType> dataTypes,
+  }) {
     throw UnimplementedError(
-        'fetchDataRecords is not implemented on the current platform');
+      'fetchDataRecords is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebStorageManager.removeDataFor}
@@ -145,11 +154,13 @@ abstract class PlatformWebStorageManager extends PlatformInterface
   ///- iOS ([Official API - WKWebsiteDataStore.removeData](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532936-removedata))
   ///- MacOS ([Official API - WKWebsiteDataStore.removeData](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532936-removedata))
   ///{@endtemplate}
-  Future<void> removeDataFor(
-      {required Set<WebsiteDataType> dataTypes,
-      required List<WebsiteDataRecord> dataRecords}) {
+  Future<void> removeDataFor({
+    required Set<WebsiteDataType> dataTypes,
+    required List<WebsiteDataRecord> dataRecords,
+  }) {
     throw UnimplementedError(
-        'removeDataFor is not implemented on the current platform');
+      'removeDataFor is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebStorageManager.removeDataModifiedSince}
@@ -163,9 +174,12 @@ abstract class PlatformWebStorageManager extends PlatformInterface
   ///- iOS ([Official API - WKWebsiteDataStore.removeData](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532938-removedata))
   ///- MacOS ([Official API - WKWebsiteDataStore.removeData](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532938-removedata))
   ///{@endtemplate}
-  Future<void> removeDataModifiedSince(
-      {required Set<WebsiteDataType> dataTypes, required DateTime date}) {
+  Future<void> removeDataModifiedSince({
+    required Set<WebsiteDataType> dataTypes,
+    required DateTime date,
+  }) {
     throw UnimplementedError(
-        'removeDataModifiedSince is not implemented on the current platform');
+      'removeDataModifiedSince is not implemented on the current platform',
+    );
   }
 }

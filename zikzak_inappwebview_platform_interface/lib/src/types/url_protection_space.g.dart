@@ -60,17 +60,18 @@ class URLProtectionSpace {
 
   ///The SSL Error associated.
   SslError? sslError;
-  URLProtectionSpace(
-      {this.authenticationMethod,
-      this.distinguishedNames,
-      required this.host,
-      this.port,
-      this.protocol,
-      this.proxyType,
-      this.realm,
-      this.receivesCredentialSecurely,
-      this.sslCertificate,
-      this.sslError});
+  URLProtectionSpace({
+    this.authenticationMethod,
+    this.distinguishedNames,
+    required this.host,
+    this.port,
+    this.protocol,
+    this.proxyType,
+    this.realm,
+    this.receivesCredentialSecurely,
+    this.sslCertificate,
+    this.sslError,
+  });
 
   ///Gets a possible [URLProtectionSpace] instance from a [Map] value.
   static URLProtectionSpace? fromMap(Map<String, dynamic>? map) {
@@ -80,9 +81,11 @@ class URLProtectionSpace {
     final instance = URLProtectionSpace(
       authenticationMethod:
           URLProtectionSpaceAuthenticationMethod.fromNativeValue(
-              map['authenticationMethod']),
-      distinguishedNames:
-          _distinguishedNamesDeserializer(map['distinguishedNames']),
+            map['authenticationMethod'],
+          ),
+      distinguishedNames: _distinguishedNamesDeserializer(
+        map['distinguishedNames'],
+      ),
       host: map['host'],
       port: map['port'],
       protocol: map['protocol'],
@@ -90,7 +93,8 @@ class URLProtectionSpace {
       realm: map['realm'],
       receivesCredentialSecurely: map['receivesCredentialSecurely'],
       sslCertificate: SslCertificate.fromMap(
-          map['sslCertificate']?.cast<String, dynamic>()),
+        map['sslCertificate']?.cast<String, dynamic>(),
+      ),
       sslError: SslError.fromMap(map['sslError']?.cast<String, dynamic>()),
     );
     return instance;

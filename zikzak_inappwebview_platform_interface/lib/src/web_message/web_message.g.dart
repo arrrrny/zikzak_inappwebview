@@ -11,10 +11,11 @@ class WebMessageType {
   final int _value;
   final int _nativeValue;
   const WebMessageType._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory WebMessageType._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      WebMessageType._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => WebMessageType._internal(value, nativeValue());
 
   ///Indicates the payload of WebMessageCompat is JavaScript ArrayBuffer.
   ///
@@ -34,8 +35,9 @@ class WebMessageType {
   static WebMessageType? fromValue(int? value) {
     if (value != null) {
       try {
-        return WebMessageType.values
-            .firstWhere((element) => element.toValue() == value);
+        return WebMessageType.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -47,8 +49,9 @@ class WebMessageType {
   static WebMessageType? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return WebMessageType.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return WebMessageType.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -96,11 +99,13 @@ class WebMessage {
   ///The payload type of the message.
   WebMessageType type;
   WebMessage({this.data, this.type = WebMessageType.STRING, this.ports}) {
-    assert(((this.data == null || this.data is String) &&
-            this.type == WebMessageType.STRING) ||
-        (this.data != null &&
-            this.data is Uint8List &&
-            this.type == WebMessageType.ARRAY_BUFFER));
+    assert(
+      ((this.data == null || this.data is String) &&
+              this.type == WebMessageType.STRING) ||
+          (this.data != null &&
+              this.data is Uint8List &&
+              this.type == WebMessageType.ARRAY_BUFFER),
+    );
   }
 
   ///Gets a possible [WebMessage] instance from a [Map] value.

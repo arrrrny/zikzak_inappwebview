@@ -22,11 +22,12 @@ class ClientCertResponse {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   String? keyStoreType;
-  ClientCertResponse(
-      {required this.certificatePath,
-      this.certificatePassword = "",
-      this.keyStoreType = "PKCS12",
-      this.action = ClientCertResponseAction.CANCEL}) {
+  ClientCertResponse({
+    required this.certificatePath,
+    this.certificatePassword = "",
+    this.keyStoreType = "PKCS12",
+    this.action = ClientCertResponseAction.CANCEL,
+  }) {
     if (this.action == ClientCertResponseAction.PROCEED)
       assert(certificatePath.isNotEmpty);
     if (Util.isAndroid) assert(this.keyStoreType != null);

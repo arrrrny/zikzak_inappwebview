@@ -6,11 +6,15 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 ///{@macro zikzak_inappwebview_platform_interface.PlatformPullToRefreshController}
 class PullToRefreshController {
   ///{@macro zikzak_inappwebview_platform_interface.PlatformPullToRefreshController}
-  PullToRefreshController(
-      {void Function()? onRefresh, PullToRefreshSettings? settings})
-      : this.fromPlatformCreationParams(
-            params: PlatformPullToRefreshControllerCreationParams(
-                onRefresh: onRefresh, settings: settings));
+  PullToRefreshController({
+    void Function()? onRefresh,
+    PullToRefreshSettings? settings,
+  }) : this.fromPlatformCreationParams(
+         params: PlatformPullToRefreshControllerCreationParams(
+           onRefresh: onRefresh,
+           settings: settings,
+         ),
+       );
 
   /// Constructs a [PullToRefreshController].
   ///

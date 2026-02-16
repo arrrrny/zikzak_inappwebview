@@ -28,7 +28,8 @@ abstract class PlatformServiceWorkerController extends PlatformInterface
     implements Disposable {
   /// Creates a new [PlatformServiceWorkerController]
   factory PlatformServiceWorkerController(
-      PlatformServiceWorkerControllerCreationParams params) {
+    PlatformServiceWorkerControllerCreationParams params,
+  ) {
     assert(
       InAppWebViewPlatform.instance != null,
       'A platform implementation for `zikzak_inappwebview` has not been set. Please '
@@ -37,8 +38,9 @@ abstract class PlatformServiceWorkerController extends PlatformInterface
       '`WebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformServiceWorkerController serviceWorkerController =
-        InAppWebViewPlatform.instance!
-            .createPlatformServiceWorkerController(params);
+        InAppWebViewPlatform.instance!.createPlatformServiceWorkerController(
+          params,
+        );
     PlatformInterface.verify(serviceWorkerController, _token);
     return serviceWorkerController;
   }
@@ -66,7 +68,7 @@ abstract class PlatformServiceWorkerController extends PlatformInterface
   /// a class that only contains a factory constructor.
   @protected
   PlatformServiceWorkerController.implementation(this.params)
-      : super(token: _token);
+    : super(token: _token);
 
   static final Object _token = Object();
 
@@ -87,7 +89,8 @@ abstract class PlatformServiceWorkerController extends PlatformInterface
   ///{@endtemplate}
   Future<void> setServiceWorkerClient(ServiceWorkerClient? value) {
     throw UnimplementedError(
-        'setServiceWorkerClient is not implemented on the current platform');
+      'setServiceWorkerClient is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformServiceWorkerController.getAllowContentAccess}
@@ -100,7 +103,8 @@ abstract class PlatformServiceWorkerController extends PlatformInterface
   ///{@endtemplate}
   Future<bool> getAllowContentAccess() {
     throw UnimplementedError(
-        'getAllowContentAccess is not implemented on the current platform');
+      'getAllowContentAccess is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformServiceWorkerController.getAllowFileAccess}
@@ -113,7 +117,8 @@ abstract class PlatformServiceWorkerController extends PlatformInterface
   ///{@endtemplate}
   Future<bool> getAllowFileAccess() {
     throw UnimplementedError(
-        'getAllowFileAccess is not implemented on the current platform');
+      'getAllowFileAccess is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformServiceWorkerController.getBlockNetworkLoads}
@@ -126,7 +131,8 @@ abstract class PlatformServiceWorkerController extends PlatformInterface
   ///{@endtemplate}
   Future<bool> getBlockNetworkLoads() {
     throw UnimplementedError(
-        'getBlockNetworkLoads is not implemented on the current platform');
+      'getBlockNetworkLoads is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformServiceWorkerController.getCacheMode}
@@ -139,7 +145,8 @@ abstract class PlatformServiceWorkerController extends PlatformInterface
   ///{@endtemplate}
   Future<CacheMode?> getCacheMode() {
     throw UnimplementedError(
-        'getCacheMode is not implemented on the current platform');
+      'getCacheMode is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformServiceWorkerController.setAllowContentAccess}
@@ -152,7 +159,8 @@ abstract class PlatformServiceWorkerController extends PlatformInterface
   ///{@endtemplate}
   Future<void> setAllowContentAccess(bool allow) {
     throw UnimplementedError(
-        'setAllowContentAccess is not implemented on the current platform');
+      'setAllowContentAccess is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformServiceWorkerController.setAllowFileAccess}
@@ -165,7 +173,8 @@ abstract class PlatformServiceWorkerController extends PlatformInterface
   ///{@endtemplate}
   Future<void> setAllowFileAccess(bool allow) {
     throw UnimplementedError(
-        'setAllowFileAccess is not implemented on the current platform');
+      'setAllowFileAccess is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformServiceWorkerController.setBlockNetworkLoads}
@@ -178,7 +187,8 @@ abstract class PlatformServiceWorkerController extends PlatformInterface
   ///{@endtemplate}
   Future<void> setBlockNetworkLoads(bool flag) {
     throw UnimplementedError(
-        'setBlockNetworkLoads is not implemented on the current platform');
+      'setBlockNetworkLoads is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformServiceWorkerController.setCacheMode}
@@ -191,7 +201,8 @@ abstract class PlatformServiceWorkerController extends PlatformInterface
   ///{@endtemplate}
   Future<void> setCacheMode(CacheMode mode) {
     throw UnimplementedError(
-        'setCacheMode is not implemented on the current platform');
+      'setCacheMode is not implemented on the current platform',
+    );
   }
 }
 
@@ -217,7 +228,7 @@ class ServiceWorkerClient {
   ///**NOTE**: available on Android 24+.
   ///{@endtemplate}
   final Future<WebResourceResponse?> Function(WebResourceRequest request)?
-      shouldInterceptRequest;
+  shouldInterceptRequest;
 
   ServiceWorkerClient({this.shouldInterceptRequest});
 }

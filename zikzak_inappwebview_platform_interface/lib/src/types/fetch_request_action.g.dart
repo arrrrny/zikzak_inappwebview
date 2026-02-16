@@ -11,10 +11,11 @@ class FetchRequestAction {
   final int _value;
   final int _nativeValue;
   const FetchRequestAction._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory FetchRequestAction._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      FetchRequestAction._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => FetchRequestAction._internal(value, nativeValue());
 
   ///Aborts the fetch request.
   static const ABORT = FetchRequestAction._internal(0, 0);
@@ -32,8 +33,9 @@ class FetchRequestAction {
   static FetchRequestAction? fromValue(int? value) {
     if (value != null) {
       try {
-        return FetchRequestAction.values
-            .firstWhere((element) => element.toValue() == value);
+        return FetchRequestAction.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -45,8 +47,9 @@ class FetchRequestAction {
   static FetchRequestAction? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return FetchRequestAction.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return FetchRequestAction.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }

@@ -22,12 +22,13 @@ class JsBeforeUnloadResponse {
 
   ///Message to be displayed in the window.
   String message;
-  JsBeforeUnloadResponse(
-      {this.action = JsBeforeUnloadResponseAction.CONFIRM,
-      this.cancelButtonTitle = "",
-      this.confirmButtonTitle = "",
-      this.handledByClient = false,
-      this.message = ""});
+  JsBeforeUnloadResponse({
+    this.action = JsBeforeUnloadResponseAction.CONFIRM,
+    this.cancelButtonTitle = "",
+    this.confirmButtonTitle = "",
+    this.handledByClient = false,
+    this.message = "",
+  });
 
   ///Gets a possible [JsBeforeUnloadResponse] instance from a [Map] value.
   static JsBeforeUnloadResponse? fromMap(Map<String, dynamic>? map) {
@@ -35,8 +36,9 @@ class JsBeforeUnloadResponse {
       return null;
     }
     final instance = JsBeforeUnloadResponse();
-    instance.action =
-        JsBeforeUnloadResponseAction.fromNativeValue(map['action']);
+    instance.action = JsBeforeUnloadResponseAction.fromNativeValue(
+      map['action'],
+    );
     instance.cancelButtonTitle = map['cancelButtonTitle'];
     instance.confirmButtonTitle = map['confirmButtonTitle'];
     instance.handledByClient = map['handledByClient'];

@@ -370,7 +370,8 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Look at using [WebStorageManager] in `zikzak_inappwebview` instead.
   @override
   AndroidWebStorageManager createPlatformWebStorageManager(
-      PlatformWebStorageManagerCreationParams params) {
+    PlatformWebStorageManagerCreationParams params,
+  ) {
     return AndroidWebStorageManager(params);
   }
 }

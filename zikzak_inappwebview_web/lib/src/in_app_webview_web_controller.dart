@@ -10,8 +10,9 @@ class InAppWebViewWebController extends PlatformInAppWebViewController {
   Function(WebUri? url)? onLoadStartCallback;
 
   InAppWebViewWebController(
-      PlatformInAppWebViewControllerCreationParams params, this._iframe)
-      : super.implementation(params) {
+    PlatformInAppWebViewControllerCreationParams params,
+    this._iframe,
+  ) : super.implementation(params) {
     _iframe.onLoad.listen((event) {
       // print("Iframe loaded: ${_iframe.src}");
       // Use a small delay to ensure the window object is ready and accessible
@@ -47,8 +48,10 @@ class InAppWebViewWebController extends PlatformInAppWebViewController {
           }
 
           if (params.webviewParams?.onConsoleMessage != null) {
-            params.webviewParams!.onConsoleMessage!(this,
-                ConsoleMessage(message: message, messageLevel: consoleLevel));
+            params.webviewParams!.onConsoleMessage!(
+              this,
+              ConsoleMessage(message: message, messageLevel: consoleLevel),
+            );
           }
         }
       } catch (_) {
@@ -120,12 +123,14 @@ class InAppWebViewWebController extends PlatformInAppWebViewController {
         // Fallback for cases where Dart might wrap it differently, though about:blank should be fine.
         // If we are here, it might be Cross-Origin or Dart's type system being tricky.
         print(
-            "Content window is not an html.Window (likely cross-origin blocked or type mismatch)");
+          "Content window is not an html.Window (likely cross-origin blocked or type mismatch)",
+        );
 
         // Strategy 2: Try accessing contentDocument directly from the iframe element via JS interop
         // This bypasses the contentWindow wrapper which might be causing issues.
         print(
-            "Attempting to access contentDocument via JS interop on iframe element...");
+          "Attempting to access contentDocument via JS interop on iframe element...",
+        );
         try {
           final jsIframe = js.JsObject.fromBrowserObject(_iframe);
           if (jsIframe.hasProperty('contentDocument')) {
@@ -197,7 +202,8 @@ class InAppWebViewWebController extends PlatformInAppWebViewController {
                 return;
               } else {
                 print(
-                    "Could not find body/head/documentElement to append script");
+                  "Could not find body/head/documentElement to append script",
+                );
               }
             }
           }
@@ -271,8 +277,10 @@ class InAppWebViewWebController extends PlatformInAppWebViewController {
   }
 
   @override
-  Future<void> loadUrl(
-      {required URLRequest urlRequest, WebUri? allowingReadAccessTo}) async {
+  Future<void> loadUrl({
+    required URLRequest urlRequest,
+    WebUri? allowingReadAccessTo,
+  }) async {
     if (urlRequest.url != null) {
       if (onLoadStartCallback != null) {
         onLoadStartCallback!(urlRequest.url);
@@ -282,13 +290,14 @@ class InAppWebViewWebController extends PlatformInAppWebViewController {
   }
 
   @override
-  Future<void> loadData(
-      {required String data,
-      String mimeType = "text/html",
-      String encoding = "utf8",
-      WebUri? baseUrl,
-      WebUri? historyUrl,
-      WebUri? allowingReadAccessTo}) async {
+  Future<void> loadData({
+    required String data,
+    String mimeType = "text/html",
+    String encoding = "utf8",
+    WebUri? baseUrl,
+    WebUri? historyUrl,
+    WebUri? allowingReadAccessTo,
+  }) async {
     if (onLoadStartCallback != null) {
       onLoadStartCallback!(baseUrl);
     }
@@ -297,9 +306,11 @@ class InAppWebViewWebController extends PlatformInAppWebViewController {
     if (mimeType == "text/html") {
       _iframe.setAttribute('srcdoc', data);
     } else {
-      final dataUri = Uri.dataFromString(data,
-              mimeType: mimeType, encoding: Encoding.getByName(encoding))
-          .toString();
+      final dataUri = Uri.dataFromString(
+        data,
+        mimeType: mimeType,
+        encoding: Encoding.getByName(encoding),
+      ).toString();
       _iframe.src = dataUri;
     }
   }
@@ -348,8 +359,10 @@ class InAppWebViewWebController extends PlatformInAppWebViewController {
   }
 
   @override
-  Future<dynamic> evaluateJavascript(
-      {required String source, ContentWorld? contentWorld}) async {
+  Future<dynamic> evaluateJavascript({
+    required String source,
+    ContentWorld? contentWorld,
+  }) async {
     try {
       final window = _iframe.contentWindow;
       if (window != null) {

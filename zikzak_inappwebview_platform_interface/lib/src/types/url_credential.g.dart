@@ -28,8 +28,12 @@ class URLCredential {
 
   ///The credential’s user name.
   String? username;
-  URLCredential(
-      {this.certificates, this.password, this.persistence, this.username});
+  URLCredential({
+    this.certificates,
+    this.password,
+    this.persistence,
+    this.username,
+  });
 
   ///Gets a possible [URLCredential] instance from a [Map] value.
   static URLCredential? fromMap(Map<String, dynamic>? map) {

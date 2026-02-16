@@ -17,19 +17,14 @@ class FetchRequestCredentialDefault extends FetchRequestCredential {
     if (map == null) {
       return null;
     }
-    final instance = FetchRequestCredentialDefault(
-      value: map['value'],
-    );
+    final instance = FetchRequestCredentialDefault(value: map['value']);
     instance.type = map['type'];
     return instance;
   }
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
-    return {
-      "type": type,
-      "value": value,
-    };
+    return {"type": type, "value": value};
   }
 
   ///Converts instance to a map.

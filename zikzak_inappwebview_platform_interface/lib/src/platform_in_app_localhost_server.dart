@@ -44,7 +44,8 @@ class PlatformInAppLocalhostServerCreationParams {
 abstract class PlatformInAppLocalhostServer extends PlatformInterface {
   /// Creates a new [PlatformInAppLocalhostServer]
   factory PlatformInAppLocalhostServer(
-      PlatformInAppLocalhostServerCreationParams params) {
+    PlatformInAppLocalhostServerCreationParams params,
+  ) {
     assert(
       InAppWebViewPlatform.instance != null,
       'A platform implementation for `zikzak_inappwebview` has not been set. Please '
@@ -53,8 +54,9 @@ abstract class PlatformInAppLocalhostServer extends PlatformInterface {
       '`WebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformInAppLocalhostServer inAppLocalhostServer =
-        InAppWebViewPlatform.instance!
-            .createPlatformInAppLocalhostServer(params);
+        InAppWebViewPlatform.instance!.createPlatformInAppLocalhostServer(
+          params,
+        );
     PlatformInterface.verify(inAppLocalhostServer, _token);
     return inAppLocalhostServer;
   }
@@ -66,7 +68,7 @@ abstract class PlatformInAppLocalhostServer extends PlatformInterface {
   /// a class that only contains a factory constructor.
   @protected
   PlatformInAppLocalhostServer.implementation(this.params)
-      : super(token: _token);
+    : super(token: _token);
 
   static final Object _token = Object();
 
@@ -114,7 +116,8 @@ abstract class PlatformInAppLocalhostServer extends PlatformInterface {
   ///{@endtemplate}
   Future<void> start() {
     throw UnimplementedError(
-        'start is not implemented on the current platform');
+      'start is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppLocalhostServer.close}
@@ -122,7 +125,8 @@ abstract class PlatformInAppLocalhostServer extends PlatformInterface {
   ///{@endtemplate}
   Future<void> close() {
     throw UnimplementedError(
-        'close is not implemented on the current platform');
+      'close is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppLocalhostServer.isRunning}
@@ -130,6 +134,7 @@ abstract class PlatformInAppLocalhostServer extends PlatformInterface {
   ///{@endtemplate}
   bool isRunning() {
     throw UnimplementedError(
-        'isRunning is not implemented on the current platform');
+      'isRunning is not implemented on the current platform',
+    );
   }
 }

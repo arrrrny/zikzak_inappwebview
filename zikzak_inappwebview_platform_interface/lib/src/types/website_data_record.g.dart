@@ -23,7 +23,8 @@ class WebsiteDataRecord {
     final instance = WebsiteDataRecord(
       dataTypes: map['dataTypes'] != null
           ? Set<WebsiteDataType>.from(
-              map['dataTypes'].map((e) => WebsiteDataType.fromNativeValue(e)!))
+              map['dataTypes'].map((e) => WebsiteDataType.fromNativeValue(e)!),
+            )
           : null,
       displayName: map['displayName'],
     );

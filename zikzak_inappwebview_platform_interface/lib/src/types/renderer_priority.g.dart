@@ -11,10 +11,11 @@ class RendererPriority {
   final int _value;
   final int _nativeValue;
   const RendererPriority._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory RendererPriority._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      RendererPriority._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => RendererPriority._internal(value, nativeValue());
 
   ///The renderer associated with this WebView is bound with the default priority for services.
   static const RENDERER_PRIORITY_BOUND = RendererPriority._internal(1, 1);
@@ -37,8 +38,9 @@ class RendererPriority {
   static RendererPriority? fromValue(int? value) {
     if (value != null) {
       try {
-        return RendererPriority.values
-            .firstWhere((element) => element.toValue() == value);
+        return RendererPriority.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -50,8 +52,9 @@ class RendererPriority {
   static RendererPriority? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return RendererPriority.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return RendererPriority.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }

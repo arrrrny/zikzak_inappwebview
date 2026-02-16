@@ -16,8 +16,10 @@ class ConsoleMessage {
 
   ///Console message level
   ConsoleMessageLevel messageLevel;
-  ConsoleMessage(
-      {this.message = "", this.messageLevel = ConsoleMessageLevel.LOG});
+  ConsoleMessage({
+    this.message = "",
+    this.messageLevel = ConsoleMessageLevel.LOG,
+  });
 
   ///Gets a possible [ConsoleMessage] instance from a [Map] value.
   static ConsoleMessage? fromMap(Map<String, dynamic>? map) {
@@ -26,17 +28,15 @@ class ConsoleMessage {
     }
     final instance = ConsoleMessage();
     instance.message = map['message'];
-    instance.messageLevel =
-        ConsoleMessageLevel.fromNativeValue(map['messageLevel'])!;
+    instance.messageLevel = ConsoleMessageLevel.fromNativeValue(
+      map['messageLevel'],
+    )!;
     return instance;
   }
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
-    return {
-      "message": message,
-      "messageLevel": messageLevel.toNativeValue(),
-    };
+    return {"message": message, "messageLevel": messageLevel.toNativeValue()};
   }
 
   ///Converts instance to a map.

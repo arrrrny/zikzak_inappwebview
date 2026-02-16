@@ -11,64 +11,78 @@ abstract class PlatformJavaScriptDelegate extends PlatformInterface {
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.evaluateJavascript}
   Future<dynamic> evaluateJavascript({required String source}) {
     throw UnimplementedError(
-        'evaluateJavascript is not implemented on the current platform');
+      'evaluateJavascript is not implemented on the current platform',
+    );
   }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.callAsyncJavaScript}
-  Future<String?> callAsyncJavaScript(
-      {required String functionBody,
-      Map<String, dynamic> arguments = const <String, dynamic>{},
-      ContentWorld? contentWorld}) {
+  Future<String?> callAsyncJavaScript({
+    required String functionBody,
+    Map<String, dynamic> arguments = const <String, dynamic>{},
+    ContentWorld? contentWorld,
+  }) {
     throw UnimplementedError(
-        'callAsyncJavaScript is not implemented on the current platform');
+      'callAsyncJavaScript is not implemented on the current platform',
+    );
   }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.injectJavascriptFileFromUrl}
-  Future<void> injectJavascriptFileFromUrl(
-      {required WebUri urlFile,
-      ScriptHtmlTagAttributes? scriptHtmlTagAttributes}) {
+  Future<void> injectJavascriptFileFromUrl({
+    required WebUri urlFile,
+    ScriptHtmlTagAttributes? scriptHtmlTagAttributes,
+  }) {
     throw UnimplementedError(
-        'injectJavascriptFileFromUrl is not implemented on the current platform');
+      'injectJavascriptFileFromUrl is not implemented on the current platform',
+    );
   }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.injectJavascriptFileFromAsset}
   Future<void> injectJavascriptFileFromAsset({required String assetFilePath}) {
     throw UnimplementedError(
-        'injectJavascriptFileFromAsset is not implemented on the current platform');
+      'injectJavascriptFileFromAsset is not implemented on the current platform',
+    );
   }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.injectCSSFileFromUrl}
-  Future<void> injectCSSFileFromUrl(
-      {required WebUri urlFile,
-      CSSLinkHtmlTagAttributes? cssLinkHtmlTagAttributes}) {
+  Future<void> injectCSSFileFromUrl({
+    required WebUri urlFile,
+    CSSLinkHtmlTagAttributes? cssLinkHtmlTagAttributes,
+  }) {
     throw UnimplementedError(
-        'injectCSSFileFromUrl is not implemented on the current platform');
+      'injectCSSFileFromUrl is not implemented on the current platform',
+    );
   }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.injectCSSFileFromAsset}
   Future<void> injectCSSFileFromAsset({required String assetFilePath}) {
     throw UnimplementedError(
-        'injectCSSFileFromAsset is not implemented on the current platform');
+      'injectCSSFileFromAsset is not implemented on the current platform',
+    );
   }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.injectCSSCode}
   Future<void> injectCSSCode({required String source}) {
     throw UnimplementedError(
-        'injectCSSCode is not implemented on the current platform');
+      'injectCSSCode is not implemented on the current platform',
+    );
   }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.addJavaScriptHandler}
-  void addJavaScriptHandler(
-      {required String handlerName,
-      required JavaScriptHandlerCallback callback}) {
+  void addJavaScriptHandler({
+    required String handlerName,
+    required JavaScriptHandlerCallback callback,
+  }) {
     throw UnimplementedError(
-        'addJavaScriptHandler is not implemented on the current platform');
+      'addJavaScriptHandler is not implemented on the current platform',
+    );
   }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.removeJavaScriptHandler}
-  Future<JavaScriptHandlerCallback?> removeJavaScriptHandler(
-      {required String handlerName}) {
+  Future<JavaScriptHandlerCallback?> removeJavaScriptHandler({
+    required String handlerName,
+  }) {
     throw UnimplementedError(
-        'removeJavaScriptHandler is not implemented on the current platform');
+      'removeJavaScriptHandler is not implemented on the current platform',
+    );
   }
 }

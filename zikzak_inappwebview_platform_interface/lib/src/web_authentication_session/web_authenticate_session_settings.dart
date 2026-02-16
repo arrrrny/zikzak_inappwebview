@@ -26,12 +26,13 @@ class WebAuthenticationSessionSettings_ {
   ///- MacOS
   bool? prefersEphemeralWebBrowserSession;
 
-  WebAuthenticationSessionSettings_(
-      {this.prefersEphemeralWebBrowserSession = false});
+  WebAuthenticationSessionSettings_({
+    this.prefersEphemeralWebBrowserSession = false,
+  });
 
   Map<String, dynamic> toMap() {
     return {
-      "prefersEphemeralWebBrowserSession": prefersEphemeralWebBrowserSession
+      "prefersEphemeralWebBrowserSession": prefersEphemeralWebBrowserSession,
     };
   }
 }

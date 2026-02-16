@@ -48,7 +48,8 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
 
   /// Creates a new [PlatformChromeSafariBrowser]
   factory PlatformChromeSafariBrowser(
-      PlatformChromeSafariBrowserCreationParams params) {
+    PlatformChromeSafariBrowserCreationParams params,
+  ) {
     assert(
       InAppWebViewPlatform.instance != null,
       'A platform implementation for `zikzak_inappwebview` has not been set. Please '
@@ -85,7 +86,7 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
   /// a class that only contains a factory constructor.
   @protected
   PlatformChromeSafariBrowser.implementation(this.params)
-      : super(token: _token);
+    : super(token: _token);
 
   static final Object _token = Object();
 
@@ -111,12 +112,13 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
   ///- Android
   ///- iOS
   ///{@endtemplate}
-  Future<void> open(
-      {WebUri? url,
-      Map<String, String>? headers,
-      List<WebUri>? otherLikelyURLs,
-      WebUri? referrer,
-      ChromeSafariBrowserSettings? settings}) {
+  Future<void> open({
+    WebUri? url,
+    Map<String, String>? headers,
+    List<WebUri>? otherLikelyURLs,
+    WebUri? referrer,
+    ChromeSafariBrowserSettings? settings,
+  }) {
     throw UnimplementedError('open is not implemented on the current platform');
   }
 
@@ -143,7 +145,8 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
     WebUri? referrer,
   }) {
     throw UnimplementedError(
-        'launchUrl is not implemented on the current platform');
+      'launchUrl is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.mayLaunchUrl}
@@ -162,7 +165,8 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
   ///{@endtemplate}
   Future<bool> mayLaunchUrl({WebUri? url, List<WebUri>? otherLikelyURLs}) {
     throw UnimplementedError(
-        'mayLaunchUrl is not implemented on the current platform');
+      'mayLaunchUrl is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.validateRelationship}
@@ -183,10 +187,13 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
   ///**Officially Supported Platforms/Implementations**:
   ///- Android ([Official API - CustomTabsSession.validateRelationship](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsSession#validateRelationship(int,android.net.Uri,android.os.Bundle)))
   ///{@endtemplate}
-  Future<bool> validateRelationship(
-      {required CustomTabsRelationType relation, required WebUri origin}) {
+  Future<bool> validateRelationship({
+    required CustomTabsRelationType relation,
+    required WebUri origin,
+  }) {
     throw UnimplementedError(
-        'validateRelationship is not implemented on the current platform');
+      'validateRelationship is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.close}
@@ -198,7 +205,8 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
   ///{@endtemplate}
   Future<void> close() {
     throw UnimplementedError(
-        'close is not implemented on the current platform');
+      'close is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.setActionButton}
@@ -211,7 +219,8 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
   ///{@endtemplate}
   void setActionButton(ChromeSafariBrowserActionButton actionButton) {
     throw UnimplementedError(
-        'setActionButton is not implemented on the current platform');
+      'setActionButton is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.updateActionButton}
@@ -222,10 +231,13 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
   ///**Officially Supported Platforms/Implementations**:
   ///- Android ([Official API - CustomTabsSession.setActionButton](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsSession#setActionButton(android.graphics.Bitmap,java.lang.String)))
   ///{@endtemplate}
-  Future<void> updateActionButton(
-      {required Uint8List icon, required String description}) {
+  Future<void> updateActionButton({
+    required Uint8List icon,
+    required String description,
+  }) {
     throw UnimplementedError(
-        'updateActionButton is not implemented on the current platform');
+      'updateActionButton is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.setSecondaryToolbar}
@@ -237,9 +249,11 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
   ///- Android ([Official API - CustomTabsIntent.Builder.setSecondaryToolbarViews](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsIntent.Builder#setSecondaryToolbarViews(android.widget.RemoteViews,int[],android.app.PendingIntent)))
   ///{@endtemplate}
   void setSecondaryToolbar(
-      ChromeSafariBrowserSecondaryToolbar secondaryToolbar) {
+    ChromeSafariBrowserSecondaryToolbar secondaryToolbar,
+  ) {
     throw UnimplementedError(
-        'setSecondaryToolbar is not implemented on the current platform');
+      'setSecondaryToolbar is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.updateSecondaryToolbar}
@@ -251,9 +265,11 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
   ///- Android ([Official API - CustomTabsSession.setSecondaryToolbarViews](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsSession#setSecondaryToolbarViews(android.widget.RemoteViews,int[],android.app.PendingIntent)))
   ///{@endtemplate}
   Future<void> updateSecondaryToolbar(
-      ChromeSafariBrowserSecondaryToolbar secondaryToolbar) {
+    ChromeSafariBrowserSecondaryToolbar secondaryToolbar,
+  ) {
     throw UnimplementedError(
-        'updateSecondaryToolbar is not implemented on the current platform');
+      'updateSecondaryToolbar is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.addMenuItem}
@@ -267,7 +283,8 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
   ///{@endtemplate}
   void addMenuItem(ChromeSafariBrowserMenuItem menuItem) {
     throw UnimplementedError(
-        'addMenuItem is not implemented on the current platform');
+      'addMenuItem is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.addMenuItems}
@@ -281,7 +298,8 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
   ///{@endtemplate}
   void addMenuItems(List<ChromeSafariBrowserMenuItem> menuItems) {
     throw UnimplementedError(
-        'addMenuItems is not implemented on the current platform');
+      'addMenuItems is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.requestPostMessageChannel}
@@ -303,10 +321,13 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
   ///**Officially Supported Platforms/Implementations**:
   ///- Android ([Official API - CustomTabsSession.requestPostMessageChannel](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsSession#requestPostMessageChannel(android.net.Uri,android.net.Uri,android.os.Bundle)))
   ///{@endtemplate}
-  Future<bool> requestPostMessageChannel(
-      {required WebUri sourceOrigin, WebUri? targetOrigin}) {
+  Future<bool> requestPostMessageChannel({
+    required WebUri sourceOrigin,
+    WebUri? targetOrigin,
+  }) {
     throw UnimplementedError(
-        'requestPostMessageChannel is not implemented on the current platform');
+      'requestPostMessageChannel is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.postMessage}
@@ -323,7 +344,8 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
   ///{@endtemplate}
   Future<CustomTabsPostMessageResultType> postMessage(String message) {
     throw UnimplementedError(
-        'postMessage is not implemented on the current platform');
+      'postMessage is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.isEngagementSignalsApiAvailable}
@@ -339,7 +361,8 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
   ///{@endtemplate}
   Future<bool> isEngagementSignalsApiAvailable() {
     throw UnimplementedError(
-        'isEngagementSignalsApiAvailable is not implemented on the current platform');
+      'isEngagementSignalsApiAvailable is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.isOpened}
@@ -351,7 +374,8 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
   ///{@endtemplate}
   bool isOpened() {
     throw UnimplementedError(
-        'isOpened is not implemented on the current platform');
+      'isOpened is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.isAvailable}
@@ -365,7 +389,8 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
   ///{@endtemplate}
   Future<bool> isAvailable() {
     throw UnimplementedError(
-        'isAvailable is not implemented on the current platform');
+      'isAvailable is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.getMaxToolbarItems}
@@ -376,7 +401,8 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
   ///{@endtemplate}
   Future<int> getMaxToolbarItems() {
     throw UnimplementedError(
-        'getMaxToolbarItems is not implemented on the current platform');
+      'getMaxToolbarItems is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.getPackageName}
@@ -397,10 +423,13 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
   ///**Officially Supported Platforms/Implementations**:
   ///- Android ([Official API - CustomTabsClient.getPackageName](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsClient#getPackageName(android.content.Context,java.util.List%3Cjava.lang.String%3E,boolean))))
   ///{@endtemplate}
-  Future<String?> getPackageName(
-      {List<String>? packages, bool ignoreDefault = false}) {
+  Future<String?> getPackageName({
+    List<String>? packages,
+    bool ignoreDefault = false,
+  }) {
     throw UnimplementedError(
-        'getPackageName is not implemented on the current platform');
+      'getPackageName is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.clearWebsiteData}
@@ -414,7 +443,8 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
   ///{@endtemplate}
   Future<void> clearWebsiteData() {
     throw UnimplementedError(
-        'clearWebsiteData is not implemented on the current platform');
+      'clearWebsiteData is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.prewarmConnections}
@@ -441,7 +471,8 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
   ///{@endtemplate}
   Future<PrewarmingToken?> prewarmConnections(List<WebUri> URLs) {
     throw UnimplementedError(
-        'prewarmConnections is not implemented on the current platform');
+      'prewarmConnections is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.invalidatePrewarmingToken}
@@ -454,7 +485,8 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
   ///{@endtemplate}
   Future<void> invalidatePrewarmingToken(PrewarmingToken prewarmingToken) {
     throw UnimplementedError(
-        'invalidatePrewarmingToken is not implemented on the current platform');
+      'invalidatePrewarmingToken is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.dispose}
@@ -525,7 +557,10 @@ abstract class PlatformChromeSafariBrowserEvents {
   ///- Android ([Official API - CustomTabsCallback.onRelationshipValidationResult](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsCallback#onRelationshipValidationResult(int,android.net.Uri,boolean,android.os.Bundle)))
   ///{@endtemplate}
   void onRelationshipValidationResult(
-      CustomTabsRelationType? relation, WebUri? requestedOrigin, bool result) {}
+    CustomTabsRelationType? relation,
+    WebUri? requestedOrigin,
+    bool result,
+  ) {}
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.onWillOpenInBrowser}
   ///Event fired when the user opens the current page in the default browser by tapping the toolbar button.

@@ -14,20 +14,24 @@ class URLProtectionSpaceAuthenticationMethod_ {
   ///Use client certificate authentication for this protection space.
   static const NSURL_AUTHENTICATION_METHOD_CLIENT_CERTIFICATE =
       const URLProtectionSpaceAuthenticationMethod_._internal(
-          "NSURLAuthenticationMethodClientCertificate");
+        "NSURLAuthenticationMethodClientCertificate",
+      );
 
   ///Negotiate whether to use Kerberos or NTLM authentication for this protection space.
   static const NSURL_AUTHENTICATION_METHOD_NEGOTIATE =
       const URLProtectionSpaceAuthenticationMethod_._internal(
-          "NSURLAuthenticationMethodNegotiate");
+        "NSURLAuthenticationMethodNegotiate",
+      );
 
   ///Use NTLM authentication for this protection space.
   static const NSURL_AUTHENTICATION_METHOD_NTLM =
       const URLProtectionSpaceAuthenticationMethod_._internal(
-          "NSURLAuthenticationMethodNTLM");
+        "NSURLAuthenticationMethodNTLM",
+      );
 
   ///Perform server trust authentication (certificate validation) for this protection space.
   static const NSURL_AUTHENTICATION_METHOD_SERVER_TRUST =
       const URLProtectionSpaceAuthenticationMethod_._internal(
-          "NSURLAuthenticationMethodServerTrust");
+        "NSURLAuthenticationMethodServerTrust",
+      );
 }

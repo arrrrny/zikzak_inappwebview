@@ -106,22 +106,23 @@ class AttributedString {
   ///This value indicates whether the text is underlined and corresponds to one of the constants described in [UnderlineStyle].
   ///The default value for this attribute is [UnderlineStyle.STYLE_NONE].
   UnderlineStyle? underlineStyle;
-  AttributedString(
-      {this.backgroundColor,
-      this.baselineOffset,
-      this.expansion,
-      this.foregroundColor,
-      this.kern,
-      this.ligature,
-      this.obliqueness,
-      this.strikethroughColor,
-      this.strikethroughStyle,
-      required this.string,
-      this.strokeColor,
-      this.strokeWidth,
-      this.textEffect,
-      this.underlineColor,
-      this.underlineStyle});
+  AttributedString({
+    this.backgroundColor,
+    this.baselineOffset,
+    this.expansion,
+    this.foregroundColor,
+    this.kern,
+    this.ligature,
+    this.obliqueness,
+    this.strikethroughColor,
+    this.strikethroughStyle,
+    required this.string,
+    this.strokeColor,
+    this.strokeWidth,
+    this.textEffect,
+    this.underlineColor,
+    this.underlineStyle,
+  });
 
   ///Gets a possible [AttributedString] instance from a [Map] value.
   static AttributedString? fromMap(Map<String, dynamic>? map) {
@@ -143,15 +144,17 @@ class AttributedString {
       strikethroughColor: map['strikethroughColor'] != null
           ? UtilColor.fromStringRepresentation(map['strikethroughColor'])
           : null,
-      strikethroughStyle:
-          UnderlineStyle.fromNativeValue(map['strikethroughStyle']),
+      strikethroughStyle: UnderlineStyle.fromNativeValue(
+        map['strikethroughStyle'],
+      ),
       string: map['string'],
       strokeColor: map['strokeColor'] != null
           ? UtilColor.fromStringRepresentation(map['strokeColor'])
           : null,
       strokeWidth: map['strokeWidth'],
-      textEffect:
-          AttributedStringTextEffectStyle.fromNativeValue(map['textEffect']),
+      textEffect: AttributedStringTextEffectStyle.fromNativeValue(
+        map['textEffect'],
+      ),
       underlineColor: map['underlineColor'] != null
           ? UtilColor.fromStringRepresentation(map['underlineColor'])
           : null,

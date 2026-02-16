@@ -7,30 +7,33 @@ import '../in_app_webview/in_app_webview_controller.dart';
 
 class LinuxInAppBrowserCreationParams
     extends PlatformInAppBrowserCreationParams {
-  LinuxInAppBrowserCreationParams(
-      {super.contextMenu,
-      super.pullToRefreshController,
-      super.findInteractionController,
-      super.initialUserScripts,
-      super.windowId,
-      super.webViewEnvironment});
+  LinuxInAppBrowserCreationParams({
+    super.contextMenu,
+    super.pullToRefreshController,
+    super.findInteractionController,
+    super.initialUserScripts,
+    super.windowId,
+    super.webViewEnvironment,
+  });
 
   LinuxInAppBrowserCreationParams.fromPlatformInAppBrowserCreationParams(
-      PlatformInAppBrowserCreationParams params)
-      : this(
-            contextMenu: params.contextMenu,
-            pullToRefreshController: params.pullToRefreshController,
-            findInteractionController: params.findInteractionController,
-            initialUserScripts: params.initialUserScripts,
-            windowId: params.windowId,
-            webViewEnvironment: params.webViewEnvironment);
+    PlatformInAppBrowserCreationParams params,
+  ) : this(
+        contextMenu: params.contextMenu,
+        pullToRefreshController: params.pullToRefreshController,
+        findInteractionController: params.findInteractionController,
+        initialUserScripts: params.initialUserScripts,
+        windowId: params.windowId,
+        webViewEnvironment: params.webViewEnvironment,
+      );
 }
 
 class LinuxInAppBrowser extends PlatformInAppBrowser with ChannelController {
   MethodChannel? _channel;
 
-  static const MethodChannel _staticChannel =
-      MethodChannel('dev.zuzu/flutter_inappbrowser');
+  static const MethodChannel _staticChannel = MethodChannel(
+    'dev.zuzu/flutter_inappbrowser',
+  );
 
   LinuxInAppWebViewController? _webViewController;
   bool _isOpened = false;
@@ -39,15 +42,17 @@ class LinuxInAppBrowser extends PlatformInAppBrowser with ChannelController {
   LinuxInAppWebViewController? get webViewController => _webViewController;
 
   LinuxInAppBrowser(PlatformInAppBrowserCreationParams params)
-      : super.implementation(
-          params is LinuxInAppBrowserCreationParams
-              ? params
-              : LinuxInAppBrowserCreationParams
-                  .fromPlatformInAppBrowserCreationParams(params),
-        );
+    : super.implementation(
+        params is LinuxInAppBrowserCreationParams
+            ? params
+            : LinuxInAppBrowserCreationParams.fromPlatformInAppBrowserCreationParams(
+                params,
+              ),
+      );
 
-  static final LinuxInAppBrowser _staticValue =
-      LinuxInAppBrowser(LinuxInAppBrowserCreationParams());
+  static final LinuxInAppBrowser _staticValue = LinuxInAppBrowser(
+    LinuxInAppBrowserCreationParams(),
+  );
 
   factory LinuxInAppBrowser.static() {
     return _staticValue;
@@ -123,15 +128,18 @@ class LinuxInAppBrowser extends PlatformInAppBrowser with ChannelController {
 
     _webViewController = LinuxInAppWebViewController.fromInAppBrowser(
       PlatformInAppWebViewControllerCreationParams(
-          id: id,
-          webviewParams: PlatformInAppWebViewWidgetCreationParams(
-              controllerFromPlatform: (controller) => controller)),
+        id: id,
+        webviewParams: PlatformInAppWebViewWidgetCreationParams(
+          controllerFromPlatform: (controller) => controller,
+        ),
+      ),
       _channel!,
     );
   }
 
-  Map<String, dynamic> _prepareOpenRequest(
-      {InAppBrowserClassSettings? settings}) {
+  Map<String, dynamic> _prepareOpenRequest({
+    InAppBrowserClassSettings? settings,
+  }) {
     if (_isOpened) {
       return {};
     }
@@ -146,47 +154,56 @@ class LinuxInAppBrowser extends PlatformInAppBrowser with ChannelController {
     args.putIfAbsent('settings', () => initialSettings);
     args.putIfAbsent('contextMenu', () => contextMenu?.toMap() ?? {});
     args.putIfAbsent('windowId', () => windowId);
-    args.putIfAbsent('initialUserScripts',
-        () => initialUserScripts?.map((e) => e.toMap()).toList() ?? []);
     args.putIfAbsent(
-        'menuItems', () => _menuItems.values.map((e) => e.toMap()).toList());
+      'initialUserScripts',
+      () => initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
+    );
+    args.putIfAbsent(
+      'menuItems',
+      () => _menuItems.values.map((e) => e.toMap()).toList(),
+    );
 
     return args;
   }
 
   @override
-  Future<void> openUrlRequest(
-      {required URLRequest urlRequest,
-      InAppBrowserClassSettings? settings}) async {
+  Future<void> openUrlRequest({
+    required URLRequest urlRequest,
+    InAppBrowserClassSettings? settings,
+  }) async {
     Map<String, dynamic> args = _prepareOpenRequest(settings: settings);
     args.putIfAbsent('urlRequest', () => urlRequest.toMap());
     await _staticChannel.invokeMethod('open', args);
   }
 
   @override
-  Future<void> openFile(
-      {required String assetFilePath,
-      InAppBrowserClassSettings? settings}) async {
+  Future<void> openFile({
+    required String assetFilePath,
+    InAppBrowserClassSettings? settings,
+  }) async {
     Map<String, dynamic> args = _prepareOpenRequest(settings: settings);
     args.putIfAbsent('assetFilePath', () => assetFilePath);
     await _staticChannel.invokeMethod('open', args);
   }
 
   @override
-  Future<void> openData(
-      {required String data,
-      String mimeType = "text/html",
-      String encoding = "utf8",
-      WebUri? baseUrl,
-      WebUri? historyUrl,
-      InAppBrowserClassSettings? settings}) async {
+  Future<void> openData({
+    required String data,
+    String mimeType = "text/html",
+    String encoding = "utf8",
+    WebUri? baseUrl,
+    WebUri? historyUrl,
+    InAppBrowserClassSettings? settings,
+  }) async {
     Map<String, dynamic> args = _prepareOpenRequest(settings: settings);
     args.putIfAbsent('data', () => data);
     args.putIfAbsent('mimeType', () => mimeType);
     args.putIfAbsent('encoding', () => encoding);
     args.putIfAbsent('baseUrl', () => baseUrl?.toString() ?? "about:blank");
     args.putIfAbsent(
-        'historyUrl', () => historyUrl?.toString() ?? "about:blank");
+      'historyUrl',
+      () => historyUrl?.toString() ?? "about:blank",
+    );
     await _staticChannel.invokeMethod('open', args);
   }
 
@@ -218,8 +235,9 @@ class LinuxInAppBrowser extends PlatformInAppBrowser with ChannelController {
   }
 
   @override
-  Future<void> setSettings(
-      {required InAppBrowserClassSettings settings}) async {
+  Future<void> setSettings({
+    required InAppBrowserClassSettings settings,
+  }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('settings', () => settings.toMap());
     await _channel?.invokeMethod('setSettings', args);
@@ -228,9 +246,10 @@ class LinuxInAppBrowser extends PlatformInAppBrowser with ChannelController {
   @override
   Future<InAppBrowserClassSettings?> getSettings() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    Map<String, dynamic>? settings =
-        (await _channel?.invokeMethod('getSettings', args))
-            ?.cast<String, dynamic>();
+    Map<String, dynamic>? settings = (await _channel?.invokeMethod(
+      'getSettings',
+      args,
+    ))?.cast<String, dynamic>();
     return settings != null
         ? InAppBrowserClassSettings.fromMap(settings)
         : null;

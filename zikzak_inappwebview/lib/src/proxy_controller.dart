@@ -5,9 +5,9 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 class ProxyController {
   ///{@macro zikzak_inappwebview_platform_interface.PlatformProxyController}
   ProxyController()
-      : this.fromPlatformCreationParams(
-          const PlatformProxyControllerCreationParams(),
-        );
+    : this.fromPlatformCreationParams(
+        const PlatformProxyControllerCreationParams(),
+      );
 
   /// Constructs a [ProxyController] from creation params for a specific
   /// platform.

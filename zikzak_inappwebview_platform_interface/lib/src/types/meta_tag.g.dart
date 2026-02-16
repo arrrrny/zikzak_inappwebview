@@ -25,8 +25,11 @@ class MetaTag {
     }
     final instance = MetaTag(
       attrs: map['attrs'] != null
-          ? List<MetaTagAttribute>.from(map['attrs'].map(
-              (e) => MetaTagAttribute.fromMap(e?.cast<String, dynamic>())!))
+          ? List<MetaTagAttribute>.from(
+              map['attrs'].map(
+                (e) => MetaTagAttribute.fromMap(e?.cast<String, dynamic>())!,
+              ),
+            )
           : null,
       content: map['content'],
       name: map['name'],

@@ -11,10 +11,11 @@ class CompressFormat {
   final String _value;
   final String _nativeValue;
   const CompressFormat._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory CompressFormat._internalMultiPlatform(
-          String value, Function nativeValue) =>
-      CompressFormat._internal(value, nativeValue());
+    String value,
+    Function nativeValue,
+  ) => CompressFormat._internal(value, nativeValue());
 
   ///Compress to the `JPEG` format.
   ///Quality of `0` means compress for the smallest size.
@@ -53,8 +54,10 @@ class CompressFormat {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView 30+
-  static const WEBP_LOSSLESS =
-      CompressFormat._internal('WEBP_LOSSLESS', 'WEBP_LOSSLESS');
+  static const WEBP_LOSSLESS = CompressFormat._internal(
+    'WEBP_LOSSLESS',
+    'WEBP_LOSSLESS',
+  );
 
   ///Compress to the `WEBP` lossy format.
   ///Quality of `0` means compress for the smallest size.
@@ -62,8 +65,10 @@ class CompressFormat {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView 30+
-  static const WEBP_LOSSY =
-      CompressFormat._internal('WEBP_LOSSY', 'WEBP_LOSSY');
+  static const WEBP_LOSSY = CompressFormat._internal(
+    'WEBP_LOSSY',
+    'WEBP_LOSSY',
+  );
 
   ///Set of all values of [CompressFormat].
   static final Set<CompressFormat> values = [
@@ -78,8 +83,9 @@ class CompressFormat {
   static CompressFormat? fromValue(String? value) {
     if (value != null) {
       try {
-        return CompressFormat.values
-            .firstWhere((element) => element.toValue() == value);
+        return CompressFormat.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -91,8 +97,9 @@ class CompressFormat {
   static CompressFormat? fromNativeValue(String? value) {
     if (value != null) {
       try {
-        return CompressFormat.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return CompressFormat.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }

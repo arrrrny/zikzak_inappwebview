@@ -27,12 +27,14 @@ class PlatformWebViewEnvironmentCreationParams {
 abstract class PlatformWebViewEnvironment extends PlatformInterface
     implements Disposable {
   ///Debug settings used by [PlatformWebViewEnvironment].
-  static DebugLoggingSettings debugLoggingSettings =
-      DebugLoggingSettings(maxLogMessageLength: 1000);
+  static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings(
+    maxLogMessageLength: 1000,
+  );
 
   /// Creates a new [PlatformInAppWebViewController]
   factory PlatformWebViewEnvironment(
-      PlatformWebViewEnvironmentCreationParams params) {
+    PlatformWebViewEnvironmentCreationParams params,
+  ) {
     assert(
       InAppWebViewPlatform.instance != null,
       'A platform implementation for `zikzak_inappwebview` has not been set. Please '
@@ -40,8 +42,9 @@ abstract class PlatformWebViewEnvironment extends PlatformInterface
       '`InAppWebViewPlatform.instance` before use. For unit testing, '
       '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
-    final PlatformWebViewEnvironment webViewEnvironment =
-        InAppWebViewPlatform.instance!.createPlatformWebViewEnvironment(params);
+    final PlatformWebViewEnvironment webViewEnvironment = InAppWebViewPlatform
+        .instance!
+        .createPlatformWebViewEnvironment(params);
     PlatformInterface.verify(webViewEnvironment, _token);
     return webViewEnvironment;
   }
@@ -55,8 +58,9 @@ abstract class PlatformWebViewEnvironment extends PlatformInterface
       '`InAppWebViewPlatform.instance` before use. For unit testing, '
       '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
-    final PlatformWebViewEnvironment webViewEnvironment =
-        InAppWebViewPlatform.instance!.createPlatformWebViewEnvironmentStatic();
+    final PlatformWebViewEnvironment webViewEnvironment = InAppWebViewPlatform
+        .instance!
+        .createPlatformWebViewEnvironmentStatic();
     PlatformInterface.verify(webViewEnvironment, _token);
     return webViewEnvironment;
   }
@@ -93,10 +97,12 @@ abstract class PlatformWebViewEnvironment extends PlatformInterface
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows ([Official API - CreateCoreWebView2EnvironmentWithOptions](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#createcorewebview2environmentwithoptions))
   ///{@endtemplate}
-  Future<PlatformWebViewEnvironment> create(
-      {WebViewEnvironmentSettings? settings}) {
+  Future<PlatformWebViewEnvironment> create({
+    WebViewEnvironmentSettings? settings,
+  }) {
     throw UnimplementedError(
-        'create is not implemented on the current platform');
+      'create is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewEnvironment.getAvailableVersion}
@@ -112,7 +118,8 @@ abstract class PlatformWebViewEnvironment extends PlatformInterface
   ///{@endtemplate}
   Future<String?> getAvailableVersion({String? browserExecutableFolder}) {
     throw UnimplementedError(
-        'getAvailableVersion is not implemented on the current platform');
+      'getAvailableVersion is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewEnvironment.compareBrowserVersions}
@@ -126,10 +133,13 @@ abstract class PlatformWebViewEnvironment extends PlatformInterface
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows ([Official API - CompareBrowserVersions](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#comparebrowserversions))
   ///{@endtemplate}
-  Future<int?> compareBrowserVersions(
-      {required String version1, required String version2}) {
+  Future<int?> compareBrowserVersions({
+    required String version1,
+    required String version2,
+  }) {
     throw UnimplementedError(
-        'compareBrowserVersions is not implemented on the current platform');
+      'compareBrowserVersions is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewEnvironment.dispose}
@@ -137,6 +147,7 @@ abstract class PlatformWebViewEnvironment extends PlatformInterface
   ///{@endtemplate}
   Future<void> dispose() {
     throw UnimplementedError(
-        'dispose is not implemented on the current platform');
+      'dispose is not implemented on the current platform',
+    );
   }
 }

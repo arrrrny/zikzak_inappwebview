@@ -35,12 +35,18 @@ class AndroidResource_ {
 
   static AndroidResource_ anim({required String name, String? defPackage}) {
     return AndroidResource_(
-        name: name, defType: "anim", defPackage: defPackage);
+      name: name,
+      defType: "anim",
+      defPackage: defPackage,
+    );
   }
 
   static AndroidResource_ layout({required String name, String? defPackage}) {
     return AndroidResource_(
-        name: name, defType: "layout", defPackage: defPackage);
+      name: name,
+      defType: "layout",
+      defPackage: defPackage,
+    );
   }
 
   static AndroidResource_ id({required String name, String? defPackage}) {
@@ -49,6 +55,9 @@ class AndroidResource_ {
 
   static AndroidResource_ drawable({required String name, String? defPackage}) {
     return AndroidResource_(
-        name: name, defType: "drawable", defPackage: defPackage);
+      name: name,
+      defType: "drawable",
+      defPackage: defPackage,
+    );
   }
 }

@@ -11,10 +11,11 @@ class HttpAuthResponseAction {
   final int _value;
   final int _nativeValue;
   const HttpAuthResponseAction._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory HttpAuthResponseAction._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      HttpAuthResponseAction._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => HttpAuthResponseAction._internal(value, nativeValue());
 
   ///Instructs the WebView to cancel the authentication request.
   static const CANCEL = HttpAuthResponseAction._internal(0, 0);
@@ -37,8 +38,9 @@ class HttpAuthResponseAction {
   static HttpAuthResponseAction? fromValue(int? value) {
     if (value != null) {
       try {
-        return HttpAuthResponseAction.values
-            .firstWhere((element) => element.toValue() == value);
+        return HttpAuthResponseAction.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -50,8 +52,9 @@ class HttpAuthResponseAction {
   static HttpAuthResponseAction? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return HttpAuthResponseAction.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return HttpAuthResponseAction.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }

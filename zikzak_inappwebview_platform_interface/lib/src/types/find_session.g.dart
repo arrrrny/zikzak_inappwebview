@@ -16,10 +16,11 @@ class FindSession {
 
   /// Defines how results are reported through the find panel's UI.
   SearchResultDisplayStyle searchResultDisplayStyle;
-  FindSession(
-      {required this.highlightedResultIndex,
-      required this.resultCount,
-      required this.searchResultDisplayStyle});
+  FindSession({
+    required this.highlightedResultIndex,
+    required this.resultCount,
+    required this.searchResultDisplayStyle,
+  });
 
   ///Gets a possible [FindSession] instance from a [Map] value.
   static FindSession? fromMap(Map<String, dynamic>? map) {
@@ -30,7 +31,8 @@ class FindSession {
       highlightedResultIndex: map['highlightedResultIndex'],
       resultCount: map['resultCount'],
       searchResultDisplayStyle: SearchResultDisplayStyle.fromNativeValue(
-          map['searchResultDisplayStyle'])!,
+        map['searchResultDisplayStyle'],
+      )!,
     );
     return instance;
   }

@@ -10,12 +10,13 @@ class InAppLocalhostServer {
     String documentRoot = './',
     bool shared = false,
   }) : this.fromPlatformCreationParams(
-          PlatformInAppLocalhostServerCreationParams(
-              port: port,
-              directoryIndex: directoryIndex,
-              documentRoot: documentRoot,
-              shared: shared),
-        );
+         PlatformInAppLocalhostServerCreationParams(
+           port: port,
+           directoryIndex: directoryIndex,
+           documentRoot: documentRoot,
+           shared: shared,
+         ),
+       );
 
   /// Constructs a [InAppLocalhostServer] from creation params for a specific
   /// platform.

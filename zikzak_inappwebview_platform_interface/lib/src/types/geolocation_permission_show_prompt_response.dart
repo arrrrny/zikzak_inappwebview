@@ -16,6 +16,9 @@ class GeolocationPermissionShowPromptResponse_ {
   ///The default value is `false`.
   bool retain;
 
-  GeolocationPermissionShowPromptResponse_(
-      {required this.origin, required this.allow, this.retain = false});
+  GeolocationPermissionShowPromptResponse_({
+    required this.origin,
+    required this.allow,
+    this.retain = false,
+  });
 }

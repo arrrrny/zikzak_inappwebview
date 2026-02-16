@@ -46,11 +46,7 @@ class UIImage {
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
-    return {
-      "data": data,
-      "name": name,
-      "systemName": systemName,
-    };
+    return {"data": data, "name": name, "systemName": systemName};
   }
 
   ///Converts instance to a map.

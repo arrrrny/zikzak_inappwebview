@@ -16,7 +16,8 @@ class PermissionResponse_ {
   ///Indicate the [PermissionResponseAction] to take in response of a permission request.
   PermissionResponseAction_? action;
 
-  PermissionResponse_(
-      {this.resources = const [],
-      this.action = PermissionResponseAction_.DENY});
+  PermissionResponse_({
+    this.resources = const [],
+    this.action = PermissionResponseAction_.DENY,
+  });
 }

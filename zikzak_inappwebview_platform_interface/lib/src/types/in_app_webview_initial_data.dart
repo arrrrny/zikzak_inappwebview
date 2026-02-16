@@ -23,10 +23,11 @@ class InAppWebViewInitialData_ {
   @SupportedPlatforms(platforms: [AndroidPlatform()])
   WebUri? historyUrl;
 
-  InAppWebViewInitialData_(
-      {required this.data,
-      this.mimeType = "text/html",
-      this.encoding = "utf8",
-      this.baseUrl,
-      this.historyUrl});
+  InAppWebViewInitialData_({
+    required this.data,
+    this.mimeType = "text/html",
+    this.encoding = "utf8",
+    this.baseUrl,
+    this.historyUrl,
+  });
 }

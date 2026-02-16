@@ -8,7 +8,7 @@ import 'in_app_webview_web_controller.dart';
 
 class HeadlessInAppWebViewWeb extends PlatformHeadlessInAppWebView {
   HeadlessInAppWebViewWeb(PlatformHeadlessInAppWebViewCreationParams params)
-      : super.implementation(params);
+    : super.implementation(params);
 
   html.IFrameElement? _iframe;
   InAppWebViewWebController? _webViewController;
@@ -44,7 +44,9 @@ class HeadlessInAppWebViewWeb extends PlatformHeadlessInAppWebView {
 
     // Create controller
     final controllerParams = PlatformInAppWebViewControllerCreationParams(
-        id: params.windowId, webviewParams: params);
+      id: params.windowId,
+      webviewParams: params,
+    );
 
     _webViewController = InAppWebViewWebController(controllerParams, _iframe!);
 
@@ -118,8 +120,9 @@ class HeadlessInAppWebViewWeb extends PlatformHeadlessInAppWebView {
   Future<Size?> getSize() async {
     if (_iframe != null) {
       return Size(
-          double.tryParse(_iframe!.style.width.replaceAll('px', '')) ?? 0,
-          double.tryParse(_iframe!.style.height.replaceAll('px', '')) ?? 0);
+        double.tryParse(_iframe!.style.width.replaceAll('px', '')) ?? 0,
+        double.tryParse(_iframe!.style.height.replaceAll('px', '')) ?? 0,
+      );
     }
     return null;
   }

@@ -8,19 +8,22 @@ import 'context_menu_settings.dart';
 part 'context_menu.g.dart';
 
 ///Class that represents the WebView context menu. It used by [PlatformWebViewCreationParams.contextMenu].
-@SupportedPlatforms(platforms: [
-  AndroidPlatform(
+@SupportedPlatforms(
+  platforms: [
+    AndroidPlatform(
       note:
-          'To make it work properly on Android, JavaScript should be enabled!'),
-  IOSPlatform()
-])
+          'To make it work properly on Android, JavaScript should be enabled!',
+    ),
+    IOSPlatform(),
+  ],
+)
 @ExchangeableObject()
 class ContextMenu_ {
   ///Event fired when the context menu for this WebView is being built.
   ///
   ///[hitTestResult] represents the hit result for hitting an HTML elements.
   final void Function(InAppWebViewHitTestResult_ hitTestResult)?
-      onCreateContextMenu;
+  onCreateContextMenu;
 
   ///Event fired when the context menu for this WebView is being hidden.
   final void Function()? onHideContextMenu;
@@ -29,7 +32,7 @@ class ContextMenu_ {
   ///
   ///[contextMenuItemClicked] represents the [ContextMenuItem] clicked.
   final void Function(ContextMenuItem_ contextMenuItemClicked)?
-      onContextMenuActionItemClicked;
+  onContextMenuActionItemClicked;
 
   ///Context menu settings.
   final ContextMenuSettings_? settings;
@@ -38,12 +41,13 @@ class ContextMenu_ {
   final List<ContextMenuItem_> menuItems;
 
   @ExchangeableObjectConstructor()
-  ContextMenu_(
-      {this.menuItems = const [],
-      this.onCreateContextMenu,
-      this.onHideContextMenu,
-      this.settings,
-      this.onContextMenuActionItemClicked});
+  ContextMenu_({
+    this.menuItems = const [],
+    this.onCreateContextMenu,
+    this.onHideContextMenu,
+    this.settings,
+    this.onContextMenuActionItemClicked,
+  });
 
   @ExchangeableObjectMethod(toMapMergeWith: true)
   // ignore: unused_element

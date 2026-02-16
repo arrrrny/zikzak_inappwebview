@@ -203,35 +203,36 @@ class InAppBrowserSettings {
   ///- MacOS
   ///- Windows
   WindowType? windowType;
-  InAppBrowserSettings(
-      {this.allowGoBackWithBackButton = true,
-      this.closeButtonCaption,
-      this.closeButtonColor,
-      this.closeOnCannotGoBack = true,
-      this.hidden = false,
-      this.hideCloseButton = false,
-      this.hideDefaultMenuItems = false,
-      this.hideProgressBar = false,
-      this.hideTitleBar = false,
-      this.hideToolbarBottom = false,
-      this.hideToolbarTop = false,
-      this.hideUrlBar = false,
-      this.menuButtonColor,
-      this.presentationStyle = ModalPresentationStyle.FULL_SCREEN,
-      this.shouldCloseOnBackButtonPressed = false,
-      this.toolbarBottomBackgroundColor,
-      this.toolbarBottomTintColor,
-      this.toolbarBottomTranslucent = true,
-      this.toolbarTopBackgroundColor,
-      this.toolbarTopFixedTitle,
-      this.toolbarTopTintColor,
-      this.toolbarTopTranslucent = true,
-      this.transitionStyle = ModalTransitionStyle.COVER_VERTICAL,
-      this.windowAlphaValue = 1.0,
-      this.windowFrame,
-      this.windowStyleMask,
-      this.windowTitlebarSeparatorStyle,
-      this.windowType});
+  InAppBrowserSettings({
+    this.allowGoBackWithBackButton = true,
+    this.closeButtonCaption,
+    this.closeButtonColor,
+    this.closeOnCannotGoBack = true,
+    this.hidden = false,
+    this.hideCloseButton = false,
+    this.hideDefaultMenuItems = false,
+    this.hideProgressBar = false,
+    this.hideTitleBar = false,
+    this.hideToolbarBottom = false,
+    this.hideToolbarTop = false,
+    this.hideUrlBar = false,
+    this.menuButtonColor,
+    this.presentationStyle = ModalPresentationStyle.FULL_SCREEN,
+    this.shouldCloseOnBackButtonPressed = false,
+    this.toolbarBottomBackgroundColor,
+    this.toolbarBottomTintColor,
+    this.toolbarBottomTranslucent = true,
+    this.toolbarTopBackgroundColor,
+    this.toolbarTopFixedTitle,
+    this.toolbarTopTintColor,
+    this.toolbarTopTranslucent = true,
+    this.transitionStyle = ModalTransitionStyle.COVER_VERTICAL,
+    this.windowAlphaValue = 1.0,
+    this.windowFrame,
+    this.windowStyleMask,
+    this.windowTitlebarSeparatorStyle,
+    this.windowType,
+  });
 
   ///Gets a possible [InAppBrowserSettings] instance from a [Map] value.
   static InAppBrowserSettings? fromMap(Map<String, dynamic>? map) {
@@ -248,7 +249,8 @@ class InAppBrowserSettings {
           : null,
       toolbarBottomBackgroundColor: map['toolbarBottomBackgroundColor'] != null
           ? UtilColor.fromStringRepresentation(
-              map['toolbarBottomBackgroundColor'])
+              map['toolbarBottomBackgroundColor'],
+            )
           : null,
       toolbarBottomTintColor: map['toolbarBottomTintColor'] != null
           ? UtilColor.fromStringRepresentation(map['toolbarBottomTintColor'])
@@ -260,12 +262,14 @@ class InAppBrowserSettings {
       toolbarTopTintColor: map['toolbarTopTintColor'] != null
           ? UtilColor.fromStringRepresentation(map['toolbarTopTintColor'])
           : null,
-      windowFrame:
-          InAppWebViewRect.fromMap(map['windowFrame']?.cast<String, dynamic>()),
+      windowFrame: InAppWebViewRect.fromMap(
+        map['windowFrame']?.cast<String, dynamic>(),
+      ),
       windowStyleMask: WindowStyleMask.fromNativeValue(map['windowStyleMask']),
       windowTitlebarSeparatorStyle:
           WindowTitlebarSeparatorStyle.fromNativeValue(
-              map['windowTitlebarSeparatorStyle']),
+            map['windowTitlebarSeparatorStyle'],
+          ),
       windowType: WindowType.fromNativeValue(map['windowType']),
     );
     instance.allowGoBackWithBackButton = map['allowGoBackWithBackButton'];
@@ -278,8 +282,9 @@ class InAppBrowserSettings {
     instance.hideToolbarBottom = map['hideToolbarBottom'];
     instance.hideToolbarTop = map['hideToolbarTop'];
     instance.hideUrlBar = map['hideUrlBar'];
-    instance.presentationStyle =
-        ModalPresentationStyle.fromNativeValue(map['presentationStyle']);
+    instance.presentationStyle = ModalPresentationStyle.fromNativeValue(
+      map['presentationStyle'],
+    );
     instance.shouldCloseOnBackButtonPressed =
         map['shouldCloseOnBackButtonPressed'];
     instance.toolbarBottomTranslucent = map['toolbarBottomTranslucent'];
@@ -287,8 +292,9 @@ class InAppBrowserSettings {
         ? UtilColor.fromStringRepresentation(map['toolbarTopBarTintColor'])
         : null;
     instance.toolbarTopTranslucent = map['toolbarTopTranslucent'];
-    instance.transitionStyle =
-        ModalTransitionStyle.fromNativeValue(map['transitionStyle']);
+    instance.transitionStyle = ModalTransitionStyle.fromNativeValue(
+      map['transitionStyle'],
+    );
     instance.windowAlphaValue = map['windowAlphaValue'];
     return instance;
   }
@@ -323,8 +329,8 @@ class InAppBrowserSettings {
       "windowAlphaValue": windowAlphaValue,
       "windowFrame": windowFrame?.toMap(),
       "windowStyleMask": windowStyleMask?.toNativeValue(),
-      "windowTitlebarSeparatorStyle":
-          windowTitlebarSeparatorStyle?.toNativeValue(),
+      "windowTitlebarSeparatorStyle": windowTitlebarSeparatorStyle
+          ?.toNativeValue(),
       "windowType": windowType?.toNativeValue(),
     };
   }

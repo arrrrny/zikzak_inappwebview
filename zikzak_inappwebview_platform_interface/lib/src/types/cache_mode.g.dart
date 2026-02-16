@@ -11,7 +11,7 @@ class CacheMode {
   final int _value;
   final int _nativeValue;
   const CacheMode._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory CacheMode._internalMultiPlatform(int value, Function nativeValue) =>
       CacheMode._internal(value, nativeValue());
 
@@ -40,8 +40,9 @@ class CacheMode {
   static CacheMode? fromValue(int? value) {
     if (value != null) {
       try {
-        return CacheMode.values
-            .firstWhere((element) => element.toValue() == value);
+        return CacheMode.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -53,8 +54,9 @@ class CacheMode {
   static CacheMode? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return CacheMode.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return CacheMode.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }

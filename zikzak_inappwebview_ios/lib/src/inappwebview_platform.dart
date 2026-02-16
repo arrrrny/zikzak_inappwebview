@@ -248,7 +248,8 @@ class IOSInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Look at using [WebStorageManager] in `zikzak_inappwebview` instead.
   @override
   IOSWebStorageManager createPlatformWebStorageManager(
-      PlatformWebStorageManagerCreationParams params) {
+    PlatformWebStorageManagerCreationParams params,
+  ) {
     return IOSWebStorageManager(params);
   }
 
@@ -258,7 +259,8 @@ class IOSInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Look at using [WebAuthenticationSession] in `zikzak_inappwebview` instead.
   @override
   IOSWebAuthenticationSession createPlatformWebAuthenticationSession(
-      PlatformWebAuthenticationSessionCreationParams params) {
+    PlatformWebAuthenticationSessionCreationParams params,
+  ) {
     return IOSWebAuthenticationSession(params);
   }
 

@@ -16,76 +16,77 @@ import 'platform_webview.dart';
 class PlatformHeadlessInAppWebViewCreationParams
     extends PlatformWebViewCreationParams {
   /// Used by the platform implementation to create a new [PlatformHeadlessInAppWebView].
-  const PlatformHeadlessInAppWebViewCreationParams(
-      {this.initialSize = const Size(-1, -1),
-      this.webViewEnvironment,
-      super.controllerFromPlatform,
-      super.windowId,
-      super.onWebViewCreated,
-      super.onLoadStart,
-      super.onLoadStop,
-      super.onReceivedError,
-      super.onReceivedHttpError,
-      super.onProgressChanged,
-      super.onConsoleMessage,
-      super.shouldOverrideUrlLoading,
-      super.onLoadResource,
-      super.onScrollChanged,
-      super.onDownloadStartRequest,
-      super.onLoadResourceWithCustomScheme,
-      super.onCreateWindow,
-      super.onCloseWindow,
-      super.onJsAlert,
-      super.onJsConfirm,
-      super.onJsPrompt,
-      super.onReceivedHttpAuthRequest,
-      super.onReceivedServerTrustAuthRequest,
-      super.onReceivedClientCertRequest,
-      super.shouldInterceptAjaxRequest,
-      super.onAjaxReadyStateChange,
-      super.onAjaxProgress,
-      super.shouldInterceptFetchRequest,
-      super.onUpdateVisitedHistory,
-      super.onPrintRequest,
-      super.onLongPressHitTestResult,
-      super.onEnterFullscreen,
-      super.onExitFullscreen,
-      super.onPageCommitVisible,
-      super.onTitleChanged,
-      super.onWindowFocus,
-      super.onWindowBlur,
-      super.onOverScrolled,
-      super.onZoomScaleChanged,
-      super.onSafeBrowsingHit,
-      super.onPermissionRequest,
-      super.onGeolocationPermissionsShowPrompt,
-      super.onGeolocationPermissionsHidePrompt,
-      super.shouldInterceptRequest,
-      super.onRenderProcessGone,
-      super.onRenderProcessResponsive,
-      super.onRenderProcessUnresponsive,
-      super.onFormResubmission,
-      super.onReceivedIcon,
-      super.onReceivedTouchIconUrl,
-      super.onJsBeforeUnload,
-      super.onReceivedLoginRequest,
-      super.onPermissionRequestCanceled,
-      super.onRequestFocus,
-      super.onWebContentProcessDidTerminate,
-      super.onDidReceiveServerRedirectForProvisionalNavigation,
-      super.onNavigationResponse,
-      super.shouldAllowDeprecatedTLS,
-      super.onCameraCaptureStateChanged,
-      super.onMicrophoneCaptureStateChanged,
-      super.onContentSizeChanged,
-      super.initialUrlRequest,
-      super.initialFile,
-      super.initialData,
-      super.initialSettings,
-      super.contextMenu,
-      super.initialUserScripts,
-      super.pullToRefreshController,
-      super.findInteractionController});
+  const PlatformHeadlessInAppWebViewCreationParams({
+    this.initialSize = const Size(-1, -1),
+    this.webViewEnvironment,
+    super.controllerFromPlatform,
+    super.windowId,
+    super.onWebViewCreated,
+    super.onLoadStart,
+    super.onLoadStop,
+    super.onReceivedError,
+    super.onReceivedHttpError,
+    super.onProgressChanged,
+    super.onConsoleMessage,
+    super.shouldOverrideUrlLoading,
+    super.onLoadResource,
+    super.onScrollChanged,
+    super.onDownloadStartRequest,
+    super.onLoadResourceWithCustomScheme,
+    super.onCreateWindow,
+    super.onCloseWindow,
+    super.onJsAlert,
+    super.onJsConfirm,
+    super.onJsPrompt,
+    super.onReceivedHttpAuthRequest,
+    super.onReceivedServerTrustAuthRequest,
+    super.onReceivedClientCertRequest,
+    super.shouldInterceptAjaxRequest,
+    super.onAjaxReadyStateChange,
+    super.onAjaxProgress,
+    super.shouldInterceptFetchRequest,
+    super.onUpdateVisitedHistory,
+    super.onPrintRequest,
+    super.onLongPressHitTestResult,
+    super.onEnterFullscreen,
+    super.onExitFullscreen,
+    super.onPageCommitVisible,
+    super.onTitleChanged,
+    super.onWindowFocus,
+    super.onWindowBlur,
+    super.onOverScrolled,
+    super.onZoomScaleChanged,
+    super.onSafeBrowsingHit,
+    super.onPermissionRequest,
+    super.onGeolocationPermissionsShowPrompt,
+    super.onGeolocationPermissionsHidePrompt,
+    super.shouldInterceptRequest,
+    super.onRenderProcessGone,
+    super.onRenderProcessResponsive,
+    super.onRenderProcessUnresponsive,
+    super.onFormResubmission,
+    super.onReceivedIcon,
+    super.onReceivedTouchIconUrl,
+    super.onJsBeforeUnload,
+    super.onReceivedLoginRequest,
+    super.onPermissionRequestCanceled,
+    super.onRequestFocus,
+    super.onWebContentProcessDidTerminate,
+    super.onDidReceiveServerRedirectForProvisionalNavigation,
+    super.onNavigationResponse,
+    super.shouldAllowDeprecatedTLS,
+    super.onCameraCaptureStateChanged,
+    super.onMicrophoneCaptureStateChanged,
+    super.onContentSizeChanged,
+    super.initialUrlRequest,
+    super.initialFile,
+    super.initialData,
+    super.initialSettings,
+    super.contextMenu,
+    super.initialUserScripts,
+    super.pullToRefreshController,
+    super.findInteractionController,
+  });
 
   ///The WebView initial size in pixels.
   ///
@@ -124,7 +125,8 @@ abstract class PlatformHeadlessInAppWebView extends PlatformInterface
     implements Disposable {
   /// Creates a new [PlatformHeadlessInAppWebView]
   factory PlatformHeadlessInAppWebView(
-      PlatformHeadlessInAppWebViewCreationParams params) {
+    PlatformHeadlessInAppWebViewCreationParams params,
+  ) {
     assert(
       InAppWebViewPlatform.instance != null,
       'A platform implementation for `zikzak_inappwebview` has not been set. Please '
@@ -133,8 +135,9 @@ abstract class PlatformHeadlessInAppWebView extends PlatformInterface
       '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformHeadlessInAppWebView webViewControllerDelegate =
-        InAppWebViewPlatform.instance!
-            .createPlatformHeadlessInAppWebView(params);
+        InAppWebViewPlatform.instance!.createPlatformHeadlessInAppWebView(
+          params,
+        );
     PlatformInterface.verify(webViewControllerDelegate, _token);
     return webViewControllerDelegate;
   }
@@ -145,7 +148,7 @@ abstract class PlatformHeadlessInAppWebView extends PlatformInterface
   /// a class that only contains a factory constructor.
   @protected
   PlatformHeadlessInAppWebView.implementation(this.params)
-      : super(token: _token);
+    : super(token: _token);
 
   static final Object _token = Object();
 
@@ -163,7 +166,8 @@ abstract class PlatformHeadlessInAppWebView extends PlatformInterface
   ///{@endtemplate}
   PlatformInAppWebViewController? get webViewController =>
       throw UnimplementedError(
-          'webViewController is not implemented on the current platform');
+        'webViewController is not implemented on the current platform',
+      );
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformHeadlessInAppWebView.run}
   ///Runs the headless WebView.
@@ -191,7 +195,8 @@ abstract class PlatformHeadlessInAppWebView extends PlatformInterface
   ///{@endtemplate}
   bool isRunning() {
     throw UnimplementedError(
-        'isRunning is not implemented on the current platform');
+      'isRunning is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformHeadlessInAppWebView.setSize}
@@ -212,7 +217,8 @@ abstract class PlatformHeadlessInAppWebView extends PlatformInterface
   ///{@endtemplate}
   Future<void> setSize(Size size) {
     throw UnimplementedError(
-        'setSize is not implemented on the current platform');
+      'setSize is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformHeadlessInAppWebView.getSize}
@@ -228,7 +234,8 @@ abstract class PlatformHeadlessInAppWebView extends PlatformInterface
   ///{@endtemplate}
   Future<Size?> getSize() {
     throw UnimplementedError(
-        'getSize is not implemented on the current platform');
+      'getSize is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformHeadlessInAppWebView.dispose}
@@ -242,6 +249,7 @@ abstract class PlatformHeadlessInAppWebView extends PlatformInterface
   ///{@endtemplate}
   Future<void> dispose() {
     throw UnimplementedError(
-        'dispose is not implemented on the current platform');
+      'dispose is not implemented on the current platform',
+    );
   }
 }

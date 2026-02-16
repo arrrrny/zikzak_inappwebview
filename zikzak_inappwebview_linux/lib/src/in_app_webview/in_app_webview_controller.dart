@@ -5,8 +5,8 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 
 class LinuxInAppWebViewController extends PlatformInAppWebViewController {
   LinuxInAppWebViewController(
-      PlatformInAppWebViewControllerCreationParams params)
-      : super.implementation(params) {
+    PlatformInAppWebViewControllerCreationParams params,
+  ) : super.implementation(params) {
     _channel = MethodChannel('dev.zuzu/zikzak_inappwebview_${params.id}');
     _channel.setMethodCallHandler((call) async {
       try {
@@ -18,15 +18,16 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
   }
 
   LinuxInAppWebViewController.fromInAppBrowser(
-      PlatformInAppWebViewControllerCreationParams params,
-      MethodChannel channel)
-      : super.implementation(params) {
+    PlatformInAppWebViewControllerCreationParams params,
+    MethodChannel channel,
+  ) : super.implementation(params) {
     _channel = channel;
   }
 
   LinuxInAppWebViewController.static()
-      : super.implementation(
-            PlatformInAppWebViewControllerCreationParams(id: 'static'));
+    : super.implementation(
+        PlatformInAppWebViewControllerCreationParams(id: 'static'),
+      );
 
   late MethodChannel _channel;
 
@@ -40,14 +41,18 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
         if (params.webviewParams?.onLoadStart != null) {
           String? url = call.arguments['url'];
           params.webviewParams!.onLoadStart!(
-              controller, url != null ? WebUri(url) : null);
+            controller,
+            url != null ? WebUri(url) : null,
+          );
         }
         break;
       case 'onLoadStop':
         if (params.webviewParams?.onLoadStop != null) {
           String? url = call.arguments['url'];
           params.webviewParams!.onLoadStop!(
-              controller, url != null ? WebUri(url) : null);
+            controller,
+            url != null ? WebUri(url) : null,
+          );
         }
         break;
       case 'onReceivedError':
@@ -57,12 +62,15 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
           String message = call.arguments['message'];
 
           params.webviewParams!.onReceivedError!(
-              controller,
-              WebResourceRequest(url: url != null ? WebUri(url) : WebUri('')),
-              WebResourceError(
-                  type: WebResourceErrorType.fromNativeValue(code) ??
-                      WebResourceErrorType.UNKNOWN,
-                  description: message));
+            controller,
+            WebResourceRequest(url: url != null ? WebUri(url) : WebUri('')),
+            WebResourceError(
+              type:
+                  WebResourceErrorType.fromNativeValue(code) ??
+                  WebResourceErrorType.UNKNOWN,
+              description: message,
+            ),
+          );
         }
         break;
       case 'onProgressChanged':
@@ -76,7 +84,10 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
           String? url = call.arguments['url'];
           bool? isReload = call.arguments['isReload'];
           params.webviewParams!.onUpdateVisitedHistory!(
-              controller, url != null ? WebUri(url) : null, isReload);
+            controller,
+            url != null ? WebUri(url) : null,
+            isReload,
+          );
         }
         break;
       case 'onTitleChanged':
@@ -88,20 +99,24 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
       case 'shouldOverrideUrlLoading':
         // Linux might not support this fully yet, but we'll include it.
         if (params.webviewParams?.shouldOverrideUrlLoading != null) {
-          Map<String, dynamic> arguments =
-              call.arguments.cast<String, dynamic>();
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
           var navigationAction = NavigationAction.fromMap(
-              arguments['navigationAction'].cast<String, dynamic>())!;
+            arguments['navigationAction'].cast<String, dynamic>(),
+          )!;
           var policy = await params.webviewParams!.shouldOverrideUrlLoading!(
-              controller, navigationAction);
+            controller,
+            navigationAction,
+          );
           return policy?.toNativeValue() ??
               NavigationActionPolicy.CANCEL.toNativeValue();
         }
         return NavigationActionPolicy.ALLOW.toNativeValue();
       case 'onConsoleMessage':
         if (params.webviewParams?.onConsoleMessage != null) {
-          var consoleMessage =
-              ConsoleMessage.fromMap(call.arguments.cast<String, dynamic>())!;
+          var consoleMessage = ConsoleMessage.fromMap(
+            call.arguments.cast<String, dynamic>(),
+          )!;
           params.webviewParams!.onConsoleMessage!(controller, consoleMessage);
         }
         break;
@@ -127,12 +142,16 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
   }
 
   @override
-  Future<void> loadUrl(
-      {required URLRequest urlRequest, WebUri? allowingReadAccessTo}) async {
+  Future<void> loadUrl({
+    required URLRequest urlRequest,
+    WebUri? allowingReadAccessTo,
+  }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('urlRequest', () => urlRequest.toMap());
     args.putIfAbsent(
-        'allowingReadAccessTo', () => allowingReadAccessTo.toString());
+      'allowingReadAccessTo',
+      () => allowingReadAccessTo.toString(),
+    );
     await _channel.invokeMethod('loadUrl', args);
   }
 
@@ -172,8 +191,10 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
   }
 
   @override
-  Future<void> evaluateJavascript(
-      {required String source, ContentWorld? contentWorld}) async {
+  Future<void> evaluateJavascript({
+    required String source,
+    ContentWorld? contentWorld,
+  }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('source', () => source);
     args.putIfAbsent('contentWorld', () => contentWorld?.toMap());
@@ -181,19 +202,23 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
   }
 
   @override
-  Future<void> injectJavascriptFileFromUrl(
-      {required WebUri urlFile,
-      ScriptHtmlTagAttributes? scriptHtmlTagAttributes}) async {
+  Future<void> injectJavascriptFileFromUrl({
+    required WebUri urlFile,
+    ScriptHtmlTagAttributes? scriptHtmlTagAttributes,
+  }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('urlFile', () => urlFile.toString());
     args.putIfAbsent(
-        'scriptHtmlTagAttributes', () => scriptHtmlTagAttributes?.toMap());
+      'scriptHtmlTagAttributes',
+      () => scriptHtmlTagAttributes?.toMap(),
+    );
     await _channel.invokeMethod('injectJavascriptFileFromUrl', args);
   }
 
   @override
-  Future<dynamic> injectJavascriptFileFromAsset(
-      {required String assetFilePath}) async {
+  Future<dynamic> injectJavascriptFileFromAsset({
+    required String assetFilePath,
+  }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('assetFilePath', () => assetFilePath);
     await _channel.invokeMethod('injectJavascriptFileFromAsset', args);
@@ -207,13 +232,16 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
   }
 
   @override
-  Future<void> injectCSSFileFromUrl(
-      {required WebUri urlFile,
-      CSSLinkHtmlTagAttributes? cssLinkHtmlTagAttributes}) async {
+  Future<void> injectCSSFileFromUrl({
+    required WebUri urlFile,
+    CSSLinkHtmlTagAttributes? cssLinkHtmlTagAttributes,
+  }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('urlFile', () => urlFile.toString());
     args.putIfAbsent(
-        'cssLinkHtmlTagAttributes', () => cssLinkHtmlTagAttributes?.toMap());
+      'cssLinkHtmlTagAttributes',
+      () => cssLinkHtmlTagAttributes?.toMap(),
+    );
     await _channel.invokeMethod('injectCSSFileFromUrl', args);
   }
 

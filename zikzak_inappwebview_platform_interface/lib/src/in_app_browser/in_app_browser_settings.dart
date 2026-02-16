@@ -22,9 +22,10 @@ class InAppBrowserClassSettings {
   ///WebView settings.
   late InAppWebViewSettings webViewSettings;
 
-  InAppBrowserClassSettings(
-      {InAppBrowserSettings? browserSettings,
-      InAppWebViewSettings? webViewSettings}) {
+  InAppBrowserClassSettings({
+    InAppBrowserSettings? browserSettings,
+    InAppWebViewSettings? webViewSettings,
+  }) {
     this.browserSettings = browserSettings ?? InAppBrowserSettings();
     this.webViewSettings = webViewSettings ?? InAppWebViewSettings();
   }
@@ -47,8 +48,10 @@ class InAppBrowserClassSettings {
     return toMap().toString();
   }
 
-  factory InAppBrowserClassSettings.fromMap(Map<String, dynamic> settings,
-      {InAppBrowserClassSettings? instance}) {
+  factory InAppBrowserClassSettings.fromMap(
+    Map<String, dynamic> settings, {
+    InAppBrowserClassSettings? instance,
+  }) {
     if (instance == null) {
       instance = InAppBrowserClassSettings();
     }
@@ -69,37 +72,44 @@ class InAppBrowserClassSettings {
 class InAppBrowserSettings_ {
   ///Set to `true` to create the browser and load the page, but not show it. Omit or set to `false` to have the browser open and load normally.
   ///The default value is `false`.
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-    IOSPlatform(),
-    MacOSPlatform(),
-    WindowsPlatform()
-  ])
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      WindowsPlatform(),
+    ],
+  )
   bool? hidden;
 
   ///Set to `true` to hide the toolbar at the top of the WebView. The default value is `false`.
   @SupportedPlatforms(
-      platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()])
+    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+  )
   bool? hideToolbarTop;
 
   ///Set the custom background color of the toolbar at the top.
   @SupportedPlatforms(
-      platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()])
+    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+  )
   Color_? toolbarTopBackgroundColor;
 
   ///Set to `true` to hide the url bar on the toolbar at the top. The default value is `false`.
   @SupportedPlatforms(
-      platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()])
+    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+  )
   bool? hideUrlBar;
 
   ///Set to `true` to hide the progress bar when the WebView is loading a page. The default value is `false`.
   @SupportedPlatforms(
-      platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()])
+    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+  )
   bool? hideProgressBar;
 
   ///Set to `true` to hide the default menu items. The default value is `false`.
   @SupportedPlatforms(
-      platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()])
+    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+  )
   bool? hideDefaultMenuItems;
 
   ///Set to `true` if you want the title should be displayed. The default value is `false`.
@@ -108,7 +118,8 @@ class InAppBrowserSettings_ {
 
   ///Set the action bar's title.
   @SupportedPlatforms(
-      platforms: [AndroidPlatform(), MacOSPlatform(), WindowsPlatform()])
+    platforms: [AndroidPlatform(), MacOSPlatform(), WindowsPlatform()],
+  )
   String? toolbarTopFixedTitle;
 
   ///Set to `false` to not close the InAppBrowser when the user click on the Android back button and the WebView cannot go back to the history. The default value is `true`.
@@ -198,33 +209,34 @@ class InAppBrowserSettings_ {
   @SupportedPlatforms(platforms: [MacOSPlatform(), WindowsPlatform()])
   InAppWebViewRect_? windowFrame;
 
-  InAppBrowserSettings_(
-      {this.hidden = false,
-      this.hideToolbarTop = false,
-      this.toolbarTopBackgroundColor,
-      this.hideUrlBar = false,
-      this.hideProgressBar = false,
-      this.hideDefaultMenuItems = false,
-      this.toolbarTopTranslucent = true,
-      this.toolbarTopTintColor,
-      this.hideToolbarBottom = false,
-      this.toolbarBottomBackgroundColor,
-      this.toolbarBottomTintColor,
-      this.toolbarBottomTranslucent = true,
-      this.closeButtonCaption,
-      this.closeButtonColor,
-      this.hideCloseButton = false,
-      this.menuButtonColor,
-      this.presentationStyle = ModalPresentationStyle_.FULL_SCREEN,
-      this.transitionStyle = ModalTransitionStyle_.COVER_VERTICAL,
-      this.hideTitleBar = false,
-      this.toolbarTopFixedTitle,
-      this.closeOnCannotGoBack = true,
-      this.allowGoBackWithBackButton = true,
-      this.shouldCloseOnBackButtonPressed = false,
-      this.windowType,
-      this.windowAlphaValue = 1.0,
-      this.windowStyleMask,
-      this.windowTitlebarSeparatorStyle,
-      this.windowFrame});
+  InAppBrowserSettings_({
+    this.hidden = false,
+    this.hideToolbarTop = false,
+    this.toolbarTopBackgroundColor,
+    this.hideUrlBar = false,
+    this.hideProgressBar = false,
+    this.hideDefaultMenuItems = false,
+    this.toolbarTopTranslucent = true,
+    this.toolbarTopTintColor,
+    this.hideToolbarBottom = false,
+    this.toolbarBottomBackgroundColor,
+    this.toolbarBottomTintColor,
+    this.toolbarBottomTranslucent = true,
+    this.closeButtonCaption,
+    this.closeButtonColor,
+    this.hideCloseButton = false,
+    this.menuButtonColor,
+    this.presentationStyle = ModalPresentationStyle_.FULL_SCREEN,
+    this.transitionStyle = ModalTransitionStyle_.COVER_VERTICAL,
+    this.hideTitleBar = false,
+    this.toolbarTopFixedTitle,
+    this.closeOnCannotGoBack = true,
+    this.allowGoBackWithBackButton = true,
+    this.shouldCloseOnBackButtonPressed = false,
+    this.windowType,
+    this.windowAlphaValue = 1.0,
+    this.windowStyleMask,
+    this.windowTitlebarSeparatorStyle,
+    this.windowFrame,
+  });
 }

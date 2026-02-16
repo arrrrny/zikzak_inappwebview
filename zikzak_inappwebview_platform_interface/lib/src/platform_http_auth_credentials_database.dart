@@ -31,7 +31,8 @@ abstract class PlatformHttpAuthCredentialDatabase extends PlatformInterface
     implements Disposable {
   /// Creates a new [PlatformHttpAuthCredentialDatabase]
   factory PlatformHttpAuthCredentialDatabase(
-      PlatformHttpAuthCredentialDatabaseCreationParams params) {
+    PlatformHttpAuthCredentialDatabaseCreationParams params,
+  ) {
     assert(
       InAppWebViewPlatform.instance != null,
       'A platform implementation for `zikzak_inappwebview` has not been set. Please '
@@ -40,8 +41,9 @@ abstract class PlatformHttpAuthCredentialDatabase extends PlatformInterface
       '`WebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformHttpAuthCredentialDatabase cookieManager =
-        InAppWebViewPlatform.instance!
-            .createPlatformHttpAuthCredentialDatabase(params);
+        InAppWebViewPlatform.instance!.createPlatformHttpAuthCredentialDatabase(
+          params,
+        );
     PlatformInterface.verify(cookieManager, _token);
     return cookieManager;
   }
@@ -53,7 +55,7 @@ abstract class PlatformHttpAuthCredentialDatabase extends PlatformInterface
   /// a class that only contains a factory constructor.
   @protected
   PlatformHttpAuthCredentialDatabase.implementation(this.params)
-      : super(token: _token);
+    : super(token: _token);
 
   static final Object _token = Object();
 
@@ -72,7 +74,8 @@ abstract class PlatformHttpAuthCredentialDatabase extends PlatformInterface
   ///{@endtemplate}
   Future<List<URLProtectionSpaceHttpAuthCredentials>> getAllAuthCredentials() {
     throw UnimplementedError(
-        'getAllAuthCredentials is not implemented on the current platform');
+      'getAllAuthCredentials is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase.getHttpAuthCredentials}
@@ -83,10 +86,12 @@ abstract class PlatformHttpAuthCredentialDatabase extends PlatformInterface
   ///- iOS
   ///- MacOS
   ///{@endtemplate}
-  Future<List<URLCredential>> getHttpAuthCredentials(
-      {required URLProtectionSpace protectionSpace}) {
+  Future<List<URLCredential>> getHttpAuthCredentials({
+    required URLProtectionSpace protectionSpace,
+  }) {
     throw UnimplementedError(
-        'getHttpAuthCredentials is not implemented on the current platform');
+      'getHttpAuthCredentials is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase.setHttpAuthCredential}
@@ -97,11 +102,13 @@ abstract class PlatformHttpAuthCredentialDatabase extends PlatformInterface
   ///- iOS ([Official API - URLCredentialStorage.set](https://developer.apple.com/documentation/foundation/urlcredentialstorage/1407227-set))
   ///- MacOS ([Official API - URLCredentialStorage.set](https://developer.apple.com/documentation/foundation/urlcredentialstorage/1407227-set))
   ///{@endtemplate}
-  Future<void> setHttpAuthCredential(
-      {required URLProtectionSpace protectionSpace,
-      required URLCredential credential}) {
+  Future<void> setHttpAuthCredential({
+    required URLProtectionSpace protectionSpace,
+    required URLCredential credential,
+  }) {
     throw UnimplementedError(
-        'setHttpAuthCredential is not implemented on the current platform');
+      'setHttpAuthCredential is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase.removeHttpAuthCredential}
@@ -112,11 +119,13 @@ abstract class PlatformHttpAuthCredentialDatabase extends PlatformInterface
   ///- iOS ([Official API - URLCredentialStorage.remove](https://developer.apple.com/documentation/foundation/urlcredentialstorage/1408664-remove))
   ///- MacOS ([Official API - URLCredentialStorage.remove](https://developer.apple.com/documentation/foundation/urlcredentialstorage/1408664-remove))
   ///{@endtemplate}
-  Future<void> removeHttpAuthCredential(
-      {required URLProtectionSpace protectionSpace,
-      required URLCredential credential}) {
+  Future<void> removeHttpAuthCredential({
+    required URLProtectionSpace protectionSpace,
+    required URLCredential credential,
+  }) {
     throw UnimplementedError(
-        'removeHttpAuthCredential is not implemented on the current platform');
+      'removeHttpAuthCredential is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase.removeHttpAuthCredentials}
@@ -127,10 +136,12 @@ abstract class PlatformHttpAuthCredentialDatabase extends PlatformInterface
   ///- iOS
   ///- MacOS
   ///{@endtemplate}
-  Future<void> removeHttpAuthCredentials(
-      {required URLProtectionSpace protectionSpace}) {
+  Future<void> removeHttpAuthCredentials({
+    required URLProtectionSpace protectionSpace,
+  }) {
     throw UnimplementedError(
-        'removeHttpAuthCredentials is not implemented on the current platform');
+      'removeHttpAuthCredentials is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase.clearAllAuthCredentials}
@@ -143,6 +154,7 @@ abstract class PlatformHttpAuthCredentialDatabase extends PlatformInterface
   ///{@endtemplate}
   Future<void> clearAllAuthCredentials() {
     throw UnimplementedError(
-        'clearAllAuthCredentials is not implemented on the current platform');
+      'clearAllAuthCredentials is not implemented on the current platform',
+    );
   }
 }

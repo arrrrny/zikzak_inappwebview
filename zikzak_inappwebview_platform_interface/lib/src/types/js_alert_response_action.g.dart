@@ -11,10 +11,11 @@ class JsAlertResponseAction {
   final int _value;
   final int _nativeValue;
   const JsAlertResponseAction._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory JsAlertResponseAction._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      JsAlertResponseAction._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => JsAlertResponseAction._internal(value, nativeValue());
 
   ///Confirm that the user hit confirm button.
   static const CONFIRM = JsAlertResponseAction._internal(0, 0);
@@ -28,8 +29,9 @@ class JsAlertResponseAction {
   static JsAlertResponseAction? fromValue(int? value) {
     if (value != null) {
       try {
-        return JsAlertResponseAction.values
-            .firstWhere((element) => element.toValue() == value);
+        return JsAlertResponseAction.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -41,8 +43,9 @@ class JsAlertResponseAction {
   static JsAlertResponseAction? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return JsAlertResponseAction.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return JsAlertResponseAction.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
