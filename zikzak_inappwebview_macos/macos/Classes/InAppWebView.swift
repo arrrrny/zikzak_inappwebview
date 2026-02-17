@@ -187,8 +187,8 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                     switch res {
                     case .success(let data):
                         result(data)
-                    case .failure(let error):
-                        result(nil)
+                    case .failure(_):
+                result(nil)
                     }
                 }
             } else {

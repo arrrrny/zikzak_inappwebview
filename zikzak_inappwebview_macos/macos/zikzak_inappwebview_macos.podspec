@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'zikzak_inappwebview_macos'
-  s.version          = '4.0.0'
+  s.version          = '4.0.8'
   s.summary          = 'macOS implementation of the zikzak_inappwebview plugin.'
   s.description      = <<-DESC
 macOS implementation of the zikzak_inappwebview plugin. A feature-rich WebView plugin for Flutter applications.
@@ -17,6 +17,6 @@ macOS implementation of the zikzak_inappwebview plugin. A feature-rich WebView p
   s.dependency 'FlutterMacOS'
   s.frameworks       = 'WebKit'
 
-  s.platform = :osx, '11.0'
+  s.platform = :osx, '12.0'
   s.swift_version = '5.0'
 end

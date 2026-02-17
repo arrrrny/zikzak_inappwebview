@@ -1,8 +1,8 @@
-import 'dart:async';
+// ignore_for_file: depend_on_referenced_packages
+// ignore:  implementation_imports
+
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart' as http;
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
-// ignore: implementation_imports
 import 'package:zikzak_inappwebview_web/src/in_app_webview_web_controller.dart';
 import 'package:web/web.dart' as web;
 

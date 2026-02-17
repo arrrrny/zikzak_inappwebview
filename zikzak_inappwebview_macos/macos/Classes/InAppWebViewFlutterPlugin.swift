@@ -4,6 +4,7 @@ import FlutterMacOS
 public class InAppWebViewFlutterPlugin: NSObject, FlutterPlugin {
     var headlessInAppWebViewManager: HeadlessInAppWebViewManager?
     var inAppBrowserManager: InAppBrowserManager?
+    var myCookieManager: MyCookieManager?
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "dev.zuzu/flutter_inappwebview", binaryMessenger: registrar.messenger)
@@ -15,6 +16,7 @@ public class InAppWebViewFlutterPlugin: NSObject, FlutterPlugin {
         
         instance.headlessInAppWebViewManager = HeadlessInAppWebViewManager(registrar: registrar)
         instance.inAppBrowserManager = InAppBrowserManager(registrar: registrar)
+        instance.myCookieManager = MyCookieManager(registrar: registrar)
     }
 
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {

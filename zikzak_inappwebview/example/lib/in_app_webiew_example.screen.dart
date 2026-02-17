@@ -100,6 +100,19 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
     return Scaffold(
         appBar: AppBar(title: const Text("InAppWebView"), actions: [
           IconButton(
+            icon: const Icon(Icons.delete),
+            tooltip: "Delete all cookies",
+            onPressed: () async {
+              await CookieManager.instance().deleteAllCookies();
+              if (!context.mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("All cookies deleted"),
+                ),
+              );
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.find_in_page),
             onPressed: () {
               findInteractionController?.presentFindNavigator();
