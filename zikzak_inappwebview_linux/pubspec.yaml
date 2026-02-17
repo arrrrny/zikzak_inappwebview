@@ -1,6 +1,6 @@
 name: zikzak_inappwebview_linux
 description: Linux implementation of the zikzak_inappwebview plugin.
-version: 4.0.8
+version: 4.0.9
 homepage: https://inappwebview.dev/
 repository: https://github.com/arrrrny/zikzak_inappwebview/tree/master/zikzak_inappwebview_linux
 issue_tracker: https://github.com/arrrrny/zikzak_inappwebview/issues
@@ -18,8 +18,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  zikzak_inappwebview_platform_interface:
-    path: ../zikzak_inappwebview_platform_interface
+  zikzak_inappwebview_platform_interface: ^4.0.9
 
 dev_dependencies:
   flutter_test:
@@ -28,10 +27,8 @@ dev_dependencies:
   plugin_platform_interface: ^2.1.8
 
 dependency_overrides:
-  zikzak_inappwebview_platform_interface:
-    path: ../zikzak_inappwebview_platform_interface
-  zikzak_inappwebview_internal_annotations:
-    path: ../zikzak_inappwebview_internal_annotations
+  zikzak_inappwebview_platform_interface: ^4.0.9
+  zikzak_inappwebview_internal_annotations: ^4.0.9
 
 flutter:
   plugin:

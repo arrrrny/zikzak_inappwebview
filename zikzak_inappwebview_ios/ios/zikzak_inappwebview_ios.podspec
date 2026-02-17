@@ -5,7 +5,7 @@
 Pod::Spec.new do |s|
   s.name             = 'zikzak_inappwebview_ios'
   s.module_name      = 'zikzak_inappwebview_ios'
-  s.version          = '4.0.8'
+  s.version          = '4.0.9'
   s.summary          = 'IOS implementation of the inappwebview plugin for Flutter.'
   s.description      = <<-DESC
 iOS implementation of the Flutter inappwebview plugin. A feature-rich WebView plugin for Flutter applications with support for iOS 16.0+. This plugin provides a powerful WebView widget with extensive customization options and JavaScript communication capabilities.

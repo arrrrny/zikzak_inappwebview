@@ -1,6 +1,6 @@
 name: zikzak_inappwebview_internal_annotations
 description: Internal annotations used by the generator of zikzak_inappwebview plugin
-version: 4.0.8
+version: 4.0.9
 homepage: https://github.com/arrrrny/zikzak_inappwebview
 
 environment:

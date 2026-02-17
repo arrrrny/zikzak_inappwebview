@@ -1,3 +1,7 @@
+## 4.0.9 - 2026-02-17
+
+* Feature: Added clearCookies support for macos
+
 ## 4.0.8 - 2026-02-16
 
 * Prepare for publishing version 4.0.8
