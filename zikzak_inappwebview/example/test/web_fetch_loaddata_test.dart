@@ -28,7 +28,7 @@ void main() {
     // We use a known CORS-friendly endpoint or just simulate it for this test
     // For a real test, we'll use a simple data string since external fetch might fail in test environment
     // But the structure mimics the user's need.
-    
+
     // Simulate fetching content
     final fetchedHtml = """
       <!DOCTYPE html>
@@ -40,7 +40,7 @@ void main() {
         </body>
       </html>
     """;
-    
+
     print('Fetched HTML length: ${fetchedHtml.length}');
 
     // 4. Load data into WebView
@@ -52,7 +52,7 @@ void main() {
 
     // 5. Get HTML
     final resultHtml = await controller.getHtml();
-    
+
     print('Result HTML: $resultHtml');
 
     expect(resultHtml, isNotNull);

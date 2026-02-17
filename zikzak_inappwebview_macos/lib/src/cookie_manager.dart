@@ -5,10 +5,11 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 
 class MacOSCookieManager extends PlatformCookieManager {
   static const MethodChannel _channel = MethodChannel(
-      'wtf.zikzak/zikzak_inappwebview_cookiemanager');
+    'wtf.zikzak/zikzak_inappwebview_cookiemanager',
+  );
 
   MacOSCookieManager(PlatformCookieManagerCreationParams params)
-      : super.implementation(params);
+    : super.implementation(params);
 
   @override
   Future<bool> setCookie({
@@ -57,17 +58,21 @@ class MacOSCookieManager extends PlatformCookieManager {
     cookieListMap = cookieListMap.cast<Map<dynamic, dynamic>>();
 
     cookieListMap.forEach((cookieMap) {
-      cookies.add(Cookie(
+      cookies.add(
+        Cookie(
           name: cookieMap["name"],
           value: cookieMap["value"],
           expiresDate: cookieMap["expiresDate"],
           isSessionOnly: cookieMap["isSessionOnly"],
           domain: cookieMap["domain"],
           sameSite: HTTPCookieSameSitePolicy.fromNativeValue(
-              cookieMap["sameSite"]),
+            cookieMap["sameSite"],
+          ),
           isSecure: cookieMap["isSecure"],
           isHttpOnly: cookieMap["isHttpOnly"],
-          path: cookieMap["path"]));
+          path: cookieMap["path"],
+        ),
+      );
     });
     return cookies;
   }
@@ -89,16 +94,18 @@ class MacOSCookieManager extends PlatformCookieManager {
       cookies[i] = cookies[i].cast<String, dynamic>();
       if (cookies[i]["name"] == name)
         return Cookie(
-            name: cookies[i]["name"],
-            value: cookies[i]["value"],
-            expiresDate: cookies[i]["expiresDate"],
-            isSessionOnly: cookies[i]["isSessionOnly"],
-            domain: cookies[i]["domain"],
-            sameSite: HTTPCookieSameSitePolicy.fromNativeValue(
-                cookies[i]["sameSite"]),
-            isSecure: cookies[i]["isSecure"],
-            isHttpOnly: cookies[i]["isHttpOnly"],
-            path: cookies[i]["path"]);
+          name: cookies[i]["name"],
+          value: cookies[i]["value"],
+          expiresDate: cookies[i]["expiresDate"],
+          isSessionOnly: cookies[i]["isSessionOnly"],
+          domain: cookies[i]["domain"],
+          sameSite: HTTPCookieSameSitePolicy.fromNativeValue(
+            cookies[i]["sameSite"],
+          ),
+          isSecure: cookies[i]["isSecure"],
+          isHttpOnly: cookies[i]["isHttpOnly"],
+          path: cookies[i]["path"],
+        );
     }
     return null;
   }
@@ -153,17 +160,21 @@ class MacOSCookieManager extends PlatformCookieManager {
     cookieListMap = cookieListMap.cast<Map<dynamic, dynamic>>();
 
     cookieListMap.forEach((cookieMap) {
-      cookies.add(Cookie(
+      cookies.add(
+        Cookie(
           name: cookieMap["name"],
           value: cookieMap["value"],
           expiresDate: cookieMap["expiresDate"],
           isSessionOnly: cookieMap["isSessionOnly"],
           domain: cookieMap["domain"],
           sameSite: HTTPCookieSameSitePolicy.fromNativeValue(
-              cookieMap["sameSite"]),
+            cookieMap["sameSite"],
+          ),
           isSecure: cookieMap["isSecure"],
           isHttpOnly: cookieMap["isHttpOnly"],
-          path: cookieMap["path"]));
+          path: cookieMap["path"],
+        ),
+      );
     });
     return cookies;
   }

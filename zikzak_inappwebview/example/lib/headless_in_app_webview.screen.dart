@@ -24,9 +24,8 @@ class _HeadlessInAppWebViewExampleScreenState
 
     headlessWebView = HeadlessInAppWebView(
       webViewEnvironment: webViewEnvironment,
-      initialUrlRequest: kIsWeb
-          ? null
-          : URLRequest(url: WebUri("https://flutter.dev")),
+      initialUrlRequest:
+          kIsWeb ? null : URLRequest(url: WebUri("https://flutter.dev")),
       initialData: kIsWeb
           ? InAppWebViewInitialData(
               data:
@@ -126,8 +125,8 @@ class _HeadlessInAppWebViewExampleScreenState
             child: ElevatedButton(
                 onPressed: () async {
                   if (headlessWebView?.isRunning() ?? false) {
-                    final html = await headlessWebView?.webViewController
-                        ?.getHtml();
+                    final html =
+                        await headlessWebView?.webViewController?.getHtml();
                     setState(() {
                       htmlResult = html ?? 'null (getHtml returned null)';
                     });
@@ -151,9 +150,8 @@ class _HeadlessInAppWebViewExampleScreenState
                     ? Colors.green.shade50
                     : Colors.red.shade50,
                 border: Border.all(
-                  color: htmlResult.contains('<html')
-                      ? Colors.green
-                      : Colors.red,
+                  color:
+                      htmlResult.contains('<html') ? Colors.green : Colors.red,
                 ),
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -176,8 +174,8 @@ class _HeadlessInAppWebViewExampleScreenState
                     htmlResult.length > 500
                         ? '${htmlResult.substring(0, 500)}...'
                         : htmlResult,
-                    style: const TextStyle(
-                        fontSize: 12, fontFamily: 'monospace'),
+                    style:
+                        const TextStyle(fontSize: 12, fontFamily: 'monospace'),
                   ),
                 ],
               ),

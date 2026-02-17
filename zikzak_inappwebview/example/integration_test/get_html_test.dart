@@ -10,7 +10,7 @@ void main() {
   testWidgets('getHtml() returns HTML content', (WidgetTester tester) async {
     final Completer<void> pageLoaded = Completer<void>();
     InAppWebViewController? controller;
-    
+
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
@@ -45,9 +45,9 @@ void main() {
 
     // Wait for page to load
     await pageLoaded.future.timeout(const Duration(seconds: 10), onTimeout: () {
-       print('Timeout waiting for page load');
+      print('Timeout waiting for page load');
     });
-    
+
     // Extra delay to ensure JS execution (if any) or rendering
     await Future.delayed(const Duration(seconds: 2));
     await tester.pumpAndSettle();
@@ -57,7 +57,7 @@ void main() {
     try {
       final html = await controller!.getHtml();
       print('HTML Content: $html');
-      
+
       expect(html, isNotNull);
       expect(html, contains('<h1>Hello World</h1>'));
     } catch (e) {

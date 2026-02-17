@@ -44,7 +44,7 @@ void main() {
 </body>
 </html>
 """;
-    
+
     // We use loadData which sets srcdoc
     controller.loadData(data: htmlData);
 
@@ -56,7 +56,7 @@ void main() {
         if (!completer.isCompleted) completer.complete();
       }).toJS,
     );
-    
+
     // Also set a timeout
     try {
       await completer.future.timeout(const Duration(seconds: 2));
@@ -80,6 +80,7 @@ void main() {
 
     // 8. Assert
     expect(content, isNotNull, reason: 'HTML content should not be null');
-    expect(content, contains('<h1>Hello World</h1>'), reason: 'HTML content should contain "Hello World"');
+    expect(content, contains('<h1>Hello World</h1>'),
+        reason: 'HTML content should contain "Hello World"');
   });
 }
