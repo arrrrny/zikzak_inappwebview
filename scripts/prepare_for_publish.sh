@@ -95,6 +95,21 @@ for pkg in "${PACKAGES[@]}"; do
             echo -e "${GREEN}Successfully updated iOS podspec in $pkg to version $VERSION${NC}"
         fi
     fi
+
+    # Update version in macOS podspec if it exists
+    if [ "$pkg" == "zikzak_inappwebview_macos" ] && [ -f "$ROOT_DIR/$pkg/macos/zikzak_inappwebview_macos.podspec" ]; then
+        echo -e "${BLUE}Updating macOS podspec version in $pkg to $VERSION${NC}"
+        # Use sed to update the version line in podspec
+        sed -i '' "s/s\.version.*=.*/s.version          = '$VERSION'/" "$ROOT_DIR/$pkg/macos/zikzak_inappwebview_macos.podspec"
+
+        # Verify the podspec update
+        podspec_version=$(grep "s.version" "$ROOT_DIR/$pkg/macos/zikzak_inappwebview_macos.podspec" | sed "s/.*= *'//" | sed "s/'.*//")
+        if [ "$podspec_version" != "$VERSION" ]; then
+            echo -e "${RED}Failed to update podspec version for $pkg to $VERSION. Current version: $podspec_version${NC}"
+        else
+            echo -e "${GREEN}Successfully updated macOS podspec in $pkg to version $VERSION${NC}"
+        fi
+    fi
 done
 
 # Function to convert path dependencies to versioned dependencies AND update existing versions
