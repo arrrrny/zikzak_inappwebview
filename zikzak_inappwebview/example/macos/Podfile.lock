@@ -5,7 +5,7 @@ PODS:
     - FlutterMacOS
   - url_launcher_macos (0.0.1):
     - FlutterMacOS
-  - zikzak_inappwebview_macos (4.0.0):
+  - zikzak_inappwebview_macos (4.0.8):
     - FlutterMacOS
 
 DEPENDENCIES:
@@ -28,7 +28,7 @@ SPEC CHECKSUMS:
   FlutterMacOS: d0db08ddef1a9af05a5ec4b724367152bb0500b1
   path_provider_foundation: bb55f6dbba17d0dccd6737fe6f7f34fbd0376880
   url_launcher_macos: 0fba8ddabfc33ce0a9afe7c5fef5aab3d8d2d673
-  zikzak_inappwebview_macos: 3edc8726e7a296d4c0bdcbb4fad2541ffe976485
+  zikzak_inappwebview_macos: e1ad32e411b0c5c2ccf53746bb4a0e8d19af8df9
 
 PODFILE CHECKSUM: 1e95c36afbfd1cb6423ceca4de7a8e1b256fb6ac
 

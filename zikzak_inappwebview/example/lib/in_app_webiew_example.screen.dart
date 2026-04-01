@@ -34,7 +34,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
   String url = "";
   double progress = 0;
   final urlController = TextEditingController();
-  final int _windowId = 12345;
 
   @override
   void initState() {
@@ -236,7 +235,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
               children: [
                 InAppWebView(
                   key: webViewKey,
-                  windowId: _windowId,
                   findInteractionController: findInteractionController,
                   webViewEnvironment: webViewEnvironment,
                   initialUrlRequest:
