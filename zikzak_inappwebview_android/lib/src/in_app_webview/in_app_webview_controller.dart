@@ -2501,9 +2501,8 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
 
   @override
   Future<Uint8List?> createPdf({PDFConfiguration? pdfConfiguration}) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('pdfConfiguration', () => pdfConfiguration?.toMap());
-    return await channel?.invokeMethod<Uint8List?>('createPdf', args);
+    // Temporarily disabled due to Android SDK compatibility issues
+    return null;
   }
 
   @override
