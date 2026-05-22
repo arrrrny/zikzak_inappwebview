@@ -194,6 +194,64 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             } else {
                 result(nil)
             }
+        case "takeScreenshot":
+            if #available(macOS 10.13, *) {
+                var snapshotConfiguration: WKSnapshotConfiguration? = nil
+                if let args = call.arguments as? [String: Any],
+                   let configMap = args["screenshotConfiguration"] as? [String: Any?] {
+                    snapshotConfiguration = WKSnapshotConfiguration()
+                    if let rectMap = configMap["rect"] as? [String: Double] {
+                        snapshotConfiguration!.rect = CGRect(
+                            x: rectMap["x"] ?? 0,
+                            y: rectMap["y"] ?? 0,
+                            width: rectMap["width"] ?? 0,
+                            height: rectMap["height"] ?? 0
+                        )
+                    }
+                    if let snapshotWidth = configMap["snapshotWidth"] as? Double {
+                        snapshotConfiguration!.snapshotWidth = NSNumber(value: snapshotWidth)
+                    }
+                    if let afterScreenUpdates = configMap["afterScreenUpdates"] as? Bool {
+                        snapshotConfiguration!.afterScreenUpdates = afterScreenUpdates
+                    }
+                }
+                
+                self.takeSnapshot(with: snapshotConfiguration) { (image, error) -> Void in
+                    var imageData: Data? = nil
+                    if let screenshot = image {
+                        if let configMap = (call.arguments as? [String: Any])?["screenshotConfiguration"] as? [String: Any?] {
+                            let compressFormat = configMap["compressFormat"] as? String ?? "PNG"
+                            switch compressFormat {
+                            case "JPEG":
+                                let quality = Float((configMap["quality"] as? Int) ?? 100) / 100.0
+                                if let tiffData = screenshot.tiffRepresentation,
+                                   let bitmapRep = NSBitmapImageRep(data: tiffData) {
+                                    let properties: [NSBitmapImageRep.PropertyKey: Any] = [
+                                        .compressionFactor: quality
+                                    ]
+                                    imageData = bitmapRep.representation(using: .jpeg, properties: properties)
+                                }
+                                break
+                            case "PNG":
+                                fallthrough
+                            default:
+                                if let tiffData = screenshot.tiffRepresentation,
+                                   let bitmapRep = NSBitmapImageRep(data: tiffData) {
+                                    imageData = bitmapRep.representation(using: .png, properties: [:])
+                                }
+                            }
+                        } else {
+                            if let tiffData = screenshot.tiffRepresentation,
+                               let bitmapRep = NSBitmapImageRep(data: tiffData) {
+                                imageData = bitmapRep.representation(using: .png, properties: [:])
+                            }
+                        }
+                    }
+                    result(imageData)
+                }
+            } else {
+                result(nil)
+            }
         case "evaluateJavascript":
             if let args = call.arguments as? [String: Any],
                let source = args["source"] as? String {

@@ -22,6 +22,7 @@ public enum WebViewChannelDelegateMethods {
   stopLoading,
   isLoading,
   takeScreenshot,
+  createPdf,
   setSettings,
   getSettings,
   close,

@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:zikzak_inappwebview/zikzak_inappwebview.dart';
@@ -210,7 +211,61 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                 },
               );
             },
-          )
+          ),
+          IconButton(
+            icon: const Icon(Icons.camera_alt),
+            tooltip: "Take Screenshot",
+            onPressed: () async {
+              final bytes = await webViewController?.takeScreenshot();
+              if (bytes != null) {
+                final file = File(
+                  '${Directory.systemTemp.path}/screenshot_${DateTime.now().millisecondsSinceEpoch}.png',
+                );
+                await file.writeAsBytes(bytes);
+                debugPrint('Screenshot saved: ${file.path}');
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Screenshot saved: ${file.path}'),
+                    duration: const Duration(seconds: 3),
+                  ),
+                );
+              } else {
+                debugPrint('Screenshot failed');
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Screenshot failed')),
+                );
+              }
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.picture_as_pdf),
+            tooltip: "Export PDF",
+            onPressed: () async {
+              final bytes = await webViewController?.createPdf();
+              if (bytes != null) {
+                final file = File(
+                  '${Directory.systemTemp.path}/webview_${DateTime.now().millisecondsSinceEpoch}.pdf',
+                );
+                await file.writeAsBytes(bytes);
+                debugPrint('PDF saved: ${file.path}');
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('PDF saved: ${file.path}'),
+                    duration: const Duration(seconds: 3),
+                  ),
+                );
+              } else {
+                debugPrint('PDF export failed');
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('PDF export failed')),
+                );
+              }
+            },
+          ),
         ]),
         drawer: myDrawer(context: context),
         body: SafeArea(

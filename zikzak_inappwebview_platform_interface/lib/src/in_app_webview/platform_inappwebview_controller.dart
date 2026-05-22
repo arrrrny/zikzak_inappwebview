@@ -783,7 +783,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.takeScreenshot}
   ///Takes a screenshot of the WebView's visible viewport and returns a [Uint8List]. Returns `null` if it wasn't be able to take it.
   ///
-  ///[screenshotConfiguration] represents the configuration data to use when generating an image from a web view’s contents.
+  ///[screenshotConfiguration] represents the configuration data to use when generating an image from a web view's contents.
   ///
   ///**NOTE for iOS**: available on iOS 11.0+.
   ///
@@ -793,7 +793,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- Android native WebView
   ///- iOS ([Official API - WKWebView.takeSnapshot](https://developer.apple.com/documentation/webkit/wkwebview/2873260-takesnapshot))
   ///- MacOS ([Official API - WKWebView.takeSnapshot](https://developer.apple.com/documentation/webkit/wkwebview/2873260-takesnapshot))
-  ///- Windows
+  ///- Linux ([WebKitGTK snapshot](https://webkitgtk.org/reference/webkit2gtk/stable/WebKitWebView.html#webkit-web-view-get-snapshot))
   ///{@endtemplate}
   Future<Uint8List?> takeScreenshot({
     ScreenshotConfiguration? screenshotConfiguration,
@@ -1905,7 +1905,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.createPdf}
-  ///Generates PDF data from the web view’s contents asynchronously.
+  ///Generates PDF data from the web view's contents asynchronously.
   ///Returns `null` if a problem occurred.
   ///
   ///[pdfConfiguration] represents the object that specifies the portion of the web view to capture as PDF data.
@@ -1915,8 +1915,10 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///**NOTE for MacOS**: available only on MacOS 11.0+.
   ///
   ///**Officially Supported Platforms/Implementations**:
+  ///- Android ([WebView.createPrintDocumentAdapter](https://developer.android.com/reference/android/webkit/WebView#createPrintDocumentAdapter(java.lang.String)))
   ///- iOS ([Official API - WKWebView.createPdf](https://developer.apple.com/documentation/webkit/wkwebview/3650490-createpdf))
   ///- MacOS ([Official API - WKWebView.createPdf](https://developer.apple.com/documentation/webkit/wkwebview/3650490-createpdf))
+  ///- Linux ([WebKitPrintOperation](https://webkitgtk.org/reference/webkit2gtk/stable/WebKitPrintOperation.html))
   ///{@endtemplate}
   Future<Uint8List?> createPdf({PDFConfiguration? pdfConfiguration}) {
     throw UnimplementedError(

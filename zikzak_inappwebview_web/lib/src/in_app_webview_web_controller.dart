@@ -199,6 +199,13 @@ class InAppWebViewWebController extends PlatformInAppWebViewController {
   }
 
   @override
+  Future<Uint8List?> takeScreenshot({
+    ScreenshotConfiguration? screenshotConfiguration,
+  }) async {
+    return null;
+  }
+
+  @override
   Future<Uint8List?> createPdf({PDFConfiguration? pdfConfiguration}) async {
     return null;
   }

@@ -309,6 +309,57 @@ void in_app_webview_handle_method_call(InAppWebView* self, FlMethodCall* method_
         g_object_unref(settings);
         g_free(uri);
         return;
+    } else if (strcmp(method, "takeScreenshot") == 0) {
+        cairo_surface_t* surface = webkit_web_view_get_snapshot(
+            WEBKIT_WEB_VIEW(self->web_view),
+            WEBKIT_SNAPSHOT_REGION_VISIBLE,
+            WEBKIT_SNAPSHOT_OPTIONS_NONE,
+            nullptr,
+            nullptr
+        );
+
+        if (!surface) {
+            fl_method_call_respond(method_call, FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_null())), nullptr);
+            return;
+        }
+
+        cairo_surface_flush(surface);
+
+        cairo_status_t status;
+        guchar* png_data = nullptr;
+        gsize png_size = 0;
+
+        GdkPixbuf* pixbuf = gdk_pixbuf_get_from_surface(
+            surface, 0, 0,
+            cairo_image_surface_get_width(surface),
+            cairo_image_surface_get_height(surface)
+        );
+
+        if (pixbuf) {
+            gchar* buffer = nullptr;
+            gsize buffer_size = 0;
+            gboolean saved = gdk_pixbuf_save_to_buffer(
+                pixbuf, &buffer, &buffer_size, "png", nullptr, nullptr
+            );
+            if (saved && buffer && buffer_size > 0) {
+                png_data = (guchar*)g_malloc(buffer_size);
+                memcpy(png_data, buffer, buffer_size);
+                png_size = buffer_size;
+                g_free(buffer);
+            }
+            g_object_unref(pixbuf);
+        }
+
+        cairo_surface_destroy(surface);
+
+        if (png_data && png_size > 0) {
+            g_autoptr(FlValue) fl_data = fl_value_new_uint8_list(png_data, png_size);
+            fl_method_call_respond(method_call, FL_METHOD_RESPONSE(fl_method_success_response_new(fl_data)), nullptr);
+            g_free(png_data);
+        } else {
+            fl_method_call_respond(method_call, FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_null())), nullptr);
+        }
+        return;
     } else {
         fl_method_call_respond(method_call, FL_METHOD_RESPONSE(fl_method_not_implemented_response_new()), nullptr);
     }

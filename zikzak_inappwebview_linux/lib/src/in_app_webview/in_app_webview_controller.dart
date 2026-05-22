@@ -258,6 +258,25 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
   }
 
   @override
+  Future<Uint8List?> takeScreenshot({
+    ScreenshotConfiguration? screenshotConfiguration,
+  }) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent(
+      'screenshotConfiguration',
+      () => screenshotConfiguration?.toMap(),
+    );
+    return await _channel.invokeMethod<Uint8List?>('takeScreenshot', args);
+  }
+
+  @override
+  Future<Uint8List?> createPdf({PDFConfiguration? pdfConfiguration}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('pdfConfiguration', () => pdfConfiguration?.toMap());
+    return await _channel.invokeMethod<Uint8List?>('createPdf', args);
+  }
+
+  @override
   void dispose({bool isKeepAlive = false}) {
     if (!isKeepAlive) {
       _channel.setMethodCallHandler(null);

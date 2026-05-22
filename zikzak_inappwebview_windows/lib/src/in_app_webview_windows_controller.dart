@@ -101,6 +101,13 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
   }
 
   @override
+  Future<Uint8List?> takeScreenshot({
+    ScreenshotConfiguration? screenshotConfiguration,
+  }) async {
+    return null;
+  }
+
+  @override
   Future<Uint8List?> createPdf({PDFConfiguration? pdfConfiguration}) async {
     // TODO: Implement createPdf for Windows when webview_windows supports it
     return null;

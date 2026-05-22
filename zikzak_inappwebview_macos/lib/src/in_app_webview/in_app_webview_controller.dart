@@ -245,6 +245,18 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
   }
 
   @override
+  Future<Uint8List?> takeScreenshot({
+    ScreenshotConfiguration? screenshotConfiguration,
+  }) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent(
+      'screenshotConfiguration',
+      () => screenshotConfiguration?.toMap(),
+    );
+    return await _channel.invokeMethod<Uint8List?>('takeScreenshot', args);
+  }
+
+  @override
   Future<void> reload() async {
     await _channel.invokeMethod('reload');
   }

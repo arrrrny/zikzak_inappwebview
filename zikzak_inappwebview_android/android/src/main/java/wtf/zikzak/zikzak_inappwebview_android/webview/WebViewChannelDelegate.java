@@ -213,6 +213,13 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
         } else
           result.success(null);
         break;
+      case createPdf:
+        if (webView != null) {
+          Map<String, Object> pdfConfiguration = (Map<String, Object>) call.argument("pdfConfiguration");
+          webView.createPdf(pdfConfiguration, result);
+        } else
+          result.success(null);
+        break;
       case setSettings:
         if (webView != null && webView.getInAppBrowserDelegate() instanceof InAppBrowserActivity) {
           InAppBrowserActivity inAppBrowserActivity = (InAppBrowserActivity) webView.getInAppBrowserDelegate();

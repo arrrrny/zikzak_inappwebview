@@ -12,8 +12,12 @@ import android.content.pm.PackageInfo;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.pdf.PdfDocument;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -68,7 +72,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -1132,6 +1138,114 @@ public final class InAppWebView
                 }
             }
         );
+    }
+
+    public void createPdf(
+        final @Nullable Map<String, Object> pdfConfiguration,
+        final MethodChannel.Result result
+    ) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+            result.success(null);
+            return;
+        }
+        final float pixelDensity = Util.getPixelDensity(getContext());
+
+        mainLooperHandler.post(
+            new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        File outputDir = new File(getContext().getCacheDir(), "pdf");
+                        if (!outputDir.exists()) {
+                            outputDir.mkdirs();
+                        }
+                        File pdfFile = File.createTempFile("inappwebview_pdf_", ".pdf", outputDir);
+
+                        int pageWidth = (int) Math.floor(getMeasuredWidth() / pixelDensity);
+                        int pageHeight = (int) Math.floor(pageWidth * 1.4142);
+                        int margins = 0;
+
+                        if (pdfConfiguration != null) {
+                            Map<String, Object> pageSizeMap = (Map<String, Object>) pdfConfiguration.get("pageSize");
+                            if (pageSizeMap != null) {
+                                Object widthObj = pageSizeMap.get("width");
+                                Object heightObj = pageSizeMap.get("height");
+                                if (widthObj instanceof Number && heightObj instanceof Number) {
+                                    pageWidth = ((Number) widthObj).intValue();
+                                    pageHeight = ((Number) heightObj).intValue();
+                                }
+                            }
+                            Map<String, Object> marginsMap = (Map<String, Object>) pdfConfiguration.get("margins");
+                            if (marginsMap != null) {
+                                Object topObj = marginsMap.get("top");
+                                if (topObj instanceof Number) {
+                                    margins = ((Number) topObj).intValue();
+                                }
+                            }
+                        }
+
+                        Bitmap fullBitmap = Bitmap.createBitmap(
+                            getMeasuredWidth(),
+                            computeVerticalScrollRange(),
+                            Bitmap.Config.ARGB_8888
+                        );
+                        Canvas fullCanvas = new Canvas(fullBitmap);
+                        fullCanvas.translate(0, -getScrollY());
+                        draw(fullCanvas);
+
+                        PdfDocument document = new PdfDocument();
+                        int totalHeight = fullBitmap.getHeight();
+                        int pageContentHeight = pageHeight - 2 * margins;
+                        int pageCount = (int) Math.ceil((double) totalHeight / pageContentHeight);
+
+                        for (int i = 0; i < pageCount; i++) {
+                            int yOffset = i * pageContentHeight;
+                            int h = Math.min(pageContentHeight, totalHeight - yOffset);
+
+                            PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(
+                                pageWidth, pageHeight, i + 1
+                            ).create();
+                            PdfDocument.Page page = document.startPage(pageInfo);
+                            Canvas pageCanvas = page.getCanvas();
+
+                            pageCanvas.scale(
+                                (float) (pageWidth - 2 * margins) / fullBitmap.getWidth(),
+                                (float) (pageWidth - 2 * margins) / fullBitmap.getWidth()
+                            );
+
+                            Rect srcRect = new Rect(0, yOffset, fullBitmap.getWidth(), yOffset + h);
+                            RectF dstRect = new RectF(margins, margins, pageWidth - margins, (float) h / fullBitmap.getHeight() * (pageWidth - 2 * margins) + margins);
+                            Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG);
+                            pageCanvas.drawBitmap(fullBitmap, srcRect, dstRect, paint);
+
+                            document.finishPage(page);
+                        }
+
+                        fullBitmap.recycle();
+
+                        FileOutputStream fos = new FileOutputStream(pdfFile);
+                        document.writeTo(fos);
+                        document.close();
+                        fos.close();
+
+                        byte[] bytes = readBytes(pdfFile);
+                        pdfFile.delete();
+                        result.success(bytes);
+                    } catch (Exception e) {
+                        Log.e(LOG_TAG, "", e);
+                        result.success(null);
+                    }
+                }
+            }
+        );
+    }
+
+    private byte[] readBytes(File file) throws IOException {
+        RandomAccessFile f = new RandomAccessFile(file, "r");
+        byte[] bytes = new byte[(int) f.length()];
+        f.readFully(bytes);
+        f.close();
+        return bytes;
     }
 
     @SuppressLint("RestrictedApi")

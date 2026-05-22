@@ -23,6 +23,16 @@ class IOSInAppWebViewController {
     await _controller?.reloadFromOrigin();
   }
 
+  ///Use [InAppWebViewController.takeScreenshot] instead.
+  @Deprecated("Use InAppWebViewController.takeScreenshot instead")
+  Future<Uint8List?> takeScreenshot({
+    ScreenshotConfiguration? screenshotConfiguration,
+  }) async {
+    return await _controller?.takeScreenshot(
+      screenshotConfiguration: screenshotConfiguration,
+    );
+  }
+
   ///Use [InAppWebViewController.createPdf] instead.
   @Deprecated("Use InAppWebViewController.createPdf instead")
   Future<Uint8List?> createPdf({PDFConfiguration? pdfConfiguration}) async {

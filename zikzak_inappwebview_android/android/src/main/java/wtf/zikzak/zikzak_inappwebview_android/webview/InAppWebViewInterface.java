@@ -51,6 +51,7 @@ public interface InAppWebViewInterface {
   void stopLoading();
   boolean isLoading();
   void takeScreenshot(Map<String, Object> screenshotConfiguration, MethodChannel.Result result);
+  void createPdf(Map<String, Object> pdfConfiguration, MethodChannel.Result result);
   void setSettings(InAppWebViewSettings newSettings, HashMap<String, Object> newSettingsMap);
   Map<String, Object> getCustomSettings();
   HashMap<String, Object> getCopyBackForwardList();
