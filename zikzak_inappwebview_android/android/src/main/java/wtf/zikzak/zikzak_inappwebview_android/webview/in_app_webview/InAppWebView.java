@@ -30,6 +30,7 @@ import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.print.PrintDocumentInfo;
 import android.print.PrintManager;
+import android.print.pdf.PrintedPdfDocument;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -1144,93 +1145,28 @@ public final class InAppWebView
         final @Nullable Map<String, Object> pdfConfiguration,
         final MethodChannel.Result result
     ) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-            result.success(null);
-            return;
-        }
-        final float pixelDensity = Util.getPixelDensity(getContext());
-
         mainLooperHandler.post(
             new Runnable() {
                 @Override
                 public void run() {
                     try {
-                        File outputDir = new File(getContext().getCacheDir(), "pdf");
-                        if (!outputDir.exists()) {
-                            outputDir.mkdirs();
-                        }
-                        File pdfFile = File.createTempFile("inappwebview_pdf_", ".pdf", outputDir);
+                        final int viewWidth = getWidth() > 0 ? getWidth() : getMeasuredWidth();
+                        final int viewHeight = getHeight() > 0 ? getHeight() : getMeasuredHeight();
+                        int rawFullHeight = computeVerticalScrollRange();
+                        if (rawFullHeight <= 0) rawFullHeight = viewHeight;
+                        final int MAX_HEIGHT = viewWidth * 40;
+                        if (rawFullHeight > MAX_HEIGHT) rawFullHeight = MAX_HEIGHT;
+                        final int fullHeight = rawFullHeight;
 
-                        int pageWidth = (int) Math.floor(getMeasuredWidth() / pixelDensity);
-                        int pageHeight = (int) Math.floor(pageWidth * 1.4142);
-                        int margins = 0;
+                        final File outputDir = new File(getContext().getCacheDir(), "pdf");
+                        outputDir.mkdirs();
+                        final File pdfFile = File.createTempFile("inappwebview_pdf_", ".pdf", outputDir);
+                        final int savedScrollY = getScrollY();
 
-                        if (pdfConfiguration != null) {
-                            Map<String, Object> pageSizeMap = (Map<String, Object>) pdfConfiguration.get("pageSize");
-                            if (pageSizeMap != null) {
-                                Object widthObj = pageSizeMap.get("width");
-                                Object heightObj = pageSizeMap.get("height");
-                                if (widthObj instanceof Number && heightObj instanceof Number) {
-                                    pageWidth = ((Number) widthObj).intValue();
-                                    pageHeight = ((Number) heightObj).intValue();
-                                }
-                            }
-                            Map<String, Object> marginsMap = (Map<String, Object>) pdfConfiguration.get("margins");
-                            if (marginsMap != null) {
-                                Object topObj = marginsMap.get("top");
-                                if (topObj instanceof Number) {
-                                    margins = ((Number) topObj).intValue();
-                                }
-                            }
-                        }
-
-                        Bitmap fullBitmap = Bitmap.createBitmap(
-                            getMeasuredWidth(),
-                            computeVerticalScrollRange(),
-                            Bitmap.Config.ARGB_8888
-                        );
-                        Canvas fullCanvas = new Canvas(fullBitmap);
-                        fullCanvas.translate(0, -getScrollY());
-                        draw(fullCanvas);
-
-                        PdfDocument document = new PdfDocument();
-                        int totalHeight = fullBitmap.getHeight();
-                        int pageContentHeight = pageHeight - 2 * margins;
-                        int pageCount = (int) Math.ceil((double) totalHeight / pageContentHeight);
-
-                        for (int i = 0; i < pageCount; i++) {
-                            int yOffset = i * pageContentHeight;
-                            int h = Math.min(pageContentHeight, totalHeight - yOffset);
-
-                            PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(
-                                pageWidth, pageHeight, i + 1
-                            ).create();
-                            PdfDocument.Page page = document.startPage(pageInfo);
-                            Canvas pageCanvas = page.getCanvas();
-
-                            pageCanvas.scale(
-                                (float) (pageWidth - 2 * margins) / fullBitmap.getWidth(),
-                                (float) (pageWidth - 2 * margins) / fullBitmap.getWidth()
-                            );
-
-                            Rect srcRect = new Rect(0, yOffset, fullBitmap.getWidth(), yOffset + h);
-                            RectF dstRect = new RectF(margins, margins, pageWidth - margins, (float) h / fullBitmap.getHeight() * (pageWidth - 2 * margins) + margins);
-                            Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG);
-                            pageCanvas.drawBitmap(fullBitmap, srcRect, dstRect, paint);
-
-                            document.finishPage(page);
-                        }
-
-                        fullBitmap.recycle();
-
-                        FileOutputStream fos = new FileOutputStream(pdfFile);
-                        document.writeTo(fos);
-                        document.close();
-                        fos.close();
-
-                        byte[] bytes = readBytes(pdfFile);
-                        pdfFile.delete();
-                        result.success(bytes);
+                        final int oldRight = getRight();
+                        final int oldBottom = getBottom();
+                        capturePdf(viewWidth, viewHeight, fullHeight,
+                            oldRight, oldBottom, savedScrollY, pdfFile, result);
                     } catch (Exception e) {
                         Log.e(LOG_TAG, "", e);
                         result.success(null);
@@ -1238,6 +1174,68 @@ public final class InAppWebView
                 }
             }
         );
+    }
+
+    private void capturePdf(
+        final int viewWidth, final int viewHeight, final int fullHeight,
+        final int oldRight, final int oldBottom, final int savedScrollY,
+        final File pdfFile, final MethodChannel.Result result
+    ) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            enableSlowWholeDocumentDraw();
+        }
+
+        layout(getLeft(), getTop(), getLeft() + viewWidth, getTop() + fullHeight);
+
+        final Runnable doCapture = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Bitmap fullBitmap = Bitmap.createBitmap(viewWidth, fullHeight, Bitmap.Config.RGB_565);
+                    Canvas fullCanvas = new Canvas(fullBitmap);
+                    fullCanvas.drawColor(Color.WHITE);
+                    draw(fullCanvas);
+
+                    layout(getLeft(), getTop(), oldRight, oldBottom);
+                    scrollTo(0, savedScrollY);
+
+                    PdfDocument document = new PdfDocument();
+                    PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(viewWidth, fullHeight, 1).create();
+                    PdfDocument.Page page = document.startPage(pageInfo);
+                    page.getCanvas().drawBitmap(fullBitmap, 0, 0, null);
+                    document.finishPage(page);
+
+                    fullBitmap.recycle();
+
+                    FileOutputStream fos = new FileOutputStream(pdfFile);
+                    document.writeTo(fos);
+                    document.close();
+                    fos.close();
+
+                    byte[] bytes = readBytes(pdfFile);
+                    pdfFile.delete();
+                    result.success(bytes);
+                } catch (Exception e) {
+                    Log.e(LOG_TAG, "", e);
+                    try {
+                        layout(getLeft(), getTop(), oldRight, oldBottom);
+                        scrollTo(0, savedScrollY);
+                    } catch (Exception ignored) {}
+                    result.success(null);
+                }
+            }
+        };
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            postVisualStateCallback(1L, new WebView.VisualStateCallback() {
+                @Override
+                public void onComplete(long requestId) {
+                    postDelayed(doCapture, 400);
+                }
+            });
+        } else {
+            postDelayed(doCapture, 500);
+        }
     }
 
     private byte[] readBytes(File file) throws IOException {

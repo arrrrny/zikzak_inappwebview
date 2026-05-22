@@ -13,7 +13,7 @@ macOS implementation of the zikzak_inappwebview plugin. A feature-rich WebView p
   s.license          = { :type => 'Apache-2.0' }
   s.author           = { 'ARRRRNY' => 'arrrrny@zuzu.dev' }
   s.source           = { :git => 'https://github.com/arrrrny/zikzak_inappwebview.git', :tag => s.version.to_s }
-  s.source_files     = 'Classes/**/*'
+  s.source_files     = 'zikzak_inappwebview_macos/Sources/zikzak_inappwebview_macos/**/*'
   s.dependency 'FlutterMacOS'
   s.frameworks       = 'WebKit'
 

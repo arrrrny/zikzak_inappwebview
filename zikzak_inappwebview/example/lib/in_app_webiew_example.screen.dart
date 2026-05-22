@@ -2,6 +2,7 @@ import 'dart:collection';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:zikzak_inappwebview/zikzak_inappwebview.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -216,10 +217,12 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
             icon: const Icon(Icons.camera_alt),
             tooltip: "Take Screenshot",
             onPressed: () async {
+              debugPrint('takeScreenshot tapped, controller is ${webViewController != null ? "set" : "null"}');
               final bytes = await webViewController?.takeScreenshot();
               if (bytes != null) {
+                final dir = await getApplicationDocumentsDirectory();
                 final file = File(
-                  '${Directory.systemTemp.path}/screenshot_${DateTime.now().millisecondsSinceEpoch}.png',
+                  '${dir.path}/screenshot_${DateTime.now().millisecondsSinceEpoch}.png',
                 );
                 await file.writeAsBytes(bytes);
                 debugPrint('Screenshot saved: ${file.path}');
@@ -243,10 +246,12 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
             icon: const Icon(Icons.picture_as_pdf),
             tooltip: "Export PDF",
             onPressed: () async {
+              debugPrint('createPdf tapped, controller is ${webViewController != null ? "set" : "null"}');
               final bytes = await webViewController?.createPdf();
               if (bytes != null) {
+                final dir = await getApplicationDocumentsDirectory();
                 final file = File(
-                  '${Directory.systemTemp.path}/webview_${DateTime.now().millisecondsSinceEpoch}.pdf',
+                  '${dir.path}/webview_${DateTime.now().millisecondsSinceEpoch}.pdf',
                 );
                 await file.writeAsBytes(bytes);
                 debugPrint('PDF saved: ${file.path}');
