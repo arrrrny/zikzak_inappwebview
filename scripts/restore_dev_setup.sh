@@ -19,21 +19,24 @@ echo "Root directory: $ROOT_DIR"
 update_for_dev_mode() {
   local package_dir=$1
   local pubspec_file="$package_dir/pubspec.yaml"
+  local path_prefix="../"
+
+  if [[ "$package_dir" == *"/example" ]]; then
+    path_prefix="../../"
+  fi
 
   if [ ! -f "$pubspec_file" ]; then
     echo "⚠️ Pubspec file not found at $pubspec_file"
     return
   fi
 
-  echo "Processing $pubspec_file"
-
-
+  echo "Processing $pubspec_file (depth prefix: $path_prefix)"
 
   # Uncomment any commented path dependencies for dev_dependencies
-  sed -i.tmp -E 's|^    #([ ]+path: ../zikzak_inappwebview.*)[ ]#[ ]Commented for publishing|\1|g' "$pubspec_file"
+  sed -i.tmp -E "s|^    #([ ]+path: $path_prefix"zikzak_inappwebview".*)[ ]#[ ]Commented for publishing|\1|g" "$pubspec_file"
 
   # Also convert versioned dev_dependencies to path dependencies
-  awk '
+  awk -v prefix="$path_prefix" '
   BEGIN {
     in_dev_dependencies = 0;
     packages["zikzak_inappwebview_platform_interface"] = 1;
@@ -62,7 +65,7 @@ update_for_dev_mode() {
       # If this is a package we care about, and its a versioned dep (not already path-based)
       if ($0 !~ /path:/) {
         print "  " pkg_name ":";
-        print "    path: ../" pkg_name;
+        print "    path: " prefix pkg_name;
         getline; # Skip the version line if there is one
         next;
       }
@@ -85,28 +88,28 @@ update_for_dev_mode() {
     echo "⚠️ Warning: awk processing failed for $pubspec_file"
   fi
 
-  sed -i.tmp -E 's|zikzak_inappwebview_internal_annotations: \^[0-9]+\.[0-9]+\.[0-9]+|zikzak_inappwebview_internal_annotations:\n    path: ../zikzak_inappwebview_internal_annotations|g' "$pubspec_file"
+  sed -i.tmp -E "s|zikzak_inappwebview_internal_annotations: \\^[0-9]+\\.[0-9]+\\.[0-9]+|zikzak_inappwebview_internal_annotations:\\n    path: ${path_prefix}zikzak_inappwebview_internal_annotations|g" "$pubspec_file"
 
   # Replace zikzak_inappwebview_platform_interface dependency
-  sed -i.tmp -E 's|zikzak_inappwebview_platform_interface: \^[0-9]+\.[0-9]+\.[0-9]+|zikzak_inappwebview_platform_interface:\n    path: ../zikzak_inappwebview_platform_interface|g' "$pubspec_file"
+  sed -i.tmp -E "s|zikzak_inappwebview_platform_interface: \\^[0-9]+\\.[0-9]+\\.[0-9]+|zikzak_inappwebview_platform_interface:\\n    path: ${path_prefix}zikzak_inappwebview_platform_interface|g" "$pubspec_file"
 
   # Replace android dependency
-  sed -i.tmp -E 's|zikzak_inappwebview_android: \^[0-9]+\.[0-9]+\.[0-9]+|zikzak_inappwebview_android:\n    path: ../zikzak_inappwebview_android|g' "$pubspec_file"
+  sed -i.tmp -E "s|zikzak_inappwebview_android: \\^[0-9]+\\.[0-9]+\\.[0-9]+|zikzak_inappwebview_android:\\n    path: ${path_prefix}zikzak_inappwebview_android|g" "$pubspec_file"
 
   # Replace iOS dependency
-  sed -i.tmp -E 's|zikzak_inappwebview_ios: \^[0-9]+\.[0-9]+\.[0-9]+|zikzak_inappwebview_ios:\n    path: ../zikzak_inappwebview_ios|g' "$pubspec_file"
+  sed -i.tmp -E "s|zikzak_inappwebview_ios: \\^[0-9]+\\.[0-9]+\\.[0-9]+|zikzak_inappwebview_ios:\\n    path: ${path_prefix}zikzak_inappwebview_ios|g" "$pubspec_file"
 
   # Replace web dependency
-  sed -i.tmp -E 's|zikzak_inappwebview_web: \^[0-9]+\.[0-9]+\.[0-9]+|zikzak_inappwebview_web:\n    path: ../zikzak_inappwebview_web|g' "$pubspec_file"
+  sed -i.tmp -E "s|zikzak_inappwebview_web: \\^[0-9]+\\.[0-9]+\\.[0-9]+|zikzak_inappwebview_web:\\n    path: ${path_prefix}zikzak_inappwebview_web|g" "$pubspec_file"
 
   # Replace macos dependency
-  sed -i.tmp -E 's|zikzak_inappwebview_macos: \^[0-9]+\.[0-9]+\.[0-9]+|zikzak_inappwebview_macos:\n    path: ../zikzak_inappwebview_macos|g' "$pubspec_file"
+  sed -i.tmp -E "s|zikzak_inappwebview_macos: \\^[0-9]+\\.[0-9]+\\.[0-9]+|zikzak_inappwebview_macos:\\n    path: ${path_prefix}zikzak_inappwebview_macos|g" "$pubspec_file"
 
   # Replace windows dependency
-  sed -i.tmp -E 's|zikzak_inappwebview_windows: \^[0-9]+\.[0-9]+\.[0-9]+|zikzak_inappwebview_windows:\n    path: ../zikzak_inappwebview_windows|g' "$pubspec_file"
+  sed -i.tmp -E "s|zikzak_inappwebview_windows: \\^[0-9]+\\.[0-9]+\\.[0-9]+|zikzak_inappwebview_windows:\\n    path: ${path_prefix}zikzak_inappwebview_windows|g" "$pubspec_file"
 
   # Replace linux dependency
-  sed -i.tmp -E 's|zikzak_inappwebview_linux: \^[0-9]+\.[0-9]+\.[0-9]+|zikzak_inappwebview_linux:\n    path: ../zikzak_inappwebview_linux|g' "$pubspec_file"
+  sed -i.tmp -E "s|zikzak_inappwebview_linux: \\^[0-9]+\\.[0-9]+\\.[0-9]+|zikzak_inappwebview_linux:\\n    path: ${path_prefix}zikzak_inappwebview_linux|g" "$pubspec_file"
 
   # Clean up temporary files
   rm -f "${pubspec_file}.tmp"
@@ -118,6 +121,10 @@ update_for_dev_mode() {
 for package in zikzak_inappwebview zikzak_inappwebview_android zikzak_inappwebview_ios zikzak_inappwebview_web zikzak_inappwebview_macos zikzak_inappwebview_windows zikzak_inappwebview_linux zikzak_inappwebview_platform_interface; do
   if [ -d "$ROOT_DIR/$package" ]; then
     update_for_dev_mode "$ROOT_DIR/$package"
+    # Also update example if it exists
+    if [ -d "$ROOT_DIR/$package/example" ]; then
+      update_for_dev_mode "$ROOT_DIR/$package/example"
+    fi
   else
     echo "⚠️ Directory not found: $ROOT_DIR/$package"
   fi
