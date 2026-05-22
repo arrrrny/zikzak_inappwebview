@@ -1230,7 +1230,7 @@ public final class InAppWebView
             postVisualStateCallback(1L, new WebView.VisualStateCallback() {
                 @Override
                 public void onComplete(long requestId) {
-                    postDelayed(doCapture, 400);
+                    doCapture.run();
                 }
             });
         } else {
