@@ -153,11 +153,7 @@ convert_path_to_versioned() {
         # Method 3: Handle multi-line path dependencies
         # This uses a more complex sed command to find the package line and replace the entire dependency block
         sed -i '' "/^[[:space:]]*${pkg}:[[:space:]]*$/,/^[[:space:]]*[^[:space:]]/ {
-            /^[[:space:]]*${pkg}:[[:space:]]*$/ {
-                c\\
-  ${pkg}: ^${version}
-                d
-            }
+            s/^\([[:space:]]*${pkg}\):[[:space:]]*$/\1: ^${version}/
             /^[[:space:]]*path:[[:space:]]*/ d
             /^[[:space:]]*version:[[:space:]]*/ d
         }" "$temp_file"
