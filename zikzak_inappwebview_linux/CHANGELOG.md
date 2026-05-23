@@ -1,3 +1,6 @@
+## 4.1.0 - 2026-05-23
+
+* Prepare for publishing version 4.1.0
 ## 4.0.10 - 2026-04-01
 
 * Prepare for publishing version 4.0.10
