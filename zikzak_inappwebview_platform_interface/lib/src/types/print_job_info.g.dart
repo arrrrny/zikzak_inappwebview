@@ -120,23 +120,24 @@ class PrintJobInfo {
   ///- iOS
   ///- MacOS
   PrintJobState? state;
-  PrintJobInfo(
-      {this.attributes,
-      this.canSpawnSeparateThread,
-      this.copies,
-      this.creationTime,
-      this.currentPage,
-      this.firstPage,
-      this.isCopyingOperation,
-      this.label,
-      this.lastPage,
-      this.numberOfPages,
-      this.pageOrder,
-      this.preferredRenderingQuality,
-      this.printer,
-      this.showsPrintPanel,
-      this.showsProgressPanel,
-      this.state});
+  PrintJobInfo({
+    this.attributes,
+    this.canSpawnSeparateThread,
+    this.copies,
+    this.creationTime,
+    this.currentPage,
+    this.firstPage,
+    this.isCopyingOperation,
+    this.label,
+    this.lastPage,
+    this.numberOfPages,
+    this.pageOrder,
+    this.preferredRenderingQuality,
+    this.printer,
+    this.showsPrintPanel,
+    this.showsProgressPanel,
+    this.state,
+  });
 
   ///Gets a possible [PrintJobInfo] instance from a [Map] value.
   static PrintJobInfo? fromMap(Map<String, dynamic>? map) {
@@ -145,7 +146,8 @@ class PrintJobInfo {
     }
     final instance = PrintJobInfo(
       attributes: PrintJobAttributes.fromMap(
-          map['attributes']?.cast<String, dynamic>()),
+        map['attributes']?.cast<String, dynamic>(),
+      ),
       canSpawnSeparateThread: map['canSpawnSeparateThread'],
       copies: map['copies'],
       creationTime: map['creationTime'],
@@ -157,7 +159,8 @@ class PrintJobInfo {
       numberOfPages: map['numberOfPages'],
       pageOrder: PrintJobPageOrder.fromNativeValue(map['pageOrder']),
       preferredRenderingQuality: PrintJobRenderingQuality.fromNativeValue(
-          map['preferredRenderingQuality']),
+        map['preferredRenderingQuality'],
+      ),
       printer: Printer.fromMap(map['printer']?.cast<String, dynamic>()),
       showsPrintPanel: map['showsPrintPanel'],
       showsProgressPanel: map['showsProgressPanel'],

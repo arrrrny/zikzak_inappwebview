@@ -31,12 +31,15 @@ class ChromeSafariBrowserSecondaryToolbar {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
-  ChromeSafariBrowserSecondaryToolbar(
-      {this.clickableIDs = const [], required this.layout});
+  ChromeSafariBrowserSecondaryToolbar({
+    this.clickableIDs = const [],
+    required this.layout,
+  });
 
   ///Gets a possible [ChromeSafariBrowserSecondaryToolbar] instance from a [Map] value.
   static ChromeSafariBrowserSecondaryToolbar? fromMap(
-      Map<String, dynamic>? map) {
+    Map<String, dynamic>? map,
+  ) {
     if (map == null) {
       return null;
     }
@@ -45,9 +48,12 @@ class ChromeSafariBrowserSecondaryToolbar {
     );
     instance.clickableIDs =
         List<ChromeSafariBrowserSecondaryToolbarClickableID>.from(
-            map['clickableIDs'].map((e) =>
-                ChromeSafariBrowserSecondaryToolbarClickableID.fromMap(
-                    e?.cast<String, dynamic>())!));
+          map['clickableIDs'].map(
+            (e) => ChromeSafariBrowserSecondaryToolbarClickableID.fromMap(
+              e?.cast<String, dynamic>(),
+            )!,
+          ),
+        );
     return instance;
   }
 
@@ -88,12 +94,15 @@ class ChromeSafariBrowserSecondaryToolbarClickableID {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
-  ChromeSafariBrowserSecondaryToolbarClickableID(
-      {required this.id, this.onClick});
+  ChromeSafariBrowserSecondaryToolbarClickableID({
+    required this.id,
+    this.onClick,
+  });
 
   ///Gets a possible [ChromeSafariBrowserSecondaryToolbarClickableID] instance from a [Map] value.
   static ChromeSafariBrowserSecondaryToolbarClickableID? fromMap(
-      Map<String, dynamic>? map) {
+    Map<String, dynamic>? map,
+  ) {
     if (map == null) {
       return null;
     }
@@ -105,9 +114,7 @@ class ChromeSafariBrowserSecondaryToolbarClickableID {
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
-    return {
-      "id": id.toMap(),
-    };
+    return {"id": id.toMap()};
   }
 
   ///Converts instance to a map.

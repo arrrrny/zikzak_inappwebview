@@ -25,9 +25,7 @@ class RequestImageRefResult {
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
-    return {
-      "url": url?.toString(),
-    };
+    return {"url": url?.toString()};
   }
 
   ///Converts instance to a map.

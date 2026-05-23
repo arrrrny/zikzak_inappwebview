@@ -27,8 +27,9 @@ class WebAuthenticationSessionSettings {
   ///- iOS
   ///- MacOS
   bool? prefersEphemeralWebBrowserSession;
-  WebAuthenticationSessionSettings(
-      {this.prefersEphemeralWebBrowserSession = false});
+  WebAuthenticationSessionSettings({
+    this.prefersEphemeralWebBrowserSession = false,
+  });
 
   ///Gets a possible [WebAuthenticationSessionSettings] instance from a [Map] value.
   static WebAuthenticationSessionSettings? fromMap(Map<String, dynamic>? map) {
@@ -43,7 +44,7 @@ class WebAuthenticationSessionSettings {
 
   Map<String, dynamic> toMap() {
     return {
-      "prefersEphemeralWebBrowserSession": prefersEphemeralWebBrowserSession
+      "prefersEphemeralWebBrowserSession": prefersEphemeralWebBrowserSession,
     };
   }
 

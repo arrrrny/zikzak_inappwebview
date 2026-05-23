@@ -17,17 +17,13 @@ class FetchRequestCredential {
     if (map == null) {
       return null;
     }
-    final instance = FetchRequestCredential(
-      type: map['type'],
-    );
+    final instance = FetchRequestCredential(type: map['type']);
     return instance;
   }
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
-    return {
-      "type": type,
-    };
+    return {"type": type};
   }
 
   ///Converts instance to a map.

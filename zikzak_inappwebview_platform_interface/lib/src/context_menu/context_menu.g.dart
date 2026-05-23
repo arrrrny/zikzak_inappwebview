@@ -39,12 +39,13 @@ class ContextMenu {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
-  ContextMenu(
-      {this.menuItems = const [],
-      this.onCreateContextMenu,
-      this.onHideContextMenu,
-      this.settings,
-      this.onContextMenuActionItemClicked});
+  ContextMenu({
+    this.menuItems = const [],
+    this.onCreateContextMenu,
+    this.onHideContextMenu,
+    this.settings,
+    this.onContextMenuActionItemClicked,
+  });
 
   ///Gets a possible [ContextMenu] instance from a [Map] value.
   static ContextMenu? fromMap(Map<String, dynamic>? map) {
@@ -52,10 +53,14 @@ class ContextMenu {
       return null;
     }
     final instance = ContextMenu(
-      menuItems: List<ContextMenuItem>.from(map['menuItems']
-          .map((e) => ContextMenuItem.fromMap(e?.cast<String, dynamic>())!)),
-      settings:
-          ContextMenuSettings.fromMap(map['settings']?.cast<String, dynamic>()),
+      menuItems: List<ContextMenuItem>.from(
+        map['menuItems'].map(
+          (e) => ContextMenuItem.fromMap(e?.cast<String, dynamic>())!,
+        ),
+      ),
+      settings: ContextMenuSettings.fromMap(
+        map['settings']?.cast<String, dynamic>(),
+      ),
     );
     return instance;
   }

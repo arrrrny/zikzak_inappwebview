@@ -39,15 +39,16 @@ class CSSLinkHtmlTagAttributes {
   ///When used on a `<link rel="stylesheet">` it defines a preferred or an alternate stylesheet.
   ///Incorrectly using it may cause the stylesheet to be ignored.
   String? title;
-  CSSLinkHtmlTagAttributes(
-      {this.alternate,
-      this.crossOrigin,
-      this.disabled,
-      this.id,
-      this.integrity,
-      this.media,
-      this.referrerPolicy,
-      this.title});
+  CSSLinkHtmlTagAttributes({
+    this.alternate,
+    this.crossOrigin,
+    this.disabled,
+    this.id,
+    this.integrity,
+    this.media,
+    this.referrerPolicy,
+    this.title,
+  });
 
   ///Gets a possible [CSSLinkHtmlTagAttributes] instance from a [Map] value.
   static CSSLinkHtmlTagAttributes? fromMap(Map<String, dynamic>? map) {

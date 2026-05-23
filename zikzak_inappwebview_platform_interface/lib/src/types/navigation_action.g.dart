@@ -71,15 +71,16 @@ class NavigationAction {
   ///- iOS ([Official API - WKNavigationAction.targetFrame](https://developer.apple.com/documentation/webkit/wknavigationaction/1401918-targetframe))
   ///- MacOS ([Official API - WKNavigationAction.targetFrame](https://developer.apple.com/documentation/webkit/wknavigationaction/1401918-targetframe))
   FrameInfo? targetFrame;
-  NavigationAction(
-      {this.hasGesture,
-      required this.isForMainFrame,
-      this.isRedirect,
-      this.navigationType,
-      required this.request,
-      this.shouldPerformDownload,
-      this.sourceFrame,
-      this.targetFrame});
+  NavigationAction({
+    this.hasGesture,
+    required this.isForMainFrame,
+    this.isRedirect,
+    this.navigationType,
+    required this.request,
+    this.shouldPerformDownload,
+    this.sourceFrame,
+    this.targetFrame,
+  });
 
   ///Gets a possible [NavigationAction] instance from a [Map] value.
   static NavigationAction? fromMap(Map<String, dynamic>? map) {
@@ -93,10 +94,12 @@ class NavigationAction {
       navigationType: NavigationType.fromNativeValue(map['navigationType']),
       request: URLRequest.fromMap(map['request']?.cast<String, dynamic>())!,
       shouldPerformDownload: map['shouldPerformDownload'],
-      sourceFrame:
-          FrameInfo.fromMap(map['sourceFrame']?.cast<String, dynamic>()),
-      targetFrame:
-          FrameInfo.fromMap(map['targetFrame']?.cast<String, dynamic>()),
+      sourceFrame: FrameInfo.fromMap(
+        map['sourceFrame']?.cast<String, dynamic>(),
+      ),
+      targetFrame: FrameInfo.fromMap(
+        map['targetFrame']?.cast<String, dynamic>(),
+      ),
     );
     return instance;
   }

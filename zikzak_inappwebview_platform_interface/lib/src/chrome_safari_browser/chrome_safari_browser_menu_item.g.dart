@@ -32,8 +32,12 @@ class ChromeSafariBrowserMenuItem {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
-  ChromeSafariBrowserMenuItem(
-      {required this.id, required this.label, this.image, this.onClick});
+  ChromeSafariBrowserMenuItem({
+    required this.id,
+    required this.label,
+    this.image,
+    this.onClick,
+  });
 
   ///Gets a possible [ChromeSafariBrowserMenuItem] instance from a [Map] value.
   static ChromeSafariBrowserMenuItem? fromMap(Map<String, dynamic>? map) {
@@ -50,11 +54,7 @@ class ChromeSafariBrowserMenuItem {
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
-    return {
-      "id": id,
-      "image": image?.toMap(),
-      "label": label,
-    };
+    return {"id": id, "image": image?.toMap(), "label": label};
   }
 
   ///Converts instance to a map.

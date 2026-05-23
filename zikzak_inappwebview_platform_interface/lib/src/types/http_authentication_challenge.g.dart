@@ -31,13 +31,13 @@ class HttpAuthenticationChallenge extends URLAuthenticationChallenge {
   ///If the proposed credential’s hasPassword method returns false, then the credential provides a default user name,
   ///and the client must prompt the user for a corresponding password.
   URLCredential? proposedCredential;
-  HttpAuthenticationChallenge(
-      {this.error,
-      this.failureResponse,
-      required this.previousFailureCount,
-      this.proposedCredential,
-      required URLProtectionSpace protectionSpace})
-      : super(protectionSpace: protectionSpace);
+  HttpAuthenticationChallenge({
+    this.error,
+    this.failureResponse,
+    required this.previousFailureCount,
+    this.proposedCredential,
+    required URLProtectionSpace protectionSpace,
+  }) : super(protectionSpace: protectionSpace);
 
   ///Gets a possible [HttpAuthenticationChallenge] instance from a [Map] value.
   static HttpAuthenticationChallenge? fromMap(Map<String, dynamic>? map) {
@@ -46,13 +46,16 @@ class HttpAuthenticationChallenge extends URLAuthenticationChallenge {
     }
     final instance = HttpAuthenticationChallenge(
       protectionSpace: URLProtectionSpace.fromMap(
-          map['protectionSpace']?.cast<String, dynamic>())!,
+        map['protectionSpace']?.cast<String, dynamic>(),
+      )!,
       error: map['error'],
-      failureResponse:
-          URLResponse.fromMap(map['failureResponse']?.cast<String, dynamic>()),
+      failureResponse: URLResponse.fromMap(
+        map['failureResponse']?.cast<String, dynamic>(),
+      ),
       previousFailureCount: map['previousFailureCount'],
       proposedCredential: URLCredential.fromMap(
-          map['proposedCredential']?.cast<String, dynamic>()),
+        map['proposedCredential']?.cast<String, dynamic>(),
+      ),
     );
     return instance;
   }

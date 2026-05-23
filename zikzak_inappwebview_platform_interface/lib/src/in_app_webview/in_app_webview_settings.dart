@@ -1992,14 +1992,16 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   ///If a page uses fixed/sticky elements for essential functionality, set this to `false`.
   ///
   ///The default value is `true`.
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-    IOSPlatform(),
-    MacOSPlatform(),
-    WebPlatform(),
-    WindowsPlatform(),
-    LinuxPlatform(),
-  ])
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      WebPlatform(),
+      WindowsPlatform(),
+      LinuxPlatform(),
+    ],
+  )
   bool? dismissDialogues;
 
   @ExchangeableObjectConstructor()

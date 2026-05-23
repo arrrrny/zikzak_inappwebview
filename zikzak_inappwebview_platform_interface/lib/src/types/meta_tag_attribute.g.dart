@@ -20,19 +20,13 @@ class MetaTagAttribute {
     if (map == null) {
       return null;
     }
-    final instance = MetaTagAttribute(
-      name: map['name'],
-      value: map['value'],
-    );
+    final instance = MetaTagAttribute(name: map['name'], value: map['value']);
     return instance;
   }
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
-    return {
-      "name": name,
-      "value": value,
-    };
+    return {"name": name, "value": value};
   }
 
   ///Converts instance to a map.

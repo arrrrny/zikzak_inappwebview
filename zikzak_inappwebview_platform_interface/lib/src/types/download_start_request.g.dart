@@ -28,14 +28,15 @@ class DownloadStartRequest {
 
   ///the user agent to be used for the download.
   String? userAgent;
-  DownloadStartRequest(
-      {this.contentDisposition,
-      required this.contentLength,
-      this.mimeType,
-      this.suggestedFilename,
-      this.textEncodingName,
-      required this.url,
-      this.userAgent});
+  DownloadStartRequest({
+    this.contentDisposition,
+    required this.contentLength,
+    this.mimeType,
+    this.suggestedFilename,
+    this.textEncodingName,
+    required this.url,
+    this.userAgent,
+  });
 
   ///Gets a possible [DownloadStartRequest] instance from a [Map] value.
   static DownloadStartRequest? fromMap(Map<String, dynamic>? map) {

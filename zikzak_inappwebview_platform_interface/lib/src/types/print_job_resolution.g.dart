@@ -27,11 +27,12 @@ class PrintJobResolution {
 
   ///The vertical resolution in DPI (dots per inch).
   final int verticalDpi;
-  const PrintJobResolution(
-      {required this.horizontalDpi,
-      required this.id,
-      required this.label,
-      required this.verticalDpi});
+  const PrintJobResolution({
+    required this.horizontalDpi,
+    required this.id,
+    required this.label,
+    required this.verticalDpi,
+  });
 
   ///Gets a possible [PrintJobResolution] instance from a [Map] value.
   static PrintJobResolution? fromMap(Map<String, dynamic>? map) {

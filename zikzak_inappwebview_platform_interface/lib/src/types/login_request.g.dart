@@ -34,11 +34,7 @@ class LoginRequest {
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
-    return {
-      "account": account,
-      "args": args,
-      "realm": realm,
-    };
+    return {"account": account, "args": args, "realm": realm};
   }
 
   ///Converts instance to a map.
