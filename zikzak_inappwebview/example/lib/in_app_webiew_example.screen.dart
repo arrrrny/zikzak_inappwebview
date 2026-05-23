@@ -217,7 +217,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
             icon: const Icon(Icons.camera_alt),
             tooltip: "Take Screenshot",
             onPressed: () async {
-              debugPrint('takeScreenshot tapped, controller is ${webViewController != null ? "set" : "null"}');
+              debugPrint(
+                  'takeScreenshot tapped, controller is ${webViewController != null ? "set" : "null"}');
               final bytes = await webViewController?.takeScreenshot();
               if (bytes != null) {
                 final dir = await getApplicationDocumentsDirectory();
@@ -246,7 +247,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
             icon: const Icon(Icons.picture_as_pdf),
             tooltip: "Export PDF",
             onPressed: () async {
-              debugPrint('createPdf tapped, controller is ${webViewController != null ? "set" : "null"}');
+              debugPrint(
+                  'createPdf tapped, controller is ${webViewController != null ? "set" : "null"}');
               final bytes = await webViewController?.createPdf();
               if (bytes != null) {
                 final dir = await getApplicationDocumentsDirectory();
