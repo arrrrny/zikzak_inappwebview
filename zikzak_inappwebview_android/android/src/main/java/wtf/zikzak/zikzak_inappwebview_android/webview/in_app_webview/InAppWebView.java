@@ -1165,8 +1165,23 @@ public final class InAppWebView
 
                         final int oldRight = getRight();
                         final int oldBottom = getBottom();
+                        // First pass: warm-up
+                        final File warmFile = File.createTempFile("inappwebview_pdf_warm_", ".pdf", outputDir);
                         capturePdf(viewWidth, viewHeight, fullHeight,
-                            oldRight, oldBottom, savedScrollY, pdfFile, result);
+                            oldRight, oldBottom, savedScrollY, warmFile,
+                            new MethodChannel.Result() {
+                                @Override public void success(Object o) { warmFile.delete(); }
+                                @Override public void error(String c, String m, Object d) { warmFile.delete(); }
+                                @Override public void notImplemented() { warmFile.delete(); }
+                            });
+                        // Second pass: real capture
+                        postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                capturePdf(viewWidth, viewHeight, fullHeight,
+                                    oldRight, oldBottom, savedScrollY, pdfFile, result);
+                            }
+                        }, 1000);
                     } catch (Exception e) {
                         Log.e(LOG_TAG, "", e);
                         result.success(null);
