@@ -12,14 +12,11 @@ class ShouldAllowDeprecatedTLSAction {
   final int _value;
   final int _nativeValue;
   const ShouldAllowDeprecatedTLSAction._internal(
-    this._value,
-    this._nativeValue,
-  );
-  // ignore: unused_element
+      this._value, this._nativeValue);
+// ignore: unused_element
   factory ShouldAllowDeprecatedTLSAction._internalMultiPlatform(
-    int value,
-    Function nativeValue,
-  ) => ShouldAllowDeprecatedTLSAction._internal(value, nativeValue());
+          int value, Function nativeValue) =>
+      ShouldAllowDeprecatedTLSAction._internal(value, nativeValue());
 
   ///Allow the navigation to continue.
   static const ALLOW = ShouldAllowDeprecatedTLSAction._internal(1, 1);
@@ -37,9 +34,8 @@ class ShouldAllowDeprecatedTLSAction {
   static ShouldAllowDeprecatedTLSAction? fromValue(int? value) {
     if (value != null) {
       try {
-        return ShouldAllowDeprecatedTLSAction.values.firstWhere(
-          (element) => element.toValue() == value,
-        );
+        return ShouldAllowDeprecatedTLSAction.values
+            .firstWhere((element) => element.toValue() == value);
       } catch (e) {
         return null;
       }
@@ -51,9 +47,8 @@ class ShouldAllowDeprecatedTLSAction {
   static ShouldAllowDeprecatedTLSAction? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return ShouldAllowDeprecatedTLSAction.values.firstWhere(
-          (element) => element.toNativeValue() == value,
-        );
+        return ShouldAllowDeprecatedTLSAction.values
+            .firstWhere((element) => element.toNativeValue() == value);
       } catch (e) {
         return null;
       }

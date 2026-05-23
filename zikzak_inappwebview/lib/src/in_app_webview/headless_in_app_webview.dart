@@ -353,9 +353,38 @@ class HeadlessInAppWebView {
            onLoadStart: onLoadStart != null
                ? (controller, url) => onLoadStart.call(controller, url)
                : null,
-           onLoadStop: onLoadStop != null
-               ? (controller, url) => onLoadStop.call(controller, url)
-               : null,
+            onLoadStop: (controller, url) {
+                onLoadStop?.call(controller, url);
+                if (initialSettings?.dismissDialogues ?? true) {
+                  () async {
+                    try {
+                      for (var i = 0; i < 3; i++) {
+                        await controller.evaluateJavascript(source: '''
+                          (function() {
+                            var removed = 0;
+                            var all = document.querySelectorAll('*');
+                            all.forEach(function(el) {
+                              try {
+                                var style = window.getComputedStyle(el);
+                                if (style.position === 'fixed' || style.position === 'sticky') {
+                                  el.remove();
+                                  removed++;
+                                }
+                              } catch(e) {}
+                            });
+                            document.documentElement.style.overflow = '';
+                            document.documentElement.style.margin = '';
+                            document.body.style.overflow = '';
+                            document.body.style.margin = '';
+                            return removed;
+                          })();
+                        ''');
+                        if (i < 2) await Future.delayed(const Duration(milliseconds: 800));
+                      }
+                    } catch (_) {}
+                  }();
+                }
+              },
            onReceivedError: onReceivedError != null
                ? (controller, request, error) =>
                      onReceivedError.call(controller, request, error)

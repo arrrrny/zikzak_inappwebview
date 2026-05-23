@@ -11,11 +11,10 @@ class UserScriptInjectionTime {
   final int _value;
   final int _nativeValue;
   const UserScriptInjectionTime._internal(this._value, this._nativeValue);
-  // ignore: unused_element
+// ignore: unused_element
   factory UserScriptInjectionTime._internalMultiPlatform(
-    int value,
-    Function nativeValue,
-  ) => UserScriptInjectionTime._internal(value, nativeValue());
+          int value, Function nativeValue) =>
+      UserScriptInjectionTime._internal(value, nativeValue());
 
   ///**NOTE for iOS**: A constant to inject the script after the document finishes loading, but before loading any other subresources.
   ///
@@ -37,9 +36,8 @@ class UserScriptInjectionTime {
   static UserScriptInjectionTime? fromValue(int? value) {
     if (value != null) {
       try {
-        return UserScriptInjectionTime.values.firstWhere(
-          (element) => element.toValue() == value,
-        );
+        return UserScriptInjectionTime.values
+            .firstWhere((element) => element.toValue() == value);
       } catch (e) {
         return null;
       }
@@ -51,9 +49,8 @@ class UserScriptInjectionTime {
   static UserScriptInjectionTime? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return UserScriptInjectionTime.values.firstWhere(
-          (element) => element.toNativeValue() == value,
-        );
+        return UserScriptInjectionTime.values
+            .firstWhere((element) => element.toNativeValue() == value);
       } catch (e) {
         return null;
       }

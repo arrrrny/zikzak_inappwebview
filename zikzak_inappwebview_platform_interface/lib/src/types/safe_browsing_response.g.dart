@@ -14,10 +14,9 @@ class SafeBrowsingResponse {
 
   ///If reporting is enabled, all reports will be sent according to the privacy policy referenced by [PlatformInAppWebViewController.getSafeBrowsingPrivacyPolicyUrl].
   bool report;
-  SafeBrowsingResponse({
-    this.action = SafeBrowsingResponseAction.SHOW_INTERSTITIAL,
-    this.report = true,
-  });
+  SafeBrowsingResponse(
+      {this.action = SafeBrowsingResponseAction.SHOW_INTERSTITIAL,
+      this.report = true});
 
   ///Gets a possible [SafeBrowsingResponse] instance from a [Map] value.
   static SafeBrowsingResponse? fromMap(Map<String, dynamic>? map) {
@@ -32,7 +31,10 @@ class SafeBrowsingResponse {
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
-    return {"action": action?.toNativeValue(), "report": report};
+    return {
+      "action": action?.toNativeValue(),
+      "report": report,
+    };
   }
 
   ///Converts instance to a map.

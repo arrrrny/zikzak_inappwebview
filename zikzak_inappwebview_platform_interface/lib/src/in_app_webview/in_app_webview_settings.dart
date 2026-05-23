@@ -1981,6 +1981,27 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   )
   String? iframeCsp;
 
+  ///Set to `true` to automatically dismiss fixed/sticky overlays (popups, dialogs, banners) from the loaded page.
+  ///
+  ///When enabled, after the page finishes loading, the WebView will find and remove all HTML elements with
+  ///CSS `position: fixed` or `position: sticky`, and reset the `overflow` and `margin` CSS properties
+  ///on both `document.documentElement` and `document.body`.
+  ///This is useful to obtain clean screenshots, PDF exports, or HTML captures.
+  ///
+  ///The removal process will retry multiple times with a delay to catch dynamically loaded overlays.
+  ///If a page uses fixed/sticky elements for essential functionality, set this to `false`.
+  ///
+  ///The default value is `true`.
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    WebPlatform(),
+    WindowsPlatform(),
+    LinuxPlatform(),
+  ])
+  bool? dismissDialogues;
+
   @ExchangeableObjectConstructor()
   InAppWebViewSettings_({
     this.useShouldOverrideUrlLoading,
@@ -2120,6 +2141,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.iframeReferrerPolicy,
     this.iframeName,
     this.iframeCsp,
+    this.dismissDialogues = true,
   }) {
     if (this.minimumFontSize == null)
       this.minimumFontSize = Util.isAndroid ? 8 : 0;

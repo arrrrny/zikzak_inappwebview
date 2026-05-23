@@ -59,13 +59,12 @@ class ScreenshotConfiguration {
   ///- iOS
   ///- MacOS
   double? snapshotWidth;
-  ScreenshotConfiguration({
-    this.rect,
-    this.snapshotWidth,
-    this.compressFormat = CompressFormat.PNG,
-    this.quality = 100,
-    this.afterScreenUpdates = true,
-  }) {
+  ScreenshotConfiguration(
+      {this.rect,
+      this.snapshotWidth,
+      this.compressFormat = CompressFormat.PNG,
+      this.quality = 100,
+      this.afterScreenUpdates = true}) {
     assert(this.quality >= 0);
   }
 
@@ -79,9 +78,8 @@ class ScreenshotConfiguration {
       snapshotWidth: map['snapshotWidth'],
     );
     instance.afterScreenUpdates = map['afterScreenUpdates'];
-    instance.compressFormat = CompressFormat.fromNativeValue(
-      map['compressFormat'],
-    )!;
+    instance.compressFormat =
+        CompressFormat.fromNativeValue(map['compressFormat'])!;
     instance.quality = map['quality'];
     return instance;
   }

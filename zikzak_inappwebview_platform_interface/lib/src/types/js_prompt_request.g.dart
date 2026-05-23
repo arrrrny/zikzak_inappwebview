@@ -23,12 +23,8 @@ class JsPromptRequest {
 
   ///The url of the page requesting the dialog.
   WebUri? url;
-  JsPromptRequest({
-    this.defaultValue,
-    this.isMainFrame,
-    this.message,
-    this.url,
-  });
+  JsPromptRequest(
+      {this.defaultValue, this.isMainFrame, this.message, this.url});
 
   ///Gets a possible [JsPromptRequest] instance from a [Map] value.
   static JsPromptRequest? fromMap(Map<String, dynamic>? map) {

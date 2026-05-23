@@ -151,6 +151,8 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
 
     public Boolean stylusHandwritingEnabled = true;
 
+    public Boolean dismissDialogues = true;
+
     @NonNull
     @Override
     public InAppWebViewSettings parse(@NonNull Map<String, Object> settings) {
@@ -440,6 +442,9 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
                 case "stylusHandwritingEnabled":
                     stylusHandwritingEnabled = (Boolean) value;
                     break;
+                case "dismissDialogues":
+                    dismissDialogues = (Boolean) value;
+                    break;
             }
         }
 
@@ -605,6 +610,7 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
                 : null
         );
         settings.put("stylusHandwritingEnabled", stylusHandwritingEnabled);
+        settings.put("dismissDialogues", dismissDialogues);
         return settings;
     }
 
