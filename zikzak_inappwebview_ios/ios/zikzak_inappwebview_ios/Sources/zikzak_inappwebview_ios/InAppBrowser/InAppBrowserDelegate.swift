@@ -5,7 +5,7 @@
 //  Created by ARRRRNY on 14/02/21.
 //
 
-import Foundation
+import UIKit
 
 public protocol InAppBrowserDelegate {
     func didChangeTitle(title: String?)

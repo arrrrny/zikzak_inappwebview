@@ -1,3 +1,4 @@
+import Flutter
 //
 //  MyCookieManager.swift
 //  zikzak_inappwebview
@@ -5,7 +6,7 @@
 //  Created by Lorenzo on 26/10/18.
 //
 
-import Foundation
+import UIKit
 import WebKit
 
 public class MyCookieManager: ChannelDelegate {

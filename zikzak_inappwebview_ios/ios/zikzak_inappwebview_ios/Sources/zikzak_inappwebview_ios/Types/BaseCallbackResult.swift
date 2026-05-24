@@ -5,7 +5,7 @@
 //  Created by ARRRRNY on 17/10/22.
 //
 
-import Foundation
+import UIKit
 
 public class BaseCallbackResult<T>: CallbackResult<T> {
     

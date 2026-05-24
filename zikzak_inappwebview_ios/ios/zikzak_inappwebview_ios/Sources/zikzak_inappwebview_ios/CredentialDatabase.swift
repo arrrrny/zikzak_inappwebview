@@ -1,3 +1,4 @@
+import Flutter
 //
 //  CredentialDatabase.swift
 //  zikzak_inappwebview
@@ -5,7 +6,7 @@
 //  Created by ARRRRNY on 29/10/2019.
 //
 
-import Foundation
+import UIKit
 
 public class CredentialDatabase: ChannelDelegate {
     static let METHOD_CHANNEL_NAME = "wtf.zikzak/zikzak_inappwebview_credential_database"

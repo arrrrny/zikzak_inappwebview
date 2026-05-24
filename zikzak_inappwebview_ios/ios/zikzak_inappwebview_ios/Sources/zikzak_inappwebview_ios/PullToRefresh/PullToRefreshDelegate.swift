@@ -5,7 +5,7 @@
 //  Created by ARRRRNY on 04/03/21.
 //
 
-import Foundation
+import UIKit
 
 public protocol PullToRefreshDelegate {
     func enablePullToRefresh()

@@ -5,7 +5,7 @@
 //  Created by ARRRRNY on 07/10/22.
 //
 
-import Foundation
+import UIKit
 
 public class FindSession: NSObject {
     var resultCount: Int

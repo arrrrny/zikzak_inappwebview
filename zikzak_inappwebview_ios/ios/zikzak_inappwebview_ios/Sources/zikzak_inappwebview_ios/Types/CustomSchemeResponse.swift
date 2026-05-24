@@ -5,7 +5,8 @@
 //  Created by ARRRRNY on 07/05/22.
 //
 
-import Foundation
+import Flutter
+import UIKit
 
 public class CustomSchemeResponse: NSObject {
     var data: Data

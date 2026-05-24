@@ -1,3 +1,4 @@
+import Flutter
 //
 //  PlatformUtil.swift
 //  zikzak_inappwebview
@@ -5,7 +6,7 @@
 //  Created by ARRRRNY on 01/03/21.
 //
 
-import Foundation
+import UIKit
 
 public class PlatformUtil: ChannelDelegate {
     static let METHOD_CHANNEL_NAME = "wtf.zikzak/zikzak_inappwebview_platformutil"

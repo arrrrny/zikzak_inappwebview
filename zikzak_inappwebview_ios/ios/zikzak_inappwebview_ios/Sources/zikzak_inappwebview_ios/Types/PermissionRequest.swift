@@ -5,7 +5,7 @@
 //  Created by ARRRRNY on 21/04/22.
 //
 
-import Foundation
+import UIKit
 import WebKit
 
 public class PermissionRequest: NSObject {

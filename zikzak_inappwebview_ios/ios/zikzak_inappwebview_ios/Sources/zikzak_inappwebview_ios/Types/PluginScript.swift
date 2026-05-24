@@ -5,7 +5,7 @@
 //  Created by ARRRRNY on 17/02/21.
 //
 
-import Foundation
+import UIKit
 import WebKit
 
 public class PluginScript: UserScript {

@@ -5,7 +5,7 @@
 //  Created by Lorenzo on 17/09/18.
 //
 
-import Foundation
+import UIKit
 
 @objcMembers
 public class InAppBrowserSettings: ISettings<InAppBrowserWebViewController> {

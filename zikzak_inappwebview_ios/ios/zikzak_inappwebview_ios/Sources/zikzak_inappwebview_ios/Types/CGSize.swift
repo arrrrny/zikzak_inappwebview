@@ -5,7 +5,7 @@
 //  Created by ARRRRNY on 28/10/22.
 //
 
-import Foundation
+import UIKit
 
 extension CGSize {
     public static func fromMap(map: [String: Double]) -> CGSize {

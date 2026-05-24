@@ -5,7 +5,7 @@
 //  Created by ARRRRNY on 16/02/21.
 //
 
-import Foundation
+import UIKit
 
 public class PluginScriptsUtil {
     public static let VAR_PLACEHOLDER_VALUE = "$IN_APP_WEBVIEW_PLACEHOLDER_VALUE"

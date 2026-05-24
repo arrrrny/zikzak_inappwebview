@@ -5,12 +5,12 @@
 //  Created by ARRRRNY on 10/05/2020.
 //
 
-import Foundation
+import UIKit
 
 import Flutter
 import UIKit
 import WebKit
-import Foundation
+import UIKit
 import AVFoundation
 
 public class HeadlessInAppWebViewManager: ChannelDelegate {

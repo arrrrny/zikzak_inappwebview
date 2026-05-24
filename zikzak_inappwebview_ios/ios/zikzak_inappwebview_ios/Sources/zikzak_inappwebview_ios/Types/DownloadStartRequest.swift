@@ -5,7 +5,7 @@
 //  Created by ARRRRNY on 17/04/22.
 //
 
-import Foundation
+import UIKit
 
 public class DownloadStartRequest: NSObject {
     var url: String

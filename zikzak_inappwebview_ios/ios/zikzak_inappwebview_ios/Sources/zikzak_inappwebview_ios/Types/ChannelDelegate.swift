@@ -1,3 +1,4 @@
+import Flutter
 //
 //  ChannelDelegate.swift
 //  zikzak_inappwebview
@@ -5,7 +6,7 @@
 //  Created by ARRRRNY on 04/05/22.
 //
 
-import Foundation
+import UIKit
 
 public class ChannelDelegate: FlutterMethodCallDelegate, Disposable {
     var channel: FlutterMethodChannel?

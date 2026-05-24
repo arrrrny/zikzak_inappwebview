@@ -5,7 +5,7 @@
 //  Created by ARRRRNY on 08/05/22.
 //
 
-import Foundation
+import UIKit
 import AuthenticationServices
 import SafariServices
 

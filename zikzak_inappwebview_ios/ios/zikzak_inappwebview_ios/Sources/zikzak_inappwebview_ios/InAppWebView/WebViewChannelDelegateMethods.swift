@@ -5,7 +5,7 @@
 //  Created by ARRRRNY on 08/10/22.
 //
 
-import Foundation
+import UIKit
 
 public enum WebViewChannelDelegateMethods: String {
     case getUrl = "getUrl"

@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "orderedset",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Weebly/OrderedSet.git",
+      "state" : {
+        "revision" : "7fdeb65e28febc2d30439947759d4b8e53d3b949",
+        "version" : "6.0.3"
+      }
+    }
+  ],
+  "version" : 2
+}

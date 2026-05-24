@@ -5,7 +5,7 @@
 //  Created by ARRRRNY on 01/05/22.
 //
 
-import Foundation
+import UIKit
 import WebKit
 
 public class WebResourceResponse: NSObject {

@@ -1,3 +1,4 @@
+import Flutter
 //
 //  HeadlessInAppWebView.swift
 //  zikzak_inappwebview
@@ -5,7 +6,7 @@
 //  Created by ARRRRNY on 26/03/21.
 //
 
-import Foundation
+import UIKit
 
 public class HeadlessInAppWebView: Disposable {
     static let METHOD_CHANNEL_NAME_PREFIX = "wtf.zikzak/flutter_headless_inappwebview_"

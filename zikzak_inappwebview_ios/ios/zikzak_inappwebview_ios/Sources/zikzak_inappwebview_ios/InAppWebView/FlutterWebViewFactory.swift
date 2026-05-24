@@ -6,7 +6,7 @@
 //
 
 import Flutter
-import Foundation
+import UIKit
 
 public class FlutterWebViewFactory: NSObject, FlutterPlatformViewFactory {
     static let VIEW_TYPE_ID = "wtf.zikzak/zikzak_inappwebview"

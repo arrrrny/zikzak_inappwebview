@@ -5,7 +5,8 @@
 //  Created by ARRRRNY on 10/03/21.
 //
 
-import Foundation
+import Flutter
+import UIKit
 
 public class WebMessage: NSObject, Disposable {
     var data: Any?

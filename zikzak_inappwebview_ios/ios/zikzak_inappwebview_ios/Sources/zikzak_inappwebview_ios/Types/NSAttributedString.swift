@@ -5,7 +5,7 @@
 //  Created by ARRRRNY on 05/03/21.
 //
 
-import Foundation
+import UIKit
 
 extension NSAttributedString {
     public static func fromMap(map: [String:Any?]?) -> NSAttributedString? {

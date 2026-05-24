@@ -1,3 +1,4 @@
+import Flutter
 //
 //  InAppWebViewManager.swift
 //  zikzak_inappwebview
@@ -5,7 +6,7 @@
 //  Created by ARRRRNY on 08/12/2019.
 //
 
-import Foundation
+import UIKit
 import WebKit
 
 public class InAppWebViewManager: ChannelDelegate {

@@ -1,3 +1,4 @@
+import Flutter
 //
 //  PrintJobManager.swift
 //  zikzak_inappwebview
@@ -5,7 +6,7 @@
 //  Created by ARRRRNY on 09/05/22.
 //
 
-import Foundation
+import UIKit
 
 public class PrintJobManager: NSObject, Disposable {
     var plugin: SwiftFlutterPlugin?

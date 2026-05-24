@@ -5,7 +5,7 @@
 //  Created by ARRRRNY on 15/02/21.
 //
 
-import Foundation
+import UIKit
 
 public class HttpAuthenticationChallenge: NSObject {
     var protectionSpace: URLProtectionSpace!

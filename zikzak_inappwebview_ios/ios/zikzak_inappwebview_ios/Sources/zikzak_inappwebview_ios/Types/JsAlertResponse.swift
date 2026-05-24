@@ -5,7 +5,7 @@
 //  Created by ARRRRNY on 06/05/22.
 //
 
-import Foundation
+import UIKit
 
 public class JsAlertResponse: NSObject {
     var message: String

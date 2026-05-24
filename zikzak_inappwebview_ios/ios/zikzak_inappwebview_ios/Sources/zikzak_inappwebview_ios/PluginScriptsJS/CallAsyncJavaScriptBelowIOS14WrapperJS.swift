@@ -5,7 +5,7 @@
 //  Created by ARRRRNY on 16/02/21.
 //
 
-import Foundation
+import UIKit
 
 let CALL_ASYNC_JAVASCRIPT_BELOW_IOS_14_WRAPPER_JS = """
 (function(obj) {

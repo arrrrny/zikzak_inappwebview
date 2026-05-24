@@ -1,3 +1,4 @@
+import Flutter
 //
 //  WebMessageListener.swift
 //  zikzak_inappwebview
@@ -5,7 +6,7 @@
 //  Created by ARRRRNY on 10/03/21.
 //
 
-import Foundation
+import UIKit
 import WebKit
 
 public class WebMessageListener: FlutterMethodCallDelegate {

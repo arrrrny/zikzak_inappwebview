@@ -1,3 +1,4 @@
+import Flutter
 //
 //  WebMessageChannel.swift
 //  zikzak_inappwebview
@@ -5,7 +6,7 @@
 //  Created by ARRRRNY on 10/03/21.
 //
 
-import Foundation
+import UIKit
 
 public class WebMessageChannel: FlutterMethodCallDelegate {
     static var METHOD_CHANNEL_NAME_PREFIX = "wtf.zikzak/zikzak_inappwebview_web_message_channel_"

@@ -5,7 +5,7 @@
 //  Created by ARRRRNY on 16/02/21.
 //
 
-import Foundation
+import UIKit
 
 let PRINT_JS_PLUGIN_SCRIPT_GROUP_NAME = "IN_APP_WEBVIEW_PRINT_JS_PLUGIN_SCRIPT"
 

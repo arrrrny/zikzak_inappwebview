@@ -1,3 +1,4 @@
+import Flutter
 //
 //  MyWebStorageManager.swift
 //  connectivity
@@ -5,7 +6,7 @@
 //  Created by ARRRRNY on 16/12/2019.
 //
 
-import Foundation
+import UIKit
 import WebKit
 
 public class MyWebStorageManager: ChannelDelegate {

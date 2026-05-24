@@ -5,7 +5,7 @@
 //  Created by ARRRRNY on 10/05/22.
 //
 
-import Foundation
+import UIKit
 
 public class PrintAttributes: NSObject {
     var orientation: UIPrintInfo.Orientation?

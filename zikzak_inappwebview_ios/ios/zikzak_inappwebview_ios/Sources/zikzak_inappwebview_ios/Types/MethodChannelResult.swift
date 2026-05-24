@@ -1,3 +1,4 @@
+import Flutter
 //
 //  MethodChannelResult.swift
 //  zikzak_inappwebview
@@ -5,7 +6,7 @@
 //  Created by ARRRRNY on 06/05/22.
 //
 
-import Foundation
+import UIKit
 
 public protocol MethodChannelResult {
     var success: (_ obj: Any?) -> Void { get set }

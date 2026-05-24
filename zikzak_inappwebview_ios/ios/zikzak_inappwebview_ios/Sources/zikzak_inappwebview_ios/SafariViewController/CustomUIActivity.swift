@@ -1,3 +1,4 @@
+import Flutter
 //
 //  CustomUIActivity.swift
 //  zikzak_inappwebview
@@ -5,7 +6,7 @@
 //  Created by ARRRRNY on 08/05/22.
 //
 
-import Foundation
+import UIKit
 
 class CustomUIActivity: UIActivity {
     var plugin: SwiftFlutterPlugin

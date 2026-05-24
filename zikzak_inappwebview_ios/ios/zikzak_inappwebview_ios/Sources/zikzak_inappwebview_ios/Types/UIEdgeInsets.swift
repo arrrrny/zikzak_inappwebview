@@ -5,7 +5,7 @@
 //  Created by ARRRRNY on 11/05/22.
 //
 
-import Foundation
+import UIKit
 
 extension UIEdgeInsets {
     public static func fromMap(map: [String: Double]) -> UIEdgeInsets {

@@ -1,3 +1,4 @@
+import Flutter
 //
 //  SafariViewController.swift
 //  zikzak_inappwebview
@@ -5,7 +6,7 @@
 //  Created by Lorenzo on 25/09/18.
 //
 
-import Foundation
+import UIKit
 import SafariServices
 
 public class SafariViewController: SFSafariViewController, SFSafariViewControllerDelegate, Disposable {

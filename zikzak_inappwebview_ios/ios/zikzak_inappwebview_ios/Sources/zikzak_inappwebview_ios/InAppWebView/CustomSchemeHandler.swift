@@ -6,7 +6,7 @@
 //
 
 import Flutter
-import Foundation
+import UIKit
 import WebKit
 
 public class CustomSchemeHandler: NSObject, WKURLSchemeHandler {

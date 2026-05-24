@@ -5,7 +5,7 @@
 //  Created by ARRRRNY on 19/02/21.
 //
 
-import Foundation
+import UIKit
 import WebKit
 
 extension WKWindowFeatures {

@@ -5,7 +5,7 @@
 //  Created by Lorenzo on 21/10/18.
 //
 
-import Foundation
+import UIKit
 import WebKit
 
 @objcMembers

@@ -1,3 +1,4 @@
+import Flutter
 //
 //  LeakAvoider.swift
 //  zikzak_inappwebview
@@ -5,7 +6,7 @@
 //  Created by ARRRRNY on 15/12/2019.
 //
 
-import Foundation
+import UIKit
 
 public class LeakAvoider: NSObject {
     weak var delegate : FlutterMethodCallDelegate?

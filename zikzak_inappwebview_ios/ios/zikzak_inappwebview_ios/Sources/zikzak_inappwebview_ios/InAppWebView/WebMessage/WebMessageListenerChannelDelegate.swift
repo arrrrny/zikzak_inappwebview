@@ -1,3 +1,4 @@
+import Flutter
 //
 //  WebMessageListenerChannelDelegate.swift
 //  zikzak_inappwebview
@@ -5,7 +6,7 @@
 //  Created by ARRRRNY on 07/05/22.
 //
 
-import Foundation
+import UIKit
 
 public class WebMessageListenerChannelDelegate: ChannelDelegate {
     private weak var webMessageListener: WebMessageListener?

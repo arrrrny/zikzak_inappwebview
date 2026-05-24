@@ -5,7 +5,7 @@
 //  Created by ARRRRNY on 10/05/22.
 //
 
-import Foundation
+import UIKit
 
 extension CGRect {
     public static func fromMap(map: [String: Double]) -> CGRect {

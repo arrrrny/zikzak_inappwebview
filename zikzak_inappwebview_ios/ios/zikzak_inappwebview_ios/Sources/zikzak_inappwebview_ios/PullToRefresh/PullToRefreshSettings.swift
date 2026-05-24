@@ -5,7 +5,7 @@
 //  Created by ARRRRNY on 03/03/21.
 //
 
-import Foundation
+import UIKit
 
 public class PullToRefreshSettings: ISettings<PullToRefreshControl> {
     

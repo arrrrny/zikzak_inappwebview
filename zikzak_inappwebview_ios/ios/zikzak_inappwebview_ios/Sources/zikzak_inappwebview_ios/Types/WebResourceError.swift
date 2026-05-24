@@ -5,7 +5,7 @@
 //  Created by ARRRRNY on 01/05/22.
 //
 
-import Foundation
+import UIKit
 
 public class WebResourceError: NSObject {
     var type: Int

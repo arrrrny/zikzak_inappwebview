@@ -5,7 +5,7 @@
 //  Created by ARRRRNY on 16/02/21.
 //
 
-import Foundation
+import UIKit
 
 public enum HitTestResultType: Int {
     case unknownType = 0

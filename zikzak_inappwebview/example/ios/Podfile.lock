@@ -1,32 +1,15 @@
 PODS:
   - Flutter (1.0.0)
-  - OrderedSet (6.0.3)
-  - zikzak_inappwebview_ios (4.0.10):
-    - Flutter
-    - OrderedSet (>= 6.0.3)
-    - zikzak_inappwebview_ios/Core (= 4.0.10)
-  - zikzak_inappwebview_ios/Core (4.0.10):
-    - Flutter
-    - OrderedSet (>= 6.0.3)
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
-  - zikzak_inappwebview_ios (from `.symlinks/plugins/zikzak_inappwebview_ios/ios`)
-
-SPEC REPOS:
-  trunk:
-    - OrderedSet
 
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
-  zikzak_inappwebview_ios:
-    :path: ".symlinks/plugins/zikzak_inappwebview_ios/ios"
 
 SPEC CHECKSUMS:
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
-  OrderedSet: e539b66b644ff081c73a262d24ad552a69be3a94
-  zikzak_inappwebview_ios: c97dc683d312b2a758be6b00ba2594c9a8d7e03e
 
 PODFILE CHECKSUM: 4c438addb11b6da45ed7ae408823d68256222460
 

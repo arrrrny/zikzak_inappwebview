@@ -5,7 +5,7 @@
 //  Created by ARRRRNY on 10/03/21.
 //
 
-import Foundation
+import UIKit
 
 let WEB_MESSAGE_LISTENER_JS_SOURCE = """
 function FlutterInAppWebViewWebMessageListener(jsObjectName) {

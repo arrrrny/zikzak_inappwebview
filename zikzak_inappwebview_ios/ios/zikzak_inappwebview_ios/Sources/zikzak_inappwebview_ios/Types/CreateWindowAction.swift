@@ -5,7 +5,7 @@
 //  Created by ARRRRNY on 07/05/22.
 //
 
-import Foundation
+import UIKit
 import WebKit
 
 public class CreateWindowAction: NSObject {

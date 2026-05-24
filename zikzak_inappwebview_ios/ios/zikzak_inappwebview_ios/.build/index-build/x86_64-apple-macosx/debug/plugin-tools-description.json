@@ -1,0 +1,1796 @@
+{
+  "builtTestProducts" : [
+
+  ],
+  "copyCommands" : {
+    "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios_zikzak_inappwebview_ios.bundle/PrivacyInfo.xcprivacy" : {
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PrivacyInfo.xcprivacy"
+        }
+      ],
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios_zikzak_inappwebview_ios.bundle/PrivacyInfo.xcprivacy"
+        }
+      ]
+    },
+    "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios_zikzak_inappwebview_ios.bundle/WebView.storyboard" : {
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Storyboards/WebView.storyboard"
+        }
+      ],
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios_zikzak_inappwebview_ios.bundle/WebView.storyboard"
+        }
+      ]
+    }
+  },
+  "explicitTargetDependencyImportCheckingMode" : {
+    "none" : {
+
+    }
+  },
+  "generatedSourceTargetSet" : [
+
+  ],
+  "pluginDescriptions" : [
+
+  ],
+  "swiftCommands" : {
+    "C.zikzak_inappwebview_ios-x86_64-apple-macosx15.0-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/sources",
+      "importPath" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/CredentialDatabase.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/FindInteraction/FindInteractionChannelDelegate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/FindInteraction/FindInteractionController.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/FindInteraction/FindInteractionSettings.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/HeadlessInAppWebView/HeadlessInAppWebView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/HeadlessInAppWebView/HeadlessInAppWebViewManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/HeadlessInAppWebView/HeadlessWebViewChannelDelegate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/ISettings.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppBrowser/InAppBrowserChannelDelegate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppBrowser/InAppBrowserDelegate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppBrowser/InAppBrowserManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppBrowser/InAppBrowserNavigationController.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppBrowser/InAppBrowserSettings.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppBrowser/InAppBrowserWebViewController.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/ContextMenuSettings.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/CustomSchemeHandler.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/FlutterWebViewController.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/FlutterWebViewFactory.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/InAppWebView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/InAppWebViewManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/InAppWebViewSettings.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/WebMessage/WebMessageChannel.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/WebMessage/WebMessageChannelChannelDelegate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/WebMessage/WebMessageListener.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/WebMessage/WebMessageListenerChannelDelegate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/WebViewChannelDelegate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/WebViewChannelDelegateMethods.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebViewFlutterPlugin.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/LeakAvoider.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/MyCookieManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/MyWebStorageManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PlatformUtil.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/CallAsyncJavaScriptBelowIOS14WrapperJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/ConsoleLogJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/EnableViewportScaleJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/FindElementsAtPointJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/FindTextHighlightJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/InterceptAjaxRequestJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/InterceptFetchRequestJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/JavaScriptBridgeJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/LastTouchedAnchorOrImageJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/OnLoadResourceJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/OnWindowBlurEventJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/OnWindowFocusEventJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/OriginalViewPortMetaTagContentJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/PluginScriptsUtil.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/PrintJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/PromisePolyfillJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/SupportZoomJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/WebMessageChannelJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/WebMessageListenerJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/WindowIdJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PrintJob/CustomUIPrintPageRenderer.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PrintJob/PrintAttributes.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PrintJob/PrintJobChannelDelegate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PrintJob/PrintJobController.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PrintJob/PrintJobInfo.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PrintJob/PrintJobManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PrintJob/PrintJobSettings.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PullToRefresh/PullToRefreshChannelDelegate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PullToRefresh/PullToRefreshControl.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PullToRefresh/PullToRefreshDelegate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PullToRefresh/PullToRefreshSettings.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/SafariViewController/ChromeSafariBrowserManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/SafariViewController/CustomUIActivity.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/SafariViewController/SafariBrowserSettings.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/SafariViewController/SafariViewController.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/SafariViewController/SafariViewControllerChannelDelegate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Security/CertificatePinningManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Security/HTTPSOnlyManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Security/SecurityCoordinator.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Security/URLValidationManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/SecurityLogger.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/SwiftFlutterPlugin.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/ActivityButton.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/BaseCallbackResult.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/CGRect.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/CGSize.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/CallbackResult.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/ChannelDelegate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/ClientCertChallenge.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/ClientCertResponse.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/CreateWindowAction.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/CustomSchemeResponse.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/Disposable.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/DownloadStartRequest.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/FlutterMethodCallDelegate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/FlutterMethodChannel.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/HitTestResult.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/HttpAuthResponse.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/HttpAuthenticationChallenge.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/InAppBrowserMenuItem.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/JsAlertResponse.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/JsConfirmResponse.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/JsPromptResponse.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/MethodChannelResult.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/NSAttributedString.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/PermissionRequest.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/PermissionResponse.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/PluginScript.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/SecCertificate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/ServerTrustAuthResponse.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/ServerTrustChallenge.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/Size2D.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/SslCertificate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/SslError.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/StringOrInt.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/UIColor.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/UIEdgeInsets.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/UIEventAttribution.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/UIFindSession.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/UIImage.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/URLAuthenticationChallenge.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/URLCredential.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/URLProtectionSpace.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/URLRequest.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/URLResponse.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/UserScript.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WKContentWorld.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WKFrameInfo.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WKNavigationAction.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WKNavigationResponse.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WKSecurityOrigin.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WKUserContentController.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WKWindowFeatures.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WebMessage.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WebMessagePort.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WebResourceError.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WebResourceRequest.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WebResourceResponse.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WebViewTransport.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/UIApplication/VisibleViewController.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Util.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/WKProcessPoolManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/WebAuthenticationSession/WebAuthenticationSession.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/WebAuthenticationSession/WebAuthenticationSessionChannelDelegate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/WebAuthenticationSession/WebAuthenticationSessionManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/WebAuthenticationSession/WebAuthenticationSessionSettings.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/DerivedSources/resource_bundle_accessor.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "virtual",
+          "name" : "<zikzak_inappwebview_ios-x86_64-apple-macosx15.0-debug.module-resources>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "zikzak_inappwebview_ios",
+      "moduleOutputPath" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/Modules/zikzak_inappwebview_ios.swiftmodule",
+      "objects" : [
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/CredentialDatabase.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/FindInteractionChannelDelegate.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/FindInteractionController.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/FindInteractionSettings.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/HeadlessInAppWebView.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/HeadlessInAppWebViewManager.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/HeadlessWebViewChannelDelegate.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/ISettings.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/InAppBrowserChannelDelegate.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/InAppBrowserDelegate.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/InAppBrowserManager.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/InAppBrowserNavigationController.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/InAppBrowserSettings.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/InAppBrowserWebViewController.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/ContextMenuSettings.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/CustomSchemeHandler.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/FlutterWebViewController.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/FlutterWebViewFactory.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/InAppWebView.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/InAppWebViewManager.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/InAppWebViewSettings.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/WebMessageChannel.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/WebMessageChannelChannelDelegate.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/WebMessageListener.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/WebMessageListenerChannelDelegate.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/WebViewChannelDelegate.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/WebViewChannelDelegateMethods.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/InAppWebViewFlutterPlugin.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/LeakAvoider.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/MyCookieManager.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/MyWebStorageManager.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/PlatformUtil.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/CallAsyncJavaScriptBelowIOS14WrapperJS.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/ConsoleLogJS.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/EnableViewportScaleJS.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/FindElementsAtPointJS.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/FindTextHighlightJS.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/InterceptAjaxRequestJS.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/InterceptFetchRequestJS.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/JavaScriptBridgeJS.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/LastTouchedAnchorOrImageJS.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/OnLoadResourceJS.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/OnWindowBlurEventJS.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/OnWindowFocusEventJS.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/OriginalViewPortMetaTagContentJS.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/PluginScriptsUtil.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/PrintJS.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/PromisePolyfillJS.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/SupportZoomJS.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/WebMessageChannelJS.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/WebMessageListenerJS.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/WindowIdJS.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/CustomUIPrintPageRenderer.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/PrintAttributes.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/PrintJobChannelDelegate.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/PrintJobController.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/PrintJobInfo.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/PrintJobManager.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/PrintJobSettings.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/PullToRefreshChannelDelegate.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/PullToRefreshControl.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/PullToRefreshDelegate.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/PullToRefreshSettings.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/ChromeSafariBrowserManager.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/CustomUIActivity.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/SafariBrowserSettings.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/SafariViewController.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/SafariViewControllerChannelDelegate.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/CertificatePinningManager.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/HTTPSOnlyManager.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/SecurityCoordinator.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/URLValidationManager.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/SecurityLogger.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/SwiftFlutterPlugin.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/ActivityButton.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/BaseCallbackResult.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/CGRect.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/CGSize.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/CallbackResult.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/ChannelDelegate.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/ClientCertChallenge.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/ClientCertResponse.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/CreateWindowAction.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/CustomSchemeResponse.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/Disposable.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/DownloadStartRequest.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/FlutterMethodCallDelegate.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/FlutterMethodChannel.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/HitTestResult.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/HttpAuthResponse.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/HttpAuthenticationChallenge.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/InAppBrowserMenuItem.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/JsAlertResponse.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/JsConfirmResponse.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/JsPromptResponse.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/MethodChannelResult.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/NSAttributedString.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/PermissionRequest.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/PermissionResponse.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/PluginScript.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/SecCertificate.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/ServerTrustAuthResponse.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/ServerTrustChallenge.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/Size2D.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/SslCertificate.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/SslError.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/StringOrInt.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/UIColor.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/UIEdgeInsets.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/UIEventAttribution.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/UIFindSession.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/UIImage.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/URLAuthenticationChallenge.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/URLCredential.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/URLProtectionSpace.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/URLRequest.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/URLResponse.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/UserScript.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/WKContentWorld.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/WKFrameInfo.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/WKNavigationAction.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/WKNavigationResponse.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/WKSecurityOrigin.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/WKUserContentController.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/WKWindowFeatures.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/WebMessage.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/WebMessagePort.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/WebResourceError.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/WebResourceRequest.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/WebResourceResponse.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/WebViewTransport.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/VisibleViewController.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/Util.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/WKProcessPoolManager.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/WebAuthenticationSession.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/WebAuthenticationSessionChannelDelegate.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/WebAuthenticationSessionManager.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/WebAuthenticationSessionSettings.swift.o",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/resource_bundle_accessor.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "x86_64-apple-macosx10.13",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-j16",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_AVAILABLE",
+        "-module-cache-path",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-emit-objc-header",
+        "-emit-objc-header-path",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/include/zikzak_inappwebview_ios-Swift.h",
+        "-swift-version",
+        "5",
+        "-Xfrontend",
+        "-experimental-lazy-typecheck",
+        "-Xfrontend",
+        "-experimental-skip-all-function-bodies",
+        "-Xfrontend",
+        "-experimental-allow-module-with-compiler-errors",
+        "-Xfrontend",
+        "-empty-abi-descriptor",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "zikzak_inappwebview_ios"
+      ],
+      "outputFileMapPath" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/Modules/zikzak_inappwebview_ios.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : true,
+      "sources" : [
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/CredentialDatabase.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/FindInteraction/FindInteractionChannelDelegate.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/FindInteraction/FindInteractionController.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/FindInteraction/FindInteractionSettings.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/HeadlessInAppWebView/HeadlessInAppWebView.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/HeadlessInAppWebView/HeadlessInAppWebViewManager.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/HeadlessInAppWebView/HeadlessWebViewChannelDelegate.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/ISettings.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppBrowser/InAppBrowserChannelDelegate.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppBrowser/InAppBrowserDelegate.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppBrowser/InAppBrowserManager.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppBrowser/InAppBrowserNavigationController.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppBrowser/InAppBrowserSettings.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppBrowser/InAppBrowserWebViewController.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/ContextMenuSettings.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/CustomSchemeHandler.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/FlutterWebViewController.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/FlutterWebViewFactory.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/InAppWebView.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/InAppWebViewManager.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/InAppWebViewSettings.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/WebMessage/WebMessageChannel.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/WebMessage/WebMessageChannelChannelDelegate.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/WebMessage/WebMessageListener.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/WebMessage/WebMessageListenerChannelDelegate.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/WebViewChannelDelegate.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/WebViewChannelDelegateMethods.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebViewFlutterPlugin.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/LeakAvoider.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/MyCookieManager.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/MyWebStorageManager.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PlatformUtil.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/CallAsyncJavaScriptBelowIOS14WrapperJS.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/ConsoleLogJS.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/EnableViewportScaleJS.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/FindElementsAtPointJS.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/FindTextHighlightJS.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/InterceptAjaxRequestJS.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/InterceptFetchRequestJS.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/JavaScriptBridgeJS.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/LastTouchedAnchorOrImageJS.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/OnLoadResourceJS.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/OnWindowBlurEventJS.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/OnWindowFocusEventJS.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/OriginalViewPortMetaTagContentJS.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/PluginScriptsUtil.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/PrintJS.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/PromisePolyfillJS.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/SupportZoomJS.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/WebMessageChannelJS.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/WebMessageListenerJS.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/WindowIdJS.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PrintJob/CustomUIPrintPageRenderer.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PrintJob/PrintAttributes.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PrintJob/PrintJobChannelDelegate.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PrintJob/PrintJobController.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PrintJob/PrintJobInfo.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PrintJob/PrintJobManager.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PrintJob/PrintJobSettings.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PullToRefresh/PullToRefreshChannelDelegate.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PullToRefresh/PullToRefreshControl.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PullToRefresh/PullToRefreshDelegate.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PullToRefresh/PullToRefreshSettings.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/SafariViewController/ChromeSafariBrowserManager.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/SafariViewController/CustomUIActivity.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/SafariViewController/SafariBrowserSettings.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/SafariViewController/SafariViewController.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/SafariViewController/SafariViewControllerChannelDelegate.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Security/CertificatePinningManager.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Security/HTTPSOnlyManager.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Security/SecurityCoordinator.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Security/URLValidationManager.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/SecurityLogger.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/SwiftFlutterPlugin.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/ActivityButton.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/BaseCallbackResult.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/CGRect.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/CGSize.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/CallbackResult.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/ChannelDelegate.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/ClientCertChallenge.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/ClientCertResponse.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/CreateWindowAction.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/CustomSchemeResponse.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/Disposable.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/DownloadStartRequest.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/FlutterMethodCallDelegate.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/FlutterMethodChannel.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/HitTestResult.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/HttpAuthResponse.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/HttpAuthenticationChallenge.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/InAppBrowserMenuItem.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/JsAlertResponse.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/JsConfirmResponse.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/JsPromptResponse.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/MethodChannelResult.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/NSAttributedString.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/PermissionRequest.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/PermissionResponse.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/PluginScript.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/SecCertificate.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/ServerTrustAuthResponse.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/ServerTrustChallenge.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/Size2D.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/SslCertificate.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/SslError.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/StringOrInt.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/UIColor.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/UIEdgeInsets.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/UIEventAttribution.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/UIFindSession.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/UIImage.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/URLAuthenticationChallenge.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/URLCredential.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/URLProtectionSpace.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/URLRequest.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/URLResponse.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/UserScript.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WKContentWorld.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WKFrameInfo.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WKNavigationAction.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WKNavigationResponse.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WKSecurityOrigin.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WKUserContentController.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WKWindowFeatures.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WebMessage.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WebMessagePort.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WebResourceError.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WebResourceRequest.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WebResourceResponse.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WebViewTransport.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/UIApplication/VisibleViewController.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Util.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/WKProcessPoolManager.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/WebAuthenticationSession/WebAuthenticationSession.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/WebAuthenticationSession/WebAuthenticationSessionChannelDelegate.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/WebAuthenticationSession/WebAuthenticationSessionManager.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/WebAuthenticationSession/WebAuthenticationSessionSettings.swift",
+        "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/DerivedSources/resource_bundle_accessor.swift"
+      ],
+      "tempsPath" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build",
+      "wholeModuleOptimization" : false
+    }
+  },
+  "swiftFrontendCommands" : {
+
+  },
+  "swiftTargetScanArgs" : {
+    "zikzak_inappwebview_ios" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "zikzak_inappwebview_ios",
+      "-package-name",
+      "zikzak_inappwebview_ios",
+      "-c",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/CredentialDatabase.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/FindInteraction/FindInteractionChannelDelegate.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/FindInteraction/FindInteractionController.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/FindInteraction/FindInteractionSettings.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/HeadlessInAppWebView/HeadlessInAppWebView.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/HeadlessInAppWebView/HeadlessInAppWebViewManager.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/HeadlessInAppWebView/HeadlessWebViewChannelDelegate.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/ISettings.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppBrowser/InAppBrowserChannelDelegate.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppBrowser/InAppBrowserDelegate.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppBrowser/InAppBrowserManager.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppBrowser/InAppBrowserNavigationController.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppBrowser/InAppBrowserSettings.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppBrowser/InAppBrowserWebViewController.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/ContextMenuSettings.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/CustomSchemeHandler.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/FlutterWebViewController.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/FlutterWebViewFactory.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/InAppWebView.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/InAppWebViewManager.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/InAppWebViewSettings.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/WebMessage/WebMessageChannel.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/WebMessage/WebMessageChannelChannelDelegate.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/WebMessage/WebMessageListener.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/WebMessage/WebMessageListenerChannelDelegate.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/WebViewChannelDelegate.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/WebViewChannelDelegateMethods.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebViewFlutterPlugin.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/LeakAvoider.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/MyCookieManager.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/MyWebStorageManager.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PlatformUtil.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/CallAsyncJavaScriptBelowIOS14WrapperJS.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/ConsoleLogJS.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/EnableViewportScaleJS.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/FindElementsAtPointJS.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/FindTextHighlightJS.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/InterceptAjaxRequestJS.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/InterceptFetchRequestJS.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/JavaScriptBridgeJS.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/LastTouchedAnchorOrImageJS.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/OnLoadResourceJS.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/OnWindowBlurEventJS.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/OnWindowFocusEventJS.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/OriginalViewPortMetaTagContentJS.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/PluginScriptsUtil.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/PrintJS.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/PromisePolyfillJS.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/SupportZoomJS.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/WebMessageChannelJS.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/WebMessageListenerJS.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/WindowIdJS.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PrintJob/CustomUIPrintPageRenderer.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PrintJob/PrintAttributes.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PrintJob/PrintJobChannelDelegate.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PrintJob/PrintJobController.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PrintJob/PrintJobInfo.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PrintJob/PrintJobManager.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PrintJob/PrintJobSettings.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PullToRefresh/PullToRefreshChannelDelegate.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PullToRefresh/PullToRefreshControl.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PullToRefresh/PullToRefreshDelegate.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PullToRefresh/PullToRefreshSettings.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/SafariViewController/ChromeSafariBrowserManager.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/SafariViewController/CustomUIActivity.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/SafariViewController/SafariBrowserSettings.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/SafariViewController/SafariViewController.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/SafariViewController/SafariViewControllerChannelDelegate.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Security/CertificatePinningManager.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Security/HTTPSOnlyManager.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Security/SecurityCoordinator.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Security/URLValidationManager.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/SecurityLogger.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/SwiftFlutterPlugin.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/ActivityButton.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/BaseCallbackResult.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/CGRect.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/CGSize.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/CallbackResult.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/ChannelDelegate.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/ClientCertChallenge.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/ClientCertResponse.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/CreateWindowAction.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/CustomSchemeResponse.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/Disposable.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/DownloadStartRequest.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/FlutterMethodCallDelegate.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/FlutterMethodChannel.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/HitTestResult.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/HttpAuthResponse.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/HttpAuthenticationChallenge.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/InAppBrowserMenuItem.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/JsAlertResponse.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/JsConfirmResponse.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/JsPromptResponse.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/MethodChannelResult.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/NSAttributedString.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/PermissionRequest.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/PermissionResponse.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/PluginScript.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/SecCertificate.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/ServerTrustAuthResponse.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/ServerTrustChallenge.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/Size2D.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/SslCertificate.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/SslError.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/StringOrInt.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/UIColor.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/UIEdgeInsets.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/UIEventAttribution.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/UIFindSession.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/UIImage.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/URLAuthenticationChallenge.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/URLCredential.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/URLProtectionSpace.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/URLRequest.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/URLResponse.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/UserScript.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WKContentWorld.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WKFrameInfo.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WKNavigationAction.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WKNavigationResponse.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WKSecurityOrigin.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WKUserContentController.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WKWindowFeatures.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WebMessage.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WebMessagePort.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WebResourceError.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WebResourceRequest.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WebResourceResponse.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WebViewTransport.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/UIApplication/VisibleViewController.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Util.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/WKProcessPoolManager.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/WebAuthenticationSession/WebAuthenticationSession.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/WebAuthenticationSession/WebAuthenticationSessionChannelDelegate.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/WebAuthenticationSession/WebAuthenticationSessionManager.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/WebAuthenticationSession/WebAuthenticationSessionSettings.swift",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/DerivedSources/resource_bundle_accessor.swift",
+      "-I",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/Modules",
+      "-target",
+      "x86_64-apple-macosx10.13",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-j16",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_AVAILABLE",
+      "-module-cache-path",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-emit-objc-header",
+      "-emit-objc-header-path",
+      "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/include/zikzak_inappwebview_ios-Swift.h",
+      "-swift-version",
+      "5",
+      "-Xfrontend",
+      "-experimental-lazy-typecheck",
+      "-Xfrontend",
+      "-experimental-skip-all-function-bodies",
+      "-Xfrontend",
+      "-experimental-allow-module-with-compiler-errors",
+      "-Xfrontend",
+      "-empty-abi-descriptor",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "zikzak_inappwebview_ios",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ]
+  },
+  "targetDependencyMap" : {
+    "zikzak_inappwebview_ios" : [
+
+    ]
+  },
+  "testDiscoveryCommands" : {
+
+  },
+  "testEntryPointCommands" : {
+
+  },
+  "traitConfiguration" : {
+    "default" : {
+
+    }
+  },
+  "writeCommands" : {
+    "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt" : {
+      "alwaysOutOfDate" : true,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<swift-get-version>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+        }
+      ],
+      "outputFilePath" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+    },
+    "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/CredentialDatabase.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/FindInteraction/FindInteractionChannelDelegate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/FindInteraction/FindInteractionController.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/FindInteraction/FindInteractionSettings.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/HeadlessInAppWebView/HeadlessInAppWebView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/HeadlessInAppWebView/HeadlessInAppWebViewManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/HeadlessInAppWebView/HeadlessWebViewChannelDelegate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/ISettings.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppBrowser/InAppBrowserChannelDelegate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppBrowser/InAppBrowserDelegate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppBrowser/InAppBrowserManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppBrowser/InAppBrowserNavigationController.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppBrowser/InAppBrowserSettings.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppBrowser/InAppBrowserWebViewController.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/ContextMenuSettings.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/CustomSchemeHandler.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/FlutterWebViewController.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/FlutterWebViewFactory.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/InAppWebView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/InAppWebViewManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/InAppWebViewSettings.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/WebMessage/WebMessageChannel.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/WebMessage/WebMessageChannelChannelDelegate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/WebMessage/WebMessageListener.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/WebMessage/WebMessageListenerChannelDelegate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/WebViewChannelDelegate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/WebViewChannelDelegateMethods.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebViewFlutterPlugin.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/LeakAvoider.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/MyCookieManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/MyWebStorageManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PlatformUtil.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/CallAsyncJavaScriptBelowIOS14WrapperJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/ConsoleLogJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/EnableViewportScaleJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/FindElementsAtPointJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/FindTextHighlightJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/InterceptAjaxRequestJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/InterceptFetchRequestJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/JavaScriptBridgeJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/LastTouchedAnchorOrImageJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/OnLoadResourceJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/OnWindowBlurEventJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/OnWindowFocusEventJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/OriginalViewPortMetaTagContentJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/PluginScriptsUtil.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/PrintJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/PromisePolyfillJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/SupportZoomJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/WebMessageChannelJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/WebMessageListenerJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PluginScriptsJS/WindowIdJS.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PrintJob/CustomUIPrintPageRenderer.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PrintJob/PrintAttributes.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PrintJob/PrintJobChannelDelegate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PrintJob/PrintJobController.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PrintJob/PrintJobInfo.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PrintJob/PrintJobManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PrintJob/PrintJobSettings.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PullToRefresh/PullToRefreshChannelDelegate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PullToRefresh/PullToRefreshControl.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PullToRefresh/PullToRefreshDelegate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/PullToRefresh/PullToRefreshSettings.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/SafariViewController/ChromeSafariBrowserManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/SafariViewController/CustomUIActivity.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/SafariViewController/SafariBrowserSettings.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/SafariViewController/SafariViewController.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/SafariViewController/SafariViewControllerChannelDelegate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Security/CertificatePinningManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Security/HTTPSOnlyManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Security/SecurityCoordinator.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Security/URLValidationManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/SecurityLogger.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/SwiftFlutterPlugin.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/ActivityButton.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/BaseCallbackResult.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/CGRect.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/CGSize.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/CallbackResult.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/ChannelDelegate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/ClientCertChallenge.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/ClientCertResponse.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/CreateWindowAction.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/CustomSchemeResponse.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/Disposable.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/DownloadStartRequest.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/FlutterMethodCallDelegate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/FlutterMethodChannel.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/HitTestResult.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/HttpAuthResponse.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/HttpAuthenticationChallenge.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/InAppBrowserMenuItem.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/JsAlertResponse.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/JsConfirmResponse.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/JsPromptResponse.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/MethodChannelResult.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/NSAttributedString.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/PermissionRequest.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/PermissionResponse.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/PluginScript.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/SecCertificate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/ServerTrustAuthResponse.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/ServerTrustChallenge.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/Size2D.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/SslCertificate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/SslError.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/StringOrInt.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/UIColor.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/UIEdgeInsets.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/UIEventAttribution.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/UIFindSession.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/UIImage.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/URLAuthenticationChallenge.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/URLCredential.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/URLProtectionSpace.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/URLRequest.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/URLResponse.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/UserScript.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WKContentWorld.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WKFrameInfo.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WKNavigationAction.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WKNavigationResponse.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WKSecurityOrigin.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WKUserContentController.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WKWindowFeatures.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WebMessage.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WebMessagePort.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WebResourceError.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WebResourceRequest.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WebResourceResponse.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Types/WebViewTransport.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/UIApplication/VisibleViewController.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/Util.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/WKProcessPoolManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/WebAuthenticationSession/WebAuthenticationSession.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/WebAuthenticationSession/WebAuthenticationSessionChannelDelegate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/WebAuthenticationSession/WebAuthenticationSessionManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/WebAuthenticationSession/WebAuthenticationSessionSettings.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/DerivedSources/resource_bundle_accessor.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/ahmettok/Developer/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/.build/index-build/x86_64-apple-macosx/debug/zikzak_inappwebview_ios.build/sources"
+    }
+  }
+}

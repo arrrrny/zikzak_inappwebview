@@ -1,3 +1,4 @@
+import Flutter
 //
 //  PullToRefreshChannelDelegate.swift
 //  zikzak_inappwebview
@@ -5,7 +6,7 @@
 //  Created by ARRRRNY on 05/05/22.
 //
 
-import Foundation
+import UIKit
 
 public class PullToRefreshChannelDelegate: ChannelDelegate {
     private weak var pullToRefreshControl: PullToRefreshControl?

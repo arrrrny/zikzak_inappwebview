@@ -8,7 +8,7 @@
 import Flutter
 import UIKit
 import WebKit
-import Foundation
+import UIKit
 
 public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelegate, UIScrollViewDelegate, UISearchBarDelegate, Disposable {
     static let METHOD_CHANNEL_NAME_PREFIX = "wtf.zikzak/zikzak_inappbrowser_"

@@ -5,7 +5,7 @@
 //  Created by ARRRRNY on 10/03/21.
 //
 
-import Foundation
+import UIKit
 
 public class WebMessagePort: NSObject {
     var name: String

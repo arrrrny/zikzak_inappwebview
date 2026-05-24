@@ -1,3 +1,4 @@
+import Flutter
 //
 //  PrintJobChannelDelegate.swift
 //  zikzak_inappwebview
@@ -5,7 +6,7 @@
 //  Created by ARRRRNY on 09/05/22.
 //
 
-import Foundation
+import UIKit
 
 public class PrintJobChannelDelegate: ChannelDelegate {
     private weak var printJobController: PrintJobController?

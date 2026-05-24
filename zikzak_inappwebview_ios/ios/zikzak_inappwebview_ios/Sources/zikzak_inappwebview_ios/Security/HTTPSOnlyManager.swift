@@ -5,7 +5,7 @@
 //  Created by ZikZak Team on 2025-11-05.
 //
 
-import Foundation
+import UIKit
 
 /// Manages HTTPS-only mode to prevent insecure HTTP connections
 public class HTTPSOnlyManager {

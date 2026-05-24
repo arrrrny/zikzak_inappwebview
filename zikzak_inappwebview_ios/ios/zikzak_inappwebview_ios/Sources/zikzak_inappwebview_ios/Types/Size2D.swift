@@ -5,7 +5,7 @@
 //  Created by ARRRRNY on 26/03/21.
 //
 
-import Foundation
+import UIKit
 
 public class Size2D: NSObject {
     var width: Double

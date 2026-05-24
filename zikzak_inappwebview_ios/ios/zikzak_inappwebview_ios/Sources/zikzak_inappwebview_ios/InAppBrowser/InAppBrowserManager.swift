@@ -8,7 +8,7 @@
 import Flutter
 import UIKit
 import WebKit
-import Foundation
+import UIKit
 import AVFoundation
 
 public class InAppBrowserManager: ChannelDelegate {

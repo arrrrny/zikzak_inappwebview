@@ -5,7 +5,8 @@
 //  Created by ARRRRNY on 21/05/23.
 //
 
-import Foundation
+import Flutter
+import UIKit
 
 public class InAppBrowserMenuItem: NSObject {
     var id: Int64

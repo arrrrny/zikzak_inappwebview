@@ -5,7 +5,8 @@
 //  Created by ARRRRNY on 06/05/22.
 //
 
-import Foundation
+import Flutter
+import UIKit
 import WebKit
 
 public class WebViewChannelDelegate: ChannelDelegate {

@@ -5,7 +5,7 @@
 //  Created by ARRRRNY on 09/05/22.
 //
 
-import Foundation
+import UIKit
 
 @objcMembers
 public class PrintJobSettings: ISettings<PrintJobController> {

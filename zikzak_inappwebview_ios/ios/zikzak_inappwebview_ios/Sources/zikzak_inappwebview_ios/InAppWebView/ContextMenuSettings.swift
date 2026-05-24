@@ -5,7 +5,7 @@
 //  Created by ARRRRNY on 30/05/2020.
 //
 
-import Foundation
+import UIKit
 
 public class ContextMenuSettings: ISettings<NSObject> {
 

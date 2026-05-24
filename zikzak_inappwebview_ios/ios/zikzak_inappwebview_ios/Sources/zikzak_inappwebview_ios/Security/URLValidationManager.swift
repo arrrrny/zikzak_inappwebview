@@ -5,7 +5,7 @@
 //  Created by ZikZak Team on 2025-11-05.
 //
 
-import Foundation
+import UIKit
 
 /// Manages URL validation to prevent malicious URLs and schemes
 public class URLValidationManager {

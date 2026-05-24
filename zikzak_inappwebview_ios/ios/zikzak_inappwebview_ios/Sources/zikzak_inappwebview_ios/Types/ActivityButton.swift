@@ -5,7 +5,7 @@
 //  Created by ARRRRNY on 26/10/22.
 //
 
-import Foundation
+import UIKit
 import SafariServices
 
 @available(iOS 15.0, *)

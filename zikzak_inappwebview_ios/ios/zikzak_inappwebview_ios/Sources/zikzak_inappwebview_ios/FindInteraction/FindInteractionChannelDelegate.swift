@@ -1,3 +1,4 @@
+import Flutter
 //
 //  FindInteractionChannelDelegate.swift
 //  zikzak_inappwebview
@@ -5,7 +6,7 @@
 //  Created by ARRRRNY on 07/10/22.
 //
 
-import Foundation
+import UIKit
 
 public class FindInteractionChannelDelegate: ChannelDelegate {
     private weak var findInteractionController: FindInteractionController?

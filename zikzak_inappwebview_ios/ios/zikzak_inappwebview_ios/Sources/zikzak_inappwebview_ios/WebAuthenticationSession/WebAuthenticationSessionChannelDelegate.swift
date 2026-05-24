@@ -1,3 +1,4 @@
+import Flutter
 //
 //  WebAuthenticationSessionChannelDelegate.swift
 //  zikzak_inappwebview
@@ -5,7 +6,7 @@
 //  Created by ARRRRNY on 08/05/22.
 //
 
-import Foundation
+import UIKit
 
 public class WebAuthenticationSessionChannelDelegate: ChannelDelegate {
     private weak var webAuthenticationSession: WebAuthenticationSession?

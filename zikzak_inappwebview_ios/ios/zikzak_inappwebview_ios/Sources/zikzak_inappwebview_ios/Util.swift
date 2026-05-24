@@ -1,3 +1,4 @@
+import Flutter
 //
 //  Util.swift
 //  zikzak_inappwebview
@@ -5,7 +6,7 @@
 //  Created by ARRRRNY on 12/02/21.
 //
 
-import Foundation
+import UIKit
 import WebKit
 
 var SharedLastTouchPointTimestamp: [InAppWebView: Int64] = [:]

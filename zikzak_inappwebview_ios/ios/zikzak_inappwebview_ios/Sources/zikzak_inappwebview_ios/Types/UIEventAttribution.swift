@@ -5,7 +5,7 @@
 //  Created by ARRRRNY on 26/10/22.
 //
 
-import Foundation
+import UIKit
 
 extension UIEventAttribution {
     public static func fromMap(map: [String:Any?]?) -> UIEventAttribution? {

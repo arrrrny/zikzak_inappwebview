@@ -18,7 +18,7 @@
 import Flutter
 import UIKit
 import WebKit
-import Foundation
+import UIKit
 import AVFoundation
 import SafariServices
 

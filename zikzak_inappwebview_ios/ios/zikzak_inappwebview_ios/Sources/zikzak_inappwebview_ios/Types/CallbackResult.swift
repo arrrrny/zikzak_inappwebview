@@ -1,3 +1,4 @@
+import Flutter
 //
 //  CallbackResult.swift
 //  zikzak_inappwebview
@@ -5,7 +6,7 @@
 //  Created by ARRRRNY on 06/05/22.
 //
 
-import Foundation
+import UIKit
 
 public class CallbackResult<T>: MethodChannelResult {
     public var notImplemented: () -> Void = {}
