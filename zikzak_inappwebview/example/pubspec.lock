@@ -41,14 +41,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.19.1"
-  cupertino_icons:
-    dependency: "direct overridden"
-    description:
-      name: cupertino_icons
-      sha256: ba631d1c7f7bef6b729a622b7b752645a2d076dba9976925b8f25725a30e1ee6
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.8"
   fake_async:
     dependency: transitive
     description:
@@ -490,63 +482,71 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "4.2.0"
+    version: "4.2.1"
   zikzak_inappwebview_android:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "../../zikzak_inappwebview_android"
-      relative: true
-    source: path
-    version: "4.2.0"
+      name: zikzak_inappwebview_android
+      sha256: dc5f6eafba2b92215159141e86cbe93dcad9a8df95018a3465be56ea858f91a5
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.2.1"
   zikzak_inappwebview_internal_annotations:
     dependency: transitive
     description:
-      path: "../../zikzak_inappwebview_internal_annotations"
-      relative: true
-    source: path
-    version: "4.2.0"
+      name: zikzak_inappwebview_internal_annotations
+      sha256: b87e39a867ed322719628a4b54378dca673e5f9807a37a113eb4c6a058db5026
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.2.1"
   zikzak_inappwebview_ios:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "../../zikzak_inappwebview_ios"
-      relative: true
-    source: path
-    version: "4.2.0"
+      name: zikzak_inappwebview_ios
+      sha256: f1d9b0f163bdaace603468a8aa2261869c42d5a04c315ec1b0aa609217877220
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.2.1"
   zikzak_inappwebview_linux:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "../../zikzak_inappwebview_linux"
-      relative: true
-    source: path
-    version: "4.2.0"
+      name: zikzak_inappwebview_linux
+      sha256: "26f2174ff39c46360b43018b7f8b0c2f86a26aa1295277a4d56bb89d37ef0e08"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.2.1"
   zikzak_inappwebview_macos:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "../../zikzak_inappwebview_macos"
-      relative: true
-    source: path
-    version: "4.2.0"
+      name: zikzak_inappwebview_macos
+      sha256: b5501c3ffda28db91e6039cd848d96c30fcb8e0ce1da6047e92ad5ab4db28d4d
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.2.1"
   zikzak_inappwebview_platform_interface:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "../../zikzak_inappwebview_platform_interface"
-      relative: true
-    source: path
-    version: "4.2.0"
+      name: zikzak_inappwebview_platform_interface
+      sha256: "20028570f0f7dfce3ff40051856eb4fd880bf180004c729479a84e7cef558566"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.2.1"
   zikzak_inappwebview_web:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "../../zikzak_inappwebview_web"
-      relative: true
-    source: path
-    version: "4.2.0"
+      name: zikzak_inappwebview_web
+      sha256: "50235b825927b1f6840b618a9019e44b3e0f0cadf7aca716f361156657148935"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.2.1"
   zikzak_inappwebview_windows:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "../../zikzak_inappwebview_windows"
-      relative: true
-    source: path
-    version: "4.2.0"
+      name: zikzak_inappwebview_windows
+      sha256: "2a1c04759dd1f57d6e0f077ab6bf0dea7477f4abbdec11a92288a4cf6a30b42b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.2.1"
 sdks:
   dart: ">=3.10.0-0 <4.0.0"
   flutter: ">=3.35.0"
