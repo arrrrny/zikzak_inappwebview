@@ -138,33 +138,33 @@ convert_path_to_versioned() {
     cp "$file" "$temp_file"
 
     # Process each zikzak package
-    for pkg in "${packages[@]}"; do
+    for dep_pkg in "${packages[@]}"; do
         # Skip excluded package (useful for examples that must keep path dependency on their parent)
-        if [ "$pkg" == "$exclude_pkg" ]; then
+        if [ "$dep_pkg" == "$exclude_pkg" ]; then
             continue
         fi
 
         # Method 1: Replace single-line versioned dependencies (package: ^1.2.3)
-        sed -i '' "s/^[[:space:]]*${pkg}:[[:space:]]*\^[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*[[:space:]]*$/  ${pkg}: ^${version}/" "$temp_file"
+        sed -i '' "s/^[[:space:]]*${dep_pkg}:[[:space:]]*\^[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*[[:space:]]*$/  ${dep_pkg}: ^${version}/" "$temp_file"
 
         # Method 2: Replace single-line versioned dependencies (package: 1.2.3)
-        sed -i '' "s/^[[:space:]]*${pkg}:[[:space:]]*[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*[[:space:]]*$/  ${pkg}: ^${version}/" "$temp_file"
+        sed -i '' "s/^[[:space:]]*${dep_pkg}:[[:space:]]*[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*[[:space:]]*$/  ${dep_pkg}: ^${version}/" "$temp_file"
 
         # Method 3: Handle multi-line path dependencies
         # This uses a more complex sed command to find the package line and replace the entire dependency block
-        sed -i '' "/^[[:space:]]*${pkg}:[[:space:]]*$/,/^[[:space:]]*[^[:space:]]/ {
-            s/^\([[:space:]]*${pkg}\):[[:space:]]*$/\1: ^${version}/
+        sed -i '' "/^[[:space:]]*${dep_pkg}:[[:space:]]*$/,/^[[:space:]]*[^[:space:]]/ {
+            s/^\([[:space:]]*${dep_pkg}\):[[:space:]]*$/\1: ^${version}/
             /^[[:space:]]*path:[[:space:]]*/ d
             /^[[:space:]]*version:[[:space:]]*/ d
         }" "$temp_file"
 
         # Method 4: Handle malformed dependencies where version and path are on separate lines
-        # First, find lines with "package: ^version" and mark them for replacement
-        awk -v pkg="$pkg" -v version="$version" '
+        # First, find lines with "dep_pkg: ^version" and mark them for replacement
+        awk -v dep_pkg="$dep_pkg" -v version="$version" '
         BEGIN { in_malformed = 0 }
         {
-            if ($0 ~ "^[[:space:]]*" pkg ":[[:space:]]*\\^[0-9]+\\.[0-9]+\\.[0-9]+[[:space:]]*$") {
-                print "  " pkg ": ^" version
+            if ($0 ~ "^[[:space:]]*" dep_pkg ":[[:space:]]*\\^[0-9]+\\.[0-9]+\\.[0-9]+[[:space:]]*$") {
+                print "  " dep_pkg ": ^" version
                 in_malformed = 1
                 next
             }
@@ -181,6 +181,15 @@ convert_path_to_versioned() {
         sed -i '' '/^[[:space:]]*generators:/d' "$temp_file"
         sed -i '' '/path:.*dev_packages\/generators/d' "$temp_file"
     done
+
+    # Remove the entire dependency_overrides section (dev-only, must not be in published packages)
+    awk '
+    BEGIN { skip = 0 }
+    /^dependency_overrides:/ { skip = 1; next }
+    skip && /^[^[:space:]]/ { skip = 0 }
+    !skip { print }
+    ' "$temp_file" > "${temp_file}.fixed"
+    mv "${temp_file}.fixed" "$temp_file"
 
     mv "$temp_file" "$file"
 
