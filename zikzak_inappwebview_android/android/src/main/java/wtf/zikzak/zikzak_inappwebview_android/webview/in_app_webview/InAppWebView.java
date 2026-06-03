@@ -1064,14 +1064,25 @@ public final class InAppWebView
                 @Override
                 public void run() {
                     try {
+                        boolean wasHorizontalScrollBarEnabled = isHorizontalScrollBarEnabled();
+                        boolean wasVerticalScrollBarEnabled = isVerticalScrollBarEnabled();
+                        setHorizontalScrollBarEnabled(false);
+                        setVerticalScrollBarEnabled(false);
+                        int bitmapWidth = getMeasuredWidth();
+                        int bitmapHeight = getMeasuredHeight();
+                        int bitmapScrollX = getScrollX();
+                        int bitmapScrollY = getScrollY();
                         Bitmap screenshotBitmap = Bitmap.createBitmap(
-                            getMeasuredWidth(),
-                            getMeasuredHeight(),
+                            bitmapWidth,
+                            bitmapHeight,
                             Bitmap.Config.ARGB_8888
                         );
                         Canvas c = new Canvas(screenshotBitmap);
-                        c.translate(-getScrollX(), -getScrollY());
+                        c.translate(-bitmapScrollX, -bitmapScrollY);
+                        layout(0, 0, bitmapWidth, bitmapHeight);
                         draw(c);
+                        setHorizontalScrollBarEnabled(wasHorizontalScrollBarEnabled);
+                        setVerticalScrollBarEnabled(wasVerticalScrollBarEnabled);
 
                         ByteArrayOutputStream byteArrayOutputStream =
                             new ByteArrayOutputStream();
