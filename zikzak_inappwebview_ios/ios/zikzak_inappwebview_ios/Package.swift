@@ -4,7 +4,7 @@ import PackageDescription
 let package = Package(
     name: "zikzak_inappwebview_ios",
     platforms: [
-        .iOS("16.0"),
+        .iOS("16.0")
     ],
     products: [
         .library(name: "zikzak-inappwebview-ios", targets: ["zikzak_inappwebview_ios"])
