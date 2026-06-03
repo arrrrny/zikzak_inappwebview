@@ -11,70 +11,79 @@ class WindowTitlebarSeparatorStyle {
   final int _value;
   final int? _nativeValue;
   const WindowTitlebarSeparatorStyle._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory WindowTitlebarSeparatorStyle._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      WindowTitlebarSeparatorStyle._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => WindowTitlebarSeparatorStyle._internal(value, nativeValue());
 
   ///A style indicating that the system determines the type of separator.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
-  static final AUTOMATIC =
-      WindowTitlebarSeparatorStyle._internalMultiPlatform(0, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.macOS:
-        return 0;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final AUTOMATIC = WindowTitlebarSeparatorStyle._internalMultiPlatform(
+    0,
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.macOS:
+          return 0;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///A style indicating that there’s no title bar separator.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
-  static final LINE =
-      WindowTitlebarSeparatorStyle._internalMultiPlatform(2, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.macOS:
-        return 2;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final LINE = WindowTitlebarSeparatorStyle._internalMultiPlatform(
+    2,
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.macOS:
+          return 2;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///A style indicating that the title bar separator is a line.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
-  static final NONE =
-      WindowTitlebarSeparatorStyle._internalMultiPlatform(1, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.macOS:
-        return 1;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final NONE = WindowTitlebarSeparatorStyle._internalMultiPlatform(
+    1,
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.macOS:
+          return 1;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///A style indicating that the title bar separator is a shadow.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
-  static final SHADOW =
-      WindowTitlebarSeparatorStyle._internalMultiPlatform(3, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.macOS:
-        return 3;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final SHADOW = WindowTitlebarSeparatorStyle._internalMultiPlatform(
+    3,
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.macOS:
+          return 3;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///Set of all values of [WindowTitlebarSeparatorStyle].
   static final Set<WindowTitlebarSeparatorStyle> values = [
@@ -88,8 +97,9 @@ class WindowTitlebarSeparatorStyle {
   static WindowTitlebarSeparatorStyle? fromValue(int? value) {
     if (value != null) {
       try {
-        return WindowTitlebarSeparatorStyle.values
-            .firstWhere((element) => element.toValue() == value);
+        return WindowTitlebarSeparatorStyle.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -101,8 +111,9 @@ class WindowTitlebarSeparatorStyle {
   static WindowTitlebarSeparatorStyle? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return WindowTitlebarSeparatorStyle.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return WindowTitlebarSeparatorStyle.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }

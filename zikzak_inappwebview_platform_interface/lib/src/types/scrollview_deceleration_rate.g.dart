@@ -11,17 +11,20 @@ class ScrollViewDecelerationRate {
   final String _value;
   final String _nativeValue;
   const ScrollViewDecelerationRate._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory ScrollViewDecelerationRate._internalMultiPlatform(
-          String value, Function nativeValue) =>
-      ScrollViewDecelerationRate._internal(value, nativeValue());
+    String value,
+    Function nativeValue,
+  ) => ScrollViewDecelerationRate._internal(value, nativeValue());
 
   ///A fast deceleration rate for a scroll view: `0.99`.
   static const FAST = ScrollViewDecelerationRate._internal('FAST', 'FAST');
 
   ///The default deceleration rate for a scroll view: `0.998`.
-  static const NORMAL =
-      ScrollViewDecelerationRate._internal('NORMAL', 'NORMAL');
+  static const NORMAL = ScrollViewDecelerationRate._internal(
+    'NORMAL',
+    'NORMAL',
+  );
 
   ///Set of all values of [ScrollViewDecelerationRate].
   static final Set<ScrollViewDecelerationRate> values = [
@@ -33,8 +36,9 @@ class ScrollViewDecelerationRate {
   static ScrollViewDecelerationRate? fromValue(String? value) {
     if (value != null) {
       try {
-        return ScrollViewDecelerationRate.values
-            .firstWhere((element) => element.toValue() == value);
+        return ScrollViewDecelerationRate.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -46,8 +50,9 @@ class ScrollViewDecelerationRate {
   static ScrollViewDecelerationRate? fromNativeValue(String? value) {
     if (value != null) {
       try {
-        return ScrollViewDecelerationRate.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return ScrollViewDecelerationRate.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }

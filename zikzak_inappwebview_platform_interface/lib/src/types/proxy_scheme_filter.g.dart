@@ -11,10 +11,11 @@ class ProxySchemeFilter {
   final String _value;
   final String _nativeValue;
   const ProxySchemeFilter._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory ProxySchemeFilter._internalMultiPlatform(
-          String value, Function nativeValue) =>
-      ProxySchemeFilter._internal(value, nativeValue());
+    String value,
+    Function nativeValue,
+  ) => ProxySchemeFilter._internal(value, nativeValue());
 
   ///Matches all schemes.
   static const MATCH_ALL_SCHEMES = ProxySchemeFilter._internal('*', '*');
@@ -36,8 +37,9 @@ class ProxySchemeFilter {
   static ProxySchemeFilter? fromValue(String? value) {
     if (value != null) {
       try {
-        return ProxySchemeFilter.values
-            .firstWhere((element) => element.toValue() == value);
+        return ProxySchemeFilter.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -49,8 +51,9 @@ class ProxySchemeFilter {
   static ProxySchemeFilter? fromNativeValue(String? value) {
     if (value != null) {
       try {
-        return ProxySchemeFilter.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return ProxySchemeFilter.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }

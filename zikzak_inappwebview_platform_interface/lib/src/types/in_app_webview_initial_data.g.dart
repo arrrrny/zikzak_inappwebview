@@ -25,12 +25,13 @@ class InAppWebViewInitialData {
 
   ///The MIME type of the data, e.g. "text/html". The default value is `"text/html"`.
   String mimeType;
-  InAppWebViewInitialData(
-      {this.baseUrl,
-      required this.data,
-      this.encoding = "utf8",
-      this.historyUrl,
-      this.mimeType = "text/html"});
+  InAppWebViewInitialData({
+    this.baseUrl,
+    required this.data,
+    this.encoding = "utf8",
+    this.historyUrl,
+    this.mimeType = "text/html",
+  });
 
   ///Gets a possible [InAppWebViewInitialData] instance from a [Map] value.
   static InAppWebViewInitialData? fromMap(Map<String, dynamic>? map) {

@@ -17,17 +17,13 @@ class PrewarmingToken {
     if (map == null) {
       return null;
     }
-    final instance = PrewarmingToken(
-      id: map['id'],
-    );
+    final instance = PrewarmingToken(id: map['id']);
     return instance;
   }
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
-    return {
-      "id": id,
-    };
+    return {"id": id};
   }
 
   ///Converts instance to a map.

@@ -18,8 +18,10 @@ class RendererPriorityPolicy {
 
   ///If `true`, this flag specifies that when this WebView is not visible, it will be treated as if it had requested a priority of [RendererPriority.RENDERER_PRIORITY_WAIVED].
   bool waivedWhenNotVisible;
-  RendererPriorityPolicy(
-      {this.rendererRequestedPriority, required this.waivedWhenNotVisible});
+  RendererPriorityPolicy({
+    this.rendererRequestedPriority,
+    required this.waivedWhenNotVisible,
+  });
 
   ///Gets a possible [RendererPriorityPolicy] instance from a [Map] value.
   static RendererPriorityPolicy? fromMap(Map<String, dynamic>? map) {
@@ -27,8 +29,9 @@ class RendererPriorityPolicy {
       return null;
     }
     final instance = RendererPriorityPolicy(
-      rendererRequestedPriority:
-          RendererPriority.fromNativeValue(map['rendererRequestedPriority']),
+      rendererRequestedPriority: RendererPriority.fromNativeValue(
+        map['rendererRequestedPriority'],
+      ),
       waivedWhenNotVisible: map['waivedWhenNotVisible'],
     );
     return instance;

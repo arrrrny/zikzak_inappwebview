@@ -11,10 +11,11 @@ class URLRequestNetworkServiceType {
   final int _value;
   final int _nativeValue;
   const URLRequestNetworkServiceType._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory URLRequestNetworkServiceType._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      URLRequestNetworkServiceType._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => URLRequestNetworkServiceType._internal(value, nativeValue());
 
   ///A service type for streaming audio/video data.
   static const AV_STREAMING = URLRequestNetworkServiceType._internal(8, 8);
@@ -63,8 +64,9 @@ class URLRequestNetworkServiceType {
   static URLRequestNetworkServiceType? fromValue(int? value) {
     if (value != null) {
       try {
-        return URLRequestNetworkServiceType.values
-            .firstWhere((element) => element.toValue() == value);
+        return URLRequestNetworkServiceType.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -76,8 +78,9 @@ class URLRequestNetworkServiceType {
   static URLRequestNetworkServiceType? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return URLRequestNetworkServiceType.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return URLRequestNetworkServiceType.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }

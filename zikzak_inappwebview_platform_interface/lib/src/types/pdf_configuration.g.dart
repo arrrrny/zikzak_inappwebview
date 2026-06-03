@@ -27,9 +27,7 @@ class PDFConfiguration {
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
-    return {
-      "rect": rect?.toMap(),
-    };
+    return {"rect": rect?.toMap()};
   }
 
   ///Converts instance to a map.

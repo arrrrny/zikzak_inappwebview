@@ -103,22 +103,23 @@ class URLRequest {
 
   ///The URL of the request. Setting this to `null` will load `about:blank`.
   WebUri? url;
-  URLRequest(
-      {this.allowsCellularAccess,
-      this.allowsConstrainedNetworkAccess,
-      this.allowsExpensiveNetworkAccess,
-      this.assumesHTTP3Capable,
-      this.attribution,
-      this.body,
-      this.cachePolicy,
-      this.headers,
-      this.httpShouldHandleCookies,
-      this.httpShouldUsePipelining,
-      this.mainDocumentURL,
-      this.method,
-      this.networkServiceType,
-      this.timeoutInterval,
-      this.url});
+  URLRequest({
+    this.allowsCellularAccess,
+    this.allowsConstrainedNetworkAccess,
+    this.allowsExpensiveNetworkAccess,
+    this.assumesHTTP3Capable,
+    this.attribution,
+    this.body,
+    this.cachePolicy,
+    this.headers,
+    this.httpShouldHandleCookies,
+    this.httpShouldUsePipelining,
+    this.mainDocumentURL,
+    this.method,
+    this.networkServiceType,
+    this.timeoutInterval,
+    this.url,
+  });
 
   ///Gets a possible [URLRequest] instance from a [Map] value.
   static URLRequest? fromMap(Map<String, dynamic>? map) {
@@ -141,7 +142,8 @@ class URLRequest {
           : null,
       method: map['method'],
       networkServiceType: URLRequestNetworkServiceType.fromNativeValue(
-          map['networkServiceType']),
+        map['networkServiceType'],
+      ),
       timeoutInterval: map['timeoutInterval'],
       url: map['url'] != null ? WebUri(map['url']) : null,
     );

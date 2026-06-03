@@ -33,12 +33,13 @@ class ChromeSafariBrowserActionButton {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
-  ChromeSafariBrowserActionButton(
-      {required this.id,
-      required this.icon,
-      required this.description,
-      this.onClick,
-      this.shouldTint = false});
+  ChromeSafariBrowserActionButton({
+    required this.id,
+    required this.icon,
+    required this.description,
+    this.onClick,
+    this.shouldTint = false,
+  });
 
   ///Gets a possible [ChromeSafariBrowserActionButton] instance from a [Map] value.
   static ChromeSafariBrowserActionButton? fromMap(Map<String, dynamic>? map) {

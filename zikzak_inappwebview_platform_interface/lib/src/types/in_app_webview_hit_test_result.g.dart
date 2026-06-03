@@ -29,10 +29,7 @@ class InAppWebViewHitTestResult {
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
-    return {
-      "extra": extra,
-      "type": type?.toNativeValue(),
-    };
+    return {"extra": extra, "type": type?.toNativeValue()};
   }
 
   ///Converts instance to a map.

@@ -11,10 +11,11 @@ class WindowType {
   final String _value;
   final String _nativeValue;
   const WindowType._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory WindowType._internalMultiPlatform(
-          String value, Function nativeValue) =>
-      WindowType._internal(value, nativeValue());
+    String value,
+    Function nativeValue,
+  ) => WindowType._internal(value, nativeValue());
 
   ///Adds the new browser window as a child window of the main window.
   ///
@@ -75,8 +76,9 @@ class WindowType {
   static WindowType? fromValue(String? value) {
     if (value != null) {
       try {
-        return WindowType.values
-            .firstWhere((element) => element.toValue() == value);
+        return WindowType.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -88,8 +90,9 @@ class WindowType {
   static WindowType? fromNativeValue(String? value) {
     if (value != null) {
       try {
-        return WindowType.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return WindowType.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }

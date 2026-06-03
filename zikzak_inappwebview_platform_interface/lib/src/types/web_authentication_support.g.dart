@@ -11,10 +11,11 @@ class WebAuthenticationSupport {
   final int _value;
   final int _nativeValue;
   const WebAuthenticationSupport._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory WebAuthenticationSupport._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      WebAuthenticationSupport._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => WebAuthenticationSupport._internal(value, nativeValue());
 
   ///Enable Web Authentication support for the embedding app (for example, passkeys).
   static const FOR_APP = WebAuthenticationSupport._internal(1, 1);
@@ -36,8 +37,9 @@ class WebAuthenticationSupport {
   static WebAuthenticationSupport? fromValue(int? value) {
     if (value != null) {
       try {
-        return WebAuthenticationSupport.values
-            .firstWhere((element) => element.toValue() == value);
+        return WebAuthenticationSupport.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -49,8 +51,9 @@ class WebAuthenticationSupport {
   static WebAuthenticationSupport? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return WebAuthenticationSupport.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return WebAuthenticationSupport.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -58,20 +61,34 @@ class WebAuthenticationSupport {
     return null;
   }
 
+  /// Gets a possible [WebAuthenticationSupport] instance value with name [name].
+  static WebAuthenticationSupport? byName(String? name) {
+    if (name != null) {
+      try {
+        return WebAuthenticationSupport.values.firstWhere(
+          (element) => element.name() == name,
+        );
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  static Map<String, WebAuthenticationSupport> asNameMap() =>
+      <String, WebAuthenticationSupport>{
+        for (final value in WebAuthenticationSupport.values)
+          value.name(): value,
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
   ///Gets [int] native value.
   int toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 1:
         return 'FOR_APP';
@@ -81,5 +98,16 @@ class WebAuthenticationSupport {
         return 'NONE';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  @override
+  String toString() {
+    return name();
   }
 }

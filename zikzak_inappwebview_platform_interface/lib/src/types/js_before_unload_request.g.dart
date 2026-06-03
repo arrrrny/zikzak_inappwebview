@@ -29,10 +29,7 @@ class JsBeforeUnloadRequest {
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
-    return {
-      "message": message,
-      "url": url?.toString(),
-    };
+    return {"message": message, "url": url?.toString()};
   }
 
   ///Converts instance to a map.

@@ -29,10 +29,7 @@ class CallAsyncJavaScriptResult {
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
-    return {
-      "error": error,
-      "value": value,
-    };
+    return {"error": error, "value": value};
   }
 
   ///Converts instance to a map.

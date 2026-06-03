@@ -30,19 +30,13 @@ class ContextMenuItem {
     if (map == null) {
       return null;
     }
-    final instance = ContextMenuItem(
-      id: map['id'],
-      title: map['title'],
-    );
+    final instance = ContextMenuItem(id: map['id'], title: map['title']);
     return instance;
   }
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
-    return {
-      "id": id,
-      "title": title,
-    };
+    return {"id": id, "title": title};
   }
 
   ///Converts instance to a map.

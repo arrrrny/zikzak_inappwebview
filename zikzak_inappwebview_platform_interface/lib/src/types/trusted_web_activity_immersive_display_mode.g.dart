@@ -17,21 +17,24 @@ class TrustedWebActivityImmersiveDisplayMode
 
   ///Whether the Trusted Web Activity should be in sticky immersive mode.
   bool isSticky;
-  TrustedWebActivityImmersiveDisplayMode(
-      {required this.isSticky,
-      this.displayCutoutMode = LayoutInDisplayCutoutMode.DEFAULT}) {}
+  TrustedWebActivityImmersiveDisplayMode({
+    required this.isSticky,
+    this.displayCutoutMode = LayoutInDisplayCutoutMode.DEFAULT,
+  }) {}
 
   ///Gets a possible [TrustedWebActivityImmersiveDisplayMode] instance from a [Map] value.
   static TrustedWebActivityImmersiveDisplayMode? fromMap(
-      Map<String, dynamic>? map) {
+    Map<String, dynamic>? map,
+  ) {
     if (map == null) {
       return null;
     }
     final instance = TrustedWebActivityImmersiveDisplayMode(
       isSticky: map['isSticky'],
     );
-    instance.displayCutoutMode =
-        LayoutInDisplayCutoutMode.fromNativeValue(map['displayCutoutMode'])!;
+    instance.displayCutoutMode = LayoutInDisplayCutoutMode.fromNativeValue(
+      map['displayCutoutMode'],
+    )!;
     return instance;
   }
 

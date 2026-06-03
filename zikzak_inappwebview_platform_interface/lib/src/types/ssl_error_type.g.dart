@@ -12,25 +12,28 @@ class SslErrorType {
   final String _value;
   final int? _nativeValue;
   const SslErrorType._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory SslErrorType._internalMultiPlatform(
-          String value, Function nativeValue) =>
-      SslErrorType._internal(value, nativeValue());
+    String value,
+    Function nativeValue,
+  ) => SslErrorType._internal(value, nativeValue());
 
   ///The date of the certificate is invalid.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - SslError.DATE_INVALID](https://developer.android.com/reference/android/net/http/SslError#SSL_DATE_INVALID))
-  static final DATE_INVALID =
-      SslErrorType._internalMultiPlatform('DATE_INVALID', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 4;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final DATE_INVALID = SslErrorType._internalMultiPlatform(
+    'DATE_INVALID',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.android:
+          return 4;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///The user specified that the certificate should not be trusted.
   ///
@@ -78,33 +81,37 @@ class SslErrorType {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - SecTrustResultType.fatalTrustFailure](https://developer.apple.com/documentation/security/sectrustresulttype/fataltrustfailure))
   ///- MacOS ([Official API - SecTrustResultType.fatalTrustFailure](https://developer.apple.com/documentation/security/sectrustresulttype/fataltrustfailure))
-  static final FATAL_TRUST_FAILURE =
-      SslErrorType._internalMultiPlatform('FATAL_TRUST_FAILURE', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return 6;
-      case TargetPlatform.macOS:
-        return 6;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final FATAL_TRUST_FAILURE = SslErrorType._internalMultiPlatform(
+    'FATAL_TRUST_FAILURE',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.iOS:
+          return 6;
+        case TargetPlatform.macOS:
+          return 6;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///Hostname mismatch.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - SslError.SSL_IDMISMATCH](https://developer.android.com/reference/android/net/http/SslError#SSL_IDMISMATCH))
-  static final IDMISMATCH =
-      SslErrorType._internalMultiPlatform('IDMISMATCH', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 2;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final IDMISMATCH = SslErrorType._internalMultiPlatform(
+    'IDMISMATCH',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.android:
+          return 2;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///Indicates an invalid setting or result. A generic error occurred.
   ///
@@ -130,16 +137,18 @@ class SslErrorType {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - SslError.SSL_NOTYETVALID](https://developer.android.com/reference/android/net/http/SslError#SSL_NOTYETVALID))
-  static final NOT_YET_VALID =
-      SslErrorType._internalMultiPlatform('NOT_YET_VALID', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 0;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final NOT_YET_VALID = SslErrorType._internalMultiPlatform(
+    'NOT_YET_VALID',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.android:
+          return 0;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///Indicates a failure other than that of trust evaluation.
   ///
@@ -149,18 +158,20 @@ class SslErrorType {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - SecTrustResultType.otherError](https://developer.apple.com/documentation/security/sectrustresulttype/othererror))
   ///- MacOS ([Official API - SecTrustResultType.otherError](https://developer.apple.com/documentation/security/sectrustresulttype/othererror))
-  static final OTHER_ERROR =
-      SslErrorType._internalMultiPlatform('OTHER_ERROR', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return 7;
-      case TargetPlatform.macOS:
-        return 7;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final OTHER_ERROR = SslErrorType._internalMultiPlatform(
+    'OTHER_ERROR',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.iOS:
+          return 7;
+        case TargetPlatform.macOS:
+          return 7;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///Trust is denied, but recovery may be possible.
   ///
@@ -175,18 +186,20 @@ class SslErrorType {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - SecTrustResultType.recoverableTrustFailure](https://developer.apple.com/documentation/security/sectrustresulttype/recoverabletrustfailure))
   ///- MacOS ([Official API - SecTrustResultType.recoverableTrustFailure](https://developer.apple.com/documentation/security/sectrustresulttype/recoverabletrustfailure))
-  static final RECOVERABLE_TRUST_FAILURE =
-      SslErrorType._internalMultiPlatform('RECOVERABLE_TRUST_FAILURE', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return 5;
-      case TargetPlatform.macOS:
-        return 5;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final RECOVERABLE_TRUST_FAILURE = SslErrorType._internalMultiPlatform(
+    'RECOVERABLE_TRUST_FAILURE',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.iOS:
+          return 5;
+        case TargetPlatform.macOS:
+          return 5;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///Indicates the evaluation succeeded and the certificate is implicitly trusted, but user intent was not explicitly specified.
   ///
@@ -200,18 +213,20 @@ class SslErrorType {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - SecTrustResultType.unspecified](https://developer.apple.com/documentation/security/sectrustresulttype/unspecified))
   ///- MacOS ([Official API - SecTrustResultType.unspecified](https://developer.apple.com/documentation/security/sectrustresulttype/unspecified))
-  static final UNSPECIFIED =
-      SslErrorType._internalMultiPlatform('UNSPECIFIED', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return 4;
-      case TargetPlatform.macOS:
-        return 4;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final UNSPECIFIED = SslErrorType._internalMultiPlatform(
+    'UNSPECIFIED',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.iOS:
+          return 4;
+        case TargetPlatform.macOS:
+          return 4;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///The certificate authority is not trusted.
   ///
@@ -246,8 +261,9 @@ class SslErrorType {
   static SslErrorType? fromValue(String? value) {
     if (value != null) {
       try {
-        return SslErrorType.values
-            .firstWhere((element) => element.toValue() == value);
+        return SslErrorType.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -259,8 +275,9 @@ class SslErrorType {
   static SslErrorType? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return SslErrorType.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return SslErrorType.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }

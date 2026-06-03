@@ -19,8 +19,11 @@ class PermissionRequest {
   ///**NOTE for iOS**: this list will have only 1 element and will be used by the [PermissionResponse.action]
   ///as the resource to consider when applying the corresponding action.
   List<PermissionResourceType> resources;
-  PermissionRequest(
-      {this.frame, required this.origin, this.resources = const []});
+  PermissionRequest({
+    this.frame,
+    required this.origin,
+    this.resources = const [],
+  });
 
   ///Gets a possible [PermissionRequest] instance from a [Map] value.
   static PermissionRequest? fromMap(Map<String, dynamic>? map) {
@@ -31,8 +34,9 @@ class PermissionRequest {
       frame: FrameInfo.fromMap(map['frame']?.cast<String, dynamic>()),
       origin: WebUri(map['origin']),
     );
-    instance.resources = List<PermissionResourceType>.from(map['resources']
-        .map((e) => PermissionResourceType.fromNativeValue(e)!));
+    instance.resources = List<PermissionResourceType>.from(
+      map['resources'].map((e) => PermissionResourceType.fromNativeValue(e)!),
+    );
     return instance;
   }
 

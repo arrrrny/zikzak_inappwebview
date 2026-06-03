@@ -11,14 +11,17 @@ class LayoutAlgorithm {
   final String _value;
   final String _nativeValue;
   const LayoutAlgorithm._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory LayoutAlgorithm._internalMultiPlatform(
-          String value, Function nativeValue) =>
-      LayoutAlgorithm._internal(value, nativeValue());
+    String value,
+    Function nativeValue,
+  ) => LayoutAlgorithm._internal(value, nativeValue());
 
   ///NARROW_COLUMNS makes all columns no wider than the screen if possible. Only use this for API levels prior to `Build.VERSION_CODES.KITKAT`.
-  static const NARROW_COLUMNS =
-      LayoutAlgorithm._internal('NARROW_COLUMNS', 'NARROW_COLUMNS');
+  static const NARROW_COLUMNS = LayoutAlgorithm._internal(
+    'NARROW_COLUMNS',
+    'NARROW_COLUMNS',
+  );
 
   ///NORMAL means no rendering changes. This is the recommended choice for maximum compatibility across different platforms and Android versions.
   static const NORMAL = LayoutAlgorithm._internal('NORMAL', 'NORMAL');
@@ -27,8 +30,10 @@ class LayoutAlgorithm {
   ///It is recommended to enable zoom support [InAppWebViewSettings.supportZoom] when using this mode.
   ///
   ///**NOTE**: available on Android 19+.
-  static const TEXT_AUTOSIZING =
-      LayoutAlgorithm._internal('TEXT_AUTOSIZING', 'TEXT_AUTOSIZING');
+  static const TEXT_AUTOSIZING = LayoutAlgorithm._internal(
+    'TEXT_AUTOSIZING',
+    'TEXT_AUTOSIZING',
+  );
 
   ///Set of all values of [LayoutAlgorithm].
   static final Set<LayoutAlgorithm> values = [
@@ -41,8 +46,9 @@ class LayoutAlgorithm {
   static LayoutAlgorithm? fromValue(String? value) {
     if (value != null) {
       try {
-        return LayoutAlgorithm.values
-            .firstWhere((element) => element.toValue() == value);
+        return LayoutAlgorithm.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -54,8 +60,9 @@ class LayoutAlgorithm {
   static LayoutAlgorithm? fromNativeValue(String? value) {
     if (value != null) {
       try {
-        return LayoutAlgorithm.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return LayoutAlgorithm.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }

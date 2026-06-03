@@ -15,8 +15,10 @@ class PermissionResponse {
   ///
   ///**NOTE for iOS**: not used. The [action] taken is based on the [PermissionRequest.resources].
   List<PermissionResourceType> resources;
-  PermissionResponse(
-      {this.action = PermissionResponseAction.DENY, this.resources = const []});
+  PermissionResponse({
+    this.action = PermissionResponseAction.DENY,
+    this.resources = const [],
+  });
 
   ///Gets a possible [PermissionResponse] instance from a [Map] value.
   static PermissionResponse? fromMap(Map<String, dynamic>? map) {
@@ -25,8 +27,9 @@ class PermissionResponse {
     }
     final instance = PermissionResponse();
     instance.action = PermissionResponseAction.fromNativeValue(map['action']);
-    instance.resources = List<PermissionResourceType>.from(map['resources']
-        .map((e) => PermissionResourceType.fromNativeValue(e)!));
+    instance.resources = List<PermissionResourceType>.from(
+      map['resources'].map((e) => PermissionResourceType.fromNativeValue(e)!),
+    );
     return instance;
   }
 

@@ -11,22 +11,29 @@ class VerticalScrollbarPosition {
   final int _value;
   final int _nativeValue;
   const VerticalScrollbarPosition._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory VerticalScrollbarPosition._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      VerticalScrollbarPosition._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => VerticalScrollbarPosition._internal(value, nativeValue());
 
   ///Position the scroll bar at the default position as determined by the system.
-  static const SCROLLBAR_POSITION_DEFAULT =
-      VerticalScrollbarPosition._internal(0, 0);
+  static const SCROLLBAR_POSITION_DEFAULT = VerticalScrollbarPosition._internal(
+    0,
+    0,
+  );
 
   ///Position the scroll bar along the left edge.
-  static const SCROLLBAR_POSITION_LEFT =
-      VerticalScrollbarPosition._internal(1, 1);
+  static const SCROLLBAR_POSITION_LEFT = VerticalScrollbarPosition._internal(
+    1,
+    1,
+  );
 
   ///Position the scroll bar along the right edge.
-  static const SCROLLBAR_POSITION_RIGHT =
-      VerticalScrollbarPosition._internal(2, 2);
+  static const SCROLLBAR_POSITION_RIGHT = VerticalScrollbarPosition._internal(
+    2,
+    2,
+  );
 
   ///Set of all values of [VerticalScrollbarPosition].
   static final Set<VerticalScrollbarPosition> values = [
@@ -39,8 +46,9 @@ class VerticalScrollbarPosition {
   static VerticalScrollbarPosition? fromValue(int? value) {
     if (value != null) {
       try {
-        return VerticalScrollbarPosition.values
-            .firstWhere((element) => element.toValue() == value);
+        return VerticalScrollbarPosition.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -52,8 +60,9 @@ class VerticalScrollbarPosition {
   static VerticalScrollbarPosition? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return VerticalScrollbarPosition.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return VerticalScrollbarPosition.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }

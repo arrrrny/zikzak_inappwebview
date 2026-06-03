@@ -11,10 +11,11 @@ class PermissionResourceType {
   final String _value;
   final dynamic _nativeValue;
   const PermissionResourceType._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory PermissionResourceType._internalMultiPlatform(
-          String value, Function nativeValue) =>
-      PermissionResourceType._internal(value, nativeValue());
+    String value,
+    Function nativeValue,
+  ) => PermissionResourceType._internal(value, nativeValue());
 
   ///Resource belongs to video capture device, like camera.
   ///
@@ -22,20 +23,22 @@ class PermissionResourceType {
   ///- Android native WebView ([Official API - PermissionRequest.RESOURCE_VIDEO_CAPTURE](https://developer.android.com/reference/android/webkit/PermissionRequest#RESOURCE_VIDEO_CAPTURE))
   ///- iOS 15.0+ ([Official API - WKMediaCaptureType.camera](https://developer.apple.com/documentation/webkit/wkmediacapturetype/camera))
   ///- MacOS 12.0+ ([Official API - WKMediaCaptureType.camera](https://developer.apple.com/documentation/webkit/wkmediacapturetype/camera))
-  static final CAMERA =
-      PermissionResourceType._internalMultiPlatform('CAMERA', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 'android.webkit.resource.VIDEO_CAPTURE';
-      case TargetPlatform.iOS:
-        return 0;
-      case TargetPlatform.macOS:
-        return 0;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final CAMERA = PermissionResourceType._internalMultiPlatform(
+    'CAMERA',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.android:
+          return 'android.webkit.resource.VIDEO_CAPTURE';
+        case TargetPlatform.iOS:
+          return 0;
+        case TargetPlatform.macOS:
+          return 0;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///A media device or devices that can capture audio and video.
   ///
@@ -43,18 +46,20 @@ class PermissionResourceType {
   ///- iOS 15.0+ ([Official API - WKMediaCaptureType.cameraAndMicrophone](https://developer.apple.com/documentation/webkit/wkmediacapturetype/cameraandmicrophone))
   ///- MacOS 12.0+ ([Official API - WKMediaCaptureType.cameraAndMicrophone](https://developer.apple.com/documentation/webkit/wkmediacapturetype/cameraandmicrophone))
   static final CAMERA_AND_MICROPHONE =
-      PermissionResourceType._internalMultiPlatform('CAMERA_AND_MICROPHONE',
-          () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return 2;
-      case TargetPlatform.macOS:
-        return 2;
-      default:
-        break;
-    }
-    return null;
-  });
+      PermissionResourceType._internalMultiPlatform(
+        'CAMERA_AND_MICROPHONE',
+        () {
+          switch (defaultTargetPlatform) {
+            case TargetPlatform.iOS:
+              return 2;
+            case TargetPlatform.macOS:
+              return 2;
+            default:
+              break;
+          }
+          return null;
+        },
+      );
 
   ///Resource belongs to the device’s orientation and motion.
   ///
@@ -63,17 +68,19 @@ class PermissionResourceType {
   ///- MacOS 12.0+
   static final DEVICE_ORIENTATION_AND_MOTION =
       PermissionResourceType._internalMultiPlatform(
-          'DEVICE_ORIENTATION_AND_MOTION', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return 'deviceOrientationAndMotion';
-      case TargetPlatform.macOS:
-        return 'deviceOrientationAndMotion';
-      default:
-        break;
-    }
-    return null;
-  });
+        'DEVICE_ORIENTATION_AND_MOTION',
+        () {
+          switch (defaultTargetPlatform) {
+            case TargetPlatform.iOS:
+              return 'deviceOrientationAndMotion';
+            case TargetPlatform.macOS:
+              return 'deviceOrientationAndMotion';
+            default:
+              break;
+          }
+          return null;
+        },
+      );
 
   ///Resource belongs to audio capture device, like microphone.
   ///
@@ -81,20 +88,22 @@ class PermissionResourceType {
   ///- Android native WebView ([Official API - PermissionRequest.RESOURCE_AUDIO_CAPTURE](https://developer.android.com/reference/android/webkit/PermissionRequest#RESOURCE_AUDIO_CAPTURE))
   ///- iOS 15.0+ ([Official API - WKMediaCaptureType.microphone](https://developer.apple.com/documentation/webkit/wkmediacapturetype/microphone))
   ///- MacOS 12.0+ ([Official API - WKMediaCaptureType.microphone](https://developer.apple.com/documentation/webkit/wkmediacapturetype/microphone))
-  static final MICROPHONE =
-      PermissionResourceType._internalMultiPlatform('MICROPHONE', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 'android.webkit.resource.AUDIO_CAPTURE';
-      case TargetPlatform.iOS:
-        return 1;
-      case TargetPlatform.macOS:
-        return 1;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final MICROPHONE = PermissionResourceType._internalMultiPlatform(
+    'MICROPHONE',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.android:
+          return 'android.webkit.resource.AUDIO_CAPTURE';
+        case TargetPlatform.iOS:
+          return 1;
+        case TargetPlatform.macOS:
+          return 1;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///Resource will allow sysex messages to be sent to or received from MIDI devices.
   ///These messages are privileged operations, e.g. modifying sound libraries and sampling data, or even updating the MIDI device's firmware.
@@ -102,16 +111,18 @@ class PermissionResourceType {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - PermissionRequest.RESOURCE_MIDI_SYSEX](https://developer.android.com/reference/android/webkit/PermissionRequest#RESOURCE_MIDI_SYSEX))
-  static final MIDI_SYSEX =
-      PermissionResourceType._internalMultiPlatform('MIDI_SYSEX', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 'android.webkit.resource.MIDI_SYSEX';
-      default:
-        break;
-    }
-    return null;
-  });
+  static final MIDI_SYSEX = PermissionResourceType._internalMultiPlatform(
+    'MIDI_SYSEX',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.android:
+          return 'android.webkit.resource.MIDI_SYSEX';
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///Resource belongs to protected media identifier. After the user grants this resource, the origin can use EME APIs to generate the license requests.
   ///
@@ -119,14 +130,14 @@ class PermissionResourceType {
   ///- Android native WebView ([Official API - PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID](https://developer.android.com/reference/android/webkit/PermissionRequest#RESOURCE_PROTECTED_MEDIA_ID))
   static final PROTECTED_MEDIA_ID =
       PermissionResourceType._internalMultiPlatform('PROTECTED_MEDIA_ID', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 'android.webkit.resource.PROTECTED_MEDIA_ID';
-      default:
-        break;
-    }
-    return null;
-  });
+        switch (defaultTargetPlatform) {
+          case TargetPlatform.android:
+            return 'android.webkit.resource.PROTECTED_MEDIA_ID';
+          default:
+            break;
+        }
+        return null;
+      });
 
   ///Set of all values of [PermissionResourceType].
   static final Set<PermissionResourceType> values = [
@@ -142,8 +153,9 @@ class PermissionResourceType {
   static PermissionResourceType? fromValue(String? value) {
     if (value != null) {
       try {
-        return PermissionResourceType.values
-            .firstWhere((element) => element.toValue() == value);
+        return PermissionResourceType.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -155,8 +167,9 @@ class PermissionResourceType {
   static PermissionResourceType? fromNativeValue(dynamic value) {
     if (value != null) {
       try {
-        return PermissionResourceType.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return PermissionResourceType.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }

@@ -17,8 +17,10 @@ class RenderProcessGoneDetail {
   /// Returns the renderer priority that was set at the time that the renderer exited. This may be greater than the priority that
   /// any individual `WebView` requested using [].
   RendererPriority? rendererPriorityAtExit;
-  RenderProcessGoneDetail(
-      {required this.didCrash, this.rendererPriorityAtExit});
+  RenderProcessGoneDetail({
+    required this.didCrash,
+    this.rendererPriorityAtExit,
+  });
 
   ///Gets a possible [RenderProcessGoneDetail] instance from a [Map] value.
   static RenderProcessGoneDetail? fromMap(Map<String, dynamic>? map) {
@@ -27,8 +29,9 @@ class RenderProcessGoneDetail {
     }
     final instance = RenderProcessGoneDetail(
       didCrash: map['didCrash'],
-      rendererPriorityAtExit:
-          RendererPriority.fromNativeValue(map['rendererPriorityAtExit']),
+      rendererPriorityAtExit: RendererPriority.fromNativeValue(
+        map['rendererPriorityAtExit'],
+      ),
     );
     return instance;
   }

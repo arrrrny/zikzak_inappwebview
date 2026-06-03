@@ -29,10 +29,7 @@ class WebViewPackageInfo {
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
-    return {
-      "packageName": packageName,
-      "versionName": versionName,
-    };
+    return {"packageName": packageName, "versionName": versionName};
   }
 
   ///Converts instance to a map.

@@ -212,42 +212,47 @@ class ChromeSafariBrowserSettings {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ModalTransitionStyle? transitionStyle;
-  ChromeSafariBrowserSettings(
-      {this.shareState = CustomTabsShareState.SHARE_STATE_DEFAULT,
-      this.showTitle = true,
-      this.toolbarBackgroundColor,
-      this.navigationBarColor,
-      this.navigationBarDividerColor,
-      this.secondaryToolbarColor,
-      this.enableUrlBarHiding = false,
-      this.instantAppsEnabled = false,
-      this.packageName,
-      this.keepAliveEnabled = false,
-      this.isSingleInstance = false,
-      this.noHistory = false,
-      this.isTrustedWebActivity = false,
-      this.additionalTrustedOrigins = const [],
-      this.displayMode,
-      this.screenOrientation = TrustedWebActivityScreenOrientation.DEFAULT,
-      this.startAnimations,
-      this.exitAnimations,
-      this.alwaysUseBrowserUI = false,
-      this.entersReaderIfAvailable = false,
-      this.barCollapsingEnabled = false,
-      this.dismissButtonStyle = DismissButtonStyle.DONE,
-      this.preferredBarTintColor,
-      this.preferredControlTintColor,
-      this.presentationStyle = ModalPresentationStyle.FULL_SCREEN,
-      this.transitionStyle = ModalTransitionStyle.COVER_VERTICAL,
-      this.activityButton,
-      this.eventAttribution}) {
+  ChromeSafariBrowserSettings({
+    this.shareState = CustomTabsShareState.SHARE_STATE_DEFAULT,
+    this.showTitle = true,
+    this.toolbarBackgroundColor,
+    this.navigationBarColor,
+    this.navigationBarDividerColor,
+    this.secondaryToolbarColor,
+    this.enableUrlBarHiding = false,
+    this.instantAppsEnabled = false,
+    this.packageName,
+    this.keepAliveEnabled = false,
+    this.isSingleInstance = false,
+    this.noHistory = false,
+    this.isTrustedWebActivity = false,
+    this.additionalTrustedOrigins = const [],
+    this.displayMode,
+    this.screenOrientation = TrustedWebActivityScreenOrientation.DEFAULT,
+    this.startAnimations,
+    this.exitAnimations,
+    this.alwaysUseBrowserUI = false,
+    this.entersReaderIfAvailable = false,
+    this.barCollapsingEnabled = false,
+    this.dismissButtonStyle = DismissButtonStyle.DONE,
+    this.preferredBarTintColor,
+    this.preferredControlTintColor,
+    this.presentationStyle = ModalPresentationStyle.FULL_SCREEN,
+    this.transitionStyle = ModalTransitionStyle.COVER_VERTICAL,
+    this.activityButton,
+    this.eventAttribution,
+  }) {
     if (startAnimations != null) {
-      assert(startAnimations!.length == 2,
-          "start animations must be have 2 android resources");
+      assert(
+        startAnimations!.length == 2,
+        "start animations must be have 2 android resources",
+      );
     }
     if (exitAnimations != null) {
-      assert(exitAnimations!.length == 2,
-          "exit animations must be have 2 android resources");
+      assert(
+        exitAnimations!.length == 2,
+        "exit animations must be have 2 android resources",
+      );
     }
   }
 
@@ -258,13 +263,18 @@ class ChromeSafariBrowserSettings {
     }
     final instance = ChromeSafariBrowserSettings(
       activityButton: ActivityButton.fromMap(
-          map['activityButton']?.cast<String, dynamic>()),
+        map['activityButton']?.cast<String, dynamic>(),
+      ),
       displayMode: _deserializeDisplayMode(map['displayMode']),
       eventAttribution: UIEventAttribution.fromMap(
-          map['eventAttribution']?.cast<String, dynamic>()),
+        map['eventAttribution']?.cast<String, dynamic>(),
+      ),
       exitAnimations: map['exitAnimations'] != null
-          ? List<AndroidResource>.from(map['exitAnimations']
-              .map((e) => AndroidResource.fromMap(e?.cast<String, dynamic>())!))
+          ? List<AndroidResource>.from(
+              map['exitAnimations'].map(
+                (e) => AndroidResource.fromMap(e?.cast<String, dynamic>())!,
+              ),
+            )
           : null,
       navigationBarColor: map['navigationBarColor'] != null
           ? UtilColor.fromStringRepresentation(map['navigationBarColor'])
@@ -283,8 +293,11 @@ class ChromeSafariBrowserSettings {
           ? UtilColor.fromStringRepresentation(map['secondaryToolbarColor'])
           : null,
       startAnimations: map['startAnimations'] != null
-          ? List<AndroidResource>.from(map['startAnimations']
-              .map((e) => AndroidResource.fromMap(e?.cast<String, dynamic>())!))
+          ? List<AndroidResource>.from(
+              map['startAnimations'].map(
+                (e) => AndroidResource.fromMap(e?.cast<String, dynamic>())!,
+              ),
+            )
           : null,
       toolbarBackgroundColor: map['toolbarBackgroundColor'] != null
           ? UtilColor.fromStringRepresentation(map['toolbarBackgroundColor'])
@@ -295,8 +308,9 @@ class ChromeSafariBrowserSettings {
         : null;
     instance.alwaysUseBrowserUI = map['alwaysUseBrowserUI'];
     instance.barCollapsingEnabled = map['barCollapsingEnabled'];
-    instance.dismissButtonStyle =
-        DismissButtonStyle.fromNativeValue(map['dismissButtonStyle']);
+    instance.dismissButtonStyle = DismissButtonStyle.fromNativeValue(
+      map['dismissButtonStyle'],
+    );
     instance.enableUrlBarHiding = map['enableUrlBarHiding'];
     instance.entersReaderIfAvailable = map['entersReaderIfAvailable'];
     instance.instantAppsEnabled = map['instantAppsEnabled'];
@@ -304,16 +318,20 @@ class ChromeSafariBrowserSettings {
     instance.isTrustedWebActivity = map['isTrustedWebActivity'];
     instance.keepAliveEnabled = map['keepAliveEnabled'];
     instance.noHistory = map['noHistory'];
-    instance.presentationStyle =
-        ModalPresentationStyle.fromNativeValue(map['presentationStyle']);
+    instance.presentationStyle = ModalPresentationStyle.fromNativeValue(
+      map['presentationStyle'],
+    );
     instance.screenOrientation =
         TrustedWebActivityScreenOrientation.fromNativeValue(
-            map['screenOrientation']);
-    instance.shareState =
-        CustomTabsShareState.fromNativeValue(map['shareState']);
+          map['screenOrientation'],
+        );
+    instance.shareState = CustomTabsShareState.fromNativeValue(
+      map['shareState'],
+    );
     instance.showTitle = map['showTitle'];
-    instance.transitionStyle =
-        ModalTransitionStyle.fromNativeValue(map['transitionStyle']);
+    instance.transitionStyle = ModalTransitionStyle.fromNativeValue(
+      map['transitionStyle'],
+    );
     return instance;
   }
 

@@ -11,10 +11,11 @@ class PrintJobOrientation {
   final int _value;
   final int _nativeValue;
   const PrintJobOrientation._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory PrintJobOrientation._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      PrintJobOrientation._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => PrintJobOrientation._internal(value, nativeValue());
 
   ///Pages are printed in landscape orientation.
   ///
@@ -60,8 +61,9 @@ class PrintJobOrientation {
   static PrintJobOrientation? fromValue(int? value) {
     if (value != null) {
       try {
-        return PrintJobOrientation.values
-            .firstWhere((element) => element.toValue() == value);
+        return PrintJobOrientation.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -73,8 +75,9 @@ class PrintJobOrientation {
   static PrintJobOrientation? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return PrintJobOrientation.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return PrintJobOrientation.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }

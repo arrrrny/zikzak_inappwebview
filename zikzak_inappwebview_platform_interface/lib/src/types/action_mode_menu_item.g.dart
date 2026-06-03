@@ -11,10 +11,11 @@ class ActionModeMenuItem {
   final int _value;
   final int _nativeValue;
   const ActionModeMenuItem._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory ActionModeMenuItem._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      ActionModeMenuItem._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => ActionModeMenuItem._internal(value, nativeValue());
 
   ///No menu items should be disabled.
   static const MENU_ITEM_NONE = ActionModeMenuItem._internal(0, 0);
@@ -40,8 +41,9 @@ class ActionModeMenuItem {
   static ActionModeMenuItem? fromValue(int? value) {
     if (value != null) {
       try {
-        return ActionModeMenuItem.values
-            .firstWhere((element) => element.toValue() == value);
+        return ActionModeMenuItem.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return ActionModeMenuItem._internal(value, value);
       }
@@ -53,8 +55,9 @@ class ActionModeMenuItem {
   static ActionModeMenuItem? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return ActionModeMenuItem.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return ActionModeMenuItem.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return ActionModeMenuItem._internal(value, value);
       }
@@ -76,7 +79,9 @@ class ActionModeMenuItem {
 
   ActionModeMenuItem operator |(ActionModeMenuItem value) =>
       ActionModeMenuItem._internal(
-          value.toValue() | _value, value.toNativeValue() | _nativeValue);
+        value.toValue() | _value,
+        value.toNativeValue() | _nativeValue,
+      );
   @override
   String toString() {
     switch (_value) {

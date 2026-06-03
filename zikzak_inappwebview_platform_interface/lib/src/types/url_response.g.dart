@@ -28,14 +28,15 @@ class URLResponse {
 
   ///The URL for the response.
   WebUri? url;
-  URLResponse(
-      {required this.expectedContentLength,
-      this.headers,
-      this.mimeType,
-      this.statusCode,
-      this.suggestedFilename,
-      this.textEncodingName,
-      this.url});
+  URLResponse({
+    required this.expectedContentLength,
+    this.headers,
+    this.mimeType,
+    this.statusCode,
+    this.suggestedFilename,
+    this.textEncodingName,
+    this.url,
+  });
 
   ///Gets a possible [URLResponse] instance from a [Map] value.
   static URLResponse? fromMap(Map<String, dynamic>? map) {

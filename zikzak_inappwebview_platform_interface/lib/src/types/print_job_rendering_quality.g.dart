@@ -11,10 +11,11 @@ class PrintJobRenderingQuality {
   final int _value;
   final int _nativeValue;
   const PrintJobRenderingQuality._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory PrintJobRenderingQuality._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      PrintJobRenderingQuality._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => PrintJobRenderingQuality._internal(value, nativeValue());
 
   ///Renders the printing at the best possible quality, regardless of speed.
   ///
@@ -39,18 +40,20 @@ class PrintJobRenderingQuality {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
-  static final RESPONSIVE =
-      PrintJobRenderingQuality._internalMultiPlatform(1, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return 1;
-      case TargetPlatform.macOS:
-        return 1;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final RESPONSIVE = PrintJobRenderingQuality._internalMultiPlatform(
+    1,
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.iOS:
+          return 1;
+        case TargetPlatform.macOS:
+          return 1;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///Set of all values of [PrintJobRenderingQuality].
   static final Set<PrintJobRenderingQuality> values = [
@@ -62,8 +65,9 @@ class PrintJobRenderingQuality {
   static PrintJobRenderingQuality? fromValue(int? value) {
     if (value != null) {
       try {
-        return PrintJobRenderingQuality.values
-            .firstWhere((element) => element.toValue() == value);
+        return PrintJobRenderingQuality.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -75,8 +79,9 @@ class PrintJobRenderingQuality {
   static PrintJobRenderingQuality? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return PrintJobRenderingQuality.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return PrintJobRenderingQuality.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }

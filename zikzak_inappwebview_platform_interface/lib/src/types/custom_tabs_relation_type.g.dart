@@ -11,40 +11,45 @@ class CustomTabsRelationType {
   final int _value;
   final int? _nativeValue;
   const CustomTabsRelationType._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory CustomTabsRelationType._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      CustomTabsRelationType._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => CustomTabsRelationType._internal(value, nativeValue());
 
   ///Requests the ability to handle all URLs from a given origin.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
-  static final HANDLE_ALL_URLS =
-      CustomTabsRelationType._internalMultiPlatform(2, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 2;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final HANDLE_ALL_URLS = CustomTabsRelationType._internalMultiPlatform(
+    2,
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.android:
+          return 2;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///For App -> Web transitions, requests the app to use the declared origin to be used as origin for the client app in the web APIs context.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
-  static final USE_AS_ORIGIN =
-      CustomTabsRelationType._internalMultiPlatform(1, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 1;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final USE_AS_ORIGIN = CustomTabsRelationType._internalMultiPlatform(
+    1,
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.android:
+          return 1;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///Set of all values of [CustomTabsRelationType].
   static final Set<CustomTabsRelationType> values = [
@@ -56,8 +61,9 @@ class CustomTabsRelationType {
   static CustomTabsRelationType? fromValue(int? value) {
     if (value != null) {
       try {
-        return CustomTabsRelationType.values
-            .firstWhere((element) => element.toValue() == value);
+        return CustomTabsRelationType.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -69,8 +75,9 @@ class CustomTabsRelationType {
   static CustomTabsRelationType? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return CustomTabsRelationType.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return CustomTabsRelationType.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }

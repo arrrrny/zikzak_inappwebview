@@ -11,10 +11,11 @@ class PullToRefreshSize {
   final int _value;
   final int _nativeValue;
   const PullToRefreshSize._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory PullToRefreshSize._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      PullToRefreshSize._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => PullToRefreshSize._internal(value, nativeValue());
 
   ///Default size.
   static const DEFAULT = PullToRefreshSize._internal(1, 1);
@@ -32,8 +33,9 @@ class PullToRefreshSize {
   static PullToRefreshSize? fromValue(int? value) {
     if (value != null) {
       try {
-        return PullToRefreshSize.values
-            .firstWhere((element) => element.toValue() == value);
+        return PullToRefreshSize.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -45,8 +47,9 @@ class PullToRefreshSize {
   static PullToRefreshSize? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return PullToRefreshSize.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return PullToRefreshSize.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }

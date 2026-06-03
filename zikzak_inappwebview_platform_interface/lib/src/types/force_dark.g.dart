@@ -11,7 +11,7 @@ class ForceDark {
   final int _value;
   final int _nativeValue;
   const ForceDark._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory ForceDark._internalMultiPlatform(int value, Function nativeValue) =>
       ForceDark._internal(value, nativeValue());
 
@@ -36,8 +36,9 @@ class ForceDark {
   static ForceDark? fromValue(int? value) {
     if (value != null) {
       try {
-        return ForceDark.values
-            .firstWhere((element) => element.toValue() == value);
+        return ForceDark.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -49,8 +50,9 @@ class ForceDark {
   static ForceDark? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return ForceDark.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return ForceDark.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }

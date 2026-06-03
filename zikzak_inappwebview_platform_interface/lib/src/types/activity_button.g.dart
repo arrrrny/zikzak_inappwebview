@@ -20,8 +20,10 @@ class ActivityButton {
 
   ///The name of the image asset or file.
   UIImage templateImage;
-  ActivityButton(
-      {required this.templateImage, required this.extensionIdentifier});
+  ActivityButton({
+    required this.templateImage,
+    required this.extensionIdentifier,
+  });
 
   ///Gets a possible [ActivityButton] instance from a [Map] value.
   static ActivityButton? fromMap(Map<String, dynamic>? map) {
@@ -30,8 +32,9 @@ class ActivityButton {
     }
     final instance = ActivityButton(
       extensionIdentifier: map['extensionIdentifier'],
-      templateImage:
-          UIImage.fromMap(map['templateImage']?.cast<String, dynamic>())!,
+      templateImage: UIImage.fromMap(
+        map['templateImage']?.cast<String, dynamic>(),
+      )!,
     );
     return instance;
   }

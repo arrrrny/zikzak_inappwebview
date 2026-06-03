@@ -84,13 +84,14 @@ class WebViewEnvironmentSettings {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows
-  WebViewEnvironmentSettings(
-      {this.additionalBrowserArguments,
-      this.allowSingleSignOnUsingOSPrimaryAccount,
-      this.browserExecutableFolder,
-      this.language,
-      this.targetCompatibleBrowserVersion,
-      this.userDataFolder});
+  WebViewEnvironmentSettings({
+    this.additionalBrowserArguments,
+    this.allowSingleSignOnUsingOSPrimaryAccount,
+    this.browserExecutableFolder,
+    this.language,
+    this.targetCompatibleBrowserVersion,
+    this.userDataFolder,
+  });
 
   ///Gets a possible [WebViewEnvironmentSettings] instance from a [Map] value.
   static WebViewEnvironmentSettings? fromMap(Map<String, dynamic>? map) {

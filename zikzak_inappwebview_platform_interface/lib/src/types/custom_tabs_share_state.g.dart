@@ -11,10 +11,11 @@ class CustomTabsShareState {
   final int _value;
   final int _nativeValue;
   const CustomTabsShareState._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory CustomTabsShareState._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      CustomTabsShareState._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => CustomTabsShareState._internal(value, nativeValue());
 
   ///Applies the default share settings depending on the browser.
   static const SHARE_STATE_DEFAULT = CustomTabsShareState._internal(0, 0);
@@ -36,8 +37,9 @@ class CustomTabsShareState {
   static CustomTabsShareState? fromValue(int? value) {
     if (value != null) {
       try {
-        return CustomTabsShareState.values
-            .firstWhere((element) => element.toValue() == value);
+        return CustomTabsShareState.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -49,8 +51,9 @@ class CustomTabsShareState {
   static CustomTabsShareState? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return CustomTabsShareState.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return CustomTabsShareState.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }

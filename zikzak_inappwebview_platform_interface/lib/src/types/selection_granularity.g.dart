@@ -11,10 +11,11 @@ class SelectionGranularity {
   final int _value;
   final int _nativeValue;
   const SelectionGranularity._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory SelectionGranularity._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      SelectionGranularity._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => SelectionGranularity._internal(value, nativeValue());
 
   ///Selection endpoints can be placed at any character boundary.
   static const CHARACTER = SelectionGranularity._internal(1, 1);
@@ -32,8 +33,9 @@ class SelectionGranularity {
   static SelectionGranularity? fromValue(int? value) {
     if (value != null) {
       try {
-        return SelectionGranularity.values
-            .firstWhere((element) => element.toValue() == value);
+        return SelectionGranularity.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -45,8 +47,9 @@ class SelectionGranularity {
   static SelectionGranularity? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return SelectionGranularity.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return SelectionGranularity.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }

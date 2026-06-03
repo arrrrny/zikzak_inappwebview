@@ -14,22 +14,29 @@ class URLProtectionSpaceHttpAuthCredentials {
 
   ///The protection space.
   URLProtectionSpace? protectionSpace;
-  URLProtectionSpaceHttpAuthCredentials(
-      {this.credentials, this.protectionSpace});
+  URLProtectionSpaceHttpAuthCredentials({
+    this.credentials,
+    this.protectionSpace,
+  });
 
   ///Gets a possible [URLProtectionSpaceHttpAuthCredentials] instance from a [Map] value.
   static URLProtectionSpaceHttpAuthCredentials? fromMap(
-      Map<String, dynamic>? map) {
+    Map<String, dynamic>? map,
+  ) {
     if (map == null) {
       return null;
     }
     final instance = URLProtectionSpaceHttpAuthCredentials(
       credentials: map['credentials'] != null
-          ? List<URLCredential>.from(map['credentials']
-              .map((e) => URLCredential.fromMap(e?.cast<String, dynamic>())!))
+          ? List<URLCredential>.from(
+              map['credentials'].map(
+                (e) => URLCredential.fromMap(e?.cast<String, dynamic>())!,
+              ),
+            )
           : null,
       protectionSpace: URLProtectionSpace.fromMap(
-          map['protectionSpace']?.cast<String, dynamic>()),
+        map['protectionSpace']?.cast<String, dynamic>(),
+      ),
     );
     return instance;
   }

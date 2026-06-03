@@ -30,10 +30,7 @@ class SslError {
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
-    return {
-      "code": code?.toNativeValue(),
-      "message": message,
-    };
+    return {"code": code?.toNativeValue(), "message": message};
   }
 
   ///Converts instance to a map.

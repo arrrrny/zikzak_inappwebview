@@ -11,10 +11,11 @@ class UnderlineStyle {
   final int _value;
   final int _nativeValue;
   const UnderlineStyle._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory UnderlineStyle._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      UnderlineStyle._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => UnderlineStyle._internal(value, nativeValue());
 
   ///Draw the line only beneath or through words, not whitespace.
   static const BY_WORD = UnderlineStyle._internal(32768, 32768);
@@ -60,8 +61,9 @@ class UnderlineStyle {
   static UnderlineStyle? fromValue(int? value) {
     if (value != null) {
       try {
-        return UnderlineStyle.values
-            .firstWhere((element) => element.toValue() == value);
+        return UnderlineStyle.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -73,8 +75,9 @@ class UnderlineStyle {
   static UnderlineStyle? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return UnderlineStyle.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return UnderlineStyle.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }

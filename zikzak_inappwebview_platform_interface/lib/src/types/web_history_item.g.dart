@@ -29,13 +29,14 @@ class WebHistoryItem {
 
   ///Url of this history item.
   WebUri? url;
-  WebHistoryItem(
-      {this.entryId,
-      this.index,
-      this.offset,
-      this.originalUrl,
-      this.title,
-      this.url});
+  WebHistoryItem({
+    this.entryId,
+    this.index,
+    this.offset,
+    this.originalUrl,
+    this.title,
+    this.url,
+  });
 
   ///Gets a possible [WebHistoryItem] instance from a [Map] value.
   static WebHistoryItem? fromMap(Map<String, dynamic>? map) {
@@ -46,8 +47,9 @@ class WebHistoryItem {
       entryId: map['entryId'],
       index: map['index'],
       offset: map['offset'],
-      originalUrl:
-          map['originalUrl'] != null ? WebUri(map['originalUrl']) : null,
+      originalUrl: map['originalUrl'] != null
+          ? WebUri(map['originalUrl'])
+          : null,
       title: map['title'],
       url: map['url'] != null ? WebUri(map['url']) : null,
     );

@@ -17,15 +17,18 @@ class ScrollBarStyle {
   final int _value;
   final int _nativeValue;
   const ScrollBarStyle._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory ScrollBarStyle._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      ScrollBarStyle._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => ScrollBarStyle._internal(value, nativeValue());
 
   ///The scrollbar style to display the scrollbars inside the padded area, increasing the padding of the view.
   ///The scrollbars will not overlap the content area of the view.
-  static const SCROLLBARS_INSIDE_INSET =
-      ScrollBarStyle._internal(16777216, 16777216);
+  static const SCROLLBARS_INSIDE_INSET = ScrollBarStyle._internal(
+    16777216,
+    16777216,
+  );
 
   ///The scrollbar style to display the scrollbars inside the content area, without increasing the padding.
   ///The scrollbars will be overlaid with translucency on the view's content.
@@ -33,13 +36,17 @@ class ScrollBarStyle {
 
   ///The scrollbar style to display the scrollbars at the edge of the view, increasing the padding of the view.
   ///The scrollbars will only overlap the background, if any.
-  static const SCROLLBARS_OUTSIDE_INSET =
-      ScrollBarStyle._internal(50331648, 50331648);
+  static const SCROLLBARS_OUTSIDE_INSET = ScrollBarStyle._internal(
+    50331648,
+    50331648,
+  );
 
   ///The scrollbar style to display the scrollbars at the edge of the view, without increasing the padding.
   ///The scrollbars will be overlaid with translucency.
-  static const SCROLLBARS_OUTSIDE_OVERLAY =
-      ScrollBarStyle._internal(33554432, 33554432);
+  static const SCROLLBARS_OUTSIDE_OVERLAY = ScrollBarStyle._internal(
+    33554432,
+    33554432,
+  );
 
   ///Set of all values of [ScrollBarStyle].
   static final Set<ScrollBarStyle> values = [
@@ -53,8 +60,9 @@ class ScrollBarStyle {
   static ScrollBarStyle? fromValue(int? value) {
     if (value != null) {
       try {
-        return ScrollBarStyle.values
-            .firstWhere((element) => element.toValue() == value);
+        return ScrollBarStyle.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -66,8 +74,9 @@ class ScrollBarStyle {
   static ScrollBarStyle? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return ScrollBarStyle.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return ScrollBarStyle.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }

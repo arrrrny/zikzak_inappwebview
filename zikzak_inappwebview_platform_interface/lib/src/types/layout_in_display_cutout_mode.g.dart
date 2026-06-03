@@ -11,10 +11,11 @@ class LayoutInDisplayCutoutMode {
   final int _value;
   final int _nativeValue;
   const LayoutInDisplayCutoutMode._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory LayoutInDisplayCutoutMode._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      LayoutInDisplayCutoutMode._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => LayoutInDisplayCutoutMode._internal(value, nativeValue());
 
   ///The window is always allowed to extend into the DisplayCutout areas on the all edges of the screen.
   ///
@@ -48,8 +49,9 @@ class LayoutInDisplayCutoutMode {
   static LayoutInDisplayCutoutMode? fromValue(int? value) {
     if (value != null) {
       try {
-        return LayoutInDisplayCutoutMode.values
-            .firstWhere((element) => element.toValue() == value);
+        return LayoutInDisplayCutoutMode.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -61,8 +63,9 @@ class LayoutInDisplayCutoutMode {
   static LayoutInDisplayCutoutMode? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return LayoutInDisplayCutoutMode.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return LayoutInDisplayCutoutMode.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
