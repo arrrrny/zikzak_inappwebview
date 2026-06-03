@@ -27,8 +27,7 @@ class FrameInfo {
       isMainFrame: map['isMainFrame'],
       request: URLRequest.fromMap(map['request']?.cast<String, dynamic>()),
       securityOrigin: SecurityOrigin.fromMap(
-        map['securityOrigin']?.cast<String, dynamic>(),
-      ),
+          map['securityOrigin']?.cast<String, dynamic>()),
     );
     return instance;
   }

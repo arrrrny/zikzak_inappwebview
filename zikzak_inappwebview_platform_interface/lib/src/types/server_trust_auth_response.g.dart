@@ -18,15 +18,16 @@ class ServerTrustAuthResponse {
       return null;
     }
     final instance = ServerTrustAuthResponse();
-    instance.action = ServerTrustAuthResponseAction.fromNativeValue(
-      map['action'],
-    );
+    instance.action =
+        ServerTrustAuthResponseAction.fromNativeValue(map['action']);
     return instance;
   }
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
-    return {"action": action?.toNativeValue()};
+    return {
+      "action": action?.toNativeValue(),
+    };
   }
 
   ///Converts instance to a map.

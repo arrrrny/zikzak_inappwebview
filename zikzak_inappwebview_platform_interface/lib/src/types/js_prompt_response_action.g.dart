@@ -11,11 +11,10 @@ class JsPromptResponseAction {
   final int _value;
   final int _nativeValue;
   const JsPromptResponseAction._internal(this._value, this._nativeValue);
-  // ignore: unused_element
+// ignore: unused_element
   factory JsPromptResponseAction._internalMultiPlatform(
-    int value,
-    Function nativeValue,
-  ) => JsPromptResponseAction._internal(value, nativeValue());
+          int value, Function nativeValue) =>
+      JsPromptResponseAction._internal(value, nativeValue());
 
   ///Confirm that the user hit cancel button.
   static const CANCEL = JsPromptResponseAction._internal(1, 1);
@@ -33,9 +32,8 @@ class JsPromptResponseAction {
   static JsPromptResponseAction? fromValue(int? value) {
     if (value != null) {
       try {
-        return JsPromptResponseAction.values.firstWhere(
-          (element) => element.toValue() == value,
-        );
+        return JsPromptResponseAction.values
+            .firstWhere((element) => element.toValue() == value);
       } catch (e) {
         return null;
       }
@@ -47,9 +45,8 @@ class JsPromptResponseAction {
   static JsPromptResponseAction? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return JsPromptResponseAction.values.firstWhere(
-          (element) => element.toNativeValue() == value,
-        );
+        return JsPromptResponseAction.values
+            .firstWhere((element) => element.toNativeValue() == value);
       } catch (e) {
         return null;
       }

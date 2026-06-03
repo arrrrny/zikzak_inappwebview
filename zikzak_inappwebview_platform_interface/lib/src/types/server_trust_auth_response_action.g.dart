@@ -11,11 +11,10 @@ class ServerTrustAuthResponseAction {
   final int _value;
   final int _nativeValue;
   const ServerTrustAuthResponseAction._internal(this._value, this._nativeValue);
-  // ignore: unused_element
+// ignore: unused_element
   factory ServerTrustAuthResponseAction._internalMultiPlatform(
-    int value,
-    Function nativeValue,
-  ) => ServerTrustAuthResponseAction._internal(value, nativeValue());
+          int value, Function nativeValue) =>
+      ServerTrustAuthResponseAction._internal(value, nativeValue());
 
   ///Instructs the WebView to cancel the authentication challenge.
   static const CANCEL = ServerTrustAuthResponseAction._internal(0, 0);
@@ -33,9 +32,8 @@ class ServerTrustAuthResponseAction {
   static ServerTrustAuthResponseAction? fromValue(int? value) {
     if (value != null) {
       try {
-        return ServerTrustAuthResponseAction.values.firstWhere(
-          (element) => element.toValue() == value,
-        );
+        return ServerTrustAuthResponseAction.values
+            .firstWhere((element) => element.toValue() == value);
       } catch (e) {
         return null;
       }
@@ -47,9 +45,8 @@ class ServerTrustAuthResponseAction {
   static ServerTrustAuthResponseAction? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return ServerTrustAuthResponseAction.values.firstWhere(
-          (element) => element.toNativeValue() == value,
-        );
+        return ServerTrustAuthResponseAction.values
+            .firstWhere((element) => element.toNativeValue() == value);
       } catch (e) {
         return null;
       }

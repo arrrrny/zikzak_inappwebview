@@ -12,11 +12,10 @@ class NavigationResponseAction {
   final int _value;
   final int _nativeValue;
   const NavigationResponseAction._internal(this._value, this._nativeValue);
-  // ignore: unused_element
+// ignore: unused_element
   factory NavigationResponseAction._internalMultiPlatform(
-    int value,
-    Function nativeValue,
-  ) => NavigationResponseAction._internal(value, nativeValue());
+          int value, Function nativeValue) =>
+      NavigationResponseAction._internal(value, nativeValue());
 
   ///Allow the navigation to continue.
   static const ALLOW = NavigationResponseAction._internal(1, 1);
@@ -40,9 +39,8 @@ class NavigationResponseAction {
   static NavigationResponseAction? fromValue(int? value) {
     if (value != null) {
       try {
-        return NavigationResponseAction.values.firstWhere(
-          (element) => element.toValue() == value,
-        );
+        return NavigationResponseAction.values
+            .firstWhere((element) => element.toValue() == value);
       } catch (e) {
         return null;
       }
@@ -54,9 +52,8 @@ class NavigationResponseAction {
   static NavigationResponseAction? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return NavigationResponseAction.values.firstWhere(
-          (element) => element.toNativeValue() == value,
-        );
+        return NavigationResponseAction.values
+            .firstWhere((element) => element.toNativeValue() == value);
       } catch (e) {
         return null;
       }

@@ -11,11 +11,10 @@ class WebsiteDataType {
   final String _value;
   final String _nativeValue;
   const WebsiteDataType._internal(this._value, this._nativeValue);
-  // ignore: unused_element
+// ignore: unused_element
   factory WebsiteDataType._internalMultiPlatform(
-    String value,
-    Function nativeValue,
-  ) => WebsiteDataType._internal(value, nativeValue());
+          String value, Function nativeValue) =>
+      WebsiteDataType._internal(value, nativeValue());
 
   ///Returns a set of all available website data types.
   static final ALL = [
@@ -28,74 +27,55 @@ class WebsiteDataType {
     WebsiteDataType.WKWebsiteDataTypeLocalStorage,
     WebsiteDataType.WKWebsiteDataTypeWebSQLDatabases,
     WebsiteDataType.WKWebsiteDataTypeIndexedDBDatabases,
-    WebsiteDataType.WKWebsiteDataTypeServiceWorkerRegistrations,
+    WebsiteDataType.WKWebsiteDataTypeServiceWorkerRegistrations
   ].toSet();
 
   ///Cookies.
   static const WKWebsiteDataTypeCookies = WebsiteDataType._internal(
-    'WKWebsiteDataTypeCookies',
-    'WKWebsiteDataTypeCookies',
-  );
+      'WKWebsiteDataTypeCookies', 'WKWebsiteDataTypeCookies');
 
   ///On-disk caches.
   static const WKWebsiteDataTypeDiskCache = WebsiteDataType._internal(
-    'WKWebsiteDataTypeDiskCache',
-    'WKWebsiteDataTypeDiskCache',
-  );
+      'WKWebsiteDataTypeDiskCache', 'WKWebsiteDataTypeDiskCache');
 
   ///On-disk Fetch caches.
   ///
   ///**NOTE**: available on iOS 11.3+.
   static const WKWebsiteDataTypeFetchCache = WebsiteDataType._internal(
-    'WKWebsiteDataTypeFetchCache',
-    'WKWebsiteDataTypeFetchCache',
-  );
+      'WKWebsiteDataTypeFetchCache', 'WKWebsiteDataTypeFetchCache');
 
   ///IndexedDB databases.
   static const WKWebsiteDataTypeIndexedDBDatabases = WebsiteDataType._internal(
-    'WKWebsiteDataTypeIndexedDBDatabases',
-    'WKWebsiteDataTypeIndexedDBDatabases',
-  );
+      'WKWebsiteDataTypeIndexedDBDatabases',
+      'WKWebsiteDataTypeIndexedDBDatabases');
 
   ///HTML local storage.
   static const WKWebsiteDataTypeLocalStorage = WebsiteDataType._internal(
-    'WKWebsiteDataTypeLocalStorage',
-    'WKWebsiteDataTypeLocalStorage',
-  );
+      'WKWebsiteDataTypeLocalStorage', 'WKWebsiteDataTypeLocalStorage');
 
   ///In-memory caches.
   static const WKWebsiteDataTypeMemoryCache = WebsiteDataType._internal(
-    'WKWebsiteDataTypeMemoryCache',
-    'WKWebsiteDataTypeMemoryCache',
-  );
+      'WKWebsiteDataTypeMemoryCache', 'WKWebsiteDataTypeMemoryCache');
 
   ///HTML offline web application caches.
   static const WKWebsiteDataTypeOfflineWebApplicationCache =
-      WebsiteDataType._internal(
-        'WKWebsiteDataTypeOfflineWebApplicationCache',
-        'WKWebsiteDataTypeOfflineWebApplicationCache',
-      );
+      WebsiteDataType._internal('WKWebsiteDataTypeOfflineWebApplicationCache',
+          'WKWebsiteDataTypeOfflineWebApplicationCache');
 
   ///Service worker registrations.
   ///
   ///**NOTE**: available on iOS 11.3+.
   static const WKWebsiteDataTypeServiceWorkerRegistrations =
-      WebsiteDataType._internal(
-        'WKWebsiteDataTypeServiceWorkerRegistrations',
-        'WKWebsiteDataTypeServiceWorkerRegistrations',
-      );
+      WebsiteDataType._internal('WKWebsiteDataTypeServiceWorkerRegistrations',
+          'WKWebsiteDataTypeServiceWorkerRegistrations');
 
   ///HTML session storage.
   static const WKWebsiteDataTypeSessionStorage = WebsiteDataType._internal(
-    'WKWebsiteDataTypeSessionStorage',
-    'WKWebsiteDataTypeSessionStorage',
-  );
+      'WKWebsiteDataTypeSessionStorage', 'WKWebsiteDataTypeSessionStorage');
 
   ///WebSQL databases.
   static const WKWebsiteDataTypeWebSQLDatabases = WebsiteDataType._internal(
-    'WKWebsiteDataTypeWebSQLDatabases',
-    'WKWebsiteDataTypeWebSQLDatabases',
-  );
+      'WKWebsiteDataTypeWebSQLDatabases', 'WKWebsiteDataTypeWebSQLDatabases');
 
   ///Set of all values of [WebsiteDataType].
   static final Set<WebsiteDataType> values = [
@@ -115,9 +95,8 @@ class WebsiteDataType {
   static WebsiteDataType? fromValue(String? value) {
     if (value != null) {
       try {
-        return WebsiteDataType.values.firstWhere(
-          (element) => element.toValue() == value,
-        );
+        return WebsiteDataType.values
+            .firstWhere((element) => element.toValue() == value);
       } catch (e) {
         return null;
       }
@@ -129,9 +108,8 @@ class WebsiteDataType {
   static WebsiteDataType? fromNativeValue(String? value) {
     if (value != null) {
       try {
-        return WebsiteDataType.values.firstWhere(
-          (element) => element.toNativeValue() == value,
-        );
+        return WebsiteDataType.values
+            .firstWhere((element) => element.toNativeValue() == value);
       } catch (e) {
         return null;
       }

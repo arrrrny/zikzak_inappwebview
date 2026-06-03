@@ -11,11 +11,10 @@ class FormResubmissionAction {
   final int _value;
   final int _nativeValue;
   const FormResubmissionAction._internal(this._value, this._nativeValue);
-  // ignore: unused_element
+// ignore: unused_element
   factory FormResubmissionAction._internalMultiPlatform(
-    int value,
-    Function nativeValue,
-  ) => FormResubmissionAction._internal(value, nativeValue());
+          int value, Function nativeValue) =>
+      FormResubmissionAction._internal(value, nativeValue());
 
   ///Don't resend data
   static const DONT_RESEND = FormResubmissionAction._internal(1, 1);
@@ -33,9 +32,8 @@ class FormResubmissionAction {
   static FormResubmissionAction? fromValue(int? value) {
     if (value != null) {
       try {
-        return FormResubmissionAction.values.firstWhere(
-          (element) => element.toValue() == value,
-        );
+        return FormResubmissionAction.values
+            .firstWhere((element) => element.toValue() == value);
       } catch (e) {
         return null;
       }
@@ -47,9 +45,8 @@ class FormResubmissionAction {
   static FormResubmissionAction? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return FormResubmissionAction.values.firstWhere(
-          (element) => element.toNativeValue() == value,
-        );
+        return FormResubmissionAction.values
+            .firstWhere((element) => element.toNativeValue() == value);
       } catch (e) {
         return null;
       }

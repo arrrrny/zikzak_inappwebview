@@ -19,7 +19,9 @@ class TrustedWebActivityDefaultDisplayMode
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
-    return {..._toMapMergeWith()};
+    return {
+      ..._toMapMergeWith(),
+    };
   }
 
   ///Converts instance to a map.

@@ -16,11 +16,8 @@ class SecurityOrigin {
 
   ///The security origin's protocol.
   String protocol;
-  SecurityOrigin({
-    required this.host,
-    required this.port,
-    required this.protocol,
-  });
+  SecurityOrigin(
+      {required this.host, required this.port, required this.protocol});
 
   ///Gets a possible [SecurityOrigin] instance from a [Map] value.
   static SecurityOrigin? fromMap(Map<String, dynamic>? map) {
@@ -37,7 +34,11 @@ class SecurityOrigin {
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
-    return {"host": host, "port": port, "protocol": protocol};
+    return {
+      "host": host,
+      "port": port,
+      "protocol": protocol,
+    };
   }
 
   ///Converts instance to a map.

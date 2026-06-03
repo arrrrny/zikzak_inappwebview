@@ -275,6 +275,16 @@ class WebViewFeature_ {
     "VISUAL_STATE_CALLBACK",
   );
 
+  ///Feature for [isFeatureSupported]. This feature covers [InAppWebViewSettings.webAuthenticationSupport].
+  static const WEB_AUTHENTICATION = const WebViewFeature_._internal(
+    "WEB_AUTHENTICATION",
+  );
+
+  ///Feature for [isFeatureSupported]. This feature covers [InAppWebViewSettings.paymentRequestEnabled].
+  static const PAYMENT_REQUEST = const WebViewFeature_._internal(
+    "PAYMENT_REQUEST",
+  );
+
   ///
   static const WEB_MESSAGE_CALLBACK_ON_MESSAGE =
       const WebViewFeature_._internal("WEB_MESSAGE_CALLBACK_ON_MESSAGE");

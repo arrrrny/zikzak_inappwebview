@@ -19,12 +19,11 @@ class InAppWebViewRect {
 
   ///y position
   double y;
-  InAppWebViewRect({
-    required this.x,
-    required this.y,
-    required this.width,
-    required this.height,
-  }) {
+  InAppWebViewRect(
+      {required this.x,
+      required this.y,
+      required this.width,
+      required this.height}) {
     assert(this.x >= 0 && this.y >= 0 && this.width >= 0 && this.height >= 0);
   }
 
@@ -44,7 +43,12 @@ class InAppWebViewRect {
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
-    return {"height": height, "width": width, "x": x, "y": y};
+    return {
+      "height": height,
+      "width": width,
+      "x": x,
+      "y": y,
+    };
   }
 
   ///Converts instance to a map.

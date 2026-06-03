@@ -28,6 +28,7 @@ import '../types/scrollview_deceleration_rate.dart';
 import '../types/selection_granularity.dart';
 import '../types/user_preferred_content_mode.dart';
 import '../types/vertical_scrollbar_position.dart';
+import '../types/web_authentication_support.dart';
 import '../util.dart';
 import '../web_uri.dart';
 import 'platform_webview.dart';
@@ -1168,6 +1169,34 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   )
   bool? algorithmicDarkeningAllowed;
 
+  ///Enable Payment Request API in order to use Google Pay inside the WebView.
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
+        apiName: "WebSettingsCompat.setPaymentRequestEnabled",
+        apiUrl:
+            "https://developer.android.com/reference/androidx/webkit/WebSettingsCompat#setPaymentRequestEnabled(android.webkit.WebSettings,boolean)",
+        note:
+            "available on Android only if [WebViewFeature.PAYMENT_REQUEST] feature is supported.",
+      ),
+    ],
+  )
+  bool? paymentRequestEnabled;
+
+  ///Sets the Web Authentication support level for the WebView. The default value is [WebAuthenticationSupport.NONE].
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
+        apiName: "WebSettingsCompat.setWebAuthenticationSupport",
+        apiUrl:
+            "https://developer.android.com/reference/androidx/webkit/WebSettingsCompat#setWebAuthenticationSupport(android.webkit.WebSettings,int)",
+        note:
+            "available on Android only if [WebViewFeature.WEB_AUTHENTICATION] feature is supported.",
+      ),
+    ],
+  )
+  WebAuthenticationSupport_? webAuthenticationSupport;
+
   ///Sets whether EnterpriseAuthenticationAppLinkPolicy if set by admin is allowed to have any
   ///effect on WebView.
   ///
@@ -2089,6 +2118,8 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.horizontalScrollbarThumbColor,
     this.horizontalScrollbarTrackColor,
     this.algorithmicDarkeningAllowed = false,
+    this.paymentRequestEnabled,
+    this.webAuthenticationSupport,
     this.enterpriseAuthenticationAppLinkPolicyEnabled = true,
     this.defaultVideoPoster,
     this.requestedWithHeaderOriginAllowList,

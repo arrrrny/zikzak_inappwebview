@@ -12,11 +12,10 @@ class OverScrollMode {
   final int _value;
   final int _nativeValue;
   const OverScrollMode._internal(this._value, this._nativeValue);
-  // ignore: unused_element
+// ignore: unused_element
   factory OverScrollMode._internalMultiPlatform(
-    int value,
-    Function nativeValue,
-  ) => OverScrollMode._internal(value, nativeValue());
+          int value, Function nativeValue) =>
+      OverScrollMode._internal(value, nativeValue());
 
   ///Always allow a user to over-scroll this view, provided it is a view that can scroll.
   static const ALWAYS = OverScrollMode._internal(0, 0);
@@ -38,9 +37,8 @@ class OverScrollMode {
   static OverScrollMode? fromValue(int? value) {
     if (value != null) {
       try {
-        return OverScrollMode.values.firstWhere(
-          (element) => element.toValue() == value,
-        );
+        return OverScrollMode.values
+            .firstWhere((element) => element.toValue() == value);
       } catch (e) {
         return null;
       }
@@ -52,9 +50,8 @@ class OverScrollMode {
   static OverScrollMode? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return OverScrollMode.values.firstWhere(
-          (element) => element.toNativeValue() == value,
-        );
+        return OverScrollMode.values
+            .firstWhere((element) => element.toNativeValue() == value);
       } catch (e) {
         return null;
       }

@@ -11,11 +11,10 @@ class SafeBrowsingResponseAction {
   final int _value;
   final int _nativeValue;
   const SafeBrowsingResponseAction._internal(this._value, this._nativeValue);
-  // ignore: unused_element
+// ignore: unused_element
   factory SafeBrowsingResponseAction._internalMultiPlatform(
-    int value,
-    Function nativeValue,
-  ) => SafeBrowsingResponseAction._internal(value, nativeValue());
+          int value, Function nativeValue) =>
+      SafeBrowsingResponseAction._internal(value, nativeValue());
 
   ///Act as if the user clicked the "back to safety" button.
   static const BACK_TO_SAFETY = SafeBrowsingResponseAction._internal(0, 0);
@@ -37,9 +36,8 @@ class SafeBrowsingResponseAction {
   static SafeBrowsingResponseAction? fromValue(int? value) {
     if (value != null) {
       try {
-        return SafeBrowsingResponseAction.values.firstWhere(
-          (element) => element.toValue() == value,
-        );
+        return SafeBrowsingResponseAction.values
+            .firstWhere((element) => element.toValue() == value);
       } catch (e) {
         return null;
       }
@@ -51,9 +49,8 @@ class SafeBrowsingResponseAction {
   static SafeBrowsingResponseAction? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return SafeBrowsingResponseAction.values.firstWhere(
-          (element) => element.toNativeValue() == value,
-        );
+        return SafeBrowsingResponseAction.values
+            .firstWhere((element) => element.toNativeValue() == value);
       } catch (e) {
         return null;
       }

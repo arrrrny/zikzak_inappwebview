@@ -74,27 +74,26 @@ class AjaxRequest {
   ///Setting withCredentials has no effect on same-site requests.
   ///In addition, this flag is also used to indicate when cookies are to be ignored in the response. The default is false.
   bool? withCredentials;
-  AjaxRequest({
-    this.action = AjaxRequestAction.PROCEED,
-    this.data,
-    this.event,
-    this.headers,
-    this.isAsync,
-    this.method,
-    this.password,
-    this.readyState,
-    this.response,
-    this.responseHeaders,
-    this.responseText,
-    this.responseType,
-    this.responseURL,
-    this.responseXML,
-    this.status,
-    this.statusText,
-    this.url,
-    this.user,
-    this.withCredentials,
-  });
+  AjaxRequest(
+      {this.action = AjaxRequestAction.PROCEED,
+      this.data,
+      this.event,
+      this.headers,
+      this.isAsync,
+      this.method,
+      this.password,
+      this.readyState,
+      this.response,
+      this.responseHeaders,
+      this.responseText,
+      this.responseType,
+      this.responseURL,
+      this.responseXML,
+      this.status,
+      this.statusText,
+      this.url,
+      this.user,
+      this.withCredentials});
 
   ///Gets a possible [AjaxRequest] instance from a [Map] value.
   static AjaxRequest? fromMap(Map<String, dynamic>? map) {
@@ -104,9 +103,8 @@ class AjaxRequest {
     final instance = AjaxRequest(
       data: map['data'],
       event: AjaxRequestEvent.fromMap(map['event']?.cast<String, dynamic>()),
-      headers: AjaxRequestHeaders.fromMap(
-        map['headers']?.cast<String, dynamic>(),
-      ),
+      headers:
+          AjaxRequestHeaders.fromMap(map['headers']?.cast<String, dynamic>()),
       isAsync: map['isAsync'],
       method: map['method'],
       password: map['password'],
@@ -115,9 +113,8 @@ class AjaxRequest {
       responseHeaders: map['responseHeaders']?.cast<String, dynamic>(),
       responseText: map['responseText'],
       responseType: map['responseType'],
-      responseURL: map['responseURL'] != null
-          ? WebUri(map['responseURL'])
-          : null,
+      responseURL:
+          map['responseURL'] != null ? WebUri(map['responseURL']) : null,
       responseXML: map['responseXML'],
       status: map['status'],
       statusText: map['statusText'],

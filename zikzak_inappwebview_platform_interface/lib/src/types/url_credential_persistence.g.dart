@@ -11,11 +11,10 @@ class URLCredentialPersistence {
   final int _value;
   final int _nativeValue;
   const URLCredentialPersistence._internal(this._value, this._nativeValue);
-  // ignore: unused_element
+// ignore: unused_element
   factory URLCredentialPersistence._internalMultiPlatform(
-    int value,
-    Function nativeValue,
-  ) => URLCredentialPersistence._internal(value, nativeValue());
+          int value, Function nativeValue) =>
+      URLCredentialPersistence._internal(value, nativeValue());
 
   ///The credential should be stored only for this session
   static const FOR_SESSION = URLCredentialPersistence._internal(1, 1);
@@ -42,9 +41,8 @@ class URLCredentialPersistence {
   static URLCredentialPersistence? fromValue(int? value) {
     if (value != null) {
       try {
-        return URLCredentialPersistence.values.firstWhere(
-          (element) => element.toValue() == value,
-        );
+        return URLCredentialPersistence.values
+            .firstWhere((element) => element.toValue() == value);
       } catch (e) {
         return null;
       }
@@ -56,9 +54,8 @@ class URLCredentialPersistence {
   static URLCredentialPersistence? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return URLCredentialPersistence.values.firstWhere(
-          (element) => element.toNativeValue() == value,
-        );
+        return URLCredentialPersistence.values
+            .firstWhere((element) => element.toNativeValue() == value);
       } catch (e) {
         return null;
       }

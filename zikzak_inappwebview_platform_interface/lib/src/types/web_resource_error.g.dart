@@ -29,7 +29,10 @@ class WebResourceError {
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
-    return {"description": description, "type": type.toNativeValue()};
+    return {
+      "description": description,
+      "type": type.toNativeValue(),
+    };
   }
 
   ///Converts instance to a map.

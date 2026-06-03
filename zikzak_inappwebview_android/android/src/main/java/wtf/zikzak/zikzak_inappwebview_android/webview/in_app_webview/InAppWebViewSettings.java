@@ -138,6 +138,9 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
     public String horizontalScrollbarTrackColor;
 
     public Boolean algorithmicDarkeningAllowed = false;
+    public Boolean paymentRequestEnabled = false;
+    @Nullable
+    public Integer webAuthenticationSupport = null;
     public Boolean enterpriseAuthenticationAppLinkPolicyEnabled = true;
 
     @Nullable
@@ -421,6 +424,12 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
                 case "algorithmicDarkeningAllowed":
                     algorithmicDarkeningAllowed = (Boolean) value;
                     break;
+                case "paymentRequestEnabled":
+                    paymentRequestEnabled = (Boolean) value;
+                    break;
+                case "webAuthenticationSupport":
+                    webAuthenticationSupport = (Integer) value;
+                    break;
                 case "enterpriseAuthenticationAppLinkPolicyEnabled":
                     enterpriseAuthenticationAppLinkPolicyEnabled =
                         (Boolean) value;
@@ -593,6 +602,14 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
         settings.put(
             "algorithmicDarkeningAllowed",
             algorithmicDarkeningAllowed
+        );
+        settings.put(
+            "paymentRequestEnabled",
+            paymentRequestEnabled
+        );
+        settings.put(
+            "webAuthenticationSupport",
+            webAuthenticationSupport
         );
         settings.put(
             "enterpriseAuthenticationAppLinkPolicyEnabled",
@@ -900,6 +917,26 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
                 realSettings.put(
                     "algorithmicDarkeningAllowed",
                     WebSettingsCompat.isAlgorithmicDarkeningAllowed(settings)
+                );
+            }
+            if (
+                WebViewFeature.isFeatureSupported(
+                    WebViewFeature.PAYMENT_REQUEST
+                )
+            ) {
+                realSettings.put(
+                    "paymentRequestEnabled",
+                    WebSettingsCompat.getPaymentRequestEnabled(settings)
+                );
+            }
+            if (
+                WebViewFeature.isFeatureSupported(
+                    WebViewFeature.WEB_AUTHENTICATION
+                )
+            ) {
+                realSettings.put(
+                    "webAuthenticationSupport",
+                    WebSettingsCompat.getWebAuthenticationSupport(settings)
                 );
             }
             if (

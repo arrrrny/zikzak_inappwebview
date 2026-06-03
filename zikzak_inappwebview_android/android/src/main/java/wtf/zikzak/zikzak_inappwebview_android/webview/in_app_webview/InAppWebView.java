@@ -694,6 +694,15 @@ public final class InAppWebView
             );
         }
 
+        if (customSettings.paymentRequestEnabled != null && WebViewFeature.isFeatureSupported(WebViewFeature.PAYMENT_REQUEST)) {
+          WebSettingsCompat.setPaymentRequestEnabled(settings, customSettings.paymentRequestEnabled);
+        }
+
+        if (customSettings.webAuthenticationSupport != null &&
+                WebViewFeature.isFeatureSupported(WebViewFeature.WEB_AUTHENTICATION)) {
+          WebSettingsCompat.setWebAuthenticationSupport(settings, customSettings.webAuthenticationSupport);
+        }
+
         contentBlockerHandler.getRuleList().clear();
         for (Map<
             String,
@@ -2083,6 +2092,18 @@ public final class InAppWebView
                 settings,
                 newCustomSettings.requestedWithHeaderOriginAllowList
             );
+        }
+
+        if (newSettingsMap.get("paymentRequestEnabled") != null &&
+                customSettings.paymentRequestEnabled != newCustomSettings.paymentRequestEnabled &&
+                WebViewFeature.isFeatureSupported(WebViewFeature.PAYMENT_REQUEST)) {
+            WebSettingsCompat.setPaymentRequestEnabled(settings, newCustomSettings.paymentRequestEnabled);
+        }
+
+        if (newSettingsMap.get("webAuthenticationSupport") != null &&
+                !Util.objEquals(customSettings.webAuthenticationSupport, newCustomSettings.webAuthenticationSupport) &&
+                WebViewFeature.isFeatureSupported(WebViewFeature.WEB_AUTHENTICATION)) {
+            WebSettingsCompat.setWebAuthenticationSupport(settings, newCustomSettings.webAuthenticationSupport);
         }
 
 /*

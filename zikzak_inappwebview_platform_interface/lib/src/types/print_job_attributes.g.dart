@@ -14,7 +14,7 @@ class PrintJobAttributes {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- MacOS
-  PrintJobColorMode? colorMode;
+  InvalidType colorMode;
 
   ///If `true`, produce detailed reports when an error occurs.
   ///
@@ -24,17 +24,25 @@ class PrintJobAttributes {
 
   ///The duplex mode to use for the print job.
   ///
+  ///**NOTE for Android native WebView**: available only on Android 23+.
+  ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView 23+
+  ///- Android native WebView
   ///- iOS
   ///- MacOS
-  PrintJobDuplexMode? duplex;
+  InvalidType duplexMode;
 
   ///A fax number.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   String? faxNumber;
+
+  ///An integer value that specifies the first page in the print job.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- MacOS
+  int? firstPage;
 
   ///The height of the page footer.
   ///
@@ -46,6 +54,7 @@ class PrintJobAttributes {
   double? footerHeight;
 
   ///If `true`, a standard header and footer are added outside the margins of each page.
+  ///The default value is `true`.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
@@ -64,21 +73,17 @@ class PrintJobAttributes {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
-  PrintJobPaginationMode? horizontalPagination;
+  InvalidType horizontalPagination;
 
   ///Indicates whether the image is centered horizontally.
+  ///The default value is `true`.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   bool? isHorizontallyCentered;
 
-  ///Indicates whether only the currently selected contents should be printed.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
-  bool? isSelectionOnly;
-
   ///Indicates whether the image is centered vertically.
+  ///The default value is `true`.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
@@ -88,7 +93,7 @@ class PrintJobAttributes {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
-  PrintJobDisposition? jobDisposition;
+  InvalidType jobDisposition;
 
   ///An URL containing the location to which the job file will be saved when the [jobDisposition] is [PrintJobDisposition.SAVE].
   ///
@@ -96,237 +101,153 @@ class PrintJobAttributes {
   ///- MacOS
   WebUri? jobSavingURL;
 
-  ///The human-readable name of the currently selected paper size, suitable for presentation in user interfaces.
+  ///An integer value that specifies the last page in the print job.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- MacOS
+  int? lastPage;
+
+  ///The name of the currently selected paper size, suitable for presenting in a user interface.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   String? localizedPaperName;
 
-  ///The margins for each printed page.
-  ///Margins define the white space around the content where the left margin defines
-  ///the amount of white space on the left of the content and so on.
+  ///The margins for the printed content.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
   EdgeInsets? margins;
 
-  ///The maximum height of the content area.
-  ///
-  ///The Print Formatter uses this value to determine where the content rectangle begins on the first page.
-  ///It compares the value of this property with the printing rectangle’s height minus the header and footer heights and
-  ///the top inset value; it uses the lower of the two values.
-  ///The default value of this property is the maximum float value.
+  ///The maximum height of the content.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
+  ///- MacOS
   double? maximumContentHeight;
 
-  ///The maximum width of the content area.
-  ///
-  ///The Print Formatter uses this value to determine the maximum width of the content rectangle.
-  ///It compares the value of this property with the printing rectangle’s width minus the left and right inset values and uses the lower of the two.
-  ///The default value of this property is the maximum float value.
+  ///The maximum width of the content.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
+  ///- MacOS
   double? maximumContentWidth;
 
   ///The media size.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
-  PrintJobMediaSize? mediaSize;
-
-  ///If `true`, collates output.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
-  bool? mustCollate;
+  InvalidType mediaSize;
 
   ///The orientation of the printed content, portrait or landscape.
-  PrintJobOrientation? orientation;
-
-  ///The number of logical pages to be tiled horizontally on a physical sheet of paper.
   ///
   ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
   ///- MacOS
-  int? pagesAcross;
+  InvalidType orientation;
 
-  ///The number of logical pages to be tiled vertically on a physical sheet of paper.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
-  int? pagesDown;
-
-  ///The name of the currently selected paper size.
+  ///The kind of paper used for the print job.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   String? paperName;
 
-  ///The size of the paper used for printing.
+  ///The size and position of the paper.
   ///
-  ///The value of this property is a rectangle that defines the size of paper chosen for the print job.
-  ///The origin is always (0,0).
+  ///The value of this property is a rectangle that defines the size and position of the paper.
+  ///The origin is (0,0).
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
   ///- MacOS
-  InAppWebViewRect? paperRect;
+  InvalidType paperRect;
 
   ///The area in which printing can occur.
   ///
   ///The value of this property is a rectangle that defines the area in which the printer can print content.
-  ///Sometimes this is referred to as the imageable area of the paper.
+  ///Sometimes this area is smaller than the [paperRect].
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
   ///- MacOS
-  InAppWebViewRect? printableRect;
+  InvalidType printableRect;
 
   ///The supported resolution in DPI (dots per inch).
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
-  PrintJobResolution? resolution;
+  ///- MacOS
+  InvalidType resolution;
 
-  ///The current scaling factor.
+  ///The vertical pagination mode.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
-  double? scalingFactor;
-
-  ///A timestamp that specifies the time at which printing should begin.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
-  int? time;
-
-  ///The vertical pagination to the specified mode.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
-  PrintJobPaginationMode? verticalPagination;
-  PrintJobAttributes({
-    this.colorMode,
-    this.detailedErrorReporting,
-    this.duplex,
-    this.faxNumber,
-    this.footerHeight,
-    this.headerAndFooter,
-    this.headerHeight,
-    this.horizontalPagination,
-    this.isHorizontallyCentered,
-    this.isSelectionOnly,
-    this.isVerticallyCentered,
-    this.jobDisposition,
-    this.jobSavingURL,
-    this.localizedPaperName,
-    this.margins,
-    this.maximumContentHeight,
-    this.maximumContentWidth,
-    this.mediaSize,
-    this.mustCollate,
-    this.orientation,
-    this.pagesAcross,
-    this.pagesDown,
-    this.paperName,
-    this.paperRect,
-    this.printableRect,
-    this.resolution,
-    this.scalingFactor,
-    this.time,
-    this.verticalPagination,
-  });
+  InvalidType verticalPagination;
+  PrintJobAttributes();
 
   ///Gets a possible [PrintJobAttributes] instance from a [Map] value.
   static PrintJobAttributes? fromMap(Map<String, dynamic>? map) {
     if (map == null) {
       return null;
     }
-    final instance = PrintJobAttributes(
-      colorMode: PrintJobColorMode.fromNativeValue(map['colorMode']),
-      detailedErrorReporting: map['detailedErrorReporting'],
-      duplex: PrintJobDuplexMode.fromNativeValue(map['duplex']),
-      faxNumber: map['faxNumber'],
-      footerHeight: map['footerHeight'],
-      headerAndFooter: map['headerAndFooter'],
-      headerHeight: map['headerHeight'],
-      horizontalPagination: PrintJobPaginationMode.fromNativeValue(
-        map['horizontalPagination'],
-      ),
-      isHorizontallyCentered: map['isHorizontallyCentered'],
-      isSelectionOnly: map['isSelectionOnly'],
-      isVerticallyCentered: map['isVerticallyCentered'],
-      jobDisposition: PrintJobDisposition.fromNativeValue(
-        map['jobDisposition'],
-      ),
-      jobSavingURL: map['jobSavingURL'] != null
-          ? WebUri(map['jobSavingURL'])
-          : null,
-      localizedPaperName: map['localizedPaperName'],
-      margins: MapEdgeInsets.fromMap(map['margins']?.cast<String, dynamic>()),
-      maximumContentHeight: map['maximumContentHeight'],
-      maximumContentWidth: map['maximumContentWidth'],
-      mediaSize: PrintJobMediaSize.fromMap(
-        map['mediaSize']?.cast<String, dynamic>(),
-      ),
-      mustCollate: map['mustCollate'],
-      orientation: PrintJobOrientation.fromNativeValue(map['orientation']),
-      pagesAcross: map['pagesAcross'],
-      pagesDown: map['pagesDown'],
-      paperName: map['paperName'],
-      paperRect: InAppWebViewRect.fromMap(
-        map['paperRect']?.cast<String, dynamic>(),
-      ),
-      printableRect: InAppWebViewRect.fromMap(
-        map['printableRect']?.cast<String, dynamic>(),
-      ),
-      resolution: PrintJobResolution.fromMap(
-        map['resolution']?.cast<String, dynamic>(),
-      ),
-      scalingFactor: map['scalingFactor'],
-      time: map['time'],
-      verticalPagination: PrintJobPaginationMode.fromNativeValue(
-        map['verticalPagination'],
-      ),
-    );
+    final instance = PrintJobAttributes();
+    instance.colorMode = map['colorMode'];
+    instance.detailedErrorReporting = map['detailedErrorReporting'];
+    instance.duplexMode = map['duplexMode'];
+    instance.faxNumber = map['faxNumber'];
+    instance.firstPage = map['firstPage'];
+    instance.footerHeight = map['footerHeight'];
+    instance.headerAndFooter = map['headerAndFooter'];
+    instance.headerHeight = map['headerHeight'];
+    instance.horizontalPagination = map['horizontalPagination'];
+    instance.isHorizontallyCentered = map['isHorizontallyCentered'];
+    instance.isVerticallyCentered = map['isVerticallyCentered'];
+    instance.jobDisposition = map['jobDisposition'];
+    instance.jobSavingURL =
+        map['jobSavingURL'] != null ? WebUri(map['jobSavingURL']) : null;
+    instance.lastPage = map['lastPage'];
+    instance.localizedPaperName = map['localizedPaperName'];
+    instance.margins =
+        MapEdgeInsets.fromMap(map['margins']?.cast<String, dynamic>());
+    instance.maximumContentHeight = map['maximumContentHeight'];
+    instance.maximumContentWidth = map['maximumContentWidth'];
+    instance.mediaSize = map['mediaSize'];
+    instance.orientation = map['orientation'];
+    instance.paperName = map['paperName'];
+    instance.paperRect = map['paperRect'];
+    instance.printableRect = map['printableRect'];
+    instance.resolution = map['resolution'];
+    instance.verticalPagination = map['verticalPagination'];
     return instance;
   }
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "colorMode": colorMode?.toNativeValue(),
+      "colorMode": colorMode,
       "detailedErrorReporting": detailedErrorReporting,
-      "duplex": duplex?.toNativeValue(),
+      "duplexMode": duplexMode,
       "faxNumber": faxNumber,
+      "firstPage": firstPage,
       "footerHeight": footerHeight,
       "headerAndFooter": headerAndFooter,
       "headerHeight": headerHeight,
-      "horizontalPagination": horizontalPagination?.toNativeValue(),
+      "horizontalPagination": horizontalPagination,
       "isHorizontallyCentered": isHorizontallyCentered,
-      "isSelectionOnly": isSelectionOnly,
       "isVerticallyCentered": isVerticallyCentered,
-      "jobDisposition": jobDisposition?.toNativeValue(),
+      "jobDisposition": jobDisposition,
       "jobSavingURL": jobSavingURL?.toString(),
+      "lastPage": lastPage,
       "localizedPaperName": localizedPaperName,
-      "margins": margins,
+      "margins": margins?.toMap(),
       "maximumContentHeight": maximumContentHeight,
       "maximumContentWidth": maximumContentWidth,
-      "mediaSize": mediaSize?.toMap(),
-      "mustCollate": mustCollate,
-      "orientation": orientation?.toNativeValue(),
-      "pagesAcross": pagesAcross,
-      "pagesDown": pagesDown,
+      "mediaSize": mediaSize,
+      "orientation": orientation,
       "paperName": paperName,
-      "paperRect": paperRect?.toMap(),
-      "printableRect": printableRect?.toMap(),
-      "resolution": resolution?.toMap(),
-      "scalingFactor": scalingFactor,
-      "time": time,
-      "verticalPagination": verticalPagination?.toNativeValue(),
+      "paperRect": paperRect,
+      "printableRect": printableRect,
+      "resolution": resolution,
+      "verticalPagination": verticalPagination,
     };
   }
 
@@ -337,6 +258,6 @@ class PrintJobAttributes {
 
   @override
   String toString() {
-    return 'PrintJobAttributes{colorMode: $colorMode, detailedErrorReporting: $detailedErrorReporting, duplex: $duplex, faxNumber: $faxNumber, footerHeight: $footerHeight, headerAndFooter: $headerAndFooter, headerHeight: $headerHeight, horizontalPagination: $horizontalPagination, isHorizontallyCentered: $isHorizontallyCentered, isSelectionOnly: $isSelectionOnly, isVerticallyCentered: $isVerticallyCentered, jobDisposition: $jobDisposition, jobSavingURL: $jobSavingURL, localizedPaperName: $localizedPaperName, margins: $margins, maximumContentHeight: $maximumContentHeight, maximumContentWidth: $maximumContentWidth, mediaSize: $mediaSize, mustCollate: $mustCollate, orientation: $orientation, pagesAcross: $pagesAcross, pagesDown: $pagesDown, paperName: $paperName, paperRect: $paperRect, printableRect: $printableRect, resolution: $resolution, scalingFactor: $scalingFactor, time: $time, verticalPagination: $verticalPagination}';
+    return 'PrintJobAttributes{colorMode: $colorMode, detailedErrorReporting: $detailedErrorReporting, duplexMode: $duplexMode, faxNumber: $faxNumber, firstPage: $firstPage, footerHeight: $footerHeight, headerAndFooter: $headerAndFooter, headerHeight: $headerHeight, horizontalPagination: $horizontalPagination, isHorizontallyCentered: $isHorizontallyCentered, isVerticallyCentered: $isVerticallyCentered, jobDisposition: $jobDisposition, jobSavingURL: $jobSavingURL, lastPage: $lastPage, localizedPaperName: $localizedPaperName, margins: $margins, maximumContentHeight: $maximumContentHeight, maximumContentWidth: $maximumContentWidth, mediaSize: $mediaSize, orientation: $orientation, paperName: $paperName, paperRect: $paperRect, printableRect: $printableRect, resolution: $resolution, verticalPagination: $verticalPagination}';
   }
 }

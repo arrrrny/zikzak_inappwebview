@@ -11,20 +11,15 @@ class AttributedStringTextEffectStyle {
   final String _value;
   final String _nativeValue;
   const AttributedStringTextEffectStyle._internal(
-    this._value,
-    this._nativeValue,
-  );
-  // ignore: unused_element
+      this._value, this._nativeValue);
+// ignore: unused_element
   factory AttributedStringTextEffectStyle._internalMultiPlatform(
-    String value,
-    Function nativeValue,
-  ) => AttributedStringTextEffectStyle._internal(value, nativeValue());
+          String value, Function nativeValue) =>
+      AttributedStringTextEffectStyle._internal(value, nativeValue());
 
   ///A graphical text effect that gives glyphs the appearance of letterpress printing, which involves pressing the type into the paper.
   static const LETTERPRESS_STYLE = AttributedStringTextEffectStyle._internal(
-    'letterpressStyle',
-    'letterpressStyle',
-  );
+      'letterpressStyle', 'letterpressStyle');
 
   ///Set of all values of [AttributedStringTextEffectStyle].
   static final Set<AttributedStringTextEffectStyle> values = [
@@ -35,9 +30,8 @@ class AttributedStringTextEffectStyle {
   static AttributedStringTextEffectStyle? fromValue(String? value) {
     if (value != null) {
       try {
-        return AttributedStringTextEffectStyle.values.firstWhere(
-          (element) => element.toValue() == value,
-        );
+        return AttributedStringTextEffectStyle.values
+            .firstWhere((element) => element.toValue() == value);
       } catch (e) {
         return null;
       }
@@ -49,9 +43,8 @@ class AttributedStringTextEffectStyle {
   static AttributedStringTextEffectStyle? fromNativeValue(String? value) {
     if (value != null) {
       try {
-        return AttributedStringTextEffectStyle.values.firstWhere(
-          (element) => element.toNativeValue() == value,
-        );
+        return AttributedStringTextEffectStyle.values
+            .firstWhere((element) => element.toNativeValue() == value);
       } catch (e) {
         return null;
       }
