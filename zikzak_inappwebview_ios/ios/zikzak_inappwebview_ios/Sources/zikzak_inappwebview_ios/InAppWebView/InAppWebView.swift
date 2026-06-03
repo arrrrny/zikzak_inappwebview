@@ -767,6 +767,12 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             if #available(iOS 15.0, *) {
                 configuration.upgradeKnownHostsToHTTPS = settings.upgradeKnownHostsToHTTPS
             }
+
+            if #available(iOS 16.4, *) {
+                if settings.webAuthenticationSupport == 1 { // FOR_APP
+                    configuration.webAuthenticationSupport.boundKeychainForPasskeys = true
+                }
+            }
         }
 
         return configuration

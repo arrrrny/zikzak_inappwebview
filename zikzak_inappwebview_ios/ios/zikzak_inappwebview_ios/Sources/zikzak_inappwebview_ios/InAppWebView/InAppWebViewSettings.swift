@@ -10,7 +10,7 @@ import WebKit
 
 @objcMembers
 public class InAppWebViewSettings: ISettings<InAppWebView> {
-    
+
     var useShouldOverrideUrlLoading = false
     var useOnLoadResource = false
     var useOnDownloadStart = false
@@ -82,12 +82,13 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     var maximumViewportInset: UIEdgeInsets? = nil
     var isInspectable = false
     var shouldPrintBackgrounds = false
+    var webAuthenticationSupport = 0
     var dismissDialogues = true
-    
+
     override init(){
         super.init()
     }
-    
+
     override func parse(settings: [String: Any?]) -> InAppWebViewSettings {
         var settings = settings // re-assing to be able to use removeValue
         if let minimumViewportInsetMap = settings["minimumViewportInset"] as? [String : Double] {
@@ -104,7 +105,7 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
         }
         return self
     }
-    
+
     override func getRealSettings(obj: InAppWebView?) -> [String: Any?] {
         var realSettings: [String: Any?] = toMap()
         if let webView = obj {
@@ -174,6 +175,7 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
             if #available(iOS 16.4, *) {
                 realSettings["isInspectable"] = webView.isInspectable
                 realSettings["shouldPrintBackgrounds"] = configuration.preferences.shouldPrintBackgrounds
+                realSettings["webAuthenticationSupport"] = configuration.webAuthenticationSupport.boundKeychainForPasskeys ? 1 : 0
             }
         }
         return realSettings
