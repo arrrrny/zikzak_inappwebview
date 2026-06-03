@@ -1335,7 +1335,7 @@ class InAppWebViewSettings {
     this.iframeReferrerPolicy,
     this.iframeName,
     this.iframeCsp,
-    this.dismissDialogues = true,
+    this.dismissDialogues = false,
   }) {
     if (this.minimumFontSize == null)
       this.minimumFontSize = Util.isAndroid ? 8 : 0;

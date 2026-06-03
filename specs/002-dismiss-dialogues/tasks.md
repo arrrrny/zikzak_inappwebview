@@ -49,16 +49,16 @@ description: "Task list for dismiss-dialogues feature"
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [x] T006 Add `dismissDialogues` property with `@ExchangeableObjectProperty(defaultValue: "true")` annotation and `@SupportedPlatforms(platforms: [PlatformOS.iOS, PlatformOS.android, PlatformOS.macOS, PlatformOS.windows, PlatformOS.linux, PlatformOS.web])` in `zikzak_inappwebview_platform_interface/lib/src/in_app_webview/in_app_webview_settings.dart`
+- [x] T006 Add `dismissDialogues` property with `@ExchangeableObjectProperty(defaultValue: "false")` annotation and `@SupportedPlatforms(platforms: [PlatformOS.iOS, PlatformOS.android, PlatformOS.macOS, PlatformOS.windows, PlatformOS.linux, PlatformOS.web])` in `zikzak_inappwebview_platform_interface/lib/src/in_app_webview/in_app_webview_settings.dart`
 - [x] T007 Regenerate `.g.dart` by running `dart run build_runner build` in `zikzak_inappwebview_platform_interface/`
 
-**Checkpoint**: Foundation ready — `InAppWebViewSettings` now has `dismissDialogues` with default `true` across the generated Dart code
+**Checkpoint**: Foundation ready — `InAppWebViewSettings` now has `dismissDialogues` with default `false` across the generated Dart code
 
 ---
 
 ## Phase 3: User Story 1 - Default overlay dismissal (Priority: P1) 🎯 MVP
 
-**Goal**: When `dismissDialogues` is `true` (default), fixed/sticky overlays are automatically removed after page load. The overlay removal script runs with retries to handle dynamic content.
+**Goal**: When `dismissDialogues` is `true`, fixed/sticky overlays are automatically removed after page load. The overlay removal script runs with retries to handle dynamic content.
 
 **Independent Test**: Load any web page with fixed/sticky overlays using default settings and verify overlays are absent from the rendered content.
 

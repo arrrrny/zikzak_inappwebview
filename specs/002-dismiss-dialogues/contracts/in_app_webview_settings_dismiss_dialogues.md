@@ -11,14 +11,14 @@
   PlatformOS.linux,
   PlatformOS.web,
 ])
-@ExchangeableObjectProperty(defaultValue: "true")
+@ExchangeableObjectProperty(defaultValue: "false")
 bool? dismissDialogues;
 ```
 
 ## Contract
 
 - **Type**: `bool?` (nullable, as per all settings in this project's convention)
-- **Default**: `true`
+- **Default**: `false`
 - **Platform support**: All platforms (iOS, Android, macOS, Windows, Linux, Web)
 
 ## Behavior

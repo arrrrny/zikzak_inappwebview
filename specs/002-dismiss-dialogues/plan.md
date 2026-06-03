@@ -6,7 +6,7 @@
 
 ## Summary
 
-Add a `dismissDialogues` boolean setting (default: `true`) to `InAppWebViewSettings` that automatically removes fixed/sticky positioned elements from loaded web pages. The removal logic runs after page load with retries to catch dynamically appearing dialogs, enabling clean captures (screenshot, PDF, HTML).
+Add a `dismissDialogues` boolean setting (default: `false`) to `InAppWebViewSettings` that automatically removes fixed/sticky positioned elements from loaded web pages. The removal logic runs after page load with retries to catch dynamically appearing dialogs, enabling clean captures (screenshot, PDF, HTML).
 
 ## Technical Context
 
@@ -30,7 +30,7 @@ Add a `dismissDialogues` boolean setting (default: `true`) to `InAppWebViewSetti
 
 ## Constitution Check
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+_GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
 The project constitution is a template placeholder (never filled in). No gates to enforce. The implementation follows the existing federated plugin architecture patterns already established in the codebase.
 

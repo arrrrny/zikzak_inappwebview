@@ -6,7 +6,7 @@
 
 **Status**: Draft
 
-**Input**: User description: "Add a new setting to inAppWebviewsettings called dismissDialogues set true by default that will dismiss fixed/sticky overlays for clean captures"
+**Input**: User description: "Add a new setting to inAppWebviewsettings called dismissDialogues set false by default that will dismiss fixed/sticky overlays for clean captures"
 
 ## User Scenarios & Testing
 
@@ -68,7 +68,7 @@ A web page loads additional overlay content dynamically after the initial page l
 ### Functional Requirements
 
 - **FR-001**: The system MUST provide a `dismissDialogues` configuration option in the web view settings.
-- **FR-002**: The `dismissDialogues` option MUST default to enabled (true).
+- **FR-002**: The `dismissDialogues` option MUST default to disabled (false).
 - **FR-003**: When enabled, the system MUST identify all HTML elements with CSS `position: fixed` or `position: sticky` on the loaded page.
 - **FR-004**: When enabled, the system MUST remove all identified fixed/sticky elements from the page DOM.
 - **FR-005**: When enabled, the system MUST reset the `overflow` and `margin` CSS properties on both `document.documentElement` and `document.body`.

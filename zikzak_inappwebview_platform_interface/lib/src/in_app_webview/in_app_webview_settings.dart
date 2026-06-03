@@ -2143,7 +2143,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.iframeReferrerPolicy,
     this.iframeName,
     this.iframeCsp,
-    this.dismissDialogues = true,
+    this.dismissDialogues = false,
   }) {
     if (this.minimumFontSize == null)
       this.minimumFontSize = Util.isAndroid ? 8 : 0;
