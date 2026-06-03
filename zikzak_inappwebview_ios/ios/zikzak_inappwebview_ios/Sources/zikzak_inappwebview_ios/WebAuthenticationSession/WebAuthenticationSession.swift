@@ -1,4 +1,8 @@
+import AuthenticationServices
 import Flutter
+import SafariServices
+import UIKit
+
 //
 //  WebAuthenticationSession.swift
 //  zikzak_inappwebview
@@ -6,11 +10,9 @@ import Flutter
 //  Created by ARRRRNY on 08/05/22.
 //
 
-import UIKit
-import AuthenticationServices
-import SafariServices
-
-public class WebAuthenticationSession: NSObject, ASWebAuthenticationPresentationContextProviding, Disposable {
+public class WebAuthenticationSession: NSObject, ASWebAuthenticationPresentationContextProviding,
+    Disposable
+{
     static let METHOD_CHANNEL_NAME_PREFIX = "wtf.zikzak/flutter_webauthenticationsession_"
     var id: String
     var plugin: SwiftFlutterPlugin?
@@ -21,7 +23,10 @@ public class WebAuthenticationSession: NSObject, ASWebAuthenticationPresentation
     var channelDelegate: WebAuthenticationSessionChannelDelegate?
     private var _canStart = true
 
-    public init(plugin: SwiftFlutterPlugin, id: String, url: URL, callbackURLScheme: String?, settings: WebAuthenticationSessionSettings) {
+    public init(
+        plugin: SwiftFlutterPlugin, id: String, url: URL, callbackURLScheme: String?,
+        settings: WebAuthenticationSessionSettings
+    ) {
         self.id = id
         self.plugin = plugin
         self.url = url
@@ -29,17 +34,23 @@ public class WebAuthenticationSession: NSObject, ASWebAuthenticationPresentation
         super.init()
         self.callbackURLScheme = callbackURLScheme
         if #available(iOS 12.0, *) {
-            let session = ASWebAuthenticationSession(url: self.url, callbackURLScheme: self.callbackURLScheme, completionHandler: self.completionHandler)
+            let session = ASWebAuthenticationSession(
+                url: self.url, callbackURLScheme: self.callbackURLScheme,
+                completionHandler: self.completionHandler)
             if #available(iOS 13.0, *) {
                 session.presentationContextProvider = self
             }
             self.session = session
         } else if #available(iOS 11.0, *) {
-            self.session = SFAuthenticationSession(url: self.url, callbackURLScheme: self.callbackURLScheme, completionHandler: self.completionHandler)
+            self.session = SFAuthenticationSession(
+                url: self.url, callbackURLScheme: self.callbackURLScheme,
+                completionHandler: self.completionHandler)
         }
-        let channel = FlutterMethodChannel(name: WebAuthenticationSession.METHOD_CHANNEL_NAME_PREFIX + id,
-                                           binaryMessenger: plugin.registrar!.messenger())
-        self.channelDelegate = WebAuthenticationSessionChannelDelegate(webAuthenticationSession: self, channel: channel)
+        let channel = FlutterMethodChannel(
+            name: WebAuthenticationSession.METHOD_CHANNEL_NAME_PREFIX + id,
+            binaryMessenger: plugin.registrar!.messenger())
+        self.channelDelegate = WebAuthenticationSessionChannelDelegate(
+            webAuthenticationSession: self, channel: channel)
     }
 
     public func prepare() {
@@ -48,7 +59,7 @@ public class WebAuthenticationSession: NSObject, ASWebAuthenticationPresentation
         }
     }
 
-    public func completionHandler(url: URL?, error: Error?) -> Void {
+    public func completionHandler(url: URL?, error: Error?) {
         channelDelegate?.onComplete(url: url, errorCode: error?._code)
     }
 
@@ -89,7 +100,9 @@ public class WebAuthenticationSession: NSObject, ASWebAuthenticationPresentation
         }
     }
 
-    public func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
+    @available(iOS 12.0, *)
+    public func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor
+    {
         return UIApplication.shared.windows.first { $0.isKeyWindow } ?? ASPresentationAnchor()
     }
 

@@ -526,10 +526,16 @@ public final class InAppWebView
                 WebViewFeature.FORCE_DARK_STRATEGY
             )
         ) {
-            WebSettingsCompat.setForceDarkStrategy(
-                settings,
-                customSettings.forceDarkStrategy
-            );
+            try {
+                WebSettingsCompat.setForceDarkStrategy(
+                    settings,
+                    customSettings.forceDarkStrategy
+                );
+            } catch (ClassCastException e) {
+                // Some OEM WebView implementations (e.g. Huawei/Honor) use a
+                // WebSettingsWrapper that cannot be cast to ContentSettingsAdapter.
+                // Silently skip setForceDarkStrategy on those devices.
+            }
         }
         settings.setGeolocationEnabled(customSettings.geolocationEnabled);
         if (customSettings.layoutAlgorithm != null) {
@@ -1700,10 +1706,16 @@ public final class InAppWebView
                 WebViewFeature.FORCE_DARK_STRATEGY
             )
         ) {
-            WebSettingsCompat.setForceDarkStrategy(
-                settings,
-                newCustomSettings.forceDarkStrategy
-            );
+            try {
+                WebSettingsCompat.setForceDarkStrategy(
+                    settings,
+                    newCustomSettings.forceDarkStrategy
+                );
+            } catch (ClassCastException e) {
+                // Some OEM WebView implementations (e.g. Huawei/Honor) use a
+                // WebSettingsWrapper that cannot be cast to ContentSettingsAdapter.
+                // Silently skip setForceDarkStrategy on those devices.
+            }
         }
 
         if (

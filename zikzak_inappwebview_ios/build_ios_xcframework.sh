@@ -39,7 +39,7 @@ IOS_SDK="iphoneos"
 SIMULATOR_SDK="iphonesimulator"
 
 # Minimum supported iOS version. Keep this in sync with the podspec.
-MIN_IOS_VERSION="13.0"
+MIN_IOS_VERSION="16.0"
 
 ###############################################################################
 # Helpers

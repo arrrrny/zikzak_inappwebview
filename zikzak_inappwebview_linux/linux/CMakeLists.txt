@@ -42,7 +42,11 @@ target_include_directories(${PLUGIN_NAME} INTERFACE
 target_link_libraries(${PLUGIN_NAME} PRIVATE flutter)
 target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::GTK)
 
-pkg_check_modules(WEBKIT2GTK REQUIRED webkit2gtk-4.0)
+# Try webkit2gtk-4.1 first (Ubuntu 24.04 Noble, Debian 13+), fall back to 4.0
+pkg_check_modules(WEBKIT2GTK webkit2gtk-4.1)
+if(NOT WEBKIT2GTK_FOUND)
+  pkg_check_modules(WEBKIT2GTK REQUIRED webkit2gtk-4.0)
+endif()
 target_include_directories(${PLUGIN_NAME} PRIVATE ${WEBKIT2GTK_INCLUDE_DIRS})
 target_link_libraries(${PLUGIN_NAME} PRIVATE ${WEBKIT2GTK_LIBRARIES})
 

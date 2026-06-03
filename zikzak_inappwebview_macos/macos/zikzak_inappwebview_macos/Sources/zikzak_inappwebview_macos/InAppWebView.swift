@@ -7,76 +7,86 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     private var findInteractionChannel: FlutterMethodChannel!
     private var searchText: String?
     private var isDisposed = false
-    
-    init(registrar: FlutterPluginRegistrar, viewId: Any, arguments: Any?, channelName: String? = nil) {
+
+    init(
+        registrar: FlutterPluginRegistrar, viewId: Any, arguments: Any?, channelName: String? = nil
+    ) {
         let configuration = WKWebViewConfiguration()
         let userContentController = WKUserContentController()
         configuration.userContentController = userContentController
-        
+
         super.init(frame: .zero, configuration: configuration)
         self.navigationDelegate = self
         self.uiDelegate = self
-        
+
         userContentController.add(WeakScriptMessageHandler(delegate: self), name: "consoleHandler")
-        userContentController.add(WeakScriptMessageHandler(delegate: self), name: "onFindResultReceived")
-        
+        userContentController.add(
+            WeakScriptMessageHandler(delegate: self), name: "onFindResultReceived")
+
         let consoleOverrideScript = """
-        (function() {
-            var originalLog = console.log;
-            var originalDebug = console.debug;
-            var originalInfo = console.info;
-            var originalWarn = console.warn;
-            var originalError = console.error;
-            
-            function log(level, message) {
-                window.webkit.messageHandlers.consoleHandler.postMessage({
-                    "message": message,
-                    "messageLevel": level
-                });
-            }
-            console.log = function(message) { log("LOG", message); if (originalLog) originalLog.call(console, message); };
-            console.debug = function(message) { log("DEBUG", message); if (originalDebug) originalDebug.call(console, message); };
-            console.info = function(message) { log("INFO", message); if (originalInfo) originalInfo.call(console, message); };
-            console.warn = function(message) { log("WARNING", message); if (originalWarn) originalWarn.call(console, message); };
-            console.error = function(message) { log("ERROR", message); if (originalError) originalError.call(console, message); };
-        })();
-        """
-        let userScript = WKUserScript(source: consoleOverrideScript, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+            (function() {
+                var originalLog = console.log;
+                var originalDebug = console.debug;
+                var originalInfo = console.info;
+                var originalWarn = console.warn;
+                var originalError = console.error;
+
+                function log(level, message) {
+                    window.webkit.messageHandlers.consoleHandler.postMessage({
+                        "message": message,
+                        "messageLevel": level
+                    });
+                }
+                console.log = function(message) { log("LOG", message); if (originalLog) originalLog.call(console, message); };
+                console.debug = function(message) { log("DEBUG", message); if (originalDebug) originalDebug.call(console, message); };
+                console.info = function(message) { log("INFO", message); if (originalInfo) originalInfo.call(console, message); };
+                console.warn = function(message) { log("WARNING", message); if (originalWarn) originalWarn.call(console, message); };
+                console.error = function(message) { log("ERROR", message); if (originalError) originalError.call(console, message); };
+            })();
+            """
+        let userScript = WKUserScript(
+            source: consoleOverrideScript, injectionTime: .atDocumentStart, forMainFrameOnly: false)
         userContentController.addUserScript(userScript)
-        
-        let findInteractionUserScript = WKUserScript(source: FIND_TEXT_HIGHLIGHT_JS_SOURCE, injectionTime: .atDocumentStart, forMainFrameOnly: true)
+
+        let findInteractionUserScript = WKUserScript(
+            source: FIND_TEXT_HIGHLIGHT_JS_SOURCE, injectionTime: .atDocumentStart,
+            forMainFrameOnly: true)
         userContentController.addUserScript(findInteractionUserScript)
-        
+
         let finalChannelName = channelName ?? "dev.zuzu/zikzak_inappwebview_\(viewId)"
         channel = FlutterMethodChannel(name: finalChannelName, binaryMessenger: registrar.messenger)
         channel.setMethodCallHandler(self.handle)
-        
+
         let findInteractionChannelName = "wtf.zikzak/zikzak_inappwebview_find_interaction_\(viewId)"
-        findInteractionChannel = FlutterMethodChannel(name: findInteractionChannelName, binaryMessenger: registrar.messenger)
+        findInteractionChannel = FlutterMethodChannel(
+            name: findInteractionChannelName, binaryMessenger: registrar.messenger)
         findInteractionChannel.setMethodCallHandler(self.handleFindInteraction)
-        
+
         if let args = arguments as? [String: Any] {
             if let initialUrlRequest = args["initialUrlRequest"] as? [String: Any],
-               let urlString = initialUrlRequest["url"] as? String,
-               let url = URL(string: urlString) {
+                let urlString = initialUrlRequest["url"] as? String,
+                let url = URL(string: urlString)
+            {
                 let request = URLRequest(url: url)
                 self.load(request)
             }
         }
-        
+
         self.addObserver(self, forKeyPath: "estimatedProgress", options: .new, context: nil)
         self.addObserver(self, forKeyPath: "url", options: .new, context: nil)
         self.addObserver(self, forKeyPath: "title", options: .new, context: nil)
     }
-    
+
     deinit {
         dispose()
     }
-    
+
     public func dispose() {
         if !isDisposed {
-            self.configuration.userContentController.removeScriptMessageHandler(forName: "consoleHandler")
-            self.configuration.userContentController.removeScriptMessageHandler(forName: "onFindResultReceived")
+            self.configuration.userContentController.removeScriptMessageHandler(
+                forName: "consoleHandler")
+            self.configuration.userContentController.removeScriptMessageHandler(
+                forName: "onFindResultReceived")
             self.removeObserver(self, forKeyPath: "estimatedProgress")
             self.removeObserver(self, forKeyPath: "url")
             self.removeObserver(self, forKeyPath: "title")
@@ -85,32 +95,37 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             isDisposed = true
         }
     }
-    
+
     required init?(coder: NSCoder) {
         super.init(coder: coder)
     }
-    
-    public override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+
+    public override func observeValue(
+        forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?,
+        context: UnsafeMutableRawPointer?
+    ) {
+        guard !isDisposed else { return }
+
         if keyPath == "estimatedProgress" {
             let progress = Int(self.estimatedProgress * 100)
-            channel.invokeMethod("onProgressChanged", arguments: ["progress": progress])
+            channel?.invokeMethod("onProgressChanged", arguments: ["progress": progress])
         } else if keyPath == "url" {
             var arguments: [String: Any] = ["isReload": false]
             if let url = self.url?.absoluteString {
                 arguments["url"] = url
             }
-            channel.invokeMethod("onUpdateVisitedHistory", arguments: arguments)
+            channel?.invokeMethod("onUpdateVisitedHistory", arguments: arguments)
         } else if keyPath == "title" {
             var arguments: [String: Any] = [:]
             if let title = self.title {
                 arguments["title"] = title
             }
-            channel.invokeMethod("onTitleChanged", arguments: arguments)
+            channel?.invokeMethod("onTitleChanged", arguments: arguments)
         } else {
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }
     }
-    
+
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         switch call.method {
         case "getUrl":
@@ -121,23 +136,27 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             result(Int(self.estimatedProgress * 100))
         case "loadUrl":
             if let args = call.arguments as? [String: Any],
-               let urlRequest = args["urlRequest"] as? [String: Any],
-               let urlString = urlRequest["url"] as? String,
-               let url = URL(string: urlString) {
+                let urlRequest = args["urlRequest"] as? [String: Any],
+                let urlString = urlRequest["url"] as? String,
+                let url = URL(string: urlString)
+            {
                 let request = URLRequest(url: url)
                 self.load(request)
                 result(true)
             } else {
-                result(FlutterError(code: "InAppWebView", message: "Invalid arguments", details: nil))
+                result(
+                    FlutterError(code: "InAppWebView", message: "Invalid arguments", details: nil))
             }
         case "loadData":
             if let args = call.arguments as? [String: Any],
-               let data = args["data"] as? String,
-               let baseUrl = args["baseUrl"] as? String {
+                let data = args["data"] as? String,
+                let baseUrl = args["baseUrl"] as? String
+            {
                 self.loadHTMLString(data, baseURL: URL(string: baseUrl))
                 result(true)
             } else {
-                result(FlutterError(code: "InAppWebView", message: "Invalid arguments", details: nil))
+                result(
+                    FlutterError(code: "InAppWebView", message: "Invalid arguments", details: nil))
             }
         case "reload":
             self.reload()
@@ -164,7 +183,10 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         case "getHtml":
             self.evaluateJavaScript("document.documentElement.outerHTML") { (value, error) in
                 if let error = error {
-                    result(FlutterError(code: "InAppWebView", message: error.localizedDescription, details: nil))
+                    result(
+                        FlutterError(
+                            code: "InAppWebView", message: error.localizedDescription, details: nil)
+                    )
                 } else {
                     result(value)
                 }
@@ -173,7 +195,8 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             if #available(macOS 11.0, *) {
                 let pdfConfiguration = WKPDFConfiguration()
                 if let args = call.arguments as? [String: Any],
-                   let configMap = args["pdfConfiguration"] as? [String: Any] {
+                    let configMap = args["pdfConfiguration"] as? [String: Any]
+                {
                     if let rectMap = configMap["rect"] as? [String: Double] {
                         let x = rectMap["x"] ?? 0
                         let y = rectMap["y"] ?? 0
@@ -182,13 +205,13 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                         pdfConfiguration.rect = CGRect(x: x, y: y, width: width, height: height)
                     }
                 }
-                
+
                 self.createPDF(configuration: pdfConfiguration) { res in
                     switch res {
                     case .success(let data):
                         result(data)
                     case .failure(_):
-                result(nil)
+                        result(nil)
                     }
                 }
             } else {
@@ -198,7 +221,8 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             if #available(macOS 10.13, *) {
                 var snapshotConfiguration: WKSnapshotConfiguration? = nil
                 if let args = call.arguments as? [String: Any],
-                   let configMap = args["screenshotConfiguration"] as? [String: Any?] {
+                    let configMap = args["screenshotConfiguration"] as? [String: Any?]
+                {
                     snapshotConfiguration = WKSnapshotConfiguration()
                     if let rectMap = configMap["rect"] as? [String: Double] {
                         snapshotConfiguration!.rect = CGRect(
@@ -215,34 +239,41 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                         snapshotConfiguration!.afterScreenUpdates = afterScreenUpdates
                     }
                 }
-                
+
                 self.takeSnapshot(with: snapshotConfiguration) { (image, error) -> Void in
                     var imageData: Data? = nil
                     if let screenshot = image {
-                        if let configMap = (call.arguments as? [String: Any])?["screenshotConfiguration"] as? [String: Any?] {
+                        if let configMap = (call.arguments as? [String: Any])?[
+                            "screenshotConfiguration"] as? [String: Any?]
+                        {
                             let compressFormat = configMap["compressFormat"] as? String ?? "PNG"
                             switch compressFormat {
                             case "JPEG":
                                 let quality = Float((configMap["quality"] as? Int) ?? 100) / 100.0
                                 if let tiffData = screenshot.tiffRepresentation,
-                                   let bitmapRep = NSBitmapImageRep(data: tiffData) {
+                                    let bitmapRep = NSBitmapImageRep(data: tiffData)
+                                {
                                     let properties: [NSBitmapImageRep.PropertyKey: Any] = [
                                         .compressionFactor: quality
                                     ]
-                                    imageData = bitmapRep.representation(using: .jpeg, properties: properties)
+                                    imageData = bitmapRep.representation(
+                                        using: .jpeg, properties: properties)
                                 }
                                 break
                             case "PNG":
                                 fallthrough
                             default:
                                 if let tiffData = screenshot.tiffRepresentation,
-                                   let bitmapRep = NSBitmapImageRep(data: tiffData) {
-                                    imageData = bitmapRep.representation(using: .png, properties: [:])
+                                    let bitmapRep = NSBitmapImageRep(data: tiffData)
+                                {
+                                    imageData = bitmapRep.representation(
+                                        using: .png, properties: [:])
                                 }
                             }
                         } else {
                             if let tiffData = screenshot.tiffRepresentation,
-                               let bitmapRep = NSBitmapImageRep(data: tiffData) {
+                                let bitmapRep = NSBitmapImageRep(data: tiffData)
+                            {
                                 imageData = bitmapRep.representation(using: .png, properties: [:])
                             }
                         }
@@ -254,35 +285,47 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             }
         case "evaluateJavascript":
             if let args = call.arguments as? [String: Any],
-               let source = args["source"] as? String {
+                let source = args["source"] as? String
+            {
                 self.evaluateJavaScript(source) { (value, error) in
                     if let error = error {
-                        result(FlutterError(code: "InAppWebView", message: error.localizedDescription, details: nil))
+                        result(
+                            FlutterError(
+                                code: "InAppWebView", message: error.localizedDescription,
+                                details: nil))
                     } else {
                         result(value)
                     }
                 }
             } else {
-                 result(FlutterError(code: "InAppWebView", message: "Invalid arguments", details: nil))
+                result(
+                    FlutterError(code: "InAppWebView", message: "Invalid arguments", details: nil))
             }
         default:
             result(FlutterMethodNotImplemented)
         }
     }
 
-    public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-        channel.invokeMethod("onLoadStart", arguments: ["url": webView.url?.absoluteString])
+    public func webView(
+        _ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!
+    ) {
+        channel?.invokeMethod("onLoadStart", arguments: ["url": webView.url?.absoluteString])
     }
 
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        channel.invokeMethod("onLoadStop", arguments: ["url": webView.url?.absoluteString])
+        channel?.invokeMethod("onLoadStop", arguments: ["url": webView.url?.absoluteString])
     }
 
-    public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+    public func webView(
+        _ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error
+    ) {
         onReceivedError(error: error)
     }
 
-    public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+    public func webView(
+        _ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!,
+        withError error: Error
+    ) {
         onReceivedError(error: error)
     }
 
@@ -291,15 +334,17 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         arguments["url"] = self.url?.absoluteString
         arguments["code"] = (error as NSError).code
         arguments["message"] = error.localizedDescription
-        channel.invokeMethod("onReceivedError", arguments: arguments)
+        channel?.invokeMethod("onReceivedError", arguments: arguments)
     }
-    
-    public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+
+    public func userContentController(
+        _ userContentController: WKUserContentController, didReceive message: WKScriptMessage
+    ) {
         if message.name == "consoleHandler", let body = message.body as? [String: Any] {
             var arguments: [String: Any] = [:]
             arguments["message"] = body["message"] as? String
-            
-            var level = 1 // LOG
+
+            var level = 1  // LOG
             if let messageLevel = body["messageLevel"] as? String {
                 switch messageLevel {
                 case "LOG":
@@ -317,12 +362,13 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 }
             }
             arguments["messageLevel"] = level
-            channel.invokeMethod("onConsoleMessage", arguments: arguments)
-        } else if message.name == "onFindResultReceived", let body = message.body as? [String: Any] {
-            findInteractionChannel.invokeMethod("onFindResultReceived", arguments: body)
+            channel?.invokeMethod("onConsoleMessage", arguments: arguments)
+        } else if message.name == "onFindResultReceived", let body = message.body as? [String: Any]
+        {
+            findInteractionChannel?.invokeMethod("onFindResultReceived", arguments: body)
         }
     }
-    
+
     public func handleFindInteraction(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         switch call.method {
         case "findAll":
@@ -332,36 +378,41 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             }
             result(true)
         case "findNext":
-             if let args = call.arguments as? [String: Any], let forward = args["forward"] as? Bool {
+            if let args = call.arguments as? [String: Any], let forward = args["forward"] as? Bool {
                 let js = "window.\(JAVASCRIPT_BRIDGE_NAME)._findNext(\(forward));"
                 self.evaluateJavaScript(js, completionHandler: nil)
-             }
-             result(true)
+            }
+            result(true)
         case "clearMatches":
-             let js = "window.\(JAVASCRIPT_BRIDGE_NAME)._clearMatches();"
-             self.evaluateJavaScript(js, completionHandler: nil)
-             result(true)
+            let js = "window.\(JAVASCRIPT_BRIDGE_NAME)._clearMatches();"
+            self.evaluateJavaScript(js, completionHandler: nil)
+            result(true)
         case "setSearchText":
-             if let args = call.arguments as? [String: Any], let searchText = args["searchText"] as? String {
+            if let args = call.arguments as? [String: Any],
+                let searchText = args["searchText"] as? String
+            {
                 self.searchText = searchText
-             }
-             result(true)
+            }
+            result(true)
         case "getSearchText":
-             result(self.searchText)
+            result(self.searchText)
         default:
-             result(FlutterMethodNotImplemented)
+            result(FlutterMethodNotImplemented)
         }
     }
-    
-    public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+
+    public func webView(
+        _ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction,
+        decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
+    ) {
         var arguments: [String: Any] = [:]
         let request: [String: Any] = [
             "url": navigationAction.request.url?.absoluteString ?? "",
             "method": navigationAction.request.httpMethod ?? "GET",
-            "headers": navigationAction.request.allHTTPHeaderFields ?? [:]
+            "headers": navigationAction.request.allHTTPHeaderFields ?? [:],
         ]
         // body is skipped for now
-        
+
         let sourceFrame: [String: Any] = [
             "isMainFrame": navigationAction.sourceFrame.isMainFrame,
             "request": [
@@ -370,10 +421,10 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             "securityOrigin": [
                 "host": navigationAction.sourceFrame.securityOrigin.host,
                 "port": navigationAction.sourceFrame.securityOrigin.port,
-                "protocol": navigationAction.sourceFrame.securityOrigin.protocol
-            ]
+                "protocol": navigationAction.sourceFrame.securityOrigin.protocol,
+            ],
         ]
-        
+
         var targetFrame: [String: Any] = [:]
         if let target = navigationAction.targetFrame {
             targetFrame["isMainFrame"] = target.isMainFrame
@@ -381,43 +432,32 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             targetFrame["securityOrigin"] = [
                 "host": target.securityOrigin.host,
                 "port": target.securityOrigin.port,
-                "protocol": target.securityOrigin.protocol
+                "protocol": target.securityOrigin.protocol,
             ]
         }
-        
+
         arguments["navigationAction"] = [
             "request": request,
             "isForMainFrame": navigationAction.targetFrame?.isMainFrame ?? false,
-            "hasGesture": navigationAction.navigationType == .linkActivated || navigationAction.navigationType == .formSubmitted,
+            "hasGesture": navigationAction.navigationType == .linkActivated
+                || navigationAction.navigationType == .formSubmitted,
             "isRedirect": false,
             "navigationType": navigationAction.navigationType.rawValue,
             "sourceFrame": sourceFrame,
-            "targetFrame": targetFrame
+            "targetFrame": targetFrame,
         ]
-        
-        channel.invokeMethod("shouldOverrideUrlLoading", arguments: arguments) { result in
-                    if let result = result as? Int {
-                        if result == 0 {
-                            decisionHandler(.cancel)
-                            return
-                        } else if result == 1 {
-                            decisionHandler(.allow)
-                            return
-                        } else if result == 2 {
-                            if #available(macOS 11.3, *) {
-                                decisionHandler(.download)
-                            } else {
-                                decisionHandler(.cancel)
-                            }
-                            return
-                        }
-                    }
-                    decisionHandler(.allow)
-                }
+
+        channel?.invokeMethod("shouldOverrideUrlLoading", arguments: arguments)
+        decisionHandler(.allow)
     }
 
-    public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
-        if let response = navigationResponse.response as? HTTPURLResponse, response.statusCode >= 400 {
+    public func webView(
+        _ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse,
+        decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void
+    ) {
+        if let response = navigationResponse.response as? HTTPURLResponse,
+            response.statusCode >= 400
+        {
             var arguments: [String: Any] = [:]
             arguments["request"] = [
                 "url": response.url?.absoluteString ?? ""
@@ -425,20 +465,23 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             arguments["errorResponse"] = [
                 "statusCode": response.statusCode,
                 "reasonPhrase": HTTPURLResponse.localizedString(forStatusCode: response.statusCode),
-                "headers": response.allHeaderFields
+                "headers": response.allHeaderFields,
             ]
-            channel.invokeMethod("onReceivedHttpError", arguments: arguments)
+            channel?.invokeMethod("onReceivedHttpError", arguments: arguments)
         }
         decisionHandler(.allow)
     }
-    
-    public func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping () -> Void) {
+
+    public func webView(
+        _ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String,
+        initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping () -> Void
+    ) {
         var arguments: [String: Any] = [:]
         arguments["message"] = message
         arguments["url"] = frame.request.url?.absoluteString ?? ""
         arguments["isMainFrame"] = frame.isMainFrame
         arguments["iosIsMainFrame"] = frame.isMainFrame
-        
+
         channel.invokeMethod("onJsAlert", arguments: arguments) { result in
             if let result = result as? [String: Any] {
                 let handledByClient = result["handledByClient"] as? Bool ?? false
@@ -449,16 +492,19 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                     alert.runModal()
                 }
             } else {
-                 let alert = NSAlert()
-                 alert.messageText = message
-                 alert.addButton(withTitle: "OK")
-                 alert.runModal()
+                let alert = NSAlert()
+                alert.messageText = message
+                alert.addButton(withTitle: "OK")
+                alert.runModal()
             }
             completionHandler()
         }
     }
-    
-    public func webView(_ webView: WKWebView, runJavaScriptConfirmPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (Bool) -> Void) {
+
+    public func webView(
+        _ webView: WKWebView, runJavaScriptConfirmPanelWithMessage message: String,
+        initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (Bool) -> Void
+    ) {
         var arguments: [String: Any] = [:]
         arguments["message"] = message
         arguments["url"] = frame.request.url?.absoluteString ?? ""
@@ -489,8 +535,12 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             }
         }
     }
-    
-    public func webView(_ webView: WKWebView, runJavaScriptTextInputPanelWithPrompt prompt: String, defaultText: String?, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (String?) -> Void) {
+
+    public func webView(
+        _ webView: WKWebView, runJavaScriptTextInputPanelWithPrompt prompt: String,
+        defaultText: String?, initiatedByFrame frame: WKFrameInfo,
+        completionHandler: @escaping (String?) -> Void
+    ) {
         var arguments: [String: Any] = [:]
         arguments["message"] = prompt
         arguments["defaultValue"] = defaultText
@@ -506,11 +556,11 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                     alert.messageText = prompt
                     alert.addButton(withTitle: "OK")
                     alert.addButton(withTitle: "Cancel")
-                    
+
                     let input = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
                     input.stringValue = defaultText ?? ""
                     alert.accessoryView = input
-                    
+
                     let res = alert.runModal()
                     if res == .alertFirstButtonReturn {
                         completionHandler(input.stringValue)
@@ -531,11 +581,11 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 alert.messageText = prompt
                 alert.addButton(withTitle: "OK")
                 alert.addButton(withTitle: "Cancel")
-                
+
                 let input = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
                 input.stringValue = defaultText ?? ""
                 alert.accessoryView = input
-                
+
                 let res = alert.runModal()
                 if res == .alertFirstButtonReturn {
                     completionHandler(input.stringValue)
