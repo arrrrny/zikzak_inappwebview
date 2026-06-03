@@ -19,6 +19,7 @@ import wtf.zikzak.zikzak_inappwebview_android.InAppWebViewFlutterPlugin;
 import wtf.zikzak.zikzak_inappwebview_android.types.ChannelDelegateImpl;
 import wtf.zikzak.zikzak_inappwebview_android.webview.in_app_webview.FlutterWebView;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -192,7 +193,7 @@ public class InAppWebViewManager extends ChannelDelegateImpl {
       flutterWebView.dispose();
     }
     if (keepAliveWebViews.containsKey(keepAliveId)) {
-      keepAliveWebViews.put(keepAliveId, null);
+      keepAliveWebViews.remove(keepAliveId);
     }
   }
 
@@ -205,7 +206,7 @@ public class InAppWebViewManager extends ChannelDelegateImpl {
   @Override
   public void dispose() {
     super.dispose();
-    Collection<FlutterWebView> flutterWebViews = keepAliveWebViews.values();
+    Collection<FlutterWebView> flutterWebViews = new ArrayList<>(keepAliveWebViews.values());
     for (FlutterWebView flutterWebView : flutterWebViews) {
       String keepAliveId = flutterWebView.keepAliveId;
       if (keepAliveId != null) {
