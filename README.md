@@ -2,7 +2,7 @@
 
 # 🚀 ZikZak InAppWebView
 
-### *The Feature-Rich WebView Plugin for Flutter*
+### _The Feature-Rich WebView Plugin for Flutter_
 
 <img src="https://img.shields.io/badge/Maintenance-Active-brightgreen" alt="Actively Maintained">
 <img src="https://img.shields.io/badge/Platforms-Android%20%7C%20iOS%20%7C%20Web%20%7C%20macOS%20%7C%20Windows%20%7C%20Linux-blue" alt="Platforms">
@@ -12,6 +12,17 @@
 
 A Flutter plugin that allows you to add an inline WebView, use an headless WebView, and open an in-app browser window.
 This is a community-driven fork of `flutter_inappwebview` focused on active maintenance, stability, and modern platform support.
+
+## Sponsor
+
+[![https://zuzu.dev](./assets/zikzak-ai.png)](https://zuzu.dev) [![Sponsored by ZikZak AI](https://img.shields.io/badge/Sponsored%20by-ZikZak%20AI-8A2BE2?style=flat-square&logo=heart)](https://zuzu.dev)
+
+Thanks to ZikZak AI for sponsoring this project!
+
+ZikZak AI is an AI-Powered Price Comparison app that you scan barcodes, and discover amazing savings instantly. Your personal shopping assistant that never sleeps.
+
+<a href="https://apps.apple.com/tr/app/zik-zak/id1563425450"><img src="assets/app-store-badge.png" width="160" style="margin-right: 8px;"></a>
+<a href="https://play.google.com/store/apps/details?id=dev.zuzu.zingo"><img src="assets/google-play-badge.png" width="160"></a>
 
 [**Documentation**](https://arrrrny.github.io/zikzak_inappwebview/) | [**Pub.dev**](https://pub.dev/packages/zikzak_inappwebview) | [**API Reference**](https://pub.dev/documentation/zikzak_inappwebview/latest/)
 
@@ -38,15 +49,15 @@ dependencies:
 
 ## � Requirements
 
-| Platform | Minimum Version | Notes |
-|----------|-----------------|-------|
-| **Flutter** | 3.10.0+ | |
-| **Android** | API 24+ | Android 7.0+ |
-| **iOS** | 15.0+ | |
-| **macOS** | 11.0+ | |
-| **Windows** | 10+ | Requires WebView2 Runtime |
-| **Linux** | | Requires WebKitGTK |
-| **Web** | Any | |
+| Platform    | Minimum Version | Notes                     |
+| ----------- | --------------- | ------------------------- |
+| **Flutter** | 3.10.0+         |                           |
+| **Android** | API 24+         | Android 7.0+              |
+| **iOS**     | 15.0+           |                           |
+| **macOS**   | 11.0+           |                           |
+| **Windows** | 10+             | Requires WebView2 Runtime |
+| **Linux**   |                 | Requires WebKitGTK        |
+| **Web**     | Any             |                           |
 
 ## 🚀 Getting Started
 
