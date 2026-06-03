@@ -1,3 +1,33 @@
+## 4.2.3 - 2026-06-03
+
+
+- Fixed: Android onWebViewCreated not firing on ~50% release cold starts — deferred JS bridge
+  registration (addJavascriptInterface, addDocumentStartJavaScript) to View.post() so binder IPC
+  doesn't suppress engine's onPlatformViewCreated dispatch
+- Fixed: Changed dismissDialogues setting default from true to false (opt-in behavior)
+- Fixed: Android 15 edge-to-edge — skip deprecated setNavigationBarColor/setNavigationBarDividerColor
+  APIs on SDK 35+ (PR #2729 @NIKDISSV-Forever)
+- Fixed: Java deprecation cleanup — new Handler(Looper.getMainLooper()), clearSessionCookies()
+  helper, @SuppressWarnings on WebViewClient classes (PR #2817 @Khairul989)
+- Fixed: KeepAlive NPE — use remove() instead of put(null), copy-on-iterate in dispose()
+  (PR #2638 @mustafayildiz12)
+- Fixed: CVE-2020-6563 — sandbox file access protection in file picker (PR #2243 @AlexV525)
+- Fixed: debugAssertNotDisposed() crash — use this.\_channel directly in disposeChannel()
+  (PR #2558 @MSOB7YY)
+- Fixed: onCreateWindow URL for window.open() — handle HitTestResult.UNKNOWN_TYPE
+  (PR #1679 @zopagaduanjr)
+- Fixed: pana/pub.dev analysis failure — analysis_options.yaml linter rules (PR #2758 @note11g)
+- Fixed: Bumped example app AGP 8.4.0 → 8.6.0
+- Feature: KeepAlive URL tracking — added currentUrl to InAppWebViewControllerKeepAliveProps
+  (PR #2614 @Hamed233)
+- Chore: Added .build/ to .gitignore — removed 3,344 tracked SPM build artifacts
+- Chore: Improved changelog generation — root CHANGELOG.md as single source of truth,
+  actual commit messages as fallback instead of generic placeholder
+- Chore: Created UPSTREAM_ISSUES_TRIAGE.md — comprehensive triage of all 156 upstream issues
+- Chore: Created 72 tracking issues, closed 18 non-applicable, notified 25+ upstream PR authors
+## 4.2.3 - 2026-06-03
+
+* Prepare for publishing version 4.2.3
 ## 4.2.2 - 2026-06-03
 
 * Prepare for publishing version 4.2.2

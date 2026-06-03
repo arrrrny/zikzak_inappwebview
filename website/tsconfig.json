@@ -1,12 +1,18 @@
 {
-  // This file is not used in compilation. It is here just for a nice editor experience.
-  "extends": "@docusaurus/tsconfig",
   "compilerOptions": {
+    "allowJs": true,
+    "esModuleInterop": true,
+    "jsx": "react-jsx",
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM"],
+    "moduleResolution": "bundler",
+    "module": "esnext",
+    "noEmit": true,
+    "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@site/*": ["./*"]
+      "@site/*": ["./*"],
     },
-    "jsx": "react-jsx"
   },
   "include": [
     "**/*.ts",
@@ -15,10 +21,7 @@
     "**/*.jsx",
     "**/*.json",
     ".docusaurus/**/*.ts",
-    ".docusaurus/**/*.tsx"
+    ".docusaurus/**/*.tsx",
   ],
-  "exclude": [
-    "node_modules",
-    "build"
-  ]
+  "exclude": ["node_modules", "build"],
 }

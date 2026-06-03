@@ -1,144 +1,152 @@
-import {themes as prismThemes} from 'prism-react-renderer';
-import type {Config} from '@docusaurus/types';
-import type * as Preset from '@docusaurus/preset-classic';
-
-// This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
+import { themes as prismThemes } from "prism-react-renderer";
+import type { Config } from "@docusaurus/types";
+import type * as Preset from "@docusaurus/preset-classic";
 
 const config: Config = {
-  title: 'ZikZak InAppWebView',
-  tagline: 'The Feature-Rich WebView Plugin for Flutter (Android, iOS, Web, macOS, Windows, Linux)',
-  favicon: 'img/favicon.ico',
+  title: "ZikZak InAppWebView",
+  tagline:
+    "The Feature-Rich WebView Plugin for Flutter (Android, iOS, Web, macOS, Windows, Linux)",
+  favicon: "img/favicon.ico",
 
-  // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
-  future: {
-    v4: true, // Improve compatibility with the upcoming Docusaurus v4
-  },
+  url: "https://arrrrny.github.io",
+  baseUrl: "/zikzak_inappwebview/",
 
-  // Set the production url of your site here
-  url: 'https://arrrrny.github.io',
-  // Set the /<baseUrl>/ pathname under which your site is served
-  // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/zikzak_inappwebview/',
-
-  // GitHub pages deployment config.
-  // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'arrrrny', // Usually your GitHub org/user name.
-  projectName: 'zikzak_inappwebview', // Usually your repo name.
+  organizationName: "arrrrny",
+  projectName: "zikzak_inappwebview",
   trailingSlash: false,
 
-  onBrokenLinks: 'throw',
+  onBrokenLinks: "warn",
 
-  // Even if you don't use internationalization, you can use this field to set
-  // useful metadata like html lang. For example, if your site is Chinese, you
-  // may want to replace "en" with "zh-Hans".
   i18n: {
-    defaultLocale: 'en',
-    locales: ['en'],
+    defaultLocale: "en",
+    locales: ["en"],
   },
 
   presets: [
     [
-      'classic',
+      "classic",
       {
         docs: {
-          sidebarPath: './sidebars.ts',
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
+          sidebarPath: "./sidebars.ts",
           editUrl:
-            'https://github.com/arrrrny/zikzak_inappwebview/tree/main/website/',
+            "https://github.com/arrrrny/zikzak_inappwebview/tree/master/website/",
         },
         blog: false,
         theme: {
-          customCss: './src/css/custom.css',
+          customCss: "./src/css/custom.css",
         },
       } satisfies Preset.Options,
     ],
   ],
 
   themeConfig: {
-    // Replace with your project's social card
-    image: 'img/docusaurus-social-card.jpg',
+    image: "img/logo.svg",
     colorMode: {
       respectPrefersColorScheme: true,
     },
     navbar: {
-      title: 'ZikZak InAppWebView',
+      title: "ZikZak InAppWebView",
       logo: {
-        alt: 'ZikZak InAppWebView Logo',
-        src: 'img/logo.svg',
+        alt: "ZikZak InAppWebView Logo",
+        src: "img/logo.svg",
       },
       items: [
         {
-          type: 'docSidebar',
-          sidebarId: 'tutorialSidebar',
-          position: 'left',
-          label: 'Docs',
+          type: "docSidebar",
+          sidebarId: "tutorialSidebar",
+          position: "left",
+          label: "Docs",
         },
         {
-          href: 'https://pub.dev/packages/zikzak_inappwebview',
-          label: 'pub.dev',
-          position: 'right',
+          href: "https://pub.dev/packages/zikzak_inappwebview",
+          label: "pub.dev",
+          position: "right",
         },
         {
-          href: 'https://github.com/arrrrny/zikzak_inappwebview',
-          label: 'GitHub',
-          position: 'right',
+          href: "https://github.com/arrrrny/zikzak_inappwebview",
+          label: "GitHub",
+          position: "right",
+        },
+        {
+          href: "https://github.com/arrrrny/zikzak_inappwebview/issues",
+          label: "Issues",
+          position: "right",
         },
       ],
     },
     footer: {
-      style: 'dark',
+      style: "dark",
       links: [
         {
-          title: 'Docs',
+          title: "Docs",
           items: [
             {
-              label: 'Intro',
-              to: '/docs/intro',
+              label: "Getting Started",
+              to: "/docs/intro",
             },
             {
-              label: 'Security Features',
-              to: '/docs/security-features',
+              label: "InAppWebView",
+              to: "/docs/webview/in-app-webview",
+            },
+            {
+              label: "JavaScript Communication",
+              to: "/docs/webview/javascript/communication",
+            },
+            {
+              label: "Cookie Manager",
+              to: "/docs/utilities/cookie-manager",
             },
           ],
         },
         {
-          title: 'Community',
+          title: "Community",
           items: [
             {
-              label: 'GitHub Issues',
-              href: 'https://github.com/arrrrny/zikzak_inappwebview/issues',
+              label: "GitHub Issues",
+              href: "https://github.com/arrrrny/zikzak_inappwebview/issues",
             },
             {
-              label: 'GitHub Discussions',
-              href: 'https://github.com/arrrrny/zikzak_inappwebview/discussions',
+              label: "GitHub Discussions",
+              href: "https://github.com/arrrrny/zikzak_inappwebview/discussions",
             },
             {
-              label: 'Stack Overflow',
-              href: 'https://stackoverflow.com/questions/tagged/flutter-inappwebview',
+              label: "Stack Overflow",
+              href: "https://stackoverflow.com/questions/tagged/flutter-inappwebview",
             },
           ],
         },
         {
-          title: 'More',
+          title: "More",
           items: [
             {
-              label: 'GitHub',
-              href: 'https://github.com/arrrrny/zikzak_inappwebview',
+              label: "pub.dev",
+              href: "https://pub.dev/packages/zikzak_inappwebview",
             },
             {
-              label: 'pub.dev',
-              href: 'https://pub.dev/packages/zikzak_inappwebview',
+              label: "API Reference",
+              href: "https://pub.dev/documentation/zikzak_inappwebview/latest/",
+            },
+            {
+              label: "GitHub",
+              href: "https://github.com/arrrrny/zikzak_inappwebview",
             },
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} ZikZak InAppWebView. Actively maintained by ARRRRNY + Claude AI. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} ZikZak InAppWebView. Maintained by <a href="https://github.com/arrrrny">ARRRRNY</a>. Built with Docusaurus.`,
     },
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
-      additionalLanguages: ['dart', 'kotlin', 'swift', 'java', 'groovy', 'yaml', 'bash'],
+      additionalLanguages: [
+        "dart",
+        "kotlin",
+        "swift",
+        "java",
+        "groovy",
+        "yaml",
+        "bash",
+      ],
     },
   } satisfies Preset.ThemeConfig,
 };
