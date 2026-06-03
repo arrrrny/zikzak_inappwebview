@@ -124,27 +124,37 @@ public class FlutterWebView implements PlatformWebView {
         }
       }
     } else {
-      if (initialFile != null) {
-        try {
-          webView.loadFile(initialFile);
-        } catch (IOException e) {
-          Log.e(LOG_TAG, initialFile + " asset file cannot be found!", e);
+      // Defer the initial load so the JS bridge is registered before
+      // the renderer receives the page load. This prevents a race where
+      // pages served from cache or sleeping-tab wake-ups could execute
+      // @document-start userscripts before window.flutter_inappwebview is defined.
+      webView.post(new Runnable() {
+        @Override
+        public void run() {
+          if (webView == null) return;
+          if (initialFile != null) {
+            try {
+              webView.loadFile(initialFile);
+            } catch (IOException e) {
+              Log.e(LOG_TAG, initialFile + " asset file cannot be found!", e);
+            }
+          }
+          else if (initialData != null) {
+            String data = initialData.get("data");
+            String mimeType = initialData.get("mimeType");
+            String encoding = initialData.get("encoding");
+            String baseUrl = initialData.get("baseUrl");
+            String historyUrl = initialData.get("historyUrl");
+            webView.loadDataWithBaseURL(baseUrl, data, mimeType, encoding, historyUrl);
+          }
+          else if (initialUrlRequest != null) {
+            URLRequest urlRequest = URLRequest.fromMap(initialUrlRequest);
+            if (urlRequest != null) {
+              webView.loadUrl(urlRequest);
+            }
+          }
         }
-      }
-      else if (initialData != null) {
-        String data = initialData.get("data");
-        String mimeType = initialData.get("mimeType");
-        String encoding = initialData.get("encoding");
-        String baseUrl = initialData.get("baseUrl");
-        String historyUrl = initialData.get("historyUrl");
-        webView.loadDataWithBaseURL(baseUrl, data, mimeType, encoding, historyUrl);
-      }
-      else if (initialUrlRequest != null) {
-        URLRequest urlRequest = URLRequest.fromMap(initialUrlRequest);
-        if (urlRequest != null) {
-          webView.loadUrl(urlRequest);
-        }
-      }
+      });
     }
   }
 

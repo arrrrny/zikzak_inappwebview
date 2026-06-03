@@ -34,6 +34,9 @@
 build/
 .fvm/
 
+# Swift Package Manager build artifacts
+.build/
+
 flutter_driver_tests.log
 tool/chromedriver
 tool/chromedriver.*

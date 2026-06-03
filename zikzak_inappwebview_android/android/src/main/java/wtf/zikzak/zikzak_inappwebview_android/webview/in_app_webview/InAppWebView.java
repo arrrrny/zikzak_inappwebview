@@ -176,7 +176,7 @@ public final class InAppWebView
     public Map<String, Object> contextMenu = null;
 
     public Handler mainLooperHandler = new Handler(getWebViewLooper());
-    static Handler mHandler = new Handler();
+    static Handler mHandler = new Handler(Looper.getMainLooper());
 
     public Runnable checkScrollStoppedTask;
     public int initialPositionScrollStoppedTask;
@@ -296,12 +296,6 @@ public final class InAppWebView
             );
         }
 
-        javaScriptBridgeInterface = new JavaScriptBridgeInterface(this);
-        addJavascriptInterface(
-            javaScriptBridgeInterface,
-            JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME
-        );
-
         inAppWebViewChromeClient = new InAppWebViewChromeClient(
             plugin,
             this,
@@ -330,19 +324,6 @@ public final class InAppWebView
                 this,
                 inAppWebViewRenderProcessClient
             );
-        }
-
-        if (
-            windowId == null ||
-            !WebViewFeature.isFeatureSupported(
-                WebViewFeature.DOCUMENT_START_SCRIPT
-            )
-        ) {
-            // for some reason, if a WebView is created using a window id,
-            // the initial plugin and user scripts injected
-            // with WebViewCompat.addDocumentStartJavaScript will not be added!
-            // https://github.com/arrrrny/zikzak_inappwebview/issues/1455
-            prepareAndAddUserScripts();
         }
 
         if (customSettings.useOnDownloadStart) setDownloadListener(
@@ -415,8 +396,7 @@ public final class InAppWebView
         }
 
         if (customSettings.clearCache) clearAllCache();
-        else if (customSettings.clearSessionCache) CookieManager.getInstance()
-            .removeSessionCookie();
+        else if (customSettings.clearSessionCache) clearSessionCookies();
 
         if (
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
@@ -443,6 +423,36 @@ public final class InAppWebView
         if (customSettings.transparentBackground) setBackgroundColor(
             Color.TRANSPARENT
         );
+
+        // Defer JS bridge registration to after platform-view attach completes.
+        // addJavascriptInterface() and WebViewCompat.addDocumentStartJavaScript()
+        // (called by prepareAndAddUserScripts) hit binder IPC to the renderer
+        // process. Running them synchronously inside prepare() during
+        // FlutterWebViewFactory.create() can cause the engine's
+        // onPlatformViewCreated dispatch to be silently dropped on some builds.
+        // Deferring to View.post() ensures the engine callback fires first.
+        post(new Runnable() {
+            @Override
+            public void run() {
+                javaScriptBridgeInterface = new JavaScriptBridgeInterface(InAppWebView.this);
+                addJavascriptInterface(
+                    javaScriptBridgeInterface,
+                    JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME
+                );
+                if (
+                    windowId == null ||
+                    !WebViewFeature.isFeatureSupported(
+                        WebViewFeature.DOCUMENT_START_SCRIPT
+                    )
+                ) {
+                    // for some reason, if a WebView is created using a window id,
+                    // the initial plugin and user scripts injected
+                    // with WebViewCompat.addDocumentStartJavaScript will not be added!
+                    // https://github.com/arrrrny/zikzak_inappwebview/issues/1455
+                    prepareAndAddUserScripts();
+                }
+            }
+        });
 
         if (
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP &&
@@ -999,6 +1009,7 @@ public final class InAppWebView
      * @deprecated
      */
     @Deprecated
+    @SuppressWarnings("deprecation")
     private void clearCookies() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             CookieManager.getInstance()
@@ -1010,6 +1021,15 @@ public final class InAppWebView
                 );
         } else {
             CookieManager.getInstance().removeAllCookie();
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    private void clearSessionCookies() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            CookieManager.getInstance().removeSessionCookies(null);
+        } else {
+            CookieManager.getInstance().removeSessionCookie();
         }
     }
 
@@ -1419,7 +1439,7 @@ public final class InAppWebView
         else if (
             newSettingsMap.get("clearSessionCache") != null &&
             newCustomSettings.clearSessionCache
-        ) CookieManager.getInstance().removeSessionCookie();
+        ) clearSessionCookies();
 
         if (
             newSettingsMap.get("thirdPartyCookiesEnabled") != null &&
