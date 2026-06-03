@@ -312,7 +312,7 @@ class InAppWebView extends StatefulWidget {
                : null,
            onLoadStop: (controller, url) {
              onLoadStop?.call(controller, url);
-             if (initialSettings?.dismissDialogues ?? true) {
+             if (initialSettings?.dismissDialogues ?? false)
                () async {
                  try {
                    for (var i = 0; i < 3; i++) {
@@ -343,7 +343,6 @@ class InAppWebView extends StatefulWidget {
                    }
                  } catch (_) {}
                }();
-             }
            },
            onReceivedError: onReceivedError != null
                ? (controller, request, error) =>
