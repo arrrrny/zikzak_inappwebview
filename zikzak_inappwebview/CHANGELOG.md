@@ -1,13 +1,5 @@
-## 4.3.0 - 2026-06-03
+## 4.3.1 - 2026-06-03
 
-- Fixed: iOS `onCreateWindow` not respecting client return value — now returns `nil` when
-  the client handles the window creation, preventing WebKit from creating an unused
-  window WebView (#107)
-- Fixed: iOS crash on `InAppWebView.dispose()` when KVO observers fire after disposal —
-  added `isDisposed` guard to `observeValue`, made `dispose()` idempotent with
-  `isDisposed = true`, added `dispose()` call in `deinit` (#120, #129)
-- Fixed: macOS SIGSEGV crash in `callAsyncJavaScript` — added `isDisposed` guard to
-  `observeValue`, added optional chaining on `channel?.invokeMethod` calls (#126)
 - Fixed: iOS Passkey/WebAuthn support — wired `webAuthenticationSupport` setting into
   native `WKWebViewWebAuthenticationSupport.boundKeychainForPasskeys` on iOS 16.4+ (#131)
 - Fixed: macOS 26 crash in AppKit NSToolbar when InAppBrowser window closes — added
@@ -23,6 +15,17 @@
 - Feature: `WebAuthenticationSession` now supports `additionalHeaderFields` for custom
   HTTP headers — available on iOS 17.4+ (#100)
 - Chore: Raised minimum Flutter version from 3.29.0 to 3.38.6 for iOS touch fix (#128)
+
+## 4.3.0 - 2026-06-03
+
+- Fixed: iOS `onCreateWindow` not respecting client return value — now returns `nil` when
+  the client handles the window creation, preventing WebKit from creating an unused
+  window WebView (#107)
+- Fixed: iOS crash on `InAppWebView.dispose()` when KVO observers fire after disposal —
+  added `isDisposed` guard to `observeValue`, made `dispose()` idempotent with
+  `isDisposed = true`, added `dispose()` call in `deinit` (#120, #129)
+- Fixed: macOS SIGSEGV crash in `callAsyncJavaScript` — added `isDisposed` guard to
+  `observeValue`, added optional chaining on `channel?.invokeMethod` calls (#126)
 - Chore: Updated minimum iOS build version to 16.0
 
 ## 4.2.4 - 2026-06-03
