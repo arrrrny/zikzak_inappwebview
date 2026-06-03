@@ -1,3 +1,15 @@
+## 4.3.0 - 2026-06-03
+
+
+- Fixed: iOS `onCreateWindow` not respecting client return value — now returns `nil` when
+  the client handles the window creation, preventing WebKit from creating an unused
+  window WebView (#107)
+- Fixed: iOS crash on `InAppWebView.dispose()` when KVO observers fire after disposal —
+  added `isDisposed` guard to `observeValue`, made `dispose()` idempotent with
+  `isDisposed = true`, added `dispose()` call in `deinit` (#120, #129)
+- Fixed: macOS SIGSEGV crash in `callAsyncJavaScript` — added `isDisposed` guard to
+  `observeValue`, added optional chaining on `channel?.invokeMethod` calls (#126)
+- Chore: Updated minimum iOS build version to 16.0
 ## 4.2.4 - 2026-06-03
 
 
