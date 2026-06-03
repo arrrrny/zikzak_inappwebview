@@ -24,7 +24,7 @@ ZikZak AI is an AI-Powered Price Comparison app that you scan barcodes, and disc
 <a href="https://apps.apple.com/tr/app/zik-zak/id1563425450"><img src="assets/app-store-badge.png" width="160" style="margin-right: 8px;"></a>
 <a href="https://play.google.com/store/apps/details?id=dev.zuzu.zingo"><img src="assets/google-play-badge.png" width="160"></a>
 
-[**Documentation**](https://arrrrny.github.io/zikzak_inappwebview/) | [**Pub.dev**](https://pub.dev/packages/zikzak_inappwebview) | [**API Reference**](https://pub.dev/documentation/zikzak_inappwebview/latest/)
+[**Documentation**](https://arrrrny.github.io/zikzak_inappwebview/) | [**Pub.dev**](https://pub.dev/packages/zikzak_inappwebview) | [**API Reference**](https://pub.dev/documentation/zikzak_inappwebview/latest/) | [**Changelog**](https://github.com/arrrrny/zikzak_inappwebview/blob/master/zikzak_inappwebview/CHANGELOG.md)
 
 </div>
 
@@ -74,6 +74,24 @@ InAppWebView(
   },
 )
 ```
+
+## 📦 Migration from flutter_inappwebview
+
+Simply replace the import:
+
+```dart
+// Before
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+
+// After
+import 'package:zikzak_inappwebview/zikzak_inappwebview.dart';
+```
+
+The API is nearly identical. Version 4.x.x corresponds to upstream 6.x.x.
+
+## 📊 Project Stats
+
+We track and triage all 156+ open issues from the upstream repository. Check out our [UPSTREAM_ISSUES_TRIAGE.md](./UPSTREAM_ISSUES_TRIAGE.md) for the full analysis.
 
 ## 🤝 Contributing
 
