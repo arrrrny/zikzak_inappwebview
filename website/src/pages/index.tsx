@@ -3,8 +3,6 @@ import clsx from "clsx";
 import Link from "@docusaurus/Link";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import Layout from "@theme/Layout";
-import Heading from "@theme/Heading";
-
 import styles from "./index.module.css";
 
 const features = [
@@ -51,9 +49,7 @@ function HomepageHeader() {
   return (
     <header className={clsx("hero hero--primary", styles.heroBanner)}>
       <div className="container">
-        <Heading as="h1" className="hero__title">
-          {siteConfig.title}
-        </Heading>
+        <h1 className="hero__title">{siteConfig.title}</h1>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
         <div className="hero-badge-container">
           <img
@@ -141,9 +137,7 @@ export default function Home(): ReactNode {
 
         <section className="sponsor-section">
           <div className="container">
-            <Heading as="h2" style={{ marginBottom: "1rem" }}>
-              🚀 Sponsored by ZikZak AI
-            </Heading>
+            <h2 style={{ marginBottom: "1rem" }}>🚀 Sponsored by ZikZak AI</h2>
             <p
               style={{
                 color: "var(--ifm-color-emphasis-600)",

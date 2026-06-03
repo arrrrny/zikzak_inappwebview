@@ -8,10 +8,6 @@ const config: Config = {
     "The Feature-Rich WebView Plugin for Flutter (Android, iOS, Web, macOS, Windows, Linux)",
   favicon: "img/favicon.ico",
 
-  future: {
-    v4: true,
-  },
-
   url: "https://arrrrny.github.io",
   baseUrl: "/zikzak_inappwebview/",
 
@@ -33,7 +29,7 @@ const config: Config = {
         docs: {
           sidebarPath: "./sidebars.ts",
           editUrl:
-            "https://github.com/arrrrny/zikzak_inappwebview/tree/main/website/",
+            "https://github.com/arrrrny/zikzak_inappwebview/tree/master/website/",
         },
         blog: false,
         theme: {

@@ -44,7 +44,7 @@ Add `zikzak_inappwebview` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  zikzak_inappwebview: ^4.0.0
+  zikzak_inappwebview: ^4.2.3
 ```
 
 ## � Requirements
