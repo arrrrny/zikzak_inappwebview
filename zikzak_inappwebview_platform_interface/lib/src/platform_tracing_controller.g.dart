@@ -26,12 +26,13 @@ class TracingSettings {
   TracingMode? tracingMode;
   TracingSettings({this.categories = const [], this.tracingMode}) {
     assert(
-        this
-            .categories
-            .map((e) =>
-                e.runtimeType is String || e.runtimeType is TracingCategory)
-            .contains(false),
-        "categories must contain only String or TracingCategory items");
+      this.categories
+          .map(
+            (e) => e.runtimeType is String || e.runtimeType is TracingCategory,
+          )
+          .contains(false),
+      "categories must contain only String or TracingCategory items",
+    );
   }
 
   ///Gets a possible [TracingSettings] instance from a [Map] value.
