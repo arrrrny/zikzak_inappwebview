@@ -14,7 +14,7 @@ if [ "$#" -eq 0 ]; then
     # Use full path to pubspec, and ensure PROJECT_DIR is defined before use
     PROJECT_DIR_FIXED="$( cd "$(dirname "$0")/.." >/dev/null 2>&1 ; pwd -P )"
     DETECTED_VERSION=$(grep "^version:" "$PROJECT_DIR_FIXED/zikzak_inappwebview/pubspec.yaml" | sed 's/version: //' | tr -d '[:space:]')
-    
+
     if [ -n "$DETECTED_VERSION" ]; then
         echo -e "${GREEN}Detected version: $DETECTED_VERSION${NC}"
         VERSION=$DETECTED_VERSION
@@ -216,8 +216,20 @@ for pkg in "${PACKAGES[@]}"; do
     fi
 done
 
-# Generate changelog content from git history
-echo -e "${BLUE}Generating changelog from git history...${NC}"
+# Generate changelog content
+# First, check if root CHANGELOG.md already has an entry for this version
+ROOT_CHANGELOG="$ROOT_DIR/zikzak_inappwebview/CHANGELOG.md"
+EXISTING_ENTRY=""
+
+if [ -f "$ROOT_CHANGELOG" ]; then
+    EXISTING_ENTRY=$(awk "/^## $VERSION - /{found=1; next} /^## [0-9]+\\.[0-9]+\\.[0-9]+/{if(found) exit} found" "$ROOT_CHANGELOG" 2>/dev/null || true)
+fi
+
+if [ -n "$EXISTING_ENTRY" ]; then
+    echo -e "${GREEN}Found existing changelog entry for version $VERSION in root CHANGELOG.md, using it...${NC}"
+    CHANGELOG_CONTENT="$EXISTING_ENTRY"
+else
+    echo -e "${BLUE}No existing changelog entry found. Generating from git history...${NC}"
 CHANGELOG_CONTENT=""
 LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
 
@@ -249,9 +261,14 @@ if [ ! -z "$FIXES" ]; then
 "
 fi
 
-# If no content found, use a default message
+# If no content found, use actual commit messages as fallback
+if [ -z "$CHANGELOG_CONTENT" ]; then
+    CHANGELOG_CONTENT=$(echo "$LOGS" | sed 's/^/* /')
+fi
+# If still empty (no commits at all), ultimate fallback
 if [ -z "$CHANGELOG_CONTENT" ]; then
     CHANGELOG_CONTENT="* Prepare for publishing version $VERSION"
+fi
 fi
 
 echo -e "${YELLOW}Generated Changelog Content:${NC}"
@@ -268,6 +285,11 @@ fi
 CURRENT_DATE=$(date +"%Y-%m-%d")
 for pkg in "${PACKAGES[@]}"; do
     if [ -f "$ROOT_DIR/$pkg/CHANGELOG.md" ]; then
+        # Skip root package if entry already existed there (no need to duplicate)
+        if [ "$pkg" == "zikzak_inappwebview" ] && [ -n "$EXISTING_ENTRY" ]; then
+            echo -e "${GREEN}Root CHANGELOG.md already has entry for $VERSION, skipping...${NC}"
+            continue
+        fi
         echo -e "${BLUE}Updating CHANGELOG.md in $pkg${NC}"
         # Add new version entry at the top of the CHANGELOG
         # We use a temporary file to handle the multiline insertion correctly
