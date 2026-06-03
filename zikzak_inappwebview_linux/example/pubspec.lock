@@ -275,25 +275,25 @@ packages:
     dependency: transitive
     description:
       name: zikzak_inappwebview_internal_annotations
-      sha256: b87e39a867ed322719628a4b54378dca673e5f9807a37a113eb4c6a058db5026
+      sha256: "306df8790a05a8d98d1f95d98049815df083a860c13ae02c81062196ba388221"
       url: "https://pub.dev"
     source: hosted
-    version: "4.2.1"
+    version: "4.2.2"
   zikzak_inappwebview_linux:
     dependency: "direct main"
     description:
       path: ".."
       relative: true
     source: path
-    version: "4.2.1"
+    version: "4.2.2"
   zikzak_inappwebview_platform_interface:
     dependency: "direct main"
     description:
       name: zikzak_inappwebview_platform_interface
-      sha256: "20028570f0f7dfce3ff40051856eb4fd880bf180004c729479a84e7cef558566"
+      sha256: "72ff594f1859df2b4daec79f9ee0086e550b3ae19036143caa837fea0f352070"
       url: "https://pub.dev"
     source: hosted
-    version: "4.2.1"
+    version: "4.2.2"
 sdks:
   dart: ">=3.10.8 <4.0.0"
   flutter: ">=3.29.0"
