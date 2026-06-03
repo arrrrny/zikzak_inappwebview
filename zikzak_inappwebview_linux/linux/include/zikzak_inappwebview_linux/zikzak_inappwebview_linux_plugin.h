@@ -18,9 +18,10 @@ typedef struct {
 
 FLUTTER_PLUGIN_EXPORT GType zikzak_inappwebview_linux_plugin_get_type();
 
-FLUTTER_PLUGIN_EXPORT void zikzak_inappwebview_linux_plugin_register_with_registrar(
-    FlPluginRegistrar* registrar);
+FLUTTER_PLUGIN_EXPORT void
+zikzak_inappwebview_linux_plugin_register_with_registrar(
+    FlPluginRegistrar *registrar);
 
 G_END_DECLS
 
-#endif  // FLUTTER_PLUGIN_ZIKZAK_INAPPWEBVIEW_LINUX_PLUGIN_H_
+#endif // FLUTTER_PLUGIN_ZIKZAK_INAPPWEBVIEW_LINUX_PLUGIN_H_
