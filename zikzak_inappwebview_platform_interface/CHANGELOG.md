@@ -1,3 +1,41 @@
+## 4.2.4 - 2026-06-03
+
+
+- Feature: WebAuthn (passkey) support — added `webAuthenticationSupport` setting +
+  `WebAuthenticationSupport` enum for native passkey authentication in WebViews
+  (Upstream PR #2743 @susemeee)
+- Feature: Google Pay support — added `paymentRequestEnabled` setting for
+  `WebViewFeature.PAYMENT_REQUEST` (Upstream PR #2722 @AzarouAmine)
+- Feature: Audio capture for file picker — added `getAudioIntent()` for
+  `<input type="file" accept="audio/*">` support (Upstream PR #2823 @PrimozRatej)
+- Fixed: takeScreenshot now renders content outside the viewport — disabled scrollbars
+  during capture, added layout() before draw() (Upstream PR #2390 @lucasdessy)
+- Fixed: AJAX blob interception — use `request.response` instead of undefined `blob`
+  variable (Upstream PR #2099 @EArminjon)
+- Fixed: Chrome not supported error handling — wrapped `onCustomTabsConnected` in
+  try-catch with `onBrowserNotSupported` callback (Upstream PR #2070 @luckyhandler)
+- Fixed: Restored working `.g.dart` files after build_runner regeneration
+- Chore: Bumped `androidx.webkit:webkit` from 1.13.0 to 1.14.0
+- Chore: Added `generators` dependency to platform_interface for proper code generation
+## 4.2.4 - 2026-06-03
+
+
+- Feature: WebAuthn (passkey) support — added `webAuthenticationSupport` setting +
+  `WebAuthenticationSupport` enum for native passkey authentication in WebViews
+  (Upstream PR #2743 @susemeee)
+- Feature: Google Pay support — added `paymentRequestEnabled` setting for
+  `WebViewFeature.PAYMENT_REQUEST` (Upstream PR #2722 @AzarouAmine)
+- Feature: Audio capture for file picker — added `getAudioIntent()` for
+  `<input type="file" accept="audio/*">` support (Upstream PR #2823 @PrimozRatej)
+- Fixed: takeScreenshot now renders content outside the viewport — disabled scrollbars
+  during capture, added layout() before draw() (Upstream PR #2390 @lucasdessy)
+- Fixed: AJAX blob interception — use `request.response` instead of undefined `blob`
+  variable (Upstream PR #2099 @EArminjon)
+- Fixed: Chrome not supported error handling — wrapped `onCustomTabsConnected` in
+  try-catch with `onBrowserNotSupported` callback (Upstream PR #2070 @luckyhandler)
+- Fixed: Restored working `.g.dart` files after build_runner regeneration
+- Chore: Bumped `androidx.webkit:webkit` from 1.13.0 to 1.14.0
+- Chore: Added `generators` dependency to platform_interface for proper code generation
 ## 4.2.3 - 2026-06-03
 
 
