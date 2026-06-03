@@ -57,6 +57,9 @@ public class WebAuthenticationSession: NSObject, ASWebAuthenticationPresentation
         if #available(iOS 13.0, *), let session = session as? ASWebAuthenticationSession {
             session.prefersEphemeralWebBrowserSession = settings.prefersEphemeralWebBrowserSession
         }
+        if #available(iOS 17.4, *), let session = session as? ASWebAuthenticationSession {
+            session.additionalHeaderFields = settings.additionalHeaderFields
+        }
     }
 
     public func completionHandler(url: URL?, error: Error?) {

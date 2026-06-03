@@ -100,6 +100,15 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         super.init(coder: coder)
     }
 
+    public override func layout() {
+        super.layout()
+        guard let superview = superview else { return }
+        let targetFrame = superview.bounds
+        if frame != targetFrame {
+            frame = targetFrame
+        }
+    }
+
     public override func observeValue(
         forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?,
         context: UnsafeMutableRawPointer?

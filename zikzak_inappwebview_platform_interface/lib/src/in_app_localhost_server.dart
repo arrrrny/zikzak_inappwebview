@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter/widgets.dart';
 
 import 'mime_type_resolver.dart';
 import 'platform_in_app_localhost_server.dart';
@@ -39,6 +40,7 @@ class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
   bool _shared = false;
   String _directoryIndex = 'index.html';
   String _documentRoot = './';
+  AppLifecycleListener? _appLifecycleListener;
 
   /// Creates a new [DefaultInAppLocalhostServer].
   DefaultInAppLocalhostServer(PlatformInAppLocalhostServerCreationParams params)
@@ -75,6 +77,8 @@ class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
       throw Exception('Server already started on http://localhost:$_port');
     }
     this._started = true;
+
+    _registerLifecycleListener();
 
     final completer = Completer();
 
@@ -128,8 +132,28 @@ class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
     return completer.future;
   }
 
+  void _registerLifecycleListener() {
+    _appLifecycleListener?.dispose();
+    _appLifecycleListener = AppLifecycleListener(
+      onResume: _onResume,
+    );
+  }
+
+  void _onResume() {
+    if (_server != null) {
+      // After the app resumes from background, the underlying socket may no
+      // longer be valid. Close the server and reset the state so the user
+      // can restart it.
+      _server!.close(force: true).catchError((_) {});
+      _server = null;
+      _started = false;
+    }
+  }
+
   @override
   Future<void> close() async {
+    _appLifecycleListener?.dispose();
+    _appLifecycleListener = null;
     if (this._server == null) {
       return;
     }

@@ -26,13 +26,25 @@ class WebAuthenticationSessionSettings_ {
   ///- MacOS
   bool? prefersEphemeralWebBrowserSession;
 
+  ///A dictionary of additional HTTP headers to include in the authentication request.
+  ///
+  ///Set this property to include additional headers in all requests made by the authentication session.
+  ///
+  ///**NOTE for iOS**: Available only on iOS 17.4+.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- iOS
+  Map<String, String>? additionalHeaderFields;
+
   WebAuthenticationSessionSettings_({
     this.prefersEphemeralWebBrowserSession = false,
+    this.additionalHeaderFields,
   });
 
   Map<String, dynamic> toMap() {
     return {
       "prefersEphemeralWebBrowserSession": prefersEphemeralWebBrowserSession,
+      "additionalHeaderFields": additionalHeaderFields,
     };
   }
 }

@@ -27,8 +27,10 @@ class WebAuthenticationSessionSettings {
   ///- iOS
   ///- MacOS
   bool? prefersEphemeralWebBrowserSession;
+  Map<String, String>? additionalHeaderFields;
   WebAuthenticationSessionSettings({
     this.prefersEphemeralWebBrowserSession = false,
+    this.additionalHeaderFields,
   });
 
   ///Gets a possible [WebAuthenticationSessionSettings] instance from a [Map] value.
@@ -39,12 +41,15 @@ class WebAuthenticationSessionSettings {
     final instance = WebAuthenticationSessionSettings();
     instance.prefersEphemeralWebBrowserSession =
         map['prefersEphemeralWebBrowserSession'];
+    instance.additionalHeaderFields =
+        Map<String, String>.from(map['additionalHeaderFields'] ?? {});
     return instance;
   }
 
   Map<String, dynamic> toMap() {
     return {
       "prefersEphemeralWebBrowserSession": prefersEphemeralWebBrowserSession,
+      "additionalHeaderFields": additionalHeaderFields,
     };
   }
 
@@ -61,6 +66,6 @@ class WebAuthenticationSessionSettings {
 
   @override
   String toString() {
-    return 'WebAuthenticationSessionSettings{prefersEphemeralWebBrowserSession: $prefersEphemeralWebBrowserSession}';
+    return 'WebAuthenticationSessionSettings{prefersEphemeralWebBrowserSession: $prefersEphemeralWebBrowserSession, additionalHeaderFields: $additionalHeaderFields}';
   }
 }

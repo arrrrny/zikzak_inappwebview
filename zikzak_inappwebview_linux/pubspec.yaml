@@ -13,13 +13,15 @@ topics:
 
 environment:
   sdk: ">=3.8.0 <4.0.0"
-  flutter: ">=3.29.0"
+  flutter: ">=3.38.6"
 
 dependencies:
   flutter:
     sdk: flutter
-  zikzak_inappwebview_platform_interface: ^4.3.0
-  zikzak_inappwebview_internal_annotations: ^4.3.0
+  zikzak_inappwebview_platform_interface:
+    path: ../zikzak_inappwebview_platform_interface
+  zikzak_inappwebview_internal_annotations:
+    path: ../zikzak_inappwebview_internal_annotations
 dev_dependencies:
   flutter_test:
     sdk: flutter

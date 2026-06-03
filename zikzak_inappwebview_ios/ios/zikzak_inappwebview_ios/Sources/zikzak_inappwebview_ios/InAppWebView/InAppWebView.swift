@@ -71,6 +71,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
 
     fileprivate var interceptOnlyAsyncAjaxRequestsPluginScript: PluginScript?
 
+    var isNavigatingWithCustomAction = false
+
     init(
         id: Any?, plugin: SwiftFlutterPlugin?, frame: CGRect, configuration: WKWebViewConfiguration,
         contextMenu: [String: Any]?, userScripts: [UserScript] = []
@@ -1051,6 +1053,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     }
 
     public func loadUrl(urlRequest: URLRequest, allowingReadAccessTo: URL?) {
+        isNavigatingWithCustomAction = true
         let url = urlRequest.url!
 
         if #available(iOS 9.0, *), let allowingReadAccessTo = allowingReadAccessTo,
@@ -2191,6 +2194,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         decidePolicyFor navigationAction: WKNavigationAction,
         decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
     ) {
+        if isNavigatingWithCustomAction {
+            isNavigatingWithCustomAction = false
+            decisionHandler(.allow)
+            return
+        }
         var decisionHandlerCalled = false
         let callback = WebViewChannelDelegate.ShouldOverrideUrlLoadingCallback()
         callback.nonNullSuccess = { (response: WKNavigationActionPolicy) in
