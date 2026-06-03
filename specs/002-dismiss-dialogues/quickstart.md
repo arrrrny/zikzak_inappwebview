@@ -15,7 +15,7 @@ Add the new property inside the `InAppWebViewSettings_` class:
   PlatformOS.linux,
   PlatformOS.web,
 ])
-@ExchangeableObjectProperty(defaultValue: "true")
+@ExchangeableObjectProperty(defaultValue: "false")
 bool? dismissDialogues;
 ```
 
@@ -31,6 +31,7 @@ dart run build_runner build --delete-conflicting-outputs
 In `zikzak_inappwebview/lib/src/in_app_webview/in_app_webview_controller.dart`, after page load completes (`onLoadStop`), if `dismissDialogues` is `true`, call `evaluateJs` with the overlay removal script.
 
 The script should:
+
 1. Query all elements
 2. Remove those with `position: fixed` or `position: sticky`
 3. Reset `overflow` and `margin` on `html` and `body`
@@ -42,20 +43,21 @@ Wrap in a retry loop (3 attempts, 800ms delay).
 
 For each platform package, add the `dismissDialogues` property to the native `InAppWebViewSettings` implementation:
 
-| Platform | File | Language |
-|---|---|---|
-| iOS | `.../ios/.../InAppWebViewSettings.swift` | Swift |
-| macOS | `.../macos/.../InAppWebViewSettings.swift` | Swift |
-| Android | `.../android/.../InAppWebViewSettings.java` | Java |
-| Linux | `.../linux/.../in_app_webview_settings.cc` | C++ |
-| Windows | `.../windows/.../in_app_webview_settings.dart` | Dart |
-| Web | `.../web/.../in_app_webview_settings.dart` | Dart |
+| Platform | File                                           | Language |
+| -------- | ---------------------------------------------- | -------- |
+| iOS      | `.../ios/.../InAppWebViewSettings.swift`       | Swift    |
+| macOS    | `.../macos/.../InAppWebViewSettings.swift`     | Swift    |
+| Android  | `.../android/.../InAppWebViewSettings.java`    | Java     |
+| Linux    | `.../linux/.../in_app_webview_settings.cc`     | C++      |
+| Windows  | `.../windows/.../in_app_webview_settings.dart` | Dart     |
+| Web      | `.../web/.../in_app_webview_settings.dart`     | Dart     |
 
 Each platform just needs to store the boolean property — the actual overlay removal runs from the Dart JS evaluation (not native code), so the native side only needs to pass the value through.
 
 ## Step 5 — Update agent context
 
 Update `AGENTS.md` to point to this plan:
+
 ```
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
