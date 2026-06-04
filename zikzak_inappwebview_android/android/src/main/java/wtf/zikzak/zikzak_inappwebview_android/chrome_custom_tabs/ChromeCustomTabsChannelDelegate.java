@@ -235,6 +235,13 @@ public class ChromeCustomTabsChannelDelegate extends ChannelDelegateImpl {
     channel.invokeMethod("onGreatestScrollPercentageIncreased", obj);
   }
 
+  public void onBrowserNotSupported() {
+    MethodChannel channel = getChannel();
+    if (channel == null) return;
+    Map<String, Object> obj = new HashMap<>();
+    channel.invokeMethod("onBrowserNotSupported", obj);
+  }
+
   public void onSessionEnded(boolean didUserInteract) {
     MethodChannel channel = getChannel();
     if (channel == null) return;
