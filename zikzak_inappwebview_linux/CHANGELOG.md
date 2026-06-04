@@ -1,3 +1,21 @@
+## 4.3.1 - 2026-06-04
+
+
+- Fixed: iOS Passkey/WebAuthn support — wired `webAuthenticationSupport` setting into
+  native `WKWebViewWebAuthenticationSupport.boundKeychainForPasskeys` on iOS 16.4+ (#131)
+- Fixed: macOS 26 crash in AppKit NSToolbar when InAppBrowser window closes — added
+  `isClosing` guard and `window?.delegate = nil` before teardown (#87)
+- Fixed: macOS WebView native frame drift with fractional platform view widths —
+  overrode `layout()` to explicitly sync frame from superview bounds (#93)
+- Fixed: iOS `shouldOverrideUrlLoading` deadlock when adding custom headers — added
+  `isNavigatingWithCustomAction` flag to prevent re-entrant navigation callbacks (#132)
+- Fixed: `InAppLocalhostServer` fails after app resumes from background — added
+  `AppLifecycleListener` to close and reset server state on resume (#113)
+- Fixed: `build_runner` fails due to missing `generators` package — added as dev_dependency
+  in platform_interface pubspec (#139)
+- Feature: `WebAuthenticationSession` now supports `additionalHeaderFields` for custom
+  HTTP headers — available on iOS 17.4+ (#100)
+- Chore: Raised minimum Flutter version from 3.29.0 to 3.38.6 for iOS touch fix (#128)
 ## 4.3.0 - 2026-06-03
 
 
