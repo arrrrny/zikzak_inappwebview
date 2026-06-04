@@ -134,9 +134,7 @@ class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
 
   void _registerLifecycleListener() {
     _appLifecycleListener?.dispose();
-    _appLifecycleListener = AppLifecycleListener(
-      onResume: _onResume,
-    );
+    _appLifecycleListener = AppLifecycleListener(onResume: _onResume);
   }
 
   void _onResume() {

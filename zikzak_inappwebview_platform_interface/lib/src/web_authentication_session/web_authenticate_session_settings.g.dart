@@ -41,8 +41,9 @@ class WebAuthenticationSessionSettings {
     final instance = WebAuthenticationSessionSettings();
     instance.prefersEphemeralWebBrowserSession =
         map['prefersEphemeralWebBrowserSession'];
-    instance.additionalHeaderFields =
-        Map<String, String>.from(map['additionalHeaderFields'] ?? {});
+    instance.additionalHeaderFields = Map<String, String>.from(
+      map['additionalHeaderFields'] ?? {},
+    );
     return instance;
   }
 

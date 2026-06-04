@@ -24,7 +24,7 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     var verticalScrollBarEnabled = true
     var horizontalScrollBarEnabled = true
     var resourceCustomSchemes: [String] = []
-    var contentBlockers: [[String: [String : Any]]] = []
+    var contentBlockers: [[String: [String: Any]]] = []
     var minimumFontSize = 0
     var useShouldInterceptAjaxRequest = false
     var interceptOnlyAsyncAjaxRequests = true
@@ -50,19 +50,19 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     var allowsPictureInPictureMediaPlayback = true
     var isFraudulentWebsiteWarningEnabled = true
     var selectionGranularity = 0
-    var dataDetectorTypes: [String] = ["NONE"] // WKDataDetectorTypeNone
+    var dataDetectorTypes: [String] = ["NONE"]  // WKDataDetectorTypeNone
     var preferredContentMode = 0
     var sharedCookiesEnabled = false
     var automaticallyAdjustsScrollIndicatorInsets = false
     var accessibilityIgnoresInvertColors = false
-    var decelerationRate = "NORMAL" // UIScrollView.DecelerationRate.normal
+    var decelerationRate = "NORMAL"  // UIScrollView.DecelerationRate.normal
     var alwaysBounceVertical = false
     var alwaysBounceHorizontal = false
     var scrollsToTop = true
     var isPagingEnabled = false
     var maximumZoomScale = 1.0
     var minimumZoomScale = 1.0
-    var contentInsetAdjustmentBehavior = 2 // UIScrollView.ContentInsetAdjustmentBehavior.never
+    var contentInsetAdjustmentBehavior = 2  // UIScrollView.ContentInsetAdjustmentBehavior.never
     var isDirectionalLockEnabled = false
     var mediaType: String? = nil
     var pageZoom = 1.0
@@ -85,22 +85,23 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     var webAuthenticationSupport = 0
     var dismissDialogues = true
 
-    override init(){
+    override init() {
         super.init()
     }
 
     override func parse(settings: [String: Any?]) -> InAppWebViewSettings {
-        var settings = settings // re-assing to be able to use removeValue
-        if let minimumViewportInsetMap = settings["minimumViewportInset"] as? [String : Double] {
+        var settings = settings  // re-assing to be able to use removeValue
+        if let minimumViewportInsetMap = settings["minimumViewportInset"] as? [String: Double] {
             minimumViewportInset = UIEdgeInsets.fromMap(map: minimumViewportInsetMap)
             settings.removeValue(forKey: "minimumViewportInset")
         }
-        if let maximumViewportInsetMap = settings["maximumViewportInset"] as? [String : Double] {
+        if let maximumViewportInsetMap = settings["maximumViewportInset"] as? [String: Double] {
             maximumViewportInset = UIEdgeInsets.fromMap(map: maximumViewportInsetMap)
             settings.removeValue(forKey: "maximumViewportInset")
         }
         let _ = super.parse(settings: settings)
-        if #available(iOS 13.0, *) {} else {
+        if #available(iOS 13.0, *) {
+        } else {
             applePayAPIEnabled = false
         }
         return self
@@ -112,58 +113,82 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
             let configuration = webView.configuration
             if #available(iOS 9.0, *) {
                 realSettings["userAgent"] = webView.customUserAgent
-                realSettings["applicationNameForUserAgent"] = configuration.applicationNameForUserAgent
-                realSettings["allowsAirPlayForMediaPlayback"] = configuration.allowsAirPlayForMediaPlayback
+                realSettings["applicationNameForUserAgent"] =
+                    configuration.applicationNameForUserAgent
+                realSettings["allowsAirPlayForMediaPlayback"] =
+                    configuration.allowsAirPlayForMediaPlayback
                 realSettings["allowsLinkPreview"] = webView.allowsLinkPreview
-                realSettings["allowsPictureInPictureMediaPlayback"] = configuration.allowsPictureInPictureMediaPlayback
+                realSettings["allowsPictureInPictureMediaPlayback"] =
+                    configuration.allowsPictureInPictureMediaPlayback
             }
-            realSettings["javaScriptCanOpenWindowsAutomatically"] = configuration.preferences.javaScriptCanOpenWindowsAutomatically
+            realSettings["javaScriptCanOpenWindowsAutomatically"] =
+                configuration.preferences.javaScriptCanOpenWindowsAutomatically
             if #available(iOS 10.0, *) {
-                realSettings["mediaPlaybackRequiresUserGesture"] = configuration.mediaTypesRequiringUserActionForPlayback == .all
-                realSettings["ignoresViewportScaleLimits"] = configuration.ignoresViewportScaleLimits
-                realSettings["dataDetectorTypes"] = Util.getDataDetectorTypeString(type: configuration.dataDetectorTypes)
+                realSettings["mediaPlaybackRequiresUserGesture"] =
+                    configuration.mediaTypesRequiringUserActionForPlayback == .all
+                realSettings["ignoresViewportScaleLimits"] =
+                    configuration.ignoresViewportScaleLimits
+                realSettings["dataDetectorTypes"] = Util.getDataDetectorTypeString(
+                    type: configuration.dataDetectorTypes)
             } else {
-                realSettings["mediaPlaybackRequiresUserGesture"] = configuration.mediaPlaybackRequiresUserAction
+                realSettings["mediaPlaybackRequiresUserGesture"] =
+                    configuration.mediaPlaybackRequiresUserAction
             }
             realSettings["minimumFontSize"] = Int(configuration.preferences.minimumFontSize)
-            realSettings["suppressesIncrementalRendering"] = configuration.suppressesIncrementalRendering
-            realSettings["allowsBackForwardNavigationGestures"] = webView.allowsBackForwardNavigationGestures
+            realSettings["suppressesIncrementalRendering"] =
+                configuration.suppressesIncrementalRendering
+            realSettings["allowsBackForwardNavigationGestures"] =
+                webView.allowsBackForwardNavigationGestures
             realSettings["allowsInlineMediaPlayback"] = configuration.allowsInlineMediaPlayback
             if #available(iOS 13.0, *) {
-                realSettings["isFraudulentWebsiteWarningEnabled"] = configuration.preferences.isFraudulentWebsiteWarningEnabled
-                realSettings["preferredContentMode"] = configuration.defaultWebpagePreferences.preferredContentMode.rawValue
-                realSettings["automaticallyAdjustsScrollIndicatorInsets"] = webView.scrollView.automaticallyAdjustsScrollIndicatorInsets
+                realSettings["isFraudulentWebsiteWarningEnabled"] =
+                    configuration.preferences.isFraudulentWebsiteWarningEnabled
+                realSettings["preferredContentMode"] =
+                    configuration.defaultWebpagePreferences.preferredContentMode.rawValue
+                realSettings["automaticallyAdjustsScrollIndicatorInsets"] =
+                    webView.scrollView.automaticallyAdjustsScrollIndicatorInsets
             }
             realSettings["selectionGranularity"] = configuration.selectionGranularity.rawValue
             if #available(iOS 11.0, *) {
-                realSettings["accessibilityIgnoresInvertColors"] = webView.accessibilityIgnoresInvertColors
-                realSettings["contentInsetAdjustmentBehavior"] = webView.scrollView.contentInsetAdjustmentBehavior.rawValue
+                realSettings["accessibilityIgnoresInvertColors"] =
+                    webView.accessibilityIgnoresInvertColors
+                realSettings["contentInsetAdjustmentBehavior"] =
+                    webView.scrollView.contentInsetAdjustmentBehavior.rawValue
             }
-            realSettings["decelerationRate"] = Util.getDecelerationRateString(type: webView.scrollView.decelerationRate)
+            realSettings["decelerationRate"] = Util.getDecelerationRateString(
+                type: webView.scrollView.decelerationRate)
             realSettings["alwaysBounceVertical"] = webView.scrollView.alwaysBounceVertical
             realSettings["alwaysBounceHorizontal"] = webView.scrollView.alwaysBounceHorizontal
             realSettings["scrollsToTop"] = webView.scrollView.scrollsToTop
             realSettings["isPagingEnabled"] = webView.scrollView.isPagingEnabled
             realSettings["maximumZoomScale"] = webView.scrollView.maximumZoomScale
             realSettings["minimumZoomScale"] = webView.scrollView.minimumZoomScale
-            realSettings["allowUniversalAccessFromFileURLs"] = configuration.value(forKey: "allowUniversalAccessFromFileURLs")
-            realSettings["allowFileAccessFromFileURLs"] = configuration.preferences.value(forKey: "allowFileAccessFromFileURLs")
+            realSettings["allowUniversalAccessFromFileURLs"] = configuration.value(
+                forKey: "allowUniversalAccessFromFileURLs")
+            realSettings["allowFileAccessFromFileURLs"] = configuration.preferences.value(
+                forKey: "allowFileAccessFromFileURLs")
             realSettings["isDirectionalLockEnabled"] = webView.scrollView.isDirectionalLockEnabled
             realSettings["javaScriptEnabled"] = configuration.preferences.javaScriptEnabled
             if #available(iOS 14.0, *) {
                 realSettings["mediaType"] = webView.mediaType
                 realSettings["pageZoom"] = Float(webView.pageZoom)
-                realSettings["limitsNavigationsToAppBoundDomains"] = configuration.limitsNavigationsToAppBoundDomains
-                realSettings["javaScriptEnabled"] = configuration.defaultWebpagePreferences.allowsContentJavaScript
+                realSettings["limitsNavigationsToAppBoundDomains"] =
+                    configuration.limitsNavigationsToAppBoundDomains
+                realSettings["javaScriptEnabled"] =
+                    configuration.defaultWebpagePreferences.allowsContentJavaScript
             }
             if #available(iOS 15.0, *) {
-                realSettings["isTextInteractionEnabled"] = configuration.preferences.isTextInteractionEnabled
+                realSettings["isTextInteractionEnabled"] =
+                    configuration.preferences.isTextInteractionEnabled
                 realSettings["upgradeKnownHostsToHTTPS"] = configuration.upgradeKnownHostsToHTTPS
-                realSettings["underPageBackgroundColor"] = webView.underPageBackgroundColor.hexString
+                realSettings["underPageBackgroundColor"] =
+                    webView.underPageBackgroundColor.hexString
             }
             if #available(iOS 15.4, *) {
-                realSettings["isSiteSpecificQuirksModeEnabled"] = configuration.preferences.isSiteSpecificQuirksModeEnabled
-                realSettings["isElementFullscreenEnabled"] = configuration.preferences.isElementFullscreenEnabled
+                realSettings["isSiteSpecificQuirksModeEnabled"] =
+                    configuration.preferences.isSiteSpecificQuirksModeEnabled
+                realSettings["isElementFullscreenEnabled"] =
+                    configuration.preferences.isElementFullscreenEnabled
             }
             if #available(iOS 15.5, *) {
                 realSettings["minimumViewportInset"] = webView.minimumViewportInset.toMap()
@@ -174,8 +199,18 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
             }
             if #available(iOS 16.4, *) {
                 realSettings["isInspectable"] = webView.isInspectable
-                realSettings["shouldPrintBackgrounds"] = configuration.preferences.shouldPrintBackgrounds
-                realSettings["webAuthenticationSupport"] = configuration.webAuthenticationSupport.boundKeychainForPasskeys ? 1 : 0
+                realSettings["shouldPrintBackgrounds"] =
+                    configuration.preferences.shouldPrintBackgrounds
+                // Use KVC to avoid compile-time availability issues with older SDKs
+                let selector = Selector(("webAuthenticationSupport"))
+                if configuration.responds(to: selector),
+                    let webAuthSupport = configuration.perform(selector)?.takeUnretainedValue()
+                        as? NSObject
+                {
+                    let boundValue =
+                        webAuthSupport.value(forKey: "boundKeychainForPasskeys") as? Bool ?? false
+                    realSettings["webAuthenticationSupport"] = boundValue ? 1 : 0
+                }
             }
         }
         return realSettings

@@ -771,8 +771,15 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             }
 
             if #available(iOS 16.4, *) {
-                if settings.webAuthenticationSupport == 1 { // FOR_APP
-                    configuration.webAuthenticationSupport.boundKeychainForPasskeys = true
+                if settings.webAuthenticationSupport == 1 {  // FOR_APP
+                    // Use KVC to avoid compile-time availability issues with older SDKs
+                    let selector = Selector(("webAuthenticationSupport"))
+                    if configuration.responds(to: selector),
+                        let webAuthSupport = configuration.perform(selector)?.takeUnretainedValue()
+                            as? NSObject
+                    {
+                        webAuthSupport.setValue(true, forKey: "boundKeychainForPasskeys")
+                    }
                 }
             }
         }
