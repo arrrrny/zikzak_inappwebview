@@ -1,3 +1,7 @@
+## 4.3.2 - 2026-06-04
+
+* fix: use KVC for webAuthenticationSupport to avoid SDK availability issue
+
 ## 4.3.1 - 2026-06-04
 
 
