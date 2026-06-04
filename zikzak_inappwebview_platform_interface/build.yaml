@@ -3,14 +3,3 @@ targets:
     sources:
       exclude:
         - example/**.dart
-
-builders:
-  generators:
-    import: "package:generators/builder.dart"
-    builder_factories:
-      - generateExchangeableObject
-      - generateExchangeableEnum
-    build_extensions: { ".dart": [".g.part"] }
-    auto_apply: dependents
-    build_to: cache
-    applies_builders: ["source_gen|combining_builder"]
