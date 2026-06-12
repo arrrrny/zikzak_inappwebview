@@ -1,3 +1,10 @@
+## 4.3.4 - 2026-06-12
+
+
+- Fixed: iOS `type 'int' is not a subtype of type 'WebAuthenticationSupport?'` crash in
+  `getHtml()`/`getSettings()` — `InAppWebViewSettings.fromMap()` now converts
+  `webAuthenticationSupport` via `WebAuthenticationSupport.fromNativeValue()` instead of
+  assigning the raw `int` value from the platform channel map
 ## 4.3.3 - 2026-06-04
 
 * 
