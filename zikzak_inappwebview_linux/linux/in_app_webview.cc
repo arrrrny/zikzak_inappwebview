@@ -5,32 +5,31 @@
 
 struct _InAppWebView {
   FlPixelBufferTexture parent_instance;
-  FlPluginRegistrar* registrar;
-  char* id;
-  FlMethodChannel* channel;
-  GtkWidget* web_view;
+  FlPluginRegistrar *registrar;
+  char *id;
+  FlMethodChannel *channel;
+  GtkWidget *web_view;
   int64_t texture_id;
 
-  uint8_t* buffer;
+  uint8_t *buffer;
   int32_t width;
   int32_t height;
 };
 
 G_DEFINE_TYPE(InAppWebView, in_app_webview, fl_pixel_buffer_texture_get_type())
 
-static gboolean in_app_webview_copy_pixels(FlPixelBufferTexture* texture,
-                                           const uint8_t** buffer,
-                                           uint32_t* width,
-                                           uint32_t* height,
-                                           GError** error) {
-  InAppWebView* self = IN_APP_WEBVIEW(texture);
+static gboolean in_app_webview_copy_pixels(FlPixelBufferTexture *texture,
+                                           const uint8_t **buffer,
+                                           uint32_t *width, uint32_t *height,
+                                           GError **error) {
+  InAppWebView *self = IN_APP_WEBVIEW(texture);
 
   if (self->buffer == nullptr) {
-      *width = 1;
-      *height = 1;
-      static uint8_t dummy[4] = {255, 0, 0, 255};
-      *buffer = dummy;
-      return TRUE;
+    *width = 1;
+    *height = 1;
+    static uint8_t dummy[4] = {255, 0, 0, 255};
+    *buffer = dummy;
+    return TRUE;
   }
 
   *buffer = self->buffer;
@@ -39,8 +38,8 @@ static gboolean in_app_webview_copy_pixels(FlPixelBufferTexture* texture,
   return TRUE;
 }
 
-static void in_app_webview_dispose(GObject* object) {
-  InAppWebView* self = IN_APP_WEBVIEW(object);
+static void in_app_webview_dispose(GObject *object) {
+  InAppWebView *self = IN_APP_WEBVIEW(object);
   if (self->web_view) {
     // gtk_widget_destroy(self->web_view); // WebKitWebView is a GtkWidget
     // But since we own the ref via g_object_ref_sink, we should unref it.
@@ -64,124 +63,136 @@ static void in_app_webview_dispose(GObject* object) {
   G_OBJECT_CLASS(in_app_webview_parent_class)->dispose(object);
 }
 
-static void in_app_webview_class_init(InAppWebViewClass* klass) {
+static void in_app_webview_class_init(InAppWebViewClass *klass) {
   G_OBJECT_CLASS(klass)->dispose = in_app_webview_dispose;
-  FL_PIXEL_BUFFER_TEXTURE_CLASS(klass)->copy_pixels = in_app_webview_copy_pixels;
+  FL_PIXEL_BUFFER_TEXTURE_CLASS(klass)->copy_pixels =
+      in_app_webview_copy_pixels;
 }
 
-static void in_app_webview_init(InAppWebView* self) {
-    self->width = 1280;
-    self->height = 720;
-    self->buffer = (uint8_t*)g_malloc0(self->width * self->height * 4);
+static void in_app_webview_init(InAppWebView *self) {
+  self->width = 1280;
+  self->height = 720;
+  self->buffer = (uint8_t *)g_malloc0(self->width * self->height * 4);
 
-    // Fill with blue for initial state
-    for (int i = 0; i < self->width * self->height; i++) {
-        self->buffer[i * 4] = 0;     // R
-        self->buffer[i * 4 + 1] = 0; // G
-        self->buffer[i * 4 + 2] = 255; // B
-        self->buffer[i * 4 + 3] = 255; // A
-    }
+  // Fill with blue for initial state
+  for (int i = 0; i < self->width * self->height; i++) {
+    self->buffer[i * 4] = 0;       // R
+    self->buffer[i * 4 + 1] = 0;   // G
+    self->buffer[i * 4 + 2] = 255; // B
+    self->buffer[i * 4 + 3] = 255; // A
+  }
 }
 
-static void in_app_webview_method_call_handler(FlMethodChannel* channel, FlMethodCall* method_call, gpointer user_data) {
-    in_app_webview_handle_method_call(IN_APP_WEBVIEW(user_data), method_call);
+static void in_app_webview_method_call_handler(FlMethodChannel *channel,
+                                               FlMethodCall *method_call,
+                                               gpointer user_data) {
+  in_app_webview_handle_method_call(IN_APP_WEBVIEW(user_data), method_call);
 }
 
 // Helper to update texture from snapshot
-static void on_snapshot_ready(GObject* source_object, GAsyncResult* res, gpointer user_data) {
-    InAppWebView* self = IN_APP_WEBVIEW(user_data);
-    GError* error = nullptr;
-    WebKitWebView* web_view = WEBKIT_WEB_VIEW(source_object);
-    cairo_surface_t* surface = webkit_web_view_get_snapshot_finish(web_view, res, &error);
+static void on_snapshot_ready(GObject *source_object, GAsyncResult *res,
+                              gpointer user_data) {
+  InAppWebView *self = IN_APP_WEBVIEW(user_data);
+  GError *error = nullptr;
+  WebKitWebView *web_view = WEBKIT_WEB_VIEW(source_object);
+  cairo_surface_t *surface =
+      webkit_web_view_get_snapshot_finish(web_view, res, &error);
 
-    if (surface) {
-        int width = cairo_image_surface_get_width(surface);
-        int height = cairo_image_surface_get_height(surface);
-        // int stride = cairo_image_surface_get_stride(surface); // Unused
-        unsigned char* data = cairo_image_surface_get_data(surface);
+  if (surface) {
+    int width = cairo_image_surface_get_width(surface);
+    int height = cairo_image_surface_get_height(surface);
+    // int stride = cairo_image_surface_get_stride(surface); // Unused
+    unsigned char *data = cairo_image_surface_get_data(surface);
 
-        if (width != self->width || height != self->height) {
-            g_free(self->buffer);
-            self->width = width;
-            self->height = height;
-            self->buffer = (uint8_t*)g_malloc0(width * height * 4);
-        }
-
-        // Cairo uses ARGB or RGB24, usually premultiplied. Flutter expects RGBA.
-        // WebKit snapshot is usually CAIRO_FORMAT_ARGB32 (premultiplied ARGB, host endian).
-
-        // Convert ARGB to RGBA
-        for (int i = 0; i < width * height; i++) {
-            // uint32_t* pixel = (uint32_t*)(data + i * 4);
-
-            uint8_t b = data[i * 4];
-            uint8_t g = data[i * 4 + 1];
-            uint8_t r = data[i * 4 + 2];
-            uint8_t a = data[i * 4 + 3];
-
-            self->buffer[i * 4] = r;
-            self->buffer[i * 4 + 1] = g;
-            self->buffer[i * 4 + 2] = b;
-            self->buffer[i * 4 + 3] = a;
-        }
-
-        cairo_surface_destroy(surface);
-
-        // Notify texture updated
-        fl_texture_registrar_mark_texture_frame_available(
-            fl_plugin_registrar_get_texture_registrar(self->registrar),
-            FL_TEXTURE(self));
-    } else {
-        if (error) {
-            g_warning("Snapshot failed: %s", error->message);
-            g_error_free(error);
-        }
+    if (width != self->width || height != self->height) {
+      g_free(self->buffer);
+      self->width = width;
+      self->height = height;
+      self->buffer = (uint8_t *)g_malloc0(width * height * 4);
     }
 
-    g_object_unref(self);
-}
+    // Cairo uses ARGB or RGB24, usually premultiplied. Flutter expects RGBA.
+    // WebKit snapshot is usually CAIRO_FORMAT_ARGB32 (premultiplied ARGB, host
+    // endian).
 
-static void update_texture(InAppWebView* self) {
-    webkit_web_view_get_snapshot(WEBKIT_WEB_VIEW(self->web_view),
-                                 WEBKIT_SNAPSHOT_REGION_VISIBLE,
-                                 WEBKIT_SNAPSHOT_OPTIONS_NONE,
-                                 nullptr,
-                                 on_snapshot_ready,
-                                 g_object_ref(self));
-}
+    // Convert ARGB to RGBA
+    for (int i = 0; i < width * height; i++) {
+      // uint32_t* pixel = (uint32_t*)(data + i * 4);
 
-static void on_load_changed(WebKitWebView* web_view, WebKitLoadEvent load_event, gpointer user_data) {
-    InAppWebView* self = IN_APP_WEBVIEW(user_data);
-    // Take snapshot on load events
-    if (load_event == WEBKIT_LOAD_FINISHED) {
-        update_texture(self);
+      uint8_t b = data[i * 4];
+      uint8_t g = data[i * 4 + 1];
+      uint8_t r = data[i * 4 + 2];
+      uint8_t a = data[i * 4 + 3];
+
+      self->buffer[i * 4] = r;
+      self->buffer[i * 4 + 1] = g;
+      self->buffer[i * 4 + 2] = b;
+      self->buffer[i * 4 + 3] = a;
     }
+
+    cairo_surface_destroy(surface);
+
+    // Notify texture updated
+    fl_texture_registrar_mark_texture_frame_available(
+        fl_plugin_registrar_get_texture_registrar(self->registrar),
+        FL_TEXTURE(self));
+  } else {
+    if (error) {
+      g_warning("Snapshot failed: %s", error->message);
+      g_error_free(error);
+    }
+  }
+
+  g_object_unref(self);
 }
 
-InAppWebView* in_app_webview_new(FlPluginRegistrar* registrar, const char* id) {
-  InAppWebView* self = IN_APP_WEBVIEW(g_object_new(IN_APP_WEBVIEW_TYPE, nullptr));
+static void update_texture(InAppWebView *self) {
+  webkit_web_view_get_snapshot(WEBKIT_WEB_VIEW(self->web_view),
+                               WEBKIT_SNAPSHOT_REGION_VISIBLE,
+                               WEBKIT_SNAPSHOT_OPTIONS_NONE, nullptr,
+                               on_snapshot_ready, g_object_ref(self));
+}
+
+static void on_load_changed(WebKitWebView *web_view, WebKitLoadEvent load_event,
+                            gpointer user_data) {
+  InAppWebView *self = IN_APP_WEBVIEW(user_data);
+  // Take snapshot on load events
+  if (load_event == WEBKIT_LOAD_FINISHED) {
+    update_texture(self);
+  }
+}
+
+InAppWebView *in_app_webview_new(FlPluginRegistrar *registrar, const char *id) {
+  InAppWebView *self =
+      IN_APP_WEBVIEW(g_object_new(IN_APP_WEBVIEW_TYPE, nullptr));
   self->registrar = registrar;
   self->id = g_strdup(id);
 
-  g_autofree gchar* channel_name = g_strdup_printf("dev.zuzu/zikzak_inappwebview_%s", id);
+  g_autofree gchar *channel_name =
+      g_strdup_printf("dev.zuzu/zikzak_inappwebview_%s", id);
   g_autoptr(FlStandardMethodCodec) codec = fl_standard_method_codec_new();
-  self->channel = fl_method_channel_new(fl_plugin_registrar_get_messenger(registrar),
-                                        channel_name,
-                                        FL_METHOD_CODEC(codec));
-  fl_method_channel_set_method_call_handler(self->channel, in_app_webview_method_call_handler, g_object_ref(self), g_object_unref);
+  self->channel =
+      fl_method_channel_new(fl_plugin_registrar_get_messenger(registrar),
+                            channel_name, FL_METHOD_CODEC(codec));
+  fl_method_channel_set_method_call_handler(self->channel,
+                                            in_app_webview_method_call_handler,
+                                            g_object_ref(self), g_object_unref);
 
   self->web_view = webkit_web_view_new();
   g_object_ref_sink(self->web_view);
 
   // Connect load-changed signal
-  g_signal_connect(self->web_view, "load-changed", G_CALLBACK(on_load_changed), self);
+  g_signal_connect(self->web_view, "load-changed", G_CALLBACK(on_load_changed),
+                   self);
 
   // Register texture
-  FlTextureRegistrar* texture_registrar = fl_plugin_registrar_get_texture_registrar(registrar);
-  if (fl_texture_registrar_register_texture(texture_registrar, FL_TEXTURE(self))) {
-      self->texture_id = (int64_t)self;
+  FlTextureRegistrar *texture_registrar =
+      fl_plugin_registrar_get_texture_registrar(registrar);
+  if (fl_texture_registrar_register_texture(texture_registrar,
+                                            FL_TEXTURE(self))) {
+    self->texture_id = (int64_t)self;
   } else {
-      self->texture_id = 0;
+    self->texture_id = 0;
   }
 
   // Set initial size
@@ -190,178 +201,238 @@ InAppWebView* in_app_webview_new(FlPluginRegistrar* registrar, const char* id) {
   return self;
 }
 
-int64_t in_app_webview_get_texture_id(InAppWebView* self) {
-    return self->texture_id;
+int64_t in_app_webview_get_texture_id(InAppWebView *self) {
+  return self->texture_id;
 }
 
 typedef struct {
-    FlMethodCall* method_call;
-    char* filename;
+  FlMethodCall *method_call;
+  char *filename;
 } PrintContext;
 
-static void print_finished_callback(WebKitPrintOperation* operation, gpointer user_data) {
-    PrintContext* context = (PrintContext*)user_data;
-    FlMethodCall* method_call = context->method_call;
-    char* filename = context->filename;
+static void print_finished_callback(WebKitPrintOperation *operation,
+                                    gpointer user_data) {
+  PrintContext *context = (PrintContext *)user_data;
+  FlMethodCall *method_call = context->method_call;
+  char *filename = context->filename;
 
-    GError* error = nullptr;
-    gchar* contents = nullptr;
-    gsize length = 0;
+  GError *error = nullptr;
+  gchar *contents = nullptr;
+  gsize length = 0;
 
-    if (g_file_get_contents(filename, &contents, &length, &error)) {
-        FlValue* result = fl_value_new_uint8_list((const uint8_t*)contents, length);
-        fl_method_call_respond(method_call, FL_METHOD_RESPONSE(fl_method_success_response_new(result)), nullptr);
-        g_free(contents);
-    } else {
-        fl_method_call_respond(method_call, FL_METHOD_RESPONSE(fl_method_error_response_new("error", error->message, nullptr)), nullptr);
-        g_error_free(error);
+  if (g_file_get_contents(filename, &contents, &length, &error)) {
+    FlValue *result =
+        fl_value_new_uint8_list((const uint8_t *)contents, length);
+    fl_method_call_respond(
+        method_call, FL_METHOD_RESPONSE(fl_method_success_response_new(result)),
+        nullptr);
+    g_free(contents);
+  } else {
+    fl_method_call_respond(method_call,
+                           FL_METHOD_RESPONSE(fl_method_error_response_new(
+                               "error", error->message, nullptr)),
+                           nullptr);
+    g_error_free(error);
+  }
+
+  g_unlink(filename);
+  g_free(filename);
+  g_free(context);
+  g_object_unref(method_call);
+}
+
+static void print_failed_callback(WebKitPrintOperation *operation,
+                                  GError *error, gpointer user_data) {
+  PrintContext *context = (PrintContext *)user_data;
+  FlMethodCall *method_call = context->method_call;
+  char *filename = context->filename;
+
+  fl_method_call_respond(method_call,
+                         FL_METHOD_RESPONSE(fl_method_error_response_new(
+                             "error", error->message, nullptr)),
+                         nullptr);
+
+  g_unlink(filename);
+  g_free(filename);
+  g_free(context);
+  g_object_unref(method_call);
+}
+
+void in_app_webview_handle_method_call(InAppWebView *self,
+                                       FlMethodCall *method_call) {
+  const gchar *method = fl_method_call_get_name(method_call);
+  FlValue *args = fl_method_call_get_args(method_call);
+
+  if (strcmp(method, "getUrl") == 0) {
+    const gchar *uri = webkit_web_view_get_uri(WEBKIT_WEB_VIEW(self->web_view));
+    g_autoptr(FlValue) result =
+        uri ? fl_value_new_string(uri) : fl_value_new_null();
+    fl_method_call_respond(
+        method_call, FL_METHOD_RESPONSE(fl_method_success_response_new(result)),
+        nullptr);
+  } else if (strcmp(method, "getHtml") == 0) {
+    webkit_web_view_evaluate_javascript(
+        WEBKIT_WEB_VIEW(self->web_view), "document.documentElement.outerHTML",
+        -1, nullptr, nullptr, nullptr,
+        [](GObject *object, GAsyncResult *result, gpointer user_data) {
+          FlMethodCall *method_call = FL_METHOD_CALL(user_data);
+          GError *error = nullptr;
+          JSCValue *value = webkit_web_view_evaluate_javascript_finish(
+              WEBKIT_WEB_VIEW(object), result, &error);
+
+          if (!value) {
+            fl_method_call_respond(
+                method_call,
+                FL_METHOD_RESPONSE(fl_method_error_response_new(
+                    "error", error->message, nullptr)),
+                nullptr);
+            g_error_free(error);
+          } else {
+            if (jsc_value_is_string(value)) {
+              g_autofree gchar *str_value = jsc_value_to_string(value);
+              fl_method_call_respond(
+                  method_call,
+                  FL_METHOD_RESPONSE(fl_method_success_response_new(
+                      fl_value_new_string(str_value))),
+                  nullptr);
+            } else {
+              fl_method_call_respond(
+                  method_call,
+                  FL_METHOD_RESPONSE(
+                      fl_method_success_response_new(fl_value_new_null())),
+                  nullptr);
+            }
+            g_object_unref(value);
+          }
+          g_object_unref(method_call);
+        },
+        g_object_ref(method_call));
+    return;
+  } else if (strcmp(method, "loadUrl") == 0) {
+    if (fl_value_get_type(args) == FL_VALUE_TYPE_MAP) {
+      FlValue *urlRequest = fl_value_lookup_string(args, "urlRequest");
+      if (urlRequest && fl_value_get_type(urlRequest) == FL_VALUE_TYPE_MAP) {
+        FlValue *urlVal = fl_value_lookup_string(urlRequest, "url");
+        if (urlVal && fl_value_get_type(urlVal) == FL_VALUE_TYPE_STRING) {
+          const char *url = fl_value_get_string(urlVal);
+          webkit_web_view_load_uri(WEBKIT_WEB_VIEW(self->web_view), url);
+          fl_method_call_respond(
+              method_call,
+              FL_METHOD_RESPONSE(
+                  fl_method_success_response_new(fl_value_new_bool(true))),
+              nullptr);
+          return;
+        }
+      }
     }
+    fl_method_call_respond(method_call,
+                           FL_METHOD_RESPONSE(fl_method_error_response_new(
+                               "error", "Invalid arguments", nullptr)),
+                           nullptr);
+  } else if (strcmp(method, "createPdf") == 0) {
+    WebKitPrintOperation *operation =
+        webkit_print_operation_new(WEBKIT_WEB_VIEW(self->web_view));
 
-    g_unlink(filename);
-    g_free(filename);
-    g_free(context);
-    g_object_unref(method_call);
-}
+    GtkPrintSettings *settings = gtk_print_settings_new();
 
-static void print_failed_callback(WebKitPrintOperation* operation, GError* error, gpointer user_data) {
-    PrintContext* context = (PrintContext*)user_data;
-    FlMethodCall* method_call = context->method_call;
-    char* filename = context->filename;
+    gchar *filename = g_strdup_printf(
+        "/tmp/flutter_inappwebview_print_%p_%ld.pdf", self, g_get_real_time());
+    gchar *uri = g_strdup_printf("file://%s", filename);
 
-    fl_method_call_respond(method_call, FL_METHOD_RESPONSE(fl_method_error_response_new("error", error->message, nullptr)), nullptr);
+    gtk_print_settings_set(settings, GTK_PRINT_SETTINGS_OUTPUT_URI, uri);
+    gtk_print_settings_set(settings, GTK_PRINT_SETTINGS_OUTPUT_FILE_FORMAT,
+                           "pdf");
 
-    g_unlink(filename);
-    g_free(filename);
-    g_free(context);
-    g_object_unref(method_call);
-}
+    webkit_print_operation_set_print_settings(operation, settings);
 
-void in_app_webview_handle_method_call(InAppWebView* self, FlMethodCall* method_call) {
-    const gchar* method = fl_method_call_get_name(method_call);
-    FlValue* args = fl_method_call_get_args(method_call);
+    PrintContext *context = g_new(PrintContext, 1);
+    context->method_call = method_call;
+    g_object_ref(context->method_call);
+    context->filename = filename;
 
-    if (strcmp(method, "getUrl") == 0) {
-        const gchar* uri = webkit_web_view_get_uri(WEBKIT_WEB_VIEW(self->web_view));
-        g_autoptr(FlValue) result = uri ? fl_value_new_string(uri) : fl_value_new_null();
-        fl_method_call_respond(method_call, FL_METHOD_RESPONSE(fl_method_success_response_new(result)), nullptr);
-    } else if (strcmp(method, "getHtml") == 0) {
-        webkit_web_view_run_javascript(WEBKIT_WEB_VIEW(self->web_view),
-            "document.documentElement.outerHTML",
-            nullptr,
-            [](GObject* object, GAsyncResult* result, gpointer user_data) {
-                FlMethodCall* method_call = FL_METHOD_CALL(user_data);
-                GError* error = nullptr;
-                WebKitJavascriptResult* js_result = webkit_web_view_run_javascript_finish(WEBKIT_WEB_VIEW(object), result, &error);
+    g_signal_connect(operation, "finished", G_CALLBACK(print_finished_callback),
+                     context);
+    g_signal_connect(operation, "failed", G_CALLBACK(print_failed_callback),
+                     context);
 
-                if (!js_result) {
-                    fl_method_call_respond(method_call, FL_METHOD_RESPONSE(fl_method_error_response_new("error", error->message, nullptr)), nullptr);
-                    g_error_free(error);
-                } else {
-                    JSCValue* value = webkit_javascript_result_get_js_value(js_result);
-                    if (jsc_value_is_string(value)) {
-                        g_autofree gchar* str_value = jsc_value_to_string(value);
-                        fl_method_call_respond(method_call, FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_string(str_value))), nullptr);
-                    } else {
-                        fl_method_call_respond(method_call, FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_null())), nullptr);
-                    }
-                    webkit_javascript_result_unref(js_result);
-                }
-                g_object_unref(method_call);
-            },
-            g_object_ref(method_call));
-        return;
-    } else if (strcmp(method, "loadUrl") == 0) {
-        if (fl_value_get_type(args) == FL_VALUE_TYPE_MAP) {
-             FlValue* urlRequest = fl_value_lookup_string(args, "urlRequest");
-             if (urlRequest && fl_value_get_type(urlRequest) == FL_VALUE_TYPE_MAP) {
-                 FlValue* urlVal = fl_value_lookup_string(urlRequest, "url");
-                 if (urlVal && fl_value_get_type(urlVal) == FL_VALUE_TYPE_STRING) {
-                     const char* url = fl_value_get_string(urlVal);
-                     webkit_web_view_load_uri(WEBKIT_WEB_VIEW(self->web_view), url);
-                     fl_method_call_respond(method_call, FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_bool(true))), nullptr);
-                     return;
-                 }
-             }
-        }
-        fl_method_call_respond(method_call, FL_METHOD_RESPONSE(fl_method_error_response_new("error", "Invalid arguments", nullptr)), nullptr);
-    } else if (strcmp(method, "createPdf") == 0) {
-        WebKitPrintOperation* operation = webkit_print_operation_new(WEBKIT_WEB_VIEW(self->web_view));
+    webkit_print_operation_print(operation);
 
-        GtkPrintSettings* settings = gtk_print_settings_new();
+    g_object_unref(settings);
+    g_free(uri);
+    return;
+  } else if (strcmp(method, "takeScreenshot") == 0) {
+    g_object_ref(method_call);
+    webkit_web_view_get_snapshot(
+        WEBKIT_WEB_VIEW(self->web_view), WEBKIT_SNAPSHOT_REGION_VISIBLE,
+        WEBKIT_SNAPSHOT_OPTIONS_NONE, nullptr,
+        [](GObject *source_object, GAsyncResult *res, gpointer user_data) {
+          FlMethodCall *method_call = FL_METHOD_CALL(user_data);
+          GError *error = nullptr;
+          WebKitWebView *web_view = WEBKIT_WEB_VIEW(source_object);
+          cairo_surface_t *surface =
+              webkit_web_view_get_snapshot_finish(web_view, res, &error);
 
-        gchar* filename = g_strdup_printf("/tmp/flutter_inappwebview_print_%p_%ld.pdf", self, g_get_real_time());
-        gchar* uri = g_strdup_printf("file://%s", filename);
-
-        gtk_print_settings_set(settings, GTK_PRINT_SETTINGS_OUTPUT_URI, uri);
-        gtk_print_settings_set(settings, GTK_PRINT_SETTINGS_OUTPUT_FILE_FORMAT, "pdf");
-
-        webkit_print_operation_set_print_settings(operation, settings);
-
-        PrintContext* context = g_new(PrintContext, 1);
-        context->method_call = method_call;
-        g_object_ref(context->method_call);
-        context->filename = filename;
-
-        g_signal_connect(operation, "finished", G_CALLBACK(print_finished_callback), context);
-        g_signal_connect(operation, "failed", G_CALLBACK(print_failed_callback), context);
-
-        webkit_print_operation_print(operation);
-
-        g_object_unref(settings);
-        g_free(uri);
-        return;
-    } else if (strcmp(method, "takeScreenshot") == 0) {
-        cairo_surface_t* surface = webkit_web_view_get_snapshot(
-            WEBKIT_WEB_VIEW(self->web_view),
-            WEBKIT_SNAPSHOT_REGION_VISIBLE,
-            WEBKIT_SNAPSHOT_OPTIONS_NONE,
-            nullptr,
-            nullptr
-        );
-
-        if (!surface) {
-            fl_method_call_respond(method_call, FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_null())), nullptr);
+          if (!surface) {
+            fl_method_call_respond(
+                method_call,
+                FL_METHOD_RESPONSE(
+                    fl_method_success_response_new(fl_value_new_null())),
+                nullptr);
+            if (error) {
+              g_error_free(error);
+            }
+            g_object_unref(method_call);
             return;
-        }
+          }
 
-        cairo_surface_flush(surface);
+          cairo_surface_flush(surface);
 
-        cairo_status_t status;
-        guchar* png_data = nullptr;
-        gsize png_size = 0;
+          guchar *png_data = nullptr;
+          gsize png_size = 0;
 
-        GdkPixbuf* pixbuf = gdk_pixbuf_get_from_surface(
-            surface, 0, 0,
-            cairo_image_surface_get_width(surface),
-            cairo_image_surface_get_height(surface)
-        );
+          GdkPixbuf *pixbuf = gdk_pixbuf_get_from_surface(
+              surface, 0, 0, cairo_image_surface_get_width(surface),
+              cairo_image_surface_get_height(surface));
 
-        if (pixbuf) {
-            gchar* buffer = nullptr;
+          if (pixbuf) {
+            gchar *buffer = nullptr;
             gsize buffer_size = 0;
             gboolean saved = gdk_pixbuf_save_to_buffer(
-                pixbuf, &buffer, &buffer_size, "png", nullptr, nullptr
-            );
+                pixbuf, &buffer, &buffer_size, "png", nullptr, nullptr);
             if (saved && buffer && buffer_size > 0) {
-                png_data = (guchar*)g_malloc(buffer_size);
-                memcpy(png_data, buffer, buffer_size);
-                png_size = buffer_size;
-                g_free(buffer);
+              png_data = (guchar *)g_malloc(buffer_size);
+              memcpy(png_data, buffer, buffer_size);
+              png_size = buffer_size;
+              g_free(buffer);
             }
             g_object_unref(pixbuf);
-        }
+          }
 
-        cairo_surface_destroy(surface);
+          cairo_surface_destroy(surface);
 
-        if (png_data && png_size > 0) {
-            g_autoptr(FlValue) fl_data = fl_value_new_uint8_list(png_data, png_size);
-            fl_method_call_respond(method_call, FL_METHOD_RESPONSE(fl_method_success_response_new(fl_data)), nullptr);
+          if (png_data && png_size > 0) {
+            g_autoptr(FlValue) fl_data =
+                fl_value_new_uint8_list(png_data, png_size);
+            fl_method_call_respond(
+                method_call,
+                FL_METHOD_RESPONSE(fl_method_success_response_new(fl_data)),
+                nullptr);
             g_free(png_data);
-        } else {
-            fl_method_call_respond(method_call, FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_null())), nullptr);
-        }
-        return;
-    } else {
-        fl_method_call_respond(method_call, FL_METHOD_RESPONSE(fl_method_not_implemented_response_new()), nullptr);
-    }
+          } else {
+            fl_method_call_respond(
+                method_call,
+                FL_METHOD_RESPONSE(
+                    fl_method_success_response_new(fl_value_new_null())),
+                nullptr);
+          }
+
+          g_object_unref(method_call);
+        },
+        g_object_ref(method_call));
+    return;
+  } else {
+    fl_method_call_respond(
+        method_call,
+        FL_METHOD_RESPONSE(fl_method_not_implemented_response_new()), nullptr);
+  }
 }

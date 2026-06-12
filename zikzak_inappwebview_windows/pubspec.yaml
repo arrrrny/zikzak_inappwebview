@@ -12,14 +12,14 @@ flutter:
     implements: zikzak_inappwebview
     platforms:
       windows:
-        pluginClass: ZikzakInAppWebViewWindows
         dartPluginClass: ZikzakInAppWebViewWindows
         fileName: zikzak_inappwebview_windows.dart
 
 dependencies:
   flutter:
     sdk: flutter
-  zikzak_inappwebview_platform_interface: ^4.3.4
+  zikzak_inappwebview_platform_interface:
+    path: ../zikzak_inappwebview_platform_interface
   webview_windows: ^0.4.0
   path: ^1.9.0
 
