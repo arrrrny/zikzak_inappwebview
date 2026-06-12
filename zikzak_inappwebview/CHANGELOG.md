@@ -1,9 +1,17 @@
+## 4.3.4 - 2026-06-12
+
+- Fixed: iOS `type 'int' is not a subtype of type 'WebAuthenticationSupport?'` crash in
+  `getHtml()`/`getSettings()` — `InAppWebViewSettings.fromMap()` now converts
+  `webAuthenticationSupport` via `WebAuthenticationSupport.fromNativeValue()` instead of
+  assigning the raw `int` value from the platform channel map
+
 ## 4.3.3 - 2026-06-04
 
-* 
+-
+
 ## 4.3.2 - 2026-06-04
 
-* fix: use KVC for webAuthenticationSupport to avoid SDK availability issue
+- fix: use KVC for webAuthenticationSupport to avoid SDK availability issue
 
 ## 4.3.1 - 2026-06-03
 

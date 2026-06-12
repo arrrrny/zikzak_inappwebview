@@ -18,8 +18,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  zikzak_inappwebview_platform_interface: ^4.3.3
-  zikzak_inappwebview_internal_annotations: ^4.3.3
+  zikzak_inappwebview_platform_interface:
+    path: ../zikzak_inappwebview_platform_interface
+  zikzak_inappwebview_internal_annotations:
+    path: ../zikzak_inappwebview_internal_annotations
 dev_dependencies:
   flutter_test:
     sdk: flutter

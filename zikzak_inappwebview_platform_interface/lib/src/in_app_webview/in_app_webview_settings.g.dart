@@ -1464,7 +1464,10 @@ class InAppWebViewSettings {
         map['accessibilityIgnoresInvertColors'];
     instance.algorithmicDarkeningAllowed = map['algorithmicDarkeningAllowed'];
     instance.paymentRequestEnabled = map['paymentRequestEnabled'];
-    instance.webAuthenticationSupport = map['webAuthenticationSupport'];
+    instance.webAuthenticationSupport =
+        WebAuthenticationSupport.fromNativeValue(
+          map['webAuthenticationSupport'],
+        );
     instance.allowBackgroundAudioPlaying = map['allowBackgroundAudioPlaying'];
     instance.allowContentAccess = map['allowContentAccess'];
     instance.allowFileAccess = map['allowFileAccess'];
