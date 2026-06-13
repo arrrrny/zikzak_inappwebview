@@ -1,3 +1,18 @@
+## 4.3.5 - 2026-06-12
+
+
+- Fixed: macOS build failure — removed stray `}` that closed the `InAppWebView` class prematurely,
+  leaving `WKNavigationDelegate`/`WKUIDelegate` methods outside the class scope. Also removed
+  dead `result` variable reference from `shouldOverrideUrlLoading` (#145)
+- Fixed: Android AGP 9+ build failure — replaced `getDefaultProguardFile('proguard-android.txt')`
+  with `getDefaultProguardFile('proguard-android-optimize.txt')` in `android/build.gradle` (#143)
+- Fixed: Linux build failure with WebKitGTK 2.52+ — migrated deprecated
+  `webkit_web_view_run_javascript` → `webkit_web_view_evaluate_javascript` and replaced
+  removed synchronous `webkit_web_view_get_snapshot` with async version (#142)
+- Fixed: Windows build failure — removed `pluginClass` from pubspec.yaml; the Windows plugin
+  is Dart-only (uses `webview_windows` package), so no native CMake project is needed (#142)
+- Fixed: CMake include directory visibility for Linux plugin — changed `INTERFACE` to `PUBLIC`
+  so the plugin can find its own headers (#142)
 ## 4.3.4 - 2026-06-12
 
 
