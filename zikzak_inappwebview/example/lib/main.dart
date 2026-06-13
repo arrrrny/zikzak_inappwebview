@@ -8,6 +8,7 @@ import 'package:zikzak_inappwebview_example/chrome_safari_browser_example.screen
 import 'package:zikzak_inappwebview_example/headless_in_app_webview.screen.dart';
 import 'package:zikzak_inappwebview_example/in_app_webiew_example.screen.dart';
 import 'package:zikzak_inappwebview_example/in_app_browser_example.screen.dart';
+import 'package:zikzak_inappwebview_example/reproduce_issue144_stuck_loading.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 // import 'package:path_provider/path_provider.dart';
@@ -64,6 +65,12 @@ PointerInterceptor myDrawer({required BuildContext context}) {
         Navigator.pushReplacementNamed(context, '/HeadlessInAppWebView');
       },
     ),
+    ListTile(
+      title: const Text('Issue 144 - Stuck Loading'),
+      onTap: () {
+        Navigator.pushReplacementNamed(context, '/ReproduceStuckLoading');
+      },
+    ),
   ];
   if (kIsWeb) {
     children = [
@@ -77,6 +84,12 @@ PointerInterceptor myDrawer({required BuildContext context}) {
         title: const Text('HeadlessInAppWebView'),
         onTap: () {
           Navigator.pushReplacementNamed(context, '/HeadlessInAppWebView');
+        },
+      ),
+      ListTile(
+        title: const Text('Issue 144 - Stuck Loading'),
+        onTap: () {
+          Navigator.pushReplacementNamed(context, '/ReproduceStuckLoading');
         },
       ),
     ];
@@ -100,6 +113,12 @@ PointerInterceptor myDrawer({required BuildContext context}) {
           Navigator.pushReplacementNamed(context, '/HeadlessInAppWebView');
         },
       ),
+      ListTile(
+        title: const Text('Issue 144 - Stuck Loading'),
+        onTap: () {
+          Navigator.pushReplacementNamed(context, '/ReproduceStuckLoading');
+        },
+      ),
     ];
   } else if (defaultTargetPlatform == TargetPlatform.windows ||
       defaultTargetPlatform == TargetPlatform.linux) {
@@ -120,6 +139,12 @@ PointerInterceptor myDrawer({required BuildContext context}) {
         title: const Text('HeadlessInAppWebView'),
         onTap: () {
           Navigator.pushReplacementNamed(context, '/HeadlessInAppWebView');
+        },
+      ),
+      ListTile(
+        title: const Text('Issue 144 - Stuck Loading'),
+        onTap: () {
+          Navigator.pushReplacementNamed(context, '/ReproduceStuckLoading');
         },
       ),
     ];
@@ -165,6 +190,7 @@ class _MyAppState extends State<MyApp> {
     if (kIsWeb) {
       return MaterialApp(initialRoute: '/', routes: {
         '/': (context) => const InAppWebViewExampleScreen(),
+        '/ReproduceStuckLoading': (context) => const WebViewDemoHomePage(),
         '/HeadlessInAppWebView': (context) =>
             const HeadlessInAppWebViewExampleScreen(),
       });
@@ -173,6 +199,7 @@ class _MyAppState extends State<MyApp> {
       return MaterialApp(initialRoute: '/', routes: {
         '/': (context) => const InAppWebViewExampleScreen(),
         '/InAppBrowser': (context) => const InAppBrowserExampleScreen(),
+        '/ReproduceStuckLoading': (context) => const WebViewDemoHomePage(),
         '/HeadlessInAppWebView': (context) =>
             const HeadlessInAppWebViewExampleScreen(),
       });
@@ -191,6 +218,7 @@ class _MyAppState extends State<MyApp> {
       '/ChromeSafariBrowser': (context) => ChromeSafariBrowserExampleScreen(),
       '/HeadlessInAppWebView': (context) =>
           const HeadlessInAppWebViewExampleScreen(),
+      '/ReproduceStuckLoading': (context) => const WebViewDemoHomePage(),
     });
   }
 }
