@@ -288,6 +288,13 @@ public final class InAppWebView
 
     @SuppressLint("RestrictedApi")
     public void prepare() {
+        // Resume global WebView timers that may have been paused by a previous
+        // WebView's dispose() -> pauseTimers() call. pauseTimers() is a global
+        // operation that pauses layout, parsing, and JS timers for ALL webviews.
+        // Without this resume, a newly created WebView's page load would never
+        // complete because parsing is frozen globally.
+        resumeTimers();
+
         if (plugin != null) {
             webViewAssetLoaderExt = WebViewAssetLoaderExt.fromMap(
                 customSettings.webViewAssetLoader,
@@ -3552,24 +3559,15 @@ public final class InAppWebView
         // STEP 11: Remove all views
         removeAllViews();
 
-        // STEP 12: Pause WebView lifecycle
-        onPause();
-        pauseTimers();
-
-        // STEP 13: Clear cache and history
+        // STEP 12: Clear cache and history
         clearHistory();
         clearCache(true);
 
-        // STEP 14: Clear plugin reference
+        // STEP 13: Clear plugin reference
         plugin = null;
 
-        // STEP 15: Final destroy on next frame to ensure cleanup completes
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                destroy();
-            }
-        });
+        // STEP 14: Final destroy immediately (not deferred, to avoid race with new WebView creation)
+        destroy();
     }
 
     @Override
