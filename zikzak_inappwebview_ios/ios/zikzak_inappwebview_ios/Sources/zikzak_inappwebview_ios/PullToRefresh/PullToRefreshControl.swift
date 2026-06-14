@@ -5,8 +5,8 @@
 //  Created by ARRRRNY on 03/03/21.
 //
 
-import UIKit
 import Flutter
+import UIKit
 
 public class PullToRefreshControl: UIRefreshControl, Disposable {
     static let METHOD_CHANNEL_NAME_PREFIX = "wtf.zikzak/zikzak_inappwebview_pull_to_refresh_"
@@ -22,9 +22,11 @@ public class PullToRefreshControl: UIRefreshControl, Disposable {
         self.plugin = plugin
         self.settings = settings
         if let registrar = plugin.registrar {
-            let channel = FlutterMethodChannel(name: PullToRefreshControl.METHOD_CHANNEL_NAME_PREFIX + String(describing: id),
-                                               binaryMessenger: registrar.messenger())
-            self.channelDelegate = PullToRefreshChannelDelegate(pullToRefreshControl: self, channel: channel)
+            let channel = FlutterMethodChannel(
+                name: PullToRefreshControl.METHOD_CHANNEL_NAME_PREFIX + String(describing: id),
+                binaryMessenger: registrar.messenger())
+            self.channelDelegate = PullToRefreshChannelDelegate(
+                pullToRefreshControl: self, channel: channel)
         }
     }
 
@@ -68,7 +70,6 @@ public class PullToRefreshControl: UIRefreshControl, Disposable {
     }
 
     deinit {
-        debugPrint("PullToRefreshControl - dealloc")
         dispose()
     }
 }

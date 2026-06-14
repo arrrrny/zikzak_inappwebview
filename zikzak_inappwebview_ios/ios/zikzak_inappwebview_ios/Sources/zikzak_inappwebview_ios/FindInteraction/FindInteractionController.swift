@@ -5,8 +5,8 @@
 //  Created by ARRRRNY on 07/10/22.
 //
 
-import UIKit
 import Flutter
+import UIKit
 
 public class FindInteractionController: NSObject, Disposable {
     static let METHOD_CHANNEL_NAME_PREFIX = "wtf.zikzak/zikzak_inappwebview_find_interaction_"
@@ -21,7 +21,7 @@ public class FindInteractionController: NSObject, Disposable {
     var searchText: String? {
         get {
             if #available(iOS 16.0, *), let interaction = webView?.findInteraction {
-                return  interaction.searchText
+                return interaction.searchText
             }
             return _searchText
         }
@@ -49,22 +49,27 @@ public class FindInteractionController: NSObject, Disposable {
         }
     }
 
-    public init(plugin: SwiftFlutterPlugin, id: Any, webView: InAppWebView, settings: FindInteractionSettings?) {
+    public init(
+        plugin: SwiftFlutterPlugin, id: Any, webView: InAppWebView,
+        settings: FindInteractionSettings?
+    ) {
         super.init()
         self.plugin = plugin
         self.webView = webView
         self.settings = settings
         if let registrar = plugin.registrar {
-            let channel = FlutterMethodChannel(name: FindInteractionController.METHOD_CHANNEL_NAME_PREFIX + String(describing: id),
-                                               binaryMessenger: registrar.messenger())
-            self.channelDelegate = FindInteractionChannelDelegate(findInteractionController: self, channel: channel)
+            let channel = FlutterMethodChannel(
+                name: FindInteractionController.METHOD_CHANNEL_NAME_PREFIX + String(describing: id),
+                binaryMessenger: registrar.messenger())
+            self.channelDelegate = FindInteractionChannelDelegate(
+                findInteractionController: self, channel: channel)
         }
     }
 
     public func prepare() {
-//        if let settings = settings {
-//
-//        }
+        //        if let settings = settings {
+        //
+        //        }
     }
 
     public func findAll(find: String?, completionHandler: ((Any?, Error?) -> Void)?) {
@@ -123,7 +128,9 @@ public class FindInteractionController: NSObject, Disposable {
                 completionHandler(nil, nil)
             }
         } else {
-            webView.evaluateJavaScript("window.\(JAVASCRIPT_BRIDGE_NAME)._findNext(\(forward ? "true" : "false"));", completionHandler: completionHandler)
+            webView.evaluateJavaScript(
+                "window.\(JAVASCRIPT_BRIDGE_NAME)._findNext(\(forward ? "true" : "false"));",
+                completionHandler: completionHandler)
         }
     }
 
@@ -143,7 +150,9 @@ public class FindInteractionController: NSObject, Disposable {
                 completionHandler(nil, nil)
             }
         } else {
-            webView.evaluateJavaScript("window.\(JAVASCRIPT_BRIDGE_NAME)._clearMatches();", completionHandler: completionHandler)
+            webView.evaluateJavaScript(
+                "window.\(JAVASCRIPT_BRIDGE_NAME)._clearMatches();",
+                completionHandler: completionHandler)
         }
     }
 
@@ -156,7 +165,6 @@ public class FindInteractionController: NSObject, Disposable {
     }
 
     deinit {
-        debugPrint("FindInteractionControl - dealloc")
         dispose()
     }
 }

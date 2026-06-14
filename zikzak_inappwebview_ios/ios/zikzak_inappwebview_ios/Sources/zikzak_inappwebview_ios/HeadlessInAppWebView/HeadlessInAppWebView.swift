@@ -1,12 +1,12 @@
 import Flutter
+import UIKit
+
 //
 //  HeadlessInAppWebView.swift
 //  zikzak_inappwebview
 //
 //  Created by ARRRRNY on 26/03/21.
 //
-
-import UIKit
 
 public class HeadlessInAppWebView: Disposable {
     static let METHOD_CHANNEL_NAME_PREFIX = "wtf.zikzak/flutter_headless_inappwebview_"
@@ -20,9 +20,11 @@ public class HeadlessInAppWebView: Disposable {
         self.id = id
         self.flutterWebView = flutterWebView
         self.plugin = plugin
-        let channel = FlutterMethodChannel(name: HeadlessInAppWebView.METHOD_CHANNEL_NAME_PREFIX + id,
-                                           binaryMessenger: plugin.registrar!.messenger())
-        self.channelDelegate = HeadlessWebViewChannelDelegate(headlessWebView: self, channel: channel)
+        let channel = FlutterMethodChannel(
+            name: HeadlessInAppWebView.METHOD_CHANNEL_NAME_PREFIX + id,
+            binaryMessenger: plugin.registrar!.messenger())
+        self.channelDelegate = HeadlessWebViewChannelDelegate(
+            headlessWebView: self, channel: channel)
     }
 
     public func onWebViewCreated() {
@@ -36,7 +38,9 @@ public class HeadlessInAppWebView: Disposable {
             if let size = Size2D.fromMap(map: initialSize) {
                 setSize(size: size)
             } else {
-                view.frame = CGRect(x: 0.0, y: 0.0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+                view.frame = CGRect(
+                    x: 0.0, y: 0.0, width: UIScreen.main.bounds.width,
+                    height: UIScreen.main.bounds.height)
             }
             if let keyWindow = UIApplication.shared.keyWindow {
                 /// Note: The WKWebView behaves very unreliable when rendering offscreen
@@ -94,7 +98,6 @@ public class HeadlessInAppWebView: Disposable {
     }
 
     deinit {
-        debugPrint("HeadlessInAppWebView - dealloc")
         dispose()
     }
 }

@@ -3956,7 +3956,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     }
 
     deinit {
-        debugPrint("InAppWebView - dealloc")
         dispose()
     }
 }

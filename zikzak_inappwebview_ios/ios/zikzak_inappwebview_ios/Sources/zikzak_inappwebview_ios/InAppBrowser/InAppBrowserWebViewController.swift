@@ -8,9 +8,10 @@
 import Flutter
 import UIKit
 import WebKit
-import UIKit
 
-public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelegate, UIScrollViewDelegate, UISearchBarDelegate, Disposable {
+public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelegate,
+    UIScrollViewDelegate, UISearchBarDelegate, Disposable
+{
     static let METHOD_CHANNEL_NAME_PREFIX = "wtf.zikzak/zikzak_inappbrowser_"
 
     var closeButton: UIBarButtonItem!
@@ -57,7 +58,9 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
             return
         }
 
-        let channel = FlutterMethodChannel(name: InAppBrowserWebViewController.METHOD_CHANNEL_NAME_PREFIX + id, binaryMessenger: registrar.messenger())
+        let channel = FlutterMethodChannel(
+            name: InAppBrowserWebViewController.METHOD_CHANNEL_NAME_PREFIX + id,
+            binaryMessenger: registrar.messenger())
         channelDelegate = InAppBrowserChannelDelegate(channel: channel)
 
         var userScripts: [UserScript] = []
@@ -65,18 +68,22 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
             userScripts.append(UserScript.fromMap(map: initialUserScript, windowId: windowId)!)
         }
 
-        let preWebviewConfiguration = InAppWebView.preWKWebViewConfiguration(settings: webViewSettings)
-        if let wId = windowId, let webViewTransport = plugin.inAppWebViewManager?.windowWebViews[wId] {
+        let preWebviewConfiguration = InAppWebView.preWKWebViewConfiguration(
+            settings: webViewSettings)
+        if let wId = windowId,
+            let webViewTransport = plugin.inAppWebViewManager?.windowWebViews[wId]
+        {
             webView = webViewTransport.webView
             webView!.contextMenu = contextMenu
             webView!.initialUserScripts = userScripts
         } else {
-            webView = InAppWebView(id: nil,
-                                   plugin: nil,
-                                   frame: .zero,
-                                   configuration: preWebviewConfiguration,
-                                   contextMenu: contextMenu,
-                                   userScripts: userScripts)
+            webView = InAppWebView(
+                id: nil,
+                plugin: nil,
+                frame: .zero,
+                configuration: preWebviewConfiguration,
+                contextMenu: contextMenu,
+                userScripts: userScripts)
         }
 
         guard let webView = webView else {
@@ -90,7 +97,8 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
 
         let pullToRefreshSettings = PullToRefreshSettings()
         let _ = pullToRefreshSettings.parse(settings: pullToRefreshInitialSettings)
-        let pullToRefreshControl = PullToRefreshControl(plugin: plugin, id: id, settings: pullToRefreshSettings)
+        let pullToRefreshControl = PullToRefreshControl(
+            plugin: plugin, id: id, settings: pullToRefreshSettings)
         webView.pullToRefreshControl = pullToRefreshControl
         pullToRefreshControl.delegate = webView
         pullToRefreshControl.prepare()
@@ -118,13 +126,19 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         progressBar.translatesAutoresizingMaskIntoConstraints = false
 
         webView?.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 0.0).isActive = true
-        webView?.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: 0.0).isActive = true
-        webView?.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 0.0).isActive = true
-        webView?.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: 0.0).isActive = true
+        webView?.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: 0.0).isActive =
+            true
+        webView?.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 0.0)
+            .isActive = true
+        webView?.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: 0.0)
+            .isActive = true
 
-        progressBar.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 0.0).isActive = true
-        progressBar.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 0.0).isActive = true
-        progressBar.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: 0.0).isActive = true
+        progressBar.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 0.0).isActive =
+            true
+        progressBar.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 0.0)
+            .isActive = true
+        progressBar.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: 0.0)
+            .isActive = true
 
         if windowId != nil {
             channelDelegate?.onBrowserCreated()
@@ -132,21 +146,23 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         } else {
             if let contentBlockers = webView?.settings?.contentBlockers, contentBlockers.count > 0 {
                 do {
-                    let jsonData = try JSONSerialization.data(withJSONObject: contentBlockers, options: [])
+                    let jsonData = try JSONSerialization.data(
+                        withJSONObject: contentBlockers, options: [])
                     let blockRules = String(data: jsonData, encoding: .utf8)
                     WKContentRuleListStore.default().compileContentRuleList(
                         forIdentifier: "ContentBlockingRules",
-                        encodedContentRuleList: blockRules) { (contentRuleList, error) in
+                        encodedContentRuleList: blockRules
+                    ) { (contentRuleList, error) in
 
-                            if let error = error {
-                                print(error.localizedDescription)
-                                return
-                            }
+                        if let error = error {
+                            print(error.localizedDescription)
+                            return
+                        }
 
-                            let configuration = self.webView!.configuration
-                            configuration.userContentController.add(contentRuleList!)
+                        let configuration = self.webView!.configuration
+                        configuration.userContentController.add(contentRuleList!)
 
-                            self.initLoad()
+                        self.initLoad()
                     }
                     return
                 } catch {
@@ -162,31 +178,35 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         if let initialFile = initialFile {
             do {
                 try webView?.loadFile(assetFilePath: initialFile)
-            }
-            catch let error as NSError {
+            } catch let error as NSError {
                 dump(error)
             }
-        }
-        else if let initialData = initialData {
+        } else if let initialData = initialData {
             let baseUrl = URL(string: initialBaseUrl ?? "about:blank")!
             var allowingReadAccessToURL: URL? = nil
-            if let allowingReadAccessTo = webView?.settings?.allowingReadAccessTo, baseUrl.scheme == "file" {
+            if let allowingReadAccessTo = webView?.settings?.allowingReadAccessTo,
+                baseUrl.scheme == "file"
+            {
                 allowingReadAccessToURL = URL(string: allowingReadAccessTo)
                 if allowingReadAccessToURL?.scheme != "file" {
                     allowingReadAccessToURL = nil
                 }
             }
-            webView?.loadData(data: initialData, mimeType: initialMimeType!, encoding: initialEncoding!, baseUrl: baseUrl, allowingReadAccessTo: allowingReadAccessToURL)
-        }
-        else if let initialUrlRequest = initialUrlRequest {
+            webView?.loadData(
+                data: initialData, mimeType: initialMimeType!, encoding: initialEncoding!,
+                baseUrl: baseUrl, allowingReadAccessTo: allowingReadAccessToURL)
+        } else if let initialUrlRequest = initialUrlRequest {
             var allowingReadAccessToURL: URL? = nil
-            if let allowingReadAccessTo = webView?.settings?.allowingReadAccessTo, let url = initialUrlRequest.url, url.scheme == "file" {
+            if let allowingReadAccessTo = webView?.settings?.allowingReadAccessTo,
+                let url = initialUrlRequest.url, url.scheme == "file"
+            {
                 allowingReadAccessToURL = URL(string: allowingReadAccessTo)
                 if allowingReadAccessToURL?.scheme != "file" {
                     allowingReadAccessToURL = nil
                 }
             }
-            webView?.loadUrl(urlRequest: initialUrlRequest, allowingReadAccessTo: allowingReadAccessToURL)
+            webView?.loadUrl(
+                urlRequest: initialUrlRequest, allowingReadAccessTo: allowingReadAccessToURL)
         }
 
         channelDelegate?.onBrowserCreated()
@@ -197,14 +217,16 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         super.viewDidDisappear(animated)
     }
 
-    public override func viewWillDisappear (_ animated: Bool) {
+    public override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
     }
 
     public func prepareNavigationControllerBeforeViewWillAppear() {
         if let browserOptions = browserSettings {
-            navigationController?.modalPresentationStyle = UIModalPresentationStyle(rawValue: browserOptions.presentationStyle)!
-            navigationController?.modalTransitionStyle = UIModalTransitionStyle(rawValue: browserOptions.transitionStyle)!
+            navigationController?.modalPresentationStyle = UIModalPresentationStyle(
+                rawValue: browserOptions.presentationStyle)!
+            navigationController?.modalTransitionStyle = UIModalTransitionStyle(
+                rawValue: browserOptions.transitionStyle)!
         }
     }
 
@@ -219,24 +241,32 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         navigationItem.titleView = searchBar
 
         let spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        reloadButton = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(reload))
-        shareButton = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(share))
-        forwardButton = UIBarButtonItem(title: "\u{203A}", style: .plain, target: self, action: #selector(goForward))
+        reloadButton = UIBarButtonItem(
+            barButtonSystemItem: .refresh, target: self, action: #selector(reload))
+        shareButton = UIBarButtonItem(
+            barButtonSystemItem: .action, target: self, action: #selector(share))
+        forwardButton = UIBarButtonItem(
+            title: "\u{203A}", style: .plain, target: self, action: #selector(goForward))
         forwardButton.isEnabled = false
-        backButton = UIBarButtonItem(title: "\u{2039}", style: .plain, target: self, action: #selector(goBack))
+        backButton = UIBarButtonItem(
+            title: "\u{2039}", style: .plain, target: self, action: #selector(goBack))
         backButton.isEnabled = false
 
-        toolbarItems = [backButton, spacer, forwardButton, spacer, shareButton, spacer, reloadButton]
+        toolbarItems = [
+            backButton, spacer, forwardButton, spacer, shareButton, spacer, reloadButton,
+        ]
 
         for state: UIControl.State in [.normal, .disabled, .highlighted, .selected] {
-            forwardButton.setTitleTextAttributes([
-                NSAttributedString.Key.font: UIFont.systemFont(ofSize: 50.0),
-                NSAttributedString.Key.baselineOffset: 2.5
-            ], for: state)
-            backButton.setTitleTextAttributes([
-                NSAttributedString.Key.font: UIFont.systemFont(ofSize: 50.0),
-                NSAttributedString.Key.baselineOffset: 2.5
-            ], for: state)
+            forwardButton.setTitleTextAttributes(
+                [
+                    NSAttributedString.Key.font: UIFont.systemFont(ofSize: 50.0),
+                    NSAttributedString.Key.baselineOffset: 2.5,
+                ], for: state)
+            backButton.setTitleTextAttributes(
+                [
+                    NSAttributedString.Key.font: UIFont.systemFont(ofSize: 50.0),
+                    NSAttributedString.Key.baselineOffset: 2.5,
+                ], for: state)
         }
 
         if let browserSettings = browserSettings {
@@ -246,17 +276,20 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
                     searchBar.isHidden = true
                 }
                 if let bgColor = browserSettings.toolbarTopBackgroundColor, !bgColor.isEmpty {
-                    navigationController?.navigationBar.backgroundColor = UIColor(hexString: bgColor)
+                    navigationController?.navigationBar.backgroundColor = UIColor(
+                        hexString: bgColor)
                 }
-                if let barTintColor = browserSettings.toolbarTopBarTintColor, !barTintColor.isEmpty {
-                    navigationController?.navigationBar.barTintColor = UIColor(hexString: barTintColor)
+                if let barTintColor = browserSettings.toolbarTopBarTintColor, !barTintColor.isEmpty
+                {
+                    navigationController?.navigationBar.barTintColor = UIColor(
+                        hexString: barTintColor)
                 }
                 if let tintColor = browserSettings.toolbarTopTintColor, !tintColor.isEmpty {
                     navigationController?.navigationBar.tintColor = UIColor(hexString: tintColor)
                 }
-                navigationController?.navigationBar.isTranslucent = browserSettings.toolbarTopTranslucent
-            }
-            else {
+                navigationController?.navigationBar.isTranslucent =
+                    browserSettings.toolbarTopTranslucent
+            } else {
                 navigationController?.navigationBar.isHidden = true
             }
 
@@ -269,13 +302,16 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
                     navigationController?.toolbar.tintColor = UIColor(hexString: tintColor)
                 }
                 navigationController?.toolbar.isTranslucent = false
-            }
-            else {
+            } else {
                 navigationController?.isToolbarHidden = true
             }
 
-            if let closeButtonCaption = browserSettings.closeButtonCaption, !closeButtonCaption.isEmpty {
-                closeButton = UIBarButtonItem(title: closeButtonCaption, style: .plain, target: self, action: #selector(close))
+            if let closeButtonCaption = browserSettings.closeButtonCaption,
+                !closeButtonCaption.isEmpty
+            {
+                closeButton = UIBarButtonItem(
+                    title: closeButtonCaption, style: .plain, target: self, action: #selector(close)
+                )
             } else {
                 setDefaultCloseButton()
             }
@@ -296,11 +332,13 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
 
             if !menuItems.isEmpty {
                 var uiActions: [UIAction] = []
-                menuItems = menuItems.sorted(by: {$0.order ?? 0 < $1.order ?? 0})
+                menuItems = menuItems.sorted(by: { $0.order ?? 0 < $1.order ?? 0 })
                 for menuItem in menuItems {
-                    let uiAction = UIAction(title: menuItem.title, image: menuItem.icon, handler: {_ in
-                        self.channelDelegate?.onMenuItemClicked(menuItem: menuItem)
-                    })
+                    let uiAction = UIAction(
+                        title: menuItem.title, image: menuItem.icon,
+                        handler: { _ in
+                            self.channelDelegate?.onMenuItemClicked(menuItem: menuItem)
+                        })
                     if !menuItem.showAsAction {
                         uiActions.append(uiAction)
                     } else {
@@ -311,8 +349,11 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
                 }
                 if !uiActions.isEmpty {
                     menu = UIMenu(title: "", options: .displayInline, children: uiActions)
-                    menuButton = UIBarButtonItem(image: UIImage(systemName: "ellipsis.circle"), menu: menu)
-                    if let menuButtonColor = browserSettings.menuButtonColor, !menuButtonColor.isEmpty {
+                    menuButton = UIBarButtonItem(
+                        image: UIImage(systemName: "ellipsis.circle"), menu: menu)
+                    if let menuButtonColor = browserSettings.menuButtonColor,
+                        !menuButtonColor.isEmpty
+                    {
                         menuButton?.tintColor = UIColor(hexString: menuButtonColor)
                     }
                     let index = browserSettings.hideCloseButton ? 0 : 1
@@ -328,11 +369,12 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
             closeButton.action = nil
         }
         var barButtonSystemItem = UIBarButtonItem.SystemItem.close
-        closeButton = UIBarButtonItem(barButtonSystemItem: barButtonSystemItem, target: self, action: #selector(close))
+        closeButton = UIBarButtonItem(
+            barButtonSystemItem: barButtonSystemItem, target: self, action: #selector(close))
     }
 
     public func didChangeTitle(title: String?) {
-        guard let _ = title else {
+        guard title != nil else {
             return
         }
     }
@@ -378,8 +420,9 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
 
     public func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         guard let text = searchBar.text,
-              let urlEncoded = text.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
-              let url = URL(string: urlEncoded) else {
+            let urlEncoded = text.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+            let url = URL(string: urlEncoded)
+        else {
             return
         }
         let request = URLRequest(url: url)
@@ -387,7 +430,9 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     }
 
     public func show(completion: (() -> Void)? = nil) {
-        if let navController = navigationController as? InAppBrowserNavigationController, let window = navController.tmpWindow {
+        if let navController = navigationController as? InAppBrowserNavigationController,
+            let window = navController.tmpWindow
+        {
             isHidden = false
             window.alpha = 0.0
             window.isHidden = false
@@ -400,7 +445,9 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     }
 
     public func hide(completion: (() -> Void)? = nil) {
-        if let navController = navigationController as? InAppBrowserNavigationController, let window = navController.tmpWindow {
+        if let navController = navigationController as? InAppBrowserNavigationController,
+            let window = navController.tmpWindow
+        {
             isHidden = true
             window.alpha = 1.0
             UIView.animate(withDuration: 0.2) {
@@ -421,28 +468,35 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     }
 
     @objc public func share() {
-        let vc = UIActivityViewController(activityItems: [webView?.url?.absoluteString ?? ""], applicationActivities: [])
+        let vc = UIActivityViewController(
+            activityItems: [webView?.url?.absoluteString ?? ""], applicationActivities: [])
         present(vc, animated: true, completion: nil)
     }
 
     public func close(completion: (() -> Void)? = nil) {
-        if (navigationController?.responds(to: #selector(getter: navigationController?.presentingViewController)))! {
-            navigationController?.presentingViewController?.dismiss(animated: true, completion: {() -> Void in
-                completion?()
-            })
-        }
-        else {
-            navigationController?.parent?.dismiss(animated: true, completion: {() -> Void in
-                completion?()
-            })
+        if (navigationController?.responds(
+            to: #selector(getter: navigationController?.presentingViewController)))!
+        {
+            navigationController?.presentingViewController?.dismiss(
+                animated: true,
+                completion: { () -> Void in
+                    completion?()
+                })
+        } else {
+            navigationController?.parent?.dismiss(
+                animated: true,
+                completion: { () -> Void in
+                    completion?()
+                })
         }
     }
 
     @objc public func close() {
-        if (navigationController?.responds(to: #selector(getter: navigationController?.presentingViewController)))! {
+        if (navigationController?.responds(
+            to: #selector(getter: navigationController?.presentingViewController)))!
+        {
             navigationController?.presentingViewController?.dismiss(animated: true, completion: nil)
-        }
-        else {
+        } else {
             navigationController?.parent?.dismiss(animated: true, completion: nil)
         }
     }
@@ -471,21 +525,26 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         if newSettingsMap["hidden"] != nil, browserSettings?.hidden != newSettings.hidden {
             if newSettings.hidden {
                 hide()
-            }
-            else {
+            } else {
                 show()
             }
         }
 
-        if newSettingsMap["hideUrlBar"] != nil, browserSettings?.hideUrlBar != newSettings.hideUrlBar {
+        if newSettingsMap["hideUrlBar"] != nil,
+            browserSettings?.hideUrlBar != newSettings.hideUrlBar
+        {
             searchBar.isHidden = newSettings.hideUrlBar
         }
 
-        if newSettingsMap["hideToolbarTop"] != nil, browserSettings?.hideToolbarTop != newSettings.hideToolbarTop {
+        if newSettingsMap["hideToolbarTop"] != nil,
+            browserSettings?.hideToolbarTop != newSettings.hideToolbarTop
+        {
             navigationController?.navigationBar.isHidden = newSettings.hideToolbarTop
         }
 
-        if newSettingsMap["toolbarTopBackgroundColor"] != nil, browserSettings?.toolbarTopBackgroundColor != newSettings.toolbarTopBackgroundColor {
+        if newSettingsMap["toolbarTopBackgroundColor"] != nil,
+            browserSettings?.toolbarTopBackgroundColor != newSettings.toolbarTopBackgroundColor
+        {
             if let bgColor = newSettings.toolbarTopBackgroundColor, !bgColor.isEmpty {
                 navigationController?.navigationBar.backgroundColor = UIColor(hexString: bgColor)
             } else {
@@ -493,7 +552,9 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
             }
         }
 
-        if newSettingsMap["toolbarTopBarTintColor"] != nil, browserSettings?.toolbarTopBarTintColor != newSettings.toolbarTopBarTintColor {
+        if newSettingsMap["toolbarTopBarTintColor"] != nil,
+            browserSettings?.toolbarTopBarTintColor != newSettings.toolbarTopBarTintColor
+        {
             if let barTintColor = newSettings.toolbarTopBarTintColor, !barTintColor.isEmpty {
                 navigationController?.navigationBar.barTintColor = UIColor(hexString: barTintColor)
             } else {
@@ -501,7 +562,9 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
             }
         }
 
-        if newSettingsMap["toolbarTopTintColor"] != nil, browserSettings?.toolbarTopTintColor != newSettings.toolbarTopTintColor {
+        if newSettingsMap["toolbarTopTintColor"] != nil,
+            browserSettings?.toolbarTopTintColor != newSettings.toolbarTopTintColor
+        {
             if let tintColor = newSettings.toolbarTopTintColor, !tintColor.isEmpty {
                 navigationController?.navigationBar.tintColor = UIColor(hexString: tintColor)
             } else {
@@ -509,11 +572,16 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
             }
         }
 
-        if newSettingsMap["hideToolbarBottom"] != nil, browserSettings?.hideToolbarBottom != newSettings.hideToolbarBottom {
+        if newSettingsMap["hideToolbarBottom"] != nil,
+            browserSettings?.hideToolbarBottom != newSettings.hideToolbarBottom
+        {
             navigationController?.isToolbarHidden = !newSettings.hideToolbarBottom
         }
 
-        if newSettingsMap["toolbarBottomBackgroundColor"] != nil, browserSettings?.toolbarBottomBackgroundColor != newSettings.toolbarBottomBackgroundColor {
+        if newSettingsMap["toolbarBottomBackgroundColor"] != nil,
+            browserSettings?.toolbarBottomBackgroundColor
+                != newSettings.toolbarBottomBackgroundColor
+        {
             if let bgColor = newSettings.toolbarBottomBackgroundColor, !bgColor.isEmpty {
                 navigationController?.toolbar.barTintColor = UIColor(hexString: bgColor)
             } else {
@@ -521,7 +589,9 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
             }
         }
 
-        if newSettingsMap["toolbarBottomTintColor"] != nil, browserSettings?.toolbarBottomTintColor != newSettings.toolbarBottomTintColor {
+        if newSettingsMap["toolbarBottomTintColor"] != nil,
+            browserSettings?.toolbarBottomTintColor != newSettings.toolbarBottomTintColor
+        {
             if let tintColor = newSettings.toolbarBottomTintColor, !tintColor.isEmpty {
                 navigationController?.toolbar.tintColor = UIColor(hexString: tintColor)
             } else {
@@ -529,29 +599,40 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
             }
         }
 
-        if newSettingsMap["toolbarTopTranslucent"] != nil, browserSettings?.toolbarTopTranslucent != newSettings.toolbarTopTranslucent {
+        if newSettingsMap["toolbarTopTranslucent"] != nil,
+            browserSettings?.toolbarTopTranslucent != newSettings.toolbarTopTranslucent
+        {
             navigationController?.navigationBar.isTranslucent = newSettings.toolbarTopTranslucent
         }
 
-        if newSettingsMap["toolbarBottomTranslucent"] != nil, browserSettings?.toolbarBottomTranslucent != newSettings.toolbarBottomTranslucent {
+        if newSettingsMap["toolbarBottomTranslucent"] != nil,
+            browserSettings?.toolbarBottomTranslucent != newSettings.toolbarBottomTranslucent
+        {
             navigationController?.toolbar.isTranslucent = newSettings.toolbarBottomTranslucent
         }
 
-        if newSettingsMap["closeButtonCaption"] != nil, browserSettings?.closeButtonCaption != newSettings.closeButtonCaption {
-            if let closeButtonCaption = newSettings.closeButtonCaption, !closeButtonCaption.isEmpty {
+        if newSettingsMap["closeButtonCaption"] != nil,
+            browserSettings?.closeButtonCaption != newSettings.closeButtonCaption
+        {
+            if let closeButtonCaption = newSettings.closeButtonCaption, !closeButtonCaption.isEmpty
+            {
                 if let oldTitle = closeButton.title, !oldTitle.isEmpty {
                     closeButton.title = closeButtonCaption
                 } else {
                     closeButton.target = nil
                     closeButton.action = nil
-                    closeButton = UIBarButtonItem(title: closeButtonCaption, style: .plain, target: self, action: #selector(close))
+                    closeButton = UIBarButtonItem(
+                        title: closeButtonCaption, style: .plain, target: self,
+                        action: #selector(close))
                 }
             } else {
                 setDefaultCloseButton()
             }
         }
 
-        if newSettingsMap["closeButtonColor"] != nil, browserSettings?.closeButtonColor != newSettings.closeButtonColor {
+        if newSettingsMap["closeButtonColor"] != nil,
+            browserSettings?.closeButtonColor != newSettings.closeButtonColor
+        {
             if let tintColor = newSettings.closeButtonColor, !tintColor.isEmpty {
                 closeButton.tintColor = UIColor(hexString: tintColor)
             } else {
@@ -559,7 +640,9 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
             }
         }
 
-        if newSettingsMap["hideCloseButton"] != nil, browserSettings?.hideCloseButton != newSettings.hideCloseButton {
+        if newSettingsMap["hideCloseButton"] != nil,
+            browserSettings?.hideCloseButton != newSettings.hideCloseButton
+        {
             if !newSettings.hideCloseButton {
                 navigationItem.rightBarButtonItems = [closeButton]
             } else {
@@ -567,19 +650,29 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
             }
         }
 
-        if newSettingsMap["presentationStyle"] != nil, browserSettings?.presentationStyle != newSettings.presentationStyle {
-            navigationController?.modalPresentationStyle = UIModalPresentationStyle(rawValue: newSettings.presentationStyle)!
+        if newSettingsMap["presentationStyle"] != nil,
+            browserSettings?.presentationStyle != newSettings.presentationStyle
+        {
+            navigationController?.modalPresentationStyle = UIModalPresentationStyle(
+                rawValue: newSettings.presentationStyle)!
         }
 
-        if newSettingsMap["transitionStyle"] != nil, browserSettings?.transitionStyle != newSettings.transitionStyle {
-            navigationController?.modalTransitionStyle = UIModalTransitionStyle(rawValue: newSettings.transitionStyle)!
+        if newSettingsMap["transitionStyle"] != nil,
+            browserSettings?.transitionStyle != newSettings.transitionStyle
+        {
+            navigationController?.modalTransitionStyle = UIModalTransitionStyle(
+                rawValue: newSettings.transitionStyle)!
         }
 
-        if newSettingsMap["hideProgressBar"] != nil, browserSettings?.hideProgressBar != newSettings.hideProgressBar {
+        if newSettingsMap["hideProgressBar"] != nil,
+            browserSettings?.hideProgressBar != newSettings.hideProgressBar
+        {
             progressBar.isHidden = newSettings.hideProgressBar
         }
 
-        if newSettingsMap["menuButtonColor"] != nil, browserSettings?.menuButtonColor != newSettings.menuButtonColor {
+        if newSettingsMap["menuButtonColor"] != nil,
+            browserSettings?.menuButtonColor != newSettings.menuButtonColor
+        {
             if let tintColor = newSettings.menuButtonColor, !tintColor.isEmpty {
                 menuButton?.tintColor = UIColor(hexString: tintColor)
             } else {
@@ -593,7 +686,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
 
     public func getSettings() -> [String: Any?]? {
         let webViewSettingsMap = webView?.getSettings()
-        if (self.browserSettings == nil || webViewSettingsMap == nil) {
+        if self.browserSettings == nil || webViewSettingsMap == nil {
             return nil
         }
         var settingsMap = self.browserSettings!.getRealSettings(obj: self)
@@ -609,7 +702,9 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         webView?.removeFromSuperview()
         webView = nil
         view = nil
-        if previousStatusBarStyle != -1, let statusBarStyle = UIStatusBarStyle(rawValue: previousStatusBarStyle) {
+        if previousStatusBarStyle != -1,
+            let statusBarStyle = UIStatusBarStyle(rawValue: previousStatusBarStyle)
+        {
             UIApplication.shared.statusBarStyle = statusBarStyle
         }
         transitioningDelegate = nil
@@ -624,7 +719,6 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     }
 
     deinit {
-        debugPrint("InAppBrowserWebViewController - dealloc")
         dispose()
     }
 }

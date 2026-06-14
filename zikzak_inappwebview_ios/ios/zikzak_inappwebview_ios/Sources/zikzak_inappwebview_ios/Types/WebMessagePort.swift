@@ -15,15 +15,18 @@ public class WebMessagePort: NSObject {
     var isClosed = false
     var isTransferred = false
     var isStarted = false
-    
-    public init(name: String, index: Int64, webMessageChannelId: String, webMessageChannel: WebMessageChannel?) {
+
+    public init(
+        name: String, index: Int64, webMessageChannelId: String,
+        webMessageChannel: WebMessageChannel?
+    ) {
         self.name = name
         self.index = index
         self.webMessageChannelId = webMessageChannelId
         super.init()
         self.webMessageChannel = webMessageChannel
     }
-    
+
     public func setWebMessageCallback(completionHandler: ((Any?) -> Void)? = nil) throws {
         if isClosed || isTransferred {
             throw NSError(domain: "Port is already closed or transferred", code: 0)
@@ -31,31 +34,34 @@ public class WebMessagePort: NSObject {
         self.isStarted = true
         if let webMessageChannel = webMessageChannel, let webView = webMessageChannel.webView {
             let index = name == "port1" ? 0 : 1
-            webView.evaluateJavascript(source: """
-            (function() {
-                var webMessageChannel = \(WEB_MESSAGE_CHANNELS_VARIABLE_NAME)["\(webMessageChannel.id)"];
-                if (webMessageChannel != null) {
-                    webMessageChannel.\(self.name).onmessage = function (event) {
-                        window.webkit.messageHandlers["onWebMessagePortMessageReceived"].postMessage({
-                            "webMessageChannelId": "\(webMessageChannel.id)",
-                            "index": \(String(index)),
-                            "message": {
-                                "data": window.ArrayBuffer != null && event.data instanceof ArrayBuffer ? Array.from(new Uint8Array(event.data)) : (event.data != null ? event.data.toString() : null),
-                                "type": window.ArrayBuffer != null && event.data instanceof ArrayBuffer ? 1 : 0
+            webView.evaluateJavascript(
+                source: """
+                    (function() {
+                        var webMessageChannel = \(WEB_MESSAGE_CHANNELS_VARIABLE_NAME)["\(webMessageChannel.id)"];
+                        if (webMessageChannel != null) {
+                            webMessageChannel.\(self.name).onmessage = function (event) {
+                                window.webkit.messageHandlers["onWebMessagePortMessageReceived"].postMessage({
+                                    "webMessageChannelId": "\(webMessageChannel.id)",
+                                    "index": \(String(index)),
+                                    "message": {
+                                        "data": window.ArrayBuffer != null && event.data instanceof ArrayBuffer ? Array.from(new Uint8Array(event.data)) : (event.data != null ? event.data.toString() : null),
+                                        "type": window.ArrayBuffer != null && event.data instanceof ArrayBuffer ? 1 : 0
+                                    }
+                                });
                             }
-                        });
-                    }
-                }
-            })();
-            """) { (_) in
+                        }
+                    })();
+                    """
+            ) { (_) in
                 completionHandler?(nil)
             }
         } else {
             completionHandler?(nil)
         }
     }
-    
-    public func postMessage(message: WebMessage, completionHandler: ((Any?) -> Void)? = nil) throws {
+
+    public func postMessage(message: WebMessage, completionHandler: ((Any?) -> Void)? = nil) throws
+    {
         if isClosed || isTransferred {
             throw NSError(domain: "Port is already closed or transferred", code: 0)
         }
@@ -74,19 +80,21 @@ public class WebMessagePort: NSObject {
                         throw NSError(domain: "Port is already closed or transferred", code: 0)
                     }
                     port.isTransferred = true
-                    portArrayString.append("\(WEB_MESSAGE_CHANNELS_VARIABLE_NAME)['\(port.webMessageChannel!.id)'].\(port.name)")
+                    portArrayString.append(
+                        "\(WEB_MESSAGE_CHANNELS_VARIABLE_NAME)['\(port.webMessageChannel!.id)'].\(port.name)"
+                    )
                 }
                 portsString = "[" + portArrayString.joined(separator: ", ") + "]"
             }
-            
+
             let source = """
-            (function() {
-                var webMessageChannel = \(WEB_MESSAGE_CHANNELS_VARIABLE_NAME)["\(webMessageChannel.id)"];
-                if (webMessageChannel != null) {
-                    webMessageChannel.\(self.name).postMessage(\(message.jsData), \(portsString));
-                }
-            })();
-            """
+                (function() {
+                    var webMessageChannel = \(WEB_MESSAGE_CHANNELS_VARIABLE_NAME)["\(webMessageChannel.id)"];
+                    if (webMessageChannel != null) {
+                        webMessageChannel.\(self.name).postMessage(\(message.jsData), \(portsString));
+                    }
+                })();
+                """
             webView.evaluateJavascript(source: source) { (_) in
                 completionHandler?(nil)
             }
@@ -95,7 +103,7 @@ public class WebMessagePort: NSObject {
         }
         message.dispose()
     }
-    
+
     public func close(completionHandler: ((Any?) -> Void)? = nil) throws {
         if isTransferred {
             throw NSError(domain: "Port is already transferred", code: 0)
@@ -103,13 +111,13 @@ public class WebMessagePort: NSObject {
         isClosed = true
         if let webMessageChannel = webMessageChannel, let webView = webMessageChannel.webView {
             let source = """
-            (function() {
-                var webMessageChannel = \(WEB_MESSAGE_CHANNELS_VARIABLE_NAME)["\(webMessageChannel.id)"];
-                if (webMessageChannel != null) {
-                    webMessageChannel.\(self.name).close();
-                }
-            })();
-            """
+                (function() {
+                    var webMessageChannel = \(WEB_MESSAGE_CHANNELS_VARIABLE_NAME)["\(webMessageChannel.id)"];
+                    if (webMessageChannel != null) {
+                        webMessageChannel.\(self.name).close();
+                    }
+                })();
+                """
             webView.evaluateJavascript(source: source) { (_) in
                 completionHandler?(nil)
             }
@@ -117,7 +125,7 @@ public class WebMessagePort: NSObject {
             completionHandler?(nil)
         }
     }
-    
+
     public static func fromMap(map: [String: Any?]) -> WebMessagePort {
         let index = map["index"] as! Int64
         return WebMessagePort(
@@ -126,22 +134,21 @@ public class WebMessagePort: NSObject {
             webMessageChannelId: map["webMessageChannelId"] as! String,
             webMessageChannel: nil)
     }
-    
-    public func toMap () -> [String: Any?] {
+
+    public func toMap() -> [String: Any?] {
         return [
             "name": name,
             "index": index,
-            "webMessageChannelId": webMessageChannelId
+            "webMessageChannelId": webMessageChannelId,
         ]
     }
-    
+
     public func dispose() {
         isClosed = true
         webMessageChannel = nil
     }
-    
+
     deinit {
-        debugPrint("WebMessagePort - dealloc")
         dispose()
     }
 }

@@ -1,4 +1,7 @@
 import Flutter
+import SafariServices
+import UIKit
+
 //
 //  SafariViewController.swift
 //  zikzak_inappwebview
@@ -6,10 +9,9 @@ import Flutter
 //  Created by Lorenzo on 25/09/18.
 //
 
-import UIKit
-import SafariServices
-
-public class SafariViewController: SFSafariViewController, SFSafariViewControllerDelegate, Disposable {
+public class SafariViewController: SFSafariViewController, SFSafariViewControllerDelegate,
+    Disposable
+{
     static let METHOD_CHANNEL_NAME_PREFIX = "wtf.zikzak/flutter_chromesafaribrowser_"
     var channelDelegate: SafariViewControllerChannelDelegate?
     var safariSettings: SafariBrowserSettings
@@ -17,32 +19,46 @@ public class SafariViewController: SFSafariViewController, SFSafariViewControlle
     var plugin: SwiftFlutterPlugin?
     var menuItemList: [[String: Any]] = []
 
-    public init(plugin: SwiftFlutterPlugin, id: String, url: URL, configuration: SFSafariViewController.Configuration, menuItemList: [[String: Any]] = [], safariSettings: SafariBrowserSettings) {
+    public init(
+        plugin: SwiftFlutterPlugin, id: String, url: URL,
+        configuration: SFSafariViewController.Configuration, menuItemList: [[String: Any]] = [],
+        safariSettings: SafariBrowserSettings
+    ) {
         self.id = id
         self.plugin = plugin
         self.menuItemList = menuItemList
         self.safariSettings = safariSettings
-        SafariViewController.prepareConfig(configuration: configuration, safariSettings: safariSettings)
+        SafariViewController.prepareConfig(
+            configuration: configuration, safariSettings: safariSettings)
         super.init(url: url, configuration: configuration)
-        let channel = FlutterMethodChannel(name: SafariViewController.METHOD_CHANNEL_NAME_PREFIX + id,
-                                           binaryMessenger: plugin.registrar!.messenger())
-        self.channelDelegate = SafariViewControllerChannelDelegate(safariViewController: self, channel: channel)
+        let channel = FlutterMethodChannel(
+            name: SafariViewController.METHOD_CHANNEL_NAME_PREFIX + id,
+            binaryMessenger: plugin.registrar!.messenger())
+        self.channelDelegate = SafariViewControllerChannelDelegate(
+            safariViewController: self, channel: channel)
         self.delegate = self
     }
 
-    public init(plugin: SwiftFlutterPlugin, id: String, url: URL, entersReaderIfAvailable: Bool, menuItemList: [[String: Any]] = [], safariSettings: SafariBrowserSettings) {
+    public init(
+        plugin: SwiftFlutterPlugin, id: String, url: URL, entersReaderIfAvailable: Bool,
+        menuItemList: [[String: Any]] = [], safariSettings: SafariBrowserSettings
+    ) {
         self.id = id
         self.plugin = plugin
         self.menuItemList = menuItemList
         self.safariSettings = safariSettings
         super.init(url: url, entersReaderIfAvailable: entersReaderIfAvailable)
-        let channel = FlutterMethodChannel(name: SafariViewController.METHOD_CHANNEL_NAME_PREFIX + id,
-                                           binaryMessenger: plugin.registrar!.messenger())
-        self.channelDelegate = SafariViewControllerChannelDelegate(safariViewController: self, channel: channel)
+        let channel = FlutterMethodChannel(
+            name: SafariViewController.METHOD_CHANNEL_NAME_PREFIX + id,
+            binaryMessenger: plugin.registrar!.messenger())
+        self.channelDelegate = SafariViewControllerChannelDelegate(
+            safariViewController: self, channel: channel)
         self.delegate = self
     }
 
-    public static func prepareConfig(configuration: SFSafariViewController.Configuration, safariSettings: SafariBrowserSettings) {
+    public static func prepareConfig(
+        configuration: SFSafariViewController.Configuration, safariSettings: SafariBrowserSettings
+    ) {
         configuration.entersReaderIfAvailable = safariSettings.entersReaderIfAvailable
         configuration.barCollapsingEnabled = safariSettings.barCollapsingEnabled
         if #available(iOS 15.0, *), let activityButtonMap = safariSettings.activityButton {
@@ -54,17 +70,24 @@ public class SafariViewController: SFSafariViewController, SFSafariViewControlle
     }
 
     func prepareSafariBrowser() {
-        self.dismissButtonStyle = SFSafariViewController.DismissButtonStyle(rawValue: safariSettings.dismissButtonStyle)!
+        self.dismissButtonStyle = SFSafariViewController.DismissButtonStyle(
+            rawValue: safariSettings.dismissButtonStyle)!
 
-        if let preferredBarTintColor = safariSettings.preferredBarTintColor, !preferredBarTintColor.isEmpty {
+        if let preferredBarTintColor = safariSettings.preferredBarTintColor,
+            !preferredBarTintColor.isEmpty
+        {
             self.preferredBarTintColor = UIColor(hexString: preferredBarTintColor)
         }
-        if let preferredControlTintColor = safariSettings.preferredControlTintColor, !preferredControlTintColor.isEmpty {
+        if let preferredControlTintColor = safariSettings.preferredControlTintColor,
+            !preferredControlTintColor.isEmpty
+        {
             self.preferredControlTintColor = UIColor(hexString: preferredControlTintColor)
         }
 
-        self.modalPresentationStyle = UIModalPresentationStyle(rawValue: safariSettings.presentationStyle)!
-        self.modalTransitionStyle = UIModalTransitionStyle(rawValue: safariSettings.transitionStyle)!
+        self.modalPresentationStyle = UIModalPresentationStyle(
+            rawValue: safariSettings.presentationStyle)!
+        self.modalTransitionStyle = UIModalTransitionStyle(
+            rawValue: safariSettings.transitionStyle)!
     }
 
     public override func viewWillAppear(_ animated: Bool) {
@@ -83,37 +106,46 @@ public class SafariViewController: SFSafariViewController, SFSafariViewControlle
         dismiss(animated: true)
 
         // wait for the animation
-        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(400), execute: {() -> Void in
-            if let result = result {
-               result(true)
-            }
-        })
+        DispatchQueue.main.asyncAfter(
+            deadline: .now() + .milliseconds(400),
+            execute: { () -> Void in
+                if let result = result {
+                    result(true)
+                }
+            })
     }
 
     public func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
         close(result: nil)
     }
 
-    public func safariViewController(_ controller: SFSafariViewController,
-                              didCompleteInitialLoad didLoadSuccessfully: Bool) {
+    public func safariViewController(
+        _ controller: SFSafariViewController,
+        didCompleteInitialLoad didLoadSuccessfully: Bool
+    ) {
         channelDelegate?.onCompletedInitialLoad(didLoadSuccessfully: didLoadSuccessfully)
     }
 
-    public func safariViewController(_ controller: SFSafariViewController, activityItemsFor URL: URL, title: String?) -> [UIActivity] {
+    public func safariViewController(
+        _ controller: SFSafariViewController, activityItemsFor URL: URL, title: String?
+    ) -> [UIActivity] {
         guard let plugin = plugin else {
             return []
         }
         var uiActivities: [UIActivity] = []
         menuItemList.forEach { (menuItem) in
-            let activity = CustomUIActivity(plugin: plugin, viewId: id, id: menuItem["id"] as! Int64, url: URL,
-                                            title: title, label: menuItem["label"] as? String, type: nil,
-                                            image: .fromMap(map: menuItem["image"] as? [String:Any?]))
+            let activity = CustomUIActivity(
+                plugin: plugin, viewId: id, id: menuItem["id"] as! Int64, url: URL,
+                title: title, label: menuItem["label"] as? String, type: nil,
+                image: .fromMap(map: menuItem["image"] as? [String: Any?]))
             uiActivities.append(activity)
         }
         return uiActivities
     }
 
-    public func safariViewController(_ controller: SFSafariViewController, initialLoadDidRedirectTo url: URL) {
+    public func safariViewController(
+        _ controller: SFSafariViewController, initialLoadDidRedirectTo url: URL
+    ) {
         channelDelegate?.onInitialLoadDidRedirect(url: url)
     }
 
@@ -130,7 +162,6 @@ public class SafariViewController: SFSafariViewController, SFSafariViewControlle
     }
 
     deinit {
-        debugPrint("SafariViewController - dealloc")
         dispose()
     }
 }
