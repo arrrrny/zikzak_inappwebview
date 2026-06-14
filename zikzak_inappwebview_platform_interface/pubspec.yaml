@@ -19,7 +19,8 @@ dependencies:
   flutter:
     sdk: flutter
   plugin_platform_interface: ^2.1.8
-  zikzak_inappwebview_internal_annotations: ^4.3.5
+  zikzak_inappwebview_internal_annotations:
+    path: ../zikzak_inappwebview_internal_annotations
 
   meta: ^1.15.0
 
