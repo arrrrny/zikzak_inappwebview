@@ -1,3 +1,17 @@
+## 4.3.6 - 2026-06-14
+
+* Merge pull request #147 from arrrrny/fix/issue144-stuck-loading
+* fixed timer issue
+* bumped gradle
+* fix(android): resume global WebView timers when preparing a new InAppWebView
+* chore(android): bump Gradle wrapper to 9.1.1 for AGP 9.0
+* chore(android): upgrade AGP to 9.0.0
+* chore(android): add .kotlin/ to gitignore
+* chore: remove accidentally committed .kotlin session file
+* fix(android): upgrade Gradle/AGP/Kotlin and migrate off kotlin-android
+* Merge branch 'publish-4.3.5'
+* 'pub get
+* Merge pull request #146 from arrrrny/fix/v4.3.5-build-fixes
 ## 4.3.5 - 2026-06-12
 
 
