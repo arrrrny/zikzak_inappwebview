@@ -3559,24 +3559,15 @@ public final class InAppWebView
         // STEP 11: Remove all views
         removeAllViews();
 
-        // STEP 12: Pause WebView lifecycle
-        onPause();
-        pauseTimers();
-
-        // STEP 13: Clear cache and history
+        // STEP 12: Clear cache and history
         clearHistory();
         clearCache(true);
 
-        // STEP 14: Clear plugin reference
+        // STEP 13: Clear plugin reference
         plugin = null;
 
-        // STEP 15: Final destroy on next frame to ensure cleanup completes
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                destroy();
-            }
-        });
+        // STEP 14: Final destroy immediately (not deferred, to avoid race with new WebView creation)
+        destroy();
     }
 
     @Override
