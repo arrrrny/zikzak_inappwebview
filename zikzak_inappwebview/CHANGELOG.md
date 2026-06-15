@@ -1,3 +1,7 @@
+## 4.3.8 - 2026-06-15
+
+* fixed macos setting and removed pods from example
+* 'updated deps'
 ## 4.3.7 - 2026-06-15
 
 * Remove debugPrint dealloc statements from Swift deinit blocks
