@@ -404,19 +404,17 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             configuration.preferences.minimumFontSize = CGFloat(newSettings.minimumFontSize)
         }
 
-        if newSettingsMap["mediaPlaybackRequiresUserGesture"] != nil
-            && settings?.mediaPlaybackRequiresUserGesture
-                != newSettings.mediaPlaybackRequiresUserGesture
-        {
-            configuration.mediaTypesRequiringUserActionForPlayback =
-                newSettings.mediaPlaybackRequiresUserGesture ? .all : []
+        if #available(macOS 10.12, *) {
+            if newSettingsMap["mediaPlaybackRequiresUserGesture"] != nil
+                && settings?.mediaPlaybackRequiresUserGesture
+                    != newSettings.mediaPlaybackRequiresUserGesture
+            {
+                configuration.mediaTypesRequiringUserActionForPlayback =
+                    newSettings.mediaPlaybackRequiresUserGesture ? .all : []
+            }
         }
 
-        if newSettingsMap["allowsInlineMediaPlayback"] != nil
-            && settings?.allowsInlineMediaPlayback != newSettings.allowsInlineMediaPlayback
-        {
-            configuration.allowsInlineMediaPlayback = newSettings.allowsInlineMediaPlayback
-        }
+        // allowsInlineMediaPlayback is not available on macOS
 
         if newSettingsMap["allowUniversalAccessFromFileURLs"] != nil
             && settings?.allowUniversalAccessFromFileURLs
@@ -438,10 +436,10 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             && settings?.transparentBackground != newSettings.transparentBackground
         {
             if newSettings.transparentBackground {
-                self.isOpaque = false
+                self.setValue(false, forKey: "drawsBackground")
                 self.layer?.backgroundColor = NSColor.clear.cgColor
             } else {
-                self.isOpaque = true
+                self.setValue(true, forKey: "drawsBackground")
                 self.layer?.backgroundColor = nil
             }
         }

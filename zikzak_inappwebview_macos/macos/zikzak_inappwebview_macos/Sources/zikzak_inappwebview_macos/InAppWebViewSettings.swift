@@ -126,9 +126,7 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
                 realSettings["isElementFullscreenEnabled"] =
                     configuration.preferences.isElementFullscreenEnabled
             }
-            if #available(macOS 13.0, *) {
-                realSettings["isFindInteractionEnabled"] = webView.isFindInteractionEnabled
-            }
+            // isFindInteractionEnabled is not available on macOS
         }
         return realSettings
     }
