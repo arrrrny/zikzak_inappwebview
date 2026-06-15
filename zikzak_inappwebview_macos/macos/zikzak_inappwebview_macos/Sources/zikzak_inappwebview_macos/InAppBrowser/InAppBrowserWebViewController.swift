@@ -4,27 +4,49 @@ import WebKit
 
 public class InAppBrowserWebView: InAppWebView {
     weak var browserController: InAppBrowserWebViewController?
+    public var browserSettings: InAppBrowserSettings?
 
     public override func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         switch call.method {
-            case "close":
-                browserController?.close()
-                result(true)
-                break
-            case "show":
-                browserController?.window?.makeKeyAndOrderFront(nil)
-                result(true)
-                break
-            case "hide":
-                browserController?.window?.orderOut(nil)
-                result(true)
-                break
-            case "isHidden":
-                result(!(browserController?.window?.isVisible ?? false))
-                break
-            default:
-                super.handle(call, result: result)
-                break
+        case "close":
+            browserController?.close()
+            result(true)
+            break
+        case "show":
+            browserController?.window?.makeKeyAndOrderFront(nil)
+            result(true)
+            break
+        case "hide":
+            browserController?.window?.orderOut(nil)
+            result(true)
+            break
+        case "isHidden":
+            result(!(browserController?.window?.isVisible ?? false))
+            break
+        default:
+            super.handle(call, result: result)
+            break
+        }
+    }
+
+    override func setSettings(newSettings: InAppWebViewSettings, newSettingsMap: [String: Any]) {
+        super.setSettings(newSettings: newSettings, newSettingsMap: newSettingsMap)
+
+        // Apply InAppBrowser-specific settings
+        let newBrowserSettings = InAppBrowserSettings()
+        let _ = newBrowserSettings.parse(settings: newSettingsMap)
+        self.browserSettings = newBrowserSettings
+
+        if let browserController = browserController {
+            if newSettingsMap["hidden"] != nil
+                && browserSettings?.hidden != newBrowserSettings.hidden
+            {
+                if newBrowserSettings.hidden {
+                    browserController.window?.orderOut(nil)
+                } else {
+                    browserController.window?.makeKeyAndOrderFront(nil)
+                }
+            }
         }
     }
 }
@@ -56,7 +78,12 @@ public class InAppBrowserWebViewController: NSWindowController, NSWindowDelegate
         fatalError("init(coder:) has not been implemented")
     }
 
-    public func prepare(urlRequest: [String: Any]?, assetFilePath: String?, data: String?, mimeType: String?, encoding: String?, baseUrl: String?, historyUrl: String?, settings: [String: Any]?, contextMenu: [String: Any]?, initialUserScripts: [[String: Any]]?, menuItems: [[String: Any]]?) {
+    public func prepare(
+        urlRequest: [String: Any]?, assetFilePath: String?, data: String?, mimeType: String?,
+        encoding: String?, baseUrl: String?, historyUrl: String?, settings: [String: Any]?,
+        contextMenu: [String: Any]?, initialUserScripts: [[String: Any]]?,
+        menuItems: [[String: Any]]?
+    ) {
 
         let channelName = "dev.zuzu/flutter_inappbrowser_\(id)"
 
@@ -64,10 +91,12 @@ public class InAppBrowserWebViewController: NSWindowController, NSWindowDelegate
         let arguments: [String: Any] = [
             "initialUrlRequest": urlRequest ?? [:],
             "initialUserScripts": initialUserScripts ?? [],
-            "settings": settings ?? [:]
+            "settings": settings ?? [:],
         ]
 
-        webView = InAppBrowserWebView(registrar: manager.registrar, viewId: id, arguments: arguments, channelName: channelName)
+        webView = InAppBrowserWebView(
+            registrar: manager.registrar, viewId: id, arguments: arguments, channelName: channelName
+        )
         webView?.frame = window?.contentView?.bounds ?? NSRect(x: 0, y: 0, width: 800, height: 600)
         webView?.autoresizingMask = [.width, .height]
         webView?.browserController = self
@@ -75,14 +104,14 @@ public class InAppBrowserWebViewController: NSWindowController, NSWindowDelegate
 
         // Handle loading if not handled by init arguments
         if urlRequest == nil {
-             if let assetFilePath = assetFilePath {
-                 let key = manager.registrar.lookupKey(forAsset: assetFilePath)
-                 if let path = Bundle.main.path(forResource: key, ofType: nil) {
-                     let url = URL(fileURLWithPath: path)
-                     webView?.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
-                 }
+            if let assetFilePath = assetFilePath {
+                let key = manager.registrar.lookupKey(forAsset: assetFilePath)
+                if let path = Bundle.main.path(forResource: key, ofType: nil) {
+                    let url = URL(fileURLWithPath: path)
+                    webView?.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
+                }
             } else if let data = data {
-                 webView?.loadHTMLString(data, baseURL: baseUrl != nil ? URL(string: baseUrl!) : nil)
+                webView?.loadHTMLString(data, baseURL: baseUrl != nil ? URL(string: baseUrl!) : nil)
             }
         }
 

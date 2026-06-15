@@ -251,6 +251,17 @@ class MacOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
   }
 
   @override
+  Future<void> setSettings({
+    required InAppBrowserClassSettings settings,
+  }) async {
+    assert(_isOpened, 'The browser is not opened.');
+
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('settings', () => settings.toMap());
+    await _channel?.invokeMethod('setSettings', args);
+  }
+
+  @override
   Future<void> show() async {
     await _channel?.invokeMethod('show');
   }

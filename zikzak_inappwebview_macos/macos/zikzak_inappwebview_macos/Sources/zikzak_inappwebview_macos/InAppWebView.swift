@@ -7,6 +7,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     private var findInteractionChannel: FlutterMethodChannel!
     private var searchText: String?
     private var isDisposed = false
+    public var settings: InAppWebViewSettings?
 
     init(
         registrar: FlutterPluginRegistrar, viewId: Any, arguments: Any?, channelName: String? = nil
@@ -69,6 +70,13 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             {
                 let request = URLRequest(url: url)
                 self.load(request)
+            }
+
+            if let settingsMap = args["settings"] as? [String: Any?] {
+                let newSettings = InAppWebViewSettings()
+                let _ = newSettings.parse(settings: settingsMap)
+                self.setSettings(
+                    newSettings: newSettings, newSettingsMap: settingsMap as! [String: Any])
             }
         }
 
@@ -310,9 +318,208 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 result(
                     FlutterError(code: "InAppWebView", message: "Invalid arguments", details: nil))
             }
+        case "setSettings":
+            if let args = call.arguments as? [String: Any],
+                let settingsMap = args["settings"] as? [String: Any?]
+            {
+                let newSettings = InAppWebViewSettings()
+                let _ = newSettings.parse(settings: settingsMap)
+                self.setSettings(
+                    newSettings: newSettings, newSettingsMap: settingsMap as! [String: Any])
+                result(true)
+            } else {
+                result(
+                    FlutterError(code: "InAppWebView", message: "Invalid arguments", details: nil))
+            }
+        case "getSettings":
+            if let settings = self.settings {
+                result(settings.getRealSettings(obj: self))
+            } else {
+                result([String: Any?]())
+            }
         default:
             result(FlutterMethodNotImplemented)
         }
+    }
+
+    func setSettings(newSettings: InAppWebViewSettings, newSettingsMap: [String: Any]) {
+        if newSettingsMap["userAgent"] != nil
+            && settings?.userAgent != newSettings.userAgent
+            && newSettings.userAgent != ""
+        {
+            customUserAgent = newSettings.userAgent
+        }
+
+        if newSettingsMap["applicationNameForUserAgent"] != nil
+            && settings?.applicationNameForUserAgent != newSettings.applicationNameForUserAgent
+            && newSettings.applicationNameForUserAgent != ""
+        {
+            configuration.applicationNameForUserAgent = newSettings.applicationNameForUserAgent
+        }
+
+        if newSettingsMap["javaScriptEnabled"] != nil
+            && settings?.javaScriptEnabled != newSettings.javaScriptEnabled
+        {
+            configuration.preferences.javaScriptEnabled = newSettings.javaScriptEnabled
+        }
+
+        if newSettingsMap["javaScriptCanOpenWindowsAutomatically"] != nil
+            && settings?.javaScriptCanOpenWindowsAutomatically
+                != newSettings.javaScriptCanOpenWindowsAutomatically
+        {
+            configuration.preferences.javaScriptCanOpenWindowsAutomatically =
+                newSettings.javaScriptCanOpenWindowsAutomatically
+        }
+
+        if newSettingsMap["suppressesIncrementalRendering"] != nil
+            && settings?.suppressesIncrementalRendering
+                != newSettings.suppressesIncrementalRendering
+        {
+            configuration.suppressesIncrementalRendering =
+                newSettings.suppressesIncrementalRendering
+        }
+
+        if newSettingsMap["allowsBackForwardNavigationGestures"] != nil
+            && settings?.allowsBackForwardNavigationGestures
+                != newSettings.allowsBackForwardNavigationGestures
+        {
+            allowsBackForwardNavigationGestures = newSettings.allowsBackForwardNavigationGestures
+        }
+
+        if newSettingsMap["allowsLinkPreview"] != nil
+            && settings?.allowsLinkPreview != newSettings.allowsLinkPreview
+        {
+            allowsLinkPreview = newSettings.allowsLinkPreview
+        }
+
+        if newSettingsMap["allowsAirPlayForMediaPlayback"] != nil
+            && settings?.allowsAirPlayForMediaPlayback != newSettings.allowsAirPlayForMediaPlayback
+        {
+            configuration.allowsAirPlayForMediaPlayback = newSettings.allowsAirPlayForMediaPlayback
+        }
+
+        if newSettingsMap["minimumFontSize"] != nil
+            && settings?.minimumFontSize != newSettings.minimumFontSize
+        {
+            configuration.preferences.minimumFontSize = CGFloat(newSettings.minimumFontSize)
+        }
+
+        if newSettingsMap["mediaPlaybackRequiresUserGesture"] != nil
+            && settings?.mediaPlaybackRequiresUserGesture
+                != newSettings.mediaPlaybackRequiresUserGesture
+        {
+            configuration.mediaTypesRequiringUserActionForPlayback =
+                newSettings.mediaPlaybackRequiresUserGesture ? .all : []
+        }
+
+        if newSettingsMap["allowsInlineMediaPlayback"] != nil
+            && settings?.allowsInlineMediaPlayback != newSettings.allowsInlineMediaPlayback
+        {
+            configuration.allowsInlineMediaPlayback = newSettings.allowsInlineMediaPlayback
+        }
+
+        if newSettingsMap["allowUniversalAccessFromFileURLs"] != nil
+            && settings?.allowUniversalAccessFromFileURLs
+                != newSettings.allowUniversalAccessFromFileURLs
+        {
+            configuration.setValue(
+                newSettings.allowUniversalAccessFromFileURLs,
+                forKey: "allowUniversalAccessFromFileURLs")
+        }
+
+        if newSettingsMap["allowFileAccessFromFileURLs"] != nil
+            && settings?.allowFileAccessFromFileURLs != newSettings.allowFileAccessFromFileURLs
+        {
+            configuration.preferences.setValue(
+                newSettings.allowFileAccessFromFileURLs, forKey: "allowFileAccessFromFileURLs")
+        }
+
+        if newSettingsMap["transparentBackground"] != nil
+            && settings?.transparentBackground != newSettings.transparentBackground
+        {
+            if newSettings.transparentBackground {
+                self.isOpaque = false
+                self.layer?.backgroundColor = NSColor.clear.cgColor
+            } else {
+                self.isOpaque = true
+                self.layer?.backgroundColor = nil
+            }
+        }
+
+        if newSettingsMap["incognito"] != nil && settings?.incognito != newSettings.incognito
+            && newSettings.incognito
+        {
+            configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+        } else if newSettingsMap["cacheEnabled"] != nil
+            && settings?.cacheEnabled != newSettings.cacheEnabled && newSettings.cacheEnabled
+        {
+            configuration.websiteDataStore = WKWebsiteDataStore.default()
+        }
+
+        if #available(macOS 11.0, *) {
+            if newSettingsMap["pageZoom"] != nil && settings?.pageZoom != newSettings.pageZoom {
+                pageZoom = CGFloat(newSettings.pageZoom)
+            }
+            if newSettingsMap["limitsNavigationsToAppBoundDomains"] != nil
+                && settings?.limitsNavigationsToAppBoundDomains
+                    != newSettings.limitsNavigationsToAppBoundDomains
+            {
+                configuration.limitsNavigationsToAppBoundDomains =
+                    newSettings.limitsNavigationsToAppBoundDomains
+            }
+            if newSettingsMap["mediaType"] != nil && settings?.mediaType != newSettings.mediaType {
+                mediaType = newSettings.mediaType
+            }
+        }
+
+        if #available(macOS 13.3, *) {
+            if newSettingsMap["isTextInteractionEnabled"] != nil
+                && settings?.isTextInteractionEnabled != newSettings.isTextInteractionEnabled
+            {
+                configuration.preferences.isTextInteractionEnabled =
+                    newSettings.isTextInteractionEnabled
+            }
+            if newSettingsMap["upgradeKnownHostsToHTTPS"] != nil
+                && settings?.upgradeKnownHostsToHTTPS != newSettings.upgradeKnownHostsToHTTPS
+            {
+                configuration.upgradeKnownHostsToHTTPS = newSettings.upgradeKnownHostsToHTTPS
+            }
+            if newSettingsMap["underPageBackgroundColor"] != nil
+                && settings?.underPageBackgroundColor != newSettings.underPageBackgroundColor
+                && newSettings.underPageBackgroundColor != nil
+                && !newSettings.underPageBackgroundColor!.isEmpty
+            {
+                self.underPageBackgroundColor = NSColor(
+                    hexString: newSettings.underPageBackgroundColor!)
+            }
+        }
+
+        if #available(macOS 14.0, *) {
+            if newSettingsMap["isInspectable"] != nil
+                && settings?.isInspectable != newSettings.isInspectable
+            {
+                self.isInspectable = newSettings.isInspectable
+            }
+            if newSettingsMap["shouldPrintBackgrounds"] != nil
+                && settings?.shouldPrintBackgrounds != newSettings.shouldPrintBackgrounds
+            {
+                configuration.preferences.shouldPrintBackgrounds =
+                    newSettings.shouldPrintBackgrounds
+            }
+        }
+
+        if newSettingsMap["clearCache"] != nil && newSettings.clearCache {
+            clearCache()
+        }
+
+        self.settings = newSettings
+    }
+
+    func clearCache() {
+        let dataTypes = WKWebsiteDataStore.allWebsiteDataTypes()
+        let date = Date(timeIntervalSince1970: 0)
+        configuration.websiteDataStore.removeData(
+            ofTypes: dataTypes, modifiedSince: date, completionHandler: {})
     }
 
     public func webView(

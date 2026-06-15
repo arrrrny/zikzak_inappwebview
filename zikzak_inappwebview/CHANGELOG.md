@@ -1,3 +1,7 @@
+## 4.3.7 - 2026-06-15
+
+* Remove debugPrint dealloc statements from Swift deinit blocks
+* published
 ## 4.3.6 - 2026-06-14
 
 * Merge pull request #147 from arrrrny/fix/issue144-stuck-loading
