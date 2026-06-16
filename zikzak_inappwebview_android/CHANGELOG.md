@@ -1,3 +1,9 @@
+## 4.4.0 - 2026-06-16
+
+- Feature: Android URLRequest now supports `timeoutInterval` — the InAppWebView will stop
+  loading after the specified interval, making rendered HTML available for extraction via
+  `getHtml()` even if the page hasn't fully loaded
+
 ## 4.3.8 - 2026-06-15
 
 * fixed macos setting and removed pods from example

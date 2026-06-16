@@ -1007,6 +1007,20 @@ public final class InAppWebView
             postUrl(url, postData);
             return;
         }
+
+        // Schedule a smart timeout: if the page hasn't finished loading within
+        // the timeout interval, call stopLoading() so that whatever HTML has
+        // been rendered so far is available for extraction.
+        Double timeoutInterval = urlRequest.getTimeoutInterval();
+        if (timeoutInterval != null && timeoutInterval > 0) {
+            android.os.Handler handler = new android.os.Handler(android.os.Looper.getMainLooper());
+            handler.postDelayed(() -> {
+                if (isLoading) {
+                    stopLoading();
+                }
+            }, (long) (timeoutInterval * 1000));
+        }
+
         Map<String, String> headers = urlRequest.getHeaders();
         if (headers != null) {
             loadUrl(url, headers);

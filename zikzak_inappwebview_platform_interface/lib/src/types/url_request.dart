@@ -149,6 +149,11 @@ class URLRequest_ {
   URLRequestNetworkServiceType_? networkServiceType;
 
   ///The timeout interval of the request.
+  ///
+  /// On iOS/macOS this maps to the native `URLRequest.timeoutInterval`.
+  /// On Android this triggers a `WebView.stopLoading()` after the interval,
+  /// so whatever HTML has been rendered so far is available for extraction
+  /// (smart timeout — no hard failure).
   @SupportedPlatforms(
     platforms: [
       IOSPlatform(
@@ -161,6 +166,7 @@ class URLRequest_ {
         apiUrl:
             "https://developer.apple.com/documentation/foundation/urlrequest/2011509-timeoutinterval",
       ),
+      AndroidPlatform(apiName: "URLRequest.timeoutInterval"),
     ],
   )
   double? timeoutInterval;

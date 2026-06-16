@@ -64,11 +64,8 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         findInteractionChannel.setMethodCallHandler(self.handleFindInteraction)
 
         if let args = arguments as? [String: Any] {
-            if let initialUrlRequest = args["initialUrlRequest"] as? [String: Any],
-                let urlString = initialUrlRequest["url"] as? String,
-                let url = URL(string: urlString)
-            {
-                let request = URLRequest(url: url)
+            if let initialUrlRequest = args["initialUrlRequest"] as? [String: Any] {
+                let request = URLRequest(fromPluginMap: initialUrlRequest)
                 self.load(request)
             }
 
@@ -153,11 +150,9 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             result(Int(self.estimatedProgress * 100))
         case "loadUrl":
             if let args = call.arguments as? [String: Any],
-                let urlRequest = args["urlRequest"] as? [String: Any],
-                let urlString = urlRequest["url"] as? String,
-                let url = URL(string: urlString)
+                let urlRequest = args["urlRequest"] as? [String: Any]
             {
-                let request = URLRequest(url: url)
+                let request = URLRequest(fromPluginMap: urlRequest)
                 self.load(request)
                 result(true)
             } else {

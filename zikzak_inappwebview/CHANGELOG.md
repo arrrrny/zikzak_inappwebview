@@ -1,25 +1,42 @@
+## 4.4.0 - 2026-06-16
+
+- Feature: Android URLRequest now supports `timeoutInterval` — the InAppWebView will stop
+  loading after the specified interval, making rendered HTML available for extraction via
+  `getHtml()` even if the page hasn't fully loaded
+- Feature: macOS `URLRequest` native extension with full property support —
+  `init(fromPluginMap:)` and `toMap()` covering method, body, headers, cache policy,
+  network service type, timeout interval, and more
+- Refactor: macOS `InAppWebView` uses the new `URLRequest(fromPluginMap:)` extension
+  for cleaner URL loading in both initial load and `loadUrl()`
+- Chore: `prepare_for_publish.sh` no longer attempts to update CocoaPods podspecs
+  (migrated to Swift Package Manager)
+- Chore: Updated dependency lock files
+
 ## 4.3.8 - 2026-06-15
 
-* fixed macos setting and removed pods from example
-* 'updated deps'
+- fixed macos setting and removed pods from example
+- 'updated deps'
+
 ## 4.3.7 - 2026-06-15
 
-* Remove debugPrint dealloc statements from Swift deinit blocks
-* published
+- Remove debugPrint dealloc statements from Swift deinit blocks
+- published
+
 ## 4.3.6 - 2026-06-14
 
-* Merge pull request #147 from arrrrny/fix/issue144-stuck-loading
-* fixed timer issue
-* bumped gradle
-* fix(android): resume global WebView timers when preparing a new InAppWebView
-* chore(android): bump Gradle wrapper to 9.1.1 for AGP 9.0
-* chore(android): upgrade AGP to 9.0.0
-* chore(android): add .kotlin/ to gitignore
-* chore: remove accidentally committed .kotlin session file
-* fix(android): upgrade Gradle/AGP/Kotlin and migrate off kotlin-android
-* Merge branch 'publish-4.3.5'
-* 'pub get
-* Merge pull request #146 from arrrrny/fix/v4.3.5-build-fixes
+- Merge pull request #147 from arrrrny/fix/issue144-stuck-loading
+- fixed timer issue
+- bumped gradle
+- fix(android): resume global WebView timers when preparing a new InAppWebView
+- chore(android): bump Gradle wrapper to 9.1.1 for AGP 9.0
+- chore(android): upgrade AGP to 9.0.0
+- chore(android): add .kotlin/ to gitignore
+- chore: remove accidentally committed .kotlin session file
+- fix(android): upgrade Gradle/AGP/Kotlin and migrate off kotlin-android
+- Merge branch 'publish-4.3.5'
+- 'pub get
+- Merge pull request #146 from arrrrny/fix/v4.3.5-build-fixes
+
 ## 4.3.6 - 2026-06-14
 
 - Fixed: Android InAppWebView stuck loading when navigating between pages — removed

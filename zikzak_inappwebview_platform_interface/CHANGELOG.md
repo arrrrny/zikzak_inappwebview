@@ -1,3 +1,8 @@
+## 4.4.0 - 2026-06-16
+
+- Feature: `URLRequest.timeoutInterval` now supported on Android — added platform
+  support annotation and improved doc comments
+
 ## 4.3.8 - 2026-06-15
 
 * fixed macos setting and removed pods from example

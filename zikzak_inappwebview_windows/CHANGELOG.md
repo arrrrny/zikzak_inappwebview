@@ -1,27 +1,33 @@
+## 4.4.0 - 2026-06-16
+
+- Chore: Updated dependency lock files
+
 ## 4.3.8 - 2026-06-15
 
-* fixed macos setting and removed pods from example
-* 'updated deps'
+- fixed macos setting and removed pods from example
+- 'updated deps'
+
 ## 4.3.7 - 2026-06-15
 
-* Remove debugPrint dealloc statements from Swift deinit blocks
-* published
+- Remove debugPrint dealloc statements from Swift deinit blocks
+- published
+
 ## 4.3.6 - 2026-06-14
 
-* Merge pull request #147 from arrrrny/fix/issue144-stuck-loading
-* fixed timer issue
-* bumped gradle
-* fix(android): resume global WebView timers when preparing a new InAppWebView
-* chore(android): bump Gradle wrapper to 9.1.1 for AGP 9.0
-* chore(android): upgrade AGP to 9.0.0
-* chore(android): add .kotlin/ to gitignore
-* chore: remove accidentally committed .kotlin session file
-* fix(android): upgrade Gradle/AGP/Kotlin and migrate off kotlin-android
-* Merge branch 'publish-4.3.5'
-* 'pub get
-* Merge pull request #146 from arrrrny/fix/v4.3.5-build-fixes
-## 4.3.5 - 2026-06-12
+- Merge pull request #147 from arrrrny/fix/issue144-stuck-loading
+- fixed timer issue
+- bumped gradle
+- fix(android): resume global WebView timers when preparing a new InAppWebView
+- chore(android): bump Gradle wrapper to 9.1.1 for AGP 9.0
+- chore(android): upgrade AGP to 9.0.0
+- chore(android): add .kotlin/ to gitignore
+- chore: remove accidentally committed .kotlin session file
+- fix(android): upgrade Gradle/AGP/Kotlin and migrate off kotlin-android
+- Merge branch 'publish-4.3.5'
+- 'pub get
+- Merge pull request #146 from arrrrny/fix/v4.3.5-build-fixes
 
+## 4.3.5 - 2026-06-12
 
 - Fixed: macOS build failure — removed stray `}` that closed the `InAppWebView` class prematurely,
   leaving `WKNavigationDelegate`/`WKUIDelegate` methods outside the class scope. Also removed
@@ -35,22 +41,23 @@
   is Dart-only (uses `webview_windows` package), so no native CMake project is needed (#142)
 - Fixed: CMake include directory visibility for Linux plugin — changed `INTERFACE` to `PUBLIC`
   so the plugin can find its own headers (#142)
-## 4.3.4 - 2026-06-12
 
+## 4.3.4 - 2026-06-12
 
 - Fixed: iOS `type 'int' is not a subtype of type 'WebAuthenticationSupport?'` crash in
   `getHtml()`/`getSettings()` — `InAppWebViewSettings.fromMap()` now converts
   `webAuthenticationSupport` via `WebAuthenticationSupport.fromNativeValue()` instead of
   assigning the raw `int` value from the platform channel map
+
 ## 4.3.3 - 2026-06-04
 
-* 
+-
+
 ## 4.3.2 - 2026-06-04
 
-* fix: use KVC for webAuthenticationSupport to avoid SDK availability issue
+- fix: use KVC for webAuthenticationSupport to avoid SDK availability issue
 
 ## 4.3.1 - 2026-06-04
-
 
 - Fixed: iOS Passkey/WebAuthn support — wired `webAuthenticationSupport` setting into
   native `WKWebViewWebAuthenticationSupport.boundKeychainForPasskeys` on iOS 16.4+ (#131)
@@ -67,8 +74,8 @@
 - Feature: `WebAuthenticationSession` now supports `additionalHeaderFields` for custom
   HTTP headers — available on iOS 17.4+ (#100)
 - Chore: Raised minimum Flutter version from 3.29.0 to 3.38.6 for iOS touch fix (#128)
-## 4.3.0 - 2026-06-03
 
+## 4.3.0 - 2026-06-03
 
 - Fixed: iOS `onCreateWindow` not respecting client return value — now returns `nil` when
   the client handles the window creation, preventing WebKit from creating an unused
@@ -79,8 +86,8 @@
 - Fixed: macOS SIGSEGV crash in `callAsyncJavaScript` — added `isDisposed` guard to
   `observeValue`, added optional chaining on `channel?.invokeMethod` calls (#126)
 - Chore: Updated minimum iOS build version to 16.0
-## 4.2.4 - 2026-06-03
 
+## 4.2.4 - 2026-06-03
 
 - Feature: WebAuthn (passkey) support — added `webAuthenticationSupport` setting +
   `WebAuthenticationSupport` enum for native passkey authentication in WebViews
@@ -98,8 +105,8 @@
 - Fixed: Restored working `.g.dart` files after build_runner regeneration
 - Chore: Bumped `androidx.webkit:webkit` from 1.13.0 to 1.14.0
 - Chore: Added `generators` dependency to platform_interface for proper code generation
-## 4.2.4 - 2026-06-03
 
+## 4.2.4 - 2026-06-03
 
 - Feature: WebAuthn (passkey) support — added `webAuthenticationSupport` setting +
   `WebAuthenticationSupport` enum for native passkey authentication in WebViews
@@ -117,8 +124,8 @@
 - Fixed: Restored working `.g.dart` files after build_runner regeneration
 - Chore: Bumped `androidx.webkit:webkit` from 1.13.0 to 1.14.0
 - Chore: Added `generators` dependency to platform_interface for proper code generation
+
 ## 4.2.3 - 2026-06-03
-
 
 - Fixed: Android onWebViewCreated not firing on ~50% release cold starts — deferred JS bridge
   registration (addJavascriptInterface, addDocumentStartJavaScript) to View.post() so binder IPC
@@ -144,62 +151,70 @@
   actual commit messages as fallback instead of generic placeholder
 - Chore: Created UPSTREAM_ISSUES_TRIAGE.md — comprehensive triage of all 156 upstream issues
 - Chore: Created 72 tracking issues, closed 18 non-applicable, notified 25+ upstream PR authors
+
 ## 4.2.3 - 2026-06-03
 
-* Prepare for publishing version 4.2.3
+- Prepare for publishing version 4.2.3
+
 ## 4.2.2 - 2026-06-03
 
-* Prepare for publishing version 4.2.2
+- Prepare for publishing version 4.2.2
+
 ## 4.2.1 - 2026-05-24
 
-* Prepare for publishing version 4.2.1
+- Prepare for publishing version 4.2.1
+
 ## 4.2.0 - 2026-05-23
 
-* Prepare for publishing version 4.2.0
+- Prepare for publishing version 4.2.0
+
 ## 4.1.0 - 2026-05-23
 
-* Prepare for publishing version 4.1.0
+- Prepare for publishing version 4.1.0
+
 ## 4.0.10 - 2026-04-01
 
-* Prepare for publishing version 4.0.10
+- Prepare for publishing version 4.0.10
+
 ## 4.0.9 - 2026-04-01
 
-* Prepare for publishing version 4.0.9
+- Prepare for publishing version 4.0.9
+
 ## 4.0.9 - 2026-02-17
 
-* Feature: Added clearCookies support for macos
+- Feature: Added clearCookies support for macos
 
 ## 4.0.8 - 2026-02-16
 
-* Prepare for publishing version 4.0.8
+- Prepare for publishing version 4.0.8
+
 ## 4.0.7 - 2026-02-16
 
-* Fixed: getHtml works on macos, tested on ios,android
+- Fixed: getHtml works on macos, tested on ios,android
 
 ## 4.0.6 - 2026-02-16
 
-* Fixed: GetHtml is tested on mac/web
+- Fixed: GetHtml is tested on mac/web
 
 ## 4.0.5 - 2026-02-16
 
-* Fix: updated missing linux package reference
+- Fix: updated missing linux package reference
 
-* Updated dependencies to use hosted references
+- Updated dependencies to use hosted references
 
 ## 4.0.3 - 2026-02-16
 
-* Fixed: EdgeInsets conversion issue on getHtml
-* Fix: Added getHtml method for macos,windows,web,linux platforms
+- Fixed: EdgeInsets conversion issue on getHtml
+- Fix: Added getHtml method for macos,windows,web,linux platforms
 
-* Updated dependencies to use hosted references
+- Updated dependencies to use hosted references
 
 ## 4.0.2 - 2026-02-16
 
-* Prepare for publishing version 4.0.2
-* Updated dependencies to use hosted references
+- Prepare for publishing version 4.0.2
+- Updated dependencies to use hosted references
 
 ## 4.0.0 - 2026-02-16
 
-* Refactored with Gemini-3-Flash
-* Updated dependencies to use hosted references
-
+- Refactored with Gemini-3-Flash
+- Updated dependencies to use hosted references

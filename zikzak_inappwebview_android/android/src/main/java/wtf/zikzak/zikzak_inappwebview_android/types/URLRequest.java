@@ -15,12 +15,15 @@ public class URLRequest {
   private byte[] body;
   @Nullable
   private Map<String, String> headers;
+  @Nullable
+  private Double timeoutInterval;
 
-  public URLRequest(@Nullable String url, @Nullable String method, @Nullable byte[] body, @Nullable Map<String, String> headers) {
+  public URLRequest(@Nullable String url, @Nullable String method, @Nullable byte[] body, @Nullable Map<String, String> headers, @Nullable Double timeoutInterval) {
     this.url = url;
     this.method = method;
     this.body = body;
     this.headers = headers;
+    this.timeoutInterval = timeoutInterval;
   }
 
   @Nullable
@@ -35,7 +38,12 @@ public class URLRequest {
     String method = (String) map.get("method");
     byte[] body = (byte[]) map.get("body");
     Map<String, String> headers = (Map<String, String>) map.get("headers");
-    return new URLRequest(url, method, body, headers);
+    Double timeoutInterval = null;
+    Object timeoutObj = map.get("timeoutInterval");
+    if (timeoutObj instanceof Number) {
+      timeoutInterval = ((Number) timeoutObj).doubleValue();
+    }
+    return new URLRequest(url, method, body, headers, timeoutInterval);
   }
 
   public Map<String, Object> toMap() {
@@ -51,7 +59,7 @@ public class URLRequest {
     urlRequestMap.put("httpShouldHandleCookies", null);
     urlRequestMap.put("httpShouldUsePipelining", null);
     urlRequestMap.put("networkServiceType", null);
-    urlRequestMap.put("timeoutInterval", null);
+    urlRequestMap.put("timeoutInterval", timeoutInterval);
     urlRequestMap.put("mainDocumentURL", null);
     urlRequestMap.put("assumesHTTP3Capable", null);
     urlRequestMap.put("attribution", null);
@@ -94,6 +102,15 @@ public class URLRequest {
     this.headers = headers;
   }
 
+  @Nullable
+  public Double getTimeoutInterval() {
+    return timeoutInterval;
+  }
+
+  public void setTimeoutInterval(@Nullable Double timeoutInterval) {
+    this.timeoutInterval = timeoutInterval;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -104,7 +121,8 @@ public class URLRequest {
     if (url != null ? !url.equals(that.url) : that.url != null) return false;
     if (method != null ? !method.equals(that.method) : that.method != null) return false;
     if (!Arrays.equals(body, that.body)) return false;
-    return headers != null ? headers.equals(that.headers) : that.headers == null;
+    if (headers != null ? !headers.equals(that.headers) : that.headers != null) return false;
+    return timeoutInterval != null ? timeoutInterval.equals(that.timeoutInterval) : that.timeoutInterval == null;
   }
 
   @Override
@@ -113,6 +131,7 @@ public class URLRequest {
     result = 31 * result + (method != null ? method.hashCode() : 0);
     result = 31 * result + Arrays.hashCode(body);
     result = 31 * result + (headers != null ? headers.hashCode() : 0);
+    result = 31 * result + (timeoutInterval != null ? timeoutInterval.hashCode() : 0);
     return result;
   }
 
@@ -123,6 +142,7 @@ public class URLRequest {
             ", method='" + method + '\'' +
             ", body=" + Arrays.toString(body) +
             ", headers=" + headers +
+            ", timeoutInterval=" + timeoutInterval +
             '}';
   }
 }

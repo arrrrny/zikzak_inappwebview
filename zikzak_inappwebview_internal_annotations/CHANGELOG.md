@@ -1,3 +1,7 @@
+## 4.4.0 - 2026-06-16
+
+- Chore: Updated dependency lock files
+
 ## 4.3.8 - 2026-06-15
 
 * fixed macos setting and removed pods from example
@@ -287,4 +291,3 @@
 
 * support compileSdk 35 fix android issues
 * Updated dependencies to use hosted references
-
