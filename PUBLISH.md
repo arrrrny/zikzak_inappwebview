@@ -27,12 +27,24 @@
 
 ## Workflow
 
+### Automated (single command)
+
+```bash
+# Full publish: prepare → publish to pub.dev → merge to master → restore dev
+bash scripts/prepare_for_publish.sh <version> <<< "" && \
+  echo "y" | bash scripts/publish.sh && \
+  printf 'y\ny\n' | bash scripts/push_to_master.sh
+```
+
+⚠️ `publish.sh` needs a 20-minute timeout due to pub.dev propagation delays.
+
+### Manual steps
+
 1. Update changelogs for the new version
 2. `./scripts/prepare_for_publish.sh <version>`
-3. Commit and push the publish branch
-4. `./scripts/publish.sh` (publishes to pub.dev)
-5. `./scripts/push_to_master.sh` (merge + tag)
-6. `./scripts/restore_dev_setup.sh` (back to dev setup)
+3. `echo "y" | ./scripts/publish.sh` (publishes to pub.dev)
+4. `printf 'y\ny\n' | ./scripts/push_to_master.sh` (merge + tag)
+5. `./scripts/restore_dev_setup.sh` (back to dev setup)
 
 ## Notes
 
