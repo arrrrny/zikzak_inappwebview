@@ -657,7 +657,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
             plugin.inAppWebViewManager.windowAutoincrementId++;
             windowId = plugin.inAppWebViewManager.windowAutoincrementId;
           }
-          URLRequest request = new URLRequest(url, "GET", null, null);
+          URLRequest request = new URLRequest(url, "GET", null, null, null);
           CreateWindowAction createWindowAction = new CreateWindowAction(
                   request,
                   true,
@@ -704,7 +704,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       return true;
     }
 
-    URLRequest request = new URLRequest(url, "GET", null, null);
+    URLRequest request = new URLRequest(url, "GET", null, null, null);
     CreateWindowAction createWindowAction = new CreateWindowAction(
             request,
             true,

@@ -1,3 +1,15 @@
+## 4.4.1 - 2026-06-16
+
+
+- Fixed: Android build failure — `URLRequest` constructor calls in `InAppWebViewClient`,
+  `InAppWebViewClientCompat`, and `InAppWebViewChromeClient` now pass the 5th `timeoutInterval`
+  parameter to match the updated constructor signature
+## 4.4.1 - 2026-06-16
+
+- Fixed: Android build failure — `URLRequest` constructor calls in `InAppWebViewClient`,
+  `InAppWebViewClientCompat`, and `InAppWebViewChromeClient` now pass the 5th `timeoutInterval`
+  parameter to match the updated constructor signature
+
 ## 4.4.0 - 2026-06-16
 
 

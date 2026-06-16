@@ -309,7 +309,7 @@ public class InAppWebViewClient extends WebViewClient {
         boolean hasGesture,
         boolean isRedirect
     ) {
-        URLRequest request = new URLRequest(url, method, null, headers);
+        URLRequest request = new URLRequest(url, method, null, headers, null);
         NavigationAction navigationAction = new NavigationAction(
             request,
             isForMainFrame,
