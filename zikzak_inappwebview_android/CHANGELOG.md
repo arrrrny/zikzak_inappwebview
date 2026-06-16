@@ -1,5 +1,19 @@
 ## 4.4.0 - 2026-06-16
 
+
+- Feature: Android URLRequest now supports `timeoutInterval` — the InAppWebView will stop
+  loading after the specified interval, making rendered HTML available for extraction via
+  `getHtml()` even if the page hasn't fully loaded
+- Feature: macOS `URLRequest` native extension with full property support —
+  `init(fromPluginMap:)` and `toMap()` covering method, body, headers, cache policy,
+  network service type, timeout interval, and more
+- Refactor: macOS `InAppWebView` uses the new `URLRequest(fromPluginMap:)` extension
+  for cleaner URL loading in both initial load and `loadUrl()`
+- Chore: `prepare_for_publish.sh` no longer attempts to update CocoaPods podspecs
+  (migrated to Swift Package Manager)
+- Chore: Updated dependency lock files
+## 4.4.0 - 2026-06-16
+
 - Feature: Android URLRequest now supports `timeoutInterval` — the InAppWebView will stop
   loading after the specified interval, making rendered HTML available for extraction via
   `getHtml()` even if the page hasn't fully loaded
