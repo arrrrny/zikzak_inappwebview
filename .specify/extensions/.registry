@@ -18,6 +18,32 @@
       },
       "registered_skills": [],
       "installed_at": "2026-04-25T17:12:53.526610+00:00"
+    },
+    "agent-context": {
+      "version": "1.0.0",
+      "source": "local",
+      "manifest_hash": "sha256:9a1dc02d2d0139bb03860392ecacef79183be2c442feda2f9ccaa4e5907b1e47",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "agy": [
+          "speckit.agent-context.update"
+        ],
+        "claude": [
+          "speckit.agent-context.update"
+        ],
+        "codex": [
+          "speckit.agent-context.update"
+        ],
+        "opencode": [
+          "speckit.agent-context.update"
+        ],
+        "zed": [
+          "speckit.agent-context.update"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-06-17T02:34:36.287280+00:00"
     }
   }
 }

@@ -87,7 +87,9 @@ class _LinuxInAppWebViewState extends State<_LinuxInAppWebView> {
     }
 
     if (widget.params.onWebViewCreated != null) {
-      widget.params.onWebViewCreated!(_controller!);
+      widget.params.onWebViewCreated!(
+        widget.params.controllerFromPlatform!(_controller!),
+      );
     }
   }
 

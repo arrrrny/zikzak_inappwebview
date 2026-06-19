@@ -94,7 +94,9 @@ class _InAppWebViewWindowsWidgetStateImpl
       );
 
       if (widget.params.onWebViewCreated != null) {
-        widget.params.onWebViewCreated!(controller);
+        widget.params.onWebViewCreated!(
+          widget.params.controllerFromPlatform!(controller),
+        );
       }
     } on PlatformException catch (e) {
       // WidgetsBinding.instance.addPostFrameCallback((_) {
