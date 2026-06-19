@@ -1,3 +1,9 @@
+## 4.4.2 - 2026-06-19
+
+
+- Fixed: Windows and Linux `onWebViewCreated` type mismatch — platform controllers
+  (`InAppWebViewWindowsController`, `LinuxInAppWebViewController`) are now wrapped through
+  `controllerFromPlatform` to return proper `InAppWebViewController` instances
 ## 4.4.1 - 2026-06-16
 
 
