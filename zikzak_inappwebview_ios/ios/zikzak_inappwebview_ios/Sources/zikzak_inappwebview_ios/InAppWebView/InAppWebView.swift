@@ -3453,10 +3453,23 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 let errorMessage = code + (message != nil ? ", " + (message ?? "") : "")
                 print(errorMessage)
 
+                // Properly escape errorMessage as a JSON string literal so that newlines,
+                // backslashes, quotes, and control characters don't break the JS source.
+                // Matches Android's JSONObject.quote() behavior (see JavaScriptBridgeInterface.java).
+                let escapedError: String
+                if let data = try? JSONSerialization.data(
+                    withJSONObject: errorMessage, options: .fragmentsAllowed),
+                    let jsonString = String(data: data, encoding: .utf8)
+                {
+                    escapedError = jsonString
+                } else {
+                    escapedError = "\"\(errorMessage)\""
+                }
+
                 self?.evaluateJavaScript(
                     """
                     if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
-                        window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)].reject(new Error('\(errorMessage.replacingOccurrences(of: "\'", with: "\\'"))'));
+                        window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)].reject(new Error(\(escapedError)));
                         delete window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)];
                     }
                     """, completionHandler: nil)
