@@ -1,3 +1,10 @@
+## 4.4.3 - 2026-06-16
+
+- Fixed: iOS JavaScript handler error messages with newlines, backslashes, or
+  carriage returns are now properly escaped via `JSONSerialization` instead of
+  single-quote interpolation that produced `SyntaxError: Unexpected EOF` and
+  left JS promises pending forever — matches Android's `JSONObject.quote()`
+
 ## 4.4.2 - 2026-06-16
 
 - Fixed: Windows and Linux `onWebViewCreated` type mismatch — platform controllers
