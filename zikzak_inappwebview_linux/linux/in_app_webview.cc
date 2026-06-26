@@ -3,6 +3,11 @@
 #include <glib/gstdio.h>
 #include <iostream>
 
+#if WEBKIT_MAJOR_VERSION < 2 || \
+    (WEBKIT_MAJOR_VERSION == 2 && WEBKIT_MINOR_VERSION < 40)
+#define WEBKIT_OLD_USED 1
+#endif
+
 struct _InAppWebView {
   FlPixelBufferTexture parent_instance;
   FlPluginRegistrar *registrar;
@@ -271,16 +276,28 @@ void in_app_webview_handle_method_call(InAppWebView *self,
         method_call, FL_METHOD_RESPONSE(fl_method_success_response_new(result)),
         nullptr);
   } else if (strcmp(method, "getHtml") == 0) {
-    webkit_web_view_evaluate_javascript(
+    #ifdef WEBKIT_OLD_USED
+      webkit_web_view_run_javascript(
+    #else
+      webkit_web_view_evaluate_javascript(
+    #endif
         WEBKIT_WEB_VIEW(self->web_view), "document.documentElement.outerHTML",
-        -1, nullptr, nullptr, nullptr,
+    #ifndef WEBKIT_OLD_USED       
+        -1, nullptr, nullptr, 
+    #endif    
+        nullptr,
         [](GObject *object, GAsyncResult *result, gpointer user_data) {
           FlMethodCall *method_call = FL_METHOD_CALL(user_data);
           GError *error = nullptr;
-          JSCValue *value = webkit_web_view_evaluate_javascript_finish(
-              WEBKIT_WEB_VIEW(object), result, &error);
+          #ifdef WEBKIT_OLD_USED 
+            WebKitJavascriptResult *js_result = webkit_web_view_run_javascript_finish( 
+          #else 
+            JSCValue *js_result = webkit_web_view_evaluate_javascript_finish(
+          #endif
+           WEBKIT_WEB_VIEW(object), result, &error);
+             
 
-          if (!value) {
+          if (!js_result) {
             fl_method_call_respond(
                 method_call,
                 FL_METHOD_RESPONSE(fl_method_error_response_new(
@@ -288,6 +305,11 @@ void in_app_webview_handle_method_call(InAppWebView *self,
                 nullptr);
             g_error_free(error);
           } else {
+            #ifdef WEBKIT_OLD_USED 
+              JSCValue* value = webkit_javascript_result_get_js_value (js_result);
+            #else  
+              JSCValue* value = js_result;
+            #endif
             if (jsc_value_is_string(value)) {
               g_autofree gchar *str_value = jsc_value_to_string(value);
               fl_method_call_respond(
