@@ -1,3 +1,10 @@
+## 4.4.4 - 2026-07-03
+
+
+- Fixed: macOS headless WebView now uses a dedicated off-screen `NSWindow` instead
+  of attaching to the main window with `alphaValue = 0.01` — eliminates potential
+  mouse event interception behind the Flutter surface while still providing the
+  view hierarchy `WKWebView` needs for rendering and JS execution
 ## 4.4.3 - 2026-06-24
 
 
