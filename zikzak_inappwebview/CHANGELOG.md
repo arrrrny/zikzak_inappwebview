@@ -1,3 +1,17 @@
+## 4.4.5 - 2026-07-18
+
+- Fixed: macOS InAppWebView no longer returns WKWebView directly as the platform
+  view — it now wraps it in a container NSView with proper autoresizing masks,
+  eliminating the blank screen caused by a zero-frame WKWebView that couldn't
+  resize to fill its allocated space
+- Fixed: macOS example app entitlements — added missing
+  `com.apple.security.network.client` to both DebugProfile and Release
+  entitlements, granting WKWebView's networking process outgoing access so it
+  can load remote web pages under App Sandbox
+- Updated: Flutter SDK upgrade with project configuration migration across all
+  platforms (Android build.gradle → build.gradle.kts, iOS SceneDelegate, Xcode
+  project updates, platform file regeneration)
+
 ## 4.4.4 - 2026-06-16
 
 - Fixed: macOS headless WebView now uses a dedicated off-screen `NSWindow` instead
