@@ -24,6 +24,8 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         userContentController.add(WeakScriptMessageHandler(delegate: self), name: "consoleHandler")
         userContentController.add(
             WeakScriptMessageHandler(delegate: self), name: "onFindResultReceived")
+        userContentController.add(
+            WeakScriptMessageHandler(delegate: self), name: "callHandler")
 
         let consoleOverrideScript = """
             (function() {
@@ -49,6 +51,11 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         let userScript = WKUserScript(
             source: consoleOverrideScript, injectionTime: .atDocumentStart, forMainFrameOnly: false)
         userContentController.addUserScript(userScript)
+
+        let bridgeScript = WKUserScript(
+            source: JAVASCRIPT_BRIDGE_JS_SOURCE, injectionTime: .atDocumentStart,
+            forMainFrameOnly: false)
+        userContentController.addUserScript(bridgeScript)
 
         let findInteractionUserScript = WKUserScript(
             source: FIND_TEXT_HIGHLIGHT_JS_SOURCE, injectionTime: .atDocumentStart,
@@ -552,7 +559,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     ) {
         if message.name == "consoleHandler", let body = message.body as? [String: Any] {
             var arguments: [String: Any] = [:]
-            arguments["message"] = body["message"] as? String
+            arguments["message"] = (body["message"] as? String) ?? ""
 
             var level = 1  // LOG
             if let messageLevel = body["messageLevel"] as? String {
@@ -573,6 +580,58 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             }
             arguments["messageLevel"] = level
             channel?.invokeMethod("onConsoleMessage", arguments: arguments)
+        } else if message.name == "callHandler", let body = message.body as? [String: Any] {
+            let handlerName = body["handlerName"] as? String ?? ""
+            let _callHandlerID = body["_callHandlerID"] as? Int64 ?? 0
+            let args = body["args"] as? String ?? ""
+
+            channel?.invokeMethod(
+                "callHandler",
+                arguments: [
+                    "handlerName": handlerName,
+                    "args": args,
+                ]
+            ) { (result) in
+                if let error = result as? FlutterError {
+                    let escapedError =
+                        error.message?.replacingOccurrences(of: "'", with: "\\\\'")
+                        ?? "Unknown error"
+                    self.evaluateJavaScript(
+                        """
+                            if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
+                                window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)].reject(new Error('\(escapedError)'));
+                                delete window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)];
+                            }
+                        """, completionHandler: nil)
+                } else if FlutterMethodNotImplemented.isEqual(to: result) {
+                    self.evaluateJavaScript(
+                        """
+                            if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
+                                window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)].reject(new Error('Method not implemented'));
+                                delete window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)];
+                            }
+                        """, completionHandler: nil)
+                } else {
+                    var json: String
+                    if let resultData = try? JSONSerialization.data(
+                        withJSONObject: result ?? NSNull(), options: []),
+                        let resultString = String(data: resultData, encoding: .utf8)
+                    {
+                        json = resultString
+                    } else if let simpleResult = result {
+                        json = "\"\(simpleResult)\""
+                    } else {
+                        json = "null"
+                    }
+                    self.evaluateJavaScript(
+                        """
+                            if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
+                                window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)].resolve(\(json));
+                                delete window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)];
+                            }
+                        """, completionHandler: nil)
+                }
+            }
         } else if message.name == "onFindResultReceived", let body = message.body as? [String: Any]
         {
             findInteractionChannel?.invokeMethod("onFindResultReceived", arguments: body)

@@ -27,10 +27,10 @@ class ConsoleMessage {
       return null;
     }
     final instance = ConsoleMessage();
-    instance.message = map['message'];
-    instance.messageLevel = ConsoleMessageLevel.fromNativeValue(
-      map['messageLevel'],
-    )!;
+    instance.message = (map['message'] as String?) ?? '';
+    instance.messageLevel =
+        ConsoleMessageLevel.fromNativeValue(map['messageLevel']) ??
+        ConsoleMessageLevel.LOG;
     return instance;
   }
 

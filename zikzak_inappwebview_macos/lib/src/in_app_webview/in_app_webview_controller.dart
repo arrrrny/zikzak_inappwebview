@@ -1,7 +1,23 @@
+import 'dart:collection';
+import 'dart:convert';
 import 'dart:core';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
+
+final _JAVASCRIPT_HANDLER_FORBIDDEN_NAMES = UnmodifiableListView<String>([
+  "onLoadResource",
+  "shouldInterceptAjaxRequest",
+  "onAjaxReadyStateChange",
+  "onAjaxProgress",
+  "shouldInterceptFetchRequest",
+  "onPrintRequest",
+  "onWindowFocus",
+  "onWindowBlur",
+  "callAsyncJavaScript",
+  "evaluateJavaScriptWithContentWorld",
+]);
 
 class MacOSInAppWebViewController extends PlatformInAppWebViewController {
   MacOSInAppWebViewController(
@@ -31,6 +47,8 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
       );
 
   late MethodChannel _channel;
+  Map<String, JavaScriptHandlerCallback> _javaScriptHandlersMap =
+      HashMap<String, JavaScriptHandlerCallback>();
 
   Future<dynamic> handleMethod(MethodCall call) async {
     final controller = params.webviewParams?.controllerFromPlatform != null
@@ -114,9 +132,16 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
         return NavigationActionPolicy.ALLOW.toNativeValue();
       case 'onConsoleMessage':
         if (params.webviewParams?.onConsoleMessage != null) {
-          var consoleMessage = ConsoleMessage.fromMap(
-            call.arguments.cast<String, dynamic>(),
-          )!;
+          var map =
+              (call.arguments as Map<dynamic, dynamic>?)
+                  ?.cast<String, dynamic>() ??
+              {};
+          var consoleMessage = ConsoleMessage(
+            message: map['message'] as String? ?? '',
+            messageLevel:
+                ConsoleMessageLevel.fromNativeValue(map['messageLevel']) ??
+                ConsoleMessageLevel.LOG,
+          );
           params.webviewParams!.onConsoleMessage!(controller, consoleMessage);
         }
         break;
@@ -172,9 +197,53 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
           return response?.toMap();
         }
         return null;
+      case 'callHandler':
+        var map =
+            (call.arguments as Map<dynamic, dynamic>?)
+                ?.cast<String, dynamic>() ??
+            {};
+        String handlerName = map['handlerName'] as String? ?? '';
+        String argsJson = map['args'] as String? ?? '[]';
+        List<dynamic> args = <dynamic>[];
+        try {
+          args = jsonDecode(argsJson) as List<dynamic>;
+        } catch (_) {}
+        if (_javaScriptHandlersMap.containsKey(handlerName)) {
+          try {
+            return jsonEncode(await _javaScriptHandlersMap[handlerName]!(args));
+          } catch (error, stacktrace) {
+            debugPrint(error.toString() + '\n' + stacktrace.toString());
+            throw Exception(error.toString().replaceFirst('Exception: ', ''));
+          }
+        }
+        break;
       default:
         throw UnimplementedError("Unimplemented ${call.method} method");
     }
+  }
+
+  @override
+  void addJavaScriptHandler({
+    required String handlerName,
+    required JavaScriptHandlerCallback callback,
+  }) {
+    assert(
+      !_JAVASCRIPT_HANDLER_FORBIDDEN_NAMES.contains(handlerName),
+      '"$handlerName" is a forbidden name!',
+    );
+    _javaScriptHandlersMap[handlerName] = callback;
+  }
+
+  @override
+  JavaScriptHandlerCallback? removeJavaScriptHandler({
+    required String handlerName,
+  }) {
+    return _javaScriptHandlersMap.remove(handlerName);
+  }
+
+  @override
+  bool hasJavaScriptHandler({required String handlerName}) {
+    return _javaScriptHandlersMap.containsKey(handlerName);
   }
 
   @override
@@ -322,10 +391,9 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
 
   @override
   void dispose({bool isKeepAlive = false}) {
-    // _channel.setMethodCallHandler(null);
     if (!isKeepAlive) {
       _channel.setMethodCallHandler(null);
-      // super.dispose(isKeepAlive: isKeepAlive);
+      _javaScriptHandlersMap.clear();
     }
   }
 }

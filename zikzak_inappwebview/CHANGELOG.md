@@ -1,3 +1,17 @@
+## 4.5.0 - 2026-07-18
+
+- Feature: Added `addJavaScriptHandler` / `removeJavaScriptHandler` /
+  `hasJavaScriptHandler` support on macOS — the JavaScript bridge
+  (`window.flutter_inappwebview.callHandler()`) is now fully functional,
+  enabling bidirectional communication between Dart and JavaScript in
+  macOS WKWebView
+- Fixed: macOS `ConsoleMessage.fromMap` crash when receiving null `message`
+  or `messageLevel` values from JavaScript — fixed at the Swift native layer
+  (coerces null to empty string), Dart macOS controller (null-safe constructor)
+  and shared `ConsoleMessage.fromMap` (null-safe defaults for all platforms)
+- Tests: Added unit tests for macOS controller (`addJavaScriptHandler` lifecycle)
+  and platform interface (`ConsoleMessage.fromMap` null safety)
+
 ## 4.4.5 - 2026-07-18
 
 - Fixed: macOS InAppWebView no longer returns WKWebView directly as the platform
