@@ -17,6 +17,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         configuration.userContentController = userContentController
 
         super.init(frame: .zero, configuration: configuration)
+        self.autoresizingMask = [.width, .height]
         self.navigationDelegate = self
         self.uiDelegate = self
 

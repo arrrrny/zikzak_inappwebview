@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   build: ^2.4.1
-  source_gen: ^1.5.0
+  source_gen: ^2.0.0
   zikzak_inappwebview_internal_annotations:
     path: ../../zikzak_inappwebview_internal_annotations
 
