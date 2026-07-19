@@ -83,6 +83,21 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 self.setSettings(
                     newSettings: newSettings, newSettingsMap: settingsMap as! [String: Any])
             }
+
+            if let initialUserScripts = args["initialUserScripts"] as? [[String: Any]] {
+                for scriptMap in initialUserScripts {
+                    guard let source = scriptMap["source"] as? String else { continue }
+                    let injectionTimeValue = scriptMap["injectionTime"] as? Int ?? 0
+                    let forMainFrameOnly = scriptMap["forMainFrameOnly"] as? Bool ?? true
+                    let wkInjectionTime: WKUserScriptInjectionTime =
+                        injectionTimeValue == 1 ? .atDocumentEnd : .atDocumentStart
+                    let userScript = WKUserScript(
+                        source: source,
+                        injectionTime: wkInjectionTime,
+                        forMainFrameOnly: forMainFrameOnly)
+                    userContentController.addUserScript(userScript)
+                }
+            }
         }
 
         self.addObserver(self, forKeyPath: "estimatedProgress", options: .new, context: nil)
@@ -314,7 +329,10 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                                 code: "InAppWebView", message: error.localizedDescription,
                                 details: nil))
                     } else {
-                        result(value)
+                        // WKWebView returns nil for undefined/void/Promise results.
+                        // Return NSNull() so Dart receives null instead of crashing with
+                        // "JavaScript execution returned a result of an unsupported type".
+                        result(value ?? NSNull())
                     }
                 }
             } else {
@@ -580,7 +598,11 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             }
             arguments["messageLevel"] = level
             channel?.invokeMethod("onConsoleMessage", arguments: arguments)
-        } else if message.name == "callHandler", let body = message.body as? [String: Any] {
+        } else if message.name == "callHandler",
+            let bodyString = message.body as? String,
+            let bodyData = bodyString.data(using: .utf8),
+            let body = try? JSONSerialization.jsonObject(with: bodyData) as? [String: Any]
+        {
             let handlerName = body["handlerName"] as? String ?? ""
             let _callHandlerID = body["_callHandlerID"] as? Int64 ?? 0
             let args = body["args"] as? String ?? ""

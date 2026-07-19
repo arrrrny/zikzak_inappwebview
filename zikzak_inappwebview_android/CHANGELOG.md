@@ -1,3 +1,19 @@
+## 4.5.1 - 2026-07-19
+
+
+- Fixed: macOS `addJavaScriptHandler` bridge now uses `postMessage` with a JSON
+  string instead of structured clone — eliminates `EXC_BAD_ACCESS` crash in
+  WebCore's `wrap<DOMException>` when passing large or complex data through
+  `callHandler`
+- Fixed: macOS `evaluateJavascript` now returns `null` to Dart instead of
+  throwing `PlatformException` when WKWebView returns `nil` (e.g., for
+  `undefined`, `void`, or Promise expressions)
+- Fixed: macOS `initialUserScripts` parameter was silently ignored — WKWebView
+  now properly injects user scripts during initialization
+- Added: `UserScriptInjectionTime.atDocumentStart` and `atDocumentEnd`
+  convenience getters (in addition to existing `AT_DOCUMENT_START` / `AT_DOCUMENT_END`)
+- Removed: CocoaPods podspec files from iOS and macOS packages (project is now
+  100% SPM)
 ## 4.5.0 - 2026-07-18
 
 

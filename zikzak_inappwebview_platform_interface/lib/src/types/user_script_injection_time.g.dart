@@ -27,6 +27,12 @@ class UserScriptInjectionTime {
   ///**NOTE for Android**: A constant to try to inject the script as soon as the page starts loading.
   static const AT_DOCUMENT_START = UserScriptInjectionTime._internal(0, 0);
 
+  ///Convenience getter for [AT_DOCUMENT_START].
+  static UserScriptInjectionTime get atDocumentStart => AT_DOCUMENT_START;
+
+  ///Convenience getter for [AT_DOCUMENT_END].
+  static UserScriptInjectionTime get atDocumentEnd => AT_DOCUMENT_END;
+
   ///Set of all values of [UserScriptInjectionTime].
   static final Set<UserScriptInjectionTime> values = [
     UserScriptInjectionTime.AT_DOCUMENT_END,
