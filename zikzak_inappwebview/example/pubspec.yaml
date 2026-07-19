@@ -56,8 +56,8 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
-  zikzak_inappwebview_platform_interface: any
-  zikzak_inappwebview_web: any
+  zikzak_inappwebview_platform_interface:
+    path: ../../zikzak_inappwebview_platform_interface
   web: any
 flutter:
   # The following line ensures that the Material Icons font is
