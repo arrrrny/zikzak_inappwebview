@@ -6,8 +6,7 @@ import '../find_interaction/find_interaction_controller.dart';
 import 'in_app_webview_controller.dart';
 
 class LinuxInAppWebViewWidget extends PlatformInAppWebViewWidget {
-  LinuxInAppWebViewWidget(PlatformInAppWebViewWidgetCreationParams params)
-    : super.implementation(params);
+  LinuxInAppWebViewWidget(super.params) : super.implementation();
 
   @override
   Widget build(BuildContext context) {

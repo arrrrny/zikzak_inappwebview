@@ -56,6 +56,20 @@ class ScrollBarStyle {
     ScrollBarStyle.SCROLLBARS_OUTSIDE_OVERLAY,
   ].toSet();
 
+  ///Convenience getter for [SCROLLBARS_INSIDE_INSET].
+  static ScrollBarStyle get scrollbarsInsideInset => SCROLLBARS_INSIDE_INSET;
+
+  ///Convenience getter for [SCROLLBARS_INSIDE_OVERLAY].
+  static ScrollBarStyle get scrollbarsInsideOverlay =>
+      SCROLLBARS_INSIDE_OVERLAY;
+
+  ///Convenience getter for [SCROLLBARS_OUTSIDE_INSET].
+  static ScrollBarStyle get scrollbarsOutsideInset => SCROLLBARS_OUTSIDE_INSET;
+
+  ///Convenience getter for [SCROLLBARS_OUTSIDE_OVERLAY].
+  static ScrollBarStyle get scrollbarsOutsideOverlay =>
+      SCROLLBARS_OUTSIDE_OVERLAY;
+
   ///Gets a possible [ScrollBarStyle] instance from [int] value.
   static ScrollBarStyle? fromValue(int? value) {
     if (value != null) {

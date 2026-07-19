@@ -29,6 +29,9 @@ class FormResubmissionAction {
     FormResubmissionAction.RESEND,
   ].toSet();
 
+  ///Convenience getter for [DONT_RESEND].
+  static FormResubmissionAction get dontResend => DONT_RESEND;
+
   ///Gets a possible [FormResubmissionAction] instance from [int] value.
   static FormResubmissionAction? fromValue(int? value) {
     if (value != null) {

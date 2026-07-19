@@ -3,8 +3,7 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 /// Implementation of [PlatformCookieManager] for Linux.
 class LinuxCookieManager extends PlatformCookieManager {
   /// Constructs a [LinuxCookieManager].
-  LinuxCookieManager(PlatformCookieManagerCreationParams params)
-    : super.implementation(params);
+  LinuxCookieManager(super.params) : super.implementation();
 
   @override
   Future<bool> setCookie({

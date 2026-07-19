@@ -9,6 +9,9 @@ part 'console_message.g.dart';
 ///This could be a issued by a call to one of the console logging functions (e.g. console.log('...')) or a JavaScript error on the page.
 ///
 ///To receive notifications of these messages, use the [PlatformWebViewCreationParams.onConsoleMessage] event.
+///
+///⚠️ NOTE: After regenerating .g.dart files, re-apply the null-safety fix in
+///   console_message.g.dart fromMap() — see GENERATOR_NOTES.md for details.
 @ExchangeableObject()
 class ConsoleMessage_ {
   ///Console message

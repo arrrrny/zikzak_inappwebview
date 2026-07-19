@@ -127,6 +127,12 @@ class CustomTabsNavigationEventType {
     CustomTabsNavigationEventType.TAB_SHOWN,
   ].toSet();
 
+  ///Convenience getter for [TAB_HIDDEN].
+  static CustomTabsNavigationEventType get tabHidden => TAB_HIDDEN;
+
+  ///Convenience getter for [TAB_SHOWN].
+  static CustomTabsNavigationEventType get tabShown => TAB_SHOWN;
+
   ///Gets a possible [CustomTabsNavigationEventType] instance from [int] value.
   static CustomTabsNavigationEventType? fromValue(int? value) {
     if (value != null) {

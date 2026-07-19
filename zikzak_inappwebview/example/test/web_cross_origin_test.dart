@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 // ignore: implementation_imports
@@ -36,9 +35,12 @@ void main() {
     print('Result for pub.dev: $html');
 
     // We expect null because of Cross-Origin policies
-    expect(html, isNull,
-        reason:
-            'Should return null for cross-origin content due to browser security policies');
+    expect(
+      html,
+      isNull,
+      reason:
+          'Should return null for cross-origin content due to browser security policies',
+    );
 
     // Cleanup
     iframe.remove();
@@ -73,9 +75,12 @@ void main() {
     print('Result for example.com: $html');
 
     // We expect null because of Cross-Origin policies
-    expect(html, isNull,
-        reason:
-            'Should return null for cross-origin content due to browser security policies');
+    expect(
+      html,
+      isNull,
+      reason:
+          'Should return null for cross-origin content due to browser security policies',
+    );
 
     // Cleanup
     iframe.remove();

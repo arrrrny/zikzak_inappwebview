@@ -33,6 +33,9 @@ class SearchResultDisplayStyle {
     SearchResultDisplayStyle.TOTAL,
   ].toSet();
 
+  ///Convenience getter for [CURRENT_AND_TOTAL].
+  static SearchResultDisplayStyle get currentAndTotal => CURRENT_AND_TOTAL;
+
   ///Gets a possible [SearchResultDisplayStyle] instance from [int] value.
   static SearchResultDisplayStyle? fromValue(int? value) {
     if (value != null) {

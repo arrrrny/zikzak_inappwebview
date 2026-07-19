@@ -355,7 +355,7 @@ class HeadlessInAppWebView {
                : null,
            onLoadStop: (controller, url) {
              onLoadStop?.call(controller, url);
-             if (initialSettings?.dismissDialogues ?? false)
+             if (initialSettings?.dismissDialogues ?? false) {
                () async {
                  try {
                    for (var i = 0; i < 3; i++) {
@@ -381,11 +381,13 @@ class HeadlessInAppWebView {
                           })();
                         ''',
                      );
-                     if (i < 2)
+                     if (i < 2) {
                        await Future.delayed(const Duration(milliseconds: 800));
+                     }
                    }
                  } catch (_) {}
                }();
+             }
            },
            onReceivedError: onReceivedError != null
                ? (controller, request, error) =>

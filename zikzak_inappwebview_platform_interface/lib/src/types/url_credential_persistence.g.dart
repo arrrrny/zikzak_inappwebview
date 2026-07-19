@@ -38,6 +38,9 @@ class URLCredentialPersistence {
     URLCredentialPersistence.SYNCHRONIZABLE,
   ].toSet();
 
+  ///Convenience getter for [FOR_SESSION].
+  static URLCredentialPersistence get forSession => FOR_SESSION;
+
   ///Gets a possible [URLCredentialPersistence] instance from [int] value.
   static URLCredentialPersistence? fromValue(int? value) {
     if (value != null) {

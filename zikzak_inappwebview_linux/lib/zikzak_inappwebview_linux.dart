@@ -1,3 +1,3 @@
-library zikzak_inappwebview_linux;
+library;
 
 export 'src/main.dart';

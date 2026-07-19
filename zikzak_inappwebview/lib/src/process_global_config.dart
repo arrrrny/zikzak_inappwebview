@@ -26,9 +26,7 @@ class ProcessGlobalConfig {
 
   ///Gets the [ProcessGlobalConfig] shared instance.
   static ProcessGlobalConfig instance() {
-    if (_instance == null) {
-      _instance = ProcessGlobalConfig();
-    }
+    _instance ??= ProcessGlobalConfig();
     return _instance!;
   }
 

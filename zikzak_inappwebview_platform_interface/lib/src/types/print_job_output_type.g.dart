@@ -47,6 +47,9 @@ class PrintJobOutputType {
     PrintJobOutputType.PHOTO_GRAYSCALE,
   ].toSet();
 
+  ///Convenience getter for [PHOTO_GRAYSCALE].
+  static PrintJobOutputType get photoGrayscale => PHOTO_GRAYSCALE;
+
   ///Gets a possible [PrintJobOutputType] instance from [int] value.
   static PrintJobOutputType? fromValue(int? value) {
     if (value != null) {

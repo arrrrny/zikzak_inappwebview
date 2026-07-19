@@ -257,6 +257,21 @@ class SslErrorType {
     SslErrorType.UNTRUSTED,
   ].toSet();
 
+  ///Convenience getter for [DATE_INVALID].
+  static SslErrorType get dateInvalid => DATE_INVALID;
+
+  ///Convenience getter for [FATAL_TRUST_FAILURE].
+  static SslErrorType get fatalTrustFailure => FATAL_TRUST_FAILURE;
+
+  ///Convenience getter for [NOT_YET_VALID].
+  static SslErrorType get notYetValid => NOT_YET_VALID;
+
+  ///Convenience getter for [OTHER_ERROR].
+  static SslErrorType get otherError => OTHER_ERROR;
+
+  ///Convenience getter for [RECOVERABLE_TRUST_FAILURE].
+  static SslErrorType get recoverableTrustFailure => RECOVERABLE_TRUST_FAILURE;
+
   ///Gets a possible [SslErrorType] instance from [String] value.
   static SslErrorType? fromValue(String? value) {
     if (value != null) {

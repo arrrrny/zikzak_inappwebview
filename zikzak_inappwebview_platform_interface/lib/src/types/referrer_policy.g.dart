@@ -80,6 +80,29 @@ class ReferrerPolicy {
     ReferrerPolicy.UNSAFE_URL,
   ].toSet();
 
+  ///Convenience getter for [NO_REFERRER].
+  static ReferrerPolicy get noReferrer => NO_REFERRER;
+
+  ///Convenience getter for [NO_REFERRER_WHEN_DOWNGRADE].
+  static ReferrerPolicy get noReferrerWhenDowngrade =>
+      NO_REFERRER_WHEN_DOWNGRADE;
+
+  ///Convenience getter for [ORIGIN_WHEN_CROSS_ORIGIN].
+  static ReferrerPolicy get originWhenCrossOrigin => ORIGIN_WHEN_CROSS_ORIGIN;
+
+  ///Convenience getter for [SAME_ORIGIN].
+  static ReferrerPolicy get sameOrigin => SAME_ORIGIN;
+
+  ///Convenience getter for [STRICT_ORIGIN].
+  static ReferrerPolicy get strictOrigin => STRICT_ORIGIN;
+
+  ///Convenience getter for [STRICT_ORIGIN_WHEN_CROSS_ORIGIN].
+  static ReferrerPolicy get strictOriginWhenCrossOrigin =>
+      STRICT_ORIGIN_WHEN_CROSS_ORIGIN;
+
+  ///Convenience getter for [UNSAFE_URL].
+  static ReferrerPolicy get unsafeUrl => UNSAFE_URL;
+
   ///Gets a possible [ReferrerPolicy] instance from [String] value.
   static ReferrerPolicy? fromValue(String? value) {
     if (value != null) {

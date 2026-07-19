@@ -21,12 +21,13 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
 
   InAppWebViewController? webViewController;
   InAppWebViewSettings settings = InAppWebViewSettings(
-      javaScriptEnabled: true,
-      domStorageEnabled: true,
-      databaseEnabled: true,
-      isFindInteractionEnabled: true,
-      isElementFullscreenEnabled: true,
-      upgradeKnownHostsToHTTPS: true);
+    javaScriptEnabled: true,
+    domStorageEnabled: true,
+    databaseEnabled: true,
+    isFindInteractionEnabled: true,
+    isElementFullscreenEnabled: true,
+    upgradeKnownHostsToHTTPS: true,
+  );
 
   FindInteractionController? findInteractionController;
 
@@ -44,48 +45,53 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
     findInteractionController = FindInteractionController();
 
     contextMenu = ContextMenu(
-        menuItems: [
-          ContextMenuItem(
-              id: 1,
-              title: "Special",
-              action: () async {
-                debugPrint("Menu item Special clicked!");
-                debugPrint(
-                    (await webViewController?.getSelectedText()).toString());
-                await webViewController?.clearFocus();
-              })
-        ],
-        settings: ContextMenuSettings(hideDefaultSystemContextMenuItems: false),
-        onCreateContextMenu: (hitTestResult) async {
-          debugPrint("onCreateContextMenu");
-          debugPrint(hitTestResult.extra.toString());
-          debugPrint((await webViewController?.getSelectedText()).toString());
-        },
-        onHideContextMenu: () {
-          debugPrint("onHideContextMenu");
-        },
-        onContextMenuActionItemClicked: (contextMenuItemClicked) async {
-          var id = contextMenuItemClicked.id;
-          debugPrint(
-              "onContextMenuActionItemClicked: $id ${contextMenuItemClicked.title}");
-        });
+      menuItems: [
+        ContextMenuItem(
+          id: 1,
+          title: "Special",
+          action: () async {
+            debugPrint("Menu item Special clicked!");
+            debugPrint((await webViewController?.getSelectedText()).toString());
+            await webViewController?.clearFocus();
+          },
+        ),
+      ],
+      settings: ContextMenuSettings(hideDefaultSystemContextMenuItems: false),
+      onCreateContextMenu: (hitTestResult) async {
+        debugPrint("onCreateContextMenu");
+        debugPrint(hitTestResult.extra.toString());
+        debugPrint((await webViewController?.getSelectedText()).toString());
+      },
+      onHideContextMenu: () {
+        debugPrint("onHideContextMenu");
+      },
+      onContextMenuActionItemClicked: (contextMenuItemClicked) async {
+        var id = contextMenuItemClicked.id;
+        debugPrint(
+          "onContextMenuActionItemClicked: $id ${contextMenuItemClicked.title}",
+        );
+      },
+    );
 
-    pullToRefreshController = kIsWeb ||
-            ![TargetPlatform.iOS, TargetPlatform.android]
-                .contains(defaultTargetPlatform)
+    pullToRefreshController =
+        kIsWeb ||
+            ![
+              TargetPlatform.iOS,
+              TargetPlatform.android,
+            ].contains(defaultTargetPlatform)
         ? null
         : PullToRefreshController(
-            settings: PullToRefreshSettings(
-              color: Colors.blue,
-            ),
+            settings: PullToRefreshSettings(color: Colors.blue),
             onRefresh: () async {
               if (defaultTargetPlatform == TargetPlatform.android) {
                 webViewController?.reload();
               } else if (defaultTargetPlatform == TargetPlatform.iOS ||
                   defaultTargetPlatform == TargetPlatform.macOS) {
                 webViewController?.loadUrl(
-                    urlRequest:
-                        URLRequest(url: await webViewController?.getUrl()));
+                  urlRequest: URLRequest(
+                    url: await webViewController?.getUrl(),
+                  ),
+                );
               }
             },
           );
@@ -99,7 +105,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: const Text("InAppWebView"), actions: [
+      appBar: AppBar(
+        title: const Text("InAppWebView"),
+        actions: [
           IconButton(
             icon: const Icon(Icons.delete),
             tooltip: "Delete all cookies",
@@ -107,9 +115,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
               await CookieManager.instance().deleteAllCookies();
               if (!context.mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("All cookies deleted"),
-                ),
+                const SnackBar(content: Text("All cookies deleted")),
               );
             },
           ),
@@ -139,12 +145,13 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                                 title: const Text("Find Interaction"),
                                 value:
                                     currentSettings.isFindInteractionEnabled ??
-                                        false,
+                                    false,
                                 onChanged: (value) async {
                                   currentSettings.isFindInteractionEnabled =
                                       value;
                                   await webViewController?.setSettings(
-                                      settings: currentSettings);
+                                    settings: currentSettings,
+                                  );
                                   setState(() {
                                     settings = currentSettings;
                                   });
@@ -153,14 +160,16 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                               SwitchListTile(
                                 title: const Text("Element Fullscreen"),
                                 subtitle: const Text("iOS 15.4+"),
-                                value: currentSettings
+                                value:
+                                    currentSettings
                                         .isElementFullscreenEnabled ??
                                     false,
                                 onChanged: (value) async {
                                   currentSettings.isElementFullscreenEnabled =
                                       value;
                                   await webViewController?.setSettings(
-                                      settings: currentSettings);
+                                    settings: currentSettings,
+                                  );
                                   setState(() {
                                     settings = currentSettings;
                                   });
@@ -171,7 +180,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                                 subtitle: const Text("Requires Restart"),
                                 value:
                                     currentSettings.upgradeKnownHostsToHTTPS ??
-                                        false,
+                                    false,
                                 onChanged: (value) {
                                   setState(() {
                                     currentSettings.upgradeKnownHostsToHTTPS =
@@ -204,7 +213,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                               Navigator.of(context).pop();
                             },
                             child: const Text("Close"),
-                          )
+                          ),
                         ],
                       );
                     },
@@ -218,7 +227,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
             tooltip: "Take Screenshot",
             onPressed: () async {
               debugPrint(
-                  'takeScreenshot tapped, controller is ${webViewController != null ? "set" : "null"}');
+                'takeScreenshot tapped, controller is ${webViewController != null ? "set" : "null"}',
+              );
               final bytes = await webViewController?.takeScreenshot();
               if (bytes != null) {
                 final dir = await getApplicationDocumentsDirectory();
@@ -248,7 +258,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
             tooltip: "Export PDF",
             onPressed: () async {
               debugPrint(
-                  'createPdf tapped, controller is ${webViewController != null ? "set" : "null"}');
+                'createPdf tapped, controller is ${webViewController != null ? "set" : "null"}',
+              );
               final bytes = await webViewController?.createPdf();
               if (bytes != null) {
                 final dir = await getApplicationDocumentsDirectory();
@@ -273,158 +284,164 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
               }
             },
           ),
-        ]),
-        drawer: myDrawer(context: context),
-        body: SafeArea(
-            child: Column(children: <Widget>[
-          TextField(
-            decoration: const InputDecoration(prefixIcon: Icon(Icons.search)),
-            controller: urlController,
-            keyboardType: TextInputType.text,
-            onSubmitted: (value) {
-              var url = WebUri(value);
-              if (url.scheme.isEmpty) {
-                url = WebUri((!kIsWeb
-                        ? "https://www.google.com/search?q="
-                        : "https://www.bing.com/search?q=") +
-                    value);
-              }
-              webViewController?.loadUrl(urlRequest: URLRequest(url: url));
-            },
-          ),
-          Expanded(
-            child: Stack(
-              children: [
-                InAppWebView(
-                  key: webViewKey,
-                  findInteractionController: findInteractionController,
-                  webViewEnvironment: webViewEnvironment,
-                  initialUrlRequest:
-                      URLRequest(url: WebUri('https://flutter.dev')),
-                  // initialUrlRequest:
-                  // URLRequest(url: WebUri(Uri.base.toString().replaceFirst("/#/", "/") + 'page.html')),
-                  // initialFile: "assets/index.html",
-                  initialUserScripts: UnmodifiableListView<UserScript>([]),
-                  initialSettings: settings,
-                  contextMenu: contextMenu,
-                  pullToRefreshController: pullToRefreshController,
-                  onWebViewCreated: (controller) async {
-                    webViewController = controller;
-                  },
-                  onLoadStart: (controller, url) async {
-                    // debugPrint("Starting to load: $url");
-                    if (mounted) {
-                      setState(() {
-                        this.url = url.toString();
-                        urlController.text = this.url;
-                      });
-                    }
-                  },
-                  onPermissionRequest: (controller, request) async {
-                    return PermissionResponse(
-                        resources: request.resources,
-                        action: PermissionResponseAction.GRANT);
-                  },
-                  shouldOverrideUrlLoading:
-                      (controller, navigationAction) async {
-                    var uri = navigationAction.request.url!;
-
-                    if (![
-                      "http",
-                      "https",
-                      "file",
-                      "chrome",
-                      "data",
-                      "javascript",
-                      "about"
-                    ].contains(uri.scheme)) {
-                      if (await canLaunchUrl(uri)) {
-                        // Launch the App
-                        await launchUrl(
-                          uri,
-                        );
-                        // and cancel the request
-                        return NavigationActionPolicy.CANCEL;
+        ],
+      ),
+      drawer: myDrawer(context: context),
+      body: SafeArea(
+        child: Column(
+          children: <Widget>[
+            TextField(
+              decoration: const InputDecoration(prefixIcon: Icon(Icons.search)),
+              controller: urlController,
+              keyboardType: TextInputType.text,
+              onSubmitted: (value) {
+                var url = WebUri(value);
+                if (url.scheme.isEmpty) {
+                  url = WebUri(
+                    (!kIsWeb
+                            ? "https://www.google.com/search?q="
+                            : "https://www.bing.com/search?q=") +
+                        value,
+                  );
+                }
+                webViewController?.loadUrl(urlRequest: URLRequest(url: url));
+              },
+            ),
+            Expanded(
+              child: Stack(
+                children: [
+                  InAppWebView(
+                    key: webViewKey,
+                    findInteractionController: findInteractionController,
+                    webViewEnvironment: webViewEnvironment,
+                    initialUrlRequest: URLRequest(
+                      url: WebUri('https://flutter.dev'),
+                    ),
+                    // initialUrlRequest:
+                    // URLRequest(url: WebUri(Uri.base.toString().replaceFirst("/#/", "/") + 'page.html')),
+                    // initialFile: "assets/index.html",
+                    initialUserScripts: UnmodifiableListView<UserScript>([]),
+                    initialSettings: settings,
+                    contextMenu: contextMenu,
+                    pullToRefreshController: pullToRefreshController,
+                    onWebViewCreated: (controller) async {
+                      webViewController = controller;
+                    },
+                    onLoadStart: (controller, url) async {
+                      // debugPrint("Starting to load: $url");
+                      if (mounted) {
+                        setState(() {
+                          this.url = url.toString();
+                          urlController.text = this.url;
+                        });
                       }
-                    }
+                    },
+                    onPermissionRequest: (controller, request) async {
+                      return PermissionResponse(
+                        resources: request.resources,
+                        action: PermissionResponseAction.GRANT,
+                      );
+                    },
+                    shouldOverrideUrlLoading:
+                        (controller, navigationAction) async {
+                          var uri = navigationAction.request.url!;
 
-                    return NavigationActionPolicy.ALLOW;
-                  },
-                  onLoadStop: (controller, url) async {
-                    pullToRefreshController?.endRefreshing();
-                    debugPrint("Page loaded successfully: $url");
-                    if (mounted) {
-                      setState(() {
-                        this.url = url.toString();
-                        urlController.text = this.url;
-                      });
-                    }
-                  },
-                  onReceivedError: (controller, request, error) {
-                    pullToRefreshController?.endRefreshing();
-                    debugPrint("WebView Error: ${error.description}");
-                    debugPrint("Error Type: ${error.type}");
-                    debugPrint("Failed URL: ${request.url}");
-                  },
-                  onProgressChanged: (controller, progress) {
-                    if (progress == 100) {
+                          if (![
+                            "http",
+                            "https",
+                            "file",
+                            "chrome",
+                            "data",
+                            "javascript",
+                            "about",
+                          ].contains(uri.scheme)) {
+                            if (await canLaunchUrl(uri)) {
+                              // Launch the App
+                              await launchUrl(uri);
+                              // and cancel the request
+                              return NavigationActionPolicy.CANCEL;
+                            }
+                          }
+
+                          return NavigationActionPolicy.ALLOW;
+                        },
+                    onLoadStop: (controller, url) async {
                       pullToRefreshController?.endRefreshing();
-                    }
-                    if (mounted) {
-                      setState(() {
-                        this.progress = progress / 100;
-                        urlController.text = url;
-                      });
-                    }
-                  },
-                  onUpdateVisitedHistory: (controller, url, isReload) {
-                    if (mounted) {
-                      setState(() {
-                        this.url = url.toString();
-                        urlController.text = this.url;
-                      });
-                    }
-                  },
-                  onConsoleMessage: (controller, consoleMessage) {
-                    debugPrint("Console: ${consoleMessage.message}");
-                  },
-                  onReceivedHttpError: (controller, request, errorResponse) {
-                    debugPrint(
-                        "HTTP Error: ${errorResponse.statusCode} - ${errorResponse.reasonPhrase}");
-                    debugPrint("Failed URL: ${request.url}");
+                      debugPrint("Page loaded successfully: $url");
+                      if (mounted) {
+                        setState(() {
+                          this.url = url.toString();
+                          urlController.text = this.url;
+                        });
+                      }
+                    },
+                    onReceivedError: (controller, request, error) {
+                      pullToRefreshController?.endRefreshing();
+                      debugPrint("WebView Error: ${error.description}");
+                      debugPrint("Error Type: ${error.type}");
+                      debugPrint("Failed URL: ${request.url}");
+                    },
+                    onProgressChanged: (controller, progress) {
+                      if (progress == 100) {
+                        pullToRefreshController?.endRefreshing();
+                      }
+                      if (mounted) {
+                        setState(() {
+                          this.progress = progress / 100;
+                          urlController.text = url;
+                        });
+                      }
+                    },
+                    onUpdateVisitedHistory: (controller, url, isReload) {
+                      if (mounted) {
+                        setState(() {
+                          this.url = url.toString();
+                          urlController.text = this.url;
+                        });
+                      }
+                    },
+                    onConsoleMessage: (controller, consoleMessage) {
+                      debugPrint("Console: ${consoleMessage.message}");
+                    },
+                    onReceivedHttpError: (controller, request, errorResponse) {
+                      debugPrint(
+                        "HTTP Error: ${errorResponse.statusCode} - ${errorResponse.reasonPhrase}",
+                      );
+                      debugPrint("Failed URL: ${request.url}");
+                    },
+                  ),
+                  progress < 1.0
+                      ? LinearProgressIndicator(value: progress)
+                      : Container(),
+                ],
+              ),
+            ),
+            OverflowBar(
+              alignment: MainAxisAlignment.center,
+              children: <Widget>[
+                ElevatedButton(
+                  child: const Icon(Icons.arrow_back),
+                  onPressed: () {
+                    webViewController?.goBack();
                   },
                 ),
-                progress < 1.0
-                    ? LinearProgressIndicator(value: progress)
-                    : Container(),
-              ],
-            ),
-          ),
-          OverflowBar(
-            alignment: MainAxisAlignment.center,
-            children: <Widget>[
-              ElevatedButton(
-                child: const Icon(Icons.arrow_back),
-                onPressed: () {
-                  webViewController?.goBack();
-                },
-              ),
-              ElevatedButton(
-                child: const Icon(Icons.arrow_forward),
-                onPressed: () {
-                  webViewController?.goForward();
-                },
-              ),
-              ElevatedButton(
-                child: const Icon(Icons.refresh),
-                onPressed: () {
-                  webViewController?.reload();
-                },
-              ),
-              ElevatedButton(
-                child: const Icon(Icons.fullscreen),
-                onPressed: () {
-                  webViewController?.evaluateJavascript(source: """
+                ElevatedButton(
+                  child: const Icon(Icons.arrow_forward),
+                  onPressed: () {
+                    webViewController?.goForward();
+                  },
+                ),
+                ElevatedButton(
+                  child: const Icon(Icons.refresh),
+                  onPressed: () {
+                    webViewController?.reload();
+                  },
+                ),
+                ElevatedButton(
+                  child: const Icon(Icons.fullscreen),
+                  onPressed: () {
+                    webViewController?.evaluateJavascript(
+                      source: """
                   var element = document.documentElement;
                   if (element.requestFullscreen) {
                     element.requestFullscreen();
@@ -432,65 +449,74 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     element.webkitRequestFullscreen();
                   }
                   void(0);
-                  """);
-                },
-              ),
-              ElevatedButton(
-                child: const Icon(Icons.code),
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      var scriptController = TextEditingController(
-                          text: "console.log('Hello from World!')");
-                      var worldController =
-                          TextEditingController(text: "myWorld");
-                      return AlertDialog(
-                        title: const Text("Run in World"),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            TextField(
-                              controller: scriptController,
-                              decoration:
-                                  const InputDecoration(labelText: "Script"),
-                              maxLines: 3,
+                  """,
+                    );
+                  },
+                ),
+                ElevatedButton(
+                  child: const Icon(Icons.code),
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        var scriptController = TextEditingController(
+                          text: "console.log('Hello from World!')",
+                        );
+                        var worldController = TextEditingController(
+                          text: "myWorld",
+                        );
+                        return AlertDialog(
+                          title: const Text("Run in World"),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              TextField(
+                                controller: scriptController,
+                                decoration: const InputDecoration(
+                                  labelText: "Script",
+                                ),
+                                maxLines: 3,
+                              ),
+                              TextField(
+                                controller: worldController,
+                                decoration: const InputDecoration(
+                                  labelText: "World Name",
+                                ),
+                              ),
+                            ],
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text("Cancel"),
                             ),
-                            TextField(
-                              controller: worldController,
-                              decoration: const InputDecoration(
-                                  labelText: "World Name"),
+                            TextButton(
+                              onPressed: () {
+                                var script = scriptController.text;
+                                var worldName = worldController.text;
+                                webViewController?.evaluateJavascript(
+                                  source: script,
+                                  contentWorld: ContentWorld.world(
+                                    name: worldName,
+                                  ),
+                                );
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text("Run"),
                             ),
                           ],
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text("Cancel"),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              var script = scriptController.text;
-                              var worldName = worldController.text;
-                              webViewController?.evaluateJavascript(
-                                source: script,
-                                contentWorld:
-                                    ContentWorld.world(name: worldName),
-                              );
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text("Run"),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                },
-              ),
-            ],
-          ),
-        ])));
+                        );
+                      },
+                    );
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

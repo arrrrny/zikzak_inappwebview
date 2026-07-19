@@ -26,9 +26,7 @@ class ServiceWorkerController {
 
   ///Gets the [ServiceWorkerController] shared instance.
   static ServiceWorkerController instance() {
-    if (_instance == null) {
-      _instance = ServiceWorkerController();
-    }
+    _instance ??= ServiceWorkerController();
     return _instance!;
   }
 
@@ -36,7 +34,7 @@ class ServiceWorkerController {
   ServiceWorkerClient? get serviceWorkerClient => platform.serviceWorkerClient;
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformServiceWorkerController.setServiceWorkerClient}
-  setServiceWorkerClient(ServiceWorkerClient? value) =>
+  Future<void> setServiceWorkerClient(ServiceWorkerClient? value) =>
       platform.setServiceWorkerClient(value);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformServiceWorkerController.getAllowContentAccess}
@@ -103,7 +101,7 @@ class AndroidServiceWorkerController {
   }
 
   ///Sets the service worker client
-  setServiceWorkerClient(AndroidServiceWorkerClient? value) async {
+  Future<void> setServiceWorkerClient(AndroidServiceWorkerClient? value) async {
     await ServiceWorkerController.instance().setServiceWorkerClient(
       value != null
           ? ServiceWorkerClient(

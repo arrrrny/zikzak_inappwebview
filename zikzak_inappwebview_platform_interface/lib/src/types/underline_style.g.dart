@@ -57,6 +57,24 @@ class UnderlineStyle {
     UnderlineStyle.THICK,
   ].toSet();
 
+  ///Convenience getter for [BY_WORD].
+  static UnderlineStyle get byWord => BY_WORD;
+
+  ///Convenience getter for [PATTERN_DASH].
+  static UnderlineStyle get patternDash => PATTERN_DASH;
+
+  ///Convenience getter for [PATTERN_DASH_DOT].
+  static UnderlineStyle get patternDashDot => PATTERN_DASH_DOT;
+
+  ///Convenience getter for [PATTERN_DASH_DOT_DOT].
+  static UnderlineStyle get patternDashDotDot => PATTERN_DASH_DOT_DOT;
+
+  ///Convenience getter for [PATTERN_DOT].
+  static UnderlineStyle get patternDot => PATTERN_DOT;
+
+  ///Convenience getter for [STYLE_NONE].
+  static UnderlineStyle get styleNone => STYLE_NONE;
+
   ///Gets a possible [UnderlineStyle] instance from [int] value.
   static UnderlineStyle? fromValue(int? value) {
     if (value != null) {

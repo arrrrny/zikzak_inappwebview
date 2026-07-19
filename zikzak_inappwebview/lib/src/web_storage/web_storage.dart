@@ -50,35 +50,45 @@ abstract class Storage implements PlatformStorage {
   final PlatformStorage platform;
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformStorage.controller}
+  @override
   PlatformInAppWebViewController? get controller => platform.controller;
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformStorage.webStorageType}
+  @override
   WebStorageType get webStorageType => platform.webStorageType;
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformStorage.length}
+  @override
   Future<int?> length() => platform.length();
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformStorage.setItem}
+  @override
   Future<void> setItem({required String key, required dynamic value}) =>
       platform.setItem(key: key, value: value);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformStorage.getItem}
+  @override
   Future<dynamic> getItem({required String key}) => platform.getItem(key: key);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformStorage.removeItem}
+  @override
   Future<void> removeItem({required String key}) =>
       platform.removeItem(key: key);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformStorage.getItems}
+  @override
   Future<List<WebStorageItem>> getItems() => platform.getItems();
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformStorage.clear}
+  @override
   Future<void> clear() => platform.clear();
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformStorage.key}
+  @override
   Future<String> key({required int index}) => platform.key(index: index);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformStorage.dispose}
+  @override
   void dispose() => platform.dispose();
 }
 
@@ -108,6 +118,7 @@ class LocalStorage extends Storage {
     : super.fromPlatform(platform: platform);
 
   /// Implementation of [PlatformLocalStorage] for the current platform.
+  @override
   final PlatformLocalStorage platform;
 }
 
@@ -137,5 +148,6 @@ class SessionStorage extends Storage {
     : super.fromPlatform(platform: platform);
 
   /// Implementation of [PlatformSessionStorage] for the current platform.
+  @override
   final PlatformSessionStorage platform;
 }

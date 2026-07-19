@@ -91,6 +91,18 @@ class CustomTabsPostMessageResultType {
     CustomTabsPostMessageResultType.SUCCESS,
   ].toSet();
 
+  ///Convenience getter for [FAILURE_DISALLOWED].
+  static CustomTabsPostMessageResultType get failureDisallowed =>
+      FAILURE_DISALLOWED;
+
+  ///Convenience getter for [FAILURE_MESSAGING_ERROR].
+  static CustomTabsPostMessageResultType get failureMessagingError =>
+      FAILURE_MESSAGING_ERROR;
+
+  ///Convenience getter for [FAILURE_REMOTE_ERROR].
+  static CustomTabsPostMessageResultType get failureRemoteError =>
+      FAILURE_REMOTE_ERROR;
+
   ///Gets a possible [CustomTabsPostMessageResultType] instance from [int] value.
   static CustomTabsPostMessageResultType? fromValue(int? value) {
     if (value != null) {

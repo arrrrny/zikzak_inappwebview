@@ -45,6 +45,9 @@ class LayoutInDisplayCutoutMode {
     LayoutInDisplayCutoutMode.SHORT_EDGES,
   ].toSet();
 
+  ///Convenience getter for [SHORT_EDGES].
+  static LayoutInDisplayCutoutMode get shortEdges => SHORT_EDGES;
+
   ///Gets a possible [LayoutInDisplayCutoutMode] instance from [int] value.
   static LayoutInDisplayCutoutMode? fromValue(int? value) {
     if (value != null) {

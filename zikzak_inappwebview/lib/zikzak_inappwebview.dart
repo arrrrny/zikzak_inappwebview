@@ -19,7 +19,7 @@
  *
 */
 
-library zikzak_inappwebview;
+library;
 
 export 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart'
     hide

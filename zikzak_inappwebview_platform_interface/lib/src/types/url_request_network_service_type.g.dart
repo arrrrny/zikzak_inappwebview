@@ -60,6 +60,18 @@ class URLRequestNetworkServiceType {
     URLRequestNetworkServiceType.VOICE,
   ].toSet();
 
+  ///Convenience getter for [AV_STREAMING].
+  static URLRequestNetworkServiceType get avStreaming => AV_STREAMING;
+
+  ///Convenience getter for [CALL_SIGNALING].
+  static URLRequestNetworkServiceType get callSignaling => CALL_SIGNALING;
+
+  ///Convenience getter for [RESPONSIVE_AV].
+  static URLRequestNetworkServiceType get responsiveAv => RESPONSIVE_AV;
+
+  ///Convenience getter for [RESPONSIVE_DATA].
+  static URLRequestNetworkServiceType get responsiveData => RESPONSIVE_DATA;
+
   ///Gets a possible [URLRequestNetworkServiceType] instance from [int] value.
   static URLRequestNetworkServiceType? fromValue(int? value) {
     if (value != null) {

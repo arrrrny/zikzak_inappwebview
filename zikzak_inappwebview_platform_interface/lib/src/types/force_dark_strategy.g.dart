@@ -45,6 +45,18 @@ class ForceDarkStrategy {
     ForceDarkStrategy.WEB_THEME_DARKENING_ONLY,
   ].toSet();
 
+  ///Convenience getter for [PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING].
+  static ForceDarkStrategy get preferWebThemeOverUserAgentDarkening =>
+      PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING;
+
+  ///Convenience getter for [USER_AGENT_DARKENING_ONLY].
+  static ForceDarkStrategy get userAgentDarkeningOnly =>
+      USER_AGENT_DARKENING_ONLY;
+
+  ///Convenience getter for [WEB_THEME_DARKENING_ONLY].
+  static ForceDarkStrategy get webThemeDarkeningOnly =>
+      WEB_THEME_DARKENING_ONLY;
+
   ///Gets a possible [ForceDarkStrategy] instance from [int] value.
   static ForceDarkStrategy? fromValue(int? value) {
     if (value != null) {

@@ -24,11 +24,14 @@ Future main() async {
 
   if (!kIsWeb && defaultTargetPlatform == TargetPlatform.windows) {
     final availableVersion = await WebViewEnvironment.getAvailableVersion();
-    assert(availableVersion != null,
-        'Failed to find an installed WebView2 runtime or non-stable Microsoft Edge installation.');
+    assert(
+      availableVersion != null,
+      'Failed to find an installed WebView2 runtime or non-stable Microsoft Edge installation.',
+    );
 
     webViewEnvironment = await WebViewEnvironment.create(
-        settings: WebViewEnvironmentSettings(userDataFolder: 'custom_path'));
+      settings: WebViewEnvironmentSettings(userDataFolder: 'custom_path'),
+    );
   }
 
   if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
@@ -130,12 +133,10 @@ PointerInterceptor myDrawer({required BuildContext context}) {
         padding: EdgeInsets.zero,
         children: <Widget>[
           const DrawerHeader(
-            decoration: BoxDecoration(
-              color: Colors.blue,
-            ),
+            decoration: BoxDecoration(color: Colors.blue),
             child: Text('zikzak_inappwebview example'),
           ),
-          ...children
+          ...children,
         ],
       ),
     ),
@@ -163,34 +164,46 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     if (kIsWeb) {
-      return MaterialApp(initialRoute: '/', routes: {
-        '/': (context) => const InAppWebViewExampleScreen(),
-        '/HeadlessInAppWebView': (context) =>
-            const HeadlessInAppWebViewExampleScreen(),
-      });
+      return MaterialApp(
+        initialRoute: '/',
+        routes: {
+          '/': (context) => const InAppWebViewExampleScreen(),
+          '/HeadlessInAppWebView': (context) =>
+              const HeadlessInAppWebViewExampleScreen(),
+        },
+      );
     }
     if (defaultTargetPlatform == TargetPlatform.macOS) {
-      return MaterialApp(initialRoute: '/', routes: {
-        '/': (context) => const InAppWebViewExampleScreen(),
-        '/InAppBrowser': (context) => const InAppBrowserExampleScreen(),
-        '/HeadlessInAppWebView': (context) =>
-            const HeadlessInAppWebViewExampleScreen(),
-      });
+      return MaterialApp(
+        initialRoute: '/',
+        routes: {
+          '/': (context) => const InAppWebViewExampleScreen(),
+          '/InAppBrowser': (context) => const InAppBrowserExampleScreen(),
+          '/HeadlessInAppWebView': (context) =>
+              const HeadlessInAppWebViewExampleScreen(),
+        },
+      );
     } else if (defaultTargetPlatform == TargetPlatform.windows ||
         defaultTargetPlatform == TargetPlatform.linux) {
-      return MaterialApp(initialRoute: '/', routes: {
+      return MaterialApp(
+        initialRoute: '/',
+        routes: {
+          '/': (context) => const InAppWebViewExampleScreen(),
+          '/InAppBrowser': (context) => const InAppBrowserExampleScreen(),
+          '/HeadlessInAppWebView': (context) =>
+              const HeadlessInAppWebViewExampleScreen(),
+        },
+      );
+    }
+    return MaterialApp(
+      initialRoute: '/',
+      routes: {
         '/': (context) => const InAppWebViewExampleScreen(),
         '/InAppBrowser': (context) => const InAppBrowserExampleScreen(),
+        '/ChromeSafariBrowser': (context) => ChromeSafariBrowserExampleScreen(),
         '/HeadlessInAppWebView': (context) =>
             const HeadlessInAppWebViewExampleScreen(),
-      });
-    }
-    return MaterialApp(initialRoute: '/', routes: {
-      '/': (context) => const InAppWebViewExampleScreen(),
-      '/InAppBrowser': (context) => const InAppBrowserExampleScreen(),
-      '/ChromeSafariBrowser': (context) => ChromeSafariBrowserExampleScreen(),
-      '/HeadlessInAppWebView': (context) =>
-          const HeadlessInAppWebViewExampleScreen(),
-    });
+      },
+    );
   }
 }

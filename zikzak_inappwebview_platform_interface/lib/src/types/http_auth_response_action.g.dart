@@ -34,6 +34,10 @@ class HttpAuthResponseAction {
     HttpAuthResponseAction.USE_SAVED_HTTP_AUTH_CREDENTIALS,
   ].toSet();
 
+  ///Convenience getter for [USE_SAVED_HTTP_AUTH_CREDENTIALS].
+  static HttpAuthResponseAction get useSavedHttpAuthCredentials =>
+      USE_SAVED_HTTP_AUTH_CREDENTIALS;
+
   ///Gets a possible [HttpAuthResponseAction] instance from [int] value.
   static HttpAuthResponseAction? fromValue(int? value) {
     if (value != null) {

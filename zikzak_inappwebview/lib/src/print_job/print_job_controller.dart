@@ -31,7 +31,7 @@ class PrintJobController {
   ///{@macro zikzak_inappwebview_platform_interface.PlatformPrintJobController.onComplete}
   PrintJobCompletionHandler? get onComplete => platform.onComplete;
 
-  void set onComplete(PrintJobCompletionHandler? handler) {
+  set onComplete(PrintJobCompletionHandler? handler) {
     platform.onComplete = handler;
   }
 

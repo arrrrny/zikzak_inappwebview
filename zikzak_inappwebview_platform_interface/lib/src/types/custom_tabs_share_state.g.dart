@@ -33,6 +33,15 @@ class CustomTabsShareState {
     CustomTabsShareState.SHARE_STATE_ON,
   ].toSet();
 
+  ///Convenience getter for [SHARE_STATE_DEFAULT].
+  static CustomTabsShareState get shareStateDefault => SHARE_STATE_DEFAULT;
+
+  ///Convenience getter for [SHARE_STATE_OFF].
+  static CustomTabsShareState get shareStateOff => SHARE_STATE_OFF;
+
+  ///Convenience getter for [SHARE_STATE_ON].
+  static CustomTabsShareState get shareStateOn => SHARE_STATE_ON;
+
   ///Gets a possible [CustomTabsShareState] instance from [int] value.
   static CustomTabsShareState? fromValue(int? value) {
     if (value != null) {

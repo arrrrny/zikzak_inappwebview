@@ -33,7 +33,7 @@ void main() {
     await Future.delayed(const Duration(milliseconds: 200));
 
     // 4. Load data
-    final htmlData = """
+    const htmlData = """
 <!DOCTYPE html>
 <html>
 <head>
@@ -80,7 +80,10 @@ void main() {
 
     // 8. Assert
     expect(content, isNotNull, reason: 'HTML content should not be null');
-    expect(content, contains('<h1>Hello World</h1>'),
-        reason: 'HTML content should contain "Hello World"');
+    expect(
+      content,
+      contains('<h1>Hello World</h1>'),
+      reason: 'HTML content should contain "Hello World"',
+    );
   });
 }

@@ -37,6 +37,12 @@ class WebStorageType {
     WebStorageType.SESSION_STORAGE,
   ].toSet();
 
+  ///Convenience getter for [LOCAL_STORAGE].
+  static WebStorageType get localStorage => LOCAL_STORAGE;
+
+  ///Convenience getter for [SESSION_STORAGE].
+  static WebStorageType get sessionStorage => SESSION_STORAGE;
+
   ///Gets a possible [WebStorageType] instance from [String] value.
   static WebStorageType? fromValue(String? value) {
     if (value != null) {

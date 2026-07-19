@@ -34,6 +34,9 @@ class CrossOrigin {
     CrossOrigin.USE_CREDENTIALS,
   ].toSet();
 
+  ///Convenience getter for [USE_CREDENTIALS].
+  static CrossOrigin get useCredentials => USE_CREDENTIALS;
+
   ///Gets a possible [CrossOrigin] instance from [String] value.
   static CrossOrigin? fromValue(String? value) {
     if (value != null) {

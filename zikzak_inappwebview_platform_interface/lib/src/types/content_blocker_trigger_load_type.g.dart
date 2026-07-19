@@ -35,6 +35,12 @@ class ContentBlockerTriggerLoadType {
     ContentBlockerTriggerLoadType.THIRD_PARTY,
   ].toSet();
 
+  ///Convenience getter for [FIRST_PARTY].
+  static ContentBlockerTriggerLoadType get firstParty => FIRST_PARTY;
+
+  ///Convenience getter for [THIRD_PARTY].
+  static ContentBlockerTriggerLoadType get thirdParty => THIRD_PARTY;
+
   ///Gets a possible [ContentBlockerTriggerLoadType] instance from [String] value.
   static ContentBlockerTriggerLoadType? fromValue(String? value) {
     if (value != null) {

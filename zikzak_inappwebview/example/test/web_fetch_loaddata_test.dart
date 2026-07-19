@@ -30,7 +30,7 @@ void main() {
     // But the structure mimics the user's need.
 
     // Simulate fetching content
-    final fetchedHtml = """
+    const fetchedHtml = """
       <!DOCTYPE html>
       <html>
         <head><title>Fetched Content</title></head>

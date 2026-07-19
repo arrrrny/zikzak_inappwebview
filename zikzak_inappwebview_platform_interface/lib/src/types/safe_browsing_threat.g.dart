@@ -57,6 +57,26 @@ class SafeBrowsingThreat {
     SafeBrowsingThreat.SAFE_BROWSING_THREAT_UNWANTED_SOFTWARE,
   ].toSet();
 
+  ///Convenience getter for [SAFE_BROWSING_THREAT_BILLING].
+  static SafeBrowsingThreat get safeBrowsingThreatBilling =>
+      SAFE_BROWSING_THREAT_BILLING;
+
+  ///Convenience getter for [SAFE_BROWSING_THREAT_MALWARE].
+  static SafeBrowsingThreat get safeBrowsingThreatMalware =>
+      SAFE_BROWSING_THREAT_MALWARE;
+
+  ///Convenience getter for [SAFE_BROWSING_THREAT_PHISHING].
+  static SafeBrowsingThreat get safeBrowsingThreatPhishing =>
+      SAFE_BROWSING_THREAT_PHISHING;
+
+  ///Convenience getter for [SAFE_BROWSING_THREAT_UNKNOWN].
+  static SafeBrowsingThreat get safeBrowsingThreatUnknown =>
+      SAFE_BROWSING_THREAT_UNKNOWN;
+
+  ///Convenience getter for [SAFE_BROWSING_THREAT_UNWANTED_SOFTWARE].
+  static SafeBrowsingThreat get safeBrowsingThreatUnwantedSoftware =>
+      SAFE_BROWSING_THREAT_UNWANTED_SOFTWARE;
+
   ///Gets a possible [SafeBrowsingThreat] instance from [int] value.
   static SafeBrowsingThreat? fromValue(int? value) {
     if (value != null) {

@@ -33,6 +33,15 @@ class ProxySchemeFilter {
     ProxySchemeFilter.MATCH_HTTPS,
   ].toSet();
 
+  ///Convenience getter for [MATCH_ALL_SCHEMES].
+  static ProxySchemeFilter get matchAllSchemes => MATCH_ALL_SCHEMES;
+
+  ///Convenience getter for [MATCH_HTTP].
+  static ProxySchemeFilter get matchHttp => MATCH_HTTP;
+
+  ///Convenience getter for [MATCH_HTTPS].
+  static ProxySchemeFilter get matchHttps => MATCH_HTTPS;
+
   ///Gets a possible [ProxySchemeFilter] instance from [String] value.
   static ProxySchemeFilter? fromValue(String? value) {
     if (value != null) {

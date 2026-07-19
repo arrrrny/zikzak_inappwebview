@@ -64,6 +64,32 @@ class TracingCategory {
     TracingCategory.CATEGORIES_WEB_DEVELOPER,
   ].toSet();
 
+  ///Convenience getter for [CATEGORIES_ALL].
+  static TracingCategory get categoriesAll => CATEGORIES_ALL;
+
+  ///Convenience getter for [CATEGORIES_ANDROID_WEBVIEW].
+  static TracingCategory get categoriesAndroidWebview =>
+      CATEGORIES_ANDROID_WEBVIEW;
+
+  ///Convenience getter for [CATEGORIES_FRAME_VIEWER].
+  static TracingCategory get categoriesFrameViewer => CATEGORIES_FRAME_VIEWER;
+
+  ///Convenience getter for [CATEGORIES_INPUT_LATENCY].
+  static TracingCategory get categoriesInputLatency => CATEGORIES_INPUT_LATENCY;
+
+  ///Convenience getter for [CATEGORIES_JAVASCRIPT_AND_RENDERING].
+  static TracingCategory get categoriesJavascriptAndRendering =>
+      CATEGORIES_JAVASCRIPT_AND_RENDERING;
+
+  ///Convenience getter for [CATEGORIES_NONE].
+  static TracingCategory get categoriesNone => CATEGORIES_NONE;
+
+  ///Convenience getter for [CATEGORIES_RENDERING].
+  static TracingCategory get categoriesRendering => CATEGORIES_RENDERING;
+
+  ///Convenience getter for [CATEGORIES_WEB_DEVELOPER].
+  static TracingCategory get categoriesWebDeveloper => CATEGORIES_WEB_DEVELOPER;
+
   ///Gets a possible [TracingCategory] instance from [int] value.
   static TracingCategory? fromValue(int? value) {
     if (value != null) {

@@ -14,7 +14,7 @@ class IOSInAppWebViewController {
   IOSInAppWebViewController({
     required PlatformInAppWebViewController controller,
   }) {
-    this._controller = controller;
+    _controller = controller;
   }
 
   ///Use [InAppWebViewController.reloadFromOrigin] instead.

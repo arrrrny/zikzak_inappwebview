@@ -43,6 +43,18 @@ class ModalTransitionStyle {
     ModalTransitionStyle.PARTIAL_CURL,
   ].toSet();
 
+  ///Convenience getter for [COVER_VERTICAL].
+  static ModalTransitionStyle get coverVertical => COVER_VERTICAL;
+
+  ///Convenience getter for [CROSS_DISSOLVE].
+  static ModalTransitionStyle get crossDissolve => CROSS_DISSOLVE;
+
+  ///Convenience getter for [FLIP_HORIZONTAL].
+  static ModalTransitionStyle get flipHorizontal => FLIP_HORIZONTAL;
+
+  ///Convenience getter for [PARTIAL_CURL].
+  static ModalTransitionStyle get partialCurl => PARTIAL_CURL;
+
   ///Gets a possible [ModalTransitionStyle] instance from [int] value.
   static ModalTransitionStyle? fromValue(int? value) {
     if (value != null) {

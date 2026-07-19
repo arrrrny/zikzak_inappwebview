@@ -17,7 +17,8 @@ void main() {
           body: InAppWebView(
             onWebViewCreated: (c) {
               controller = c;
-              c.loadData(data: """
+              c.loadData(
+                data: """
 <!DOCTYPE html>
 <html>
 <head>
@@ -27,7 +28,8 @@ void main() {
     <h1>Hello World</h1>
 </body>
 </html>
-""");
+""",
+              );
             },
             onLoadStop: (controller, url) {
               print('onLoadStop: $url');
@@ -44,9 +46,12 @@ void main() {
     );
 
     // Wait for page to load
-    await pageLoaded.future.timeout(const Duration(seconds: 10), onTimeout: () {
-      print('Timeout waiting for page load');
-    });
+    await pageLoaded.future.timeout(
+      const Duration(seconds: 10),
+      onTimeout: () {
+        print('Timeout waiting for page load');
+      },
+    );
 
     // Extra delay to ensure JS execution (if any) or rendering
     await Future.delayed(const Duration(seconds: 2));

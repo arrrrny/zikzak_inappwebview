@@ -3,9 +3,7 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 
 class LinuxFindInteractionController extends PlatformFindInteractionController
     with ChannelController {
-  LinuxFindInteractionController(
-    PlatformFindInteractionControllerCreationParams params,
-  ) : super.implementation(params);
+  LinuxFindInteractionController(super.params) : super.implementation();
 
   Future<dynamic> _handleMethod(MethodCall call) async {
     switch (call.method) {

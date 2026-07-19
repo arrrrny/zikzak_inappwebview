@@ -31,6 +31,10 @@ class AttributedStringTextEffectStyle {
     AttributedStringTextEffectStyle.LETTERPRESS_STYLE,
   ].toSet();
 
+  ///Convenience getter for [LETTERPRESS_STYLE].
+  static AttributedStringTextEffectStyle get letterpressStyle =>
+      LETTERPRESS_STYLE;
+
   ///Gets a possible [AttributedStringTextEffectStyle] instance from [String] value.
   static AttributedStringTextEffectStyle? fromValue(String? value) {
     if (value != null) {

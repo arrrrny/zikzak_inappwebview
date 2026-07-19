@@ -8,8 +8,7 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 import 'in_app_webview_web_controller.dart';
 
 class HeadlessInAppWebViewWeb extends PlatformHeadlessInAppWebView {
-  HeadlessInAppWebViewWeb(PlatformHeadlessInAppWebViewCreationParams params)
-    : super.implementation(params);
+  HeadlessInAppWebViewWeb(super.params) : super.implementation();
 
   web.HTMLIFrameElement? _iframe;
   InAppWebViewWebController? _webViewController;

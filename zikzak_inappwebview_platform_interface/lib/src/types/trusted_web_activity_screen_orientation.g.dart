@@ -83,6 +83,22 @@ class TrustedWebActivityScreenOrientation {
     TrustedWebActivityScreenOrientation.PORTRAIT_SECONDARY,
   ].toSet();
 
+  ///Convenience getter for [LANDSCAPE_PRIMARY].
+  static TrustedWebActivityScreenOrientation get landscapePrimary =>
+      LANDSCAPE_PRIMARY;
+
+  ///Convenience getter for [LANDSCAPE_SECONDARY].
+  static TrustedWebActivityScreenOrientation get landscapeSecondary =>
+      LANDSCAPE_SECONDARY;
+
+  ///Convenience getter for [PORTRAIT_PRIMARY].
+  static TrustedWebActivityScreenOrientation get portraitPrimary =>
+      PORTRAIT_PRIMARY;
+
+  ///Convenience getter for [PORTRAIT_SECONDARY].
+  static TrustedWebActivityScreenOrientation get portraitSecondary =>
+      PORTRAIT_SECONDARY;
+
   ///Gets a possible [TrustedWebActivityScreenOrientation] instance from [int] value.
   static TrustedWebActivityScreenOrientation? fromValue(int? value) {
     if (value != null) {

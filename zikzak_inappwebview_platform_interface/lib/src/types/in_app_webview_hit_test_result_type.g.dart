@@ -56,6 +56,31 @@ class InAppWebViewHitTestResultType {
     InAppWebViewHitTestResultType.UNKNOWN_TYPE,
   ].toSet();
 
+  ///Convenience getter for [EDIT_TEXT_TYPE].
+  static InAppWebViewHitTestResultType get editTextType => EDIT_TEXT_TYPE;
+
+  ///Convenience getter for [EMAIL_TYPE].
+  static InAppWebViewHitTestResultType get emailType => EMAIL_TYPE;
+
+  ///Convenience getter for [GEO_TYPE].
+  static InAppWebViewHitTestResultType get geoType => GEO_TYPE;
+
+  ///Convenience getter for [IMAGE_TYPE].
+  static InAppWebViewHitTestResultType get imageType => IMAGE_TYPE;
+
+  ///Convenience getter for [PHONE_TYPE].
+  static InAppWebViewHitTestResultType get phoneType => PHONE_TYPE;
+
+  ///Convenience getter for [SRC_ANCHOR_TYPE].
+  static InAppWebViewHitTestResultType get srcAnchorType => SRC_ANCHOR_TYPE;
+
+  ///Convenience getter for [SRC_IMAGE_ANCHOR_TYPE].
+  static InAppWebViewHitTestResultType get srcImageAnchorType =>
+      SRC_IMAGE_ANCHOR_TYPE;
+
+  ///Convenience getter for [UNKNOWN_TYPE].
+  static InAppWebViewHitTestResultType get unknownType => UNKNOWN_TYPE;
+
   ///Gets a possible [InAppWebViewHitTestResultType] instance from [int] value.
   static InAppWebViewHitTestResultType? fromValue(int? value) {
     if (value != null) {

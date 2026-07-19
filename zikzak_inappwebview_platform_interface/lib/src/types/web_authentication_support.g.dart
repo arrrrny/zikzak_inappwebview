@@ -33,6 +33,12 @@ class WebAuthenticationSupport {
     WebAuthenticationSupport.NONE,
   ].toSet();
 
+  ///Convenience getter for [FOR_APP].
+  static WebAuthenticationSupport get forApp => FOR_APP;
+
+  ///Convenience getter for [FOR_BROWSER].
+  static WebAuthenticationSupport get forBrowser => FOR_BROWSER;
+
   ///Gets a possible [WebAuthenticationSupport] instance from [int] value.
   static WebAuthenticationSupport? fromValue(int? value) {
     if (value != null) {
@@ -61,44 +67,11 @@ class WebAuthenticationSupport {
     return null;
   }
 
-  /// Gets a possible [WebAuthenticationSupport] instance value with name [name].
-  static WebAuthenticationSupport? byName(String? name) {
-    if (name != null) {
-      try {
-        return WebAuthenticationSupport.values.firstWhere(
-          (element) => element.name() == name,
-        );
-      } catch (e) {
-        return null;
-      }
-    }
-    return null;
-  }
-
-  static Map<String, WebAuthenticationSupport> asNameMap() =>
-      <String, WebAuthenticationSupport>{
-        for (final value in WebAuthenticationSupport.values)
-          value.name(): value,
-      };
-
   ///Gets [int] value.
   int toValue() => _value;
 
   ///Gets [int] native value.
   int toNativeValue() => _nativeValue;
-
-  ///Gets the name of the value.
-  String name() {
-    switch (_value) {
-      case 1:
-        return 'FOR_APP';
-      case 2:
-        return 'FOR_BROWSER';
-      case 0:
-        return 'NONE';
-    }
-    return _value.toString();
-  }
 
   @override
   int get hashCode => _value.hashCode;
@@ -108,6 +81,14 @@ class WebAuthenticationSupport {
 
   @override
   String toString() {
-    return name();
+    switch (_value) {
+      case 1:
+        return 'FOR_APP';
+      case 2:
+        return 'FOR_BROWSER';
+      case 0:
+        return 'NONE';
+    }
+    return _value.toString();
   }
 }

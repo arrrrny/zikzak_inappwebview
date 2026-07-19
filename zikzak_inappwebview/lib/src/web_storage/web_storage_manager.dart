@@ -38,9 +38,7 @@ class WebStorageManager {
 
   ///Gets the [WebStorageManager] shared instance.
   static WebStorageManager instance() {
-    if (_instance == null) {
-      _instance = WebStorageManager();
-    }
+    _instance ??= WebStorageManager();
     return _instance!;
   }
 

@@ -47,6 +47,10 @@ class ScrollViewContentInsetAdjustmentBehavior {
     ScrollViewContentInsetAdjustmentBehavior.SCROLLABLE_AXES,
   ].toSet();
 
+  ///Convenience getter for [SCROLLABLE_AXES].
+  static ScrollViewContentInsetAdjustmentBehavior get scrollableAxes =>
+      SCROLLABLE_AXES;
+
   ///Gets a possible [ScrollViewContentInsetAdjustmentBehavior] instance from [int] value.
   static ScrollViewContentInsetAdjustmentBehavior? fromValue(int? value) {
     if (value != null) {

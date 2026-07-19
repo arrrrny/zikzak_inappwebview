@@ -33,9 +33,7 @@ class CookieManager {
   ///[webViewEnvironment] (Supported only on Windows) - Used to create the [CookieManager] using the specified environment.
   static CookieManager instance({WebViewEnvironment? webViewEnvironment}) {
     if (webViewEnvironment == null) {
-      if (_instance == null) {
-        _instance = CookieManager();
-      }
+      _instance ??= CookieManager();
       return _instance!;
     } else {
       return CookieManager.fromPlatformCreationParams(

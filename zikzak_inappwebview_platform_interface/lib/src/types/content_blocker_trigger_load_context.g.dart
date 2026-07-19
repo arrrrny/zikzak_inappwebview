@@ -38,6 +38,12 @@ class ContentBlockerTriggerLoadContext {
     ContentBlockerTriggerLoadContext.TOP_FRAME,
   ].toSet();
 
+  ///Convenience getter for [CHILD_FRAME].
+  static ContentBlockerTriggerLoadContext get childFrame => CHILD_FRAME;
+
+  ///Convenience getter for [TOP_FRAME].
+  static ContentBlockerTriggerLoadContext get topFrame => TOP_FRAME;
+
   ///Gets a possible [ContentBlockerTriggerLoadContext] instance from [String] value.
   static ContentBlockerTriggerLoadContext? fromValue(String? value) {
     if (value != null) {

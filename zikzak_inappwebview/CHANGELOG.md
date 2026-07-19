@@ -1,3 +1,17 @@
+## 4.5.2 - 2026-07-18
+
+- Fixed: Generator no longer produces `InvalidType` for fields referencing
+  other generated types (e.g. `PrintJobColorMode?`) — the `exchangeable_object_generator`
+  now falls back to AST source text when the analyzer can't resolve a type
+- Feature: Added camelCase convenience getters for all `SCREAMING_SNAKE_CASE`
+  enum constants (e.g. `UserScriptInjectionTime.atDocumentStart`,
+  `Sandbox.allowPopups`, `ConsoleMessageLevel.warning`)
+- Fixed: `exchangeable_enum_generator` no longer attempts to generate getters
+  for Dart reserved words (`default`, `switch`, etc.) or `@ExchangeableEnumCustomValue`
+  fields with non-standard types
+- Docs: Added `GENERATOR_NOTES.md` documenting the `console_message.g.dart`
+  null-safety hand-edit and regeneration workflow
+
 ## 4.5.1 - 2026-07-18
 
 - Fixed: macOS `addJavaScriptHandler` bridge now uses `postMessage` with a JSON

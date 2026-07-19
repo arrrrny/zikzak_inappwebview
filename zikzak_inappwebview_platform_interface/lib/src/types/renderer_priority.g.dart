@@ -34,6 +34,17 @@ class RendererPriority {
     RendererPriority.RENDERER_PRIORITY_WAIVED,
   ].toSet();
 
+  ///Convenience getter for [RENDERER_PRIORITY_BOUND].
+  static RendererPriority get rendererPriorityBound => RENDERER_PRIORITY_BOUND;
+
+  ///Convenience getter for [RENDERER_PRIORITY_IMPORTANT].
+  static RendererPriority get rendererPriorityImportant =>
+      RENDERER_PRIORITY_IMPORTANT;
+
+  ///Convenience getter for [RENDERER_PRIORITY_WAIVED].
+  static RendererPriority get rendererPriorityWaived =>
+      RENDERER_PRIORITY_WAIVED;
+
   ///Gets a possible [RendererPriority] instance from [int] value.
   static RendererPriority? fromValue(int? value) {
     if (value != null) {

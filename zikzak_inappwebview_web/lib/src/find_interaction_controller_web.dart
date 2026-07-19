@@ -2,9 +2,7 @@ import 'dart:async';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
 class FindInteractionControllerWeb extends PlatformFindInteractionController {
-  FindInteractionControllerWeb(
-    PlatformFindInteractionControllerCreationParams params,
-  ) : super.implementation(params);
+  FindInteractionControllerWeb(super.params) : super.implementation();
 
   @override
   Future<void> findAll({String? find}) async {

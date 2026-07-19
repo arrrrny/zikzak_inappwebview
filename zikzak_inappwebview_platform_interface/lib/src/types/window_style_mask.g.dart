@@ -197,6 +197,21 @@ class WindowStyleMask {
     WindowStyleMask.UTILITY_WINDOW,
   ].toSet();
 
+  ///Convenience getter for [DOC_MODAL_WINDOW].
+  static WindowStyleMask get docModalWindow => DOC_MODAL_WINDOW;
+
+  ///Convenience getter for [FULL_SIZE_CONTENT_VIEW].
+  static WindowStyleMask get fullSizeContentView => FULL_SIZE_CONTENT_VIEW;
+
+  ///Convenience getter for [HUD_WINDOW].
+  static WindowStyleMask get hudWindow => HUD_WINDOW;
+
+  ///Convenience getter for [NONACTIVATING_PANEL].
+  static WindowStyleMask get nonactivatingPanel => NONACTIVATING_PANEL;
+
+  ///Convenience getter for [UTILITY_WINDOW].
+  static WindowStyleMask get utilityWindow => UTILITY_WINDOW;
+
   ///Gets a possible [WindowStyleMask] instance from [int] value.
   static WindowStyleMask? fromValue(int? value) {
     if (value != null) {
@@ -241,7 +256,7 @@ class WindowStyleMask {
       WindowStyleMask._internal(
         value.toValue() | _value,
         value.toNativeValue() != null && _nativeValue != null
-            ? value.toNativeValue()! | _nativeValue
+            ? value.toNativeValue()! | _nativeValue!
             : _nativeValue,
       );
   @override

@@ -5,7 +5,7 @@ abstract class PathHandler
     implements PlatformPathHandler, PlatformPathHandlerEvents {
   /// Constructs a [PathHandler] from a specific platform implementation.
   PathHandler.fromPlatform({required this.platform}) {
-    this.platform.eventHandler = this;
+    platform.eventHandler = this;
   }
 
   @override
@@ -55,6 +55,7 @@ class AssetsPathHandler extends PathHandler {
     : super.fromPlatform(platform: platform);
 
   /// Implementation of [PlatformAssetsPathHandler] for the current platform.
+  @override
   final PlatformAssetsPathHandler platform;
 }
 
@@ -81,6 +82,7 @@ class ResourcesPathHandler extends PathHandler {
     : super.fromPlatform(platform: platform);
 
   /// Implementation of [PlatformResourcesPathHandler] for the current platform.
+  @override
   final PlatformResourcesPathHandler platform;
 }
 
@@ -108,6 +110,7 @@ class InternalStoragePathHandler extends PathHandler {
     : super.fromPlatform(platform: platform);
 
   /// Implementation of [PlatformInternalStoragePathHandler] for the current platform.
+  @override
   final PlatformInternalStoragePathHandler platform;
 
   String get directory => platform.directory;
@@ -136,5 +139,6 @@ abstract class CustomPathHandler extends PathHandler {
     : super.fromPlatform(platform: platform);
 
   /// Implementation of [PlatformCustomPathHandler] for the current platform.
+  @override
   final PlatformCustomPathHandler platform;
 }

@@ -7,7 +7,7 @@ import '../in_app_webview/in_app_webview_controller.dart';
 
 class LinuxInAppBrowserCreationParams
     extends PlatformInAppBrowserCreationParams {
-  LinuxInAppBrowserCreationParams({
+  const LinuxInAppBrowserCreationParams({
     super.contextMenu,
     super.pullToRefreshController,
     super.findInteractionController,

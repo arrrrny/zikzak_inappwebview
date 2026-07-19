@@ -226,6 +226,115 @@ class ExchangeableEnumGenerator
       classBuffer.writeln('].toSet();');
     }
 
+    // Generate camelCase convenience getters for all SCREAMING_CASE
+    // enum constants (e.g. atDocumentStart -> AT_DOCUMENT_START),
+    // skipping names that collide with Dart reserved words.
+    const _dartReservedWords = <String>{
+      'abstract',
+      'as',
+      'assert',
+      'async',
+      'await',
+      'break',
+      'case',
+      'catch',
+      'class',
+      'const',
+      'continue',
+      'covariant',
+      'default',
+      'deferred',
+      'do',
+      'dynamic',
+      'else',
+      'enum',
+      'export',
+      'extends',
+      'extension',
+      'external',
+      'factory',
+      'false',
+      'final',
+      'finally',
+      'for',
+      'Function',
+      'get',
+      'hide',
+      'if',
+      'implements',
+      'import',
+      'in',
+      'interface',
+      'is',
+      'late',
+      'library',
+      'mixin',
+      'new',
+      'null',
+      'on',
+      'operator',
+      'part',
+      'required',
+      'rethrow',
+      'return',
+      'sealed',
+      'set',
+      'show',
+      'static',
+      'super',
+      'switch',
+      'sync',
+      'this',
+      'throw',
+      'true',
+      'try',
+      'typedef',
+      'var',
+      'void',
+      'when',
+      'while',
+      'with',
+      'yield',
+    };
+    for (final entry in fieldEntriesSorted) {
+      final fieldName = entry.key;
+      final fieldElement = entry.value;
+      if (!fieldElement.isPrivate &&
+          fieldElement.isStatic &&
+          !fieldName.startsWith('_')) {
+        // Skip fields with custom values (e.g. Set/List types) since
+        // they don't match the enum's value type.
+        if (_coreCheckerEnumCustomValue.firstAnnotationOf(fieldElement) !=
+            null) {
+          continue;
+        }
+        final camelName = fieldName
+            .split('_')
+            .asMap()
+            .entries
+            .map(
+              (e) => e.key == 0
+                  ? e.value.toLowerCase()
+                  : e.value.isEmpty
+                  ? ''
+                  : e.value[0].toUpperCase() +
+                        e.value.substring(1).toLowerCase(),
+            )
+            .join();
+        if (camelName != fieldName && !_dartReservedWords.contains(camelName)) {
+          // Only generate getters for SCREAMING_SNAKE_CASE names that
+          // actually have underscores. Names like WKWebsiteDataTypeCookies
+          // (PascalCase-with-UPPER-prefix) produce unreadable camelCase
+          // since there are no underscore word boundaries.
+          if (!fieldName.contains('_')) continue;
+          classBuffer.writeln('///Convenience getter for [$fieldName].');
+          classBuffer.writeln(
+            'static $extClassName get $camelName => $fieldName;',
+          );
+        }
+      }
+    }
+
     if (annotation.read("fromValueMethod").boolValue &&
         (!visitor.methods.containsKey("fromValue") ||
             Util.methodHasIgnore(visitor.methods['fromNativeValue']!))) {

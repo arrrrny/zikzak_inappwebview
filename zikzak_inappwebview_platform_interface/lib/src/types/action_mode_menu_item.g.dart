@@ -37,6 +37,18 @@ class ActionModeMenuItem {
     ActionModeMenuItem.MENU_ITEM_WEB_SEARCH,
   ].toSet();
 
+  ///Convenience getter for [MENU_ITEM_NONE].
+  static ActionModeMenuItem get menuItemNone => MENU_ITEM_NONE;
+
+  ///Convenience getter for [MENU_ITEM_PROCESS_TEXT].
+  static ActionModeMenuItem get menuItemProcessText => MENU_ITEM_PROCESS_TEXT;
+
+  ///Convenience getter for [MENU_ITEM_SHARE].
+  static ActionModeMenuItem get menuItemShare => MENU_ITEM_SHARE;
+
+  ///Convenience getter for [MENU_ITEM_WEB_SEARCH].
+  static ActionModeMenuItem get menuItemWebSearch => MENU_ITEM_WEB_SEARCH;
+
   ///Gets a possible [ActionModeMenuItem] instance from [int] value.
   static ActionModeMenuItem? fromValue(int? value) {
     if (value != null) {

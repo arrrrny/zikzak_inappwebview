@@ -79,6 +79,24 @@ class DataDetectorTypes {
     DataDetectorTypes.TRACKING_NUMBER,
   ].toSet();
 
+  ///Convenience getter for [CALENDAR_EVENT].
+  static DataDetectorTypes get calendarEvent => CALENDAR_EVENT;
+
+  ///Convenience getter for [FLIGHT_NUMBER].
+  static DataDetectorTypes get flightNumber => FLIGHT_NUMBER;
+
+  ///Convenience getter for [LOOKUP_SUGGESTION].
+  static DataDetectorTypes get lookupSuggestion => LOOKUP_SUGGESTION;
+
+  ///Convenience getter for [PHONE_NUMBER].
+  static DataDetectorTypes get phoneNumber => PHONE_NUMBER;
+
+  ///Convenience getter for [SPOTLIGHT_SUGGESTION].
+  static DataDetectorTypes get spotlightSuggestion => SPOTLIGHT_SUGGESTION;
+
+  ///Convenience getter for [TRACKING_NUMBER].
+  static DataDetectorTypes get trackingNumber => TRACKING_NUMBER;
+
   ///Gets a possible [DataDetectorTypes] instance from [String] value.
   static DataDetectorTypes? fromValue(String? value) {
     if (value != null) {

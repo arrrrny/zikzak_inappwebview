@@ -79,6 +79,12 @@ class CompressFormat {
     CompressFormat.WEBP_LOSSY,
   ].toSet();
 
+  ///Convenience getter for [WEBP_LOSSLESS].
+  static CompressFormat get webpLossless => WEBP_LOSSLESS;
+
+  ///Convenience getter for [WEBP_LOSSY].
+  static CompressFormat get webpLossy => WEBP_LOSSY;
+
   ///Gets a possible [CompressFormat] instance from [String] value.
   static CompressFormat? fromValue(String? value) {
     if (value != null) {

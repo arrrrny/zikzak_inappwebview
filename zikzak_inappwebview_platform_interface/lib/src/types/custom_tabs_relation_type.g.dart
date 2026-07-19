@@ -57,6 +57,12 @@ class CustomTabsRelationType {
     CustomTabsRelationType.USE_AS_ORIGIN,
   ].toSet();
 
+  ///Convenience getter for [HANDLE_ALL_URLS].
+  static CustomTabsRelationType get handleAllUrls => HANDLE_ALL_URLS;
+
+  ///Convenience getter for [USE_AS_ORIGIN].
+  static CustomTabsRelationType get useAsOrigin => USE_AS_ORIGIN;
+
   ///Gets a possible [CustomTabsRelationType] instance from [int] value.
   static CustomTabsRelationType? fromValue(int? value) {
     if (value != null) {

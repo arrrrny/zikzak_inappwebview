@@ -63,6 +63,24 @@ class ModalPresentationStyle {
     ModalPresentationStyle.POPOVER,
   ].toSet();
 
+  ///Convenience getter for [CURRENT_CONTEXT].
+  static ModalPresentationStyle get currentContext => CURRENT_CONTEXT;
+
+  ///Convenience getter for [FORM_SHEET].
+  static ModalPresentationStyle get formSheet => FORM_SHEET;
+
+  ///Convenience getter for [FULL_SCREEN].
+  static ModalPresentationStyle get fullScreen => FULL_SCREEN;
+
+  ///Convenience getter for [OVER_CURRENT_CONTEXT].
+  static ModalPresentationStyle get overCurrentContext => OVER_CURRENT_CONTEXT;
+
+  ///Convenience getter for [OVER_FULL_SCREEN].
+  static ModalPresentationStyle get overFullScreen => OVER_FULL_SCREEN;
+
+  ///Convenience getter for [PAGE_SHEET].
+  static ModalPresentationStyle get pageSheet => PAGE_SHEET;
+
   ///Gets a possible [ModalPresentationStyle] instance from [int] value.
   static ModalPresentationStyle? fromValue(int? value) {
     if (value != null) {

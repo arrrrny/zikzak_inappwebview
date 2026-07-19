@@ -1316,6 +1316,202 @@ class WebResourceErrorType {
     WebResourceErrorType.ZERO_BYTE_RESOURCE,
   ].toSet();
 
+  ///Convenience getter for [APP_TRANSPORT_SECURITY_REQUIRES_SECURE_CONNECTION].
+  static WebResourceErrorType
+  get appTransportSecurityRequiresSecureConnection =>
+      APP_TRANSPORT_SECURITY_REQUIRES_SECURE_CONNECTION;
+
+  ///Convenience getter for [BACKGROUND_SESSION_IN_USE_BY_ANOTHER_PROCESS].
+  static WebResourceErrorType get backgroundSessionInUseByAnotherProcess =>
+      BACKGROUND_SESSION_IN_USE_BY_ANOTHER_PROCESS;
+
+  ///Convenience getter for [BACKGROUND_SESSION_REQUIRES_SHARED_CONTAINER].
+  static WebResourceErrorType get backgroundSessionRequiresSharedContainer =>
+      BACKGROUND_SESSION_REQUIRES_SHARED_CONTAINER;
+
+  ///Convenience getter for [BACKGROUND_SESSION_WAS_DISCONNECTED].
+  static WebResourceErrorType get backgroundSessionWasDisconnected =>
+      BACKGROUND_SESSION_WAS_DISCONNECTED;
+
+  ///Convenience getter for [BAD_SERVER_RESPONSE].
+  static WebResourceErrorType get badServerResponse => BAD_SERVER_RESPONSE;
+
+  ///Convenience getter for [BAD_URL].
+  static WebResourceErrorType get badUrl => BAD_URL;
+
+  ///Convenience getter for [CALL_IS_ACTIVE].
+  static WebResourceErrorType get callIsActive => CALL_IS_ACTIVE;
+
+  ///Convenience getter for [CANNOT_CLOSE_FILE].
+  static WebResourceErrorType get cannotCloseFile => CANNOT_CLOSE_FILE;
+
+  ///Convenience getter for [CANNOT_CONNECT_TO_HOST].
+  static WebResourceErrorType get cannotConnectToHost => CANNOT_CONNECT_TO_HOST;
+
+  ///Convenience getter for [CANNOT_CREATE_FILE].
+  static WebResourceErrorType get cannotCreateFile => CANNOT_CREATE_FILE;
+
+  ///Convenience getter for [CANNOT_DECODE_CONTENT_DATA].
+  static WebResourceErrorType get cannotDecodeContentData =>
+      CANNOT_DECODE_CONTENT_DATA;
+
+  ///Convenience getter for [CANNOT_DECODE_RAW_DATA].
+  static WebResourceErrorType get cannotDecodeRawData => CANNOT_DECODE_RAW_DATA;
+
+  ///Convenience getter for [CANNOT_LOAD_FROM_NETWORK].
+  static WebResourceErrorType get cannotLoadFromNetwork =>
+      CANNOT_LOAD_FROM_NETWORK;
+
+  ///Convenience getter for [CANNOT_MOVE_FILE].
+  static WebResourceErrorType get cannotMoveFile => CANNOT_MOVE_FILE;
+
+  ///Convenience getter for [CANNOT_OPEN_FILE].
+  static WebResourceErrorType get cannotOpenFile => CANNOT_OPEN_FILE;
+
+  ///Convenience getter for [CANNOT_PARSE_RESPONSE].
+  static WebResourceErrorType get cannotParseResponse => CANNOT_PARSE_RESPONSE;
+
+  ///Convenience getter for [CANNOT_REMOVE_FILE].
+  static WebResourceErrorType get cannotRemoveFile => CANNOT_REMOVE_FILE;
+
+  ///Convenience getter for [CANNOT_WRITE_TO_FILE].
+  static WebResourceErrorType get cannotWriteToFile => CANNOT_WRITE_TO_FILE;
+
+  ///Convenience getter for [CLIENT_CERTIFICATE_REJECTED].
+  static WebResourceErrorType get clientCertificateRejected =>
+      CLIENT_CERTIFICATE_REJECTED;
+
+  ///Convenience getter for [CLIENT_CERTIFICATE_REQUIRED].
+  static WebResourceErrorType get clientCertificateRequired =>
+      CLIENT_CERTIFICATE_REQUIRED;
+
+  ///Convenience getter for [CONNECTION_ABORTED].
+  static WebResourceErrorType get connectionAborted => CONNECTION_ABORTED;
+
+  ///Convenience getter for [DATA_LENGTH_EXCEEDS_MAXIMUM].
+  static WebResourceErrorType get dataLengthExceedsMaximum =>
+      DATA_LENGTH_EXCEEDS_MAXIMUM;
+
+  ///Convenience getter for [DATA_NOT_ALLOWED].
+  static WebResourceErrorType get dataNotAllowed => DATA_NOT_ALLOWED;
+
+  ///Convenience getter for [DOWNLOAD_DECODING_FAILED_MID_STREAM].
+  static WebResourceErrorType get downloadDecodingFailedMidStream =>
+      DOWNLOAD_DECODING_FAILED_MID_STREAM;
+
+  ///Convenience getter for [DOWNLOAD_DECODING_FAILED_TO_COMPLETE].
+  static WebResourceErrorType get downloadDecodingFailedToComplete =>
+      DOWNLOAD_DECODING_FAILED_TO_COMPLETE;
+
+  ///Convenience getter for [FAILED_SSL_HANDSHAKE].
+  static WebResourceErrorType get failedSslHandshake => FAILED_SSL_HANDSHAKE;
+
+  ///Convenience getter for [FILE_IS_DIRECTORY].
+  static WebResourceErrorType get fileIsDirectory => FILE_IS_DIRECTORY;
+
+  ///Convenience getter for [FILE_NOT_FOUND].
+  static WebResourceErrorType get fileNotFound => FILE_NOT_FOUND;
+
+  ///Convenience getter for [GENERIC_FILE_ERROR].
+  static WebResourceErrorType get genericFileError => GENERIC_FILE_ERROR;
+
+  ///Convenience getter for [HOST_LOOKUP].
+  static WebResourceErrorType get hostLookup => HOST_LOOKUP;
+
+  ///Convenience getter for [INTERNATIONAL_ROAMING_OFF].
+  static WebResourceErrorType get internationalRoamingOff =>
+      INTERNATIONAL_ROAMING_OFF;
+
+  ///Convenience getter for [NETWORK_CONNECTION_LOST].
+  static WebResourceErrorType get networkConnectionLost =>
+      NETWORK_CONNECTION_LOST;
+
+  ///Convenience getter for [NOT_CONNECTED_TO_INTERNET].
+  static WebResourceErrorType get notConnectedToInternet =>
+      NOT_CONNECTED_TO_INTERNET;
+
+  ///Convenience getter for [NO_PERMISSIONS_TO_READ_FILE].
+  static WebResourceErrorType get noPermissionsToReadFile =>
+      NO_PERMISSIONS_TO_READ_FILE;
+
+  ///Convenience getter for [PROXY_AUTHENTICATION].
+  static WebResourceErrorType get proxyAuthentication => PROXY_AUTHENTICATION;
+
+  ///Convenience getter for [REDIRECT_FAILED].
+  static WebResourceErrorType get redirectFailed => REDIRECT_FAILED;
+
+  ///Convenience getter for [REDIRECT_TO_NON_EXISTENT_LOCATION].
+  static WebResourceErrorType get redirectToNonExistentLocation =>
+      REDIRECT_TO_NON_EXISTENT_LOCATION;
+
+  ///Convenience getter for [REQUEST_BODY_STREAM_EXHAUSTED].
+  static WebResourceErrorType get requestBodyStreamExhausted =>
+      REQUEST_BODY_STREAM_EXHAUSTED;
+
+  ///Convenience getter for [RESOURCE_UNAVAILABLE].
+  static WebResourceErrorType get resourceUnavailable => RESOURCE_UNAVAILABLE;
+
+  ///Convenience getter for [SECURE_CONNECTION_FAILED].
+  static WebResourceErrorType get secureConnectionFailed =>
+      SECURE_CONNECTION_FAILED;
+
+  ///Convenience getter for [SERVER_CERTIFICATE_HAS_BAD_DATE].
+  static WebResourceErrorType get serverCertificateHasBadDate =>
+      SERVER_CERTIFICATE_HAS_BAD_DATE;
+
+  ///Convenience getter for [SERVER_CERTIFICATE_HAS_UNKNOWN_ROOT].
+  static WebResourceErrorType get serverCertificateHasUnknownRoot =>
+      SERVER_CERTIFICATE_HAS_UNKNOWN_ROOT;
+
+  ///Convenience getter for [SERVER_CERTIFICATE_NOT_YET_VALID].
+  static WebResourceErrorType get serverCertificateNotYetValid =>
+      SERVER_CERTIFICATE_NOT_YET_VALID;
+
+  ///Convenience getter for [SERVER_CERTIFICATE_UNTRUSTED].
+  static WebResourceErrorType get serverCertificateUntrusted =>
+      SERVER_CERTIFICATE_UNTRUSTED;
+
+  ///Convenience getter for [SERVER_UNREACHABLE].
+  static WebResourceErrorType get serverUnreachable => SERVER_UNREACHABLE;
+
+  ///Convenience getter for [TOO_MANY_REDIRECTS].
+  static WebResourceErrorType get tooManyRedirects => TOO_MANY_REDIRECTS;
+
+  ///Convenience getter for [TOO_MANY_REQUESTS].
+  static WebResourceErrorType get tooManyRequests => TOO_MANY_REQUESTS;
+
+  ///Convenience getter for [UNEXPECTED_ERROR].
+  static WebResourceErrorType get unexpectedError => UNEXPECTED_ERROR;
+
+  ///Convenience getter for [UNSAFE_RESOURCE].
+  static WebResourceErrorType get unsafeResource => UNSAFE_RESOURCE;
+
+  ///Convenience getter for [UNSUPPORTED_AUTH_SCHEME].
+  static WebResourceErrorType get unsupportedAuthScheme =>
+      UNSUPPORTED_AUTH_SCHEME;
+
+  ///Convenience getter for [UNSUPPORTED_SCHEME].
+  static WebResourceErrorType get unsupportedScheme => UNSUPPORTED_SCHEME;
+
+  ///Convenience getter for [USER_AUTHENTICATION_FAILED].
+  static WebResourceErrorType get userAuthenticationFailed =>
+      USER_AUTHENTICATION_FAILED;
+
+  ///Convenience getter for [USER_AUTHENTICATION_REQUIRED].
+  static WebResourceErrorType get userAuthenticationRequired =>
+      USER_AUTHENTICATION_REQUIRED;
+
+  ///Convenience getter for [USER_CANCELLED_AUTHENTICATION].
+  static WebResourceErrorType get userCancelledAuthentication =>
+      USER_CANCELLED_AUTHENTICATION;
+
+  ///Convenience getter for [VALID_PROXY_AUTHENTICATION_REQUIRED].
+  static WebResourceErrorType get validProxyAuthenticationRequired =>
+      VALID_PROXY_AUTHENTICATION_REQUIRED;
+
+  ///Convenience getter for [ZERO_BYTE_RESOURCE].
+  static WebResourceErrorType get zeroByteResource => ZERO_BYTE_RESOURCE;
+
   ///Gets a possible [WebResourceErrorType] instance from [String] value.
   static WebResourceErrorType? fromValue(String? value) {
     if (value != null) {

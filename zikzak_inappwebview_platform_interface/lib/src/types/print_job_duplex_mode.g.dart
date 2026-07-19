@@ -92,6 +92,12 @@ class PrintJobDuplexMode {
     PrintJobDuplexMode.SHORT_EDGE,
   ].toSet();
 
+  ///Convenience getter for [LONG_EDGE].
+  static PrintJobDuplexMode get longEdge => LONG_EDGE;
+
+  ///Convenience getter for [SHORT_EDGE].
+  static PrintJobDuplexMode get shortEdge => SHORT_EDGE;
+
   ///Gets a possible [PrintJobDuplexMode] instance from [String] value.
   static PrintJobDuplexMode? fromValue(String? value) {
     if (value != null) {

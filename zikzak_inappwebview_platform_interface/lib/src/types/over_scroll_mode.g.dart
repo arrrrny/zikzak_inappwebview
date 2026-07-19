@@ -34,6 +34,9 @@ class OverScrollMode {
     OverScrollMode.NEVER,
   ].toSet();
 
+  ///Convenience getter for [IF_CONTENT_SCROLLS].
+  static OverScrollMode get ifContentScrolls => IF_CONTENT_SCROLLS;
+
   ///Gets a possible [OverScrollMode] instance from [int] value.
   static OverScrollMode? fromValue(int? value) {
     if (value != null) {

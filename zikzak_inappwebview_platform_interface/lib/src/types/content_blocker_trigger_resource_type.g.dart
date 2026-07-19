@@ -63,6 +63,12 @@ class ContentBlockerTriggerResourceType {
     ContentBlockerTriggerResourceType.SVG_DOCUMENT,
   ].toSet();
 
+  ///Convenience getter for [STYLE_SHEET].
+  static ContentBlockerTriggerResourceType get styleSheet => STYLE_SHEET;
+
+  ///Convenience getter for [SVG_DOCUMENT].
+  static ContentBlockerTriggerResourceType get svgDocument => SVG_DOCUMENT;
+
   ///Gets a possible [ContentBlockerTriggerResourceType] instance from [String] value.
   static ContentBlockerTriggerResourceType? fromValue(String? value) {
     if (value != null) {

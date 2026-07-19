@@ -33,6 +33,12 @@ class TracingMode {
     TracingMode.RECORD_UNTIL_FULL,
   ].toSet();
 
+  ///Convenience getter for [RECORD_CONTINUOUSLY].
+  static TracingMode get recordContinuously => RECORD_CONTINUOUSLY;
+
+  ///Convenience getter for [RECORD_UNTIL_FULL].
+  static TracingMode get recordUntilFull => RECORD_UNTIL_FULL;
+
   ///Gets a possible [TracingMode] instance from [int] value.
   static TracingMode? fromValue(int? value) {
     if (value != null) {

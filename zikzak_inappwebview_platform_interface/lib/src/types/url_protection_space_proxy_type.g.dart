@@ -53,6 +53,22 @@ class URLProtectionSpaceProxyType {
     URLProtectionSpaceProxyType.URL_PROTECTION_SPACE_SOCKS_PROXY,
   ].toSet();
 
+  ///Convenience getter for [URL_PROTECTION_SPACE_FTP_PROXY].
+  static URLProtectionSpaceProxyType get urlProtectionSpaceFtpProxy =>
+      URL_PROTECTION_SPACE_FTP_PROXY;
+
+  ///Convenience getter for [URL_PROTECTION_SPACE_HTTPS_PROXY].
+  static URLProtectionSpaceProxyType get urlProtectionSpaceHttpsProxy =>
+      URL_PROTECTION_SPACE_HTTPS_PROXY;
+
+  ///Convenience getter for [URL_PROTECTION_SPACE_HTTP_PROXY].
+  static URLProtectionSpaceProxyType get urlProtectionSpaceHttpProxy =>
+      URL_PROTECTION_SPACE_HTTP_PROXY;
+
+  ///Convenience getter for [URL_PROTECTION_SPACE_SOCKS_PROXY].
+  static URLProtectionSpaceProxyType get urlProtectionSpaceSocksProxy =>
+      URL_PROTECTION_SPACE_SOCKS_PROXY;
+
   ///Gets a possible [URLProtectionSpaceProxyType] instance from [String] value.
   static URLProtectionSpaceProxyType? fromValue(String? value) {
     if (value != null) {

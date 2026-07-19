@@ -59,6 +59,25 @@ class URLProtectionSpaceAuthenticationMethod {
         .NSURL_AUTHENTICATION_METHOD_SERVER_TRUST,
   ].toSet();
 
+  ///Convenience getter for [NSURL_AUTHENTICATION_METHOD_CLIENT_CERTIFICATE].
+  static URLProtectionSpaceAuthenticationMethod
+  get nsurlAuthenticationMethodClientCertificate =>
+      NSURL_AUTHENTICATION_METHOD_CLIENT_CERTIFICATE;
+
+  ///Convenience getter for [NSURL_AUTHENTICATION_METHOD_NEGOTIATE].
+  static URLProtectionSpaceAuthenticationMethod
+  get nsurlAuthenticationMethodNegotiate =>
+      NSURL_AUTHENTICATION_METHOD_NEGOTIATE;
+
+  ///Convenience getter for [NSURL_AUTHENTICATION_METHOD_NTLM].
+  static URLProtectionSpaceAuthenticationMethod
+  get nsurlAuthenticationMethodNtlm => NSURL_AUTHENTICATION_METHOD_NTLM;
+
+  ///Convenience getter for [NSURL_AUTHENTICATION_METHOD_SERVER_TRUST].
+  static URLProtectionSpaceAuthenticationMethod
+  get nsurlAuthenticationMethodServerTrust =>
+      NSURL_AUTHENTICATION_METHOD_SERVER_TRUST;
+
   ///Gets a possible [URLProtectionSpaceAuthenticationMethod] instance from [String] value.
   static URLProtectionSpaceAuthenticationMethod? fromValue(String? value) {
     if (value != null) {

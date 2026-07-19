@@ -35,6 +35,17 @@ class WebAuthenticationSessionError {
     WebAuthenticationSessionError.PRESENTATION_CONTEXT_NOT_PROVIDED,
   ].toSet();
 
+  ///Convenience getter for [CANCELED_LOGIN].
+  static WebAuthenticationSessionError get canceledLogin => CANCELED_LOGIN;
+
+  ///Convenience getter for [PRESENTATION_CONTEXT_INVALID].
+  static WebAuthenticationSessionError get presentationContextInvalid =>
+      PRESENTATION_CONTEXT_INVALID;
+
+  ///Convenience getter for [PRESENTATION_CONTEXT_NOT_PROVIDED].
+  static WebAuthenticationSessionError get presentationContextNotProvided =>
+      PRESENTATION_CONTEXT_NOT_PROVIDED;
+
   ///Gets a possible [WebAuthenticationSessionError] instance from [int] value.
   static WebAuthenticationSessionError? fromValue(int? value) {
     if (value != null) {

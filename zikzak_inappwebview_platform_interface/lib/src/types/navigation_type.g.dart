@@ -153,6 +153,18 @@ class NavigationType {
     NavigationType.RELOAD,
   ].toSet();
 
+  ///Convenience getter for [BACK_FORWARD].
+  static NavigationType get backForward => BACK_FORWARD;
+
+  ///Convenience getter for [FORM_RESUBMITTED].
+  static NavigationType get formResubmitted => FORM_RESUBMITTED;
+
+  ///Convenience getter for [FORM_SUBMITTED].
+  static NavigationType get formSubmitted => FORM_SUBMITTED;
+
+  ///Convenience getter for [LINK_ACTIVATED].
+  static NavigationType get linkActivated => LINK_ACTIVATED;
+
   ///Gets a possible [NavigationType] instance from [String] value.
   static NavigationType? fromValue(String? value) {
     if (value != null) {

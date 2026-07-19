@@ -42,6 +42,12 @@ class LayoutAlgorithm {
     LayoutAlgorithm.TEXT_AUTOSIZING,
   ].toSet();
 
+  ///Convenience getter for [NARROW_COLUMNS].
+  static LayoutAlgorithm get narrowColumns => NARROW_COLUMNS;
+
+  ///Convenience getter for [TEXT_AUTOSIZING].
+  static LayoutAlgorithm get textAutosizing => TEXT_AUTOSIZING;
+
   ///Gets a possible [LayoutAlgorithm] instance from [String] value.
   static LayoutAlgorithm? fromValue(String? value) {
     if (value != null) {

@@ -26,9 +26,7 @@ class TracingController {
 
   ///Gets the [TracingController] shared instance.
   static TracingController instance() {
-    if (_instance == null) {
-      _instance = TracingController();
-    }
+    _instance ??= TracingController();
     return _instance!;
   }
 

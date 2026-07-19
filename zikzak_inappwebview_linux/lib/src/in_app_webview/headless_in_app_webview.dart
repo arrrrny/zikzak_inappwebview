@@ -187,7 +187,7 @@ class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
   LinuxHeadlessInAppWebViewCreationParams get _linuxParams =>
       params as LinuxHeadlessInAppWebViewCreationParams;
 
-  _init() {
+  void _init() {
     _webViewController = LinuxInAppWebViewController(
       PlatformInAppWebViewControllerCreationParams(
         id: id,

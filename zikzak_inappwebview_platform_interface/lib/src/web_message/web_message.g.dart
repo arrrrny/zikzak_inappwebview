@@ -31,6 +31,9 @@ class WebMessageType {
     WebMessageType.STRING,
   ].toSet();
 
+  ///Convenience getter for [ARRAY_BUFFER].
+  static WebMessageType get arrayBuffer => ARRAY_BUFFER;
+
   ///Gets a possible [WebMessageType] instance from [int] value.
   static WebMessageType? fromValue(int? value) {
     if (value != null) {

@@ -41,6 +41,9 @@ class AjaxRequestReadyState {
     AjaxRequestReadyState.UNSENT,
   ].toSet();
 
+  ///Convenience getter for [HEADERS_RECEIVED].
+  static AjaxRequestReadyState get headersReceived => HEADERS_RECEIVED;
+
   ///Gets a possible [AjaxRequestReadyState] instance from [int] value.
   static AjaxRequestReadyState? fromValue(int? value) {
     if (value != null) {

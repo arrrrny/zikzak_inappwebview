@@ -141,6 +141,19 @@ class ContentBlockerActionType {
     ContentBlockerActionType.MAKE_HTTPS,
   ].toSet();
 
+  ///Convenience getter for [BLOCK_COOKIES].
+  static ContentBlockerActionType get blockCookies => BLOCK_COOKIES;
+
+  ///Convenience getter for [CSS_DISPLAY_NONE].
+  static ContentBlockerActionType get cssDisplayNone => CSS_DISPLAY_NONE;
+
+  ///Convenience getter for [IGNORE_PREVIOUS_RULES].
+  static ContentBlockerActionType get ignorePreviousRules =>
+      IGNORE_PREVIOUS_RULES;
+
+  ///Convenience getter for [MAKE_HTTPS].
+  static ContentBlockerActionType get makeHttps => MAKE_HTTPS;
+
   ///Gets a possible [ContentBlockerActionType] instance from [String] value.
   static ContentBlockerActionType? fromValue(String? value) {
     if (value != null) {

@@ -31,7 +31,7 @@ class InAppWebView extends StatefulWidget {
        );
 
   /// Constructs a [InAppWebView] from a specific platform implementation.
-  InAppWebView.fromPlatform({super.key, required this.platform});
+  const InAppWebView.fromPlatform({super.key, required this.platform});
 
   /// Implementation of [PlatformInAppWebView] for the current platform.
   final PlatformInAppWebViewWidget platform;
@@ -312,7 +312,7 @@ class InAppWebView extends StatefulWidget {
                : null,
            onLoadStop: (controller, url) {
              onLoadStop?.call(controller, url);
-             if (initialSettings?.dismissDialogues ?? false)
+             if (initialSettings?.dismissDialogues ?? false) {
                () async {
                  try {
                    for (var i = 0; i < 3; i++) {
@@ -338,11 +338,13 @@ class InAppWebView extends StatefulWidget {
                           })();
                         ''',
                      );
-                     if (i < 2)
+                     if (i < 2) {
                        await Future.delayed(const Duration(milliseconds: 800));
+                     }
                    }
                  } catch (_) {}
                }();
+             }
            },
            onReceivedError: onReceivedError != null
                ? (controller, request, error) =>

@@ -36,6 +36,18 @@ class CacheMode {
     CacheMode.LOAD_NO_CACHE,
   ].toSet();
 
+  ///Convenience getter for [LOAD_CACHE_ELSE_NETWORK].
+  static CacheMode get loadCacheElseNetwork => LOAD_CACHE_ELSE_NETWORK;
+
+  ///Convenience getter for [LOAD_CACHE_ONLY].
+  static CacheMode get loadCacheOnly => LOAD_CACHE_ONLY;
+
+  ///Convenience getter for [LOAD_DEFAULT].
+  static CacheMode get loadDefault => LOAD_DEFAULT;
+
+  ///Convenience getter for [LOAD_NO_CACHE].
+  static CacheMode get loadNoCache => LOAD_NO_CACHE;
+
   ///Gets a possible [CacheMode] instance from [int] value.
   static CacheMode? fromValue(int? value) {
     if (value != null) {

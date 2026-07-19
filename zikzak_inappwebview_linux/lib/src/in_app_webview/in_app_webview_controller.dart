@@ -18,9 +18,9 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
   }
 
   LinuxInAppWebViewController.fromInAppBrowser(
-    PlatformInAppWebViewControllerCreationParams params,
+    super.params,
     MethodChannel channel,
-  ) : super.implementation(params) {
+  ) : super.implementation() {
     _channel = channel;
   }
 

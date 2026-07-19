@@ -96,9 +96,15 @@ class URLRequest {
 
   ///The timeout interval of the request.
   ///
+  /// On iOS/macOS this maps to the native `URLRequest.timeoutInterval`.
+  /// On Android this triggers a `WebView.stopLoading()` after the interval,
+  /// so whatever HTML has been rendered so far is available for extraction
+  /// (smart timeout — no hard failure).
+  ///
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLRequest.timeoutInterval](https://developer.apple.com/documentation/foundation/urlrequest/2011509-timeoutinterval))
   ///- MacOS ([Official API - URLRequest.timeoutInterval](https://developer.apple.com/documentation/foundation/urlrequest/2011509-timeoutinterval))
+  ///- Android native WebView (Official API - URLRequest.timeoutInterval)
   double? timeoutInterval;
 
   ///The URL of the request. Setting this to `null` will load `about:blank`.

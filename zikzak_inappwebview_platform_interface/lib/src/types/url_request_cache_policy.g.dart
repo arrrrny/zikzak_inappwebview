@@ -71,6 +71,30 @@ class URLRequestCachePolicy {
     URLRequestCachePolicy.USE_PROTOCOL_CACHE_POLICY,
   ].toSet();
 
+  ///Convenience getter for [RELOAD_IGNORING_LOCAL_AND_REMOTE_CACHE_DATA].
+  static URLRequestCachePolicy get reloadIgnoringLocalAndRemoteCacheData =>
+      RELOAD_IGNORING_LOCAL_AND_REMOTE_CACHE_DATA;
+
+  ///Convenience getter for [RELOAD_IGNORING_LOCAL_CACHE_DATA].
+  static URLRequestCachePolicy get reloadIgnoringLocalCacheData =>
+      RELOAD_IGNORING_LOCAL_CACHE_DATA;
+
+  ///Convenience getter for [RELOAD_REVALIDATING_CACHE_DATA].
+  static URLRequestCachePolicy get reloadRevalidatingCacheData =>
+      RELOAD_REVALIDATING_CACHE_DATA;
+
+  ///Convenience getter for [RETURN_CACHE_DATA_DONT_LOAD].
+  static URLRequestCachePolicy get returnCacheDataDontLoad =>
+      RETURN_CACHE_DATA_DONT_LOAD;
+
+  ///Convenience getter for [RETURN_CACHE_DATA_ELSE_LOAD].
+  static URLRequestCachePolicy get returnCacheDataElseLoad =>
+      RETURN_CACHE_DATA_ELSE_LOAD;
+
+  ///Convenience getter for [USE_PROTOCOL_CACHE_POLICY].
+  static URLRequestCachePolicy get useProtocolCachePolicy =>
+      USE_PROTOCOL_CACHE_POLICY;
+
   ///Gets a possible [URLRequestCachePolicy] instance from [int] value.
   static URLRequestCachePolicy? fromValue(int? value) {
     if (value != null) {

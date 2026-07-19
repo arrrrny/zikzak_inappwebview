@@ -42,6 +42,18 @@ class MixedContentMode {
     MixedContentMode.MIXED_CONTENT_NEVER_ALLOW,
   ].toSet();
 
+  ///Convenience getter for [MIXED_CONTENT_ALWAYS_ALLOW].
+  static MixedContentMode get mixedContentAlwaysAllow =>
+      MIXED_CONTENT_ALWAYS_ALLOW;
+
+  ///Convenience getter for [MIXED_CONTENT_COMPATIBILITY_MODE].
+  static MixedContentMode get mixedContentCompatibilityMode =>
+      MIXED_CONTENT_COMPATIBILITY_MODE;
+
+  ///Convenience getter for [MIXED_CONTENT_NEVER_ALLOW].
+  static MixedContentMode get mixedContentNeverAllow =>
+      MIXED_CONTENT_NEVER_ALLOW;
+
   ///Gets a possible [MixedContentMode] instance from [int] value.
   static MixedContentMode? fromValue(int? value) {
     if (value != null) {

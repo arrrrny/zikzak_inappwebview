@@ -23,17 +23,22 @@ class WebMessagePort implements IWebMessagePort {
   final PlatformWebMessagePort platform;
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformWebMessagePort.setWebMessageCallback}
+  @override
   Future<void> setWebMessageCallback(WebMessageCallback? onMessage) =>
       platform.setWebMessageCallback(onMessage);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformWebMessagePort.postMessage}
+  @override
   Future<void> postMessage(WebMessage message) => platform.postMessage(message);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformWebMessagePort.close}
+  @override
   Future<void> close() => platform.close();
 
+  @override
   Map<String, dynamic> toMap() => platform.toMap();
 
+  @override
   Map<String, dynamic> toJson() => platform.toJson();
 
   @override

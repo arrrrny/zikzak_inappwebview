@@ -105,6 +105,44 @@ class Sandbox {
     Sandbox.ALLOW_TOP_NAVIGATION_BY_USER_ACTIVATION,
   ].toSet();
 
+  ///Convenience getter for [ALLOW_DOWNLOADS].
+  static Sandbox get allowDownloads => ALLOW_DOWNLOADS;
+
+  ///Convenience getter for [ALLOW_FORMS].
+  static Sandbox get allowForms => ALLOW_FORMS;
+
+  ///Convenience getter for [ALLOW_MODALS].
+  static Sandbox get allowModals => ALLOW_MODALS;
+
+  ///Convenience getter for [ALLOW_ORIENTATION_LOCK].
+  static Sandbox get allowOrientationLock => ALLOW_ORIENTATION_LOCK;
+
+  ///Convenience getter for [ALLOW_POINTER_LOCK].
+  static Sandbox get allowPointerLock => ALLOW_POINTER_LOCK;
+
+  ///Convenience getter for [ALLOW_POPUPS].
+  static Sandbox get allowPopups => ALLOW_POPUPS;
+
+  ///Convenience getter for [ALLOW_POPUPS_TO_ESCAPE_SANDBOX].
+  static Sandbox get allowPopupsToEscapeSandbox =>
+      ALLOW_POPUPS_TO_ESCAPE_SANDBOX;
+
+  ///Convenience getter for [ALLOW_PRESENTATION].
+  static Sandbox get allowPresentation => ALLOW_PRESENTATION;
+
+  ///Convenience getter for [ALLOW_SAME_ORIGIN].
+  static Sandbox get allowSameOrigin => ALLOW_SAME_ORIGIN;
+
+  ///Convenience getter for [ALLOW_SCRIPTS].
+  static Sandbox get allowScripts => ALLOW_SCRIPTS;
+
+  ///Convenience getter for [ALLOW_TOP_NAVIGATION].
+  static Sandbox get allowTopNavigation => ALLOW_TOP_NAVIGATION;
+
+  ///Convenience getter for [ALLOW_TOP_NAVIGATION_BY_USER_ACTIVATION].
+  static Sandbox get allowTopNavigationByUserActivation =>
+      ALLOW_TOP_NAVIGATION_BY_USER_ACTIVATION;
+
   ///Gets a possible [Sandbox] instance from a native value.
   static Sandbox? fromNativeValue(String? value) {
     if (value == null) {

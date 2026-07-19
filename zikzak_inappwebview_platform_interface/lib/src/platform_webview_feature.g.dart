@@ -391,6 +391,189 @@ class WebViewFeature {
     WebViewFeature.WEB_VIEW_RENDERER_TERMINATE,
   ].toSet();
 
+  ///Convenience getter for [ALGORITHMIC_DARKENING].
+  static WebViewFeature get algorithmicDarkening => ALGORITHMIC_DARKENING;
+
+  ///Convenience getter for [CREATE_WEB_MESSAGE_CHANNEL].
+  static WebViewFeature get createWebMessageChannel =>
+      CREATE_WEB_MESSAGE_CHANNEL;
+
+  ///Convenience getter for [DISABLED_ACTION_MODE_MENU_ITEMS].
+  static WebViewFeature get disabledActionModeMenuItems =>
+      DISABLED_ACTION_MODE_MENU_ITEMS;
+
+  ///Convenience getter for [DOCUMENT_START_SCRIPT].
+  static WebViewFeature get documentStartScript => DOCUMENT_START_SCRIPT;
+
+  ///Convenience getter for [ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY].
+  static WebViewFeature get enterpriseAuthenticationAppLinkPolicy =>
+      ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY;
+
+  ///Convenience getter for [FORCE_DARK].
+  static WebViewFeature get forceDark => FORCE_DARK;
+
+  ///Convenience getter for [FORCE_DARK_STRATEGY].
+  static WebViewFeature get forceDarkStrategy => FORCE_DARK_STRATEGY;
+
+  ///Convenience getter for [GET_COOKIE_INFO].
+  static WebViewFeature get getCookieInfo => GET_COOKIE_INFO;
+
+  ///Convenience getter for [GET_VARIATIONS_HEADER].
+  static WebViewFeature get getVariationsHeader => GET_VARIATIONS_HEADER;
+
+  ///Convenience getter for [GET_WEB_CHROME_CLIENT].
+  static WebViewFeature get getWebChromeClient => GET_WEB_CHROME_CLIENT;
+
+  ///Convenience getter for [GET_WEB_VIEW_CLIENT].
+  static WebViewFeature get getWebViewClient => GET_WEB_VIEW_CLIENT;
+
+  ///Convenience getter for [GET_WEB_VIEW_RENDERER].
+  static WebViewFeature get getWebViewRenderer => GET_WEB_VIEW_RENDERER;
+
+  ///Convenience getter for [MULTI_PROCESS].
+  static WebViewFeature get multiProcess => MULTI_PROCESS;
+
+  ///Convenience getter for [OFF_SCREEN_PRERASTER].
+  static WebViewFeature get offScreenPreraster => OFF_SCREEN_PRERASTER;
+
+  ///Convenience getter for [PAYMENT_REQUEST].
+  static WebViewFeature get paymentRequest => PAYMENT_REQUEST;
+
+  ///Convenience getter for [POST_WEB_MESSAGE].
+  static WebViewFeature get postWebMessage => POST_WEB_MESSAGE;
+
+  ///Convenience getter for [PROXY_OVERRIDE].
+  static WebViewFeature get proxyOverride => PROXY_OVERRIDE;
+
+  ///Convenience getter for [PROXY_OVERRIDE_REVERSE_BYPASS].
+  static WebViewFeature get proxyOverrideReverseBypass =>
+      PROXY_OVERRIDE_REVERSE_BYPASS;
+
+  ///Convenience getter for [RECEIVE_HTTP_ERROR].
+  static WebViewFeature get receiveHttpError => RECEIVE_HTTP_ERROR;
+
+  ///Convenience getter for [RECEIVE_WEB_RESOURCE_ERROR].
+  static WebViewFeature get receiveWebResourceError =>
+      RECEIVE_WEB_RESOURCE_ERROR;
+
+  ///Convenience getter for [REQUESTED_WITH_HEADER_ALLOW_LIST].
+  static WebViewFeature get requestedWithHeaderAllowList =>
+      REQUESTED_WITH_HEADER_ALLOW_LIST;
+
+  ///Convenience getter for [SAFE_BROWSING_ALLOWLIST].
+  static WebViewFeature get safeBrowsingAllowlist => SAFE_BROWSING_ALLOWLIST;
+
+  ///Convenience getter for [SAFE_BROWSING_ENABLE].
+  static WebViewFeature get safeBrowsingEnable => SAFE_BROWSING_ENABLE;
+
+  ///Convenience getter for [SAFE_BROWSING_HIT].
+  static WebViewFeature get safeBrowsingHit => SAFE_BROWSING_HIT;
+
+  ///Convenience getter for [SAFE_BROWSING_PRIVACY_POLICY_URL].
+  static WebViewFeature get safeBrowsingPrivacyPolicyUrl =>
+      SAFE_BROWSING_PRIVACY_POLICY_URL;
+
+  ///Convenience getter for [SAFE_BROWSING_RESPONSE_BACK_TO_SAFETY].
+  static WebViewFeature get safeBrowsingResponseBackToSafety =>
+      SAFE_BROWSING_RESPONSE_BACK_TO_SAFETY;
+
+  ///Convenience getter for [SAFE_BROWSING_RESPONSE_PROCEED].
+  static WebViewFeature get safeBrowsingResponseProceed =>
+      SAFE_BROWSING_RESPONSE_PROCEED;
+
+  ///Convenience getter for [SAFE_BROWSING_RESPONSE_SHOW_INTERSTITIAL].
+  static WebViewFeature get safeBrowsingResponseShowInterstitial =>
+      SAFE_BROWSING_RESPONSE_SHOW_INTERSTITIAL;
+
+  ///Convenience getter for [SERVICE_WORKER_BASIC_USAGE].
+  static WebViewFeature get serviceWorkerBasicUsage =>
+      SERVICE_WORKER_BASIC_USAGE;
+
+  ///Convenience getter for [SERVICE_WORKER_BLOCK_NETWORK_LOADS].
+  static WebViewFeature get serviceWorkerBlockNetworkLoads =>
+      SERVICE_WORKER_BLOCK_NETWORK_LOADS;
+
+  ///Convenience getter for [SERVICE_WORKER_CACHE_MODE].
+  static WebViewFeature get serviceWorkerCacheMode => SERVICE_WORKER_CACHE_MODE;
+
+  ///Convenience getter for [SERVICE_WORKER_CONTENT_ACCESS].
+  static WebViewFeature get serviceWorkerContentAccess =>
+      SERVICE_WORKER_CONTENT_ACCESS;
+
+  ///Convenience getter for [SERVICE_WORKER_FILE_ACCESS].
+  static WebViewFeature get serviceWorkerFileAccess =>
+      SERVICE_WORKER_FILE_ACCESS;
+
+  ///Convenience getter for [SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST].
+  static WebViewFeature get serviceWorkerShouldInterceptRequest =>
+      SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST;
+
+  ///Convenience getter for [SHOULD_OVERRIDE_WITH_REDIRECTS].
+  static WebViewFeature get shouldOverrideWithRedirects =>
+      SHOULD_OVERRIDE_WITH_REDIRECTS;
+
+  ///Convenience getter for [STARTUP_FEATURE_SET_DATA_DIRECTORY_SUFFIX].
+  static WebViewFeature get startupFeatureSetDataDirectorySuffix =>
+      STARTUP_FEATURE_SET_DATA_DIRECTORY_SUFFIX;
+
+  ///Convenience getter for [STARTUP_FEATURE_SET_DIRECTORY_BASE_PATHS].
+  static WebViewFeature get startupFeatureSetDirectoryBasePaths =>
+      STARTUP_FEATURE_SET_DIRECTORY_BASE_PATHS;
+
+  ///Convenience getter for [START_SAFE_BROWSING].
+  static WebViewFeature get startSafeBrowsing => START_SAFE_BROWSING;
+
+  ///Convenience getter for [TRACING_CONTROLLER_BASIC_USAGE].
+  static WebViewFeature get tracingControllerBasicUsage =>
+      TRACING_CONTROLLER_BASIC_USAGE;
+
+  ///Convenience getter for [VISUAL_STATE_CALLBACK].
+  static WebViewFeature get visualStateCallback => VISUAL_STATE_CALLBACK;
+
+  ///Convenience getter for [WEB_AUTHENTICATION].
+  static WebViewFeature get webAuthentication => WEB_AUTHENTICATION;
+
+  ///Convenience getter for [WEB_MESSAGE_ARRAY_BUFFER].
+  static WebViewFeature get webMessageArrayBuffer => WEB_MESSAGE_ARRAY_BUFFER;
+
+  ///Convenience getter for [WEB_MESSAGE_CALLBACK_ON_MESSAGE].
+  static WebViewFeature get webMessageCallbackOnMessage =>
+      WEB_MESSAGE_CALLBACK_ON_MESSAGE;
+
+  ///Convenience getter for [WEB_MESSAGE_LISTENER].
+  static WebViewFeature get webMessageListener => WEB_MESSAGE_LISTENER;
+
+  ///Convenience getter for [WEB_MESSAGE_PORT_CLOSE].
+  static WebViewFeature get webMessagePortClose => WEB_MESSAGE_PORT_CLOSE;
+
+  ///Convenience getter for [WEB_MESSAGE_PORT_POST_MESSAGE].
+  static WebViewFeature get webMessagePortPostMessage =>
+      WEB_MESSAGE_PORT_POST_MESSAGE;
+
+  ///Convenience getter for [WEB_MESSAGE_PORT_SET_MESSAGE_CALLBACK].
+  static WebViewFeature get webMessagePortSetMessageCallback =>
+      WEB_MESSAGE_PORT_SET_MESSAGE_CALLBACK;
+
+  ///Convenience getter for [WEB_RESOURCE_ERROR_GET_CODE].
+  static WebViewFeature get webResourceErrorGetCode =>
+      WEB_RESOURCE_ERROR_GET_CODE;
+
+  ///Convenience getter for [WEB_RESOURCE_ERROR_GET_DESCRIPTION].
+  static WebViewFeature get webResourceErrorGetDescription =>
+      WEB_RESOURCE_ERROR_GET_DESCRIPTION;
+
+  ///Convenience getter for [WEB_RESOURCE_REQUEST_IS_REDIRECT].
+  static WebViewFeature get webResourceRequestIsRedirect =>
+      WEB_RESOURCE_REQUEST_IS_REDIRECT;
+
+  ///Convenience getter for [WEB_VIEW_RENDERER_CLIENT_BASIC_USAGE].
+  static WebViewFeature get webViewRendererClientBasicUsage =>
+      WEB_VIEW_RENDERER_CLIENT_BASIC_USAGE;
+
+  ///Convenience getter for [WEB_VIEW_RENDERER_TERMINATE].
+  static WebViewFeature get webViewRendererTerminate =>
+      WEB_VIEW_RENDERER_TERMINATE;
+
   ///Gets a possible [WebViewFeature] instance from [String] value.
   static WebViewFeature? fromValue(String? value) {
     if (value != null) {

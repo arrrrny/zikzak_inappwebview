@@ -12,7 +12,7 @@ class AndroidInAppWebViewController {
   AndroidInAppWebViewController({
     required PlatformInAppWebViewController controller,
   }) {
-    this._controller = controller;
+    _controller = controller;
   }
 
   ///Use [InAppWebViewController.startSafeBrowsing] instead.

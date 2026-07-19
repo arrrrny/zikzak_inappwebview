@@ -42,6 +42,18 @@ class VerticalScrollbarPosition {
     VerticalScrollbarPosition.SCROLLBAR_POSITION_RIGHT,
   ].toSet();
 
+  ///Convenience getter for [SCROLLBAR_POSITION_DEFAULT].
+  static VerticalScrollbarPosition get scrollbarPositionDefault =>
+      SCROLLBAR_POSITION_DEFAULT;
+
+  ///Convenience getter for [SCROLLBAR_POSITION_LEFT].
+  static VerticalScrollbarPosition get scrollbarPositionLeft =>
+      SCROLLBAR_POSITION_LEFT;
+
+  ///Convenience getter for [SCROLLBAR_POSITION_RIGHT].
+  static VerticalScrollbarPosition get scrollbarPositionRight =>
+      SCROLLBAR_POSITION_RIGHT;
+
   ///Gets a possible [VerticalScrollbarPosition] instance from [int] value.
   static VerticalScrollbarPosition? fromValue(int? value) {
     if (value != null) {

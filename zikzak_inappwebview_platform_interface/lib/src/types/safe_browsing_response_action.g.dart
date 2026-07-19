@@ -33,6 +33,12 @@ class SafeBrowsingResponseAction {
     SafeBrowsingResponseAction.SHOW_INTERSTITIAL,
   ].toSet();
 
+  ///Convenience getter for [BACK_TO_SAFETY].
+  static SafeBrowsingResponseAction get backToSafety => BACK_TO_SAFETY;
+
+  ///Convenience getter for [SHOW_INTERSTITIAL].
+  static SafeBrowsingResponseAction get showInterstitial => SHOW_INTERSTITIAL;
+
   ///Gets a possible [SafeBrowsingResponseAction] instance from [int] value.
   static SafeBrowsingResponseAction? fromValue(int? value) {
     if (value != null) {

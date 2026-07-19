@@ -149,6 +149,20 @@ class PermissionResourceType {
     PermissionResourceType.PROTECTED_MEDIA_ID,
   ].toSet();
 
+  ///Convenience getter for [CAMERA_AND_MICROPHONE].
+  static PermissionResourceType get cameraAndMicrophone =>
+      CAMERA_AND_MICROPHONE;
+
+  ///Convenience getter for [DEVICE_ORIENTATION_AND_MOTION].
+  static PermissionResourceType get deviceOrientationAndMotion =>
+      DEVICE_ORIENTATION_AND_MOTION;
+
+  ///Convenience getter for [MIDI_SYSEX].
+  static PermissionResourceType get midiSysex => MIDI_SYSEX;
+
+  ///Convenience getter for [PROTECTED_MEDIA_ID].
+  static PermissionResourceType get protectedMediaId => PROTECTED_MEDIA_ID;
+
   ///Gets a possible [PermissionResourceType] instance from [String] value.
   static PermissionResourceType? fromValue(String? value) {
     if (value != null) {

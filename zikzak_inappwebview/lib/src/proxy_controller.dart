@@ -26,9 +26,7 @@ class ProxyController {
 
   ///Gets the [ProxyController] shared instance.
   static ProxyController instance() {
-    if (_instance == null) {
-      _instance = ProxyController();
-    }
+    _instance ??= ProxyController();
     return _instance!;
   }
 
