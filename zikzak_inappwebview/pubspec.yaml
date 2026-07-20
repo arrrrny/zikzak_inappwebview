@@ -32,6 +32,7 @@ dependencies:
     path: ../zikzak_inappwebview_windows
   zikzak_inappwebview_linux:
     path: ../zikzak_inappwebview_linux
+  synchronized: ^3.4.1
 
 dev_dependencies:
   flutter_test:

@@ -41,6 +41,7 @@ class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
   String _directoryIndex = 'index.html';
   String _documentRoot = './';
   AppLifecycleListener? _appLifecycleListener;
+  Completer<void>? _bindCompleter;
 
   /// Creates a new [DefaultInAppLocalhostServer].
   DefaultInAppLocalhostServer(PlatformInAppLocalhostServerCreationParams params)
@@ -73,63 +74,61 @@ class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
 
   @override
   Future<void> start() async {
-    if (this._started) {
+    if (_started) {
       throw Exception('Server already started on http://localhost:$_port');
     }
-    this._started = true;
+    if (_bindCompleter != null) {
+      return _bindCompleter!.future;
+    }
 
+    _started = true;
+    _bindCompleter = Completer<void>();
     _registerLifecycleListener();
 
-    final completer = Completer();
+    try {
+      _server = await HttpServer.bind('127.0.0.1', _port, shared: _shared);
+      print('Server running on http://localhost:' + _port.toString());
 
-    runZonedGuarded(() {
-      HttpServer.bind('127.0.0.1', _port, shared: _shared).then((server) {
-        print('Server running on http://localhost:' + _port.toString());
+      _server!.listen((HttpRequest request) async {
+        Uint8List body = Uint8List(0);
 
-        this._server = server;
+        var path = request.requestedUri.path;
+        path = (path.startsWith('/')) ? path.substring(1) : path;
+        path += (path.endsWith('/')) ? _directoryIndex : '';
+        if (path == '') {
+          // if the path still empty, try to load the index file
+          path = _directoryIndex;
+        }
+        path = _documentRoot + path;
 
-        server.listen((HttpRequest request) async {
-          Uint8List body = Uint8List(0);
-
-          var path = request.requestedUri.path;
-          path = (path.startsWith('/')) ? path.substring(1) : path;
-          path += (path.endsWith('/')) ? _directoryIndex : '';
-          if (path == '') {
-            // if the path still empty, try to load the index file
-            path = _directoryIndex;
-          }
-          path = _documentRoot + path;
-
-          try {
-            body = (await rootBundle.load(
-              Uri.decodeFull(path),
-            )).buffer.asUint8List();
-          } catch (e) {
-            print(Uri.decodeFull(path));
-            print(e.toString());
-            request.response.close();
-            return;
-          }
-
-          var contentType = ContentType('text', 'html', charset: 'utf-8');
-          if (!request.requestedUri.path.endsWith('/') &&
-              request.requestedUri.pathSegments.isNotEmpty) {
-            final mimeType = MimeTypeResolver.lookup(request.requestedUri.path);
-            if (mimeType != null) {
-              contentType = _getContentTypeFromMimeType(mimeType);
-            }
-          }
-
-          request.response.headers.contentType = contentType;
-          request.response.add(body);
+        try {
+          body = (await rootBundle.load(
+            Uri.decodeFull(path),
+          )).buffer.asUint8List();
+        } catch (e) {
+          print(Uri.decodeFull(path));
+          print(e.toString());
           request.response.close();
-        });
+          return;
+        }
 
-        completer.complete();
+        var contentType = ContentType('text', 'html', charset: 'utf-8');
+        if (!request.requestedUri.path.endsWith('/') &&
+            request.requestedUri.pathSegments.isNotEmpty) {
+          final mimeType = MimeTypeResolver.lookup(request.requestedUri.path);
+          if (mimeType != null) {
+            contentType = _getContentTypeFromMimeType(mimeType);
+          }
+        }
+
+        request.response.headers.contentType = contentType;
+        request.response.add(body);
+        request.response.close();
       });
-    }, (e, stackTrace) => print('Error: $e $stackTrace'));
-
-    return completer.future;
+    } finally {
+      _bindCompleter!.complete();
+      _bindCompleter = null;
+    }
   }
 
   void _registerLifecycleListener() {
@@ -152,13 +151,14 @@ class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
   Future<void> close() async {
     _appLifecycleListener?.dispose();
     _appLifecycleListener = null;
-    if (this._server == null) {
-      return;
+    if (_bindCompleter != null) {
+      await _bindCompleter!.future;
     }
-    await this._server!.close(force: true);
+    if (_server == null) return;
+    await _server!.close(force: true);
     print('Server running on http://localhost:$_port closed');
-    this._started = false;
-    this._server = null;
+    _started = false;
+    _server = null;
   }
 
   @override

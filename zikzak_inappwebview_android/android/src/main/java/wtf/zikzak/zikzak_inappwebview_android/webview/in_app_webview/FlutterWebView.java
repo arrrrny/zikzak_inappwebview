@@ -195,5 +195,8 @@ public class FlutterWebView implements PlatformWebView {
     if (webView != null && !webView.customSettings.useHybridComposition) {
       webView.setContainerView(null);
     }
+    if (webView != null) {
+      webView.destroy();
+    }
   }
 }

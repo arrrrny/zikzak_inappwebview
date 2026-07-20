@@ -360,10 +360,16 @@ public final class InAppWebView
             WebViewFeature.isFeatureSupported(
                 WebViewFeature.SAFE_BROWSING_ENABLE
             )
-        ) WebSettingsCompat.setSafeBrowsingEnabled(
-            settings,
-            customSettings.safeBrowsingEnabled
-        );
+        ) {
+            try {
+                WebSettingsCompat.setSafeBrowsingEnabled(
+                    settings,
+                    customSettings.safeBrowsingEnabled
+                );
+            } catch (ClassCastException e) {
+                Log.w(LOG_TAG, "OEM WebView wrapper incompatible with setSafeBrowsingEnabled", e);
+            }
+        }
         else if (
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
         ) settings.setSafeBrowsingEnabled(customSettings.safeBrowsingEnabled);
@@ -504,10 +510,16 @@ public final class InAppWebView
                 WebViewFeature.isFeatureSupported(
                     WebViewFeature.DISABLED_ACTION_MODE_MENU_ITEMS
                 )
-            ) WebSettingsCompat.setDisabledActionModeMenuItems(
-                settings,
-                customSettings.disabledActionModeMenuItems
-            );
+            ) {
+                try {
+                    WebSettingsCompat.setDisabledActionModeMenuItems(
+                        settings,
+                        customSettings.disabledActionModeMenuItems
+                    );
+                } catch (ClassCastException e) {
+                    Log.w(LOG_TAG, "OEM WebView wrapper incompatible with setDisabledActionModeMenuItems", e);
+                }
+            }
             else if (
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
             ) settings.setDisabledActionModeMenuItems(
@@ -519,10 +531,16 @@ public final class InAppWebView
         if (customSettings.forceDark != null) {
             if (
                 WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)
-            ) WebSettingsCompat.setForceDark(
-                settings,
-                customSettings.forceDark
-            );
+            ) {
+                try {
+                    WebSettingsCompat.setForceDark(
+                        settings,
+                        customSettings.forceDark
+                    );
+                } catch (ClassCastException e) {
+                    Log.w(LOG_TAG, "OEM WebView wrapper incompatible with setForceDark", e);
+                }
+            }
             else if (
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
             ) settings.setForceDark(customSettings.forceDark);
@@ -570,10 +588,16 @@ public final class InAppWebView
             WebViewFeature.isFeatureSupported(
                 WebViewFeature.OFF_SCREEN_PRERASTER
             )
-        ) WebSettingsCompat.setOffscreenPreRaster(
-            settings,
-            customSettings.offscreenPreRaster
-        );
+        ) {
+            try {
+                WebSettingsCompat.setOffscreenPreRaster(
+                    settings,
+                    customSettings.offscreenPreRaster
+                );
+            } catch (ClassCastException e) {
+                Log.w(LOG_TAG, "OEM WebView wrapper incompatible with setOffscreenPreRaster", e);
+            }
+        }
         else if (
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
         ) settings.setOffscreenPreRaster(customSettings.offscreenPreRaster);
@@ -680,20 +704,28 @@ public final class InAppWebView
             ) &&
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
         ) {
-            WebSettingsCompat.setAlgorithmicDarkeningAllowed(
-                settings,
-                customSettings.algorithmicDarkeningAllowed
-            );
+            try {
+                WebSettingsCompat.setAlgorithmicDarkeningAllowed(
+                    settings,
+                    customSettings.algorithmicDarkeningAllowed
+                );
+            } catch (ClassCastException e) {
+                Log.w(LOG_TAG, "OEM WebView wrapper incompatible with setAlgorithmicDarkeningAllowed", e);
+            }
         }
         if (
             WebViewFeature.isFeatureSupported(
                 WebViewFeature.ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY
             )
         ) {
-            WebSettingsCompat.setEnterpriseAuthenticationAppLinkPolicyEnabled(
-                settings,
-                customSettings.enterpriseAuthenticationAppLinkPolicyEnabled
-            );
+            try {
+                WebSettingsCompat.setEnterpriseAuthenticationAppLinkPolicyEnabled(
+                    settings,
+                    customSettings.enterpriseAuthenticationAppLinkPolicyEnabled
+                );
+            } catch (ClassCastException e) {
+                Log.w(LOG_TAG, "OEM WebView wrapper incompatible with setEnterpriseAuthenticationAppLinkPolicyEnabled", e);
+            }
         }
         if (
             customSettings.requestedWithHeaderOriginAllowList != null &&
@@ -701,19 +733,31 @@ public final class InAppWebView
                 WebViewFeature.REQUESTED_WITH_HEADER_ALLOW_LIST
             )
         ) {
-            WebSettingsCompat.setRequestedWithHeaderOriginAllowList(
-                settings,
-                customSettings.requestedWithHeaderOriginAllowList
-            );
+            try {
+                WebSettingsCompat.setRequestedWithHeaderOriginAllowList(
+                    settings,
+                    customSettings.requestedWithHeaderOriginAllowList
+                );
+            } catch (ClassCastException e) {
+                Log.w(LOG_TAG, "OEM WebView wrapper incompatible with setRequestedWithHeaderOriginAllowList", e);
+            }
         }
 
         if (customSettings.paymentRequestEnabled != null && WebViewFeature.isFeatureSupported(WebViewFeature.PAYMENT_REQUEST)) {
-          WebSettingsCompat.setPaymentRequestEnabled(settings, customSettings.paymentRequestEnabled);
+          try {
+            WebSettingsCompat.setPaymentRequestEnabled(settings, customSettings.paymentRequestEnabled);
+          } catch (ClassCastException e) {
+            Log.w(LOG_TAG, "OEM WebView wrapper incompatible with setPaymentRequestEnabled", e);
+          }
         }
 
         if (customSettings.webAuthenticationSupport != null &&
                 WebViewFeature.isFeatureSupported(WebViewFeature.WEB_AUTHENTICATION)) {
-          WebSettingsCompat.setWebAuthenticationSupport(settings, customSettings.webAuthenticationSupport);
+          try {
+            WebSettingsCompat.setWebAuthenticationSupport(settings, customSettings.webAuthenticationSupport);
+          } catch (ClassCastException e) {
+            Log.w(LOG_TAG, "OEM WebView wrapper incompatible with setWebAuthenticationSupport", e);
+          }
         }
 
         contentBlockerHandler.getRuleList().clear();
@@ -1423,10 +1467,16 @@ public final class InAppWebView
                 WebViewFeature.isFeatureSupported(
                     WebViewFeature.SAFE_BROWSING_ENABLE
                 )
-            ) WebSettingsCompat.setSafeBrowsingEnabled(
-                settings,
-                newCustomSettings.safeBrowsingEnabled
-            );
+            ) {
+                try {
+                    WebSettingsCompat.setSafeBrowsingEnabled(
+                        settings,
+                        newCustomSettings.safeBrowsingEnabled
+                    );
+                } catch (ClassCastException e) {
+                    Log.w(LOG_TAG, "OEM WebView wrapper incompatible with setSafeBrowsingEnabled", e);
+                }
+            }
             else if (
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
             ) settings.setSafeBrowsingEnabled(
@@ -1678,10 +1728,16 @@ public final class InAppWebView
                 WebViewFeature.isFeatureSupported(
                     WebViewFeature.DISABLED_ACTION_MODE_MENU_ITEMS
                 )
-            ) WebSettingsCompat.setDisabledActionModeMenuItems(
-                settings,
-                newCustomSettings.disabledActionModeMenuItems
-            );
+            ) {
+                try {
+                    WebSettingsCompat.setDisabledActionModeMenuItems(
+                        settings,
+                        newCustomSettings.disabledActionModeMenuItems
+                    );
+                } catch (ClassCastException e) {
+                    Log.w(LOG_TAG, "OEM WebView wrapper incompatible with setDisabledActionModeMenuItems", e);
+                }
+            }
             else if (
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
             ) settings.setDisabledActionModeMenuItems(
@@ -1709,10 +1765,16 @@ public final class InAppWebView
         ) {
             if (
                 WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)
-            ) WebSettingsCompat.setForceDark(
-                settings,
-                newCustomSettings.forceDark
-            );
+            ) {
+                try {
+                    WebSettingsCompat.setForceDark(
+                        settings,
+                        newCustomSettings.forceDark
+                    );
+                } catch (ClassCastException e) {
+                    Log.w(LOG_TAG, "OEM WebView wrapper incompatible with setForceDark", e);
+                }
+            }
             else if (
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
             ) settings.setForceDark(newCustomSettings.forceDark);
@@ -1813,10 +1875,16 @@ public final class InAppWebView
                 WebViewFeature.isFeatureSupported(
                     WebViewFeature.OFF_SCREEN_PRERASTER
                 )
-            ) WebSettingsCompat.setOffscreenPreRaster(
-                settings,
-                newCustomSettings.offscreenPreRaster
-            );
+            ) {
+                try {
+                    WebSettingsCompat.setOffscreenPreRaster(
+                        settings,
+                        newCustomSettings.offscreenPreRaster
+                    );
+                } catch (ClassCastException e) {
+                    Log.w(LOG_TAG, "OEM WebView wrapper incompatible with setOffscreenPreRaster", e);
+                }
+            }
             else if (
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
             ) settings.setOffscreenPreRaster(
@@ -2099,10 +2167,14 @@ public final class InAppWebView
             ) &&
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
         ) {
-            WebSettingsCompat.setAlgorithmicDarkeningAllowed(
-                settings,
-                newCustomSettings.algorithmicDarkeningAllowed
-            );
+            try {
+                WebSettingsCompat.setAlgorithmicDarkeningAllowed(
+                    settings,
+                    newCustomSettings.algorithmicDarkeningAllowed
+                );
+            } catch (ClassCastException e) {
+                Log.w(LOG_TAG, "OEM WebView wrapper incompatible with setAlgorithmicDarkeningAllowed", e);
+            }
         }
         if (
             newSettingsMap.get(
@@ -2117,10 +2189,14 @@ public final class InAppWebView
                 WebViewFeature.ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY
             )
         ) {
-            WebSettingsCompat.setEnterpriseAuthenticationAppLinkPolicyEnabled(
-                settings,
-                newCustomSettings.enterpriseAuthenticationAppLinkPolicyEnabled
-            );
+            try {
+                WebSettingsCompat.setEnterpriseAuthenticationAppLinkPolicyEnabled(
+                    settings,
+                    newCustomSettings.enterpriseAuthenticationAppLinkPolicyEnabled
+                );
+            } catch (ClassCastException e) {
+                Log.w(LOG_TAG, "OEM WebView wrapper incompatible with setEnterpriseAuthenticationAppLinkPolicyEnabled", e);
+            }
         }
         if (
             newSettingsMap.get("requestedWithHeaderOriginAllowList") != null &&
@@ -2132,22 +2208,34 @@ public final class InAppWebView
                 WebViewFeature.REQUESTED_WITH_HEADER_ALLOW_LIST
             )
         ) {
-            WebSettingsCompat.setRequestedWithHeaderOriginAllowList(
-                settings,
-                newCustomSettings.requestedWithHeaderOriginAllowList
-            );
+            try {
+                WebSettingsCompat.setRequestedWithHeaderOriginAllowList(
+                    settings,
+                    newCustomSettings.requestedWithHeaderOriginAllowList
+                );
+            } catch (ClassCastException e) {
+                Log.w(LOG_TAG, "OEM WebView wrapper incompatible with setRequestedWithHeaderOriginAllowList", e);
+            }
         }
 
         if (newSettingsMap.get("paymentRequestEnabled") != null &&
                 customSettings.paymentRequestEnabled != newCustomSettings.paymentRequestEnabled &&
                 WebViewFeature.isFeatureSupported(WebViewFeature.PAYMENT_REQUEST)) {
-            WebSettingsCompat.setPaymentRequestEnabled(settings, newCustomSettings.paymentRequestEnabled);
+            try {
+                WebSettingsCompat.setPaymentRequestEnabled(settings, newCustomSettings.paymentRequestEnabled);
+            } catch (ClassCastException e) {
+                Log.w(LOG_TAG, "OEM WebView wrapper incompatible with setPaymentRequestEnabled", e);
+            }
         }
 
         if (newSettingsMap.get("webAuthenticationSupport") != null &&
                 !Util.objEquals(customSettings.webAuthenticationSupport, newCustomSettings.webAuthenticationSupport) &&
                 WebViewFeature.isFeatureSupported(WebViewFeature.WEB_AUTHENTICATION)) {
-            WebSettingsCompat.setWebAuthenticationSupport(settings, newCustomSettings.webAuthenticationSupport);
+            try {
+                WebSettingsCompat.setWebAuthenticationSupport(settings, newCustomSettings.webAuthenticationSupport);
+            } catch (ClassCastException e) {
+                Log.w(LOG_TAG, "OEM WebView wrapper incompatible with setWebAuthenticationSupport", e);
+            }
         }
 
 /*

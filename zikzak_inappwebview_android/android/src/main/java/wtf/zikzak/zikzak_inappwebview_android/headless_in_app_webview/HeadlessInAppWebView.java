@@ -151,6 +151,12 @@ public class HeadlessInAppWebView implements Disposable {
       }
     }
     if (flutterWebView != null) {
+      // Stop loading and remove user scripts before full dispose
+      if (flutterWebView.webView != null) {
+        flutterWebView.webView.stopLoading();
+        flutterWebView.webView.getUserContentController().removeAllUserOnlyScripts();
+        flutterWebView.webView.getUserContentController().removeAllPluginScripts();
+      }
       flutterWebView.dispose();
     }
     flutterWebView = null;

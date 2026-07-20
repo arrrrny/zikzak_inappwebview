@@ -627,5 +627,7 @@ class HeadlessInAppWebView {
   Future<Size?> getSize() => platform.getSize();
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformHeadlessInAppWebView.dispose}
-  Future<void> dispose() => platform.dispose();
+  Future<void> dispose({bool isKeepAlive = false}) async {
+    await platform.dispose();
+  }
 }

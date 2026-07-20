@@ -33,6 +33,8 @@ class AndroidPullToRefreshControllerCreationParams
 class AndroidPullToRefreshController extends PlatformPullToRefreshController
     with ChannelController {
   /// Constructs a [AndroidPullToRefreshController].
+  bool _isDisposed = false;
+
   AndroidPullToRefreshController(
     PlatformPullToRefreshControllerCreationParams params,
   ) : super.implementation(
@@ -92,7 +94,12 @@ class AndroidPullToRefreshController extends PlatformPullToRefreshController
 
   @override
   Future<void> endRefreshing() async {
-    await _setRefreshing(false);
+    if (_isDisposed) return;
+    try {
+      await _setRefreshing(false);
+    } on MissingPluginException {
+      // WebView already destroyed, ignore
+    }
   }
 
   @override
@@ -148,6 +155,7 @@ class AndroidPullToRefreshController extends PlatformPullToRefreshController
 
   @override
   void dispose({bool isKeepAlive = false}) {
+    _isDisposed = true;
     disposeChannel(removeMethodCallHandler: !isKeepAlive);
   }
 }

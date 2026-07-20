@@ -4,12 +4,16 @@ import 'dart:js_interop';
 import 'dart:js_interop_unsafe';
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:web/web.dart' as web;
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
 class InAppWebViewWebController extends PlatformInAppWebViewController {
   final web.HTMLIFrameElement _iframe;
   Function(WebUri? url)? onLoadStartCallback;
+
+  final Map<String, JavaScriptHandlerCallback> _javaScriptHandlersMap = {};
+  bool _jsHandlerListenerInitialized = false;
 
   InAppWebViewWebController(
     PlatformInAppWebViewControllerCreationParams params,
@@ -379,7 +383,46 @@ class InAppWebViewWebController extends PlatformInAppWebViewController {
   }
 
   @override
+  void addJavaScriptHandler({
+    required String handlerName,
+    required JavaScriptHandlerCallback callback,
+  }) {
+    _javaScriptHandlersMap[handlerName] = callback;
+    if (!_jsHandlerListenerInitialized) {
+      _jsHandlerListenerInitialized = true;
+      web.window.addEventListener(
+        'message',
+        ((web.MessageEvent event) {
+          final data = event.data;
+          if (data == null) return;
+          final raw = data.dartify();
+          if (raw is! Map) return;
+          final name = raw['handlerName'];
+          if (name is! String) return;
+          final handler = _javaScriptHandlersMap[name];
+          if (handler != null) {
+            handler.call(raw['args']);
+          }
+        }).toJS,
+      );
+    }
+  }
+
+  @override
+  JavaScriptHandlerCallback? removeJavaScriptHandler({
+    required String handlerName,
+  }) {
+    return _javaScriptHandlersMap.remove(handlerName);
+  }
+
+  @override
+  bool hasJavaScriptHandler({required String handlerName}) {
+    return _javaScriptHandlersMap.containsKey(handlerName);
+  }
+
+  @override
   void dispose({bool isKeepAlive = false}) {
-    // Cleanup if needed
+    _javaScriptHandlersMap.clear();
+    _jsHandlerListenerInitialized = false;
   }
 }
