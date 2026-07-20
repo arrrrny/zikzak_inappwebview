@@ -1,3 +1,10 @@
+## 4.5.3 - 2026-07-20
+
+- Fixed: iOS InAppBrowser crash after SPM migration — storyboard now loaded via
+  `Bundle.module` instead of main bundle, resolving "Could not find a storyboard
+  named 'WebView'" exception when opening the in-app browser
+- Cleaned up `any` version constraints from dev/example pubspec files
+
 ## 4.5.2 - 2026-07-18
 
 - Fixed: Generator no longer produces `InvalidType` for fields referencing

@@ -5,11 +5,10 @@
 //  Created by ARRRRNY on 18/12/2019.
 //
 
+import AVFoundation
 import Flutter
 import UIKit
 import WebKit
-import UIKit
-import AVFoundation
 
 public class InAppBrowserManager: ChannelDelegate {
     static let METHOD_CHANNEL_NAME = "wtf.zikzak/zikzak_inappbrowser"
@@ -21,7 +20,10 @@ public class InAppBrowserManager: ChannelDelegate {
     private var previousStatusBarStyle = -1
 
     init(plugin: SwiftFlutterPlugin) {
-        super.init(channel: FlutterMethodChannel(name: InAppBrowserManager.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar!.messenger()))
+        super.init(
+            channel: FlutterMethodChannel(
+                name: InAppBrowserManager.METHOD_CHANNEL_NAME,
+                binaryMessenger: plugin.registrar!.messenger()))
         self.plugin = plugin
     }
 
@@ -29,21 +31,23 @@ public class InAppBrowserManager: ChannelDelegate {
         let arguments = call.arguments as? NSDictionary
 
         switch call.method {
-            case "open":
-                open(arguments: arguments!)
-                result(true)
-                break
-            case "openWithSystemBrowser":
-                let url = arguments!["url"] as! String
-                openWithSystemBrowser(url: url, result: result)
-                break
-            default:
-                result(FlutterMethodNotImplemented)
-                break
+        case "open":
+            open(arguments: arguments!)
+            result(true)
+            break
+        case "openWithSystemBrowser":
+            let url = arguments!["url"] as! String
+            openWithSystemBrowser(url: url, result: result)
+            break
+        default:
+            result(FlutterMethodNotImplemented)
+            break
         }
     }
 
-    public func prepareInAppBrowserWebViewController(settings: [String: Any?]) -> InAppBrowserWebViewController {
+    public func prepareInAppBrowserWebViewController(settings: [String: Any?])
+        -> InAppBrowserWebViewController
+    {
         if previousStatusBarStyle == -1 {
             previousStatusBarStyle = UIApplication.shared.statusBarStyle.rawValue
         }
@@ -65,7 +69,7 @@ public class InAppBrowserManager: ChannelDelegate {
 
     public func open(arguments: NSDictionary) {
         let id = arguments["id"] as! String
-        let urlRequest = arguments["urlRequest"] as? [String:Any?]
+        let urlRequest = arguments["urlRequest"] as? [String: Any?]
         let assetFilePath = arguments["assetFilePath"] as? String
         let data = arguments["data"] as? String
         let mimeType = arguments["mimeType"] as? String
@@ -81,7 +85,8 @@ public class InAppBrowserManager: ChannelDelegate {
         let webViewController = prepareInAppBrowserWebViewController(settings: settings)
 
         webViewController.id = id
-        webViewController.initialUrlRequest = urlRequest != nil ? URLRequest.init(fromPluginMap: urlRequest!) : nil
+        webViewController.initialUrlRequest =
+            urlRequest != nil ? URLRequest.init(fromPluginMap: urlRequest!) : nil
         webViewController.initialFile = assetFilePath
         webViewController.initialData = data
         webViewController.initialMimeType = mimeType
@@ -99,8 +104,11 @@ public class InAppBrowserManager: ChannelDelegate {
     }
 
     public func presentViewController(webViewController: InAppBrowserWebViewController) {
-        let storyboard = UIStoryboard(name: InAppBrowserManager.WEBVIEW_STORYBOARD, bundle: Bundle(for: InAppWebViewFlutterPlugin.self))
-        let navController = storyboard.instantiateViewController(withIdentifier: InAppBrowserManager.NAV_STORYBOARD_CONTROLLER_ID) as! InAppBrowserNavigationController
+        let storyboard = UIStoryboard(name: InAppBrowserManager.WEBVIEW_STORYBOARD, bundle: .module)
+        let navController =
+            storyboard.instantiateViewController(
+                withIdentifier: InAppBrowserManager.NAV_STORYBOARD_CONTROLLER_ID)
+            as! InAppBrowserNavigationController
         webViewController.edgesForExtendedLayout = []
         navController.pushViewController(webViewController, animated: false)
         webViewController.prepareNavigationControllerBeforeViewWillAppear()
@@ -118,7 +126,8 @@ public class InAppBrowserManager: ChannelDelegate {
         if let popover = navController.popoverPresentationController {
             let sourceView = visibleViewController.view ?? UIView()
 
-            popover.sourceRect = CGRect(x: sourceView.bounds.midX, y: sourceView.bounds.midY, width: 0, height: 0)
+            popover.sourceRect = CGRect(
+                x: sourceView.bounds.midX, y: sourceView.bounds.midY, width: 0, height: 0)
             popover.permittedArrowDirections = []
             popover.sourceView = sourceView
         }
@@ -129,10 +138,11 @@ public class InAppBrowserManager: ChannelDelegate {
     public func openWithSystemBrowser(url: String, result: @escaping FlutterResult) {
         let absoluteUrl = URL(string: url)!.absoluteURL
         if !UIApplication.shared.canOpenURL(absoluteUrl) {
-            result(FlutterError(code: "InAppBrowserManager", message: url + " cannot be opened!", details: nil))
+            result(
+                FlutterError(
+                    code: "InAppBrowserManager", message: url + " cannot be opened!", details: nil))
             return
-        }
-        else {
+        } else {
             if #available(iOS 10.0, *) {
                 UIApplication.shared.open(absoluteUrl)
             } else {

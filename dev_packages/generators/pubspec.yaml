@@ -15,6 +15,7 @@ dependencies:
   zikzak_inappwebview_internal_annotations:
     path: ../../zikzak_inappwebview_internal_annotations
 
+  analyzer: ^7.7.1
 dev_dependencies:
   build_runner: ^2.4.13
   build_test: ^2.2.2

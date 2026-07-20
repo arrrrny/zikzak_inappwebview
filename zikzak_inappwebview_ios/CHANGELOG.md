@@ -1,5 +1,18 @@
-## 4.5.2 - 2026-07-19
+## 4.5.3 - 2026-07-20
 
+
+- Fixed: iOS InAppBrowser crash after SPM migration — storyboard now loaded via
+  `Bundle.module` instead of main bundle, resolving "Could not find a storyboard
+  named 'WebView'" exception when opening the in-app browser
+- Cleaned up `any` version constraints from dev/example pubspec files
+## 4.5.3 - 2026-07-20
+
+- Fixed: iOS InAppBrowser crash after SPM migration — storyboard now loaded via
+  `Bundle.module` instead of main bundle, resolving "Could not find a storyboard
+  named 'WebView'" exception when opening the in-app browser
+- Cleaned up `any` version constraints from dev/example pubspec files
+
+## 4.5.2 - 2026-07-19
 
 - Fixed: Generator no longer produces `InvalidType` for fields referencing
   other generated types (e.g. `PrintJobColorMode?`) — the `exchangeable_object_generator`
@@ -12,8 +25,8 @@
   fields with non-standard types
 - Docs: Added `GENERATOR_NOTES.md` documenting the `console_message.g.dart`
   null-safety hand-edit and regeneration workflow
-## 4.5.1 - 2026-07-19
 
+## 4.5.1 - 2026-07-19
 
 - Fixed: macOS `addJavaScriptHandler` bridge now uses `postMessage` with a JSON
   string instead of structured clone — eliminates `EXC_BAD_ACCESS` crash in
@@ -28,8 +41,8 @@
   convenience getters (in addition to existing `AT_DOCUMENT_START` / `AT_DOCUMENT_END`)
 - Removed: CocoaPods podspec files from iOS and macOS packages (project is now
   100% SPM)
-## 4.5.0 - 2026-07-18
 
+## 4.5.0 - 2026-07-18
 
 - Feature: Added `addJavaScriptHandler` / `removeJavaScriptHandler` /
   `hasJavaScriptHandler` support on macOS — the JavaScript bridge
@@ -42,8 +55,8 @@
   and shared `ConsoleMessage.fromMap` (null-safe defaults for all platforms)
 - Tests: Added unit tests for macOS controller (`addJavaScriptHandler` lifecycle)
   and platform interface (`ConsoleMessage.fromMap` null safety)
-## 4.4.5 - 2026-07-18
 
+## 4.4.5 - 2026-07-18
 
 - Fixed: macOS InAppWebView no longer returns WKWebView directly as the platform
   view — it now wraps it in a container NSView with proper autoresizing masks,
@@ -56,32 +69,33 @@
 - Updated: Flutter SDK upgrade with project configuration migration across all
   platforms (Android build.gradle → build.gradle.kts, iOS SceneDelegate, Xcode
   project updates, platform file regeneration)
-## 4.4.4 - 2026-07-03
 
+## 4.4.4 - 2026-07-03
 
 - Fixed: macOS headless WebView now uses a dedicated off-screen `NSWindow` instead
   of attaching to the main window with `alphaValue = 0.01` — eliminates potential
   mouse event interception behind the Flutter surface while still providing the
   view hierarchy `WKWebView` needs for rendering and JS execution
-## 4.4.3 - 2026-06-24
 
+## 4.4.3 - 2026-06-24
 
 - Fixed: iOS JavaScript handler error messages with newlines, backslashes, or
   carriage returns are now properly escaped via `JSONSerialization` instead of
   single-quote interpolation that produced `SyntaxError: Unexpected EOF` and
   left JS promises pending forever — matches Android's `JSONObject.quote()`
-## 4.4.2 - 2026-06-19
 
+## 4.4.2 - 2026-06-19
 
 - Fixed: Windows and Linux `onWebViewCreated` type mismatch — platform controllers
   (`InAppWebViewWindowsController`, `LinuxInAppWebViewController`) are now wrapped through
   `controllerFromPlatform` to return proper `InAppWebViewController` instances
-## 4.4.1 - 2026-06-16
 
+## 4.4.1 - 2026-06-16
 
 - Fixed: Android build failure — `URLRequest` constructor calls in `InAppWebViewClient`,
   `InAppWebViewClientCompat`, and `InAppWebViewChromeClient` now pass the 5th `timeoutInterval`
   parameter to match the updated constructor signature
+
 ## 4.4.1 - 2026-06-16
 
 - Fixed: Android build failure — `URLRequest` constructor calls in `InAppWebViewClient`,
@@ -89,7 +103,6 @@
   parameter to match the updated constructor signature
 
 ## 4.4.0 - 2026-06-16
-
 
 - Feature: Android URLRequest now supports `timeoutInterval` — the InAppWebView will stop
   loading after the specified interval, making rendered HTML available for extraction via
@@ -102,6 +115,7 @@
 - Chore: `prepare_for_publish.sh` no longer attempts to update CocoaPods podspecs
   (migrated to Swift Package Manager)
 - Chore: Updated dependency lock files
+
 ## 4.4.0 - 2026-06-16
 
 - Chore: Updated dependency lock files

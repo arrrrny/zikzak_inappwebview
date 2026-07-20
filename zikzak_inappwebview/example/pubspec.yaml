@@ -52,13 +52,13 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^4.0.0
 
-# For information on the generic Dart part of this file, see the
-# following page: https://dart.dev/tools/pub/pubspec
+  # For information on the generic Dart part of this file, see the
+  # following page: https://dart.dev/tools/pub/pubspec
 
-# The following section is specific to Flutter packages.
-  zikzak_inappwebview_platform_interface:
-    path: ../../zikzak_inappwebview_platform_interface
-  web: any
+  # The following section is specific to Flutter packages.
+  zikzak_inappwebview_platform_interface: ^4.5.3
+  web: ^1.1.1
+  zikzak_inappwebview_web: ^4.5.3
 flutter:
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
