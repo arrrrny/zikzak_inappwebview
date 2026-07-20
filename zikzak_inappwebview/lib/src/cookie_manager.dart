@@ -61,19 +61,21 @@ class CookieManager {
     HTTPCookieSameSitePolicy? sameSite,
     InAppWebViewController? webViewController,
   }) {
-    return _lock.synchronized(() => platform.setCookie(
-      url: url,
-      name: name,
-      value: value,
-      path: path,
-      domain: domain,
-      expiresDate: expiresDate,
-      maxAge: maxAge,
-      isSecure: isSecure,
-      isHttpOnly: isHttpOnly,
-      sameSite: sameSite,
-      webViewController: webViewController?.platform,
-    ));
+    return _lock.synchronized(
+      () => platform.setCookie(
+        url: url,
+        name: name,
+        value: value,
+        path: path,
+        domain: domain,
+        expiresDate: expiresDate,
+        maxAge: maxAge,
+        isSecure: isSecure,
+        isHttpOnly: isHttpOnly,
+        sameSite: sameSite,
+        webViewController: webViewController?.platform,
+      ),
+    );
   }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformCookieManager.getCookies}
@@ -81,10 +83,12 @@ class CookieManager {
     required WebUri url,
     InAppWebViewController? webViewController,
   }) {
-    return _lock.synchronized(() => platform.getCookies(
-      url: url,
-      webViewController: webViewController?.platform,
-    ));
+    return _lock.synchronized(
+      () => platform.getCookies(
+        url: url,
+        webViewController: webViewController?.platform,
+      ),
+    );
   }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformCookieManager.getCookie}
@@ -93,11 +97,13 @@ class CookieManager {
     required String name,
     InAppWebViewController? webViewController,
   }) {
-    return _lock.synchronized(() => platform.getCookie(
-      url: url,
-      name: name,
-      webViewController: webViewController?.platform,
-    ));
+    return _lock.synchronized(
+      () => platform.getCookie(
+        url: url,
+        name: name,
+        webViewController: webViewController?.platform,
+      ),
+    );
   }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformCookieManager.deleteCookie}
@@ -108,13 +114,15 @@ class CookieManager {
     String? domain,
     InAppWebViewController? webViewController,
   }) {
-    return _lock.synchronized(() => platform.deleteCookie(
-      url: url,
-      name: name,
-      path: path,
-      domain: domain,
-      webViewController: webViewController?.platform,
-    ));
+    return _lock.synchronized(
+      () => platform.deleteCookie(
+        url: url,
+        name: name,
+        path: path,
+        domain: domain,
+        webViewController: webViewController?.platform,
+      ),
+    );
   }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformCookieManager.deleteCookies}
@@ -124,20 +132,25 @@ class CookieManager {
     String? domain,
     InAppWebViewController? webViewController,
   }) {
-    return _lock.synchronized(() => platform.deleteCookies(
-      url: url,
-      path: path,
-      domain: domain,
-      webViewController: webViewController?.platform,
-    ));
+    return _lock.synchronized(
+      () => platform.deleteCookies(
+        url: url,
+        path: path,
+        domain: domain,
+        webViewController: webViewController?.platform,
+      ),
+    );
   }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformCookieManager.deleteAllCookies}
-  Future<bool> deleteAllCookies() => _lock.synchronized(() => platform.deleteAllCookies());
+  Future<bool> deleteAllCookies() =>
+      _lock.synchronized(() => platform.deleteAllCookies());
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformCookieManager.getAllCookies}
-  Future<List<Cookie>> getAllCookies() => _lock.synchronized(() => platform.getAllCookies());
+  Future<List<Cookie>> getAllCookies() =>
+      _lock.synchronized(() => platform.getAllCookies());
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformCookieManager.removeSessionCookies}
-  Future<bool> removeSessionCookies() => _lock.synchronized(() => platform.removeSessionCookies());
+  Future<bool> removeSessionCookies() =>
+      _lock.synchronized(() => platform.removeSessionCookies());
 }

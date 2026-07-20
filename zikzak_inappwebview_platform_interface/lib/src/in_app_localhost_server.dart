@@ -74,11 +74,11 @@ class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
 
   @override
   Future<void> start() async {
-    if (_started) {
-      throw Exception('Server already started on http://localhost:$_port');
-    }
     if (_bindCompleter != null) {
       return _bindCompleter!.future;
+    }
+    if (_started) {
+      throw Exception('Server already started on http://localhost:$_port');
     }
 
     _started = true;
@@ -125,10 +125,33 @@ class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
         request.response.add(body);
         request.response.close();
       });
-    } finally {
-      _bindCompleter!.complete();
+    } catch (e, s) {
+      _started = false;
+      _bindCompleter?.completeError(e, s);
       _bindCompleter = null;
+      rethrow;
+    } finally {
+      if (_bindCompleter != null) {
+        _bindCompleter!.complete();
+        _bindCompleter = null;
+      }
     }
+  }
+
+  @override
+  Future<void> close() async {
+    _appLifecycleListener?.dispose();
+    _appLifecycleListener = null;
+    try {
+      await _bindCompleter?.future;
+    } catch (_) {
+      // Bind failed — no server to close
+    }
+    if (_server == null) return;
+    await _server!.close(force: true);
+    print('Server running on http://localhost:$_port closed');
+    _started = false;
+    _server = null;
   }
 
   void _registerLifecycleListener() {
@@ -145,20 +168,6 @@ class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
       _server = null;
       _started = false;
     }
-  }
-
-  @override
-  Future<void> close() async {
-    _appLifecycleListener?.dispose();
-    _appLifecycleListener = null;
-    if (_bindCompleter != null) {
-      await _bindCompleter!.future;
-    }
-    if (_server == null) return;
-    await _server!.close(force: true);
-    print('Server running on http://localhost:$_port closed');
-    _started = false;
-    _server = null;
   }
 
   @override

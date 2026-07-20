@@ -344,7 +344,7 @@ class IOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
   }
 
   @override
-  Future<void> dispose() async {
+  Future<void> dispose({bool isKeepAlive = false}) async {
     if (!_running) {
       return;
     }

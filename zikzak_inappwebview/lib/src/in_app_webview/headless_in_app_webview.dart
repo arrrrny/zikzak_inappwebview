@@ -628,6 +628,6 @@ class HeadlessInAppWebView {
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformHeadlessInAppWebView.dispose}
   Future<void> dispose({bool isKeepAlive = false}) async {
-    await platform.dispose();
+    await platform.dispose(isKeepAlive: isKeepAlive);
   }
 }

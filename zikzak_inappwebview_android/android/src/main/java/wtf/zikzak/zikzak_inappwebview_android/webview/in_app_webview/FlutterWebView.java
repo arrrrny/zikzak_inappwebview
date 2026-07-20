@@ -195,7 +195,9 @@ public class FlutterWebView implements PlatformWebView {
     if (webView != null && !webView.customSettings.useHybridComposition) {
       webView.setContainerView(null);
     }
-    if (webView != null) {
+    // Only destroy if not keepAlive — kept-alive WebViews should remain
+    // available for later reattachment.
+    if (webView != null && keepAliveId == null) {
       webView.destroy();
     }
   }

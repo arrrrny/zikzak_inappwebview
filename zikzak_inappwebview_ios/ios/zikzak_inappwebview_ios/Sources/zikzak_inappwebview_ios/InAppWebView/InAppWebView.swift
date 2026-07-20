@@ -3178,7 +3178,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     public func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
         channelDelegate?.onWebContentProcessDidTerminate()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-            self?.reload()
+            guard let self = self, !self.isDisposed else { return }
+            self.reload()
         }
     }
 

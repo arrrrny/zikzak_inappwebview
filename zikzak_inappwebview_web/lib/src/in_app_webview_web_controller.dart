@@ -13,7 +13,7 @@ class InAppWebViewWebController extends PlatformInAppWebViewController {
   Function(WebUri? url)? onLoadStartCallback;
 
   final Map<String, JavaScriptHandlerCallback> _javaScriptHandlersMap = {};
-  bool _jsHandlerListenerInitialized = false;
+  dynamic _jsHandlerListener;
 
   InAppWebViewWebController(
     PlatformInAppWebViewControllerCreationParams params,
@@ -29,50 +29,50 @@ class InAppWebViewWebController extends PlatformInAppWebViewController {
       }).toJS,
     );
 
-    web.window.addEventListener(
-      'message',
-      ((web.MessageEvent event) {
-        final data = event.data;
-        if (data == null) return;
-        final raw = data.dartify();
-        if (raw is! String) return;
-        if (!raw.contains('"type":"console"')) return;
-        try {
-          final decoded = jsonDecode(raw);
-          if (decoded is Map && decoded['type'] == 'console') {
-            final message = decoded['message'];
-            final level = decoded['level'];
-            ConsoleMessageLevel consoleLevel = ConsoleMessageLevel.LOG;
-            switch (level) {
-              case 'WARNING':
-                consoleLevel = ConsoleMessageLevel.WARNING;
-                break;
-              case 'ERROR':
-                consoleLevel = ConsoleMessageLevel.ERROR;
-                break;
-              case 'DEBUG':
-                consoleLevel = ConsoleMessageLevel.DEBUG;
-                break;
-              case 'INFO':
-                consoleLevel = ConsoleMessageLevel.LOG;
-                break;
-            }
-
-            if (params.webviewParams?.onConsoleMessage != null) {
-              params.webviewParams!.onConsoleMessage!(
-                this,
-                ConsoleMessage(
-                  message: message?.toString() ?? '',
-                  messageLevel: consoleLevel,
-                ),
-              );
-            }
+    final consoleListener = ((web.MessageEvent event) {
+      final data = event.data;
+      if (data == null) return;
+      final raw = data.dartify();
+      if (raw is! String) return;
+      if (!raw.contains('"type":"console"')) return;
+      try {
+        final decoded = jsonDecode(raw);
+        if (decoded is Map && decoded['type'] == 'console') {
+          final message = decoded['message'];
+          final level = decoded['level'];
+          ConsoleMessageLevel consoleLevel = ConsoleMessageLevel.LOG;
+          switch (level) {
+            case 'WARNING':
+              consoleLevel = ConsoleMessageLevel.WARNING;
+              break;
+            case 'ERROR':
+              consoleLevel = ConsoleMessageLevel.ERROR;
+              break;
+            case 'DEBUG':
+              consoleLevel = ConsoleMessageLevel.DEBUG;
+              break;
+            case 'INFO':
+              consoleLevel = ConsoleMessageLevel.LOG;
+              break;
           }
-        } catch (e) {
-          // Ignore JSON parse errors
+
+          if (params.webviewParams?.onConsoleMessage != null) {
+            params.webviewParams!.onConsoleMessage!(
+              this,
+              ConsoleMessage(
+                message: message?.toString() ?? '',
+                messageLevel: consoleLevel,
+              ),
+            );
+          }
         }
-      }).toJS,
-    );
+      } catch (e) {
+        // Ignore JSON parse errors
+      }
+    }).toJS;
+    web.window.addEventListener('message', consoleListener);
+    // Store for cleanup in dispose()
+    _jsHandlerListener = consoleListener;
   }
 
   static const String _consoleInterceptionScript = """
@@ -388,23 +388,21 @@ class InAppWebViewWebController extends PlatformInAppWebViewController {
     required JavaScriptHandlerCallback callback,
   }) {
     _javaScriptHandlersMap[handlerName] = callback;
-    if (!_jsHandlerListenerInitialized) {
-      _jsHandlerListenerInitialized = true;
-      web.window.addEventListener(
-        'message',
-        ((web.MessageEvent event) {
-          final data = event.data;
-          if (data == null) return;
-          final raw = data.dartify();
-          if (raw is! Map) return;
-          final name = raw['handlerName'];
-          if (name is! String) return;
-          final handler = _javaScriptHandlersMap[name];
-          if (handler != null) {
-            handler.call(raw['args']);
-          }
-        }).toJS,
-      );
+    if (_jsHandlerListener == null) {
+      final listener = ((web.MessageEvent event) {
+        final data = event.data;
+        if (data == null) return;
+        final raw = data.dartify();
+        if (raw is! Map) return;
+        final name = raw['handlerName'];
+        if (name is! String) return;
+        final handler = _javaScriptHandlersMap[name];
+        if (handler != null) {
+          handler.call(raw['args']);
+        }
+      }).toJS;
+      _jsHandlerListener = listener;
+      web.window.addEventListener('message', listener);
     }
   }
 
@@ -423,6 +421,9 @@ class InAppWebViewWebController extends PlatformInAppWebViewController {
   @override
   void dispose({bool isKeepAlive = false}) {
     _javaScriptHandlersMap.clear();
-    _jsHandlerListenerInitialized = false;
+    if (_jsHandlerListener != null) {
+      web.window.removeEventListener('message', _jsHandlerListener);
+      _jsHandlerListener = null;
+    }
   }
 }
