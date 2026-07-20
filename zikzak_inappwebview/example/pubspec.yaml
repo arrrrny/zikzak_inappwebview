@@ -38,6 +38,10 @@ dependencies:
   url_launcher: ^6.2.0
   zikzak_inappwebview:
     path: ../
+  zikzak_inappwebview_platform_interface:
+    path: ../../zikzak_inappwebview_platform_interface
+  zikzak_inappwebview_web:
+    path: ../../zikzak_inappwebview_web
 
 dev_dependencies:
   integration_test:
@@ -56,13 +60,12 @@ dev_dependencies:
   # following page: https://dart.dev/tools/pub/pubspec
 
   # The following section is specific to Flutter packages.
-  zikzak_inappwebview_platform_interface:
-    path: ../../zikzak_inappwebview_platform_interface
-  zikzak_inappwebview_web:
-    path: ../../zikzak_inappwebview_web
+
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
+
+flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
