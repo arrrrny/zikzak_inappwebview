@@ -27,13 +27,14 @@
 
 ## Workflow
 
-### Automated (single command)
+### Automated (single command — no confirmation needed)
 
 ```bash
 # Full publish: prepare → publish to pub.dev → merge to master → restore dev
 bash scripts/prepare_for_publish.sh <version> <<< "" && \
-  echo "y" | bash scripts/publish.sh && \
-  printf 'y\ny\n' | bash scripts/push_to_master.sh
+  bash scripts/publish.sh && \
+  bash scripts/push_to_master.sh -f && \
+  bash scripts/restore_dev_setup.sh
 ```
 
 ⚠️ `publish.sh` needs a 20-minute timeout due to pub.dev propagation delays.
@@ -42,9 +43,9 @@ bash scripts/prepare_for_publish.sh <version> <<< "" && \
 
 1. Update changelogs for the new version
 2. `./scripts/prepare_for_publish.sh <version>`
-3. `echo "y" | ./scripts/publish.sh` (publishes to pub.dev)
-4. `printf 'y\ny\n' | ./scripts/push_to_master.sh` (merge + tag)
-5. `./scripts/restore_dev_setup.sh` (back to dev setup)
+3. `bash scripts/publish.sh` (publishes to pub.dev)
+4. `bash scripts/push_to_master.sh -f` (merge + tag, auto-deletes branch)
+5. `bash scripts/restore_dev_setup.sh` (back to dev setup)
 
 ## Notes
 
@@ -52,5 +53,5 @@ bash scripts/prepare_for_publish.sh <version> <<< "" && \
 - The root `CHANGELOG.md` is the single source of truth for changelog content. The script reads the entry for the new version from it and propagates to all sub-package changelogs.
 - `zikzak_inappwebview_windows` may show path dependency warnings for `webview_windows` and `path` — these are external deps, not zikzak packages, and are expected.
 - **Timeout**: `publish.sh` needs at least 20 minutes (`timeout_ms: 1200000`). Pub.dev takes up to 10 minutes to propagate each newly published package before dependents can resolve it, and with 9 packages published sequentially, the total can be 20–30 minutes.
-- When running the full automated workflow (publish + push_to_master), both scripts can be chained: `echo "y" | bash scripts/publish.sh && bash scripts/push_to_master.sh`
+- All scripts accept `-f` / `--force` flags to run non-interactively — the automated workflow uses this.
 - **No `any` constraints**: Before publishing, ALL `pubspec.yaml` files must have real version constraints. Search for `: any` and replace with caret bounds (e.g., `^X.Y.Z`). The publish-manager skill now validates this automatically in Step 4.

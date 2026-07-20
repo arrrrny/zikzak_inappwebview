@@ -142,14 +142,15 @@ for package in zikzak_inappwebview zikzak_inappwebview_platform_interface zikzak
 done
 
 # Nuclear cleaning mode - Obliterate any caching issues that might persist
+DEEP_CLEAN=false
+if [[ "$1" == "-f" || "$1" == "--force" ]]; then
+    DEEP_CLEAN=true
+fi
+
 echo ""
 echo "🔥 INITIATING NUCLEAR CLEANING MODE 🔥"
 
-# Ask if they want to nuke pub caches for absolutely clean dev setup
-echo "Do you want to perform a deep clean of Flutter/Dart caches? (y/n)"
-read -r deep_clean_choice
-
-if [[ "$deep_clean_choice" == "y" || "$deep_clean_choice" == "Y" ]]; then
+if [ "$DEEP_CLEAN" = true ]; then
   echo "☢️ NUCLEAR CLEANING: PURGING ALL PUB CACHES ☢️"
 
   # Delete .dart_tool directories to force complete rebuild

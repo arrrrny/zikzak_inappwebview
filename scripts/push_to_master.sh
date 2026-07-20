@@ -8,6 +8,12 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
+# Non-interactive mode flag
+FORCE=false
+if [[ "$1" == "-f" || "$1" == "--force" ]]; then
+    FORCE=true
+fi
+
 echo -e "${BLUE}=== ZIKZAK PUSH TO master TOOL ===${NC}"
 
 # Get current branch
@@ -24,29 +30,37 @@ fi
 # Check for uncommitted changes
 if ! git diff-index --quiet HEAD --; then
     echo -e "${RED}You have uncommitted changes. Please commit them before proceeding.${NC}"
-    echo -e "${YELLOW}Do you want to commit all changes now? (y/n)${NC}"
-    read -r commit_changes
-    if [[ "$commit_changes" == "y" || "$commit_changes" == "Y" ]]; then
-        echo -e "${YELLOW}Enter commit message:${NC}"
-        read -r commit_message
-
+    if [ "$FORCE" = true ]; then
+        echo -e "${YELLOW}Force mode: committing all changes with default message...${NC}"
         git add .
-        git commit -m "$commit_message"
+        git commit -m "Prepare for publishing version $VERSION"
         echo -e "${GREEN}Changes committed successfully!${NC}"
     else
-        echo -e "${RED}Operation aborted. Please commit your changes first.${NC}"
-        exit 1
+        echo -e "${YELLOW}Do you want to commit all changes now? (y/n)${NC}"
+        read -r commit_changes
+        if [[ "$commit_changes" == "y" || "$commit_changes" == "Y" ]]; then
+            echo -e "${YELLOW}Enter commit message:${NC}"
+            read -r commit_message
+            git add .
+            git commit -m "$commit_message"
+            echo -e "${GREEN}Changes committed successfully!${NC}"
+        else
+            echo -e "${RED}Operation aborted. Please commit your changes first.${NC}"
+            exit 1
+        fi
     fi
 fi
 
 # Confirm before proceeding
-echo -e "${YELLOW}This will merge changes from '$CURRENT_BRANCH' into 'master' and push to remote.${NC}"
-echo -e "${RED}Make sure you have tested your changes before proceeding.${NC}"
-echo -e "${YELLOW}Do you want to continue? (y/n)${NC}"
-read -r confirm
-if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
-    echo -e "${RED}Operation aborted.${NC}"
-    exit 1
+if [ "$FORCE" = false ]; then
+    echo -e "${YELLOW}This will merge changes from '$CURRENT_BRANCH' into 'master' and push to remote.${NC}"
+    echo -e "${RED}Make sure you have tested your changes before proceeding.${NC}"
+    echo -e "${YELLOW}Do you want to continue? (y/n)${NC}"
+    read -r confirm
+    if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+        echo -e "${RED}Operation aborted.${NC}"
+        exit 1
+    fi
 fi
 
 # Check if master branch exists
@@ -117,16 +131,25 @@ fi
 
 # Ask if user wants to delete the branch
 if [ "$CURRENT_BRANCH" != "master" ]; then
-    echo -e "${YELLOW}Do you want to delete the '$CURRENT_BRANCH' branch? (y/n)${NC}"
-    read -r delete_branch
-    if [[ "$delete_branch" == "y" || "$delete_branch" == "Y" ]]; then
+    if [ "$FORCE" = true ]; then
+        echo -e "${YELLOW}Force mode: deleting branch '$CURRENT_BRANCH'...${NC}"
         git branch -D "$CURRENT_BRANCH" || {
             echo -e "${RED}Failed to delete branch.${NC}"
             exit 1
         }
         echo -e "${GREEN}Branch '$CURRENT_BRANCH' deleted successfully.${NC}"
     else
-        echo -e "${BLUE}Branch '$CURRENT_BRANCH' was kept.${NC}"
+        echo -e "${YELLOW}Do you want to delete the '$CURRENT_BRANCH' branch? (y/n)${NC}"
+        read -r delete_branch
+        if [[ "$delete_branch" == "y" || "$delete_branch" == "Y" ]]; then
+            git branch -D "$CURRENT_BRANCH" || {
+                echo -e "${RED}Failed to delete branch.${NC}"
+                exit 1
+            }
+            echo -e "${GREEN}Branch '$CURRENT_BRANCH' deleted successfully.${NC}"
+        else
+            echo -e "${BLUE}Branch '$CURRENT_BRANCH' was kept.${NC}"
+        fi
     fi
 fi
 

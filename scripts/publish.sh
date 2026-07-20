@@ -224,13 +224,7 @@ for package in "${PACKAGES[@]}"; do
 done
 echo
 
-# Confirm publication of all packages
-echo -e "${YELLOW}Do you want to proceed with publishing all packages? (y/n)${NC}"
-read -r proceed
-if [ "$proceed" != "y" ] && [ "$proceed" != "Y" ]; then
-    echo -e "${RED}Publication process aborted.${NC}"
-    exit 0
-fi
+# Non-interactive mode: proceed with publishing all packages
 
 # Publish each package in the defined order
 for package in "${PACKAGES[@]}"; do
