@@ -2,7 +2,7 @@
 
 # 🚀 ZikZak InAppWebView
 
-### *The Feature-Rich WebView Plugin for Flutter*
+### _The Feature-Rich WebView Plugin for Flutter_
 
 <img src="https://img.shields.io/badge/Maintenance-Active-brightgreen" alt="Actively Maintained">
 <img src="https://img.shields.io/badge/Platforms-Android%20%7C%20iOS%20%7C%20Web%20%7C%20macOS%20%7C%20Windows%20%7C%20Linux-blue" alt="Platforms">
@@ -29,24 +29,26 @@ This is a community-driven fork of `flutter_inappwebview` focused on active main
 
 ## � Installation
 
+## Installation
+
 Add `zikzak_inappwebview` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  zikzak_inappwebview: ^4.0.0
+  zikzak_inappwebview: ^4.6.0
 ```
 
-## � Requirements
+## Requirements
 
-| Platform | Minimum Version | Notes |
-|----------|-----------------|-------|
-| **Flutter** | 3.10.0+ | |
-| **Android** | API 24+ | Android 7.0+ |
-| **iOS** | 15.0+ | |
-| **macOS** | 11.0+ | |
-| **Windows** | 10+ | Requires WebView2 Runtime |
-| **Linux** | | Requires WebKitGTK |
-| **Web** | Any | |
+| Platform    | Minimum Version | Notes                     |
+| ----------- | --------------- | ------------------------- |
+| **Flutter** | 3.10.0+         |                           |
+| **Android** | API 24+         | Android 7.0+              |
+| **iOS**     | 16.0+           |                           |
+| **macOS**   | 12.0+           |                           |
+| **Windows** | 10+             | Requires WebView2 Runtime |
+| **Linux**   |                 | Requires WebKitGTK 2.40+  |
+| **Web**     | Any             |                           |
 
 ## 🚀 Getting Started
 

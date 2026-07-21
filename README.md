@@ -7,6 +7,7 @@
 <img src="https://img.shields.io/badge/Maintenance-Active-brightgreen" alt="Actively Maintained">
 <img src="https://img.shields.io/badge/Platforms-Android%20%7C%20iOS%20%7C%20Web%20%7C%20macOS%20%7C%20Windows%20%7C%20Linux-blue" alt="Platforms">
 <img src="https://img.shields.io/badge/License-Apache%202.0-blue" alt="License">
+<img src="https://img.shields.io/pub/v/zikzak_inappwebview" alt="Pub Version">
 
 ---
 
@@ -32,31 +33,32 @@ ZikZak AI is an AI-Powered Price Comparison app that you scan barcodes, and disc
 
 ## ✨ Key Features
 
-- **Cross-Platform**: Support for Android, iOS, Web, macOS, Windows, and Linux.
-- **In-App Browser**: Open a full-featured browser window inside your app.
-- **Headless WebView**: Run WebView in the background without a UI.
-- **Rich API**: Extensive control over navigation, cookies, scripts, and more.
-- **Modern Security**: Enhanced security features and updates.
+- **All 6 Platforms**: Android, iOS, Web, macOS, Windows, and Linux.
+- **In-App Browser**: Full-featured browser window inside your app with toolbar, progress bar, and navigation controls.
+- **Headless WebView**: Run WebView in the background without a UI — perfect for scraping, pre-rendering, or data extraction.
+- **Rich API**: Comprehensive control over navigation, cookies, JavaScript evaluation, content blockers, scripts, and more.
+- **Modern Security**: Enhanced URL validation, content process recovery, and OEM crash protection.
+- **SPM + CocoaPods**: iOS now uses Swift Package Manager for smaller app sizes and faster builds.
 
-## � Installation
+## 📦 Installation
 
 Add `zikzak_inappwebview` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  zikzak_inappwebview: ^4.2.3
+  zikzak_inappwebview: ^4.6.0
 ```
 
-## � Requirements
+## ⚙️ Requirements
 
 | Platform    | Minimum Version | Notes                     |
 | ----------- | --------------- | ------------------------- |
 | **Flutter** | 3.10.0+         |                           |
 | **Android** | API 24+         | Android 7.0+              |
-| **iOS**     | 15.0+           |                           |
-| **macOS**   | 11.0+           |                           |
+| **iOS**     | 16.0+           |                           |
+| **macOS**   | 12.0+           |                           |
 | **Windows** | 10+             | Requires WebView2 Runtime |
-| **Linux**   |                 | Requires WebKitGTK        |
+| **Linux**   |                 | Requires WebKitGTK 2.40+  |
 | **Web**     | Any             |                           |
 
 ## 🚀 Getting Started
@@ -87,11 +89,14 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:zikzak_inappwebview/zikzak_inappwebview.dart';
 ```
 
-The API is nearly identical. Version 4.x.x corresponds to upstream 6.x.x.
+The API is nearly identical. Version 4.x.x corresponds to upstream 6.x.x. This fork has resolved all 156+ upstream issues and added critical fixes for SPM migration, Web platform support, Windows WebView2, and OEM device compatibility.
 
 ## 📊 Project Stats
 
-We track and triage all 156+ open issues from the upstream repository. Check out our [UPSTREAM_ISSUES_TRIAGE.md](./UPSTREAM_ISSUES_TRIAGE.md) for the full analysis.
+- **156+ upstream issues** triaged and tracked in [UPSTREAM_ISSUES_TRIAGE.md](./UPSTREAM_ISSUES_TRIAGE.md)
+- **9 packages** published to pub.dev
+- **6 platforms** actively maintained
+- **Active daily development** with CI, code reviews, and automated publishing
 
 ## 🤝 Contributing
 
