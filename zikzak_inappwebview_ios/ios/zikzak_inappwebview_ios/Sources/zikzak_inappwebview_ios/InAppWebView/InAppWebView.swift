@@ -2208,7 +2208,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         }
 
         let validator = URLValidationManager()
-        if let url = navigationAction.request.url, !validator.validateURL(url: url).allowed {
+        if let url = navigationAction.request.url, !validator.validateURL(url).allowed {
             decisionHandler(.cancel)
             return
         }
