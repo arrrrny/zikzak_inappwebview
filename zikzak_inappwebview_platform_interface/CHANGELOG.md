@@ -1,3 +1,9 @@
+## 4.6.2 - 2026-07-21
+
+
+- Fixed: Web/WASM compilation broken by unconditional `dart:io` import in platform
+  interface — replaced with conditional export `if (dart.library.io)` to compile
+  a stub on Web/WASM and the real `HttpServer`-based implementation on native
 ## 4.6.1 - 2026-07-21
 
 
