@@ -100,7 +100,13 @@ The API is nearly identical. Version 4.x.x corresponds to upstream 6.x.x. This f
 
 ## ⭐ Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=arrrrny/zikzak_inappwebview&type=Date)](https://star-history.com/#arrrrny/zikzak_inappwebview&Date)
+<a href="https://www.star-history.com/?type=date&repos=arrrrny%2Fzikzak_inappwebview">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=arrrrny/zikzak_inappwebview&type=date&theme=dark&legend=top-left&sealed_token=nk2uEtORUsQmjO7IYXmTFBk4YRAPQDIgQ0RYeJiVu0BxGlCRGFWVBEJ-W27lOfr5LFkV2ui-78pP3k5FfJPrbZAC315NBV9AqNEmKgU3IB5ZK0FCrOFo7ReDBlYe8VSEsa3RdY3rjxeUhpMJ8rJgXvaitb8haEgwv1H0fZyEMQUl3nURel5Rkb3OuICf" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=arrrrny/zikzak_inappwebview&type=date&legend=top-left&sealed_token=nk2uEtORUsQmjO7IYXmTFBk4YRAPQDIgQ0RYeJiVu0BxGlCRGFWVBEJ-W27lOfr5LFkV2ui-78pP3k5FfJPrbZAC315NBV9AqNEmKgU3IB5ZK0FCrOFo7ReDBlYe8VSEsa3RdY3rjxeUhpMJ8rJgXvaitb8haEgwv1H0fZyEMQUl3nURel5Rkb3OuICf" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=arrrrny/zikzak_inappwebview&type=date&legend=top-left&sealed_token=nk2uEtORUsQmjO7IYXmTFBk4YRAPQDIgQ0RYeJiVu0BxGlCRGFWVBEJ-W27lOfr5LFkV2ui-78pP3k5FfJPrbZAC315NBV9AqNEmKgU3IB5ZK0FCrOFo7ReDBlYe8VSEsa3RdY3rjxeUhpMJ8rJgXvaitb8haEgwv1H0fZyEMQUl3nURel5Rkb3OuICf" />
+ </picture>
+</a>
 
 ## 🤝 Contributing
 
