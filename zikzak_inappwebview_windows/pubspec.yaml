@@ -1,6 +1,6 @@
 name: zikzak_inappwebview_windows
 description: The Windows implementation of zikzak_inappwebview.
-version: 4.6.0
+version: 4.6.1
 homepage: https://github.com/arrrrny/zikzak_inappwebview
 
 environment:
@@ -18,8 +18,7 @@ flutter:
 dependencies:
   flutter:
     sdk: flutter
-  zikzak_inappwebview_platform_interface:
-    path: ../zikzak_inappwebview_platform_interface
+  zikzak_inappwebview_platform_interface: ^4.6.1
   webview_windows: ^0.4.0
   path: ^1.9.0
   path_provider: ^2.1.0

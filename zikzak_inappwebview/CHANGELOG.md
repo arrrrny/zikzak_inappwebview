@@ -1,3 +1,9 @@
+## 4.6.1 - 2026-07-21
+
+- Fixed: iOS compile error in `URLValidationManager` integration — removed extraneous
+  argument label `url:` from `validateURL` call that caused Swift compiler error
+  when archiving for device
+
 ## 4.6.0 - 2026-07-20
 
 - Fixed: iOS InAppBrowser crash after SPM migration — storyboard now loaded via
