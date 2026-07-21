@@ -1,3 +1,9 @@
+## 4.6.3 - 2026-07-21
+
+
+- Fixed: Web/WASM build failure — `HeadlessInAppWebViewWeb.dispose()` missing
+  `isKeepAlive` parameter that was added to `PlatformHeadlessInAppWebView.dispose`
+  interface, causing `dart2wasm` and `dart2js` compile errors
 ## 4.6.2 - 2026-07-21
 
 

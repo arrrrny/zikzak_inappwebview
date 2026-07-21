@@ -109,7 +109,7 @@ class HeadlessInAppWebViewWeb extends PlatformHeadlessInAppWebView {
   }
 
   @override
-  Future<void> dispose() async {
+  Future<void> dispose({bool isKeepAlive = false}) async {
     _iframe?.remove();
     _iframe = null;
     _webViewController = null;
