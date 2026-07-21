@@ -146,8 +146,8 @@ class ChromeSafariBrowser implements PlatformChromeSafariBrowserEvents {
       PlatformChromeSafariBrowser.static().clearWebsiteData();
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.prewarmConnections}
-  static Future<PrewarmingToken?> prewarmConnections(List<WebUri> URLs) =>
-      PlatformChromeSafariBrowser.static().prewarmConnections(URLs);
+  static Future<PrewarmingToken?> prewarmConnections(List<WebUri> urls) =>
+      PlatformChromeSafariBrowser.static().prewarmConnections(urls);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformChromeSafariBrowser.invalidatePrewarmingToken}
   static Future<void> invalidatePrewarmingToken(
