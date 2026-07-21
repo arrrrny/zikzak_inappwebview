@@ -38,8 +38,10 @@ dependencies:
   url_launcher: ^6.2.0
   zikzak_inappwebview:
     path: ../
-  zikzak_inappwebview_platform_interface: ^4.6.0
-  zikzak_inappwebview_web: ^4.6.0
+  zikzak_inappwebview_platform_interface:
+    path: ../../zikzak_inappwebview_platform_interface
+  zikzak_inappwebview_web:
+    path: ../../zikzak_inappwebview_web
 
 dev_dependencies:
   integration_test:
