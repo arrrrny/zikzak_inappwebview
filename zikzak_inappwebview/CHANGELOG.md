@@ -1,3 +1,31 @@
+## 4.6.0 - 2026-07-20
+
+- Fixed: iOS InAppBrowser crash after SPM migration — storyboard now loaded via
+  `Bundle.module` instead of main bundle, resolving "Could not find a storyboard
+  named 'WebView'" exception when opening the in-app browser
+- Fixed: Android WebView lifecycle — `onFlutterViewDetached()` now properly
+  destroys the WebView (guarded against keepAlive)
+- Fixed: Android WebSettings OEM crash protection — 18 `WebSettingsCompat.*`
+  calls wrapped in try/catch for Huawei/Honor/OnePlus devices
+- Fixed: iOS `webViewWebContentProcessDidTerminate` now auto-reloads after
+  500ms with `isDisposed` guard
+- Fixed: iOS `URLValidationManager` wired into navigation flow — blocks
+  `javascript:`, `vbscript:`, `jar`, `wyciwyg` schemes at native level
+- Fixed: `InAppLocalhostServer` race condition — added `Completer` gate to
+  prevent `SocketException: Address already in use` on rapid start/close
+- Fixed: `PullToRefreshController` — added `_isDisposed` guard with
+  `MissingPluginException` catch
+- Fixed: Headless WebView cleanup — explicit `stopLoading()` and script
+  removal in deinit/dispose across iOS, Android, and Dart layers
+- Fixed: webkit2gtk-4.0 compile failure with proper memory cleanup
+- Feature: Web platform — added `addJavaScriptHandler`/`removeJavaScriptHandler`/
+  `hasJavaScriptHandler` via `postMessage` bridge
+- Feature: Windows — wired `WebViewEnvironmentSettings.userDataFolder` into
+  WebView2 initialization with writability verification
+- Security: iOS native URL scheme validation via `URLValidationManager`
+- Perf: CookieManager — all 7 methods wrapped with `Lock.synchronized()` for
+  thread-safe concurrent access
+
 ## 4.5.3 - 2026-07-20
 
 - Fixed: iOS InAppBrowser crash after SPM migration — storyboard now loaded via
