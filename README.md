@@ -98,6 +98,10 @@ The API is nearly identical. Version 4.x.x corresponds to upstream 6.x.x. This f
 - **6 platforms** actively maintained
 - **Active daily development** with CI, code reviews, and automated publishing
 
+## ⭐ Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=arrrrny/zikzak_inappwebview&type=Date)](https://star-history.com/#arrrrny/zikzak_inappwebview&Date)
+
 ## 🤝 Contributing
 
 Contributions are welcome! If you find a bug or have a feature request, please [open an issue](https://github.com/arrrrny/zikzak_inappwebview/issues).
