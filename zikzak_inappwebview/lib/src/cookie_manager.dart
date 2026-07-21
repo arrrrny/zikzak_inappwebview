@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:synchronized/synchronized.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
 import 'in_app_webview/in_app_webview_controller.dart';
@@ -25,6 +26,8 @@ class CookieManager {
 
   /// Implementation of [PlatformCookieManager] for the current platform.
   final PlatformCookieManager platform;
+
+  final Lock _lock = Lock();
 
   static CookieManager? _instance;
 
@@ -57,39 +60,51 @@ class CookieManager {
     bool? isHttpOnly,
     HTTPCookieSameSitePolicy? sameSite,
     InAppWebViewController? webViewController,
-  }) => platform.setCookie(
-    url: url,
-    name: name,
-    value: value,
-    path: path,
-    domain: domain,
-    expiresDate: expiresDate,
-    maxAge: maxAge,
-    isSecure: isSecure,
-    isHttpOnly: isHttpOnly,
-    sameSite: sameSite,
-    webViewController: webViewController?.platform,
-  );
+  }) {
+    return _lock.synchronized(
+      () => platform.setCookie(
+        url: url,
+        name: name,
+        value: value,
+        path: path,
+        domain: domain,
+        expiresDate: expiresDate,
+        maxAge: maxAge,
+        isSecure: isSecure,
+        isHttpOnly: isHttpOnly,
+        sameSite: sameSite,
+        webViewController: webViewController?.platform,
+      ),
+    );
+  }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformCookieManager.getCookies}
   Future<List<Cookie>> getCookies({
     required WebUri url,
     InAppWebViewController? webViewController,
-  }) => platform.getCookies(
-    url: url,
-    webViewController: webViewController?.platform,
-  );
+  }) {
+    return _lock.synchronized(
+      () => platform.getCookies(
+        url: url,
+        webViewController: webViewController?.platform,
+      ),
+    );
+  }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformCookieManager.getCookie}
   Future<Cookie?> getCookie({
     required WebUri url,
     required String name,
     InAppWebViewController? webViewController,
-  }) => platform.getCookie(
-    url: url,
-    name: name,
-    webViewController: webViewController?.platform,
-  );
+  }) {
+    return _lock.synchronized(
+      () => platform.getCookie(
+        url: url,
+        name: name,
+        webViewController: webViewController?.platform,
+      ),
+    );
+  }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformCookieManager.deleteCookie}
   Future<bool> deleteCookie({
@@ -98,13 +113,17 @@ class CookieManager {
     String path = "/",
     String? domain,
     InAppWebViewController? webViewController,
-  }) => platform.deleteCookie(
-    url: url,
-    name: name,
-    path: path,
-    domain: domain,
-    webViewController: webViewController?.platform,
-  );
+  }) {
+    return _lock.synchronized(
+      () => platform.deleteCookie(
+        url: url,
+        name: name,
+        path: path,
+        domain: domain,
+        webViewController: webViewController?.platform,
+      ),
+    );
+  }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformCookieManager.deleteCookies}
   Future<bool> deleteCookies({
@@ -112,19 +131,26 @@ class CookieManager {
     String path = "/",
     String? domain,
     InAppWebViewController? webViewController,
-  }) => platform.deleteCookies(
-    url: url,
-    path: path,
-    domain: domain,
-    webViewController: webViewController?.platform,
-  );
+  }) {
+    return _lock.synchronized(
+      () => platform.deleteCookies(
+        url: url,
+        path: path,
+        domain: domain,
+        webViewController: webViewController?.platform,
+      ),
+    );
+  }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformCookieManager.deleteAllCookies}
-  Future<bool> deleteAllCookies() => platform.deleteAllCookies();
+  Future<bool> deleteAllCookies() =>
+      _lock.synchronized(() => platform.deleteAllCookies());
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformCookieManager.getAllCookies}
-  Future<List<Cookie>> getAllCookies() => platform.getAllCookies();
+  Future<List<Cookie>> getAllCookies() =>
+      _lock.synchronized(() => platform.getAllCookies());
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformCookieManager.removeSessionCookies}
-  Future<bool> removeSessionCookies() => platform.removeSessionCookies();
+  Future<bool> removeSessionCookies() =>
+      _lock.synchronized(() => platform.removeSessionCookies());
 }

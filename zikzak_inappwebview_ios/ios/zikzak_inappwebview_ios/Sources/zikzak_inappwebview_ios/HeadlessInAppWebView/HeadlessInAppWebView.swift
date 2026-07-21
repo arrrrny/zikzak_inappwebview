@@ -98,6 +98,8 @@ public class HeadlessInAppWebView: Disposable {
     }
 
     deinit {
+        flutterWebView?.webView()?.stopLoading()
+        flutterWebView?.webView()?.configuration.userContentController.removeAllUserScripts()
         dispose()
     }
 }

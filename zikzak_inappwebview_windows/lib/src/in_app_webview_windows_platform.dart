@@ -1,6 +1,9 @@
 import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+
+import 'package:path_provider/path_provider.dart';
 import 'package:webview_windows/webview_windows.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
@@ -53,8 +56,42 @@ class _InAppWebViewWindowsWidgetStateImpl
     initPlatformState();
   }
 
+  Future<String> _getDefaultUserDataFolder() async {
+    final directory = await getApplicationSupportDirectory();
+    final path = '${directory.path}/zikzak_webview2_data';
+    final dir = Directory(path);
+    if (!await dir.exists()) {
+      await dir.create(recursive: true);
+    }
+    // Verify writability
+    final testFile = File('$path/.write_test');
+    try {
+      await testFile.writeAsString('test');
+      try {
+        await testFile.delete();
+      } catch (_) {
+        // Ignore deletion errors (e.g., temporary file locks from AV)
+      }
+      return path;
+    } catch (e) {
+      throw StateError('WebView2 user data folder is not writable: $path');
+    }
+  }
+
   Future<void> initPlatformState() async {
     try {
+      // Determine user data folder from WebViewEnvironmentSettings or use default
+      String userDataPath;
+      final settings = widget.params.webViewEnvironment?.settings;
+      if (settings?.userDataFolder != null) {
+        userDataPath = settings!.userDataFolder!;
+      } else {
+        userDataPath = await _getDefaultUserDataFolder();
+      }
+
+      // Initialize the shared WebView2 environment with the user data folder
+      await WebviewController.initializeEnvironment(userDataPath: userDataPath);
+
       await _controller.initialize();
 
       // Setup listeners
@@ -98,30 +135,7 @@ class _InAppWebViewWindowsWidgetStateImpl
           widget.params.controllerFromPlatform!(controller),
         );
       }
-    } on PlatformException catch (e) {
-      // WidgetsBinding.instance.addPostFrameCallback((_) {
-      //   showDialog(
-      //       context: context,
-      //       builder: (_) => AlertDialog(
-      //             title: Text('Error'),
-      //             content: Column(
-      //               mainAxisSize: MainAxisSize.min,
-      //               crossAxisAlignment: CrossAxisAlignment.start,
-      //               children: [
-      //                 Text('Code: ${e.code}'),
-      //                 Text('Message: ${e.message}'),
-      //               ],
-      //             ),
-      //             actions: [
-      //               TextButton(
-      //                 child: Text('Continue'),
-      //                 onPressed: () {
-      //                   Navigator.of(context).pop();
-      //                 },
-      //               )
-      //             ],
-      //           ));
-      // });
+    } catch (e) {
       print("Failed to initialize webview: $e");
     }
   }

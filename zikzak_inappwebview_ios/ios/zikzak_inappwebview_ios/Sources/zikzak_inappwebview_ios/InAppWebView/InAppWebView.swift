@@ -2206,6 +2206,13 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             decisionHandler(.allow)
             return
         }
+
+        let validator = URLValidationManager()
+        if let url = navigationAction.request.url, !validator.validateURL(url: url).allowed {
+            decisionHandler(.cancel)
+            return
+        }
+
         var decisionHandlerCalled = false
         let callback = WebViewChannelDelegate.ShouldOverrideUrlLoadingCallback()
         callback.nonNullSuccess = { (response: WKNavigationActionPolicy) in
@@ -3170,6 +3177,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
 
     public func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
         channelDelegate?.onWebContentProcessDidTerminate()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            guard let self = self, !self.isDisposed else { return }
+            self.reload()
+        }
     }
 
     public func webView(
