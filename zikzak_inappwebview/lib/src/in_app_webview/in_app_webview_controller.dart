@@ -10,6 +10,7 @@ import '../web_message/main.dart';
 import '../web_storage/web_storage.dart';
 
 import '../print_job/print_job_controller.dart';
+import 'network_capture/network_capture_manager.dart';
 
 ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController}
 class InAppWebViewController {
@@ -26,6 +27,16 @@ class InAppWebViewController {
 
   /// Implementation of [PlatformInAppWebViewController] for the current platform.
   final PlatformInAppWebViewController platform;
+
+  ///The [NetworkCaptureController] accumulating captured network entries for
+  ///this WebView, or `null` when the Network Capture API is not enabled.
+  ///
+  ///When `InAppWebViewSettings.networkCapture` was provided, this returns
+  ///that same instance; otherwise it returns the automatically created
+  ///collector (available when `useNetworkCapture` is `true` or any of the
+  ///`onNetwork*` events is implemented).
+  NetworkCaptureController? get networkCaptureController =>
+      NetworkCaptureManager.of(this)?.collector;
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.webStorage}
   WebStorage get webStorage =>

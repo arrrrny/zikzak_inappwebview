@@ -2033,6 +2033,102 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   )
   bool? dismissDialogues;
 
+  ///Set to `true` to enable the Network Capture API: `XMLHttpRequest` and
+  ///`fetch()` calls made by the page are intercepted and reported through
+  ///the `onNetworkRequest`/`onNetworkResponse`/`onNetworkLoadingFinished`
+  ///events and/or the [NetworkCaptureController].
+  ///
+  ///If any of those events is implemented or [networkCapture] is set and
+  ///this value is `null`, it is automatically inferred as `true`.
+  ///The default value is `false`.
+  ///
+  ///**NOTE**: requires [javaScriptEnabled] to be `true`.
+  @SupportedPlatforms(
+    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+  )
+  bool? useNetworkCapture;
+
+  ///Maximum response body size to capture, in characters.
+  ///Bodies exceeding this are truncated with a
+  ///`... [truncated, total: N chars]` suffix.
+  ///
+  ///The default value is `50000` (50 KB of text).
+  @SupportedPlatforms(
+    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+  )
+  int? networkCaptureMaxBodySize;
+
+  ///Whether to capture response bodies at all.
+  ///Set to `false` for URL/status/headers-only monitoring.
+  ///
+  ///The default value is `true`.
+  @SupportedPlatforms(
+    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+  )
+  bool? networkCaptureBodies;
+
+  ///Whether to capture binary response bodies (images, fonts, ...).
+  ///When `false`, binary responses capture metadata only.
+  ///When `true`, binary bodies are base64-encoded.
+  ///
+  ///The default value is `false`.
+  @SupportedPlatforms(
+    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+  )
+  bool? networkCaptureBinaryBodies;
+
+  ///URL patterns used to filter captured requests.
+  ///Only requests whose URL matches ANY pattern are captured.
+  ///An empty list captures all requests.
+  ///
+  ///Patterns are interpreted according to [networkCaptureUrlPatternType].
+  ///
+  ///The default value is an empty list (capture all).
+  @SupportedPlatforms(
+    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+  )
+  List<String>? networkCaptureUrlPatterns;
+
+  ///How [networkCaptureUrlPatterns] are interpreted.
+  ///
+  ///The default value is [UrlPatternType.substring].
+  @SupportedPlatforms(
+    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+  )
+  UrlPatternType? networkCaptureUrlPatternType;
+
+  ///Resource types to capture.
+  ///
+  ///**NOTE**: the JavaScript-injection-based capture engine can only
+  ///observe [ResourceType.xhr] and [ResourceType.fetch].
+  ///
+  ///The default value is `[ResourceType.xhr, ResourceType.fetch]`.
+  @SupportedPlatforms(
+    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+  )
+  List<ResourceType>? networkCaptureResourceTypes;
+
+  ///MIME type patterns used to filter captured response bodies.
+  ///When non-empty, only responses whose `Content-Type` matches ANY pattern
+  ///(substring) have their body captured. Requests are still tracked and
+  ///response metadata is still reported; only the body is discarded.
+  ///
+  ///The default value is an empty list (capture all bodies).
+  @SupportedPlatforms(
+    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+  )
+  List<String>? networkCaptureMimeTypes;
+
+  ///A [NetworkCaptureController] that accumulates all captured
+  ///request-response pairs for bulk retrieval.
+  ///Setting this also enables network capture (see [useNetworkCapture]).
+  ///
+  ///**NOTE**: this value is not serialized with the other settings.
+  @SupportedPlatforms(
+    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+  )
+  NetworkCaptureController? networkCapture;
+
   @ExchangeableObjectConstructor()
   InAppWebViewSettings_({
     this.useShouldOverrideUrlLoading,
@@ -2175,6 +2271,18 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.iframeName,
     this.iframeCsp,
     this.dismissDialogues = false,
+    this.useNetworkCapture,
+    this.networkCaptureMaxBodySize = 50000,
+    this.networkCaptureBodies = true,
+    this.networkCaptureBinaryBodies = false,
+    this.networkCaptureUrlPatterns = const [],
+    this.networkCaptureUrlPatternType = UrlPatternType.substring,
+    this.networkCaptureResourceTypes = const [
+      ResourceType.xhr,
+      ResourceType.fetch,
+    ],
+    this.networkCaptureMimeTypes = const [],
+    this.networkCapture,
   }) {
     if (this.minimumFontSize == null)
       this.minimumFontSize = Util.isAndroid ? 8 : 0;

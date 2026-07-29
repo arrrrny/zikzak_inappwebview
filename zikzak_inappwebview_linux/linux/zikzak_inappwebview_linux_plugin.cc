@@ -20,6 +20,8 @@
 struct _ZikzakInappwebviewLinuxPlugin {
   GObject parent_instance;
   FlPluginRegistrar *registrar;
+  FlBinaryMessenger *messenger;
+  FlTextureRegistrar *texture_registrar;
   GHashTable *web_views;
 };
 
@@ -42,9 +44,12 @@ static void zikzak_inappwebview_linux_plugin_handle_method_call(
       if (idVal && fl_value_get_type(idVal) == FL_VALUE_TYPE_STRING) {
         const char *id = fl_value_get_string(idVal);
 
-        InAppWebView *webview = in_app_webview_new(self->registrar, id);
+        InAppWebView *webview = in_app_webview_new(self->messenger, self->texture_registrar, id);
 
         g_hash_table_insert(self->web_views, g_strdup(id), webview);
+
+        in_app_webview_load_initial(webview,
+                                    fl_value_lookup_string(args, "params"));
 
         int64_t texture_id = in_app_webview_get_texture_id(webview);
         response = FL_METHOD_RESPONSE(
@@ -72,13 +77,34 @@ static void headless_method_call_cb(FlMethodChannel *channel,
   const gchar *method = fl_method_call_get_name(method_call);
   FlValue *args = fl_method_call_get_args(method_call);
 
-  if (strcmp(method, "createHeadless") == 0) {
+  if (strcmp(method, "run") == 0) {
+    if (fl_value_get_type(args) == FL_VALUE_TYPE_MAP) {
+      FlValue *idVal = fl_value_lookup_string(args, "id");
+      if (idVal && fl_value_get_type(idVal) == FL_VALUE_TYPE_STRING) {
+        const char *id = fl_value_get_string(idVal);
+        InAppWebView *webview = in_app_webview_new(self->messenger, self->texture_registrar, id);
+        g_hash_table_insert(self->web_views, g_strdup(id), webview);
+        in_app_webview_load_initial(webview,
+                                    fl_value_lookup_string(args, "params"));
+        g_autofree gchar *channel_name = g_strdup_printf(
+            "wtf.zikzak/flutter_headless_inappwebview_%s", id);
+        g_autoptr(FlStandardMethodCodec) codec = fl_standard_method_codec_new();
+        FlMethodChannel *headless_channel =
+            fl_method_channel_new(self->messenger, channel_name,
+                                  FL_METHOD_CODEC(codec));
+        fl_method_channel_invoke_method(headless_channel, "onWebViewCreated",
+                                        nullptr, nullptr, nullptr, nullptr);
+        response = FL_METHOD_RESPONSE(
+            fl_method_success_response_new(fl_value_new_bool(true)));
+      }
+    }
+  } else if (strcmp(method, "createHeadless") == 0) {
     if (fl_value_get_type(args) == FL_VALUE_TYPE_MAP) {
       FlValue *idVal = fl_value_lookup_string(args, "id");
       if (idVal && fl_value_get_type(idVal) == FL_VALUE_TYPE_STRING) {
         const char *id = fl_value_get_string(idVal);
 
-        InAppWebView *webview = in_app_webview_new(self->registrar, id);
+        InAppWebView *webview = in_app_webview_new(self->messenger, self->texture_registrar, id);
         g_hash_table_insert(self->web_views, g_strdup(id), webview);
 
         response = FL_METHOD_RESPONSE(
@@ -119,6 +145,8 @@ static void zikzak_inappwebview_linux_plugin_dispose(GObject *object) {
   if (self->web_views) {
     g_hash_table_destroy(self->web_views);
   }
+  g_clear_object(&self->messenger);
+  g_clear_object(&self->texture_registrar);
   G_OBJECT_CLASS(zikzak_inappwebview_linux_plugin_parent_class)
       ->dispose(object);
 }
@@ -147,6 +175,13 @@ void zikzak_inappwebview_linux_plugin_register_with_registrar(
       g_object_new(zikzak_inappwebview_linux_plugin_get_type(), nullptr));
 
   plugin->registrar = registrar;
+  // The FlPluginRegistrar may be invalidated by the engine after plugin
+  // registration completes. Cache referenced messenger/texture registrar
+  // for per-webview method channel and texture registration.
+  plugin->messenger = FL_BINARY_MESSENGER(
+      g_object_ref(fl_plugin_registrar_get_messenger(registrar)));
+  plugin->texture_registrar = FL_TEXTURE_REGISTRAR(
+      g_object_ref(fl_plugin_registrar_get_texture_registrar(registrar)));
 
   g_autoptr(FlStandardMethodCodec) codec = fl_standard_method_codec_new();
   g_autoptr(FlMethodChannel) channel = fl_method_channel_new(

@@ -803,6 +803,103 @@ class InAppWebViewSettings {
   ///- Android native WebView ([Official API - WebView.setNetworkAvailable](https://developer.android.com/reference/android/webkit/WebView#setNetworkAvailable(boolean)))
   bool? networkAvailable;
 
+  ///Whether to capture binary response bodies (images, fonts, ...).
+  ///When `false`, binary responses capture metadata only.
+  ///When `true`, binary bodies are base64-encoded.
+  ///
+  ///The default value is `false`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
+  bool? networkCaptureBinaryBodies;
+
+  ///Whether to capture response bodies at all.
+  ///Set to `false` for URL/status/headers-only monitoring.
+  ///
+  ///The default value is `true`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
+  bool? networkCaptureBodies;
+
+  ///Maximum response body size to capture, in characters.
+  ///Bodies exceeding this are truncated with a
+  ///`... [truncated, total: N chars]` suffix.
+  ///
+  ///The default value is `50000` (50 KB of text).
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
+  int? networkCaptureMaxBodySize;
+
+  ///MIME type patterns used to filter captured response bodies.
+  ///When non-empty, only responses whose `Content-Type` matches ANY pattern
+  ///(substring) have their body captured. Requests are still tracked and
+  ///response metadata is still reported; only the body is discarded.
+  ///
+  ///The default value is an empty list (capture all bodies).
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
+  List<String>? networkCaptureMimeTypes;
+
+  ///Resource types to capture.
+  ///
+  ///**NOTE**: the JavaScript-injection-based capture engine can only
+  ///observe [ResourceType.xhr] and [ResourceType.fetch].
+  ///
+  ///The default value is `[ResourceType.xhr, ResourceType.fetch]`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
+  List<ResourceType>? networkCaptureResourceTypes;
+
+  ///URL patterns used to filter captured requests.
+  ///Only requests whose URL matches ANY pattern are captured.
+  ///An empty list captures all requests.
+  ///
+  ///Patterns are interpreted according to [networkCaptureUrlPatternType].
+  ///
+  ///The default value is an empty list (capture all).
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
+  List<String>? networkCaptureUrlPatterns;
+
+  ///How [networkCaptureUrlPatterns] are interpreted.
+  ///
+  ///The default value is [UrlPatternType.substring].
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
+  UrlPatternType? networkCaptureUrlPatternType;
+
+  ///A [NetworkCaptureController] that accumulates all captured
+  ///request-response pairs for bulk retrieval.
+  ///Setting this also enables network capture (see [useNetworkCapture]).
+  ///
+  ///**NOTE**: this value is not serialized with the other settings.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
+  NetworkCaptureController? networkCapture;
+
   ///Sets whether this WebView should raster tiles when it is offscreen but attached to a window.
   ///Turning this on can avoid rendering artifacts when animating an offscreen WebView on-screen.
   ///Offscreen WebViews in this mode use more memory. The default value is `false`.
@@ -1067,6 +1164,23 @@ class InAppWebViewSettings {
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///Set to `true` to enable the Network Capture API: `XMLHttpRequest` and
+  ///`fetch()` calls made by the page are intercepted and reported through
+  ///the `onNetworkRequest`/`onNetworkResponse`/`onNetworkLoadingFinished`
+  ///events and/or the [NetworkCaptureController].
+  ///
+  ///If any of those events is implemented or [networkCapture] is set and
+  ///this value is `null`, it is automatically inferred as `true`.
+  ///The default value is `false`.
+  ///
+  ///**NOTE**: requires [javaScriptEnabled] to be `true`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
+  bool? useNetworkCapture;
+
   bool? useOnDownloadStart;
 
   ///Set to `true` to be able to listen at the [PlatformWebViewCreationParams.onLoadResource] event.
@@ -1354,6 +1468,18 @@ class InAppWebViewSettings {
     this.iframeName,
     this.iframeCsp,
     this.dismissDialogues = false,
+    this.useNetworkCapture,
+    this.networkCaptureMaxBodySize = 50000,
+    this.networkCaptureBodies = true,
+    this.networkCaptureBinaryBodies = false,
+    this.networkCaptureUrlPatterns = const [],
+    this.networkCaptureUrlPatternType = UrlPatternType.substring,
+    this.networkCaptureResourceTypes = const [
+      ResourceType.xhr,
+      ResourceType.fetch,
+    ],
+    this.networkCaptureMimeTypes = const [],
+    this.networkCapture,
   }) {
     if (this.minimumFontSize == null)
       this.minimumFontSize = Util.isAndroid ? 8 : 0;
@@ -1531,6 +1657,30 @@ class InAppWebViewSettings {
     instance.disableVerticalScroll = map['disableVerticalScroll'];
     instance.disallowOverScroll = map['disallowOverScroll'];
     instance.dismissDialogues = map['dismissDialogues'];
+    instance.useNetworkCapture = map['useNetworkCapture'];
+    instance.networkCaptureMaxBodySize = map['networkCaptureMaxBodySize'];
+    instance.networkCaptureBodies = map['networkCaptureBodies'];
+    instance.networkCaptureBinaryBodies = map['networkCaptureBinaryBodies'];
+    instance.networkCaptureUrlPatterns =
+        map['networkCaptureUrlPatterns'] != null
+        ? List<String>.from(map['networkCaptureUrlPatterns']!.cast<String>())
+        : null;
+    instance.networkCaptureUrlPatternType = UrlPatternType.fromNativeValue(
+      map['networkCaptureUrlPatternType'],
+    );
+    instance.networkCaptureResourceTypes =
+        map['networkCaptureResourceTypes'] != null
+        ? List<ResourceType>.from(
+            map['networkCaptureResourceTypes'].map(
+              (e) => ResourceType.fromNativeValue(e)!,
+            ),
+          )
+        : null;
+    instance.networkCaptureMimeTypes = map['networkCaptureMimeTypes'] != null
+        ? List<String>.from(map['networkCaptureMimeTypes']!.cast<String>())
+        : null;
+    // NOTE: networkCapture is a runtime-only object and is intentionally
+    // not deserialized.
     instance.displayZoomControls = map['displayZoomControls'];
     instance.domStorageEnabled = map['domStorageEnabled'];
     instance.enableViewportScale = map['enableViewportScale'];
@@ -1720,6 +1870,18 @@ class InAppWebViewSettings {
       "mixedContentMode": mixedContentMode?.toNativeValue(),
       "needInitialFocus": needInitialFocus,
       "networkAvailable": networkAvailable,
+      "networkCaptureBinaryBodies": networkCaptureBinaryBodies,
+      "networkCaptureBodies": networkCaptureBodies,
+      "networkCaptureMaxBodySize": networkCaptureMaxBodySize,
+      "networkCaptureMimeTypes": networkCaptureMimeTypes,
+      "networkCaptureResourceTypes": networkCaptureResourceTypes
+          ?.map((e) => e.toNativeValue())
+          .toList(),
+      "networkCaptureUrlPatterns": networkCaptureUrlPatterns,
+      "networkCaptureUrlPatternType": networkCaptureUrlPatternType
+          ?.toNativeValue(),
+      // NOTE: "networkCapture" is a runtime-only object and is
+      // intentionally not serialized.
       "offscreenPreRaster": offscreenPreRaster,
       "overScrollMode": overScrollMode?.toNativeValue(),
       "pageZoom": pageZoom,
@@ -1753,6 +1915,7 @@ class InAppWebViewSettings {
       "underPageBackgroundColor": underPageBackgroundColor?.toHex(),
       "upgradeKnownHostsToHTTPS": upgradeKnownHostsToHTTPS,
       "useHybridComposition": useHybridComposition,
+      "useNetworkCapture": useNetworkCapture,
       "useOnDownloadStart": useOnDownloadStart,
       "useOnLoadResource": useOnLoadResource,
       "useOnNavigationResponse": useOnNavigationResponse,
@@ -1779,7 +1942,11 @@ class InAppWebViewSettings {
 
   ///Returns a copy of InAppWebViewSettings.
   InAppWebViewSettings copy() {
-    return InAppWebViewSettings.fromMap(toMap()) ?? InAppWebViewSettings();
+    final instance =
+        InAppWebViewSettings.fromMap(toMap()) ?? InAppWebViewSettings();
+    // networkCapture is not serialized; carry the reference over manually.
+    instance.networkCapture = networkCapture;
+    return instance;
   }
 
   @override

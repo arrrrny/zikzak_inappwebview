@@ -15,6 +15,7 @@ import 'in_app_webview_controller.dart';
 import '../find_interaction/find_interaction_controller.dart';
 import '../pull_to_refresh/main.dart';
 import '../pull_to_refresh/pull_to_refresh_controller.dart';
+import 'network_capture/network_capture_manager.dart';
 
 ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewWidget}
 class InAppWebView extends StatefulWidget {
@@ -37,7 +38,7 @@ class InAppWebView extends StatefulWidget {
   final PlatformInAppWebViewWidget platform;
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewWidget}
-  InAppWebView({
+  factory InAppWebView({
     Key? key,
     Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers,
     int? windowId,
@@ -286,9 +287,25 @@ class InAppWebView extends StatefulWidget {
       Size newContentSize,
     )?
     onContentSizeChanged,
-  }) : this.fromPlatformCreationParams(
-         key: key,
-         params: PlatformInAppWebViewWidgetCreationParams(
+    void Function(InAppWebViewController controller, NetworkRequest request)?
+    onNetworkRequest,
+    void Function(InAppWebViewController controller, NetworkResponse response)?
+    onNetworkResponse,
+    void Function(
+      InAppWebViewController controller,
+      NetworkResponseBody responseBody,
+    )?
+    onNetworkLoadingFinished,
+  }) {
+    final networkCaptureManager = NetworkCaptureManager.maybeCreate(
+      settings: initialSettings,
+      onNetworkRequest: onNetworkRequest,
+      onNetworkResponse: onNetworkResponse,
+      onNetworkLoadingFinished: onNetworkLoadingFinished,
+    );
+    return InAppWebView.fromPlatformCreationParams(
+      key: key,
+      params: PlatformInAppWebViewWidgetCreationParams(
            controllerFromPlatform:
                (PlatformInAppWebViewController controller) =>
                    InAppWebViewController.fromPlatform(platform: controller),
@@ -298,19 +315,25 @@ class InAppWebView extends StatefulWidget {
            initialFile: initialFile,
            initialData: initialData,
            initialSettings: initialSettings,
-           initialUserScripts: initialUserScripts,
+           initialUserScripts: NetworkCaptureManager.mergeUserScripts(
+             initialUserScripts,
+             networkCaptureManager,
+           ),
            pullToRefreshController: pullToRefreshController?.platform,
            findInteractionController: findInteractionController?.platform,
            contextMenu: contextMenu,
            layoutDirection: layoutDirection,
            webViewEnvironment: webViewEnvironment?.platform,
-           onWebViewCreated: onWebViewCreated != null
-               ? (controller) => onWebViewCreated.call(controller)
-               : null,
-           onLoadStart: onLoadStart != null
-               ? (controller, url) => onLoadStart.call(controller, url)
-               : null,
+           onWebViewCreated: (controller) {
+             networkCaptureManager?.attach(controller);
+             onWebViewCreated?.call(controller);
+           },
+           onLoadStart: (controller, url) {
+             networkCaptureManager?.onPageLoad(controller);
+             onLoadStart?.call(controller, url);
+           },
            onLoadStop: (controller, url) {
+             networkCaptureManager?.onPageLoad(controller);
              onLoadStop?.call(controller, url);
              if (initialSettings?.dismissDialogues ?? false) {
                () async {
@@ -568,11 +591,24 @@ class InAppWebView extends StatefulWidget {
                        newContentSize,
                      )
                : null,
+           onNetworkRequest: onNetworkRequest != null
+               ? (controller, request) =>
+                     onNetworkRequest.call(controller, request)
+               : null,
+           onNetworkResponse: onNetworkResponse != null
+               ? (controller, response) =>
+                     onNetworkResponse.call(controller, response)
+               : null,
+           onNetworkLoadingFinished: onNetworkLoadingFinished != null
+               ? (controller, responseBody) =>
+                     onNetworkLoadingFinished.call(controller, responseBody)
+               : null,
            gestureRecognizers: gestureRecognizers,
            headlessWebView: headlessWebView?.platform,
            preventGestureDelay: preventGestureDelay,
          ),
-       );
+    );
+  }
 
   @override
   _InAppWebViewState createState() => _InAppWebViewState();

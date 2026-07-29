@@ -947,6 +947,51 @@ class PlatformWebViewCreationParams<T> {
   final void Function(T controller, Size oldContentSize, Size newContentSize)?
   onContentSizeChanged;
 
+  ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onNetworkRequest}
+  ///Event fired when a network request matching the Network Capture filters
+  ///is sent by the page (`XMLHttpRequest` or `fetch()`).
+  ///
+  ///**NOTE**: In order to be able to listen to this event, you need to set
+  ///[InAppWebViewSettings.useNetworkCapture] setting to `true`
+  ///(it is inferred as `true` when this event is implemented).
+  ///This event is driven by the Dart-level capture engine
+  ///(JavaScript injection), not by the native platform implementation.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
+  ///{@endtemplate}
+  final void Function(T controller, NetworkRequest request)? onNetworkRequest;
+
+  ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onNetworkResponse}
+  ///Event fired when the response headers/status of a captured request
+  ///arrive (before the body has been fully read).
+  ///
+  ///**NOTE**: same enabling logic as [PlatformWebViewCreationParams.onNetworkRequest].
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
+  ///{@endtemplate}
+  final void Function(T controller, NetworkResponse response)?
+  onNetworkResponse;
+
+  ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.onNetworkLoadingFinished}
+  ///Event fired after the response body of a captured request has been
+  ///fully read.
+  ///
+  ///**NOTE**: same enabling logic as [PlatformWebViewCreationParams.onNetworkRequest].
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
+  ///{@endtemplate}
+  final void Function(T controller, NetworkResponseBody responseBody)?
+  onNetworkLoadingFinished;
+
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewCreationParams.initialUrlRequest}
   ///Initial url request that will be loaded.
   ///
@@ -1120,6 +1165,9 @@ class PlatformWebViewCreationParams<T> {
     this.onCameraCaptureStateChanged,
     this.onMicrophoneCaptureStateChanged,
     this.onContentSizeChanged,
+    this.onNetworkRequest,
+    this.onNetworkResponse,
+    this.onNetworkLoadingFinished,
     this.initialUrlRequest,
     this.initialFile,
     this.initialData,
