@@ -15,42 +15,47 @@
  under the License.
  */
 
+import AVFoundation
 import Flutter
+import SafariServices
 import UIKit
 import WebKit
-import UIKit
-import AVFoundation
-import SafariServices
 
 public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
-    
+
     var registrar: FlutterPluginRegistrar?
     var platformUtil: PlatformUtil?
     var inAppWebViewManager: InAppWebViewManager?
     var myCookieManager: Any?
     var myWebStorageManager: Any?
     var credentialDatabase: CredentialDatabase?
+    var proxyManager: Any?
     var inAppBrowserManager: InAppBrowserManager?
     var headlessInAppWebViewManager: HeadlessInAppWebViewManager?
     var chromeSafariBrowserManager: ChromeSafariBrowserManager?
     var webAuthenticationSessionManager: WebAuthenticationSessionManager?
     var printJobManager: PrintJobManager?
-    
+
     var webViewControllers: [String: InAppBrowserWebViewController?] = [:]
     var safariViewControllers: [String: Any?] = [:]
-    
+
     public init(with registrar: FlutterPluginRegistrar) {
         super.init()
-        
+
         self.registrar = registrar
-        registrar.register(FlutterWebViewFactory(plugin: self) as FlutterPlatformViewFactory, withId: FlutterWebViewFactory.VIEW_TYPE_ID)
-        
+        registrar.register(
+            FlutterWebViewFactory(plugin: self) as FlutterPlatformViewFactory,
+            withId: FlutterWebViewFactory.VIEW_TYPE_ID)
+
         platformUtil = PlatformUtil(plugin: self)
         inAppBrowserManager = InAppBrowserManager(plugin: self)
         headlessInAppWebViewManager = HeadlessInAppWebViewManager(plugin: self)
         chromeSafariBrowserManager = ChromeSafariBrowserManager(plugin: self)
         inAppWebViewManager = InAppWebViewManager(plugin: self)
         credentialDatabase = CredentialDatabase(plugin: self)
+        if #available(iOS 17.0, *) {
+            proxyManager = ProxyManager(plugin: self)
+        }
         if #available(iOS 11.0, *) {
             myCookieManager = MyCookieManager(plugin: self)
         }
@@ -60,11 +65,11 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         webAuthenticationSessionManager = WebAuthenticationSessionManager(plugin: self)
         printJobManager = PrintJobManager(plugin: self)
     }
-    
+
     public static func register(with registrar: FlutterPluginRegistrar) {
         let _ = SwiftFlutterPlugin(with: registrar)
     }
-    
+
     public func detachFromEngine(for registrar: FlutterPluginRegistrar) {
         platformUtil?.dispose()
         platformUtil = nil
@@ -78,6 +83,10 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         inAppWebViewManager = nil
         credentialDatabase?.dispose()
         credentialDatabase = nil
+        if #available(iOS 17.0, *) {
+            (proxyManager as! ProxyManager?)?.dispose()
+            proxyManager = nil
+        }
         if #available(iOS 11.0, *) {
             (myCookieManager as! MyCookieManager?)?.dispose()
             myCookieManager = nil

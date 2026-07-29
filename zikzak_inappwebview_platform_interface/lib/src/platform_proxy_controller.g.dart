@@ -6,11 +6,64 @@ part of 'platform_proxy_controller.dart';
 // ExchangeableObjectGenerator
 // **************************************************************************
 
-///Class that represents the settings used to configure the [PlatformProxyController].
-///
-///**Officially Supported Platforms/Implementations**:
-///- Android native WebView ([Official API - ProxyConfig](https://developer.android.com/reference/androidx/webkit/ProxyConfig))
-class ProxySettings {
+class IOSProxySettings {
+  /// A Boolean that indicates whether or not a proxy configuration allows failover to non-proxied connections.
+  /// Failover isn’t allowed by default.
+  bool allowFailover;
+  List<String> excludedDomains;
+  List<String> matchDomains;
+
+  ///Proxy is a string in the format `[scheme://]host[:port]`.
+  ///Scheme is optional, if present must be `HTTP`, `HTTPS` or [SOCKS](https://tools.ietf.org/html/rfc1928) and defaults to `HTTP`.
+  String proxyUrl;
+  IOSProxySettings(
+      {this.allowFailover = false,
+      this.excludedDomains = const [],
+      this.matchDomains = const [],
+      this.proxyUrl = ''});
+
+  ///Gets a possible [IOSProxySettings] instance from a [Map] value.
+  static IOSProxySettings? fromMap(Map<String, dynamic>? map) {
+    if (map == null) {
+      return null;
+    }
+    final instance = IOSProxySettings();
+    instance.allowFailover = map['allowFailover'];
+    instance.excludedDomains =
+        List<String>.from(map['excludedDomains']!.cast<String>());
+    instance.matchDomains =
+        List<String>.from(map['matchDomains']!.cast<String>());
+    instance.proxyUrl = map['proxyUrl'];
+    return instance;
+  }
+
+  ///Converts instance to a map.
+  Map<String, dynamic> toMap() {
+    return {
+      "allowFailover": allowFailover,
+      "excludedDomains": excludedDomains,
+      "matchDomains": matchDomains,
+      "proxyUrl": proxyUrl,
+    };
+  }
+
+  ///Converts instance to a map.
+  Map<String, dynamic> toJson() {
+    return toMap();
+  }
+
+  ///Returns a copy of IOSProxySettings.
+  IOSProxySettings copy() {
+    return IOSProxySettings.fromMap(toMap()) ?? IOSProxySettings();
+  }
+
+  @override
+  String toString() {
+    return 'IOSProxySettings{allowFailover: $allowFailover, excludedDomains: $excludedDomains, matchDomains: $matchDomains, proxyUrl: $proxyUrl}';
+  }
+}
+
+class AndroidProxySettings {
   ///List of bypass rules.
   ///
   ///A bypass rule describes URLs that should skip proxy override settings and make a direct connection instead. These can be URLs or IP addresses. Wildcards are accepted.
@@ -59,33 +112,28 @@ class ProxySettings {
   ///
   ///**NOTE**: available only if [WebViewFeature.PROXY_OVERRIDE_REVERSE_BYPASS] feature is supported.
   bool reverseBypassEnabled;
-  ProxySettings({
-    this.bypassRules = const [],
-    this.bypassSimpleHostnames,
-    this.directs = const [],
-    this.proxyRules = const [],
-    this.removeImplicitRules,
-    this.reverseBypassEnabled = false,
-  });
+  AndroidProxySettings(
+      {this.bypassRules = const [],
+      this.bypassSimpleHostnames,
+      this.directs = const [],
+      this.proxyRules = const [],
+      this.removeImplicitRules,
+      this.reverseBypassEnabled = false});
 
-  ///Gets a possible [ProxySettings] instance from a [Map] value.
-  static ProxySettings? fromMap(Map<String, dynamic>? map) {
+  ///Gets a possible [AndroidProxySettings] instance from a [Map] value.
+  static AndroidProxySettings? fromMap(Map<String, dynamic>? map) {
     if (map == null) {
       return null;
     }
-    final instance = ProxySettings(
+    final instance = AndroidProxySettings(
       bypassSimpleHostnames: map['bypassSimpleHostnames'],
       removeImplicitRules: map['removeImplicitRules'],
     );
-    instance.bypassRules = List<String>.from(
-      map['bypassRules']!.cast<String>(),
-    );
+    instance.bypassRules =
+        List<String>.from(map['bypassRules']!.cast<String>());
     instance.directs = List<String>.from(map['directs']!.cast<String>());
-    instance.proxyRules = List<ProxyRule>.from(
-      map['proxyRules'].map(
-        (e) => ProxyRule.fromMap(e?.cast<String, dynamic>())!,
-      ),
-    );
+    instance.proxyRules = List<ProxyRule>.from(map['proxyRules']
+        .map((e) => ProxyRule.fromMap(e?.cast<String, dynamic>())!));
     instance.reverseBypassEnabled = map['reverseBypassEnabled'];
     return instance;
   }
@@ -107,13 +155,13 @@ class ProxySettings {
     return toMap();
   }
 
-  ///Returns a copy of ProxySettings.
-  ProxySettings copy() {
-    return ProxySettings.fromMap(toMap()) ?? ProxySettings();
+  ///Returns a copy of AndroidProxySettings.
+  AndroidProxySettings copy() {
+    return AndroidProxySettings.fromMap(toMap()) ?? AndroidProxySettings();
   }
 
   @override
   String toString() {
-    return 'ProxySettings{bypassRules: $bypassRules, bypassSimpleHostnames: $bypassSimpleHostnames, directs: $directs, proxyRules: $proxyRules, removeImplicitRules: $removeImplicitRules, reverseBypassEnabled: $reverseBypassEnabled}';
+    return 'AndroidProxySettings{bypassRules: $bypassRules, bypassSimpleHostnames: $bypassSimpleHostnames, directs: $directs, proxyRules: $proxyRules, removeImplicitRules: $removeImplicitRules, reverseBypassEnabled: $reverseBypassEnabled}';
   }
 }

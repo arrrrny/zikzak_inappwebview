@@ -3,6 +3,7 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 import 'chrome_safari_browser/chrome_safari_browser.dart';
 import 'cookie_manager.dart';
 import 'http_auth_credentials_database.dart';
+import 'proxy_controller.dart';
 import 'find_interaction/main.dart';
 import 'in_app_browser/in_app_browser.dart';
 import 'in_app_webview/main.dart';
@@ -271,5 +272,16 @@ class IOSInAppWebViewPlatform extends InAppWebViewPlatform {
   @override
   IOSWebAuthenticationSession createPlatformWebAuthenticationSessionStatic() {
     return IOSWebAuthenticationSession.static();
+  }
+
+  /// Creates a new [IosProxyController].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [ProxyController] in `zikzak_inappwebview` instead.
+  @override
+  PlatformProxyController createPlatformProxyController(
+    PlatformProxyControllerCreationParams params,
+  ) {
+    return IosProxyController(params);
   }
 }
