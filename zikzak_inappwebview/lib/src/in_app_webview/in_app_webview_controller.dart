@@ -10,6 +10,7 @@ import '../web_message/main.dart';
 import '../web_storage/web_storage.dart';
 
 import '../print_job/print_job_controller.dart';
+import 'controllers/main.dart';
 import 'network_capture/network_capture_manager.dart';
 
 ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController}
@@ -41,6 +42,30 @@ class InAppWebViewController implements Disposable {
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.webStorage}
   WebStorage get webStorage =>
       WebStorage.fromPlatform(platform: platform.webStorage);
+
+  NavigationController? _navigationController;
+  JavaScriptController? _javaScriptController;
+  CookieController? _cookieController;
+  SettingsController? _settingsController;
+
+  ///Domain-specific facade for navigation, page loading and history.
+  ///
+  ///Part of the domain controller split (issue #161, P3): the growing API
+  ///surface is grouped into focused facades without changing behavior.
+  NavigationController get navigation =>
+      _navigationController ??= NavigationController(this);
+
+  ///Domain-specific facade for JavaScript evaluation, handlers and
+  ///user scripts.
+  JavaScriptController get javaScript =>
+      _javaScriptController ??= JavaScriptController(this);
+
+  ///Domain-specific facade for cookie management scoped to this WebView.
+  CookieController get cookies => _cookieController ??= CookieController(this);
+
+  ///Domain-specific facade for reading and updating settings.
+  SettingsController get settings =>
+      _settingsController ??= SettingsController(this);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getUrl}
   Future<WebUri?> getUrl() => platform.getUrl();
