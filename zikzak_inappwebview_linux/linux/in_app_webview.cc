@@ -195,7 +195,7 @@ InAppWebView *in_app_webview_new(FlPluginRegistrar *registrar, const char *id) {
       fl_plugin_registrar_get_texture_registrar(registrar);
   if (fl_texture_registrar_register_texture(texture_registrar,
                                             FL_TEXTURE(self))) {
-    self->texture_id = (int64_t)self;
+    self->texture_id = fl_texture_get_id(FL_TEXTURE(self));
   } else {
     self->texture_id = 0;
   }
@@ -388,7 +388,6 @@ void in_app_webview_handle_method_call(InAppWebView *self,
     g_free(uri);
     return;
   } else if (strcmp(method, "takeScreenshot") == 0) {
-    g_object_ref(method_call);
     webkit_web_view_get_snapshot(
         WEBKIT_WEB_VIEW(self->web_view), WEBKIT_SNAPSHOT_REGION_VISIBLE,
         WEBKIT_SNAPSHOT_OPTIONS_NONE, nullptr,
