@@ -236,9 +236,11 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
     required JavaScriptHandlerCallback callback,
   }) {
     _javaScriptHandlers[handlerName] = callback;
-    _channel.invokeMethod('addJavaScriptHandler', <String, dynamic>{
-      'handlerName': handlerName,
-    });
+    _channel
+        .invokeMethod('addJavaScriptHandler', <String, dynamic>{
+          'handlerName': handlerName,
+        })
+        .catchError((_) {});
   }
 
   @override
@@ -246,9 +248,11 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
     required String handlerName,
   }) {
     final callback = _javaScriptHandlers.remove(handlerName);
-    _channel.invokeMethod('removeJavaScriptHandler', <String, dynamic>{
-      'handlerName': handlerName,
-    });
+    _channel
+        .invokeMethod('removeJavaScriptHandler', <String, dynamic>{
+          'handlerName': handlerName,
+        })
+        .catchError((_) {});
     return callback;
   }
 

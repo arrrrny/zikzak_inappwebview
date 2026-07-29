@@ -149,6 +149,7 @@ class NetworkCaptureManager {
   ///Registers the JavaScript handler on [controller] and flushes events the
   ///page buffered before registration. Called from `onWebViewCreated`.
   void attach(InAppWebViewController controller) {
+    if (_registry[controller] == this) return;
     _registry[controller] = this;
     _registry[controller.platform] = this;
     controller.addJavaScriptHandler(
@@ -167,6 +168,18 @@ class NetworkCaptureManager {
   void onPageLoad(InAppWebViewController controller) {
     _flushPageQueue(controller);
   }
+
+  ///Removes the JavaScript handler and clears registry entries.
+  ///Should be called from WebView dispose paths.
+  void detach(InAppWebViewController controller) {
+    if (_registry[controller] != this) return;
+    controller.removeJavaScriptHandler(
+      handlerName: kNetworkCaptureHandlerName,
+    );
+    _registry[controller] = null;
+    _registry[controller.platform] = null;
+  }
+
 
   Future<void> _flushPageQueue(InAppWebViewController controller) async {
     try {

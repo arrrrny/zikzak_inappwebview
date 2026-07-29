@@ -147,7 +147,7 @@ const String networkCaptureInterceptorJsTemplate = r'''
   }
 
   function truncateBody(str) {
-    var max = CONFIG.maxBodySize || 50000;
+    var max = CONFIG.maxBodySize != null ? CONFIG.maxBodySize : 50000;
     var total = str.length;
     if (total > max) {
       return {
@@ -264,7 +264,7 @@ const String networkCaptureInterceptorJsTemplate = r'''
       cb(sync.body, sync.isBinary);
       return;
     }
-    if (body && body.type && body.type.indexOf('text') === 0) {
+    if (body && typeof body.text === 'function' && isTextualMime(body.type)) {
       body.text().then(
         function (t) {
           cb(t, false);
