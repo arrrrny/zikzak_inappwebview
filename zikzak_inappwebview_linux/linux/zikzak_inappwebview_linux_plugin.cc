@@ -7,7 +7,6 @@
 #include <sys/utsname.h>
 
 #include <cstring>
-#include <iostream>
 
 #include "include/zikzak_inappwebview_linux/in_app_webview.h"
 #include "zikzak_inappwebview_linux_plugin_private.h"
@@ -44,7 +43,8 @@ static void zikzak_inappwebview_linux_plugin_handle_method_call(
       if (idVal && fl_value_get_type(idVal) == FL_VALUE_TYPE_STRING) {
         const char *id = fl_value_get_string(idVal);
 
-        InAppWebView *webview = in_app_webview_new(self->messenger, self->texture_registrar, id);
+        InAppWebView *webview =
+            in_app_webview_new(self->messenger, self->texture_registrar, id);
 
         g_hash_table_insert(self->web_views, g_strdup(id), webview);
 
@@ -82,16 +82,16 @@ static void headless_method_call_cb(FlMethodChannel *channel,
       FlValue *idVal = fl_value_lookup_string(args, "id");
       if (idVal && fl_value_get_type(idVal) == FL_VALUE_TYPE_STRING) {
         const char *id = fl_value_get_string(idVal);
-        InAppWebView *webview = in_app_webview_new(self->messenger, self->texture_registrar, id);
+        InAppWebView *webview =
+            in_app_webview_new(self->messenger, self->texture_registrar, id);
         g_hash_table_insert(self->web_views, g_strdup(id), webview);
         in_app_webview_load_initial(webview,
                                     fl_value_lookup_string(args, "params"));
-        g_autofree gchar *channel_name = g_strdup_printf(
-            "wtf.zikzak/flutter_headless_inappwebview_%s", id);
+        g_autofree gchar *channel_name =
+            g_strdup_printf("wtf.zikzak/flutter_headless_inappwebview_%s", id);
         g_autoptr(FlStandardMethodCodec) codec = fl_standard_method_codec_new();
-        FlMethodChannel *headless_channel =
-            fl_method_channel_new(self->messenger, channel_name,
-                                  FL_METHOD_CODEC(codec));
+        FlMethodChannel *headless_channel = fl_method_channel_new(
+            self->messenger, channel_name, FL_METHOD_CODEC(codec));
         fl_method_channel_invoke_method(headless_channel, "onWebViewCreated",
                                         nullptr, nullptr, nullptr, nullptr);
         response = FL_METHOD_RESPONSE(
@@ -104,8 +104,11 @@ static void headless_method_call_cb(FlMethodChannel *channel,
       if (idVal && fl_value_get_type(idVal) == FL_VALUE_TYPE_STRING) {
         const char *id = fl_value_get_string(idVal);
 
-        InAppWebView *webview = in_app_webview_new(self->messenger, self->texture_registrar, id);
+        InAppWebView *webview =
+            in_app_webview_new(self->messenger, self->texture_registrar, id);
         g_hash_table_insert(self->web_views, g_strdup(id), webview);
+        in_app_webview_load_initial(webview,
+                                    fl_value_lookup_string(args, "params"));
 
         response = FL_METHOD_RESPONSE(
             fl_method_success_response_new(fl_value_new_bool(true)));

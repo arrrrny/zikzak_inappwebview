@@ -1,7 +1,6 @@
 #include "include/zikzak_inappwebview_linux/in_app_webview.h"
 #include <cstring>
 #include <glib/gstdio.h>
-#include <iostream>
 
 struct _InAppWebView {
   FlPixelBufferTexture parent_instance;
