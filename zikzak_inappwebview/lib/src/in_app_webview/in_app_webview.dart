@@ -18,7 +18,7 @@ import '../pull_to_refresh/pull_to_refresh_controller.dart';
 import 'network_capture/network_capture_manager.dart';
 
 ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewWidget}
-class InAppWebView extends StatefulWidget {
+class InAppWebView extends StatefulWidget implements Disposable {
   /// Constructs a [InAppWebView].
   ///
   /// See [InAppWebView.fromPlatformCreationParams] for setting parameters for
@@ -306,41 +306,40 @@ class InAppWebView extends StatefulWidget {
     return InAppWebView.fromPlatformCreationParams(
       key: key,
       params: PlatformInAppWebViewWidgetCreationParams(
-           controllerFromPlatform:
-               (PlatformInAppWebViewController controller) =>
-                   InAppWebViewController.fromPlatform(platform: controller),
-           windowId: windowId,
-           keepAlive: keepAlive,
-           initialUrlRequest: initialUrlRequest,
-           initialFile: initialFile,
-           initialData: initialData,
-           initialSettings: initialSettings,
-           initialUserScripts: NetworkCaptureManager.mergeUserScripts(
-             initialUserScripts,
-             networkCaptureManager,
-           ),
-           pullToRefreshController: pullToRefreshController?.platform,
-           findInteractionController: findInteractionController?.platform,
-           contextMenu: contextMenu,
-           layoutDirection: layoutDirection,
-           webViewEnvironment: webViewEnvironment?.platform,
-           onWebViewCreated: (controller) {
-             networkCaptureManager?.attach(controller);
-             onWebViewCreated?.call(controller);
-           },
-           onLoadStart: (controller, url) {
-             networkCaptureManager?.onPageLoad(controller);
-             onLoadStart?.call(controller, url);
-           },
-           onLoadStop: (controller, url) {
-             networkCaptureManager?.onPageLoad(controller);
-             onLoadStop?.call(controller, url);
-             if (initialSettings?.dismissDialogues ?? false) {
-               () async {
-                 try {
-                   for (var i = 0; i < 3; i++) {
-                     await controller.evaluateJavascript(
-                       source: '''
+        controllerFromPlatform: (PlatformInAppWebViewController controller) =>
+            InAppWebViewController.fromPlatform(platform: controller),
+        windowId: windowId,
+        keepAlive: keepAlive,
+        initialUrlRequest: initialUrlRequest,
+        initialFile: initialFile,
+        initialData: initialData,
+        initialSettings: initialSettings,
+        initialUserScripts: NetworkCaptureManager.mergeUserScripts(
+          initialUserScripts,
+          networkCaptureManager,
+        ),
+        pullToRefreshController: pullToRefreshController?.platform,
+        findInteractionController: findInteractionController?.platform,
+        contextMenu: contextMenu,
+        layoutDirection: layoutDirection,
+        webViewEnvironment: webViewEnvironment?.platform,
+        onWebViewCreated: (controller) {
+          networkCaptureManager?.attach(controller);
+          onWebViewCreated?.call(controller);
+        },
+        onLoadStart: (controller, url) {
+          networkCaptureManager?.onPageLoad(controller);
+          onLoadStart?.call(controller, url);
+        },
+        onLoadStop: (controller, url) {
+          networkCaptureManager?.onPageLoad(controller);
+          onLoadStop?.call(controller, url);
+          if (initialSettings?.dismissDialogues ?? false) {
+            () async {
+              try {
+                for (var i = 0; i < 3; i++) {
+                  await controller.evaluateJavascript(
+                    source: '''
                           (function() {
                             var removed = 0;
                             var all = document.querySelectorAll('*');
@@ -360,258 +359,257 @@ class InAppWebView extends StatefulWidget {
                             return removed;
                           })();
                         ''',
-                     );
-                     if (i < 2) {
-                       await Future.delayed(const Duration(milliseconds: 800));
-                     }
-                   }
-                 } catch (_) {}
-               }();
-             }
-           },
-           onReceivedError: onReceivedError != null
-               ? (controller, request, error) =>
-                     onReceivedError.call(controller, request, error)
-               : null,
-           onReceivedHttpError: onReceivedHttpError != null
-               ? (controller, request, errorResponse) => onReceivedHttpError
-                     .call(controller, request, errorResponse)
-               : null,
-           onConsoleMessage: onConsoleMessage != null
-               ? (controller, consoleMessage) =>
-                     onConsoleMessage.call(controller, consoleMessage)
-               : null,
-           onProgressChanged: onProgressChanged != null
-               ? (controller, progress) =>
-                     onProgressChanged.call(controller, progress)
-               : null,
-           shouldOverrideUrlLoading: shouldOverrideUrlLoading != null
-               ? (controller, navigationAction) =>
-                     shouldOverrideUrlLoading(controller, navigationAction)
-               : null,
-           onLoadResource: onLoadResource != null
-               ? (controller, resource) =>
-                     onLoadResource.call(controller, resource)
-               : null,
-           onScrollChanged: onScrollChanged != null
-               ? (controller, x, y) => onScrollChanged.call(controller, x, y)
-               : null,
-           onDownloadStartRequest: onDownloadStartRequest != null
-               ? (controller, downloadStartRequest) => onDownloadStartRequest
-                     .call(controller, downloadStartRequest)
-               : null,
-           onLoadResourceWithCustomScheme:
-               onLoadResourceWithCustomScheme != null
-               ? (controller, request) =>
-                     onLoadResourceWithCustomScheme.call(controller, request)
-               : null,
-           onCreateWindow: onCreateWindow != null
-               ? (controller, createWindowAction) =>
-                     onCreateWindow.call(controller, createWindowAction)
-               : null,
-           onCloseWindow: onCloseWindow != null
-               ? (controller) => onCloseWindow.call(controller)
-               : null,
-           onJsAlert: onJsAlert != null
-               ? (controller, jsAlertRequest) =>
-                     onJsAlert.call(controller, jsAlertRequest)
-               : null,
-           onJsConfirm: onJsConfirm != null
-               ? (controller, jsConfirmRequest) =>
-                     onJsConfirm.call(controller, jsConfirmRequest)
-               : null,
-           onJsPrompt: onJsPrompt != null
-               ? (controller, jsPromptRequest) =>
-                     onJsPrompt.call(controller, jsPromptRequest)
-               : null,
-           onReceivedHttpAuthRequest: onReceivedHttpAuthRequest != null
-               ? (controller, challenge) =>
-                     onReceivedHttpAuthRequest.call(controller, challenge)
-               : null,
-           onReceivedServerTrustAuthRequest:
-               onReceivedServerTrustAuthRequest != null
-               ? (controller, challenge) => onReceivedServerTrustAuthRequest
-                     .call(controller, challenge)
-               : null,
-           onReceivedClientCertRequest: onReceivedClientCertRequest != null
-               ? (controller, challenge) =>
-                     onReceivedClientCertRequest.call(controller, challenge)
-               : null,
-           shouldInterceptAjaxRequest: shouldInterceptAjaxRequest != null
-               ? (controller, ajaxRequest) =>
-                     shouldInterceptAjaxRequest.call(controller, ajaxRequest)
-               : null,
-           onAjaxReadyStateChange: onAjaxReadyStateChange != null
-               ? (controller, ajaxRequest) =>
-                     onAjaxReadyStateChange.call(controller, ajaxRequest)
-               : null,
-           onAjaxProgress: onAjaxProgress != null
-               ? (controller, ajaxRequest) =>
-                     onAjaxProgress.call(controller, ajaxRequest)
-               : null,
-           shouldInterceptFetchRequest: shouldInterceptFetchRequest != null
-               ? (controller, fetchRequest) =>
-                     shouldInterceptFetchRequest.call(controller, fetchRequest)
-               : null,
-           onUpdateVisitedHistory: onUpdateVisitedHistory != null
-               ? (controller, url, isReload) =>
-                     onUpdateVisitedHistory.call(controller, url, isReload)
-               : null,
-           onPrintRequest: onPrintRequest != null
-               ? (controller, url, printJobController) =>
-                     onPrintRequest.call(controller, url, printJobController)
-               : null,
-           onLongPressHitTestResult: onLongPressHitTestResult != null
-               ? (controller, hitTestResult) =>
-                     onLongPressHitTestResult.call(controller, hitTestResult)
-               : null,
-           onEnterFullscreen: onEnterFullscreen != null
-               ? (controller) => onEnterFullscreen.call(controller)
-               : null,
-           onExitFullscreen: onExitFullscreen != null
-               ? (controller) => onExitFullscreen.call(controller)
-               : null,
-           onPageCommitVisible: onPageCommitVisible != null
-               ? (controller, url) => onPageCommitVisible.call(controller, url)
-               : null,
-           onTitleChanged: onTitleChanged != null
-               ? (controller, title) => onTitleChanged.call(controller, title)
-               : null,
-           onWindowFocus: onWindowFocus != null
-               ? (controller) => onWindowFocus.call(controller)
-               : null,
-           onWindowBlur: onWindowBlur != null
-               ? (controller) => onWindowBlur.call(controller)
-               : null,
-           onOverScrolled: onOverScrolled != null
-               ? (controller, x, y, clampedX, clampedY) =>
-                     onOverScrolled.call(controller, x, y, clampedX, clampedY)
-               : null,
-           onZoomScaleChanged: onZoomScaleChanged != null
-               ? (controller, oldScale, newScale) =>
-                     onZoomScaleChanged.call(controller, oldScale, newScale)
-               : null,
-           onSafeBrowsingHit: onSafeBrowsingHit != null
-               ? (controller, url, threatType) =>
-                     onSafeBrowsingHit.call(controller, url, threatType)
-               : null,
-           onPermissionRequest: onPermissionRequest != null
-               ? (controller, permissionRequest) =>
-                     onPermissionRequest.call(controller, permissionRequest)
-               : null,
-           onGeolocationPermissionsShowPrompt:
-               onGeolocationPermissionsShowPrompt != null
-               ? (controller, origin) =>
-                     onGeolocationPermissionsShowPrompt.call(controller, origin)
-               : null,
-           onGeolocationPermissionsHidePrompt:
-               onGeolocationPermissionsHidePrompt != null
-               ? (controller) =>
-                     onGeolocationPermissionsHidePrompt.call(controller)
-               : null,
-           shouldInterceptRequest: shouldInterceptRequest != null
-               ? (controller, request) =>
-                     shouldInterceptRequest.call(controller, request)
-               : null,
-           onRenderProcessGone: onRenderProcessGone != null
-               ? (controller, detail) =>
-                     onRenderProcessGone.call(controller, detail)
-               : null,
-           onRenderProcessResponsive: onRenderProcessResponsive != null
-               ? (controller) =>
-                     onRenderProcessResponsive.call(controller, null)
-               : null,
-           onRenderProcessUnresponsive: onRenderProcessUnresponsive != null
-               ? (controller) =>
-                     onRenderProcessUnresponsive.call(controller, null)
-               : null,
-           onFormResubmission: onFormResubmission != null
-               ? (controller, url) => onFormResubmission.call(controller, url)
-               : null,
-           onReceivedIcon: onReceivedIcon != null
-               ? (controller, icon) => onReceivedIcon.call(controller, icon)
-               : null,
-           onReceivedTouchIconUrl: onReceivedTouchIconUrl != null
-               ? (controller, url, precomposed) =>
-                     onReceivedTouchIconUrl.call(controller, url, precomposed)
-               : null,
-           onJsBeforeUnload: onJsBeforeUnload != null
-               ? (controller, jsBeforeUnloadRequest) =>
-                     onJsBeforeUnload.call(controller, jsBeforeUnloadRequest)
-               : null,
-           onReceivedLoginRequest: onReceivedLoginRequest != null
-               ? (controller, loginRequest) =>
-                     onReceivedLoginRequest.call(controller, loginRequest)
-               : null,
-           onPermissionRequestCanceled: onPermissionRequestCanceled != null
-               ? (controller, permissionRequest) => onPermissionRequestCanceled
-                     .call(controller, permissionRequest)
-               : null,
-           onRequestFocus: onRequestFocus != null
-               ? (controller) => onRequestFocus.call(controller)
-               : null,
-           onWebContentProcessDidTerminate:
-               onWebContentProcessDidTerminate != null
-               ? (controller) =>
-                     onWebContentProcessDidTerminate.call(controller)
-               : null,
-           onDidReceiveServerRedirectForProvisionalNavigation:
-               onDidReceiveServerRedirectForProvisionalNavigation != null
-               ? (controller) =>
-                     onDidReceiveServerRedirectForProvisionalNavigation.call(
-                       controller,
-                     )
-               : null,
-           onNavigationResponse: onNavigationResponse != null
-               ? (controller, navigationResponse) =>
-                     onNavigationResponse.call(controller, navigationResponse)
-               : null,
-           shouldAllowDeprecatedTLS: shouldAllowDeprecatedTLS != null
-               ? (controller, challenge) =>
-                     shouldAllowDeprecatedTLS.call(controller, challenge)
-               : null,
-           onCameraCaptureStateChanged: onCameraCaptureStateChanged != null
-               ? (controller, oldState, newState) => onCameraCaptureStateChanged
-                     .call(controller, oldState, newState)
-               : null,
-           onMicrophoneCaptureStateChanged:
-               onMicrophoneCaptureStateChanged != null
-               ? (controller, oldState, newState) =>
-                     onMicrophoneCaptureStateChanged.call(
-                       controller,
-                       oldState,
-                       newState,
-                     )
-               : null,
-           onContentSizeChanged: onContentSizeChanged != null
-               ? (controller, oldContentSize, newContentSize) =>
-                     onContentSizeChanged.call(
-                       controller,
-                       oldContentSize,
-                       newContentSize,
-                     )
-               : null,
-           onNetworkRequest: onNetworkRequest != null
-               ? (controller, request) =>
-                     onNetworkRequest.call(controller, request)
-               : null,
-           onNetworkResponse: onNetworkResponse != null
-               ? (controller, response) =>
-                     onNetworkResponse.call(controller, response)
-               : null,
-           onNetworkLoadingFinished: onNetworkLoadingFinished != null
-               ? (controller, responseBody) =>
-                     onNetworkLoadingFinished.call(controller, responseBody)
-               : null,
-           gestureRecognizers: gestureRecognizers,
-           headlessWebView: headlessWebView?.platform,
-           preventGestureDelay: preventGestureDelay,
-         ),
+                  );
+                  if (i < 2) {
+                    await Future.delayed(const Duration(milliseconds: 800));
+                  }
+                }
+              } catch (_) {}
+            }();
+          }
+        },
+        onReceivedError: onReceivedError != null
+            ? (controller, request, error) =>
+                  onReceivedError.call(controller, request, error)
+            : null,
+        onReceivedHttpError: onReceivedHttpError != null
+            ? (controller, request, errorResponse) =>
+                  onReceivedHttpError.call(controller, request, errorResponse)
+            : null,
+        onConsoleMessage: onConsoleMessage != null
+            ? (controller, consoleMessage) =>
+                  onConsoleMessage.call(controller, consoleMessage)
+            : null,
+        onProgressChanged: onProgressChanged != null
+            ? (controller, progress) =>
+                  onProgressChanged.call(controller, progress)
+            : null,
+        shouldOverrideUrlLoading: shouldOverrideUrlLoading != null
+            ? (controller, navigationAction) =>
+                  shouldOverrideUrlLoading(controller, navigationAction)
+            : null,
+        onLoadResource: onLoadResource != null
+            ? (controller, resource) =>
+                  onLoadResource.call(controller, resource)
+            : null,
+        onScrollChanged: onScrollChanged != null
+            ? (controller, x, y) => onScrollChanged.call(controller, x, y)
+            : null,
+        onDownloadStartRequest: onDownloadStartRequest != null
+            ? (controller, downloadStartRequest) =>
+                  onDownloadStartRequest.call(controller, downloadStartRequest)
+            : null,
+        onLoadResourceWithCustomScheme: onLoadResourceWithCustomScheme != null
+            ? (controller, request) =>
+                  onLoadResourceWithCustomScheme.call(controller, request)
+            : null,
+        onCreateWindow: onCreateWindow != null
+            ? (controller, createWindowAction) =>
+                  onCreateWindow.call(controller, createWindowAction)
+            : null,
+        onCloseWindow: onCloseWindow != null
+            ? (controller) => onCloseWindow.call(controller)
+            : null,
+        onJsAlert: onJsAlert != null
+            ? (controller, jsAlertRequest) =>
+                  onJsAlert.call(controller, jsAlertRequest)
+            : null,
+        onJsConfirm: onJsConfirm != null
+            ? (controller, jsConfirmRequest) =>
+                  onJsConfirm.call(controller, jsConfirmRequest)
+            : null,
+        onJsPrompt: onJsPrompt != null
+            ? (controller, jsPromptRequest) =>
+                  onJsPrompt.call(controller, jsPromptRequest)
+            : null,
+        onReceivedHttpAuthRequest: onReceivedHttpAuthRequest != null
+            ? (controller, challenge) =>
+                  onReceivedHttpAuthRequest.call(controller, challenge)
+            : null,
+        onReceivedServerTrustAuthRequest:
+            onReceivedServerTrustAuthRequest != null
+            ? (controller, challenge) =>
+                  onReceivedServerTrustAuthRequest.call(controller, challenge)
+            : null,
+        onReceivedClientCertRequest: onReceivedClientCertRequest != null
+            ? (controller, challenge) =>
+                  onReceivedClientCertRequest.call(controller, challenge)
+            : null,
+        shouldInterceptAjaxRequest: shouldInterceptAjaxRequest != null
+            ? (controller, ajaxRequest) =>
+                  shouldInterceptAjaxRequest.call(controller, ajaxRequest)
+            : null,
+        onAjaxReadyStateChange: onAjaxReadyStateChange != null
+            ? (controller, ajaxRequest) =>
+                  onAjaxReadyStateChange.call(controller, ajaxRequest)
+            : null,
+        onAjaxProgress: onAjaxProgress != null
+            ? (controller, ajaxRequest) =>
+                  onAjaxProgress.call(controller, ajaxRequest)
+            : null,
+        shouldInterceptFetchRequest: shouldInterceptFetchRequest != null
+            ? (controller, fetchRequest) =>
+                  shouldInterceptFetchRequest.call(controller, fetchRequest)
+            : null,
+        onUpdateVisitedHistory: onUpdateVisitedHistory != null
+            ? (controller, url, isReload) =>
+                  onUpdateVisitedHistory.call(controller, url, isReload)
+            : null,
+        onPrintRequest: onPrintRequest != null
+            ? (controller, url, printJobController) =>
+                  onPrintRequest.call(controller, url, printJobController)
+            : null,
+        onLongPressHitTestResult: onLongPressHitTestResult != null
+            ? (controller, hitTestResult) =>
+                  onLongPressHitTestResult.call(controller, hitTestResult)
+            : null,
+        onEnterFullscreen: onEnterFullscreen != null
+            ? (controller) => onEnterFullscreen.call(controller)
+            : null,
+        onExitFullscreen: onExitFullscreen != null
+            ? (controller) => onExitFullscreen.call(controller)
+            : null,
+        onPageCommitVisible: onPageCommitVisible != null
+            ? (controller, url) => onPageCommitVisible.call(controller, url)
+            : null,
+        onTitleChanged: onTitleChanged != null
+            ? (controller, title) => onTitleChanged.call(controller, title)
+            : null,
+        onWindowFocus: onWindowFocus != null
+            ? (controller) => onWindowFocus.call(controller)
+            : null,
+        onWindowBlur: onWindowBlur != null
+            ? (controller) => onWindowBlur.call(controller)
+            : null,
+        onOverScrolled: onOverScrolled != null
+            ? (controller, x, y, clampedX, clampedY) =>
+                  onOverScrolled.call(controller, x, y, clampedX, clampedY)
+            : null,
+        onZoomScaleChanged: onZoomScaleChanged != null
+            ? (controller, oldScale, newScale) =>
+                  onZoomScaleChanged.call(controller, oldScale, newScale)
+            : null,
+        onSafeBrowsingHit: onSafeBrowsingHit != null
+            ? (controller, url, threatType) =>
+                  onSafeBrowsingHit.call(controller, url, threatType)
+            : null,
+        onPermissionRequest: onPermissionRequest != null
+            ? (controller, permissionRequest) =>
+                  onPermissionRequest.call(controller, permissionRequest)
+            : null,
+        onGeolocationPermissionsShowPrompt:
+            onGeolocationPermissionsShowPrompt != null
+            ? (controller, origin) =>
+                  onGeolocationPermissionsShowPrompt.call(controller, origin)
+            : null,
+        onGeolocationPermissionsHidePrompt:
+            onGeolocationPermissionsHidePrompt != null
+            ? (controller) =>
+                  onGeolocationPermissionsHidePrompt.call(controller)
+            : null,
+        shouldInterceptRequest: shouldInterceptRequest != null
+            ? (controller, request) =>
+                  shouldInterceptRequest.call(controller, request)
+            : null,
+        onRenderProcessGone: onRenderProcessGone != null
+            ? (controller, detail) =>
+                  onRenderProcessGone.call(controller, detail)
+            : null,
+        onRenderProcessResponsive: onRenderProcessResponsive != null
+            ? (controller) => onRenderProcessResponsive.call(controller, null)
+            : null,
+        onRenderProcessUnresponsive: onRenderProcessUnresponsive != null
+            ? (controller) => onRenderProcessUnresponsive.call(controller, null)
+            : null,
+        onFormResubmission: onFormResubmission != null
+            ? (controller, url) => onFormResubmission.call(controller, url)
+            : null,
+        onReceivedIcon: onReceivedIcon != null
+            ? (controller, icon) => onReceivedIcon.call(controller, icon)
+            : null,
+        onReceivedTouchIconUrl: onReceivedTouchIconUrl != null
+            ? (controller, url, precomposed) =>
+                  onReceivedTouchIconUrl.call(controller, url, precomposed)
+            : null,
+        onJsBeforeUnload: onJsBeforeUnload != null
+            ? (controller, jsBeforeUnloadRequest) =>
+                  onJsBeforeUnload.call(controller, jsBeforeUnloadRequest)
+            : null,
+        onReceivedLoginRequest: onReceivedLoginRequest != null
+            ? (controller, loginRequest) =>
+                  onReceivedLoginRequest.call(controller, loginRequest)
+            : null,
+        onPermissionRequestCanceled: onPermissionRequestCanceled != null
+            ? (controller, permissionRequest) => onPermissionRequestCanceled
+                  .call(controller, permissionRequest)
+            : null,
+        onRequestFocus: onRequestFocus != null
+            ? (controller) => onRequestFocus.call(controller)
+            : null,
+        onWebContentProcessDidTerminate: onWebContentProcessDidTerminate != null
+            ? (controller) => onWebContentProcessDidTerminate.call(controller)
+            : null,
+        onDidReceiveServerRedirectForProvisionalNavigation:
+            onDidReceiveServerRedirectForProvisionalNavigation != null
+            ? (controller) => onDidReceiveServerRedirectForProvisionalNavigation
+                  .call(controller)
+            : null,
+        onNavigationResponse: onNavigationResponse != null
+            ? (controller, navigationResponse) =>
+                  onNavigationResponse.call(controller, navigationResponse)
+            : null,
+        shouldAllowDeprecatedTLS: shouldAllowDeprecatedTLS != null
+            ? (controller, challenge) =>
+                  shouldAllowDeprecatedTLS.call(controller, challenge)
+            : null,
+        onCameraCaptureStateChanged: onCameraCaptureStateChanged != null
+            ? (controller, oldState, newState) => onCameraCaptureStateChanged
+                  .call(controller, oldState, newState)
+            : null,
+        onMicrophoneCaptureStateChanged: onMicrophoneCaptureStateChanged != null
+            ? (controller, oldState, newState) =>
+                  onMicrophoneCaptureStateChanged.call(
+                    controller,
+                    oldState,
+                    newState,
+                  )
+            : null,
+        onContentSizeChanged: onContentSizeChanged != null
+            ? (controller, oldContentSize, newContentSize) =>
+                  onContentSizeChanged.call(
+                    controller,
+                    oldContentSize,
+                    newContentSize,
+                  )
+            : null,
+        onNetworkRequest: onNetworkRequest != null
+            ? (controller, request) =>
+                  onNetworkRequest.call(controller, request)
+            : null,
+        onNetworkResponse: onNetworkResponse != null
+            ? (controller, response) =>
+                  onNetworkResponse.call(controller, response)
+            : null,
+        onNetworkLoadingFinished: onNetworkLoadingFinished != null
+            ? (controller, responseBody) =>
+                  onNetworkLoadingFinished.call(controller, responseBody)
+            : null,
+        gestureRecognizers: gestureRecognizers,
+        headlessWebView: headlessWebView?.platform,
+        preventGestureDelay: preventGestureDelay,
+      ),
     );
   }
 
   @override
   _InAppWebViewState createState() => _InAppWebViewState();
+
+  /// Disposes the WebView and releases its resources.
+  ///
+  /// If [isKeepAlive] is `true`, the WebView is kept alive.
+  @override
+  void dispose({bool isKeepAlive = false}) =>
+      platform.dispose(isKeepAlive: isKeepAlive);
 }
 
 class _InAppWebViewState extends State<InAppWebView> {

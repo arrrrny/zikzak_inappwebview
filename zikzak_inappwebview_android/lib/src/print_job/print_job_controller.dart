@@ -78,7 +78,7 @@ class AndroidPrintJobController extends PlatformPrintJobController
   }
 
   @override
-  Future<void> dispose() async {
+  Future<void> dispose({bool isKeepAlive = false}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     await channel?.invokeMethod('dispose', args);
     disposeChannel();

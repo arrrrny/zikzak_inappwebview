@@ -277,7 +277,7 @@ class MacOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
   }
 
   @override
-  void dispose() {
+  void dispose({bool isKeepAlive = false}) {
     _channel?.setMethodCallHandler(null);
     _webViewController?.dispose();
     _webViewController = null;

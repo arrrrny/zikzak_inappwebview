@@ -155,7 +155,7 @@ class AndroidHttpAuthCredentialDatabase
   }
 
   @override
-  void dispose() {
+  void dispose({bool isKeepAlive = false}) {
     // empty
   }
 }

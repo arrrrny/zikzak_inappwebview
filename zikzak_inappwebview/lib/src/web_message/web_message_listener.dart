@@ -39,7 +39,8 @@ class WebMessageListener {
   OnPostMessageCallback? get onPostMessage => platform.onPostMessage;
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformWebMessageListener.dispose}
-  void dispose() => platform.dispose();
+  void dispose({bool isKeepAlive = false}) =>
+      platform.dispose(isKeepAlive: isKeepAlive);
 
   Map<String, dynamic> toMap() => platform.toMap();
 

@@ -70,7 +70,7 @@ mixin AndroidPathHandler implements ChannelController, PlatformPathHandler {
   }
 
   @override
-  void dispose() {
+  void dispose({bool isKeepAlive = false}) {
     disposeChannel();
     eventHandler = null;
   }

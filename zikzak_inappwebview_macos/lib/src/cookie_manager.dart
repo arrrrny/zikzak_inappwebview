@@ -180,7 +180,7 @@ class MacOSCookieManager extends PlatformCookieManager {
   }
 
   @override
-  Future<void> dispose() async {
+  Future<void> dispose({bool isKeepAlive = false}) async {
     // nothing to dispose
   }
 }

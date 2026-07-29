@@ -74,7 +74,7 @@ class LinuxCookieManager extends PlatformCookieManager {
   }
 
   @override
-  Future<void> dispose() async {
+  Future<void> dispose({bool isKeepAlive = false}) async {
     // TODO: implement dispose
   }
 }

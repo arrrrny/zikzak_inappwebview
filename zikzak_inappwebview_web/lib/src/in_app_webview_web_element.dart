@@ -87,7 +87,7 @@ class InAppWebViewWebElement extends PlatformInAppWebViewWidget {
   }
 
   @override
-  void dispose() {
+  void dispose({bool isKeepAlive = false}) {
     _controller.dispose();
   }
 }

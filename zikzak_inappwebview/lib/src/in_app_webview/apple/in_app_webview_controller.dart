@@ -57,7 +57,7 @@ class IOSInAppWebViewController {
     return await InAppWebViewController.handlesURLScheme(urlScheme);
   }
 
-  void dispose() {
+  void dispose({bool isKeepAlive = false}) {
     _controller = null;
   }
 }

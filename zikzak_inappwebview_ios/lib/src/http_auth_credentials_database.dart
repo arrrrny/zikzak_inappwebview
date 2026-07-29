@@ -154,7 +154,7 @@ class IOSHttpAuthCredentialDatabase extends PlatformHttpAuthCredentialDatabase
   }
 
   @override
-  void dispose() {
+  void dispose({bool isKeepAlive = false}) {
     // empty
   }
 }

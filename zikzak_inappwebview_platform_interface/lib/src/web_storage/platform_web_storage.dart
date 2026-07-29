@@ -79,7 +79,7 @@ abstract class PlatformWebStorage extends PlatformInterface
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebStorage.dispose}
   ///Disposes the web storage.
   ///{@endtemplate}
-  void dispose() {
+  void dispose({bool isKeepAlive = false}) {
     throw UnimplementedError(
       'dispose is not implemented on the current platform',
     );
@@ -243,7 +243,7 @@ abstract mixin class PlatformStorage implements Disposable {
   }
 
   @override
-  void dispose() {
+  void dispose({bool isKeepAlive = false}) {
     throw UnimplementedError(
       'dispose is not implemented on the current platform',
     );

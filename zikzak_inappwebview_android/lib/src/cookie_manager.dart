@@ -227,7 +227,7 @@ class AndroidCookieManager extends PlatformCookieManager
   }
 
   @override
-  void dispose() {
+  void dispose({bool isKeepAlive = false}) {
     // empty
   }
 }

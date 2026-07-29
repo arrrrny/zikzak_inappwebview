@@ -115,7 +115,7 @@ class AndroidInAppWebViewController {
     return await _controller?.getOriginalUrl();
   }
 
-  void dispose() {
+  void dispose({bool isKeepAlive = false}) {
     _controller = null;
   }
 }

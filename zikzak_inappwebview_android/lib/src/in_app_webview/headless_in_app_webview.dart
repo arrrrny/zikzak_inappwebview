@@ -184,6 +184,12 @@ class AndroidHeadlessInAppWebView extends PlatformHeadlessInAppWebView
   bool _started = false;
   bool _running = false;
 
+  /// Tracks whether [dispose] has been called.
+  ///
+  /// Kept separate from [_running] so that a [dispose] call issued while
+  /// [run] is still in flight is not silently ignored.
+  bool _disposed = false;
+
   static const MethodChannel _sharedChannel = const MethodChannel(
     'wtf.zikzak/flutter_headless_inappwebview',
   );
@@ -241,7 +247,7 @@ class AndroidHeadlessInAppWebView extends PlatformHeadlessInAppWebView
   }
 
   Future<void> run() async {
-    if (_started) {
+    if (_started || _disposed) {
       return;
     }
     _started = true;
@@ -275,6 +281,11 @@ class AndroidHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     );
     await _sharedChannel.invokeMethod('run', args);
     _running = true;
+    if (_disposed) {
+      // dispose() was called while the native WebView was still starting:
+      // tear it down now that the native side exists.
+      await _disposeNative();
+    }
   }
 
   void _inferInitialSettings(InAppWebViewSettings settings) {
@@ -343,9 +354,20 @@ class AndroidHeadlessInAppWebView extends PlatformHeadlessInAppWebView
 
   @override
   Future<void> dispose({bool isKeepAlive = false}) async {
-    if (!_running) {
+    if (_disposed) {
       return;
     }
+    _disposed = true;
+    if (!_running) {
+      // run() has not completed yet (or was never called). If it is still
+      // in flight, it performs the cleanup itself once the native side is
+      // up; otherwise there is nothing to release.
+      return;
+    }
+    await _disposeNative();
+  }
+
+  Future<void> _disposeNative() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await channel?.invokeMethod('dispose', args);
     disposeChannel();

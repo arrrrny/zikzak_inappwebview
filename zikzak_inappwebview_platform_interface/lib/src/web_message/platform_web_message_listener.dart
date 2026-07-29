@@ -114,7 +114,7 @@ abstract class PlatformWebMessageListener extends PlatformInterface
   ///Disposes the channel.
   ///{@endtemplate}
   @override
-  void dispose() {
+  void dispose({bool isKeepAlive = false}) {
     throw UnimplementedError(
       'dispose is not implemented on the current platform.',
     );

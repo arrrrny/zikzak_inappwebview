@@ -112,7 +112,7 @@ abstract class PlatformWebMessageChannel extends PlatformInterface
   ///Disposes the web message channel.
   ///{@endtemplate}
   @override
-  void dispose() {
+  void dispose({bool isKeepAlive = false}) {
     throw UnimplementedError(
       'dispose is not implemented on the current platform',
     );

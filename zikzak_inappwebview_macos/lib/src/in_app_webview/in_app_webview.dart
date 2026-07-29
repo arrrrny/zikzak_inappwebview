@@ -56,7 +56,7 @@ class MacOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
   }
 
   @override
-  void dispose() {
+  void dispose({bool isKeepAlive = false}) {
     _controller?.dispose();
     _controller = null;
   }

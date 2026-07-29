@@ -27,7 +27,7 @@ class InAppWebViewWindowsWidget extends PlatformInAppWebViewWidget {
   }
 
   @override
-  void dispose() {}
+  void dispose({bool isKeepAlive = false}) {}
 
   @override
   T controllerFromPlatform<T>(dynamic platformController) {

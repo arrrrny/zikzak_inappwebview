@@ -374,7 +374,7 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
   }
 
   @override
-  void dispose() {
+  void dispose({bool isKeepAlive = false}) {
     dynamic viewId = _controller?.getViewId();
     debugLog(
       className: runtimeType.toString(),
