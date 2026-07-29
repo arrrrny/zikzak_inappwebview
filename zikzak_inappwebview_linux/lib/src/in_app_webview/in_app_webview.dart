@@ -60,8 +60,10 @@ class _LinuxInAppWebViewState extends State<_LinuxInAppWebView> {
           'initialUrlRequest': widget.params.initialUrlRequest?.toMap(),
           'initialData': widget.params.initialData?.toMap(),
           'initialUserScripts':
-              widget.params.initialUserScripts?.map((e) => e.toMap()).toList() ??
-                  [],
+              widget.params.initialUserScripts
+                  ?.map((e) => e.toMap())
+                  .toList() ??
+              [],
         },
       });
       if (textureId != null && mounted) {

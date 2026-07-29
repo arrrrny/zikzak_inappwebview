@@ -65,8 +65,7 @@ class NetworkCaptureController {
     List<ResourceType>? resourceTypes,
     bool? withBodyOnly,
   }) async {
-    final lowerUrlPatterns =
-        urlPatterns?.map((e) => e.toLowerCase()).toList();
+    final lowerUrlPatterns = urlPatterns?.map((e) => e.toLowerCase()).toList();
     final lowerMimeTypes = mimeTypes?.map((e) => e.toLowerCase()).toList();
 
     return _entries.where((entry) {
@@ -77,7 +76,8 @@ class NetworkCaptureController {
         }
       }
       if (lowerMimeTypes != null && lowerMimeTypes.isNotEmpty) {
-        final mime = entry.response?.mimeType.toLowerCase() ??
+        final mime =
+            entry.response?.mimeType.toLowerCase() ??
             entry.responseBody?.mimeType?.toLowerCase() ??
             '';
         if (!lowerMimeTypes.any((p) => mime.contains(p))) {
