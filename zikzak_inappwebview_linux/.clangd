@@ -1,0 +1,6 @@
+CompileFlags:
+  Add:
+    - "-I/usr/local/share/flutter/engine/src/flutter/shell/platform/linux/public"
+    - "-std=c++17"
+    - "-x"
+    - "c++"
