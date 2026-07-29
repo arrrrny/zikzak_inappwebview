@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:zikzak_inappwebview_internal_annotations/zikzak_inappwebview_internal_annotations.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'inappwebview_platform.dart';
+import 'types/disposable.dart';
 import 'types/proxy_rule.dart';
 import 'platform_webview_feature.dart';
 
@@ -32,9 +33,12 @@ class PlatformProxyControllerCreationParams {
 ///- Android native WebView ([Official API - ProxyController](https://developer.android.com/reference/androidx/webkit/ProxyController))
 ///- iOS 17.0+ WKWebView  ([Official API - ProxyConfiguration](https://developer.apple.com/documentation/network/proxyconfiguration))
 ///{@endtemplate}
-abstract class PlatformProxyController extends PlatformInterface {
+abstract class PlatformProxyController extends PlatformInterface
+    implements Disposable {
   /// Creates a new [PlatformProxyController]
-  factory PlatformProxyController(PlatformProxyControllerCreationParams params) {
+  factory PlatformProxyController(
+    PlatformProxyControllerCreationParams params,
+  ) {
     assert(
       InAppWebViewPlatform.instance != null,
       'A platform implementation for `zikzak_inappwebview` has not been set. Please '
@@ -42,8 +46,9 @@ abstract class PlatformProxyController extends PlatformInterface {
       '`WebViewPlatform.instance` before use. For unit testing, '
       '`WebViewPlatform.instance` can be set with your own test implementation.',
     );
-    final PlatformProxyController proxyController =
-        InAppWebViewPlatform.instance!.createPlatformProxyController(params);
+    final PlatformProxyController proxyController = InAppWebViewPlatform
+        .instance!
+        .createPlatformProxyController(params);
     PlatformInterface.verify(proxyController, _token);
     return proxyController;
   }
@@ -68,7 +73,9 @@ abstract class PlatformProxyController extends PlatformInterface {
   ///Network connections are not guaranteed to immediately use the new proxy setting; wait for the method to return before loading a page.
   ///{@endtemplate}
   Future<void> setProxyOverride({required ProxySettings settings}) {
-    throw UnimplementedError('setProxyOverride is not implemented on the current platform');
+    throw UnimplementedError(
+      'setProxyOverride is not implemented on the current platform',
+    );
   }
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformProxyController.clearProxyOverride}
@@ -76,7 +83,9 @@ abstract class PlatformProxyController extends PlatformInterface {
   ///Network connections are not guaranteed to immediately use the new proxy setting; wait for the method to return before loading a page.
   ///{@endtemplate}
   Future<void> clearProxyOverride() {
-    throw UnimplementedError('clearProxyOverride is not implemented on the current platform');
+    throw UnimplementedError(
+      'clearProxyOverride is not implemented on the current platform',
+    );
   }
 }
 
@@ -89,10 +98,7 @@ class ProxySettings {
   AndroidProxySettings? androidProxySettings;
   IOSProxySettings? iOSProxySettings;
 
-  ProxySettings({
-    this.androidProxySettings,
-    this.iOSProxySettings,
-  });
+  ProxySettings({this.androidProxySettings, this.iOSProxySettings});
 }
 
 @ExchangeableObject(copyMethod: true)
@@ -168,11 +174,12 @@ class AndroidProxySettings_ {
   ///**NOTE**: available only if [WebViewFeature.PROXY_OVERRIDE_REVERSE_BYPASS] feature is supported.
   bool reverseBypassEnabled;
 
-  AndroidProxySettings_(
-      {this.bypassRules = const [],
-      this.directs = const [],
-      this.proxyRules = const [],
-      this.bypassSimpleHostnames,
-      this.removeImplicitRules,
-      this.reverseBypassEnabled = false});
+  AndroidProxySettings_({
+    this.bypassRules = const [],
+    this.directs = const [],
+    this.proxyRules = const [],
+    this.bypassSimpleHostnames,
+    this.removeImplicitRules,
+    this.reverseBypassEnabled = false,
+  });
 }
