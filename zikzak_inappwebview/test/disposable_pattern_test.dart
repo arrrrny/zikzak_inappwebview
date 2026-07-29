@@ -7,6 +7,17 @@ import 'package:zikzak_inappwebview/zikzak_inappwebview.dart';
 /// compiling, so `flutter analyze` and `flutter test` both fail.
 void expectDisposable<T extends Disposable>() {}
 
+/// Probe implementing [Disposable] with the canonical signature:
+/// `void dispose({bool isKeepAlive = false})`.
+///
+/// If the interface ever drifts (for example the named parameter is
+/// renamed or its type changes), this override stops being a valid
+/// implementation and the file no longer compiles.
+class _ProbeDisposable implements Disposable {
+  @override
+  void dispose({bool isKeepAlive = false}) {}
+}
+
 void main() {
   group('Disposable pattern standardization', () {
     test('wrapper classes implement Disposable', () {
@@ -19,13 +30,13 @@ void main() {
     });
 
     test('Disposable declares the standardized dispose signature', () {
-      // The canonical signature: dispose({bool isKeepAlive = false}).
-      // A reference with the standardized type must be assignable from any
-      // implementation's tear-off; this is verified by the type system at
-      // compile time through the generic bound above, and documented here
-      // for readers.
-      void Function({bool isKeepAlive})? ref;
-      expect(ref, isNull);
+      // Compile-time probe: tearing dispose off through the [Disposable]
+      // interface type must yield exactly the canonical type
+      // `void Function({bool isKeepAlive})`. A drifted interface
+      // declaration fails this assignment at compile time.
+      final Disposable probe = _ProbeDisposable();
+      final void Function({bool isKeepAlive}) dispose = probe.dispose;
+      expect(dispose, isNotNull);
     });
   });
 }

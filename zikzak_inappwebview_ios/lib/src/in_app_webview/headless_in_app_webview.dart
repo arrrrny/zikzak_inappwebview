@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/services.dart';
@@ -187,6 +188,14 @@ class IOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
   /// [run] is still in flight is not silently ignored.
   bool _disposed = false;
 
+  /// Completes when an in-flight [run] finishes, including the deferred
+  /// native teardown it performs when [dispose] was called mid-startup.
+  ///
+  /// [dispose] waits on this so that `await dispose()` only returns once
+  /// the native side has been fully released. `null` when no [run] is in
+  /// flight.
+  Completer<void>? _runCompleter;
+
   static const MethodChannel _sharedChannel = const MethodChannel(
     'wtf.zikzak/flutter_headless_inappwebview',
   );
@@ -281,12 +290,22 @@ class IOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
         'initialSize': params.initialSize.toMap(),
       },
     );
-    await _sharedChannel.invokeMethod('run', args);
-    _running = true;
-    if (_disposed) {
-      // dispose() was called while the native WebView was still starting:
-      // tear it down now that the native side exists.
-      await _disposeNative();
+    final runCompleter = Completer<void>();
+    _runCompleter = runCompleter;
+    try {
+      await _sharedChannel.invokeMethod('run', args);
+      _running = true;
+      if (_disposed) {
+        // dispose() was called while the native WebView was still starting:
+        // tear it down now that the native side exists.
+        await _disposeNative();
+      }
+    } finally {
+      // Unblock a dispose() call waiting for this in-flight run().
+      runCompleter.complete();
+      if (identical(_runCompleter, runCompleter)) {
+        _runCompleter = null;
+      }
     }
   }
 
@@ -362,24 +381,39 @@ class IOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     _disposed = true;
     if (!_running) {
       // run() has not completed yet (or was never called). If it is still
-      // in flight, it performs the cleanup itself once the native side is
-      // up; otherwise there is nothing to release.
+      // in flight, wait for it: run() performs the native cleanup itself
+      // once the native side is up. Otherwise there is nothing to release.
+      await _runCompleter?.future;
       return;
     }
     await _disposeNative();
   }
 
   Future<void> _disposeNative() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    await channel?.invokeMethod('dispose', args);
+    // Isolate each teardown step so that a single failure (for example the
+    // native side already being gone) cannot leave the rest undisposed.
+    try {
+      Map<String, dynamic> args = <String, dynamic>{};
+      await channel?.invokeMethod('dispose', args);
+    } catch (_) {
+      // The native WebView may already be gone; continue local teardown.
+    }
     disposeChannel();
     _started = false;
     _running = false;
-    _webViewController?.dispose();
+    try {
+      _webViewController?.dispose();
+    } catch (_) {
+      // Ignore controller teardown failures.
+    }
     _webViewController = null;
     _controllerFromPlatform = null;
-    _iosParams.pullToRefreshController?.dispose();
-    _iosParams.findInteractionController?.dispose();
+    try {
+      _iosParams.pullToRefreshController?.dispose();
+      _iosParams.findInteractionController?.dispose();
+    } catch (_) {
+      // Ignore auxiliary controller teardown failures.
+    }
   }
 }
 

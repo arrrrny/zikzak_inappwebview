@@ -105,7 +105,7 @@ class _LinuxInAppWebViewState extends State<_LinuxInAppWebView> {
 
   @override
   void dispose() {
-    _controller?.dispose();
+    _controller?.dispose(isKeepAlive: widget.params.keepAlive != null);
     _controller = null;
     super.dispose();
   }

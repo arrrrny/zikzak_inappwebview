@@ -317,8 +317,17 @@ class IOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
     }
   }
 
+  /// Whether [dispose] has already run. Both the public widget-level
+  /// dispose and the owning State's dispose route through this method, so
+  /// the guard keeps the teardown idempotent.
+  bool _disposed = false;
+
   @override
   void dispose({bool isKeepAlive = false}) {
+    if (_disposed) {
+      return;
+    }
+    _disposed = true;
     dynamic viewId = _controller?.getViewId();
     debugLog(
       className: runtimeType.toString(),
@@ -327,11 +336,13 @@ class IOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
       method: "dispose",
       args: [],
     );
-    final isKeepAlive = params.keepAlive != null;
-    _controller?.dispose(isKeepAlive: isKeepAlive);
+    // Combine the explicit argument with the keep-alive creation param;
+    // previously the argument was silently shadowed and ignored.
+    final keepAlive = isKeepAlive || params.keepAlive != null;
+    _controller?.dispose(isKeepAlive: keepAlive);
     _controller = null;
-    params.pullToRefreshController?.dispose(isKeepAlive: isKeepAlive);
-    params.findInteractionController?.dispose(isKeepAlive: isKeepAlive);
+    params.pullToRefreshController?.dispose(isKeepAlive: keepAlive);
+    params.findInteractionController?.dispose(isKeepAlive: keepAlive);
   }
 
   @override

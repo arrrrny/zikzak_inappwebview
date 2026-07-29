@@ -68,7 +68,9 @@ class InAppLocalhostServer implements Disposable {
     }
     _disposed = true;
     if (isRunning()) {
-      unawaited(close());
+      // Fire-and-forget (dispose is synchronous): swallow a rejected
+      // close() future so it cannot surface as an unhandled async error.
+      unawaited(close().catchError((_) {}));
     }
   }
 }

@@ -55,9 +55,18 @@ class MacOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
     }
   }
 
+  /// Whether [dispose] has already run. Both the public widget-level
+  /// dispose and the owning State's dispose route through this method, so
+  /// the guard keeps the teardown idempotent.
+  bool _disposed = false;
+
   @override
   void dispose({bool isKeepAlive = false}) {
-    _controller?.dispose();
+    if (_disposed) {
+      return;
+    }
+    _disposed = true;
+    _controller?.dispose(isKeepAlive: isKeepAlive || params.keepAlive != null);
     _controller = null;
   }
 

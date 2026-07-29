@@ -46,10 +46,9 @@ void main() {
     await controller.loadData(
       data: '<html><body><h1>lifecycle</h1></body></html>',
     );
-    await pageLoaded.future.timeout(
-      const Duration(seconds: 15),
-      onTimeout: () {},
-    );
+    // No onTimeout fallback: a page that never finishes loading must fail
+    // the test instead of being silently swallowed.
+    await pageLoaded.future.timeout(const Duration(seconds: 15));
     await tester.pumpAndSettle();
     return controller;
   }
@@ -122,10 +121,22 @@ void main() {
       ),
     );
 
-    // P1 regression: dispose() before run() completes must not leak and
-    // must not hang; a second dispose() must be a no-op.
+    // P1 regression: dispose() before run() must be safe and idempotent.
     await headless.dispose();
     await headless.dispose();
+
+    // dispose() while run() is still in flight must coordinate with the
+    // pending startup: it waits for the native side to come up, tears it
+    // down, and must not hang; a second dispose() remains a no-op.
+    final headlessInFlight = HeadlessInAppWebView(
+      initialData: InAppWebViewInitialData(
+        data: '<html><body>headless-in-flight</body></html>',
+      ),
+    );
+    final runFuture = headlessInFlight.run();
+    await headlessInFlight.dispose();
+    await runFuture;
+    await headlessInFlight.dispose();
 
     // A fresh instance still runs and disposes cleanly.
     final Completer<void> loaded = Completer();
