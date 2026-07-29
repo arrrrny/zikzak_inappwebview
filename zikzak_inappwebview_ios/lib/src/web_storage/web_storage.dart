@@ -48,7 +48,7 @@ class IOSWebStorage extends PlatformWebStorage {
   PlatformSessionStorage get sessionStorage => params.sessionStorage;
 
   @override
-  void dispose() {
+  void dispose({bool isKeepAlive = false}) {
     localStorage.dispose();
     sessionStorage.dispose();
   }
@@ -194,7 +194,7 @@ abstract mixin class IOSStorage implements PlatformStorage {
   }
 
   @override
-  void dispose() {
+  void dispose({bool isKeepAlive = false}) {
     controller = null;
   }
 }

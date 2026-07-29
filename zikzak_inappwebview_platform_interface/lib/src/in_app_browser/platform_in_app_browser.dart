@@ -506,7 +506,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///{@endtemplate}
   @override
   @mustCallSuper
-  void dispose() {
+  void dispose({bool isKeepAlive = false}) {
     eventHandler = null;
   }
 }

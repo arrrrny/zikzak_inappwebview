@@ -1,7 +1,8 @@
 import 'package:flutter/services.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
-class IosProxyControllerCreationParams extends PlatformProxyControllerCreationParams {
+class IosProxyControllerCreationParams
+    extends PlatformProxyControllerCreationParams {
   /// Creates a new [IosProxyControllerCreationParams] instance.
   const IosProxyControllerCreationParams(
     // This parameter prevents breaking changes later.
@@ -17,14 +18,19 @@ class IosProxyControllerCreationParams extends PlatformProxyControllerCreationPa
   }
 }
 
-class IosProxyController extends PlatformProxyController with ChannelController {
+class IosProxyController extends PlatformProxyController
+    with ChannelController {
   IosProxyController(PlatformProxyControllerCreationParams params)
-      : super.implementation(
-          params is IosProxyControllerCreationParams
-              ? params
-              : IosProxyControllerCreationParams.fromPlatformProxyControllerCreationParams(params),
-        ) {
-    channel = const MethodChannel('wtf.zikzak/zikzak_inappwebview_proxycontroller');
+    : super.implementation(
+        params is IosProxyControllerCreationParams
+            ? params
+            : IosProxyControllerCreationParams.fromPlatformProxyControllerCreationParams(
+                params,
+              ),
+      ) {
+    channel = const MethodChannel(
+      'wtf.zikzak/zikzak_inappwebview_proxycontroller',
+    );
     handler = _handleMethod;
     initMethodCallHandler();
   }
@@ -36,7 +42,11 @@ class IosProxyController extends PlatformProxyController with ChannelController 
   }
 
   static IosProxyController _init() {
-    _instance = IosProxyController(IosProxyControllerCreationParams(const PlatformProxyControllerCreationParams()));
+    _instance = IosProxyController(
+      IosProxyControllerCreationParams(
+        const PlatformProxyControllerCreationParams(),
+      ),
+    );
     return _instance!;
   }
 
@@ -55,7 +65,7 @@ class IosProxyController extends PlatformProxyController with ChannelController 
   Future<dynamic> _handleMethod(MethodCall call) async {}
 
   @override
-  void dispose() {
+  void dispose({bool isKeepAlive = false}) {
     // empty.
   }
 }

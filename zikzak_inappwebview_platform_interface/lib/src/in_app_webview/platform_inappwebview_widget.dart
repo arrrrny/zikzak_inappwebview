@@ -204,5 +204,5 @@ abstract class PlatformInAppWebViewWidget extends PlatformInterface
   T controllerFromPlatform<T>(PlatformInAppWebViewController controller);
 
   @override
-  void dispose();
+  void dispose({bool isKeepAlive = false});
 }

@@ -1,3 +1,3 @@
 abstract class Disposable {
-  void dispose();
+  void dispose({bool isKeepAlive = false});
 }

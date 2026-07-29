@@ -215,7 +215,7 @@ class IOSChromeSafariBrowser extends PlatformChromeSafariBrowser
 
   @override
   @mustCallSuper
-  void dispose() {
+  void dispose({bool isKeepAlive = false}) {
     super.dispose();
     disposeChannel();
   }

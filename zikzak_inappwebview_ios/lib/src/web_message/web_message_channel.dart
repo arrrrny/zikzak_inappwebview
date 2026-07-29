@@ -115,7 +115,7 @@ class IOSWebMessageChannel extends PlatformWebMessageChannel
   }
 
   @override
-  void dispose() {
+  void dispose({bool isKeepAlive = false}) {
     disposeChannel();
   }
 

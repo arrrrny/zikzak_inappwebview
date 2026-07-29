@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
 ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppLocalhostServer}
-class InAppLocalhostServer {
+class InAppLocalhostServer implements Disposable {
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppLocalhostServer}
   InAppLocalhostServer({
     int port = 8080,
@@ -51,4 +51,26 @@ class InAppLocalhostServer {
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppLocalhostServer.isRunning}
   bool isRunning() => platform.isRunning();
+
+  bool _disposed = false;
+
+  /// Indicates if the server has been disposed.
+  bool get disposed => _disposed;
+
+  /// Disposes the server, stopping it if it is still running,
+  /// and releasing its resources.
+  ///
+  /// After disposal, this instance cannot be used anymore.
+  @override
+  void dispose({bool isKeepAlive = false}) {
+    if (_disposed) {
+      return;
+    }
+    _disposed = true;
+    if (isRunning()) {
+      // Fire-and-forget (dispose is synchronous): swallow a rejected
+      // close() future so it cannot surface as an unhandled async error.
+      unawaited(close().catchError((_) {}));
+    }
+  }
 }

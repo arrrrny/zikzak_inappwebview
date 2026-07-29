@@ -48,7 +48,7 @@ class AndroidWebStorage extends PlatformWebStorage {
   PlatformSessionStorage get sessionStorage => params.sessionStorage;
 
   @override
-  void dispose() {
+  void dispose({bool isKeepAlive = false}) {
     localStorage.dispose();
     sessionStorage.dispose();
   }
@@ -194,7 +194,7 @@ mixin AndroidStorage implements PlatformStorage {
   }
 
   @override
-  void dispose() {
+  void dispose({bool isKeepAlive = false}) {
     controller = null;
   }
 }

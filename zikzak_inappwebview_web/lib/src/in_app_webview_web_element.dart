@@ -86,8 +86,17 @@ class InAppWebViewWebElement extends PlatformInAppWebViewWidget {
     return controller as T;
   }
 
+  /// Whether [dispose] has already run. Both the public widget-level
+  /// dispose and the owning State's dispose route through this method, so
+  /// the guard keeps the teardown idempotent.
+  bool _disposed = false;
+
   @override
-  void dispose() {
-    _controller.dispose();
+  void dispose({bool isKeepAlive = false}) {
+    if (_disposed) {
+      return;
+    }
+    _disposed = true;
+    _controller.dispose(isKeepAlive: isKeepAlive);
   }
 }

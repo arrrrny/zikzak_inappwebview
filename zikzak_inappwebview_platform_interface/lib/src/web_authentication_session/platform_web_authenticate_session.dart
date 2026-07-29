@@ -212,7 +212,7 @@ abstract class PlatformWebAuthenticationSession extends PlatformInterface
   ///- MacOS
   ///{@endtemplate}
   @override
-  Future<void> dispose() {
+  Future<void> dispose({bool isKeepAlive = false}) {
     throw UnimplementedError(
       'cancel is not implemented on the current platform',
     );

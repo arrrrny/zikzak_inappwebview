@@ -13,7 +13,7 @@ import '../print_job/print_job_controller.dart';
 import 'network_capture/network_capture_manager.dart';
 
 ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController}
-class InAppWebViewController {
+class InAppWebViewController implements Disposable {
   /// Constructs a [InAppWebViewController].
   ///
   /// See [InAppWebViewController.fromPlatformCreationParams] for setting parameters for

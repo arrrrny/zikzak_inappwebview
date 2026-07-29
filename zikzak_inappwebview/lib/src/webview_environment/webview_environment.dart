@@ -52,5 +52,6 @@ class WebViewEnvironment {
   );
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformWebViewEnvironment.dispose}
-  Future<void> dispose() => platform.dispose();
+  Future<void> dispose({bool isKeepAlive = false}) =>
+      platform.dispose(isKeepAlive: isKeepAlive);
 }

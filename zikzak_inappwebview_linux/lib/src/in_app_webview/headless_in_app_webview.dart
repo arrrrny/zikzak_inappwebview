@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 import '../find_interaction/find_interaction_controller.dart';
@@ -163,6 +165,20 @@ class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
   bool _started = false;
   bool _running = false;
 
+  /// Tracks whether [dispose] has been called.
+  ///
+  /// Kept separate from [_running] so that a [dispose] call issued while
+  /// [run] is still in flight is not silently ignored.
+  bool _disposed = false;
+
+  /// Completes when an in-flight [run] finishes, including the deferred
+  /// native teardown it performs when [dispose] was called mid-startup.
+  ///
+  /// [dispose] waits on this so that `await dispose()` only returns once
+  /// the native side has been fully released. `null` when no [run] is in
+  /// flight.
+  Completer<void>? _runCompleter;
+
   static const MethodChannel _sharedChannel = MethodChannel(
     'wtf.zikzak/flutter_headless_inappwebview',
   );
@@ -224,7 +240,7 @@ class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
 
   @override
   Future<void> run() async {
-    if (_started) {
+    if (_started || _disposed) {
       return;
     }
     _started = true;
@@ -264,8 +280,23 @@ class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
         'initialSize': params.initialSize.toMap(),
       },
     );
-    await _sharedChannel.invokeMethod('run', args);
-    _running = true;
+    final runCompleter = Completer<void>();
+    _runCompleter = runCompleter;
+    try {
+      await _sharedChannel.invokeMethod('run', args);
+      _running = true;
+      if (_disposed) {
+        // dispose() was called while the native WebView was still starting:
+        // tear it down now that the native side exists.
+        await _disposeNative();
+      }
+    } finally {
+      // Unblock a dispose() call waiting for this in-flight run().
+      runCompleter.complete();
+      if (identical(_runCompleter, runCompleter)) {
+        _runCompleter = null;
+      }
+    }
   }
 
   void _inferInitialSettings(InAppWebViewSettings settings) {
@@ -330,16 +361,42 @@ class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
 
   @override
   Future<void> dispose({bool isKeepAlive = false}) async {
-    if (!_running) {
+    if (_disposed) {
       return;
     }
-    await _sharedChannel.invokeMethod('dispose', <String, dynamic>{'id': id});
+    _disposed = true;
+    if (!_running) {
+      // run() has not completed yet (or was never called). If it is still
+      // in flight, wait for it: run() performs the native cleanup itself
+      // once the native side is up. Otherwise there is nothing to release.
+      await _runCompleter?.future;
+      return;
+    }
+    await _disposeNative();
+  }
+
+  Future<void> _disposeNative() async {
+    // Isolate each teardown step so that a single failure (for example the
+    // native side already being gone) cannot leave the rest undisposed.
+    try {
+      await _sharedChannel.invokeMethod('dispose', <String, dynamic>{'id': id});
+    } catch (_) {
+      // The native WebView may already be gone; continue local teardown.
+    }
     disposeChannel();
     _started = false;
     _running = false;
-    _webViewController?.dispose();
+    try {
+      _webViewController?.dispose();
+    } catch (_) {
+      // Ignore controller teardown failures.
+    }
     _webViewController = null;
     _controllerFromPlatform = null;
-    _linuxParams.findInteractionController?.dispose();
+    try {
+      _linuxParams.findInteractionController?.dispose();
+    } catch (_) {
+      // Ignore auxiliary controller teardown failures.
+    }
   }
 }
