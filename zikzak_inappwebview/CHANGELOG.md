@@ -1,12 +1,30 @@
-## 4.6.3 - 2026-07-21
+## 4.7.0 - 2026-07-29
 
-## Unreleased
+### Features
 
 - Added iOS proxy support (iOS 17.0+) — set process-wide proxy for WKWebView
+- Added Network Capture API — capture XHR/fetch requests and response bodies
+- Added Network Capture Scraper example screen
+
+### Fixes
 
 - Fixed: Web/WASM build failure — `HeadlessInAppWebViewWeb.dispose()` missing
   `isKeepAlive` parameter that was added to `PlatformHeadlessInAppWebView.dispose`
   interface, causing `dart2wasm` and `dart2js` compile errors
+- Fixed iOS: removed duplicate `else` clause in `ProxyManager` guard statement
+- Fixed iOS: added missing Flutter import and fixed Swift API usage in `ProxyManager`
+- Fixed Linux: removed unused `<iostream>` includes and call `load_initial` in
+  `createHeadless`
+- Fixed Linux: fixed pre-existing C++ issues in `in_app_webview.cc`
+- Fixed: restored `Disposable` interface on `PlatformProxyController`
+
+### Chores
+
+- Removed network capture example from public package
+- Added `.clangd` and `compile_flags.txt` for Linux Flutter header resolution
+- Bumped svgo dependency
+
+## 4.6.3 - 2026-07-21
 
 ## 4.6.2 - 2026-07-21
 
