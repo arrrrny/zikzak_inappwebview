@@ -8,6 +8,7 @@ import 'package:zikzak_inappwebview_example/chrome_safari_browser_example.screen
 import 'package:zikzak_inappwebview_example/headless_in_app_webview.screen.dart';
 import 'package:zikzak_inappwebview_example/in_app_webiew_example.screen.dart';
 import 'package:zikzak_inappwebview_example/in_app_browser_example.screen.dart';
+import 'package:zikzak_inappwebview_example/network_capture_scraper.screen.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 // import 'package:path_provider/path_provider.dart';
@@ -62,6 +63,12 @@ PointerInterceptor myDrawer({required BuildContext context}) {
       },
     ),
     ListTile(
+      title: const Text('Network Capture Scraper'),
+      onTap: () {
+        Navigator.pushReplacementNamed(context, '/NetworkCapture');
+      },
+    ),
+    ListTile(
       title: const Text('HeadlessInAppWebView'),
       onTap: () {
         Navigator.pushReplacementNamed(context, '/HeadlessInAppWebView');
@@ -74,6 +81,13 @@ PointerInterceptor myDrawer({required BuildContext context}) {
         title: const Text('InAppWebView'),
         onTap: () {
           Navigator.pushReplacementNamed(context, '/');
+        },
+      ),
+
+      ListTile(
+        title: const Text('Network Capture Scraper'),
+        onTap: () {
+          Navigator.pushReplacementNamed(context, '/NetworkCapture');
         },
       ),
       ListTile(
@@ -97,6 +111,13 @@ PointerInterceptor myDrawer({required BuildContext context}) {
           Navigator.pushReplacementNamed(context, '/InAppBrowser');
         },
       ),
+
+      ListTile(
+        title: const Text('Network Capture Scraper'),
+        onTap: () {
+          Navigator.pushReplacementNamed(context, '/NetworkCapture');
+        },
+      ),
       ListTile(
         title: const Text('HeadlessInAppWebView'),
         onTap: () {
@@ -117,6 +138,13 @@ PointerInterceptor myDrawer({required BuildContext context}) {
         title: const Text('InAppBrowser'),
         onTap: () {
           Navigator.pushReplacementNamed(context, '/InAppBrowser');
+        },
+      ),
+
+      ListTile(
+        title: const Text('Network Capture Scraper'),
+        onTap: () {
+          Navigator.pushReplacementNamed(context, '/NetworkCapture');
         },
       ),
       ListTile(
@@ -168,6 +196,7 @@ class _MyAppState extends State<MyApp> {
         initialRoute: '/',
         routes: {
           '/': (context) => const InAppWebViewExampleScreen(),
+          '/NetworkCapture': (context) => const NetworkCaptureScraperScreen(),
           '/HeadlessInAppWebView': (context) =>
               const HeadlessInAppWebViewExampleScreen(),
         },
@@ -179,6 +208,7 @@ class _MyAppState extends State<MyApp> {
         routes: {
           '/': (context) => const InAppWebViewExampleScreen(),
           '/InAppBrowser': (context) => const InAppBrowserExampleScreen(),
+          '/NetworkCapture': (context) => const NetworkCaptureScraperScreen(),
           '/HeadlessInAppWebView': (context) =>
               const HeadlessInAppWebViewExampleScreen(),
         },
@@ -190,6 +220,7 @@ class _MyAppState extends State<MyApp> {
         routes: {
           '/': (context) => const InAppWebViewExampleScreen(),
           '/InAppBrowser': (context) => const InAppBrowserExampleScreen(),
+          '/NetworkCapture': (context) => const NetworkCaptureScraperScreen(),
           '/HeadlessInAppWebView': (context) =>
               const HeadlessInAppWebViewExampleScreen(),
         },
@@ -201,6 +232,7 @@ class _MyAppState extends State<MyApp> {
         '/': (context) => const InAppWebViewExampleScreen(),
         '/InAppBrowser': (context) => const InAppBrowserExampleScreen(),
         '/ChromeSafariBrowser': (context) => ChromeSafariBrowserExampleScreen(),
+        '/NetworkCapture': (context) => const NetworkCaptureScraperScreen(),
         '/HeadlessInAppWebView': (context) =>
             const HeadlessInAppWebViewExampleScreen(),
       },
