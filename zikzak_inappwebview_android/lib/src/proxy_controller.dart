@@ -37,7 +37,7 @@ class AndroidProxyController extends PlatformProxyController
                   .fromPlatformProxyControllerCreationParams(params),
         ) {
     channel = const MethodChannel(
-        'com.pichillilorenzo/zikzak_inappwebview_proxycontroller');
+        'wtf.zikzak/zikzak_inappwebview_proxycontroller');
     handler = handleMethod;
     initMethodCallHandler();
   }

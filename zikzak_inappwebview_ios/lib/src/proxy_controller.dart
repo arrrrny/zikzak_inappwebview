@@ -24,7 +24,7 @@ class IosProxyController extends PlatformProxyController with ChannelController 
               ? params
               : IosProxyControllerCreationParams.fromPlatformProxyControllerCreationParams(params),
         ) {
-    channel = const MethodChannel('com.pichillilorenzo/zikzak_inappwebview_proxycontroller');
+    channel = const MethodChannel('wtf.zikzak/zikzak_inappwebview_proxycontroller');
     handler = _handleMethod;
     initMethodCallHandler();
   }
