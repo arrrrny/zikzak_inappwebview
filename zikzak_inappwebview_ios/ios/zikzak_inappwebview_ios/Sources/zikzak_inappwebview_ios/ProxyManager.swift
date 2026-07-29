@@ -109,7 +109,9 @@ public class ProxyManager: ChannelDelegate {
             return true
         }
 
-        guard let asciiHost = host.applyingTransform(StringTransform(rawValue: "Any-Latin; Latin-ASCII"), reverse: false),
+        guard
+            let asciiHost = host.applyingTransform(
+                StringTransform(rawValue: "Any-Latin; Latin-ASCII"), reverse: false),
             !asciiHost.isEmpty,
             asciiHost.count <= 253
         else {
@@ -127,7 +129,9 @@ public class ProxyManager: ChannelDelegate {
                 labelValue.count <= 63,
                 !labelValue.hasPrefix("-"),
                 !labelValue.hasSuffix("-"),
-                labelValue.range(of: "^[A-Za-z0-9-]+$", options: NSString.CompareOptions.regularExpression) != nil else {
+                labelValue.range(
+                    of: "^[A-Za-z0-9-]+$", options: NSString.CompareOptions.regularExpression)
+                    != nil
             else {
                 return false
             }
