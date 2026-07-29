@@ -12,12 +12,15 @@ import '../in_app_webview_controller.dart';
 ///and global operations.
 class CookieController {
   final InAppWebViewController _controller;
+  final CookieManager? _cookieManagerOverride;
   CookieManager? _cookieManager;
 
   ///Creates a [CookieController] bound to the given controller.
-  CookieController(this._controller);
+  CookieController(this._controller, {CookieManager? cookieManager})
+    : _cookieManagerOverride = cookieManager;
 
-  CookieManager get _cookies => _cookieManager ??= CookieManager.instance();
+  CookieManager get _cookies =>
+      _cookieManager ??= _cookieManagerOverride ?? CookieManager.instance();
 
   Future<WebUri?> _resolveUrl(WebUri? url) async =>
       url ?? await _controller.getUrl();
