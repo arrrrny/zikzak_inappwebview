@@ -8,6 +8,7 @@ import '../find_interaction/find_interaction_controller.dart';
 import '../webview_environment/webview_environment.dart';
 import 'in_app_webview_controller.dart';
 import '../pull_to_refresh/pull_to_refresh_controller.dart';
+import 'network_capture/network_capture_manager.dart';
 
 ///{@macro zikzak_inappwebview_platform_interface.PlatformHeadlessInAppWebView}
 class HeadlessInAppWebView {
@@ -38,7 +39,7 @@ class HeadlessInAppWebView {
     );
   }
 
-  HeadlessInAppWebView({
+  factory HeadlessInAppWebView({
     Size initialSize = const Size(-1, -1),
     int? windowId,
     HeadlessInAppWebView? headlessWebView,
@@ -331,8 +332,24 @@ class HeadlessInAppWebView {
       Size newContentSize,
     )?
     onContentSizeChanged,
-  }) : this.fromPlatformCreationParams(
-         params: PlatformHeadlessInAppWebViewCreationParams(
+    void Function(InAppWebViewController controller, NetworkRequest request)?
+    onNetworkRequest,
+    void Function(InAppWebViewController controller, NetworkResponse response)?
+    onNetworkResponse,
+    void Function(
+      InAppWebViewController controller,
+      NetworkResponseBody responseBody,
+    )?
+    onNetworkLoadingFinished,
+  }) {
+    final networkCaptureManager = NetworkCaptureManager.maybeCreate(
+      settings: initialSettings,
+      onNetworkRequest: onNetworkRequest,
+      onNetworkResponse: onNetworkResponse,
+      onNetworkLoadingFinished: onNetworkLoadingFinished,
+    );
+    return HeadlessInAppWebView.fromPlatformCreationParams(
+      params: PlatformHeadlessInAppWebViewCreationParams(
            controllerFromPlatform:
                (PlatformInAppWebViewController controller) =>
                    InAppWebViewController.fromPlatform(platform: controller),
@@ -342,18 +359,24 @@ class HeadlessInAppWebView {
            initialFile: initialFile,
            initialData: initialData,
            initialSettings: initialSettings,
-           initialUserScripts: initialUserScripts,
+           initialUserScripts: NetworkCaptureManager.mergeUserScripts(
+             initialUserScripts,
+             networkCaptureManager,
+           ),
            pullToRefreshController: pullToRefreshController?.platform,
            findInteractionController: findInteractionController?.platform,
            contextMenu: contextMenu,
            webViewEnvironment: webViewEnvironment?.platform,
-           onWebViewCreated: onWebViewCreated != null
-               ? (controller) => onWebViewCreated.call(controller)
-               : null,
-           onLoadStart: onLoadStart != null
-               ? (controller, url) => onLoadStart.call(controller, url)
-               : null,
+           onWebViewCreated: (controller) {
+             networkCaptureManager?.attach(controller);
+             onWebViewCreated?.call(controller);
+           },
+           onLoadStart: (controller, url) {
+             networkCaptureManager?.onPageLoad(controller);
+             onLoadStart?.call(controller, url);
+           },
            onLoadStop: (controller, url) {
+             networkCaptureManager?.onPageLoad(controller);
              onLoadStop?.call(controller, url);
              if (initialSettings?.dismissDialogues ?? false) {
                () async {
@@ -611,8 +634,21 @@ class HeadlessInAppWebView {
                        newContentSize,
                      )
                : null,
+           onNetworkRequest: onNetworkRequest != null
+               ? (controller, request) =>
+                     onNetworkRequest.call(controller, request)
+               : null,
+           onNetworkResponse: onNetworkResponse != null
+               ? (controller, response) =>
+                     onNetworkResponse.call(controller, response)
+               : null,
+           onNetworkLoadingFinished: onNetworkLoadingFinished != null
+               ? (controller, responseBody) =>
+                     onNetworkLoadingFinished.call(controller, responseBody)
+               : null,
          ),
-       );
+    );
+  }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformHeadlessInAppWebView.run}
   Future<void> run() => platform.run();

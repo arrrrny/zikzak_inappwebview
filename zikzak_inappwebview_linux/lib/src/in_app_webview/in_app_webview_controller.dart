@@ -55,6 +55,17 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
           );
         }
         break;
+      case 'onCallJsHandler':
+        final handlerName = call.arguments['handlerName'] as String?;
+        final handlerArgs =
+            (call.arguments['args'] as List?)?.cast<dynamic>() ?? const [];
+        final callback = handlerName != null
+            ? _javaScriptHandlers[handlerName]
+            : null;
+        if (callback != null) {
+          return callback(handlerArgs);
+        }
+        break;
       case 'onReceivedError':
         if (params.webviewParams?.onReceivedError != null) {
           String? url = call.arguments['url'];
@@ -191,14 +202,54 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
   }
 
   @override
-  Future<void> evaluateJavascript({
+  Future<dynamic> evaluateJavascript({
     required String source,
     ContentWorld? contentWorld,
   }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('source', () => source);
     args.putIfAbsent('contentWorld', () => contentWorld?.toMap());
-    await _channel.invokeMethod('evaluateJavascript', args);
+    return await _channel.invokeMethod('evaluateJavascript', args);
+  }
+
+  @override
+  Future<void> loadData({
+    required String data,
+    String mimeType = "text/html",
+    String encoding = "utf8",
+    WebUri? baseUrl,
+    WebUri? historyUrl,
+    WebUri? allowingReadAccessTo,
+  }) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('data', () => data);
+    args.putIfAbsent('baseUrl', () => baseUrl?.toString());
+    await _channel.invokeMethod('loadData', args);
+  }
+
+  final Map<String, JavaScriptHandlerCallback> _javaScriptHandlers =
+      <String, JavaScriptHandlerCallback>{};
+
+  @override
+  void addJavaScriptHandler({
+    required String handlerName,
+    required JavaScriptHandlerCallback callback,
+  }) {
+    _javaScriptHandlers[handlerName] = callback;
+    _channel.invokeMethod('addJavaScriptHandler', <String, dynamic>{
+      'handlerName': handlerName,
+    });
+  }
+
+  @override
+  JavaScriptHandlerCallback? removeJavaScriptHandler({
+    required String handlerName,
+  }) {
+    final callback = _javaScriptHandlers.remove(handlerName);
+    _channel.invokeMethod('removeJavaScriptHandler', <String, dynamic>{
+      'handlerName': handlerName,
+    });
+    return callback;
   }
 
   @override

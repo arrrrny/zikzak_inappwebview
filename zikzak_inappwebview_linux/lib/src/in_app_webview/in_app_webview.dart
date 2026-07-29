@@ -54,7 +54,16 @@ class _LinuxInAppWebViewState extends State<_LinuxInAppWebView> {
     var id = DateTime.now().microsecondsSinceEpoch.toString();
 
     try {
-      var textureId = await _sharedChannel.invokeMethod('create', {'id': id});
+      var textureId = await _sharedChannel.invokeMethod('create', {
+        'id': id,
+        'params': {
+          'initialUrlRequest': widget.params.initialUrlRequest?.toMap(),
+          'initialData': widget.params.initialData?.toMap(),
+          'initialUserScripts':
+              widget.params.initialUserScripts?.map((e) => e.toMap()).toList() ??
+                  [],
+        },
+      });
       if (textureId != null && mounted) {
         setState(() {
           _textureId = textureId;
