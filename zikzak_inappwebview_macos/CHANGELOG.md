@@ -1,5 +1,14 @@
 ## 4.7.0 - 2026-07-29
 
+## Unreleased
+
+- Fixed macOS: popup windows (window.open / target=_blank) never loaded their
+  URL. Added WKUIDelegate createWebViewWith support: the popup webview is
+  created in an off-screen NSWindow (required for navigation to start on
+  macOS) and reparented into a new Flutter platform view when onCreateWindow
+  is handled by the app.
+
+
 
 ### Features
 
