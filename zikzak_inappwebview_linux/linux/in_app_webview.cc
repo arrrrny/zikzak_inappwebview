@@ -29,6 +29,16 @@ G_DEFINE_TYPE(InAppWebView, in_app_webview, fl_pixel_buffer_texture_get_type())
 
 static void update_texture(InAppWebView *self);
 
+/**
+ * @brief Supplies the current pixel buffer for the Flutter texture.
+ *
+ * @param texture Texture whose pixel data is requested.
+ * @param buffer Receives the RGBA pixel buffer.
+ * @param width Receives the buffer width in pixels.
+ * @param height Receives the buffer height in pixels.
+ * @param error Receives an error if pixel retrieval fails.
+ * @return TRUE after supplying the pixel buffer.
+ */
 static gboolean in_app_webview_copy_pixels(FlPixelBufferTexture *texture,
                                            const uint8_t **buffer,
                                            uint32_t *width, uint32_t *height,
@@ -49,6 +59,15 @@ static gboolean in_app_webview_copy_pixels(FlPixelBufferTexture *texture,
   return TRUE;
 }
 
+/**
+ * @brief Releases resources associated with the in-app web view.
+ *
+ * Stops scheduled texture updates and releases the offscreen window, web view,
+ * communication channel, pixel buffer, and texture identifier before delegating
+ * disposal to the parent class.
+ *
+ * @param object GObject instance being disposed.
+ */
 static void in_app_webview_dispose(GObject *object) {
   InAppWebView *self = IN_APP_WEBVIEW(object);
   if (self->update_timeout_id != 0) {
@@ -91,6 +110,11 @@ static void in_app_webview_class_init(InAppWebViewClass *klass) {
       in_app_webview_copy_pixels;
 }
 
+/**
+ * @brief Initializes the web view's rendering state and default dimensions.
+ *
+ * @param self Web view instance to initialize.
+ */
 static void in_app_webview_init(InAppWebView *self) {
   self->width = 1280;
   self->height = 720;
@@ -100,20 +124,41 @@ static void in_app_webview_init(InAppWebView *self) {
   self->snapshot_in_flight = FALSE;
 }
 
-// Periodic callback to refresh the Flutter texture from the WebKit snapshot.
+/**
+ * @brief Refreshes the Flutter texture from the current WebKit snapshot.
+ *
+ * @param user_data The associated InAppWebView instance.
+ * @return G_SOURCE_CONTINUE to keep the periodic callback active.
+ */
 static gboolean on_update_timeout(gpointer user_data) {
   InAppWebView *self = IN_APP_WEBVIEW(user_data);
   update_texture(self);
   return G_SOURCE_CONTINUE;
 }
 
+/**
+ * @brief Dispatches a method channel call to an in-app web view.
+ *
+ * @param channel Method channel receiving the call.
+ * @param method_call Method call to handle.
+ * @param user_data In-app web view instance that handles the call.
+ */
 static void in_app_webview_method_call_handler(FlMethodChannel *channel,
                                                FlMethodCall *method_call,
                                                gpointer user_data) {
   in_app_webview_handle_method_call(IN_APP_WEBVIEW(user_data), method_call);
 }
 
-// Helper to update texture from snapshot
+/**
+ * @brief Updates the Flutter texture with a completed WebKit snapshot.
+ *
+ * Converts the snapshot pixels to straight RGBA, resizes the pixel buffer when
+ * the snapshot dimensions change, and marks a new texture frame as available.
+ *
+ * @param source_object WebKit web view that produced the snapshot.
+ * @param res Asynchronous snapshot result.
+ * @param user_data InAppWebView instance receiving the snapshot.
+ */
 static void on_snapshot_ready(GObject *source_object, GAsyncResult *res,
                               gpointer user_data) {
   InAppWebView *self = IN_APP_WEBVIEW(user_data);
@@ -178,6 +223,13 @@ static void on_snapshot_ready(GObject *source_object, GAsyncResult *res,
   g_object_unref(self);
 }
 
+/**
+ * @brief Requests an asynchronous snapshot of the visible web view region.
+ *
+ * Skips the request when another snapshot is already in progress.
+ *
+ * @param self Web view whose visible content should be captured.
+ */
 static void update_texture(InAppWebView *self) {
   if (self->snapshot_in_flight) {
     return;
@@ -189,6 +241,13 @@ static void update_texture(InAppWebView *self) {
                                on_snapshot_ready, g_object_ref(self));
 }
 
+/**
+ * @brief Handles WebKit load state changes and updates the Flutter texture.
+ *
+ * @param web_view WebKit web view whose load state changed.
+ * @param load_event Load event that triggered the callback.
+ * @param user_data InAppWebView instance associated with the web view.
+ */
 static void on_load_changed(WebKitWebView *web_view, WebKitLoadEvent load_event,
                             gpointer user_data) {
   InAppWebView *self = IN_APP_WEBVIEW(user_data);
@@ -466,6 +525,14 @@ void in_app_webview_load_initial(InAppWebView *self, FlValue *params) {
   }
 }
 
+/**
+ * @brief Creates and initializes an offscreen WebKit web view registered as a Flutter texture.
+ *
+ * @param messenger Flutter binary messenger used for method-channel communication.
+ * @param texture_registrar Flutter texture registrar used to register the web view texture.
+ * @param id Identifier used to construct the method-channel name.
+ * @return InAppWebView* Newly initialized web view instance.
+ */
 InAppWebView *in_app_webview_new(FlBinaryMessenger *messenger,
                                  FlTextureRegistrar *texture_registrar,
                                  const char *id) {
@@ -600,6 +667,16 @@ static void print_failed_callback(WebKitPrintOperation *operation,
   g_object_unref(method_call);
 }
 
+/**
+ * @brief Handles a method-channel request for the web view.
+ *
+ * Dispatches navigation, loading, JavaScript, content retrieval, screenshot,
+ * PDF generation, developer tools, and state queries, responding with the
+ * operation result or an error when the request is invalid or unsupported.
+ *
+ * @param self The web view instance receiving the request.
+ * @param method_call The method-channel call to process and respond to.
+ */
 void in_app_webview_handle_method_call(InAppWebView *self,
                                        FlMethodCall *method_call) {
   const gchar *method = fl_method_call_get_name(method_call);
