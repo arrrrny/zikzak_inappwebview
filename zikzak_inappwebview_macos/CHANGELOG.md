@@ -1,5 +1,14 @@
 ## 4.7.0 - 2026-07-29
 
+## Unreleased
+
+- Fixed macOS: Network Capture API callbacks never fired — the JS bridge was
+  exposed as `window.flutter_inappwebview` while iOS/Android and the Network
+  Capture interceptor use `window.zikzak_inappwebview`, so captured events
+  never reached the Dart side (fixes `onNetworkRequest` / `onNetworkResponse` /
+  `onNetworkLoadingFinished`)
+
+
 
 ### Features
 

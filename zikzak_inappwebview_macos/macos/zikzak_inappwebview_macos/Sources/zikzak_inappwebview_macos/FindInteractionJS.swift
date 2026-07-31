@@ -1,6 +1,6 @@
 import Foundation
 
-let JAVASCRIPT_BRIDGE_NAME = "flutter_inappwebview"
+let JAVASCRIPT_BRIDGE_NAME = "zikzak_inappwebview"
 
 let FIND_TEXT_HIGHLIGHT_JS_SOURCE = """
 window.\(JAVASCRIPT_BRIDGE_NAME) = window.\(JAVASCRIPT_BRIDGE_NAME) || {};
