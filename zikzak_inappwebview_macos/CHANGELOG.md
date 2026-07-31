@@ -1,4 +1,10 @@
 ## 4.7.0 - 2026-07-29
+## Unreleased
+
+- Renamed remaining flutter_inappwebview residuals to zikzak_inappwebview
+  (JS bridge name, method channel and platform view type id)
+
+
 
 ## Unreleased
 
