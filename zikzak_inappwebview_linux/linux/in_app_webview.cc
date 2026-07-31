@@ -739,7 +739,7 @@ void in_app_webview_handle_method_call(InAppWebView *self,
     GtkPrintSettings *settings = gtk_print_settings_new();
 
     gchar *filename = g_strdup_printf(
-        "/tmp/flutter_inappwebview_print_%p_%ld.pdf", self, g_get_real_time());
+        "/tmp/zikzak_inappwebview_print_%p_%ld.pdf", self, g_get_real_time());
     gchar *uri = g_strdup_printf("file://%s", filename);
 
     gtk_print_settings_set(settings, GTK_PRINT_SETTINGS_OUTPUT_URI, uri);
