@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Fixed macOS: popup windows (window.open / target=_blank) never loaded their
+  URL. Added WKUIDelegate createWebViewWith support: the popup webview is
+  created in an off-screen NSWindow (required for navigation to start on
+  macOS) and reparented into a new Flutter platform view when onCreateWindow
+  is handled by the app.
 - Fixed macOS: Network Capture API callbacks never fired — the JS bridge was
   exposed as `window.flutter_inappwebview` while iOS/Android and the Network
   Capture interceptor use `window.zikzak_inappwebview`, so captured events

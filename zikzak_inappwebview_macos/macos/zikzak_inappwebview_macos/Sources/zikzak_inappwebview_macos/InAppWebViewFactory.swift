@@ -11,6 +11,27 @@ public class InAppWebViewFactory: NSObject, FlutterPlatformViewFactory {
     }
 
     public func create(withViewIdentifier viewId: Int64, arguments args: Any?) -> NSView {
+        let container = NSView(frame: .zero)
+        container.clipsToBounds = true
+        container.autoresizesSubviews = true
+        container.autoresizingMask = [.width, .height]
+
+        if let args = args as? [String: Any],
+            let windowId = args["windowId"] as? Int64,
+            let webView = InAppWebView.windowWebViews[windowId]
+        {
+            // Reparent an existing popup webview created by createWebViewWith
+            // into this new Flutter platform view. Close the temporary
+            // off-screen window and attach the webview to the container.
+            webView.popupWindow?.close()
+            webView.popupWindow = nil
+            webView.bindChannels(registrar: registrar, viewId: viewId)
+            webView.frame = container.bounds
+            webView.autoresizingMask = [.width, .height]
+            container.addSubview(webView)
+            return container
+        }
+
         let webViewController = FlutterWebViewController(
             registrar: registrar,
             withFrame: .zero,
