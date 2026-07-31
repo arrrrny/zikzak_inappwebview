@@ -11,12 +11,23 @@ struct _InAppWebView {
   GtkWidget *web_view;
   int64_t texture_id;
 
+  // Offscreen window hosting the webview so it actually renders. Without a
+  // realized widget hierarchy WebKit never paints and snapshots stay empty
+  // (the "blue screen" bug).
+  GtkWidget *offscreen_window;
+  // Periodic snapshot timer id (see on_update_timeout).
+  guint update_timeout_id;
+  // Guards against overlapping async snapshots from the timer.
+  gboolean snapshot_in_flight;
+
   uint8_t *buffer;
   int32_t width;
   int32_t height;
 };
 
 G_DEFINE_TYPE(InAppWebView, in_app_webview, fl_pixel_buffer_texture_get_type())
+
+static void update_texture(InAppWebView *self);
 
 static gboolean in_app_webview_copy_pixels(FlPixelBufferTexture *texture,
                                            const uint8_t **buffer,
@@ -40,11 +51,22 @@ static gboolean in_app_webview_copy_pixels(FlPixelBufferTexture *texture,
 
 static void in_app_webview_dispose(GObject *object) {
   InAppWebView *self = IN_APP_WEBVIEW(object);
+  if (self->update_timeout_id != 0) {
+    g_source_remove(self->update_timeout_id);
+    self->update_timeout_id = 0;
+  }
+  if (self->offscreen_window) {
+    // Destroying the window drops the container's reference on web_view;
+    // our own reference on the window is released below.
+    gtk_widget_destroy(self->offscreen_window);
+    g_object_unref(self->offscreen_window);
+    self->offscreen_window = nullptr;
+  }
   if (self->web_view) {
     // gtk_widget_destroy(self->web_view); // WebKitWebView is a GtkWidget
     // But since we own the ref via g_object_ref_sink, we should unref it.
     // If it was added to a container, the container would own it.
-    // Here we don't add it to a container, so we own it.
+    // Here we own it via g_object_ref_sink.
     g_object_unref(self->web_view);
     self->web_view = nullptr;
   }
@@ -72,15 +94,17 @@ static void in_app_webview_class_init(InAppWebViewClass *klass) {
 static void in_app_webview_init(InAppWebView *self) {
   self->width = 1280;
   self->height = 720;
-  self->buffer = (uint8_t *)g_malloc0(self->width * self->height * 4);
+  self->buffer = nullptr;
+  self->offscreen_window = nullptr;
+  self->update_timeout_id = 0;
+  self->snapshot_in_flight = FALSE;
+}
 
-  // Fill with blue for initial state
-  for (int i = 0; i < self->width * self->height; i++) {
-    self->buffer[i * 4] = 0;       // R
-    self->buffer[i * 4 + 1] = 0;   // G
-    self->buffer[i * 4 + 2] = 255; // B
-    self->buffer[i * 4 + 3] = 255; // A
-  }
+// Periodic callback to refresh the Flutter texture from the WebKit snapshot.
+static gboolean on_update_timeout(gpointer user_data) {
+  InAppWebView *self = IN_APP_WEBVIEW(user_data);
+  update_texture(self);
+  return G_SOURCE_CONTINUE;
 }
 
 static void in_app_webview_method_call_handler(FlMethodChannel *channel,
@@ -104,25 +128,33 @@ static void on_snapshot_ready(GObject *source_object, GAsyncResult *res,
     // int stride = cairo_image_surface_get_stride(surface); // Unused
     unsigned char *data = cairo_image_surface_get_data(surface);
 
-    if (width != self->width || height != self->height) {
+    if (self->buffer == nullptr || width != self->width ||
+        height != self->height) {
       g_free(self->buffer);
       self->width = width;
       self->height = height;
       self->buffer = (uint8_t *)g_malloc0(width * height * 4);
     }
 
-    // Cairo uses ARGB or RGB24, usually premultiplied. Flutter expects RGBA.
-    // WebKit snapshot is usually CAIRO_FORMAT_ARGB32 (premultiplied ARGB, host
-    // endian).
-
-    // Convert ARGB to RGBA
+    // WebKit snapshot is CAIRO_FORMAT_ARGB32 (0xAARRGGBB) in native-endian
+    // format; memory order is BGRA on little-endian and ARGB on big-endian,
+    // but reading it back as a native-endian uint32 always yields the same
+    // 0xAARRGGBB value. Flutter's pixel buffer texture expects straight
+    // (non-premultiplied) RGBA, so also unpremultiply the alpha channel.
     for (int i = 0; i < width * height; i++) {
-      // uint32_t* pixel = (uint32_t*)(data + i * 4);
+      uint32_t pixel = ((uint32_t *)data)[i];
 
-      uint8_t b = data[i * 4];
-      uint8_t g = data[i * 4 + 1];
-      uint8_t r = data[i * 4 + 2];
-      uint8_t a = data[i * 4 + 3];
+      uint8_t b = (pixel >> 0) & 0xFF;
+      uint8_t g = (pixel >> 8) & 0xFF;
+      uint8_t r = (pixel >> 16) & 0xFF;
+      uint8_t a = (pixel >> 24) & 0xFF;
+
+      // Unpremultiply alpha (rounding division).
+      if (a != 0 && a != 255) {
+        r = (r * 255 + a / 2) / a;
+        g = (g * 255 + a / 2) / a;
+        b = (b * 255 + a / 2) / a;
+      }
 
       self->buffer[i * 4] = r;
       self->buffer[i * 4 + 1] = g;
@@ -142,10 +174,15 @@ static void on_snapshot_ready(GObject *source_object, GAsyncResult *res,
     }
   }
 
+  self->snapshot_in_flight = FALSE;
   g_object_unref(self);
 }
 
 static void update_texture(InAppWebView *self) {
+  if (self->snapshot_in_flight) {
+    return;
+  }
+  self->snapshot_in_flight = TRUE;
   webkit_web_view_get_snapshot(WEBKIT_WEB_VIEW(self->web_view),
                                WEBKIT_SNAPSHOT_REGION_VISIBLE,
                                WEBKIT_SNAPSHOT_OPTIONS_NONE, nullptr,
@@ -156,6 +193,13 @@ static void on_load_changed(WebKitWebView *web_view, WebKitLoadEvent load_event,
                             gpointer user_data) {
   InAppWebView *self = IN_APP_WEBVIEW(user_data);
   if (load_event == WEBKIT_LOAD_STARTED) {
+    // Ensure the offscreen window is realized so rendering actually happens.
+    if (self->offscreen_window &&
+        !gtk_widget_get_realized(self->offscreen_window)) {
+      gtk_widget_realize(self->offscreen_window);
+      gtk_widget_show_all(self->offscreen_window);
+    }
+
     const gchar *uri = webkit_web_view_get_uri(web_view);
     g_autoptr(FlValue) args = fl_value_new_map();
     fl_value_set_string(args, "url",
@@ -164,6 +208,7 @@ static void on_load_changed(WebKitWebView *web_view, WebKitLoadEvent load_event,
                                     nullptr, nullptr);
   }
   if (load_event == WEBKIT_LOAD_FINISHED) {
+    gtk_widget_queue_draw(self->web_view);
     const gchar *uri = webkit_web_view_get_uri(web_view);
     g_autoptr(FlValue) args = fl_value_new_map();
     fl_value_set_string(args, "url",
@@ -460,6 +505,19 @@ InAppWebView *in_app_webview_new(FlBinaryMessenger *messenger,
   g_object_unref(ucm);
   g_object_ref_sink(self->web_view);
 
+  // Create an offscreen window so the WebKitWebView actually renders.
+  // Without being in a realized widget hierarchy, snapshots return
+  // empty/transparent and the texture stays stuck on the initial frame
+  // (the "blue screen" bug). Keep the window hidden: we only need the
+  // snapshot texture, not visible UI.
+  self->offscreen_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+  g_object_ref_sink(self->offscreen_window);
+  gtk_window_set_default_size(GTK_WINDOW(self->offscreen_window), 1280, 720);
+  gtk_container_add(GTK_CONTAINER(self->offscreen_window), self->web_view);
+  gtk_widget_realize(self->offscreen_window);
+  gtk_widget_show_all(self->offscreen_window);
+  gtk_widget_hide(self->offscreen_window);
+
   // Connect load-changed signal
   g_signal_connect(self->web_view, "load-changed", G_CALLBACK(on_load_changed),
                    self);
@@ -474,6 +532,10 @@ InAppWebView *in_app_webview_new(FlBinaryMessenger *messenger,
   } else {
     self->texture_id = 0;
   }
+
+  // Start periodic texture refresh (~30fps). WebKit does not notify us when
+  // content repaints, so poll snapshots to keep the Flutter texture live.
+  self->update_timeout_id = g_timeout_add(33, on_update_timeout, self);
 
   // Set initial size
   gtk_widget_set_size_request(self->web_view, 1280, 720);
@@ -831,6 +893,20 @@ void in_app_webview_handle_method_call(InAppWebView *self,
           g_object_unref(method_call);
         },
         g_object_ref(method_call));
+    return;
+  } else if (strcmp(method, "openDevTools") == 0) {
+    // The WebKit inspector is a no-op unless developer extras are enabled.
+    // Enable lazily here so the setting stays off for ordinary webviews.
+    WebKitSettings *settings =
+        webkit_web_view_get_settings(WEBKIT_WEB_VIEW(self->web_view));
+    webkit_settings_set_enable_developer_extras(settings, TRUE);
+    WebKitWebInspector *inspector =
+        webkit_web_view_get_inspector(WEBKIT_WEB_VIEW(self->web_view));
+    webkit_web_inspector_show(inspector);
+    fl_method_call_respond(method_call,
+                           FL_METHOD_RESPONSE(fl_method_success_response_new(
+                               fl_value_new_bool(true))),
+                           nullptr);
     return;
   } else {
     fl_method_call_respond(

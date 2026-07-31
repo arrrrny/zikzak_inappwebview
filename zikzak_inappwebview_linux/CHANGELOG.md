@@ -1,5 +1,15 @@
 ## 4.7.0 - 2026-07-29
 
+## Unreleased
+
+- Fixed Linux: webview texture stuck on the initial blue frame. The WebKitWebView
+  now renders inside a realized offscreen GTK window and the texture is
+  refreshed from periodic snapshots (~30fps), with correct ARGB-to-RGBA
+  conversion including alpha unpremultiplication.
+- Added Linux: openDevTools support via WebKitWebInspector (developer extras
+  enabled on demand).
+
+
 
 ### Features
 
