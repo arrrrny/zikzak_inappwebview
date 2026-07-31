@@ -3,8 +3,150 @@
 part of 'webview_environment_settings.dart';
 
 // **************************************************************************
+// ExchangeableEnumGenerator
+// **************************************************************************
+
+///The access kind for resources mapped by [VirtualHostMapping].
+///
+///The values match the WebView2
+///`COREWEBVIEW2_HOST_RESOURCE_ACCESS_KIND` enum.
+class HostResourceAccessKind {
+  final int _value;
+  final int _nativeValue;
+  const HostResourceAccessKind._internal(this._value, this._nativeValue);
+  // ignore: unused_element
+  factory HostResourceAccessKind._internalMultiPlatform(
+    int value,
+    Function nativeValue,
+  ) => HostResourceAccessKind._internal(value, nativeValue());
+
+  ///The host resource can be accessed from the same origin.
+  static const allow = HostResourceAccessKind._internal(1, 1);
+
+  ///The host resource can be accessed from any origin (CORS allowed).
+  static const allowCors = HostResourceAccessKind._internal(2, 2);
+
+  ///The host resource access is denied.
+  static const deny = HostResourceAccessKind._internal(0, 0);
+
+  ///Set of all values of [HostResourceAccessKind].
+  static final Set<HostResourceAccessKind> values = [
+    HostResourceAccessKind.allow,
+    HostResourceAccessKind.allowCors,
+    HostResourceAccessKind.deny,
+  ].toSet();
+
+  ///Gets a possible [HostResourceAccessKind] instance from [int] value.
+  static HostResourceAccessKind? fromValue(int? value) {
+    if (value != null) {
+      try {
+        return HostResourceAccessKind.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  ///Gets a possible [HostResourceAccessKind] instance from a native value.
+  static HostResourceAccessKind? fromNativeValue(int? value) {
+    if (value != null) {
+      try {
+        return HostResourceAccessKind.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  ///Gets [int] value.
+  int toValue() => _value;
+
+  ///Gets [int] native value.
+  int toNativeValue() => _nativeValue;
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  @override
+  String toString() {
+    switch (_value) {
+      case 1:
+        return 'allow';
+      case 2:
+        return 'allowCors';
+      case 0:
+        return 'deny';
+    }
+    return _value.toString();
+  }
+}
+
+// **************************************************************************
 // ExchangeableObjectGenerator
 // **************************************************************************
+
+///Represents a mapping between a virtual host name and a local folder,
+///used to serve local content through the WebView.
+///
+///The WebView serves the [folderPath] content at `https://[hostName]/`.
+class VirtualHostMapping {
+  ///The access kind for the mapped resources.
+  final HostResourceAccessKind accessKind;
+
+  ///The absolute folder path to map to the host name.
+  final String folderPath;
+
+  ///The host name to map (e.g. `app.localhost`).
+  final String hostName;
+  VirtualHostMapping({
+    this.accessKind = HostResourceAccessKind.allow,
+    required this.folderPath,
+    required this.hostName,
+  });
+
+  ///Gets a possible [VirtualHostMapping] instance from a [Map] value.
+  static VirtualHostMapping? fromMap(Map<String, dynamic>? map) {
+    if (map == null) {
+      return null;
+    }
+    final instance = VirtualHostMapping(
+      accessKind:
+          HostResourceAccessKind.fromNativeValue(map['accessKind']) ??
+          HostResourceAccessKind.allow,
+      folderPath: map['folderPath'] as String? ?? '',
+      hostName: map['hostName'] as String? ?? '',
+    );
+    return instance;
+  }
+
+  ///Converts instance to a map.
+  Map<String, dynamic> toMap() {
+    return {
+      "accessKind": accessKind.toNativeValue(),
+      "folderPath": folderPath,
+      "hostName": hostName,
+    };
+  }
+
+  ///Converts instance to a map.
+  Map<String, dynamic> toJson() {
+    return toMap();
+  }
+
+  @override
+  String toString() {
+    return 'VirtualHostMapping{accessKind: $accessKind, folderPath: $folderPath, hostName: $hostName}';
+  }
+}
 
 ///This class represents all the [PlatformWebViewEnvironment] settings available.
 ///
@@ -81,6 +223,14 @@ class WebViewEnvironmentSettings {
   ///- Windows ([Official API - CreateCoreWebView2EnvironmentWithOptions.userDataFolder](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#createcorewebview2environmentwithoptions))
   final String? userDataFolder;
 
+  ///Virtual host name to folder path mappings applied to the WebView.
+  ///
+  ///Each mapping serves the given local [VirtualHostMapping.folderPath] at
+  ///`https://[VirtualHostMapping.hostName]/`, which bypasses CORS for local
+  ///resources (use [HostResourceAccessKind.allowCors] to allow cross-origin
+  ///access). Currently honored by the Windows implementation.
+  final List<VirtualHostMapping>? virtualHostMappings;
+
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows
@@ -91,6 +241,7 @@ class WebViewEnvironmentSettings {
     this.language,
     this.targetCompatibleBrowserVersion,
     this.userDataFolder,
+    this.virtualHostMappings,
   });
 
   ///Gets a possible [WebViewEnvironmentSettings] instance from a [Map] value.
@@ -106,6 +257,13 @@ class WebViewEnvironmentSettings {
       language: map['language'],
       targetCompatibleBrowserVersion: map['targetCompatibleBrowserVersion'],
       userDataFolder: map['userDataFolder'],
+      virtualHostMappings: map['virtualHostMappings'] != null
+          ? List<VirtualHostMapping>.from(
+              map['virtualHostMappings'].map(
+                (e) => VirtualHostMapping.fromMap(e?.cast<String, dynamic>())!,
+              ),
+            )
+          : null,
     );
     return instance;
   }
@@ -120,6 +278,9 @@ class WebViewEnvironmentSettings {
       "language": language,
       "targetCompatibleBrowserVersion": targetCompatibleBrowserVersion,
       "userDataFolder": userDataFolder,
+      "virtualHostMappings": virtualHostMappings
+          ?.map((e) => e.toMap())
+          .toList(),
     };
   }
 
@@ -136,6 +297,6 @@ class WebViewEnvironmentSettings {
 
   @override
   String toString() {
-    return 'WebViewEnvironmentSettings{additionalBrowserArguments: $additionalBrowserArguments, allowSingleSignOnUsingOSPrimaryAccount: $allowSingleSignOnUsingOSPrimaryAccount, browserExecutableFolder: $browserExecutableFolder, language: $language, targetCompatibleBrowserVersion: $targetCompatibleBrowserVersion, userDataFolder: $userDataFolder}';
+    return 'WebViewEnvironmentSettings{additionalBrowserArguments: $additionalBrowserArguments, allowSingleSignOnUsingOSPrimaryAccount: $allowSingleSignOnUsingOSPrimaryAccount, browserExecutableFolder: $browserExecutableFolder, language: $language, targetCompatibleBrowserVersion: $targetCompatibleBrowserVersion, userDataFolder: $userDataFolder, virtualHostMappings: $virtualHostMappings}';
   }
 }

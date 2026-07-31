@@ -1,5 +1,11 @@
 ## 4.7.0 - 2026-07-29
 
+## Unreleased
+
+- Added virtual host name to folder mapping support, enabling CORS-safe
+  serving of local folders (CORS bypass for local resources)
+
+
 
 ### Features
 

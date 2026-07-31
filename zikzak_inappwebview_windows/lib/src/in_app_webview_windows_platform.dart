@@ -94,6 +94,22 @@ class _InAppWebViewWindowsWidgetStateImpl
 
       await _controller.initialize();
 
+      // Apply virtual host mappings from the environment settings. Each
+      // mapping serves a local folder at https://<hostName>/ and bypasses
+      // CORS for those resources when the access kind is allowCors.
+      final virtualHostMappings =
+          widget.params.webViewEnvironment?.settings?.virtualHostMappings;
+      if (virtualHostMappings != null) {
+        for (final mapping in virtualHostMappings) {
+          await _controller.addVirtualHostNameMapping(
+            mapping.hostName,
+            mapping.folderPath,
+            WebviewHostResourceAccessKind.values[mapping.accessKind
+                .toNativeValue()],
+          );
+        }
+      }
+
       // Setup listeners
       _controller.url.listen((url) {
         // TODO: handle url change

@@ -36,3 +36,26 @@ instance.messageLevel =
     ConsoleMessageLevel.fromNativeValue(map['messageLevel']) ??
     ConsoleMessageLevel.LOG;
 ```
+
+### `lib/src/webview_environment/webview_environment_settings.g.dart`
+
+The `VirtualHostMapping.fromMap` method fixes the `accessKind`, `folderPath`
+and `hostName` fields:
+
+```dart
+// Before (generated — crashes when map values are null):
+final instance = VirtualHostMapping(
+  accessKind: HostResourceAccessKind.fromNativeValue(map['accessKind'])!,
+  folderPath: map['folderPath'],
+  hostName: map['hostName'],
+);
+
+// After (hand-fixed — null-safe):
+final instance = VirtualHostMapping(
+  accessKind:
+      HostResourceAccessKind.fromNativeValue(map['accessKind']) ??
+      HostResourceAccessKind.allow,
+  folderPath: map['folderPath'] as String? ?? '',
+  hostName: map['hostName'] as String? ?? '',
+);
+```
