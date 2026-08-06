@@ -6,8 +6,6 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     var channel: FlutterMethodChannel!
     var registrar: FlutterPluginRegistrar
     var plugin: InAppWebViewFlutterPlugin?
-    var registrar: FlutterPluginRegistrar
-    var plugin: InAppWebViewFlutterPlugin?
     private var findInteractionChannel: FlutterMethodChannel!
     private var searchText: String?
     private var isDisposed = false

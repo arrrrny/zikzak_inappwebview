@@ -34,7 +34,7 @@ class MacOSPrintJobController extends PlatformPrintJobController
         ) {
     onComplete = params.onComplete;
     channel = MethodChannel(
-      "wtf.zikzak/zikzak_inappwebview_printjobcontroller_\${params.id}",
+      "wtf.zikzak/zikzak_inappwebview_printjobcontroller_${params.id}",
     );
     handler = _handleMethod;
     initMethodCallHandler();
@@ -50,7 +50,7 @@ class MacOSPrintJobController extends PlatformPrintJobController
         }
         break;
       default:
-        throw UnimplementedError("Unimplemented \${call.method} method");
+        throw UnimplementedError("Unimplemented ${call.method} method");
     }
   }
 
