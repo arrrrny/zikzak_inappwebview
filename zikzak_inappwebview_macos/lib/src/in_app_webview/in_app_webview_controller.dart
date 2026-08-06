@@ -5,6 +5,7 @@ import 'dart:core';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
+import '../print_job/print_job_controller.dart';
 
 final _JAVASCRIPT_HANDLER_FORBIDDEN_NAMES = UnmodifiableListView<String>([
   "onLoadResource",
@@ -387,6 +388,25 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
     args.putIfAbsent('source', () => source);
     args.putIfAbsent('contentWorld', () => contentWorld?.toMap());
     return await _channel.invokeMethod('evaluateJavascript', args);
+  }
+
+
+  @override
+  Future<MacOSPrintJobController?> printCurrentPage({
+    PrintJobSettings? settings,
+  }) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent("settings", () => settings?.toMap());
+    String? jobId = await _channel.invokeMethod<String?>(
+      'printCurrentPage',
+      args,
+    );
+    if (jobId != null) {
+      return MacOSPrintJobController(
+        PlatformPrintJobControllerCreationParams(id: jobId),
+      );
+    }
+    return null;
   }
 
   @override

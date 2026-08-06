@@ -4,19 +4,25 @@ import WebKit
 
 public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler, WKUIDelegate {
     var channel: FlutterMethodChannel!
+    var registrar: FlutterPluginRegistrar
+    var plugin: InAppWebViewFlutterPlugin?
+    var registrar: FlutterPluginRegistrar
+    var plugin: InAppWebViewFlutterPlugin?
     private var findInteractionChannel: FlutterMethodChannel!
     private var searchText: String?
     private var isDisposed = false
     public var settings: InAppWebViewSettings?
 
     init(
-        registrar: FlutterPluginRegistrar, viewId: Any, arguments: Any?, channelName: String? = nil
+        registrar: FlutterPluginRegistrar, viewId: Any, arguments: Any?, channelName: String? = nil, plugin: InAppWebViewFlutterPlugin? = nil
     ) {
         let configuration = WKWebViewConfiguration()
         let userContentController = WKUserContentController()
         configuration.userContentController = userContentController
 
         super.init(frame: .zero, configuration: configuration)
+        self.registrar = registrar
+        self.plugin = plugin
         self.autoresizingMask = [.width, .height]
         self.navigationDelegate = self
         self.uiDelegate = self
@@ -56,6 +62,9 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             source: JAVASCRIPT_BRIDGE_JS_SOURCE, injectionTime: .atDocumentStart,
             forMainFrameOnly: false)
         userContentController.addUserScript(bridgeScript)
+        let printScript = WKUserScript(
+            source: PRINT_JS_SOURCE, injectionTime: .atDocumentStart, forMainFrameOnly: true)
+        userContentController.addUserScript(printScript)
 
         let findInteractionUserScript = WKUserScript(
             source: FIND_TEXT_HIGHLIGHT_JS_SOURCE, injectionTime: .atDocumentStart,
@@ -105,6 +114,53 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         self.addObserver(self, forKeyPath: "title", options: .new, context: nil)
     }
 
+
+    public func printCurrentPage(
+        settings: PrintJobSettings? = nil
+    ) -> String? {
+        var printJobId: String? = nil
+        if let settings = settings, settings.handledByClient {
+            printJobId = UUID().uuidString
+        }
+
+        let printInfo = NSPrintInfo(dictionary: nil)
+        printInfo.jobName =
+            settings?.jobName ?? (title ?? url?.absoluteString ?? "") + " Document"
+        if let settings = settings {
+            if let orientationValue = settings.orientation,
+               let orientation = NSPrintInfo.PaperOrientation.init(rawValue: orientationValue)
+            {
+                printInfo.orientation = orientation
+            }
+            if let duplexModeValue = settings.duplexMode,
+               let duplexMode = NSPrintInfo.DuplexMode.init(rawValue: duplexModeValue)
+            {
+                printInfo.duplex = duplexMode
+            }
+            if let margins = settings.margins {
+                printInfo.topMargin = margins.top
+                printInfo.bottomMargin = margins.bottom
+                printInfo.leftMargin = margins.left
+                printInfo.rightMargin = margins.right
+            }
+        }
+
+        let printOperation = NSPrintOperation(view: self, printInfo: printInfo)
+        printOperation.showsPrintPanel = settings?.animated ?? true
+        printOperation.showsProgressPanel = true
+
+        let animated = settings?.animated ?? true
+        if let id = printJobId, let plugin = plugin {
+            let printJob = PrintJobController(
+                plugin: plugin, id: id, printOperation: printOperation, settings: settings, webView: self)
+            plugin.printJobManager?.jobs[id] = printJob
+            printJob.present(animated: animated)
+        } else {
+            printOperation.run()
+        }
+
+        return printJobId
+    }
     deinit {
         dispose()
     }
@@ -358,6 +414,16 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             } else {
                 result([String: Any?]())
             }
+        case "printCurrentPage":
+            if let args = call.arguments as? [String: Any],
+               let settingsMap = args["settings"] as? [String: Any?] {
+                let settings = PrintJobSettings()
+                let _ = settings.parse(settings: settingsMap)
+                result(self.printCurrentPage(settings: settings))
+            } else {
+                result(self.printCurrentPage())
+            }
+            break
         default:
             result(FlutterMethodNotImplemented)
         }
@@ -604,6 +670,24 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             let body = try? JSONSerialization.jsonObject(with: bodyData) as? [String: Any]
         {
             let handlerName = body["handlerName"] as? String ?? ""
+            if handlerName == "onPrintRequest" {
+                let url = self.url
+                let settings = PrintJobSettings()
+                settings.handledByClient = true
+                if let printJobId = printCurrentPage(settings: settings) {
+                    channel?.invokeMethod("onPrintRequest", arguments: [
+                        "url": url?.absoluteString,
+                        "printJobId": printJobId
+                    ]) { (result) in
+                        if let handledByClient = result as? Bool, !handledByClient {
+                            if let printJob = self.plugin?.printJobManager?.jobs[printJobId] {
+                                printJob?.dispose()
+                            }
+                        }
+                    }
+                }
+                return
+            }
             let _callHandlerID = body["_callHandlerID"] as? Int64 ?? 0
             let args = body["args"] as? String ?? ""
 
