@@ -11,9 +11,8 @@ struct _InAppWebView {
   GtkWidget *web_view;
   int64_t texture_id;
 
-  // Offscreen window hosting the webview so it actually renders. Without a
-  // realized widget hierarchy WebKit never paints and snapshots stay empty
-  // (the "blue screen" bug).
+  // GtkOffscreenWindow hosting the webview so it actually renders.
+  // Unlike a hidden GTK_WINDOW_TOPLEVEL, keeps a valid rendering surface.
   GtkWidget *offscreen_window;
   // Periodic snapshot timer id (see on_update_timeout).
   guint update_timeout_id;
@@ -75,17 +74,16 @@ static void in_app_webview_dispose(GObject *object) {
     self->update_timeout_id = 0;
   }
   if (self->offscreen_window) {
-    // Destroying the window drops the container's reference on web_view;
-    // our own reference on the window is released below.
+    if (self->web_view &&
+        gtk_widget_get_parent(self->web_view) == self->offscreen_window) {
+      gtk_container_remove(GTK_CONTAINER(self->offscreen_window),
+                          self->web_view);
+    }
     gtk_widget_destroy(self->offscreen_window);
     g_object_unref(self->offscreen_window);
     self->offscreen_window = nullptr;
   }
   if (self->web_view) {
-    // gtk_widget_destroy(self->web_view); // WebKitWebView is a GtkWidget
-    // But since we own the ref via g_object_ref_sink, we should unref it.
-    // If it was added to a container, the container would own it.
-    // Here we own it via g_object_ref_sink.
     g_object_unref(self->web_view);
     self->web_view = nullptr;
   }
@@ -252,13 +250,6 @@ static void on_load_changed(WebKitWebView *web_view, WebKitLoadEvent load_event,
                             gpointer user_data) {
   InAppWebView *self = IN_APP_WEBVIEW(user_data);
   if (load_event == WEBKIT_LOAD_STARTED) {
-    // Ensure the offscreen window is realized so rendering actually happens.
-    if (self->offscreen_window &&
-        !gtk_widget_get_realized(self->offscreen_window)) {
-      gtk_widget_realize(self->offscreen_window);
-      gtk_widget_show_all(self->offscreen_window);
-    }
-
     const gchar *uri = webkit_web_view_get_uri(web_view);
     g_autoptr(FlValue) args = fl_value_new_map();
     fl_value_set_string(args, "url",
@@ -575,15 +566,18 @@ InAppWebView *in_app_webview_new(FlBinaryMessenger *messenger,
   // Create an offscreen window so the WebKitWebView actually renders.
   // Without being in a realized widget hierarchy, snapshots return
   // empty/transparent and the texture stays stuck on the initial frame
-  // (the "blue screen" bug). Keep the window hidden: we only need the
-  // snapshot texture, not visible UI.
-  self->offscreen_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+  // (the "blue screen" bug).
+  //
+  // GtkOffscreenWindow maintains a valid GdkWindow (rendering surface)
+  // without ever becoming visible on screen. The previous approach used
+  // gtk_window_new(GTK_WINDOW_TOPLEVEL) + gtk_widget_hide(), which
+  // destroys the native window surface on Wayland and many compositors,
+  // causing WebKit to lose its rendering target and snapshots to fail.
+  self->offscreen_window = gtk_offscreen_window_new();
   g_object_ref_sink(self->offscreen_window);
-  gtk_window_set_default_size(GTK_WINDOW(self->offscreen_window), 1280, 720);
+  gtk_widget_set_size_request(self->web_view, 1280, 720);
   gtk_container_add(GTK_CONTAINER(self->offscreen_window), self->web_view);
-  gtk_widget_realize(self->offscreen_window);
   gtk_widget_show_all(self->offscreen_window);
-  gtk_widget_hide(self->offscreen_window);
 
   // Connect load-changed signal
   g_signal_connect(self->web_view, "load-changed", G_CALLBACK(on_load_changed),
