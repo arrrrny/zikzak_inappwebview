@@ -1,5 +1,10 @@
 ## 4.7.0 - 2026-07-29
 
+## Unreleased
+
+- Added VirtualHostMapping / HostResourceAccessKind to WebViewEnvironmentSettings
+
+
 
 ### Features
 
