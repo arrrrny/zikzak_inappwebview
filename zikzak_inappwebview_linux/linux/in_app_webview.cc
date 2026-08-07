@@ -11,13 +11,16 @@ struct _InAppWebView {
   GtkWidget *web_view;
   int64_t texture_id;
 
-  // Offscreen TOPLEVEL window hosting the webview so it actually renders.
-  // Moved off-screen; remains mapped so WebKit compositing can paint.
+  // Offscreen window hosting the webview so it actually renders.
+  // We use GtkOffscreenWindow which provides a proper offscreen rendering
+  // context without requiring a visible native window. This is essential
+  // for WebKitGTK to render on compositors that don't allocate GL surfaces
+  // for offscreen windows (e.g. WSLg/Weston, nested Wayland).
   GtkWidget *offscreen_window;
   // Periodic snapshot timer id (see on_update_timeout).
   guint update_timeout_id;
-  // Guards against overlapping async snapshots from the timer.
-  gboolean snapshot_in_flight;
+  // Guards against overlapping draws from the timer.
+  gboolean draw_in_flight;
 
   uint8_t *buffer;
   int32_t width;
@@ -45,9 +48,11 @@ static gboolean in_app_webview_copy_pixels(FlPixelBufferTexture *texture,
   InAppWebView *self = IN_APP_WEBVIEW(texture);
 
   if (self->buffer == nullptr) {
+    // Return a 1x1 transparent pixel so the Flutter texture doesn't show
+    // a garbage/random color before the first frame is rendered.
     *width = 1;
     *height = 1;
-    static uint8_t dummy[4] = {255, 0, 0, 255};
+    static uint8_t dummy[4] = {0, 0, 0, 0};
     *buffer = dummy;
     return TRUE;
   }
@@ -77,6 +82,7 @@ static void in_app_webview_dispose(GObject *object) {
     // Destroying the window also destroys the web_view child widget.
     // Null out web_view so we don't double-free it below.
     gtk_widget_destroy(self->offscreen_window);
+    // offscreen_window was ref-sunk, so unref after destroy.
     g_object_unref(self->offscreen_window);
     self->offscreen_window = nullptr;
     self->web_view = nullptr;
@@ -118,11 +124,11 @@ static void in_app_webview_init(InAppWebView *self) {
   self->buffer = nullptr;
   self->offscreen_window = nullptr;
   self->update_timeout_id = 0;
-  self->snapshot_in_flight = FALSE;
+  self->draw_in_flight = FALSE;
 }
 
 /**
- * @brief Refreshes the Flutter texture from the current WebKit snapshot.
+ * @brief Refreshes the Flutter texture from the current offscreen render.
  *
  * @param user_data The associated InAppWebView instance.
  * @return G_SOURCE_CONTINUE to keep the periodic callback active.
@@ -147,95 +153,137 @@ static void in_app_webview_method_call_handler(FlMethodChannel *channel,
 }
 
 /**
- * @brief Updates the Flutter texture with a completed WebKit snapshot.
+ * @brief Converts a cairo ARGB32 surface to straight RGBA and pushes it as the
+ *        new Flutter texture frame.
  *
- * Converts the snapshot pixels to straight RGBA, resizes the pixel buffer when
- * the snapshot dimensions change, and marks a new texture frame as available.
+ * WebKit snapshots / gtk_widget_draw produce CAIRO_FORMAT_ARGB32
+ * (0xAARRGGBB) in native-endian format. Flutter's pixel buffer texture
+ * expects straight (non-premultiplied) RGBA, so this function also
+ * unpremultiplies the alpha channel.
  *
- * @param source_object WebKit web view that produced the snapshot.
- * @param res Asynchronous snapshot result.
- * @param user_data InAppWebView instance receiving the snapshot.
+ * @param surface The cairo surface to copy from. May be nullptr.
+ * @param self The InAppWebView whose buffer and texture should be updated.
  */
-static void on_snapshot_ready(GObject *source_object, GAsyncResult *res,
-                              gpointer user_data) {
-  InAppWebView *self = IN_APP_WEBVIEW(user_data);
-  GError *error = nullptr;
-  WebKitWebView *web_view = WEBKIT_WEB_VIEW(source_object);
-  cairo_surface_t *surface =
-      webkit_web_view_get_snapshot_finish(web_view, res, &error);
-
-  if (surface) {
-    int width = cairo_image_surface_get_width(surface);
-    int height = cairo_image_surface_get_height(surface);
-    // int stride = cairo_image_surface_get_stride(surface); // Unused
-    unsigned char *data = cairo_image_surface_get_data(surface);
-
-    if (self->buffer == nullptr || width != self->width ||
-        height != self->height) {
-      g_free(self->buffer);
-      self->width = width;
-      self->height = height;
-      self->buffer = (uint8_t *)g_malloc0(width * height * 4);
-    }
-
-    // WebKit snapshot is CAIRO_FORMAT_ARGB32 (0xAARRGGBB) in native-endian
-    // format; memory order is BGRA on little-endian and ARGB on big-endian,
-    // but reading it back as a native-endian uint32 always yields the same
-    // 0xAARRGGBB value. Flutter's pixel buffer texture expects straight
-    // (non-premultiplied) RGBA, so also unpremultiply the alpha channel.
-    for (int i = 0; i < width * height; i++) {
-      uint32_t pixel = ((uint32_t *)data)[i];
-
-      uint8_t b = (pixel >> 0) & 0xFF;
-      uint8_t g = (pixel >> 8) & 0xFF;
-      uint8_t r = (pixel >> 16) & 0xFF;
-      uint8_t a = (pixel >> 24) & 0xFF;
-
-      // Unpremultiply alpha (rounding division).
-      if (a != 0 && a != 255) {
-        r = (r * 255 + a / 2) / a;
-        g = (g * 255 + a / 2) / a;
-        b = (b * 255 + a / 2) / a;
-      }
-
-      self->buffer[i * 4] = r;
-      self->buffer[i * 4 + 1] = g;
-      self->buffer[i * 4 + 2] = b;
-      self->buffer[i * 4 + 3] = a;
-    }
-
-    cairo_surface_destroy(surface);
-
-    // Notify texture updated
-    fl_texture_registrar_mark_texture_frame_available(self->texture_registrar,
-                                                      FL_TEXTURE(self));
-  } else {
-    if (error) {
-      g_warning("Snapshot failed: %s", error->message);
-      g_error_free(error);
-    }
+static void push_surface_to_texture(cairo_surface_t *surface,
+                                    InAppWebView *self) {
+  if (surface == nullptr) {
+    return;
   }
 
-  self->snapshot_in_flight = FALSE;
-  g_object_unref(self);
+  // Ensure the surface is flushed so pixel data is up to date.
+  cairo_surface_flush(surface);
+
+  int width = cairo_image_surface_get_width(surface);
+  int height = cairo_image_surface_get_height(surface);
+  unsigned char *data = cairo_image_surface_get_data(surface);
+
+  if (width <= 0 || height <= 0 || data == nullptr) {
+    cairo_surface_destroy(surface);
+    return;
+  }
+
+  if (self->buffer == nullptr || width != self->width ||
+      height != self->height) {
+    g_free(self->buffer);
+    self->width = width;
+    self->height = height;
+    self->buffer = (uint8_t *)g_malloc0(width * height * 4);
+  }
+
+  // WebKit snapshot is CAIRO_FORMAT_ARGB32 (0xAARRGGBB) in native-endian
+  // format; memory order is BGRA on little-endian and ARGB on big-endian,
+  // but reading it back as a native-endian uint32 always yields the same
+  // 0xAARRGGBB value. Flutter's pixel buffer texture expects straight
+  // (non-premultiplied) RGBA, so also unpremultiply the alpha channel.
+  for (int i = 0; i < width * height; i++) {
+    uint32_t pixel = ((uint32_t *)data)[i];
+
+    uint8_t b = (pixel >> 0) & 0xFF;
+    uint8_t g = (pixel >> 8) & 0xFF;
+    uint8_t r = (pixel >> 16) & 0xFF;
+    uint8_t a = (pixel >> 24) & 0xFF;
+
+    // Unpremultiply alpha (rounding division).
+    if (a != 0 && a != 255) {
+      r = (r * 255 + a / 2) / a;
+      g = (g * 255 + a / 2) / a;
+      b = (b * 255 + a / 2) / a;
+    }
+
+    self->buffer[i * 4] = r;
+    self->buffer[i * 4 + 1] = g;
+    self->buffer[i * 4 + 2] = b;
+    self->buffer[i * 4 + 3] = a;
+  }
+
+  cairo_surface_destroy(surface);
+
+  // Notify texture updated
+  if (self->texture_registrar != nullptr) {
+    fl_texture_registrar_mark_texture_frame_available(self->texture_registrar,
+                                                      FL_TEXTURE(self));
+  }
 }
 
 /**
- * @brief Requests an asynchronous snapshot of the visible web view region.
+ * @brief Updates the Flutter texture by directly rendering the webview to a
+ *        cairo surface via gtk_widget_draw.
  *
- * Skips the request when another snapshot is already in progress.
+ * This bypasses WebKit's compositor entirely, so it works even when the
+ * webview is inside a GtkOffscreenWindow on compositors that don't
+ * allocate GL surfaces for offscreen windows (WSLg, nested Wayland, etc.).
  *
- * @param self Web view whose visible content should be captured.
+ * @param self Web view whose content should be captured.
  */
 static void update_texture(InAppWebView *self) {
-  if (self->snapshot_in_flight) {
+  if (self->draw_in_flight || self->web_view == nullptr) {
     return;
   }
-  self->snapshot_in_flight = TRUE;
-  webkit_web_view_get_snapshot(WEBKIT_WEB_VIEW(self->web_view),
-                               WEBKIT_SNAPSHOT_REGION_VISIBLE,
-                               WEBKIT_SNAPSHOT_OPTIONS_NONE, nullptr,
-                               on_snapshot_ready, g_object_ref(self));
+  self->draw_in_flight = TRUE;
+
+  // Get the webview's allocated size. Fall back to the default if unset.
+  GtkAllocation alloc;
+  gtk_widget_get_allocation(self->web_view, &alloc);
+  int width = alloc.width > 0 ? alloc.width : self->width;
+  int height = alloc.height > 0 ? alloc.height : self->height;
+
+  if (width <= 0 || height <= 0) {
+    self->draw_in_flight = FALSE;
+    return;
+  }
+
+  // Create a cairo image surface and force the webview to render into it.
+  // gtk_widget_draw works regardless of whether the widget is visible or
+  // mapped, as long as it has been realized and has a valid allocation.
+  cairo_surface_t *surface =
+      cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height);
+  if (cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS) {
+    cairo_surface_destroy(surface);
+    self->draw_in_flight = FALSE;
+    return;
+  }
+
+  cairo_t *cr = cairo_create(surface);
+  if (cairo_status(cr) != CAIRO_STATUS_SUCCESS) {
+    cairo_destroy(cr);
+    cairo_surface_destroy(surface);
+    self->draw_in_flight = FALSE;
+    return;
+  }
+
+  // Paint a white background first so transparent pages don't show
+  // uninitialized memory.
+  cairo_set_source_rgb(cr, 1.0, 1.0, 1.0);
+  cairo_paint(cr);
+
+  // Force the webview to draw itself into our cairo context.
+  gtk_widget_draw(self->web_view, cr);
+
+  cairo_destroy(cr);
+
+  push_surface_to_texture(surface, self);
+
+  self->draw_in_flight = FALSE;
 }
 
 /**
@@ -562,28 +610,36 @@ InAppWebView *in_app_webview_new(FlBinaryMessenger *messenger,
   g_object_unref(ucm);
   g_object_ref_sink(self->web_view);
 
-  // Create an offscreen window so the WebKitWebView actually renders.
-  // Without being in a realized widget hierarchy, snapshots return
-  // empty/transparent and the texture stays stuck on the initial frame
-  // (the "blue screen" bug).
-  //
-  // The window MUST remain mapped (shown) for WebKit's compositor to
-  // paint. We use a real TOPLEVEL window (needed for WebKit's GL
-  // context) but move it far off-screen and strip decorations so the
-  // user never sees it. Previous approaches using gtk_widget_hide()
-  // or GtkOffscreenWindow both fail: hide() unmaps the window
-  // destroying the GL surface, and GtkOffscreenWindow provides no
-  // native window for WebKit's compositor.
-  self->offscreen_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+  // Force software rendering. This is CRITICAL for offscreen rendering:
+  // WebKitGTK's hardware-accelerated path uses DMA-BUF / GL surfaces which
+  // are only allocated for visible, native windows. On compositors like
+  // WSLg (Weston) or nested Wayland, offscreen windows never get a GL
+  // surface, so the compositor never paints and snapshots return empty.
+  // Software rendering makes gtk_widget_draw() produce real pixels.
+  WebKitSettings *settings =
+      webkit_web_view_get_settings(WEBKIT_WEB_VIEW(self->web_view));
+  webkit_settings_set_hardware_acceleration_policy(
+      settings, WEBKIT_HARDWARE_ACCELERATION_POLICY_NEVER);
+
+  // Create a GtkOffscreenWindow to host the webview. Unlike a real
+  // GTK_WINDOW_TOPLEVEL moved off-screen, GtkOffscreenWindow:
+  //   1. Never appears on screen (no compositor surface needed)
+  //   2. Provides a proper offscreen rendering context for gtk_widget_draw
+  //   3. Allocates / realizes child widgets correctly
+  // Combined with software rendering above, this lets us capture webview
+  // content even on WSLg / headless Wayland where the previous TOPLEVEL +
+  // move-off-screen approach produced a blue (empty) texture.
+  self->offscreen_window = gtk_offscreen_window_new();
   g_object_ref_sink(self->offscreen_window);
   gtk_window_set_default_size(GTK_WINDOW(self->offscreen_window), 1280, 720);
-  gtk_window_set_decorated(GTK_WINDOW(self->offscreen_window), FALSE);
-  gtk_window_set_skip_taskbar_hint(GTK_WINDOW(self->offscreen_window), TRUE);
-  gtk_window_set_skip_pager_hint(GTK_WINDOW(self->offscreen_window), TRUE);
   gtk_container_add(GTK_CONTAINER(self->offscreen_window), self->web_view);
+  gtk_widget_set_size_request(self->web_view, 1280, 720);
+
+  // Realize + show so the widget hierarchy is prepared for rendering.
+  // GtkOffscreenWindow doesn't map to the actual display, so show_all()
+  // just realizes widgets without putting anything on screen.
   gtk_widget_realize(self->offscreen_window);
   gtk_widget_show_all(self->offscreen_window);
-  gtk_window_move(GTK_WINDOW(self->offscreen_window), -32000, -32000);
 
   // Connect load-changed signal
   g_signal_connect(self->web_view, "load-changed", G_CALLBACK(on_load_changed),
@@ -601,11 +657,10 @@ InAppWebView *in_app_webview_new(FlBinaryMessenger *messenger,
   }
 
   // Start periodic texture refresh (~30fps). WebKit does not notify us when
-  // content repaints, so poll snapshots to keep the Flutter texture live.
+  // content repaints, so poll gtk_widget_draw to keep the Flutter texture
+  // live. This is cheap because software rendering into a cairo image
+  // surface is fast and we skip re-entrancy via draw_in_flight.
   self->update_timeout_id = g_timeout_add(33, on_update_timeout, self);
-
-  // Set initial size
-  gtk_widget_set_size_request(self->web_view, 1280, 720);
 
   return self;
 }
@@ -675,7 +730,7 @@ static void print_failed_callback(WebKitPrintOperation *operation,
  * operation result or an error when the request is invalid or unsupported.
  *
  * @param self The web view instance receiving the request.
- * @param method_call The method-channel call to process and respond to.
+ * @param method_call The method-channel call to process and respond.
  */
 void in_app_webview_handle_method_call(InAppWebView *self,
                                        FlMethodCall *method_call) {
@@ -812,6 +867,7 @@ void in_app_webview_handle_method_call(InAppWebView *self,
     fl_method_call_respond(
         method_call, FL_METHOD_RESPONSE(fl_method_success_response_new(result)),
         nullptr);
+    return;
   } else if (strcmp(method, "getHtml") == 0) {
     webkit_web_view_evaluate_javascript(
         WEBKIT_WEB_VIEW(self->web_view), "document.documentElement.outerHTML",
@@ -871,6 +927,7 @@ void in_app_webview_handle_method_call(InAppWebView *self,
                            FL_METHOD_RESPONSE(fl_method_error_response_new(
                                "error", "Invalid arguments", nullptr)),
                            nullptr);
+    return;
   } else if (strcmp(method, "createPdf") == 0) {
     WebKitPrintOperation *operation =
         webkit_print_operation_new(WEBKIT_WEB_VIEW(self->web_view));
@@ -902,74 +959,65 @@ void in_app_webview_handle_method_call(InAppWebView *self,
     g_object_unref(settings);
     g_free(uri);
     return;
-  } else if (strcmp(method, 'takeScreenshot") == 0) {
-    webkit_web_view_get_snapshot(
-        WEBKIT_WEB_VIEW(self->web_view), WEBKIT_SNAPSHOT_REGION_VISIBLE,
-        WEBKIT_SNAPSHOT_OPTIONS_NONE, nullptr,
-        [](GObject *source_object, GAsyncResult *res, gpointer user_data) {
-          FlMethodCall *method_call = FL_METHOD_CALL(user_data);
-          GError *error = nullptr;
-          WebKitWebView *web_view = WEBKIT_WEB_VIEW(source_object);
-          cairo_surface_t *surface =
-              webkit_web_view_get_snapshot_finish(web_view, res, &error);
+  } else if (strcmp(method, "takeScreenshot") == 0) {
+    // Capture the current webview content using gtk_widget_draw, which
+    // works offscreen (unlike webkit_web_view_get_snapshot on some
+    // compositors). Encode the result as PNG and return to Dart.
+    GtkAllocation alloc;
+    gtk_widget_get_allocation(self->web_view, &alloc);
+    int width = alloc.width > 0 ? alloc.width : self->width;
+    int height = alloc.height > 0 ? alloc.height : self->height;
 
-          if (!surface) {
-            fl_method_call_respond(
-                method_call,
-                FL_METHOD_RESPONSE(
-                    fl_method_success_response_new(fl_value_new_null())),
-                nullptr);
-            if (error) {
-              g_error_free(error);
-            }
-            g_object_unref(method_call);
-            return;
-          }
+    if (width <= 0 || height <= 0) {
+      fl_method_call_respond(
+          method_call,
+          FL_METHOD_RESPONSE(
+              fl_method_success_response_new(fl_value_new_null())),
+          nullptr);
+      return;
+    }
 
-          cairo_surface_flush(surface);
+    cairo_surface_t *surface =
+        cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height);
+    cairo_t *cr = cairo_create(surface);
+    cairo_set_source_rgb(cr, 1.0, 1.0, 1.0);
+    cairo_paint(cr);
+    gtk_widget_draw(self->web_view, cr);
+    cairo_destroy(cr);
 
-          guchar *png_data = nullptr;
-          gsize png_size = 0;
+    GdkPixbuf *pixbuf = gdk_pixbuf_get_from_surface(surface, 0, 0, width, height);
+    cairo_surface_destroy(surface);
 
-          GdkPixbuf *pixbuf = gdk_pixbuf_get_from_surface(
-              surface, 0, 0, cairo_image_surface_get_width(surface),
-              cairo_image_surface_get_height(surface));
+    if (pixbuf == nullptr) {
+      fl_method_call_respond(
+          method_call,
+          FL_METHOD_RESPONSE(
+              fl_method_success_response_new(fl_value_new_null())),
+          nullptr);
+      return;
+    }
 
-          if (pixbuf) {
-            gchar *buffer = nullptr;
-            gsize buffer_size = 0;
-            gboolean saved = gdk_pixbuf_save_to_buffer(
-                pixbuf, &buffer, &buffer_size, "png", nullptr, nullptr);
-            if (saved && buffer && buffer_size > 0) {
-              png_data = (guchar *)g_malloc(buffer_size);
-              memcpy(png_data, buffer, buffer_size);
-              png_size = buffer_size;
-              g_free(buffer);
-            }
-            g_object_unref(pixbuf);
-          }
+    gchar *buffer = nullptr;
+    gsize buffer_size = 0;
+    gboolean saved = gdk_pixbuf_save_to_buffer(pixbuf, &buffer, &buffer_size,
+                                                "png", nullptr, nullptr);
+    g_object_unref(pixbuf);
 
-          cairo_surface_destroy(surface);
-
-          if (png_data && png_size > 0) {
-            g_autoptr(FlValue) fl_data =
-                fl_value_new_uint8_list(png_data, png_size);
-            fl_method_call_respond(
-                method_call,
-                FL_METHOD_RESPONSE(fl_method_success_response_new(fl_data)),
-                nullptr);
-            g_free(png_data);
-          } else {
-            fl_method_call_respond(
-                method_call,
-                FL_METHOD_RESPONSE(
-                    fl_method_success_response_new(fl_value_new_null())),
-                nullptr);
-          }
-
-          g_object_unref(method_call);
-        },
-        g_object_ref(method_call));
+    if (saved && buffer && buffer_size > 0) {
+      g_autoptr(FlValue) fl_data =
+          fl_value_new_uint8_list((const uint8_t *)buffer, buffer_size);
+      fl_method_call_respond(
+          method_call,
+          FL_METHOD_RESPONSE(fl_method_success_response_new(fl_data)),
+          nullptr);
+      g_free(buffer);
+    } else {
+      fl_method_call_respond(
+          method_call,
+          FL_METHOD_RESPONSE(
+              fl_method_success_response_new(fl_value_new_null())),
+          nullptr);
+    }
     return;
   } else if (strcmp(method, "openDevTools") == 0) {
     // The WebKit inspector is a no-op unless developer extras are enabled.

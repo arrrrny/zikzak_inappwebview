@@ -2,10 +2,22 @@
 
 ## Unreleased
 
-- Fixed Linux: webview texture stuck on the initial blue frame. The WebKitWebView
-  now renders inside a realized offscreen GTK window and the texture is
-  refreshed from periodic snapshots (~30fps), with correct ARGB-to-RGBA
-  conversion including alpha unpremultiplication.
+- Fixed Linux: the native plugin failed to compile (issue #179 regression)
+  due to a broken `takeScreenshot` string literal (`'takeScreenshot"` instead
+  of `"takeScreenshot"`) introduced by the docstring commit, and a missing
+  include path for `in_app_web_view_flutter_plugin.h`. Both are fixed so the
+  shared library actually builds and the method channel handlers are
+  registered.
+- Fixed Linux: webview texture stuck on the initial blue frame (issue #179).
+  The previous offscreen `GTK_WINDOW_TOPLEVEL` + `webkit_web_view_get_snapshot`
+  approach did not work on WSLg / nested Wayland because WebKit's GL
+  compositor never allocates a render surface for offscreen windows, so
+  snapshots returned an empty blue texture. Replaced with
+  `GtkOffscreenWindow` + `gtk_widget_draw` + software rendering
+  (`WEBKIT_HARDWARE_ACCELERATION_POLICY_NEVER`), which forces the webview to
+  paint directly into a cairo image surface regardless of compositor support.
+- Fixed Linux: `takeScreenshot` now uses the same `gtk_widget_draw` code path
+  so it works offscreen instead of returning null.
 - Added Linux: openDevTools support via WebKitWebInspector (developer extras
   enabled on demand).
 
