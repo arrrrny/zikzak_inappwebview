@@ -1,6 +1,6 @@
 #include "include/zikzak_inappwebview_linux/zikzak_inappwebview_linux_plugin.h"
 
-#include <zikzak_inappwebview_linux/in_app_web_view_flutter_plugin.h>
+#include "include/zikzak_inappwebview_linux/in_app_web_view_flutter_plugin.h"
 
 #include <flutter_linux/flutter_linux.h>
 #include <gtk/gtk.h>
