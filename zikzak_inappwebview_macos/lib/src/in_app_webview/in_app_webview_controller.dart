@@ -145,6 +145,11 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
           }
         }
         break;
+      case 'onCloseWindow':
+        if (params.webviewParams?.onCloseWindow != null) {
+          params.webviewParams!.onCloseWindow!(controller);
+        }
+        break;
       case 'onConsoleMessage':
         if (params.webviewParams?.onConsoleMessage != null) {
           var map =

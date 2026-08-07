@@ -27,6 +27,37 @@ This is a community-driven fork of `flutter_inappwebview` focused on active main
 - **Rich API**: Extensive control over navigation, cookies, scripts, and more.
 - **Modern Security**: Enhanced security features and updates.
 
+## 🧭 Navigation Tracker & Session Recipes
+
+Two pure-Dart modules (no native code) built on the same UserScript + JS-bridge architecture as Network Capture:
+
+**NavigationTracker** (`lib/src/navigation_tracker/`) — a unified, ordered URL-cycle stream for a webview. Merges `onLoadStart`/`onUpdateVisitedHistory`/server-redirect callbacks with an injected script that patches `history.pushState`/`replaceState` and listens to `popstate`/`hashchange`/`pageshow`, deduplicated into `UrlCycleEntry` records (`url`, `timestamp`, `trigger`, `isMainFrame`). Useful anywhere you need navigation history.
+
+**Session Recipe** (`lib/src/session_recipe/`) — guided multi-step session recording and DOM-based replay:
+
+```dart
+final recorder = RecipeRecorder.maybeCreate(recipe: myRecipe, onEvent: (event) { /* live UI feedback */ });
+
+InAppWebView(
+  initialUserScripts: RecipeRecorder.mergeUserScripts(null, recorder),
+  onWebViewCreated: recorder.attach,
+  onLoadStart: (_, url) => recorder.onLoadStart(url),
+  onUpdateVisitedHistory: (_, url, __) => recorder.onUpdateVisitedHistory(url),
+  onNetworkRequest: (_, req) => recorder.onNetworkRequest(req),   // signal matching
+  onNetworkResponse: (_, res) => recorder.onNetworkResponse(res),
+);
+
+// User confirms each step; finish() snapshots cookies into the recording.
+final recording = await recorder.finish();
+
+// Later: restore the session and replay steps via recorded DOM selectors.
+final result = await RecipeReplayer().replay(
+  controller: controller, recipe: myRecipe, recording: recording,
+);
+```
+
+All models are storage-agnostic JSON (`toJson`/`fromJson`) — persist recordings however you like. See `test/session_recipe/` and `test/navigation_tracker/` for usage examples.
+
 ## � Installation
 
 ## Installation
