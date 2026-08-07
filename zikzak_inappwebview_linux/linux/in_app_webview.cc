@@ -11,8 +11,8 @@ struct _InAppWebView {
   GtkWidget *web_view;
   int64_t texture_id;
 
-  // GtkOffscreenWindow hosting the webview so it actually renders.
-  // Unlike a hidden GTK_WINDOW_TOPLEVEL, keeps a valid rendering surface.
+  // Offscreen TOPLEVEL window hosting the webview so it actually renders.
+  // Moved off-screen; remains mapped so WebKit compositing can paint.
   GtkWidget *offscreen_window;
   // Periodic snapshot timer id (see on_update_timeout).
   guint update_timeout_id;
@@ -74,16 +74,15 @@ static void in_app_webview_dispose(GObject *object) {
     self->update_timeout_id = 0;
   }
   if (self->offscreen_window) {
-    if (self->web_view &&
-        gtk_widget_get_parent(self->web_view) == self->offscreen_window) {
-      gtk_container_remove(GTK_CONTAINER(self->offscreen_window),
-                          self->web_view);
-    }
+    // Destroying the window also destroys the web_view child widget.
+    // Null out web_view so we don't double-free it below.
     gtk_widget_destroy(self->offscreen_window);
     g_object_unref(self->offscreen_window);
     self->offscreen_window = nullptr;
+    self->web_view = nullptr;
   }
   if (self->web_view) {
+    // Only reached if web_view was NOT inside the offscreen window.
     g_object_unref(self->web_view);
     self->web_view = nullptr;
   }
@@ -568,16 +567,23 @@ InAppWebView *in_app_webview_new(FlBinaryMessenger *messenger,
   // empty/transparent and the texture stays stuck on the initial frame
   // (the "blue screen" bug).
   //
-  // GtkOffscreenWindow maintains a valid GdkWindow (rendering surface)
-  // without ever becoming visible on screen. The previous approach used
-  // gtk_window_new(GTK_WINDOW_TOPLEVEL) + gtk_widget_hide(), which
-  // destroys the native window surface on Wayland and many compositors,
-  // causing WebKit to lose its rendering target and snapshots to fail.
-  self->offscreen_window = gtk_offscreen_window_new();
+  // The window MUST remain mapped (shown) for WebKit's compositor to
+  // paint. We use a real TOPLEVEL window (needed for WebKit's GL
+  // context) but move it far off-screen and strip decorations so the
+  // user never sees it. Previous approaches using gtk_widget_hide()
+  // or GtkOffscreenWindow both fail: hide() unmaps the window
+  // destroying the GL surface, and GtkOffscreenWindow provides no
+  // native window for WebKit's compositor.
+  self->offscreen_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   g_object_ref_sink(self->offscreen_window);
-  gtk_widget_set_size_request(self->web_view, 1280, 720);
+  gtk_window_set_default_size(GTK_WINDOW(self->offscreen_window), 1280, 720);
+  gtk_window_set_decorated(GTK_WINDOW(self->offscreen_window), FALSE);
+  gtk_window_set_skip_taskbar_hint(GTK_WINDOW(self->offscreen_window), TRUE);
+  gtk_window_set_skip_pager_hint(GTK_WINDOW(self->offscreen_window), TRUE);
   gtk_container_add(GTK_CONTAINER(self->offscreen_window), self->web_view);
+  gtk_widget_realize(self->offscreen_window);
   gtk_widget_show_all(self->offscreen_window);
+  gtk_window_move(GTK_WINDOW(self->offscreen_window), -32000, -32000);
 
   // Connect load-changed signal
   g_signal_connect(self->web_view, "load-changed", G_CALLBACK(on_load_changed),
@@ -896,7 +902,7 @@ void in_app_webview_handle_method_call(InAppWebView *self,
     g_object_unref(settings);
     g_free(uri);
     return;
-  } else if (strcmp(method, "takeScreenshot") == 0) {
+  } else if (strcmp(method, 'takeScreenshot") == 0) {
     webkit_web_view_get_snapshot(
         WEBKIT_WEB_VIEW(self->web_view), WEBKIT_SNAPSHOT_REGION_VISIBLE,
         WEBKIT_SNAPSHOT_OPTIONS_NONE, nullptr,
