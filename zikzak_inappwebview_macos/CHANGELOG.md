@@ -4,7 +4,7 @@
 - Fixed: macOS `webViewWebContentProcessDidTerminate` now implemented on the
   `WKNavigationDelegate` — when WebKit kills the content process (memory
   pressure, crash) the `onWebContentProcessDidTerminate` callback now reaches
-  Dart and the WebView auto-reloads after 500ms (mirrors the iOS behavior from
+  Dart and the WebView auto-reloads after 500 ms (mirrors the iOS behavior from
   #154), instead of leaving a blank/unrecoverable WebView. Closes #194
 - Fixed: macOS `InAppBrowser` now forwards `onWebContentProcessDidTerminate`
   to the `InAppBrowserEventHandler`, matching the standalone WebView path
