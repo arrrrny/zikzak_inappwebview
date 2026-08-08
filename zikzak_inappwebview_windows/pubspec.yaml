@@ -1,6 +1,6 @@
 name: zikzak_inappwebview_windows
 description: The Windows implementation of zikzak_inappwebview.
-version: 4.6.3
+version: 4.6.4
 homepage: https://github.com/arrrrny/zikzak_inappwebview
 
 environment:
