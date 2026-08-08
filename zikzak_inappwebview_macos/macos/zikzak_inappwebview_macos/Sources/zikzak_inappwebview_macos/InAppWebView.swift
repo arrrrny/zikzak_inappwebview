@@ -847,7 +847,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             self.resumeTimers()
             result(true)
         case "getSelectedText":
-            if self.configuration.preferences.javaScriptEnabled {
+            if self.configuration.defaultWebpagePreferences.allowsContentJavaScript {
                 self.evaluateJavaScript(PluginScriptsUtil.GET_SELECTED_TEXT_JS_SOURCE) { (value, _) in
                     result(value ?? "")
                 }
