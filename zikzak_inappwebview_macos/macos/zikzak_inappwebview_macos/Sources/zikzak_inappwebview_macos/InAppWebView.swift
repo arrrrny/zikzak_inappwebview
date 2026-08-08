@@ -1338,8 +1338,13 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     ) -> NSMenu? {
         // 1. Honor `disableContextMenu` — suppress the menu entirely but still
         //    fire onCreateContextMenu so Dart parity with iOS/Android is kept.
+        //    We invoke the channel directly (bypassing `onCreateContextMenu(...)`
+        //    which would set `contextMenuIsShowing = true`): no NSMenu is shown,
+        //    so `menuDidClose(_:)` never fires and the flag would otherwise stay
+        //    true forever. iOS uses a separate debounce flag for the same reason.
         if settings?.disableContextMenu == true {
-            onCreateContextMenu(hitTestResult: hitTestResult(for: elementInfo))
+            let hit = hitTestResult(for: elementInfo)
+            channel?.invokeMethod("onCreateContextMenu", arguments: hit.toMap())
             return nil
         }
 
@@ -1371,7 +1376,11 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
 
         if let menuItems = menu["menuItems"] as? [[String: Any]] {
             for menuItem in menuItems {
-                let id = menuItem["id"]!
+                guard let id = menuItem["id"] else {
+                    // Skip items without an id — Dart's `assert(id != null)`
+                    // is stripped in release builds, so we must guard here.
+                    continue
+                }
                 let title = menuItem["title"] as? String ?? ""
                 let target = ContextMenuItemTarget(id: id, title: title) { [weak self] itemId, itemTitle in
                     self?.onContextMenuActionItemClicked(id: itemId, title: itemTitle)
@@ -1386,23 +1395,17 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             }
         }
 
-        // If the user wants to hide the default system items, return only the
-        // custom menu. Otherwise, fetch the default menu and append custom items.
-        if contextMenuSettings.hideDefaultSystemContextMenuItems {
-            if customMenu.items.isEmpty {
-                // No custom items + hide defaults => no menu at all.
-                return nil
-            }
-            customMenu.delegate = self
-            return customMenu
-        }
-
-        // Append custom items to the default WebKit menu. We obtain the default
-        // menu by temporarily removing our uiDelegate and calling super is not
-        // possible for WKWebView. Instead, we build a combined menu: the default
-        // items are provided by WebKit only when this delegate returns nil, so
-        // we return the custom menu alone when custom items exist, or nil to let
-        // WebKit show its default menu.
+        // WKWebView does not expose its default NSMenu, so we cannot append
+        // custom items to the system items — when any custom items are present
+        // they *replace* the default menu. `hideDefaultSystemContextMenuItems`
+        // therefore only changes behavior when there are NO custom items:
+        //   true  + no custom items => suppress the menu entirely (return nil)
+        //   false + no custom items => let WebKit show its default menu (also
+        //                              return nil here; we cannot fetch defaults
+        //                              without dropping the uiDelegate — see note)
+        // To literally merge with defaults you would need to temporarily nil-out
+        // `webView.uiDelegate`, ask WebKit for the default menu, then restore
+        // the delegate — left as a follow-up.
         if customMenu.items.isEmpty {
             return nil
         }

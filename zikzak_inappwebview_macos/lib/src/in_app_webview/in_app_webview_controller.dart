@@ -257,6 +257,8 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
           if (contextMenu.onContextMenuActionItemClicked != null) {
             contextMenu.onContextMenuActionItemClicked!(menuItemClicked);
           }
+        }
+        break;
 
       case 'onReceivedHttpAuthRequest':
         if (params.webviewParams?.onReceivedHttpAuthRequest != null) {
