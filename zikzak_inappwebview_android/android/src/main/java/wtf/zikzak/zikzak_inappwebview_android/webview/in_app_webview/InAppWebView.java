@@ -2273,12 +2273,17 @@ public final class InAppWebView
             );
         }
 
-        if (newSettingsMap.get("insetsForWebContentToIgnore") != null &&
+        if (newSettingsMap.containsKey("insetsForWebContentToIgnore") &&
                 !Util.objEquals(
                     customSettings.insetsForWebContentToIgnore,
                     newCustomSettings.insetsForWebContentToIgnore
                 )) {
+            // Assign the new settings BEFORE applying so applyInsetsForWebContentToIgnore()
+            // reads the updated value. Using containsKey (not get(...) != null) also
+            // detects a runtime reset to null so the listener gets cleared.
+            customSettings = newCustomSettings;
             applyInsetsForWebContentToIgnore();
+            return;
         }
         customSettings = newCustomSettings;
     }
@@ -2312,6 +2317,10 @@ public final class InAppWebView
         if (ignored == null || ignored.isEmpty()) {
             // Restore default behavior: clear any previously installed listener.
             ViewCompat.setOnApplyWindowInsetsListener(this, null);
+            // Request a fresh insets dispatch so the WebView immediately receives
+            // the real (unfiltered) insets instead of retaining the last filtered
+            // WindowInsetsCompat until the next system event.
+            requestApplyInsets();
             return;
         }
 
@@ -2331,6 +2340,9 @@ public final class InAppWebView
         if (typeMask == 0) {
             // No recognized types — clear to avoid a no-op listener.
             ViewCompat.setOnApplyWindowInsetsListener(this, null);
+            // Same as the empty-list branch: re-dispatch so the real insets are
+            // applied immediately.
+            requestApplyInsets();
             return;
         }
 
