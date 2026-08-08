@@ -1098,8 +1098,71 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             "targetFrame": targetFrame,
         ]
 
-        channel?.invokeMethod("shouldOverrideUrlLoading", arguments: arguments)
-        decisionHandler(.allow)
+        // Honor `useShouldOverrideUrlLoading` opt-in (mirrors iOS). When the
+        // Dart side has not enabled the callback, fall through to the default
+        // `.allow` policy without round-tripping through the method channel.
+        let useShouldOverrideUrlLoading =
+            (settings?.useShouldOverrideUrlLoading == true)
+        guard useShouldOverrideUrlLoading else {
+            decisionHandler(.allow)
+            return
+        }
+
+        guard let channel = self.channel else {
+            decisionHandler(.allow)
+            return
+        }
+
+        // Await the Dart-side `shouldOverrideUrlLoading` callback before
+        // resolving the navigation policy. Previously this was invoked
+        // fire-and-forget and `decisionHandler(.allow)` was called
+        // unconditionally, so the user's `NavigationActionPolicy.CANCEL`
+        // (e.g. to block `intent:` or custom schemes) was silently ignored.
+        //
+        // The Dart handler returns the `NavigationActionPolicy` native int:
+        //   0 = CANCEL, 1 = ALLOW, 2 = DOWNLOAD (iOS 14.5+ only — not yet
+        //   exposed on macOS; treat as CANCEL to honor the user's intent to
+        //   block rather than silently allow).
+        var decisionHandlerCalled = false
+        let resolvePolicy: (WKNavigationActionPolicy) -> Void = { policy in
+            guard !decisionHandlerCalled else { return }
+            decisionHandlerCalled = true
+            decisionHandler(policy)
+        }
+
+        channel.invokeMethod(
+            "shouldOverrideUrlLoading",
+            arguments: arguments
+        ) { result in
+            let policy: WKNavigationActionPolicy
+            if let action = result as? Int {
+                switch action {
+                case 1:
+                    policy = .allow
+                case 0, 2:
+                    // 0 = CANCEL; 2 = DOWNLOAD (not supported on macOS yet —
+                    // fall back to CANCEL so we never silently allow a
+                    // navigation the user explicitly tried to block).
+                    policy = .cancel
+                default:
+                    policy = .cancel
+                }
+            } else if let action = result as? NSNumber {
+                // The Flutter channel may surface the int as NSNumber on
+                // macOS. Normalize before comparing.
+                switch action.intValue {
+                case 1: policy = .allow
+                default: policy = .cancel
+                }
+            } else {
+                // Dart side returns ALLOW (1) when no callback is registered
+                // and CANCEL (0) when the callback returns null. Any other
+                // shape is treated as a safe-default CANCEL so a buggy
+                // handler can never accidentally allow a blocked scheme.
+                policy = .cancel
+            }
+            resolvePolicy(policy)
+        }
     }
 
     public func webView(
