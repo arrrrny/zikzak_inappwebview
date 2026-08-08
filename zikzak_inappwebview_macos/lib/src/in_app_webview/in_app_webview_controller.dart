@@ -218,6 +218,47 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
           }
         }
         break;
+      case 'onCreateContextMenu':
+        ContextMenu? contextMenu = webviewParams?.contextMenu;
+        if (contextMenu != null && contextMenu.onCreateContextMenu != null) {
+          Map<String, dynamic> arguments =
+              (call.arguments as Map<dynamic, dynamic>)
+                  .cast<String, dynamic>();
+          InAppWebViewHitTestResult hitTestResult =
+              InAppWebViewHitTestResult.fromMap(arguments)!;
+          contextMenu.onCreateContextMenu!(hitTestResult);
+        }
+        break;
+      case 'onHideContextMenu':
+        ContextMenu? contextMenu = webviewParams?.contextMenu;
+        if (contextMenu != null && contextMenu.onHideContextMenu != null) {
+          contextMenu.onHideContextMenu!();
+        }
+        break;
+      case 'onContextMenuActionItemClicked':
+        ContextMenu? contextMenu = webviewParams?.contextMenu;
+        if (contextMenu != null) {
+          dynamic id = call.arguments['id'];
+          String title = call.arguments['title'];
+          ContextMenuItem menuItemClicked = ContextMenuItem(
+            id: id,
+            title: title,
+            action: null,
+          );
+          for (var menuItem in contextMenu.menuItems) {
+            if (menuItem.id == id) {
+              menuItemClicked = menuItem;
+              if (menuItem.action != null) {
+                menuItem.action!();
+              }
+              break;
+            }
+          }
+          if (contextMenu.onContextMenuActionItemClicked != null) {
+            contextMenu.onContextMenuActionItemClicked!(menuItemClicked);
+          }
+        }
+        break;
       default:
         throw UnimplementedError("Unimplemented ${call.method} method");
     }
@@ -407,6 +448,13 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
       );
     }
     return null;
+  }
+
+  @override
+  Future<void> setContextMenu(ContextMenu? contextMenu) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent("contextMenu", () => contextMenu?.toMap());
+    await _channel.invokeMethod('setContextMenu', args);
   }
 
   @override

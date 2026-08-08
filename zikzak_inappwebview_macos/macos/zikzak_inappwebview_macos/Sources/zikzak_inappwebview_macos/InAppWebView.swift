@@ -2,7 +2,7 @@ import Cocoa
 import FlutterMacOS
 import WebKit
 
-public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler, WKUIDelegate {
+public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler, WKUIDelegate, NSMenuDelegate {
     var channel: FlutterMethodChannel!
     var registrar: FlutterPluginRegistrar
     var plugin: InAppWebViewFlutterPlugin?
@@ -10,6 +10,11 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     private var searchText: String?
     private var isDisposed = false
     public var settings: InAppWebViewSettings?
+    var contextMenu: [String: Any]?
+    var contextMenuIsShowing = false
+    /// Retains ContextMenuItemTarget objects for the lifetime of the currently
+    /// displayed menu so NSMenuItem targets are not deallocated before click.
+    var contextMenuItemTargets: [ContextMenuItemTarget] = []
 
     init(
         registrar: FlutterPluginRegistrar, viewId: Any, arguments: Any?, channelName: String? = nil, plugin: InAppWebViewFlutterPlugin? = nil
@@ -104,6 +109,10 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                         forMainFrameOnly: forMainFrameOnly)
                     userContentController.addUserScript(userScript)
                 }
+            }
+
+            if let contextMenu = args["contextMenu"] as? [String: Any] {
+                self.contextMenu = contextMenu
             }
         }
 
@@ -420,6 +429,14 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 result(self.printCurrentPage(settings: settings))
             } else {
                 result(self.printCurrentPage())
+            }
+            break
+        case "setContextMenu":
+            if let args = call.arguments as? [String: Any] {
+                self.contextMenu = args["contextMenu"] as? [String: Any]
+                result(true)
+            } else {
+                result(false)
             }
             break
         default:
@@ -967,5 +984,157 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 }
             }
         }
+    }
+
+    // MARK: - Context Menu (WKUIDelegate)
+
+    @available(macOS 12.0, *)
+    public func webView(
+        _ webView: WKWebView,
+        contextMenuForElement elementInfo: WKContextMenuElementInfo,
+        willDisplayWithHighlight highlight: Bool
+    ) -> NSMenu? {
+        // 1. Honor `disableContextMenu` — suppress the menu entirely but still
+        //    fire onCreateContextMenu so Dart parity with iOS/Android is kept.
+        if settings?.disableContextMenu == true {
+            onCreateContextMenu(hitTestResult: hitTestResult(for: elementInfo))
+            return nil
+        }
+
+        // 2. Honor `disableLongPressContextMenuOnLinks` — on macOS the right-click
+        //    menu on a link is the equivalent of the iOS long-press menu on links.
+        //    When the setting is true and the hit element is a link, suppress.
+        if settings?.disableLongPressContextMenuOnLinks == true,
+           elementInfo.linkURL != nil
+        {
+            return nil
+        }
+
+        let hitTestResult = self.hitTestResult(for: elementInfo)
+        onCreateContextMenu(hitTestResult: hitTestResult)
+
+        // 3. Build the menu. If no custom contextMenu was set via Dart, return nil
+        //    so WebKit shows its default menu (and we still fired onCreateContextMenu).
+        guard let menu = self.contextMenu else {
+            return nil
+        }
+
+        let contextMenuSettings = ContextMenuSettings()
+        if let contextMenuSettingsMap = menu["settings"] as? [String: Any?] {
+            let _ = contextMenuSettings.parse(settings: contextMenuSettingsMap)
+        }
+
+        let customMenu = NSMenu()
+        contextMenuItemTargets = []
+
+        if let menuItems = menu["menuItems"] as? [[String: Any]] {
+            for menuItem in menuItems {
+                let id = menuItem["id"]!
+                let title = menuItem["title"] as? String ?? ""
+                let target = ContextMenuItemTarget(id: id, title: title) { [weak self] itemId, itemTitle in
+                    self?.onContextMenuActionItemClicked(id: itemId, title: itemTitle)
+                }
+                contextMenuItemTargets.append(target)
+                let item = NSMenuItem(
+                    title: title,
+                    action: #selector(ContextMenuItemTarget.itemClicked),
+                    keyEquivalent: "")
+                item.target = target
+                customMenu.addItem(item)
+            }
+        }
+
+        // If the user wants to hide the default system items, return only the
+        // custom menu. Otherwise, fetch the default menu and append custom items.
+        if contextMenuSettings.hideDefaultSystemContextMenuItems {
+            if customMenu.items.isEmpty {
+                // No custom items + hide defaults => no menu at all.
+                return nil
+            }
+            customMenu.delegate = self
+            return customMenu
+        }
+
+        // Append custom items to the default WebKit menu. We obtain the default
+        // menu by temporarily removing our uiDelegate and calling super is not
+        // possible for WKWebView. Instead, we build a combined menu: the default
+        // items are provided by WebKit only when this delegate returns nil, so
+        // we return the custom menu alone when custom items exist, or nil to let
+        // WebKit show its default menu.
+        if customMenu.items.isEmpty {
+            return nil
+        }
+        customMenu.delegate = self
+        return customMenu
+    }
+
+    /// Builds a `HitTestResult` from the `WKContextMenuElementInfo` provided by
+    /// WebKit. Maps linkURL/imageURL to the same `HitTestResultType` values used
+    /// on iOS so Dart receives a consistent result across platforms.
+    private func hitTestResult(for elementInfo: WKContextMenuElementInfo) -> HitTestResult {
+        let linkURL = elementInfo.linkURL?.absoluteString
+        let imageURL = elementInfo.imageURL?.absoluteString
+
+        var type: HitTestResultType = .unknownType
+        var extra: String? = nil
+
+        if let link = linkURL, let image = imageURL, !link.isEmpty, !image.isEmpty {
+            type = .srcImageAnchorType
+            extra = link
+        } else if let image = imageURL, !image.isEmpty {
+            type = .imageType
+            extra = image
+        } else if let link = linkURL, !link.isEmpty {
+            if link.hasPrefix("mailto:") {
+                type = .emailType
+                extra = String(link.dropFirst("mailto:".count))
+            } else if link.hasPrefix("tel:") {
+                type = .phoneType
+                extra = String(link.dropFirst("tel:".count))
+            } else if link.hasPrefix("geo:") {
+                type = .geoType
+                extra = String(link.dropFirst("geo:".count))
+            } else {
+                type = .srcAnchorType
+                extra = link
+            }
+        }
+
+        return HitTestResult(type: type, extra: extra)
+    }
+
+    // MARK: - NSMenuDelegate
+
+    public func menuDidClose(_ menu: NSMenu) {
+        onHideContextMenu()
+    }
+
+    // MARK: - Context Menu channel events
+
+    func onCreateContextMenu(hitTestResult: HitTestResult) {
+        contextMenuIsShowing = true
+        channel?.invokeMethod("onCreateContextMenu", arguments: hitTestResult.toMap())
+    }
+
+    func onHideContextMenu() {
+        if !contextMenuIsShowing {
+            return
+        }
+        contextMenuIsShowing = false
+        contextMenuItemTargets = []
+        let arguments: [String: Any?] = [:]
+        channel?.invokeMethod("onHideContextMenu", arguments: arguments)
+    }
+
+    func onContextMenuActionItemClicked(id: Any, title: String) {
+        let arguments: [String: Any?] = [
+            "id": id,
+            "iosId": id is Int64 ? String(id as! Int64) : (id as? String),
+            "androidId": nil,
+            "title": title,
+        ]
+        channel?.invokeMethod("onContextMenuActionItemClicked", arguments: arguments)
+        // After a custom item is clicked, fire onHideContextMenu to match iOS.
+        onHideContextMenu()
     }
 }

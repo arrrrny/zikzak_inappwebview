@@ -1119,6 +1119,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- macOS
   ///{@endtemplate}
   Future<void> setContextMenu(ContextMenu? contextMenu) {
     throw UnimplementedError(
