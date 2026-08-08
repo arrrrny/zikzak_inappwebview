@@ -516,6 +516,14 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             scrollView.decelerationRate = Util.getDecelerationRate(type: settings.decelerationRate)
             scrollView.alwaysBounceVertical = settings.alwaysBounceVertical
             scrollView.alwaysBounceHorizontal = settings.alwaysBounceHorizontal
+            if #available(iOS 17.4, *) {
+                if let bouncesHorizontally = settings.bouncesHorizontally {
+                    scrollView.bouncesHorizontally = bouncesHorizontally
+                }
+                if let bouncesVertically = settings.bouncesVertically {
+                    scrollView.bouncesVertically = bouncesVertically
+                }
+            }
             scrollView.scrollsToTop = settings.scrollsToTop
             scrollView.isPagingEnabled = settings.isPagingEnabled
 
@@ -1431,6 +1439,20 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             && settings?.alwaysBounceHorizontal != newSettings.alwaysBounceHorizontal
         {
             scrollView.alwaysBounceHorizontal = newSettings.alwaysBounceHorizontal
+        }
+        if #available(iOS 17.4, *) {
+            if newSettingsMap["bouncesHorizontally"] != nil,
+                let newValue = newSettings.bouncesHorizontally,
+                settings?.bouncesHorizontally != newValue
+            {
+                scrollView.bouncesHorizontally = newValue
+            }
+            if newSettingsMap["bouncesVertically"] != nil,
+                let newValue = newSettings.bouncesVertically,
+                settings?.bouncesVertically != newValue
+            {
+                scrollView.bouncesVertically = newValue
+            }
         }
         if newSettingsMap["scrollsToTop"] != nil
             && settings?.scrollsToTop != newSettings.scrollsToTop
