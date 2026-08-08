@@ -1,6 +1,5 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter/services.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 import 'package:zikzak_inappwebview_macos/src/in_app_webview/in_app_webview_controller.dart';
 
@@ -159,6 +158,7 @@ void main() {
       );
       // reaching here without throwing is the assertion
     });
+  });
 
   // Regression test for issue #192:
   // https://github.com/arrrrny/zikzak_inappwebview/issues/192
