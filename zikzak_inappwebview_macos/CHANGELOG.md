@@ -5,7 +5,7 @@
   did not implement `requestMediaCapturePermissionForOrigin`, so any page calling
   `getUserMedia()` (camera/microphone) was silently denied on macOS. Ported the
   iOS implementation to macOS (gated `@available(macOS 12.0, *)`): the delegate
-  now dispatches `onPermissionRequest` to Dart with the `PermissionResource`
+  now dispatches `onPermissionRequest` to Dart with the `PermissionResourceType`
   (`camera` / `microphone` / `cameraAndMicrophone`) and maps the returned
   `PermissionResponse.action` (`GRANT` / `DENY` / `PROMPT`) back to
   `WKPermissionDecision`, defaulting to `.deny` if Dart returns no action. Also

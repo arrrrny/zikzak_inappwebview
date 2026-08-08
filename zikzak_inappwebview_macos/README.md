@@ -52,14 +52,30 @@ with `NotAllowedError`, even though the WebView permission prompt was granted.
 
 ### Example
 
-The example app's `InAppWebViewExampleScreen` grants media-capture requests by
-default and ships a "Media capture (getUserMedia) test" button in the app bar
-that loads an inline page calling `getUserMedia({video:true,audio:true})`:
+The example app ships a "Media capture (getUserMedia) test" button in the app
+bar that loads an inline page calling `getUserMedia({video:true,audio:true})`.
+**For testing only**, the example's `onPermissionRequest` handler grants every
+request — this is convenient for the test button but is **not** a pattern you
+should copy into production apps that load untrusted web content.
+
+In production, **deny by default** and grant only for origins you trust after
+checking `request.resources`:
 
 ```dart
 InAppWebView(
   // ...
   onPermissionRequest: (controller, request) async {
+    // Trust only your own origin. Reject anything else.
+    final trustedHosts = const {'your-app.example.com'};
+    final originHost = request.origin.host;
+    if (!trustedHosts.contains(originHost)) {
+      return PermissionResponse(
+        resources: request.resources,
+        action: PermissionResponseAction.DENY,
+      );
+    }
+    // Optionally gate on request.resources (camera / microphone / etc.)
+    // before granting. Here we grant only the resources the page requested.
     return PermissionResponse(
       resources: request.resources,
       action: PermissionResponseAction.GRANT,
