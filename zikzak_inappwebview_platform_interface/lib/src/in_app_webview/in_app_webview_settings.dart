@@ -2033,6 +2033,30 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   )
   bool? dismissDialogues;
 
+  ///Which window insets the Android WebView should **ignore** when laying out
+  ///web content, so that content can render edge-to-edge behind the status bar,
+  ///navigation bar, IME (keyboard), display cutout and/or system-gesture areas.
+  ///
+  ///This is the zikzak equivalent of `webview_flutter_android`'s
+  ///`setInsetsForWebContentToIgnore` API. Each listed inset type is zeroed out
+  ///before reaching the WebView, so the WebView will not pad or shrink its
+  ///content for those insets.
+  ///
+  ///Example - render web content behind the status bar, navigation bar and IME:
+  ///```dart
+  ///InAppWebViewSettings(
+  ///  insetsForWebContentToIgnore: [
+  ///    AndroidWebViewInsets.systemBars,
+  ///    AndroidWebViewInsets.ime,
+  ///  ],
+  ///)
+  ///```
+  ///
+  ///Leave this `null` or empty to keep the default Android behavior (the
+  ///WebView is inset by the system bars / IME as usual).
+  @SupportedPlatforms(platforms: [AndroidPlatform()])
+  List<AndroidWebViewInsets>? insetsForWebContentToIgnore;
+
   ///Set to `true` to enable the Network Capture API: `XMLHttpRequest` and
   ///`fetch()` calls made by the page are intercepted and reported through
   ///the `onNetworkRequest`/`onNetworkResponse`/`onNetworkLoadingFinished`
@@ -2271,6 +2295,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.iframeName,
     this.iframeCsp,
     this.dismissDialogues = false,
+    this.insetsForWebContentToIgnore,
     this.useNetworkCapture,
     this.networkCaptureMaxBodySize = 50000,
     this.networkCaptureBodies = true,

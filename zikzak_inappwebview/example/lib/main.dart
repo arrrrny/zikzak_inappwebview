@@ -7,6 +7,7 @@ import 'package:zikzak_inappwebview/zikzak_inappwebview.dart';
 import 'package:zikzak_inappwebview_example/chrome_safari_browser_example.screen.dart';
 import 'package:zikzak_inappwebview_example/headless_in_app_webview.screen.dart';
 import 'package:zikzak_inappwebview_example/in_app_webiew_example.screen.dart';
+import 'package:zikzak_inappwebview_example/in_app_webview_edge_to_edge.screen.dart';
 import 'package:zikzak_inappwebview_example/in_app_browser_example.screen.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 
@@ -47,6 +48,12 @@ PointerInterceptor myDrawer({required BuildContext context}) {
       title: const Text('InAppWebView'),
       onTap: () {
         Navigator.pushReplacementNamed(context, '/');
+      },
+    ),
+    ListTile(
+      title: const Text('Edge-to-edge WebView (Android)'),
+      onTap: () {
+        Navigator.pushReplacementNamed(context, '/EdgeToEdge');
       },
     ),
     ListTile(
@@ -189,6 +196,8 @@ class _MyAppState extends State<MyApp> {
         initialRoute: '/',
         routes: {
           '/': (context) => const InAppWebViewExampleScreen(),
+        '/EdgeToEdge': (context) =>
+            const InAppWebViewEdgeToEdgeExampleScreen(),
             '/HeadlessInAppWebView': (context) =>
               const HeadlessInAppWebViewExampleScreen(),
         },
@@ -199,6 +208,8 @@ class _MyAppState extends State<MyApp> {
         initialRoute: '/',
         routes: {
           '/': (context) => const InAppWebViewExampleScreen(),
+        '/EdgeToEdge': (context) =>
+            const InAppWebViewEdgeToEdgeExampleScreen(),
           '/InAppBrowser': (context) => const InAppBrowserExampleScreen(),
             '/HeadlessInAppWebView': (context) =>
               const HeadlessInAppWebViewExampleScreen(),
@@ -210,6 +221,8 @@ class _MyAppState extends State<MyApp> {
         initialRoute: '/',
         routes: {
           '/': (context) => const InAppWebViewExampleScreen(),
+        '/EdgeToEdge': (context) =>
+            const InAppWebViewEdgeToEdgeExampleScreen(),
           '/InAppBrowser': (context) => const InAppBrowserExampleScreen(),
             '/HeadlessInAppWebView': (context) =>
               const HeadlessInAppWebViewExampleScreen(),
@@ -220,6 +233,8 @@ class _MyAppState extends State<MyApp> {
       initialRoute: '/',
       routes: {
         '/': (context) => const InAppWebViewExampleScreen(),
+        '/EdgeToEdge': (context) =>
+            const InAppWebViewEdgeToEdgeExampleScreen(),
         '/InAppBrowser': (context) => const InAppBrowserExampleScreen(),
         '/ChromeSafariBrowser': (context) => ChromeSafariBrowserExampleScreen(),
         '/HeadlessInAppWebView': (context) =>
