@@ -162,6 +162,13 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
           );
         }
         break;
+      case 'onWebContentProcessDidTerminate':
+        if (params.webviewParams?.onWebContentProcessDidTerminate != null) {
+          params.webviewParams!.onWebContentProcessDidTerminate!(
+            controller,
+          );
+        }
+        break;
       case 'onJsAlert':
         if (params.webviewParams?.onJsAlert != null) {
           Map<String, dynamic> arguments = call.arguments

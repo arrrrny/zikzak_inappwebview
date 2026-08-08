@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/services.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 import 'package:zikzak_inappwebview_macos/src/in_app_webview/in_app_webview_controller.dart';
 
@@ -124,6 +125,38 @@ void main() {
       controller.dispose();
       expect(controller.hasJavaScriptHandler(handlerName: 'persist'), isFalse);
       expect(controller.hasJavaScriptHandler(handlerName: 'persist2'), isFalse);
+    });
+  });
+
+  group('onWebContentProcessDidTerminate', () {
+    test('invokes the callback when the method is dispatched (issue #194)', () async {
+      var invoked = false;
+      final widgetParams = PlatformInAppWebViewWidgetCreationParams(
+        controllerFromPlatform: (c) => c,
+        onWebContentProcessDidTerminate: (c) {
+          invoked = true;
+        },
+      );
+      final controllerParams = PlatformInAppWebViewControllerCreationParams(
+        id: 12345,
+        webviewParams: widgetParams,
+      );
+      final ctl = MacOSInAppWebViewController(controllerParams);
+
+      await ctl.handleMethod(
+        const MethodCall('onWebContentProcessDidTerminate'),
+      );
+
+      expect(invoked, isTrue);
+      ctl.dispose();
+    });
+
+    test('does not throw when no callback is registered', () async {
+      // controller in setUp has no onWebContentProcessDidTerminate callback
+      await controller.handleMethod(
+        const MethodCall('onWebContentProcessDidTerminate'),
+      );
+      // reaching here without throwing is the assertion
     });
   });
 }

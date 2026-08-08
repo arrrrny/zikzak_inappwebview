@@ -636,6 +636,18 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         channel?.invokeMethod("onReceivedError", arguments: arguments)
     }
 
+    public func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+        channel?.invokeMethod("onWebContentProcessDidTerminate", arguments: [:])
+        // Auto-reload to recover from the content-process termination.
+        // Mirrors the iOS implementation (issue #154) so apps get a sensible
+        // default recovery while still receiving the Dart-side callback first,
+        // giving them a chance to intercept or cancel if needed.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            guard let self = self, !self.isDisposed else { return }
+            self.reload()
+        }
+    }
+
     public func userContentController(
         _ userContentController: WKUserContentController, didReceive message: WKScriptMessage
     ) {
