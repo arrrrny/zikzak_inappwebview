@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Android toolchain bump (closes #201): `androidx.webkit:webkit` 1.14.0 -> 1.15.0, AGP 8.5.2 -> 8.13.1 (current stable 8.x, matches webview_flutter_android reference), JVM target 11 -> 17. Reflection-based `SUPPRESS_ERROR_PAGE` guards in `InAppWebViewSettings` and `ZikZakSecurityManager` remain forward-compatible (feature available since webkit 1.13.0). 16KB page size alignment retained.
 - Added iOS proxy support (iOS 17.0+) — set process-wide proxy for WKWebView
 
 
