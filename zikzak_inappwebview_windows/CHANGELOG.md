@@ -1,3 +1,17 @@
+## 4.6.4 - 2026-08-09
+
+
+- Fixed: Windows — `WebViewEnvironmentSettings.additionalBrowserArguments`
+  and `browserExecutableFolder` are now forwarded to
+  `WebviewController.initializeEnvironment` (previously only `userDataFolder`
+  was honored). Chromium flags such as `--disable-web-security` now actually
+  reach the WebView2 runtime via `ICoreWebView2EnvironmentOptions::put_AdditionalBrowserArguments`,
+  so local CORS can be disabled for development (issue #178).
+- Test: added `resolveEnvironmentInitArgs` unit tests covering the issue #178
+  repro (`--disable-web-security --allow-running-insecure-content
+  --use-fake-ui-for-media-stream --use-fake-device-for-media-stream`) and the
+  full/null/partial settings matrix.
+
 ## 4.6.3 - 2026-07-21
 
 
