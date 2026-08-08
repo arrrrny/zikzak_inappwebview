@@ -22,10 +22,6 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
 
     // MARK: - Issue #197 state (method-channel parity with iOS)
 
-    /// Stored map for `setContextMenu` — kept for parity with iOS even though
-    /// macOS context-menu rendering is handled separately.
-    var contextMenu: [String: Any]?
-
     /// Active `WebMessageChannel` instances, keyed by id. Populated by
     /// `createWebMessageChannel`; the Dart side holds the matching id.
     var webMessageChannels: [String: WebMessageChannel] = [:]
@@ -1049,14 +1045,6 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 result(self.printCurrentPage(settings: settings))
             } else {
                 result(self.printCurrentPage())
-            }
-            break
-        case "setContextMenu":
-            if let args = call.arguments as? [String: Any] {
-                self.contextMenu = args["contextMenu"] as? [String: Any]
-                result(true)
-            } else {
-                result(false)
             }
             break
         default:
@@ -2463,8 +2451,13 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         onCreateContextMenu(hitTestResult: hitTestResult)
 
         // 3. Build the menu. If no custom contextMenu was set via Dart, return nil
-        //    so WebKit shows its default menu (and we still fired onCreateContextMenu).
+        //    so WebKit shows its default menu. We already fired onCreateContextMenu
+        //    above (parity with iOS); since WebKit's default NSMenu is not ours,
+        //    `menuDidClose(_:)` will never fire on us — so balance the event here
+        //    by calling onHideContextMenu() immediately. (iOS observes close via
+        //    UIContextMenuInteraction; macOS WKUIDelegate cannot when returning nil.)
         guard let menu = self.contextMenu else {
+            onHideContextMenu()
             return nil
         }
 
@@ -2509,6 +2502,10 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         // `webView.uiDelegate`, ask WebKit for the default menu, then restore
         // the delegate — left as a follow-up.
         if customMenu.items.isEmpty {
+            // Same rationale as the `guard let menu` branch above: we already
+            // fired onCreateContextMenu, but we're returning nil so WebKit shows
+            // its default menu — balance the event by firing onHideContextMenu.
+            onHideContextMenu()
             return nil
         }
         customMenu.delegate = self
@@ -2532,13 +2529,16 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             type = .imageType
             extra = image
         } else if let link = linkURL, !link.isEmpty {
-            if link.hasPrefix("mailto:") {
+            // HTML allows case variations (MAILTO:, Mailto:, etc.) — match
+            // case-insensitively but strip the original-cased scheme length.
+            let lower = link.lowercased()
+            if lower.hasPrefix("mailto:") {
                 type = .emailType
                 extra = String(link.dropFirst("mailto:".count))
-            } else if link.hasPrefix("tel:") {
+            } else if lower.hasPrefix("tel:") {
                 type = .phoneType
                 extra = String(link.dropFirst("tel:".count))
-            } else if link.hasPrefix("geo:") {
+            } else if lower.hasPrefix("geo:") {
                 type = .geoType
                 extra = String(link.dropFirst("geo:".count))
             } else {
@@ -2576,8 +2576,6 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     func onContextMenuActionItemClicked(id: Any, title: String) {
         let arguments: [String: Any?] = [
             "id": id,
-            "iosId": id is Int64 ? String(id as! Int64) : (id as? String),
-            "androidId": nil,
             "title": title,
         ]
         channel?.invokeMethod("onContextMenuActionItemClicked", arguments: arguments)

@@ -21,6 +21,16 @@ final _JAVASCRIPT_HANDLER_FORBIDDEN_NAMES = UnmodifiableListView<String>([
 ]);
 
 class MacOSInAppWebViewController extends PlatformInAppWebViewController {
+  /// Mutable override for the context menu set via [setContextMenu].
+  ///
+  /// The construction-time [PlatformWebViewCreationParams.contextMenu] is
+  /// `final`, so without this override, calling `setContextMenu(newMenu)`
+  /// would update the native side but leave Dart-side event routing stuck on
+  /// the old menu. Event handlers prefer this field, falling back to
+  /// `webviewParams?.contextMenu` (mirroring the iOS port's fallback to
+  /// `_inAppBrowser!.contextMenu`).
+  ContextMenu? _contextMenu;
+
   MacOSInAppWebViewController(
     PlatformInAppWebViewControllerCreationParams params,
   ) : super.implementation(params) {
@@ -219,7 +229,8 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
         }
         break;
       case 'onCreateContextMenu':
-        ContextMenu? contextMenu = webviewParams?.contextMenu;
+        ContextMenu? contextMenu =
+            _contextMenu ?? webviewParams?.contextMenu;
         if (contextMenu != null && contextMenu.onCreateContextMenu != null) {
           Map<String, dynamic> arguments =
               (call.arguments as Map<dynamic, dynamic>)
@@ -230,13 +241,15 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
         }
         break;
       case 'onHideContextMenu':
-        ContextMenu? contextMenu = webviewParams?.contextMenu;
+        ContextMenu? contextMenu =
+            _contextMenu ?? webviewParams?.contextMenu;
         if (contextMenu != null && contextMenu.onHideContextMenu != null) {
           contextMenu.onHideContextMenu!();
         }
         break;
       case 'onContextMenuActionItemClicked':
-        ContextMenu? contextMenu = webviewParams?.contextMenu;
+        ContextMenu? contextMenu =
+            _contextMenu ?? webviewParams?.contextMenu;
         if (contextMenu != null) {
           dynamic id = call.arguments['id'];
           String title = call.arguments['title'];
@@ -491,6 +504,11 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
 
   @override
   Future<void> setContextMenu(ContextMenu? contextMenu) async {
+    // Keep the Dart-side reference in sync so subsequent onCreateContextMenu /
+    // onHideContextMenu / onContextMenuActionItemClicked events route to the
+    // new menu's callbacks (the construction-time webviewParams.contextMenu
+    // is final and cannot be updated).
+    _contextMenu = contextMenu;
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("contextMenu", () => contextMenu?.toMap());
     await _channel.invokeMethod('setContextMenu', args);

@@ -379,7 +379,7 @@ class InAppWebViewSettings {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
-  ///- macOS
+  ///- MacOS
   ///- Web but iframe requires same origin
   bool? disableContextMenu;
 
@@ -411,7 +411,7 @@ class InAppWebViewSettings {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS
-  ///- macOS
+  ///- MacOS
   bool? disableLongPressContextMenuOnLinks;
 
   ///Set to `true` to disable vertical scroll. The default value is `false`.

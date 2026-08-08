@@ -64,6 +64,76 @@ void main() {
       // Should not throw — the native channel will receive the call.
       await controller.setContextMenu(contextMenu);
     });
+
+    test('setContextMenu updates the menu used by subsequent events', () async {
+      // Regression: previously setContextMenu only invoked the native channel
+      // and did not update the Dart-side reference, so subsequent
+      // onContextMenuActionItemClicked events still routed to the construction-
+      // time menu (or to no menu at all).
+      var originalActionCalled = false;
+      var newActionCalled = false;
+
+      final originalMenu = ContextMenu(
+        menuItems: [
+          ContextMenuItem(id: 1, title: 'Original', action: () {
+            originalActionCalled = true;
+          }),
+        ],
+      );
+
+      // Build a controller whose construction-time contextMenu is originalMenu.
+      controller.dispose();
+      final widgetParams = PlatformInAppWebViewWidgetCreationParams(
+        controllerFromPlatform: (c) => c,
+        contextMenu: originalMenu,
+      );
+      final controllerParams = PlatformInAppWebViewControllerCreationParams(
+        id: 77777,
+        webviewParams: widgetParams,
+      );
+      controller = MacOSInAppWebViewController(controllerParams);
+
+      // Re-bind the mock channel for the new controller id.
+      TestDefaultBinaryMessengerBinding
+          .instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+        const MethodChannel('dev.zuzu/zikzak_inappwebview_77777'),
+        (MethodCall call) async => true,
+      );
+
+      // Swap to a new menu via setContextMenu.
+      final newMenu = ContextMenu(
+        menuItems: [
+          ContextMenuItem(id: 2, title: 'New', action: () {
+            newActionCalled = true;
+          }),
+        ],
+        onContextMenuActionItemClicked: (_) {},
+      );
+      await controller.setContextMenu(newMenu);
+
+      // Simulate the native side firing onContextMenuActionItemClicked with
+      // id=2 (an item that exists only in newMenu, not in originalMenu).
+      await controller.handleMethod(
+        const MethodCall('onContextMenuActionItemClicked', {
+          'id': 2,
+          'title': 'New',
+        }),
+      );
+
+      expect(originalActionCalled, isFalse,
+          reason: 'original menu action must not fire after setContextMenu');
+      expect(newActionCalled, isTrue,
+          reason: 'new menu action should fire after setContextMenu');
+
+      // Cleanup the mock handler we installed.
+      TestDefaultBinaryMessengerBinding
+          .instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+        const MethodChannel('dev.zuzu/zikzak_inappwebview_77777'),
+        null,
+      );
+    });
   });
 
   group('onCreateContextMenu event', () {
