@@ -2,11 +2,16 @@
 //  HitTestResult.swift
 //  zikzak_inappwebview
 //
-//  macOS port of the iOS HitTestResult type. The raw values mirror the iOS
-//  enum so the Dart platform interface decodes them identically on both
-//  platforms. See issue #197.
+//  Ported from iOS to support macOS context-menu hit-test results.
+//  The raw values mirror the iOS enum so the Dart platform interface
+//  decodes them identically on both platforms.
+//  https://github.com/arrrrny/zikzak_inappwebview/issues/196
 //
 
+import Foundation
+
+/// Mirrors `Android.WebView.HitTestResult` / iOS `HitTestResult` so the Dart
+/// side receives the same shape on every platform.
 public enum HitTestResultType: Int {
     case unknownType = 0
     case phoneType = 2
@@ -28,10 +33,12 @@ public class HitTestResult: NSObject {
     }
 
     public static func fromMap(map: [String: Any?]?) -> HitTestResult? {
-        guard let map = map else { return nil }
-        let type =
-            HitTestResultType.init(rawValue: map["type"] as? Int ?? HitTestResultType.unknownType.rawValue)
-            ?? HitTestResultType.unknownType
+        guard let map = map else {
+            return nil
+        }
+        let type = HitTestResultType.init(
+            rawValue: map["type"] as? Int ?? HitTestResultType.unknownType.rawValue
+        ) ?? HitTestResultType.unknownType
         return HitTestResult(type: type, extra: map["extra"] as? String)
     }
 

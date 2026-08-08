@@ -382,7 +382,7 @@ because there isn't any way to make the website data store non-persistent for th
 
   ///Set to `true` to disable context menu. The default value is `false`.
   @SupportedPlatforms(
-    platforms: [AndroidPlatform(), IOSPlatform(), WebPlatform()],
+    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform(), WebPlatform()],
   )
   bool? disableContextMenu;
 
@@ -1778,7 +1778,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   ///Set to `true` to disable the context menu (copy, select, etc.) that is shown when the user emits a long press event on a HTML link.
   ///This is implemented using also JavaScript, so it must be enabled or it won't work.
   ///The default value is `false`.
-  @SupportedPlatforms(platforms: [IOSPlatform()])
+  @SupportedPlatforms(platforms: [IOSPlatform(), MacOSPlatform()])
   bool? disableLongPressContextMenuOnLinks;
 
   ///Set to `true` to disable the [inputAccessoryView](https://developer.apple.com/documentation/uikit/uiresponder/1621119-inputaccessoryview) above system keyboard.
