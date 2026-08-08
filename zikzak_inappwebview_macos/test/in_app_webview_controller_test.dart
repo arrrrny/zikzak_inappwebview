@@ -128,6 +128,38 @@ void main() {
     });
   });
 
+  group('onWebContentProcessDidTerminate', () {
+    test('invokes the callback when the method is dispatched (issue #194)', () async {
+      var invoked = false;
+      final widgetParams = PlatformInAppWebViewWidgetCreationParams(
+        controllerFromPlatform: (c) => c,
+        onWebContentProcessDidTerminate: (c) {
+          invoked = true;
+        },
+      );
+      final controllerParams = PlatformInAppWebViewControllerCreationParams(
+        id: 12345,
+        webviewParams: widgetParams,
+      );
+      final ctl = MacOSInAppWebViewController(controllerParams);
+
+      await ctl.handleMethod(
+        const MethodCall('onWebContentProcessDidTerminate'),
+      );
+
+      expect(invoked, isTrue);
+      ctl.dispose();
+    });
+
+    test('does not throw when no callback is registered', () async {
+      // controller in setUp has no onWebContentProcessDidTerminate callback
+      await controller.handleMethod(
+        const MethodCall('onWebContentProcessDidTerminate'),
+      );
+      // reaching here without throwing is the assertion
+    });
+  });
+
   // Regression test for issue #192:
   // https://github.com/arrrrny/zikzak_inappwebview/issues/192
   //
