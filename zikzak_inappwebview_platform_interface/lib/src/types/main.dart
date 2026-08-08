@@ -88,6 +88,7 @@ export 'network_request.dart' show NetworkRequest;
 export 'network_response.dart' show NetworkResponse;
 export 'network_response_body.dart' show NetworkResponseBody;
 export 'resource_type.dart' show ResourceType;
+export 'android_webview_insets.dart' show AndroidWebViewInsets;
 export 'url_pattern_type.dart' show UrlPatternType;
 export 'navigation_action_policy.dart' show NavigationActionPolicy;
 export 'navigation_response.dart' show NavigationResponse;
