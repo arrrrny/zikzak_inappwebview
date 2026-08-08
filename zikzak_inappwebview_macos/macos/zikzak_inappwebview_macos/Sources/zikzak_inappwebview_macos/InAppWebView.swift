@@ -968,4 +968,113 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             }
         }
     }
+
+    // MARK: - Media capture / device orientation permission (macOS 12+)
+    //
+    // Ports the iOS WKUIDelegate implementation
+    // (zikzak_inappwebview_ios/.../InAppWebView/InAppWebView.swift:2044+) to
+    // macOS. Without these, any page calling getUserMedia() (camera/microphone)
+    // is silently denied on macOS because WKWebView defaults to
+    // WKPermissionDecision.deny when the delegate does not implement
+    // requestMediaCapturePermissionForOrigin. See issue #195.
+    //
+    // The delegate dispatches onPermissionRequest to Dart (the same event the
+    // iOS port and the shared Dart platform interface already use) and maps the
+    // returned PermissionResponse.action back to WKPermissionDecision:
+    //   0 -> .deny, 1 -> .grant, 2 -> .prompt  (see PermissionResponseAction).
+    // If Dart returns no action (or the channel has no handler), we default to
+    // .deny - matching the iOS callback.defaultBehaviour - so we never leave
+    // the async decisionHandler uncalled (which would otherwise hang WebKit).
+
+    @available(macOS 12.0, *)
+    public func webView(
+        _ webView: WKWebView,
+        requestMediaCapturePermissionFor origin: WKSecurityOrigin,
+        initiatedByFrame frame: WKFrameInfo,
+        type: WKMediaCaptureType,
+        decisionHandler: @escaping (WKPermissionDecision) -> Void
+    ) {
+        let originString =
+            "\(origin.protocol)://\(origin.host)"
+            + (origin.port != 0 ? ":" + String(origin.port) : "")
+        let permissionRequest = PermissionRequest(
+            origin: originString, resources: [type.rawValue], frame: frame)
+
+        var decisionHandlerCalled = false
+        let resolve: (PermissionResponse?) -> Void = { response in
+            guard !decisionHandlerCalled else { return }
+            if let action = response?.action {
+                decisionHandlerCalled = true
+                switch action {
+                case 1:  // PermissionResponseAction.GRANT
+                    decisionHandler(.grant)
+                case 2:  // PermissionResponseAction.PROMPT
+                    decisionHandler(.prompt)
+                default:  // 0 == PermissionResponseAction.DENY
+                    decisionHandler(.deny)
+                }
+            } else {
+                decisionHandlerCalled = true
+                decisionHandler(.deny)
+            }
+        }
+
+        channel.invokeMethod(
+            "onPermissionRequest",
+            arguments: permissionRequest.toMap()
+        ) { result in
+            if let map = result as? [String: Any] {
+                resolve(PermissionResponse.fromMap(map: map))
+            } else {
+                resolve(nil)
+            }
+        }
+    }
+
+    @available(macOS 12.0, *)
+    public func webView(
+        _ webView: WKWebView,
+        requestDeviceOrientationAndMotionPermissionFor origin: WKSecurityOrigin,
+        initiatedByFrame frame: WKFrameInfo,
+        decisionHandler: @escaping (WKPermissionDecision) -> Void
+    ) {
+        let originString =
+            "\(origin.protocol)://\(origin.host)"
+            + (origin.port != 0 ? ":" + String(origin.port) : "")
+        let permissionRequest = PermissionRequest(
+            origin: originString,
+            resources: ["deviceOrientationAndMotion"],
+            frame: frame)
+
+        var decisionHandlerCalled = false
+        let resolve: (PermissionResponse?) -> Void = { response in
+            guard !decisionHandlerCalled else { return }
+            if let action = response?.action {
+                decisionHandlerCalled = true
+                switch action {
+                case 1:  // PermissionResponseAction.GRANT
+                    decisionHandler(.grant)
+                case 2:  // PermissionResponseAction.PROMPT
+                    decisionHandler(.prompt)
+                default:  // 0 == PermissionResponseAction.DENY
+                    decisionHandler(.deny)
+                }
+            } else {
+                decisionHandlerCalled = true
+                decisionHandler(.deny)
+            }
+        }
+
+        channel.invokeMethod(
+            "onPermissionRequest",
+            arguments: permissionRequest.toMap()
+        ) { result in
+            if let map = result as? [String: Any] {
+                resolve(PermissionResponse.fromMap(map: map))
+            } else {
+                resolve(nil)
+            }
+        }
+    }
+
 }

@@ -9,5 +9,12 @@
 	<true />
 	<key>com.apple.security.network.server</key>
 	<true />
+	<!-- Media-capture entitlements for getUserMedia() on macOS (issue #195).
+	     Required by sandboxed apps so WKWebView can actually access the camera
+	     and microphone after the user grants the WKPermissionDecision. -->
+	<key>com.apple.security.device.camera</key>
+	<true />
+	<key>com.apple.security.device.audio-input</key>
+	<true />
 </dict>
 </plist>

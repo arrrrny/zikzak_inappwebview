@@ -109,6 +109,44 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
         title: const Text("InAppWebView"),
         actions: [
           IconButton(
+            icon: const Icon(Icons.videocam),
+            tooltip: "Media capture (getUserMedia) test",
+            onPressed: () async {
+              // Loads an inline page that calls getUserMedia() for camera +
+              // microphone. Triggers the WKUIDelegate media-capture permission
+              // path on iOS/macOS (issue #195). The onPermissionRequest handler
+              // configured below grants the request; macOS additionally needs
+              // NSCameraUsageDescription / NSMicrophoneUsageDescription in
+              // Info.plist plus camera/audio-input entitlements.
+              await webViewController?.loadData(
+                data: '''<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>getUserMedia test</title></head>
+<body style="font-family:sans-serif;text-align:center">
+  <h2>getUserMedia() test</h2>
+  <video id="v" autoplay playsinline style="max-width:100%;border:1px solid #ccc"></video>
+  <p id="status">Requesting media&#8230;</p>
+  <script>
+    navigator.mediaDevices.getUserMedia({video:true,audio:true})
+      .then(function(stream){
+        document.getElementById('v').srcObject = stream;
+        document.getElementById('status').textContent =
+          'Granted: ' + stream.getTracks().map(function(t){return t.kind}).join(', ');
+      })
+      .catch(function(err){
+        document.getElementById('status').textContent =
+          'Denied: ' + err.name + ': ' + err.message;
+      });
+  </script>
+</body>
+</html>''',
+                mimeType: 'text/html',
+                encoding: 'utf8',
+                baseUrl: WebUri('about:blank'),
+              );
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.delete),
             tooltip: "Delete all cookies",
             onPressed: () async {

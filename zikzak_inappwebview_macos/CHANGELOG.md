@@ -1,3 +1,23 @@
+## Unreleased
+
+
+- Fixed: macOS media-capture permission prompts were missing - the `WKUIDelegate`
+  did not implement `requestMediaCapturePermissionForOrigin`, so any page calling
+  `getUserMedia()` (camera/microphone) was silently denied on macOS. Ported the
+  iOS implementation to macOS (gated `@available(macOS 12.0, *)`): the delegate
+  now dispatches `onPermissionRequest` to Dart with the `PermissionResource`
+  (`camera` / `microphone` / `cameraAndMicrophone`) and maps the returned
+  `PermissionResponse.action` (`GRANT` / `DENY` / `PROMPT`) back to
+  `WKPermissionDecision`, defaulting to `.deny` if Dart returns no action. Also
+  implemented the sibling `requestDeviceOrientationAndMotionPermissionForOrigin`
+  for parity with iOS. Added the supporting `PermissionRequest` /
+  `PermissionResponse` / `StringOrInt` types and `WKFrameInfo` /
+  `WKSecurityOrigin` `toMap()` extensions (ported from iOS). Documented the
+  required `NSCameraUsageDescription` / `NSMicrophoneUsageDescription` Info.plist
+  keys and `com.apple.security.device.camera` / `com.apple.security.device.audio-input`
+  entitlements, and added a `getUserMedia()` test button to the example app.
+  Closes #195
+
 ## 4.6.3 - 2026-07-21
 
 
