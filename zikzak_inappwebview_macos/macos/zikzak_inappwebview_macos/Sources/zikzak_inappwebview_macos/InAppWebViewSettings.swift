@@ -96,7 +96,7 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
                 configuration.suppressesIncrementalRendering
             realSettings["allowsBackForwardNavigationGestures"] =
                 webView.allowsBackForwardNavigationGestures
-            realSettings["javaScriptEnabled"] = configuration.preferences.javaScriptEnabled
+            realSettings["javaScriptEnabled"] = configuration.defaultWebpagePreferences.allowsContentJavaScript
             realSettings["allowUniversalAccessFromFileURLs"] = configuration.value(
                 forKey: "allowUniversalAccessFromFileURLs")
             realSettings["allowFileAccessFromFileURLs"] = configuration.preferences.value(
