@@ -10,6 +10,9 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     private var searchText: String?
     private var isDisposed = false
     public var settings: InAppWebViewSettings?
+    private static var sslCertificatesMap: [String: SslCertificate] = [:]
+    private static var credentialsProposed: [URLCredential] = []
+    var channelDelegate: WebViewChannelDelegate?
 
     init(
         registrar: FlutterPluginRegistrar, viewId: Any, arguments: Any?, channelName: String? = nil, plugin: InAppWebViewFlutterPlugin? = nil
@@ -72,6 +75,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         let finalChannelName = channelName ?? "dev.zuzu/zikzak_inappwebview_\(viewId)"
         channel = FlutterMethodChannel(name: finalChannelName, binaryMessenger: registrar.messenger)
         channel.setMethodCallHandler(self.handle)
+        channelDelegate = WebViewChannelDelegate(channel: channel)
 
         let findInteractionChannelName = "wtf.zikzak/zikzak_inappwebview_find_interaction_\(viewId)"
         findInteractionChannel = FlutterMethodChannel(
@@ -612,12 +616,14 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     }
 
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        InAppWebView.credentialsProposed = []
         channel?.invokeMethod("onLoadStop", arguments: ["url": webView.url?.absoluteString])
     }
 
     public func webView(
         _ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error
     ) {
+        InAppWebView.credentialsProposed = []
         onReceivedError(error: error)
     }
 
@@ -625,6 +631,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         _ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!,
         withError error: Error
     ) {
+        InAppWebView.credentialsProposed = []
         onReceivedError(error: error)
     }
 
@@ -635,6 +642,277 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         arguments["message"] = error.localizedDescription
         channel?.invokeMethod("onReceivedError", arguments: arguments)
     }
+    public func webView(
+        _ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge,
+        completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
+    ) {
+        var completionHandlerCalled = false
+        if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic
+            || challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodDefault
+            || challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPDigest
+            || challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodNegotiate
+            || challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodNTLM
+        {
+            let host = challenge.protectionSpace.host
+            let prot = challenge.protectionSpace.protocol
+            let realm = challenge.protectionSpace.realm
+            let port = challenge.protectionSpace.port
+
+            let callback = WebViewChannelDelegate.ReceivedHttpAuthRequestCallback()
+            callback.nonNullSuccess = { (response: HttpAuthResponse) in
+                if let action = response.action {
+                    completionHandlerCalled = true
+                    switch action {
+                    case 0:
+                        InAppWebView.credentialsProposed = []
+                        completionHandler(.performDefaultHandling, nil)
+                        break
+                    case 1:
+                        let username = response.username
+                        let password = response.password
+                        let permanentPersistence = response.permanentPersistence
+                        let persistence =
+                            (permanentPersistence)
+                            ? URLCredential.Persistence.permanent
+                            : URLCredential.Persistence.forSession
+                        let credential = URLCredential(
+                            user: username, password: password, persistence: persistence)
+                        completionHandler(.useCredential, credential)
+                        break
+                    case 2:
+                        if InAppWebView.credentialsProposed.count == 0 {
+                            for (protectionSpace, credentials) in CredentialDatabase.credentialStore
+                                .allCredentials
+                            {
+                                if protectionSpace.host == host && protectionSpace.realm == realm
+                                    && protectionSpace.protocol == prot
+                                    && protectionSpace.port == port
+                                {
+                                    for credential in credentials {
+                                        InAppWebView.credentialsProposed.append(credential.value)
+                                    }
+                                    break
+                                }
+                            }
+                        }
+                        if InAppWebView.credentialsProposed.count == 0,
+                            let credential = challenge.proposedCredential
+                        {
+                            InAppWebView.credentialsProposed.append(credential)
+                        }
+
+                        if let credential = InAppWebView.credentialsProposed.popLast() {
+                            completionHandler(.useCredential, credential)
+                        } else {
+                            completionHandler(.performDefaultHandling, nil)
+                        }
+                        break
+                    default:
+                        InAppWebView.credentialsProposed = []
+                        completionHandler(.performDefaultHandling, nil)
+                    }
+                    return false
+                }
+                return true
+            }
+            callback.defaultBehaviour = { (response: HttpAuthResponse?) in
+                if !completionHandlerCalled {
+                    completionHandlerCalled = true
+                    completionHandler(.performDefaultHandling, nil)
+                }
+            }
+            callback.error = { [weak callback] (code: String, message: String?, details: Any?) in
+                print(code + ", " + (message ?? ""))
+                callback?.defaultBehaviour(nil)
+            }
+
+            let runCallback = {
+                if let channelDelegate = self.channelDelegate {
+                    channelDelegate.onReceivedHttpAuthRequest(
+                        challenge: HttpAuthenticationChallenge(fromChallenge: challenge),
+                        callback: callback)
+                } else {
+                    callback.defaultBehaviour(nil)
+                }
+            }
+
+            runCallback()
+        } else if challenge.protectionSpace.authenticationMethod
+            == NSURLAuthenticationMethodServerTrust
+        {
+            guard let serverTrust = challenge.protectionSpace.serverTrust else {
+                completionHandler(.performDefaultHandling, nil)
+                return
+            }
+
+            if let scheme = challenge.protectionSpace.protocol, scheme == "https" {
+                DispatchQueue.global(qos: .background).async {
+                    if let sslCertificate = challenge.protectionSpace.sslCertificate {
+                        DispatchQueue.main.async {
+                            InAppWebView.sslCertificatesMap[challenge.protectionSpace.host] =
+                                sslCertificate
+                        }
+                    }
+                }
+            }
+
+            let callback = WebViewChannelDelegate.ReceivedServerTrustAuthRequestCallback()
+            callback.nonNullSuccess = { (response: ServerTrustAuthResponse) in
+                if let action = response.action {
+                    completionHandlerCalled = true
+                    switch action {
+                    case 0:
+                        InAppWebView.credentialsProposed = []
+                        completionHandler(.cancelAuthenticationChallenge, nil)
+                        break
+                    case 1:
+                        DispatchQueue.global(qos: .background).async {
+                            let exceptions = SecTrustCopyExceptions(serverTrust)
+                            SecTrustSetExceptions(serverTrust, exceptions)
+                            let credential = URLCredential(trust: serverTrust)
+                            completionHandler(.useCredential, credential)
+                        }
+                        break
+                    default:
+                        InAppWebView.credentialsProposed = []
+                        completionHandler(.performDefaultHandling, nil)
+                    }
+                    return false
+                }
+                return true
+            }
+            callback.defaultBehaviour = { (response: ServerTrustAuthResponse?) in
+                if !completionHandlerCalled {
+                    completionHandlerCalled = true
+                    completionHandler(.performDefaultHandling, nil)
+                }
+            }
+            callback.error = { [weak callback] (code: String, message: String?, details: Any?) in
+                print(code + ", " + (message ?? ""))
+                callback?.defaultBehaviour(nil)
+            }
+
+            let runCallback = {
+                if let channelDelegate = self.channelDelegate {
+                    channelDelegate.onReceivedServerTrustAuthRequest(
+                        challenge: ServerTrustChallenge(fromChallenge: challenge),
+                        callback: callback)
+                } else {
+                    callback.defaultBehaviour(nil)
+                }
+            }
+
+            runCallback()
+        } else if challenge.protectionSpace.authenticationMethod
+            == NSURLAuthenticationMethodClientCertificate
+        {
+            let callback = WebViewChannelDelegate.ReceivedClientCertRequestCallback()
+            callback.nonNullSuccess = { (response: ClientCertResponse) in
+                if let action = response.action {
+                    completionHandlerCalled = true
+                    switch action {
+                    case 0:
+                        completionHandler(.cancelAuthenticationChallenge, nil)
+                        break
+                    case 1:
+                        let certificatePath = response.certificatePath
+                        let certificatePassword = response.certificatePassword ?? ""
+
+                        var path: String = certificatePath
+                        do {
+                            if let plugin = self.plugin {
+                                path = try Util.getAbsPathAsset(
+                                    plugin: plugin, assetFilePath: certificatePath)
+                            }
+                        } catch {}
+
+                        if let PKCS12Data = NSData(contentsOfFile: path),
+                            let identityAndTrust: IdentityAndTrust = self.extractIdentity(
+                                PKCS12Data: PKCS12Data, password: certificatePassword)
+                        {
+                            let urlCredential: URLCredential = URLCredential(
+                                identity: identityAndTrust.identityRef,
+                                certificates: identityAndTrust.certArray as? [AnyObject],
+                                persistence: URLCredential.Persistence.forSession)
+                            completionHandler(.useCredential, urlCredential)
+                        } else {
+                            completionHandler(.performDefaultHandling, nil)
+                        }
+
+                        break
+                    case 2:
+                        completionHandler(.cancelAuthenticationChallenge, nil)
+                        break
+                    default:
+                        completionHandler(.performDefaultHandling, nil)
+                    }
+                    return false
+                }
+                return true
+            }
+            callback.defaultBehaviour = { (response: ClientCertResponse?) in
+                if !completionHandlerCalled {
+                    completionHandlerCalled = true
+                    completionHandler(.performDefaultHandling, nil)
+                }
+            }
+            callback.error = { [weak callback] (code: String, message: String?, details: Any?) in
+                print(code + ", " + (message ?? ""))
+                callback?.defaultBehaviour(nil)
+            }
+
+            let runCallback = {
+                if let channelDelegate = self.channelDelegate {
+                    channelDelegate.onReceivedClientCertRequest(
+                        challenge: ClientCertChallenge(fromChallenge: challenge), callback: callback
+                    )
+                } else {
+                    callback.defaultBehaviour(nil)
+                }
+            }
+
+            runCallback()
+        } else {
+            completionHandler(.performDefaultHandling, nil)
+        }
+    }
+
+    struct IdentityAndTrust {
+        var identityRef: SecIdentity
+        var trust: SecTrust
+        var certArray: AnyObject
+    }
+
+    func extractIdentity(PKCS12Data: NSData, password: String) -> IdentityAndTrust? {
+        var identityAndTrust: IdentityAndTrust?
+        var securityError: OSStatus = errSecSuccess
+
+        var importResult: CFArray?
+        securityError = SecPKCS12Import(
+            PKCS12Data as NSData,
+            [kSecImportExportPassphrase as String: password] as NSDictionary,
+            &importResult
+        )
+
+        if securityError == errSecSuccess {
+            let certItems: CFArray = importResult! as CFArray
+            let certItemsArray: Array = certItems as Array
+            let dict: AnyObject? = certItemsArray.first
+            if let certEntry: Dictionary = dict as? [String: AnyObject] {
+                let identityPointer: AnyObject? = certEntry["identity"]
+                let secIdentityRef: SecIdentity = (identityPointer as! SecIdentity?)!
+                let trustPointer: AnyObject? = certEntry["trust"]
+                let trustRef: SecTrust = trustPointer as! SecTrust
+                let chainPointer: AnyObject? = certEntry["chain"]
+                identityAndTrust = IdentityAndTrust(
+                    identityRef: secIdentityRef, trust: trustRef, certArray: chainPointer!)
+            }
+        } else {
+            print("Security Error: " + securityError.description)
+        }
+        return identityAndTrust
+    }
+
 
     public func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
         channel?.invokeMethod("onWebContentProcessDidTerminate", arguments: [:])
@@ -832,8 +1110,71 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             "targetFrame": targetFrame,
         ]
 
-        channel?.invokeMethod("shouldOverrideUrlLoading", arguments: arguments)
-        decisionHandler(.allow)
+        // Honor `useShouldOverrideUrlLoading` opt-in (mirrors iOS). When the
+        // Dart side has not enabled the callback, fall through to the default
+        // `.allow` policy without round-tripping through the method channel.
+        let useShouldOverrideUrlLoading =
+            (settings?.useShouldOverrideUrlLoading == true)
+        guard useShouldOverrideUrlLoading else {
+            decisionHandler(.allow)
+            return
+        }
+
+        guard let channel = self.channel else {
+            decisionHandler(.allow)
+            return
+        }
+
+        // Await the Dart-side `shouldOverrideUrlLoading` callback before
+        // resolving the navigation policy. Previously this was invoked
+        // fire-and-forget and `decisionHandler(.allow)` was called
+        // unconditionally, so the user's `NavigationActionPolicy.CANCEL`
+        // (e.g. to block `intent:` or custom schemes) was silently ignored.
+        //
+        // The Dart handler returns the `NavigationActionPolicy` native int:
+        //   0 = CANCEL, 1 = ALLOW, 2 = DOWNLOAD (iOS 14.5+ only — not yet
+        //   exposed on macOS; treat as CANCEL to honor the user's intent to
+        //   block rather than silently allow).
+        var decisionHandlerCalled = false
+        let resolvePolicy: (WKNavigationActionPolicy) -> Void = { policy in
+            guard !decisionHandlerCalled else { return }
+            decisionHandlerCalled = true
+            decisionHandler(policy)
+        }
+
+        channel.invokeMethod(
+            "shouldOverrideUrlLoading",
+            arguments: arguments
+        ) { result in
+            let policy: WKNavigationActionPolicy
+            if let action = result as? Int {
+                switch action {
+                case 1:
+                    policy = .allow
+                case 0, 2:
+                    // 0 = CANCEL; 2 = DOWNLOAD (not supported on macOS yet —
+                    // fall back to CANCEL so we never silently allow a
+                    // navigation the user explicitly tried to block).
+                    policy = .cancel
+                default:
+                    policy = .cancel
+                }
+            } else if let action = result as? NSNumber {
+                // The Flutter channel may surface the int as NSNumber on
+                // macOS. Normalize before comparing.
+                switch action.intValue {
+                case 1: policy = .allow
+                default: policy = .cancel
+                }
+            } else {
+                // Dart side returns ALLOW (1) when no callback is registered
+                // and CANCEL (0) when the callback returns null. Any other
+                // shape is treated as a safe-default CANCEL so a buggy
+                // handler can never accidentally allow a blocked scheme.
+                policy = .cancel
+            }
+            resolvePolicy(policy)
+        }
     }
 
     public func webView(

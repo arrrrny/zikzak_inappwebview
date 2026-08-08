@@ -1486,6 +1486,52 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   )
   bool? alwaysBounceHorizontal;
 
+  ///A Boolean value that controls whether the scroll view bounces when it reaches
+  ///the end of its horizontal content.
+  ///
+  ///When set to `false`, horizontal scrolling does not produce a bounce effect
+  ///even when [InAppWebViewSettings.disallowOverScroll] is `false` and
+  ///[InAppWebViewSettings.alwaysBounceHorizontal] is `false`. The default value
+  ///is `true`.
+  ///
+  ///This property is only applied on iOS 17.4 and newer; on earlier iOS versions
+  ///it is a no-op. When left `null`, no override is applied and the scroll view's
+  ///own default is preserved.
+  @SupportedPlatforms(
+    platforms: [
+      IOSPlatform(
+        available: "17.4",
+        apiName: "UIScrollView.bouncesHorizontally",
+        apiUrl:
+            "https://developer.apple.com/documentation/uikit/uiscrollview/4210610-bounceshorizontally",
+      ),
+    ],
+  )
+  bool? bouncesHorizontally;
+
+  ///A Boolean value that controls whether the scroll view bounces when it reaches
+  ///the end of its vertical content.
+  ///
+  ///When set to `false`, vertical scrolling does not produce a bounce effect
+  ///even when [InAppWebViewSettings.disallowOverScroll] is `false` and
+  ///[InAppWebViewSettings.alwaysBounceVertical] is `false`. The default value
+  ///is `true`.
+  ///
+  ///This property is only applied on iOS 17.4 and newer; on earlier iOS versions
+  ///it is a no-op. When left `null`, no override is applied and the scroll view's
+  ///own default is preserved.
+  @SupportedPlatforms(
+    platforms: [
+      IOSPlatform(
+        available: "17.4",
+        apiName: "UIScrollView.bouncesVertically",
+        apiUrl:
+            "https://developer.apple.com/documentation/uikit/uiscrollview/4210612-bouncesvertically",
+      ),
+    ],
+  )
+  bool? bouncesVertically;
+
   ///A Boolean value that controls whether the scroll-to-top gesture is enabled.
   ///The scroll-to-top gesture is a tap on the status bar. When a user makes this gesture,
   ///the system asks the scroll view closest to the status bar to scroll to the top.
@@ -2237,6 +2283,8 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.decelerationRate = ScrollViewDecelerationRate_.NORMAL,
     this.alwaysBounceVertical = false,
     this.alwaysBounceHorizontal = false,
+    this.bouncesHorizontally,
+    this.bouncesVertically,
     this.scrollsToTop = true,
     this.isPagingEnabled = false,
     this.maximumZoomScale = 1.0,
