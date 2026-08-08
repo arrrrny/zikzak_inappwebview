@@ -8,9 +8,11 @@ buildscript {
     }
 
     dependencies {
-        // AGP 8.5.2 automatically enables 16KB page size alignment (requires >= 8.5.1)
-        // This ensures compatibility with Android 15+ devices using 16KB memory pages
-        classpath 'com.android.tools.build:gradle:8.5.2'
+        // AGP 8.13.1 — current stable 8.x (matches webview_flutter_android reference).
+        // 16KB page size alignment is enabled automatically (requires AGP >= 8.5.1).
+        // This ensures compatibility with Android 15+ devices using 16KB memory pages.
+        // See #70 for the planned AGP 9.0 / built-in Kotlin migration.
+        classpath 'com.android.tools.build:gradle:8.13.1'
     }
 }
 
@@ -31,8 +33,8 @@ android {
     compileSdkVersion 36
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     defaultConfig {
@@ -56,7 +58,7 @@ android {
         }
     }
     dependencies {
-        implementation 'androidx.webkit:webkit:1.14.0'
+        implementation 'androidx.webkit:webkit:1.15.0'
         implementation 'androidx.browser:browser:1.8.0'
         implementation 'androidx.appcompat:appcompat:1.7.0'
         implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
