@@ -257,6 +257,43 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
           if (contextMenu.onContextMenuActionItemClicked != null) {
             contextMenu.onContextMenuActionItemClicked!(menuItemClicked);
           }
+
+      case 'onReceivedHttpAuthRequest':
+        if (params.webviewParams?.onReceivedHttpAuthRequest != null) {
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
+          HttpAuthenticationChallenge challenge =
+              HttpAuthenticationChallenge.fromMap(arguments)!;
+          return (await params.webviewParams!.onReceivedHttpAuthRequest!(
+            controller,
+            challenge,
+          ))?.toMap();
+        }
+        break;
+      case 'onReceivedServerTrustAuthRequest':
+        if (params.webviewParams?.onReceivedServerTrustAuthRequest != null) {
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
+          ServerTrustChallenge challenge = ServerTrustChallenge.fromMap(
+            arguments,
+          )!;
+          return (await params.webviewParams!.onReceivedServerTrustAuthRequest!(
+            controller,
+            challenge,
+          ))?.toMap();
+        }
+        break;
+      case 'onReceivedClientCertRequest':
+        if (params.webviewParams?.onReceivedClientCertRequest != null) {
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
+          ClientCertChallenge challenge = ClientCertChallenge.fromMap(
+            arguments,
+          )!;
+          return (await params.webviewParams!.onReceivedClientCertRequest!(
+            controller,
+            challenge,
+          ))?.toMap();
         }
         break;
       default:
