@@ -28,5 +28,12 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<!-- Media-capture usage strings so WKWebView can prompt for camera/microphone
+	     via getUserMedia() on macOS (issue #195). Without these the system denies
+	     access at the TCC layer even after the WKPermissionDecision is .grant. -->
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs camera access so web pages can use the camera via getUserMedia().</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app needs microphone access so web pages can use the microphone via getUserMedia().</string>
 </dict>
 </plist>
