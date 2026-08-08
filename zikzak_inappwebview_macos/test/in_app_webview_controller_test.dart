@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 import 'package:zikzak_inappwebview_macos/src/in_app_webview/in_app_webview_controller.dart';
@@ -125,5 +126,113 @@ void main() {
       expect(controller.hasJavaScriptHandler(handlerName: 'persist'), isFalse);
       expect(controller.hasJavaScriptHandler(handlerName: 'persist2'), isFalse);
     });
+  });
+
+  // Regression test for issue #192:
+  // https://github.com/arrrrny/zikzak_inappwebview/issues/192
+  //
+  // On macOS, `InAppWebView.swift` `decidePolicyFor navigationAction:` used
+  // to invoke `shouldOverrideUrlLoading` on the method channel fire-and-
+  // forget and then unconditionally call `decisionHandler(.allow)`. The fix
+  // awaits the Dart-side response and maps the returned
+  // `NavigationActionPolicy` int (0=cancel, 1=allow, 2=download) to the
+  // `WKNavigationActionPolicy` handed to `decisionHandler`.
+  //
+  // These tests pin the *Dart-side* channel contract that the Swift fix
+  // relies on: the integer returned by `handleMethod('shouldOverrideUrlLoading')`
+  // must match `NavigationActionPolicy.*.toNativeValue()` so the native side
+  // can decode it correctly.
+  group('shouldOverrideUrlLoading channel contract (issue #192)', () {
+    /// Build a `MethodCall` that mirrors the payload the macOS
+    /// `InAppWebView.swift` sends to Dart when a navigation action is about
+    /// to occur. Only the fields consumed by `NavigationAction.fromMap` are
+    /// populated; the rest default to `null` on the Dart side.
+    MethodCall shouldOverrideUrlLoadingCall(String url) {
+      return MethodCall('shouldOverrideUrlLoading', {
+        'navigationAction': {
+          'request': {'url': url},
+          'isForMainFrame': true,
+        },
+      });
+    }
+
+    test('returns ALLOW (1) when no callback is registered', () async {
+      // `controller` from setUp has no `shouldOverrideUrlLoading` wired up.
+      final result = await controller.handleMethod(
+        shouldOverrideUrlLoadingCall('https://example.com'),
+      );
+      expect(result, NavigationActionPolicy.ALLOW.toNativeValue());
+    });
+
+    test(
+      'returns CANCEL (0) when the callback blocks a non-allowed scheme (intent:)',
+      () async {
+        final widgetParams = PlatformInAppWebViewWidgetCreationParams(
+          controllerFromPlatform: (c) => c,
+          shouldOverrideUrlLoading: (c, navigationAction) async {
+            final url = navigationAction.request.url;
+            if (url != null && url.scheme == 'intent') {
+              return NavigationActionPolicy.CANCEL;
+            }
+            return NavigationActionPolicy.ALLOW;
+          },
+        );
+        final controllerParams = PlatformInAppWebViewControllerCreationParams(
+          id: 54321,
+          webviewParams: widgetParams,
+        );
+        final ctrl = MacOSInAppWebViewController(controllerParams);
+        addTearDown(ctrl.dispose);
+
+        final blockedResult = await ctrl.handleMethod(
+          shouldOverrideUrlLoadingCall('intent://example.com#Intent;end;'),
+        );
+        expect(
+          blockedResult,
+          NavigationActionPolicy.CANCEL.toNativeValue(),
+          reason:
+              'A blocked scheme must surface as CANCEL (0) so the macOS '
+              'native side calls `decisionHandler(.cancel)` and stops the '
+              'navigation. This is the exact regression from issue #192.',
+        );
+
+        final allowedResult = await ctrl.handleMethod(
+          shouldOverrideUrlLoadingCall('https://example.com'),
+        );
+        expect(
+          allowedResult,
+          NavigationActionPolicy.ALLOW.toNativeValue(),
+          reason: 'Allowed schemes must surface as ALLOW (1).',
+        );
+      },
+    );
+
+    test(
+      'returns CANCEL (0) when the callback returns null (safe default)',
+      () async {
+        final widgetParams = PlatformInAppWebViewWidgetCreationParams(
+          controllerFromPlatform: (c) => c,
+          shouldOverrideUrlLoading: (c, navigationAction) async => null,
+        );
+        final controllerParams = PlatformInAppWebViewControllerCreationParams(
+          id: 67890,
+          webviewParams: widgetParams,
+        );
+        final ctrl = MacOSInAppWebViewController(controllerParams);
+        addTearDown(ctrl.dispose);
+
+        final result = await ctrl.handleMethod(
+          shouldOverrideUrlLoadingCall('https://example.com'),
+        );
+        expect(
+          result,
+          NavigationActionPolicy.CANCEL.toNativeValue(),
+          reason:
+              'When the callback is registered but returns null, the Dart '
+              'side must default to CANCEL so the native side never silently '
+              'allows a navigation the user did not explicitly approve.',
+        );
+      },
+    );
   });
 }
