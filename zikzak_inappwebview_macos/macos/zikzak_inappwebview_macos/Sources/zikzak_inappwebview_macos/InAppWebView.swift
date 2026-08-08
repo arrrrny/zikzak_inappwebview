@@ -449,7 +449,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         if newSettingsMap["javaScriptEnabled"] != nil
             && settings?.javaScriptEnabled != newSettings.javaScriptEnabled
         {
-            configuration.preferences.javaScriptEnabled = newSettings.javaScriptEnabled
+            configuration.defaultWebpagePreferences.allowsContentJavaScript = newSettings.javaScriptEnabled
         }
 
         if newSettingsMap["javaScriptCanOpenWindowsAutomatically"] != nil
