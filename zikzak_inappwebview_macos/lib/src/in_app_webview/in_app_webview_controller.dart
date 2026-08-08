@@ -31,6 +31,16 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
   /// `_inAppBrowser!.contextMenu`).
   ContextMenu? _contextMenu;
 
+  /// Whether `setContextMenu` has been called at least once.
+  ///
+  /// Without this flag, an explicit `setContextMenu(null)` could not clear
+  /// a construction-time `webviewParams.contextMenu`: the event handlers
+  /// fell back to `webviewParams?.contextMenu` whenever `_contextMenu` was
+  /// null, so the original menu kept receiving lifecycle callbacks forever.
+  /// When true, the event handlers prefer `_contextMenu` (even if null)
+  /// and skip the construction-time fallback.
+  bool _contextMenuSet = false;
+
   MacOSInAppWebViewController(
     PlatformInAppWebViewControllerCreationParams params,
   ) : super.implementation(params) {
@@ -229,8 +239,9 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
         }
         break;
       case 'onCreateContextMenu':
-        ContextMenu? contextMenu =
-            _contextMenu ?? webviewParams?.contextMenu;
+        ContextMenu? contextMenu = _contextMenuSet
+            ? _contextMenu
+            : webviewParams?.contextMenu;
         if (contextMenu != null && contextMenu.onCreateContextMenu != null) {
           Map<String, dynamic> arguments =
               (call.arguments as Map<dynamic, dynamic>)
@@ -241,15 +252,17 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
         }
         break;
       case 'onHideContextMenu':
-        ContextMenu? contextMenu =
-            _contextMenu ?? webviewParams?.contextMenu;
+        ContextMenu? contextMenu = _contextMenuSet
+            ? _contextMenu
+            : webviewParams?.contextMenu;
         if (contextMenu != null && contextMenu.onHideContextMenu != null) {
           contextMenu.onHideContextMenu!();
         }
         break;
       case 'onContextMenuActionItemClicked':
-        ContextMenu? contextMenu =
-            _contextMenu ?? webviewParams?.contextMenu;
+        ContextMenu? contextMenu = _contextMenuSet
+            ? _contextMenu
+            : webviewParams?.contextMenu;
         if (contextMenu != null) {
           dynamic id = call.arguments['id'];
           String title = call.arguments['title'];
@@ -509,6 +522,10 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
     // new menu's callbacks (the construction-time webviewParams.contextMenu
     // is final and cannot be updated).
     _contextMenu = contextMenu;
+    // Mark that setContextMenu was explicitly called. Without this, an
+    // explicit setContextMenu(null) could not clear a construction-time
+    // menu — see _contextMenuSet docs above.
+    _contextMenuSet = true;
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("contextMenu", () => contextMenu?.toMap());
     await _channel.invokeMethod('setContextMenu', args);

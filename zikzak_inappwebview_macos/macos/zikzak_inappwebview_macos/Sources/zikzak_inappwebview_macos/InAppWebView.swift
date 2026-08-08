@@ -12,6 +12,18 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     public var settings: InAppWebViewSettings?
     var contextMenu: [String: Any]?
     var contextMenuIsShowing = false
+
+    /// Set by the WKUIDelegate when returning `nil` from
+    /// `webView(_:contextMenuForElement:willDisplayWithHighlight:)` in the
+    /// cases where we want to actually suppress the menu (not let WebKit
+    /// show its default NSMenu). Consumed by `willOpenMenu(_:with:)`, which
+    /// cancels tracking on the upcoming default menu.
+    ///
+    /// Currently set when `hideDefaultSystemContextMenuItems == true` and no
+    /// custom menu items are present (the only case where the setting is
+    /// observable on macOS — when custom items exist they already *replace*
+    /// the default menu, so there's nothing to hide).
+    var suppressDefaultMenuNext = false
     /// Retains ContextMenuItemTarget objects for the lifetime of the currently
     /// displayed menu so NSMenuItem targets are not deallocated before click.
     var contextMenuItemTargets: [ContextMenuItemTarget] = []
@@ -2494,17 +2506,24 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         // custom items to the system items — when any custom items are present
         // they *replace* the default menu. `hideDefaultSystemContextMenuItems`
         // therefore only changes behavior when there are NO custom items:
-        //   true  + no custom items => suppress the menu entirely (return nil)
-        //   false + no custom items => let WebKit show its default menu (also
-        //                              return nil here; we cannot fetch defaults
-        //                              without dropping the uiDelegate — see note)
-        // To literally merge with defaults you would need to temporarily nil-out
-        // `webView.uiDelegate`, ask WebKit for the default menu, then restore
-        // the delegate — left as a follow-up.
+        //   true  + no custom items => suppress the menu entirely
+        //   false + no custom items => let WebKit show its default menu
+        //
+        // Returning nil from this delegate method lets WebKit show its default
+        // menu (per Apple's WKUIDelegate documentation). To actually suppress
+        // the menu when `hideDefaultSystemContextMenuItems == true`, we set the
+        // `suppressDefaultMenuNext` flag and cancel tracking in
+        // `willOpenMenu(_:with:)` — the supported macOS override path.
         if customMenu.items.isEmpty {
+            if contextMenuSettings.hideDefaultSystemContextMenuItems {
+                // Suppress the default menu: set the flag so willOpenMenu cancels
+                // WebKit's default NSMenu before it's shown.
+                suppressDefaultMenuNext = true
+            }
             // Same rationale as the `guard let menu` branch above: we already
             // fired onCreateContextMenu, but we're returning nil so WebKit shows
-            // its default menu — balance the event by firing onHideContextMenu.
+            // its default menu (or, when suppressed, no menu at all) — balance
+            // the event by firing onHideContextMenu.
             onHideContextMenu()
             return nil
         }
@@ -2548,6 +2567,35 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         }
 
         return HitTestResult(type: type, extra: extra)
+    }
+
+    // MARK: - Default-menu suppression (WKWebView default NSMenu)
+
+    /// Called by AppKit when a contextual menu is about to be displayed.
+    ///
+    /// When the WKUIDelegate returns `nil` from
+    /// `webView(_:contextMenuForElement:willDisplayWithHighlight:)`, WebKit
+    /// falls back to its default NSMenu (per Apple's documentation). To
+    /// honor `hideDefaultSystemContextMenuItems == true` with no custom items,
+    /// we set `suppressDefaultMenuNext` in the delegate and cancel tracking
+    /// here before the default menu becomes visible.
+    ///
+    /// This override is the supported macOS menu-override path (per
+    /// CodeRabbit's review of commit 62971480). It only fires when the
+    /// delegate returned `nil`; when the delegate returned our custom
+    /// `NSMenu`, the flag is false and we simply forward to `super`.
+    public override func willOpenMenu(_ menu: NSMenu, with event: NSEvent?) {
+        super.willOpenMenu(menu, with: event)
+        if suppressDefaultMenuNext {
+            suppressDefaultMenuNext = false
+            // Cancel tracking on the default menu so it is not displayed.
+            // Dispatching async ensures the menu has entered its tracking
+            // loop before we cancel (cancelTracking on a menu that has not
+            // yet started tracking is a no-op).
+            DispatchQueue.main.async { [weak menu] in
+                menu?.cancelTracking()
+            }
+        }
     }
 
     // MARK: - NSMenuDelegate

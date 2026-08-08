@@ -134,6 +134,60 @@ void main() {
         null,
       );
     });
+
+    test('setContextMenu(null) suppresses construction-time contextMenu', () async {
+      // Regression: previously _contextMenu ?? webviewParams?.contextMenu
+      // would fall back to the construction-time menu after setContextMenu(null),
+      // so the original menu's onCreateContextMenu would still fire.
+      var originalCreateCalled = false;
+
+      final originalMenu = ContextMenu(
+        menuItems: [],
+        onCreateContextMenu: (_) {
+          originalCreateCalled = true;
+        },
+      );
+
+      // Build a controller whose construction-time contextMenu is originalMenu.
+      controller.dispose();
+      final widgetParams = PlatformInAppWebViewWidgetCreationParams(
+        controllerFromPlatform: (c) => c,
+        contextMenu: originalMenu,
+      );
+      final controllerParams = PlatformInAppWebViewControllerCreationParams(
+        id: 88888,
+        webviewParams: widgetParams,
+      );
+      controller = MacOSInAppWebViewController(controllerParams);
+
+      TestDefaultBinaryMessengerBinding
+          .instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+        const MethodChannel('dev.zuzu/zikzak_inappwebview_88888'),
+        (MethodCall call) async => true,
+      );
+
+      // Explicitly clear the menu.
+      await controller.setContextMenu(null);
+
+      // Simulate the native side firing onCreateContextMenu.
+      await controller.handleMethod(
+        const MethodCall('onCreateContextMenu',
+            {'type': 7, 'extra': 'https://example.com'}),
+      );
+
+      expect(originalCreateCalled, isFalse,
+          reason:
+              'construction-time menu onCreateContextMenu must not fire after '
+              'setContextMenu(null)');
+
+      TestDefaultBinaryMessengerBinding
+          .instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+        const MethodChannel('dev.zuzu/zikzak_inappwebview_88888'),
+        null,
+      );
+    });
   });
 
   group('onCreateContextMenu event', () {
