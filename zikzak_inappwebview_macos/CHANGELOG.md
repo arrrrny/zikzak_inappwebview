@@ -17,6 +17,13 @@
   keys and `com.apple.security.device.camera` / `com.apple.security.device.audio-input`
   entitlements, and added a `getUserMedia()` test button to the example app.
   Closes #195
+- Fixed: macOS `webViewWebContentProcessDidTerminate` now implemented on the
+  `WKNavigationDelegate` — when WebKit kills the content process (memory
+  pressure, crash) the `onWebContentProcessDidTerminate` callback now reaches
+  Dart and the WebView auto-reloads after 500 ms (mirrors the iOS behavior from
+  #154), instead of leaving a blank/unrecoverable WebView. Closes #194
+- Fixed: macOS `InAppBrowser` now forwards `onWebContentProcessDidTerminate`
+  to the `InAppBrowserEventHandler`, matching the standalone WebView path
 
 ## 4.6.3 - 2026-07-21
 

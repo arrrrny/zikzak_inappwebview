@@ -5,6 +5,7 @@ public class InAppWebViewFlutterPlugin: NSObject, FlutterPlugin {
     var headlessInAppWebViewManager: HeadlessInAppWebViewManager?
     var inAppBrowserManager: InAppBrowserManager?
     var myCookieManager: MyCookieManager?
+    var credentialDatabase: CredentialDatabase?
     var printJobManager: PrintJobManager?
     var registrar: FlutterPluginRegistrar?
     
@@ -20,6 +21,7 @@ public class InAppWebViewFlutterPlugin: NSObject, FlutterPlugin {
         instance.headlessInAppWebViewManager = HeadlessInAppWebViewManager(registrar: registrar)
         instance.inAppBrowserManager = InAppBrowserManager(registrar: registrar)
         instance.myCookieManager = MyCookieManager(registrar: registrar)
+        instance.credentialDatabase = CredentialDatabase(plugin: instance)
         instance.printJobManager = PrintJobManager(plugin: instance)
     }
 
@@ -31,6 +33,8 @@ public class InAppWebViewFlutterPlugin: NSObject, FlutterPlugin {
         headlessInAppWebViewManager = nil
         inAppBrowserManager = nil
         myCookieManager = nil
+        credentialDatabase?.dispose()
+        credentialDatabase = nil
         printJobManager?.dispose()
         printJobManager = nil
     }

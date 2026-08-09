@@ -156,6 +156,18 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
 
     public Boolean dismissDialogues = true;
 
+    /**
+     * Which window insets the WebView should <b>ignore</b> when laying out
+     * web content, so that content can render edge-to-edge behind the
+     * status bar, navigation bar, IME, display cutout and/or system-gesture
+     * areas. Each entry is one of the {@link wtf.zikzak.zikzak_inappwebview_android.types.WebViewInsets}
+     * wire values (e.g. {@code "systemBars"}, {@code "ime"},
+     * {@code "displayCutout"}). {@code null} or empty keeps the default
+     * Android behavior (the WebView is inset by the system bars / IME).
+     */
+    @Nullable
+    public List<String> insetsForWebContentToIgnore = null;
+
     @NonNull
     @Override
     public InAppWebViewSettings parse(@NonNull Map<String, Object> settings) {
@@ -454,6 +466,9 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
                 case "dismissDialogues":
                     dismissDialogues = (Boolean) value;
                     break;
+                case "insetsForWebContentToIgnore":
+                    insetsForWebContentToIgnore = (List<String>) value;
+                    break;
             }
         }
 
@@ -628,6 +643,7 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
         );
         settings.put("stylusHandwritingEnabled", stylusHandwritingEnabled);
         settings.put("dismissDialogues", dismissDialogues);
+        settings.put("insetsForWebContentToIgnore", insetsForWebContentToIgnore);
         return settings;
     }
 

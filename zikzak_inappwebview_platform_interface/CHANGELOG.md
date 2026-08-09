@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Added iOS proxy support (iOS 17.0+) — set process-wide proxy for WKWebView
+- Added `bouncesHorizontally` / `bouncesVertically` to `InAppWebViewSettings` (iOS 17.4+) — per-axis `UIScrollView` bounce control. No-op below iOS 17.4 and when left `null`. Closes #199.
 
 
 - Fixed: Web/WASM build failure — `HeadlessInAppWebViewWeb.dispose()` missing

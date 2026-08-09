@@ -21,6 +21,26 @@ final _JAVASCRIPT_HANDLER_FORBIDDEN_NAMES = UnmodifiableListView<String>([
 ]);
 
 class MacOSInAppWebViewController extends PlatformInAppWebViewController {
+  /// Mutable override for the context menu set via [setContextMenu].
+  ///
+  /// The construction-time [PlatformWebViewCreationParams.contextMenu] is
+  /// `final`, so without this override, calling `setContextMenu(newMenu)`
+  /// would update the native side but leave Dart-side event routing stuck on
+  /// the old menu. Event handlers prefer this field, falling back to
+  /// `webviewParams?.contextMenu` (mirroring the iOS port's fallback to
+  /// `_inAppBrowser!.contextMenu`).
+  ContextMenu? _contextMenu;
+
+  /// Whether `setContextMenu` has been called at least once.
+  ///
+  /// Without this flag, an explicit `setContextMenu(null)` could not clear
+  /// a construction-time `webviewParams.contextMenu`: the event handlers
+  /// fell back to `webviewParams?.contextMenu` whenever `_contextMenu` was
+  /// null, so the original menu kept receiving lifecycle callbacks forever.
+  /// When true, the event handlers prefer `_contextMenu` (even if null)
+  /// and skip the construction-time fallback.
+  bool _contextMenuSet = false;
+
   MacOSInAppWebViewController(
     PlatformInAppWebViewControllerCreationParams params,
   ) : super.implementation(params) {
@@ -162,6 +182,13 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
           );
         }
         break;
+      case 'onWebContentProcessDidTerminate':
+        if (params.webviewParams?.onWebContentProcessDidTerminate != null) {
+          params.webviewParams!.onWebContentProcessDidTerminate!(
+            controller,
+          );
+        }
+        break;
       case 'onJsAlert':
         if (params.webviewParams?.onJsAlert != null) {
           Map<String, dynamic> arguments = call.arguments
@@ -216,6 +243,92 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
             debugPrint(error.toString() + '\n' + stacktrace.toString());
             throw Exception(error.toString().replaceFirst('Exception: ', ''));
           }
+        }
+        break;
+      case 'onCreateContextMenu':
+        ContextMenu? contextMenu = _contextMenuSet
+            ? _contextMenu
+            : webviewParams?.contextMenu;
+        if (contextMenu != null && contextMenu.onCreateContextMenu != null) {
+          Map<String, dynamic> arguments =
+              (call.arguments as Map<dynamic, dynamic>)
+                  .cast<String, dynamic>();
+          InAppWebViewHitTestResult hitTestResult =
+              InAppWebViewHitTestResult.fromMap(arguments)!;
+          contextMenu.onCreateContextMenu!(hitTestResult);
+        }
+        break;
+      case 'onHideContextMenu':
+        ContextMenu? contextMenu = _contextMenuSet
+            ? _contextMenu
+            : webviewParams?.contextMenu;
+        if (contextMenu != null && contextMenu.onHideContextMenu != null) {
+          contextMenu.onHideContextMenu!();
+        }
+        break;
+      case 'onContextMenuActionItemClicked':
+        ContextMenu? contextMenu = _contextMenuSet
+            ? _contextMenu
+            : webviewParams?.contextMenu;
+        if (contextMenu != null) {
+          dynamic id = call.arguments['id'];
+          String title = call.arguments['title'];
+          ContextMenuItem menuItemClicked = ContextMenuItem(
+            id: id,
+            title: title,
+            action: null,
+          );
+          for (var menuItem in contextMenu.menuItems) {
+            if (menuItem.id == id) {
+              menuItemClicked = menuItem;
+              if (menuItem.action != null) {
+                menuItem.action!();
+              }
+              break;
+            }
+          }
+          if (contextMenu.onContextMenuActionItemClicked != null) {
+            contextMenu.onContextMenuActionItemClicked!(menuItemClicked);
+          }
+        }
+        break;
+
+      case 'onReceivedHttpAuthRequest':
+        if (params.webviewParams?.onReceivedHttpAuthRequest != null) {
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
+          HttpAuthenticationChallenge challenge =
+              HttpAuthenticationChallenge.fromMap(arguments)!;
+          return (await params.webviewParams!.onReceivedHttpAuthRequest!(
+            controller,
+            challenge,
+          ))?.toMap();
+        }
+        break;
+      case 'onReceivedServerTrustAuthRequest':
+        if (params.webviewParams?.onReceivedServerTrustAuthRequest != null) {
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
+          ServerTrustChallenge challenge = ServerTrustChallenge.fromMap(
+            arguments,
+          )!;
+          return (await params.webviewParams!.onReceivedServerTrustAuthRequest!(
+            controller,
+            challenge,
+          ))?.toMap();
+        }
+        break;
+      case 'onReceivedClientCertRequest':
+        if (params.webviewParams?.onReceivedClientCertRequest != null) {
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
+          ClientCertChallenge challenge = ClientCertChallenge.fromMap(
+            arguments,
+          )!;
+          return (await params.webviewParams!.onReceivedClientCertRequest!(
+            controller,
+            challenge,
+          ))?.toMap();
         }
         break;
       default:
@@ -407,6 +520,22 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
       );
     }
     return null;
+  }
+
+  @override
+  Future<void> setContextMenu(ContextMenu? contextMenu) async {
+    // Keep the Dart-side reference in sync so subsequent onCreateContextMenu /
+    // onHideContextMenu / onContextMenuActionItemClicked events route to the
+    // new menu's callbacks (the construction-time webviewParams.contextMenu
+    // is final and cannot be updated).
+    _contextMenu = contextMenu;
+    // Mark that setContextMenu was explicitly called. Without this, an
+    // explicit setContextMenu(null) could not clear a construction-time
+    // menu — see _contextMenuSet docs above.
+    _contextMenuSet = true;
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent("contextMenu", () => contextMenu?.toMap());
+    await _channel.invokeMethod('setContextMenu', args);
   }
 
   @override

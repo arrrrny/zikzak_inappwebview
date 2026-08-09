@@ -65,6 +65,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.webkit.WebSettingsCompat;
 import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
@@ -87,6 +90,7 @@ import org.json.JSONObject;
 import wtf.zikzak.zikzak_inappwebview_android.InAppWebViewFlutterPlugin;
 import wtf.zikzak.zikzak_inappwebview_android.R;
 import wtf.zikzak.zikzak_inappwebview_android.Util;
+import wtf.zikzak.zikzak_inappwebview_android.types.WebViewInsets;
 import wtf.zikzak.zikzak_inappwebview_android.content_blocker.ContentBlocker;
 import wtf.zikzak.zikzak_inappwebview_android.content_blocker.ContentBlockerAction;
 import wtf.zikzak.zikzak_inappwebview_android.content_blocker.ContentBlockerHandler;
@@ -929,6 +933,11 @@ public final class InAppWebView
                 }
             }
         );
+
+        // Apply the configured window-insets to ignore (edge-to-edge /
+        // immersive) for the initial settings. Updates are handled in
+        // setSettings().
+        applyInsetsForWebContentToIgnore();
     }
 
     public void prepareAndAddUserScripts() {
@@ -2264,7 +2273,115 @@ public final class InAppWebView
             );
         }
 
+        if (newSettingsMap.containsKey("insetsForWebContentToIgnore") &&
+                !Util.objEquals(
+                    customSettings.insetsForWebContentToIgnore,
+                    newCustomSettings.insetsForWebContentToIgnore
+                )) {
+            // Assign the new settings BEFORE applying so applyInsetsForWebContentToIgnore()
+            // reads the updated value. Using containsKey (not get(...) != null) also
+            // detects a runtime reset to null so the listener gets cleared.
+            customSettings = newCustomSettings;
+            applyInsetsForWebContentToIgnore();
+            return;
+        }
         customSettings = newCustomSettings;
+    }
+
+    /**
+     * Applies the configured {@link InAppWebViewSettings#insetsForWebContentToIgnore}
+     * to this WebView.
+     *
+     * <p>For each ignored inset type the matching {@link WindowInsetsCompat.Type}
+     * mask is zeroed out via a {@link ViewCompat.OnApplyWindowInsetsListener}
+     * (using {@link WindowInsetsCompat.Builder#setInsets(int, Insets)}) so the
+     * WebView no longer pads or shrinks its content for those insets. This is
+     * the zikzak equivalent of {@code webview_flutter_android}'s
+     * {@code setInsetsForWebContentToIgnore} and enables edge-to-edge / immersive
+     * layouts where web content renders behind the status bar, navigation bar,
+     * IME, display cutout and/or system-gesture areas.</p>
+     *
+     * <p>Passing {@code null} or an empty list restores the default Android
+     * behavior (the listener is cleared).</p>
+     *
+     * <p>Note: window insets are only dispatched to platform views that use
+     * Hybrid Composition ({@link InAppWebViewSettings#useHybridComposition}).
+     * With virtual-display (non-hybrid) mode the system never dispatches real
+     * window insets to the WebView, so this setting has no effect there.</p>
+     */
+    public void applyInsetsForWebContentToIgnore() {
+        final List<String> ignored = customSettings != null
+            ? customSettings.insetsForWebContentToIgnore
+            : null;
+
+        if (ignored == null || ignored.isEmpty()) {
+            // Restore default behavior: clear any previously installed listener.
+            ViewCompat.setOnApplyWindowInsetsListener(this, null);
+            // Request a fresh insets dispatch so the WebView immediately receives
+            // the real (unfiltered) insets instead of retaining the last filtered
+            // WindowInsetsCompat until the next system event.
+            requestApplyInsets();
+            return;
+        }
+
+        int typeMask = 0;
+        for (String value : ignored) {
+            WebViewInsets insets = WebViewInsets.fromValue(value);
+            if (insets != null) {
+                typeMask |= insets.getTypeMask();
+            } else {
+                Log.w(
+                    LOG_TAG,
+                    "Unknown insetsForWebContentToIgnore value: " + value
+                );
+            }
+        }
+
+        if (typeMask == 0) {
+            // No recognized types — clear to avoid a no-op listener.
+            ViewCompat.setOnApplyWindowInsetsListener(this, null);
+            // Same as the empty-list branch: re-dispatch so the real insets are
+            // applied immediately.
+            requestApplyInsets();
+            return;
+        }
+
+        final int finalTypeMask = typeMask;
+        ViewCompat.setOnApplyWindowInsetsListener(
+            this,
+            new ViewCompat.OnApplyWindowInsetsListener() {
+                @Override
+                public WindowInsetsCompat onApplyWindowInsets(
+                    View v, WindowInsetsCompat insets
+                ) {
+                    if (insets == null) {
+                        return null;
+                    }
+                    try {
+                        WindowInsetsCompat.Builder builder =
+                            new WindowInsetsCompat.Builder(insets);
+                        // Zero out the insets the app wants the WebView to ignore
+                        // so web content is not padded/shrunk for them.
+                        builder.setInsets(finalTypeMask, Insets.NONE);
+                        return builder.build();
+                    } catch (Throwable t) {
+                        // Builder / setInsets can throw on some OEM WebView
+                        // wrappers; fall back to the original insets so the
+                        // WebView keeps working.
+                        Log.w(
+                            LOG_TAG,
+                            "Failed to apply insetsForWebContentToIgnore",
+                            t
+                        );
+                        return insets;
+                    }
+                }
+            }
+        );
+
+        // Request a fresh insets dispatch so the new listener takes effect
+        // immediately for an already-attached view.
+        requestApplyInsets();
     }
 
     public Map<String, Object> getCustomSettings() {
