@@ -2441,7 +2441,98 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         }
     }
 
+    // MARK: - Media capture / device orientation permission (macOS 12+)
+    //
+    // Ports the iOS WKUIDelegate implementation
+    // (zikzak_inappwebview_ios/.../InAppWebView/InAppWebView.swift:2044+) to
+    // macOS. Without these, any page calling getUserMedia() (camera/microphone)
+    // is silently denied on macOS because WKWebView defaults to
+    // WKPermissionDecision.deny when the delegate does not implement
+    // requestMediaCapturePermissionForOrigin. See issue #195.
+    //
+    // The delegate dispatches onPermissionRequest to Dart (the same event the
+    // iOS port and the shared Dart platform interface already use) and maps the
+    // returned PermissionResponse.action back to WKPermissionDecision:
+    //   0 -> .deny, 1 -> .grant, 2 -> .prompt  (see PermissionResponseAction).
+    // If Dart returns no action (or the channel has no handler), we default to
+    // .deny - matching the iOS callback.defaultBehaviour - so we never leave
+    // the async decisionHandler uncalled (which would otherwise hang WebKit).
+    //
+    // SAFETY: We guard on `isDisposed` before invoking the FlutterMethodChannel
+    // to prevent crashes if the InAppWebView is torn down while a permission
+    // request is in flight. If disposed, we immediately deny — this matches the
+    // iOS channelDelegate-nil fallback and is always safe.
+
+    /// Resolves a PermissionResponse into a WKPermissionDecision, guarding
+    /// against double-invocation of the decisionHandler (which WebKit forbids).
+    @available(macOS 12.0, *)
+    private static func resolvePermissionDecision(
+        response: PermissionResponse?,
+        decisionHandler: @escaping (WKPermissionDecision) -> Void,
+        decisionHandlerCalled: inout Bool
+    ) {
+        guard !decisionHandlerCalled else { return }
+        decisionHandlerCalled = true
+        if let action = response?.action {
+            switch action {
+            case 1:  // PermissionResponseAction.GRANT
+                decisionHandler(.grant)
+            case 2:  // PermissionResponseAction.PROMPT
+                decisionHandler(.prompt)
+            default:  // 0 == PermissionResponseAction.DENY
+                decisionHandler(.deny)
+            }
+        } else {
+            decisionHandler(.deny)
+        }
+    }
+
     // MARK: - Context Menu (WKUIDelegate)
+
+    @available(macOS 12.0, *)
+    public func webView(
+        _ webView: WKWebView,
+        requestMediaCapturePermissionFor origin: WKSecurityOrigin,
+        initiatedByFrame frame: WKFrameInfo,
+        type: WKMediaCaptureType,
+        decisionHandler: @escaping (WKPermissionDecision) -> Void
+    ) {
+        // If the WebView is already disposed, deny immediately to avoid
+        // invoking a torn-down FlutterMethodChannel.
+        guard !isDisposed else {
+            decisionHandler(.deny)
+            return
+        }
+
+        let originString =
+            "\(origin.protocol)://\(origin.host)"
+            + (origin.port != 0 ? ":" + String(origin.port) : "")
+        let permissionRequest = PermissionRequest(
+            origin: originString, resources: [type.rawValue], frame: frame)
+
+        var decisionHandlerCalled = false
+        channel.invokeMethod(
+            "onPermissionRequest",
+            arguments: permissionRequest.toMap()
+        ) { result in
+            if let map = result as? [String: Any] {
+                InAppWebView.resolvePermissionDecision(
+                    response: PermissionResponse.fromMap(map: map),
+                    decisionHandler: decisionHandler,
+                    decisionHandlerCalled: &decisionHandlerCalled)
+            } else {
+                // Log non-dictionary results (FlutterError / not-implemented)
+                // for debuggability, then deny — matching iOS callback.error.
+                if let error = result as? FlutterError {
+                    print("[InAppWebView] onPermissionRequest error: \(error.code) – \(error.message ?? "")")
+                }
+                InAppWebView.resolvePermissionDecision(
+                    response: nil,
+                    decisionHandler: decisionHandler,
+                    decisionHandlerCalled: &decisionHandlerCalled)
+            }
+        }
+    }
 
     @available(macOS 12.0, *)
     public func webView(
@@ -2605,6 +2696,50 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             // yet started tracking is a no-op).
             DispatchQueue.main.async { [weak menu] in
                 menu?.cancelTracking()
+            }
+        }
+    }
+
+    @available(macOS 12.0, *)
+    public func webView(
+        _ webView: WKWebView,
+        requestDeviceOrientationAndMotionPermissionFor origin: WKSecurityOrigin,
+        initiatedByFrame frame: WKFrameInfo,
+        decisionHandler: @escaping (WKPermissionDecision) -> Void
+    ) {
+        // If the WebView is already disposed, deny immediately to avoid
+        // invoking a torn-down FlutterMethodChannel.
+        guard !isDisposed else {
+            decisionHandler(.deny)
+            return
+        }
+
+        let originString =
+            "\(origin.protocol)://\(origin.host)"
+            + (origin.port != 0 ? ":" + String(origin.port) : "")
+        let permissionRequest = PermissionRequest(
+            origin: originString,
+            resources: ["deviceOrientationAndMotion"],
+            frame: frame)
+
+        var decisionHandlerCalled = false
+        channel.invokeMethod(
+            "onPermissionRequest",
+            arguments: permissionRequest.toMap()
+        ) { result in
+            if let map = result as? [String: Any] {
+                InAppWebView.resolvePermissionDecision(
+                    response: PermissionResponse.fromMap(map: map),
+                    decisionHandler: decisionHandler,
+                    decisionHandlerCalled: &decisionHandlerCalled)
+            } else {
+                if let error = result as? FlutterError {
+                    print("[InAppWebView] onPermissionRequest error: \(error.code) – \(error.message ?? "")")
+                }
+                InAppWebView.resolvePermissionDecision(
+                    response: nil,
+                    decisionHandler: decisionHandler,
+                    decisionHandlerCalled: &decisionHandlerCalled)
             }
         }
     }
