@@ -15,6 +15,7 @@ part 'context_menu.g.dart';
           'To make it work properly on Android, JavaScript should be enabled!',
     ),
     IOSPlatform(),
+    MacOSPlatform(),
   ],
 )
 @ExchangeableObject()

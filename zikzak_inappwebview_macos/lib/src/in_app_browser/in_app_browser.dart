@@ -163,6 +163,7 @@ class MacOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
         return await eventHandler?.onJsPrompt(jsPromptRequest);
       },
       // Add other events as needed
+      contextMenu: contextMenu,
     );
 
     _webViewController = MacOSInAppWebViewController.fromInAppBrowser(

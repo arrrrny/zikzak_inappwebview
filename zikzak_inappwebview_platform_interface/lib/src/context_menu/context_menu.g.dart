@@ -13,6 +13,7 @@ part of 'context_menu.dart';
 ///**Officially Supported Platforms/Implementations**:
 ///- Android native WebView
 ///- iOS
+///- MacOS
 class ContextMenu {
   ///List of the custom [ContextMenuItem].
   final List<ContextMenuItem> menuItems;
@@ -39,6 +40,7 @@ class ContextMenu {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   ContextMenu({
     this.menuItems = const [],
     this.onCreateContextMenu,
