@@ -325,6 +325,11 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
   }
 
   @override
+  Future<void> openDevTools() async {
+    await _channel.invokeMethod('openDevTools');
+  }
+
+  @override
   Future<Uint8List?> createPdf({PDFConfiguration? pdfConfiguration}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('pdfConfiguration', () => pdfConfiguration?.toMap());

@@ -440,7 +440,7 @@ class ExchangeableEnumGenerator
     if (annotation.read("equalsOperator").boolValue) {
       classBuffer.writeln("""
       @override
-      bool operator ==(value) => value == _value;
+      bool operator ==(value) => value is $extClassName && value._value == _value;
       """);
     }
 

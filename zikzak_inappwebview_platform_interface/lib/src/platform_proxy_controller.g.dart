@@ -16,11 +16,12 @@ class IOSProxySettings {
   ///Proxy is a string in the format `[scheme://]host[:port]`.
   ///Scheme is optional, if present must be `HTTP`, `HTTPS` or [SOCKS](https://tools.ietf.org/html/rfc1928) and defaults to `HTTP`.
   String proxyUrl;
-  IOSProxySettings(
-      {this.allowFailover = false,
-      this.excludedDomains = const [],
-      this.matchDomains = const [],
-      this.proxyUrl = ''});
+  IOSProxySettings({
+    this.allowFailover = false,
+    this.excludedDomains = const [],
+    this.matchDomains = const [],
+    this.proxyUrl = '',
+  });
 
   ///Gets a possible [IOSProxySettings] instance from a [Map] value.
   static IOSProxySettings? fromMap(Map<String, dynamic>? map) {
@@ -29,10 +30,12 @@ class IOSProxySettings {
     }
     final instance = IOSProxySettings();
     instance.allowFailover = map['allowFailover'];
-    instance.excludedDomains =
-        List<String>.from(map['excludedDomains']!.cast<String>());
-    instance.matchDomains =
-        List<String>.from(map['matchDomains']!.cast<String>());
+    instance.excludedDomains = List<String>.from(
+      map['excludedDomains']!.cast<String>(),
+    );
+    instance.matchDomains = List<String>.from(
+      map['matchDomains']!.cast<String>(),
+    );
     instance.proxyUrl = map['proxyUrl'];
     return instance;
   }
@@ -112,13 +115,14 @@ class AndroidProxySettings {
   ///
   ///**NOTE**: available only if [WebViewFeature.PROXY_OVERRIDE_REVERSE_BYPASS] feature is supported.
   bool reverseBypassEnabled;
-  AndroidProxySettings(
-      {this.bypassRules = const [],
-      this.bypassSimpleHostnames,
-      this.directs = const [],
-      this.proxyRules = const [],
-      this.removeImplicitRules,
-      this.reverseBypassEnabled = false});
+  AndroidProxySettings({
+    this.bypassRules = const [],
+    this.bypassSimpleHostnames,
+    this.directs = const [],
+    this.proxyRules = const [],
+    this.removeImplicitRules,
+    this.reverseBypassEnabled = false,
+  });
 
   ///Gets a possible [AndroidProxySettings] instance from a [Map] value.
   static AndroidProxySettings? fromMap(Map<String, dynamic>? map) {
@@ -129,11 +133,15 @@ class AndroidProxySettings {
       bypassSimpleHostnames: map['bypassSimpleHostnames'],
       removeImplicitRules: map['removeImplicitRules'],
     );
-    instance.bypassRules =
-        List<String>.from(map['bypassRules']!.cast<String>());
+    instance.bypassRules = List<String>.from(
+      map['bypassRules']!.cast<String>(),
+    );
     instance.directs = List<String>.from(map['directs']!.cast<String>());
-    instance.proxyRules = List<ProxyRule>.from(map['proxyRules']
-        .map((e) => ProxyRule.fromMap(e?.cast<String, dynamic>())!));
+    instance.proxyRules = List<ProxyRule>.from(
+      map['proxyRules'].map(
+        (e) => ProxyRule.fromMap(e?.cast<String, dynamic>())!,
+      ),
+    );
     instance.reverseBypassEnabled = map['reverseBypassEnabled'];
     return instance;
   }

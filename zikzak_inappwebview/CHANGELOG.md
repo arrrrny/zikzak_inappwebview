@@ -1,12 +1,57 @@
-## 4.6.3 - 2026-07-21
+## 4.8.0 - 2026-08-14
 
-## Unreleased
+### Features
+
+- [macOS] Add context-menu support — `disableContextMenu` / `disableLongPressContextMenuOnLinks` settings now honored, `onCreateContextMenu` event fired (#208, fixes #196)
+- [macOS] Implement WKNavigationDelegate authentication challenges — HTTP basic/digest/NTLM/Negotiate, TLS server-trust, and client-certificate requests (#207, fixes #193)
+- [macOS] Method-channel parity — ~50 controller methods implemented on iOS are now available on macOS (MissingPluginException resolved) (#205, fixes #197)
+- [macOS] Implement print page support reusing the iOS pattern (#190, fixes #188)
+- [Android] Add window-insets control for web content (`setInsetsForWebContentToIgnore` equivalent) (#206, fixes #198)
+- [iOS] Add `UIScrollView` bouncesHorizontally / bouncesVertically (iOS 17.4+) (#209, fixes #199)
+- [Android] Bump toolchain — androidx.webkit 1.15.0, AGP 8.13.1, JVM target 17 (#211, fixes #201)
+- Refactor: split `InAppWebViewController` into domain-specific controllers (#176)
+- Refactor: standardize dispose patterns across all wrapper classes (#175)
+
+### Fixes
+
+- [macOS] Implement media-capture permission prompts for `getUserMedia()` — no longer silently denied (#204, fixes #195)
+- [macOS] Implement `webViewWebContentProcessDidTerminate` — no more blank/unrecoverable WebView after content-process kill (#203, fixes #194)
+- [macOS] Await `shouldOverrideUrlLoading` response so cancellations are honored (#202, fixes #192)
+- [macOS] Use `WKWebpagePreferences.allowsContentJavaScript` instead of deprecated `WKPreferences.javaScriptEnabled` (#212, fixes #200)
+- [macOS] Replace deprecated `javaScriptEnabled` read in `getSelectedText` (#213)
+- [macOS] Repair SPM build — duplicate `Util.swift`, iOS-only APIs, init ordering (#215)
+- [macOS] Add missing `onPageCommitVisible` / `onDidReceiveServerRedirectForProvisionalNavigation` method-channel handlers (#217)
+- [Windows] Forward `additionalBrowserArguments` to WebView2 (#214, fixes #178)
+- [Windows] Implement `addJavaScriptHandler` + JS bridge (fixes #177)
+- [Android] Use `androidx.core.view.OnApplyWindowInsetsListener` type directly (#217)
+
+## 4.7.0 - 2026-07-29
+
+### Features
 
 - Added iOS proxy support (iOS 17.0+) — set process-wide proxy for WKWebView
+- Added Network Capture API — capture XHR/fetch requests and response bodies
+- Added Network Capture Scraper example screen
+
+### Fixes
 
 - Fixed: Web/WASM build failure — `HeadlessInAppWebViewWeb.dispose()` missing
   `isKeepAlive` parameter that was added to `PlatformHeadlessInAppWebView.dispose`
   interface, causing `dart2wasm` and `dart2js` compile errors
+- Fixed iOS: removed duplicate `else` clause in `ProxyManager` guard statement
+- Fixed iOS: added missing Flutter import and fixed Swift API usage in `ProxyManager`
+- Fixed Linux: removed unused `<iostream>` includes and call `load_initial` in
+  `createHeadless`
+- Fixed Linux: fixed pre-existing C++ issues in `in_app_webview.cc`
+- Fixed: restored `Disposable` interface on `PlatformProxyController`
+
+### Chores
+
+- Removed network capture example from public package
+- Added `.clangd` and `compile_flags.txt` for Linux Flutter header resolution
+- Bumped svgo dependency
+
+## 4.6.3 - 2026-07-21
 
 ## 4.6.2 - 2026-07-21
 

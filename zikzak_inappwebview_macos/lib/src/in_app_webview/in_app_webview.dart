@@ -26,7 +26,7 @@ class MacOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
     };
 
     return AppKitView(
-      viewType: 'dev.zuzu/flutter_inappwebview',
+      viewType: 'dev.zuzu/zikzak_inappwebview',
       onPlatformViewCreated: _onPlatformViewCreated,
       creationParams: creationParams,
       creationParamsCodec: const StandardMessageCodec(),

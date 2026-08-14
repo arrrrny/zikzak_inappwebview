@@ -9,6 +9,16 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 
 import 'in_app_webview_windows_controller.dart';
 
+class _VirtualHostMappingInfo {
+  final String folderPath;
+  final int accessKind;
+
+  _VirtualHostMappingInfo({
+    required this.folderPath,
+    required this.accessKind,
+  });
+}
+
 class InAppWebViewWindowsPlatform extends PlatformInAppWebViewController {
   InAppWebViewWindowsPlatform(
     PlatformInAppWebViewControllerCreationParams params,
@@ -100,6 +110,43 @@ class _InAppWebViewWindowsWidgetStateImpl
       );
 
       await _controller.initialize();
+
+      // Apply virtual host mappings from the environment settings. Each
+      // mapping serves a local folder at https://<hostName>/ and bypasses
+      // CORS for those resources when the access kind is allowCors.
+      final virtualHostMappings =
+          widget.params.webViewEnvironment?.settings?.virtualHostMappings;
+      if (virtualHostMappings != null) {
+        final registeredMappings = <String, _VirtualHostMappingInfo>{};
+        for (final mapping in virtualHostMappings) {
+          final canonicalHostName = mapping.hostName.toLowerCase();
+          if (registeredMappings.containsKey(canonicalHostName)) {
+            final existing = registeredMappings[canonicalHostName]!;
+            if (existing.folderPath != mapping.folderPath ||
+                existing.accessKind != mapping.accessKind.toNativeValue()) {
+              print(
+                'Warning: Skipping duplicate virtual host mapping for "$canonicalHostName" '
+                'with conflicting folderPath or accessKind. '
+                'Existing: folderPath="${existing.folderPath}", accessKind=${existing.accessKind}. '
+                'Conflicting: folderPath="${mapping.folderPath}", accessKind=${mapping.accessKind.toNativeValue()}.',
+              );
+              continue;
+            }
+            // Compatible duplicate (same folderPath and accessKind), skip silently
+            continue;
+          }
+          await _controller.addVirtualHostNameMapping(
+            mapping.hostName,
+            mapping.folderPath,
+            WebviewHostResourceAccessKind.values[mapping.accessKind
+                .toNativeValue()],
+          );
+          registeredMappings[canonicalHostName] = _VirtualHostMappingInfo(
+            folderPath: mapping.folderPath,
+            accessKind: mapping.accessKind.toNativeValue(),
+          );
+        }
+      }
 
       // Setup listeners
       _controller.url.listen((url) {

@@ -127,7 +127,7 @@ public class FlutterWebView implements PlatformWebView {
       // Defer the initial load so the JS bridge is registered before
       // the renderer receives the page load. This prevents a race where
       // pages served from cache or sleeping-tab wake-ups could execute
-      // @document-start userscripts before window.flutter_inappwebview is defined.
+      // @document-start userscripts before window.zikzak_inappwebview is defined.
       webView.post(new Runnable() {
         @Override
         public void run() {

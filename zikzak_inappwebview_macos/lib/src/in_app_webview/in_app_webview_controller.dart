@@ -170,6 +170,26 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
               NavigationActionPolicy.CANCEL.toNativeValue();
         }
         return NavigationActionPolicy.ALLOW.toNativeValue();
+      case 'onCreateWindow':
+        if (params.webviewParams?.onCreateWindow != null) {
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
+          CreateWindowAction? createWindowAction = CreateWindowAction.fromMap(
+            arguments,
+          );
+          if (createWindowAction != null) {
+            return await params.webviewParams!.onCreateWindow!(
+              controller,
+              createWindowAction,
+            );
+          }
+        }
+        break;
+      case 'onCloseWindow':
+        if (params.webviewParams?.onCloseWindow != null) {
+          params.webviewParams!.onCloseWindow!(controller);
+        }
+        break;
       case 'onConsoleMessage':
         if (params.webviewParams?.onConsoleMessage != null) {
           var map =

@@ -227,14 +227,14 @@ packages:
       path: "../zikzak_inappwebview_internal_annotations"
       relative: true
     source: path
-    version: "4.6.3"
+    version: "4.7.0"
   zikzak_inappwebview_platform_interface:
     dependency: "direct main"
     description:
       path: "../zikzak_inappwebview_platform_interface"
       relative: true
     source: path
-    version: "4.6.3"
+    version: "4.7.0"
 sdks:
   dart: ">=3.10.0-0 <4.0.0"
   flutter: ">=3.38.6"

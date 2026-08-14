@@ -4,6 +4,48 @@ import 'platform_webview_environment.dart';
 
 part 'webview_environment_settings.g.dart';
 
+///The access kind for resources mapped by [VirtualHostMapping].
+///
+///The values match the WebView2
+///`COREWEBVIEW2_HOST_RESOURCE_ACCESS_KIND` enum.
+@ExchangeableEnum()
+class HostResourceAccessKind_ {
+  // ignore: unused_field
+  final int _value;
+  const HostResourceAccessKind_._internal(this._value);
+
+  ///The host resource access is denied.
+  static const deny = const HostResourceAccessKind_._internal(0);
+
+  ///The host resource can be accessed from the same origin.
+  static const allow = const HostResourceAccessKind_._internal(1);
+
+  ///The host resource can be accessed from any origin (CORS allowed).
+  static const allowCors = const HostResourceAccessKind_._internal(2);
+}
+
+///Represents a mapping between a virtual host name and a local folder,
+///used to serve local content through the WebView.
+///
+///The WebView serves the [folderPath] content at `https://[hostName]/`.
+@ExchangeableObject()
+class VirtualHostMapping_ {
+  ///The host name to map (e.g. `app.localhost`).
+  final String hostName;
+
+  ///The absolute folder path to map to the host name.
+  final String folderPath;
+
+  ///The access kind for the mapped resources.
+  final HostResourceAccessKind_ accessKind;
+
+  VirtualHostMapping_({
+    required this.hostName,
+    required this.folderPath,
+    this.accessKind = HostResourceAccessKind_.allow,
+  });
+}
+
 ///This class represents all the [PlatformWebViewEnvironment] settings available.
 ///
 ///The [browserExecutableFolder], [userDataFolder] and [additionalBrowserArguments]
@@ -118,6 +160,14 @@ class WebViewEnvironmentSettings_ {
   )
   final String? targetCompatibleBrowserVersion;
 
+  ///Virtual host name to folder path mappings applied to the WebView.
+  ///
+  ///Each mapping serves the given local [VirtualHostMapping.folderPath] at
+  ///`https://[VirtualHostMapping.hostName]/`, which bypasses CORS for local
+  ///resources (use [HostResourceAccessKind.allowCors] to allow cross-origin
+  ///access). Currently honored by the Windows implementation.
+  final List<VirtualHostMapping_>? virtualHostMappings;
+
   WebViewEnvironmentSettings_({
     this.browserExecutableFolder,
     this.userDataFolder,
@@ -125,5 +175,6 @@ class WebViewEnvironmentSettings_ {
     this.allowSingleSignOnUsingOSPrimaryAccount,
     this.language,
     this.targetCompatibleBrowserVersion,
+    this.virtualHostMappings,
   });
 }

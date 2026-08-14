@@ -64,6 +64,30 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     private var lastScrollX: Int = 0
     private var lastScrollY: Int = 0
 
+    ///Auto-incrementing id counter for popup webviews created by
+    ///[createWebViewWith].
+    public static var windowIdCount: Int64 = 0
+
+    ///Registry of popup webviews waiting to be reparented into a Flutter
+    ///platform view (keyed by [windowId]).
+    public static var windowWebViews: [Int64: InAppWebView] = [:]
+
+    ///Registry of pending close events for popups that closed before their
+    ///channel was bound (keyed by [windowId]).
+    public static var pendingCloseEvents: Set<Int64> = []
+
+    ///The popup window id assigned by [createWebViewWith], `nil` for the
+    ///main (non-popup) webview.
+    public var windowId: Int64?
+
+    ///The off-screen window hosting a popup webview before it is reparented
+    ///into a Flutter platform view.
+    public var popupWindow: NSWindow?
+
+    ///The opener webview that created this popup (via [createWebViewWith]),
+    ///`nil` for main (non-popup) webviews.
+    public weak var opener: InAppWebView?
+
     init(
         registrar: FlutterPluginRegistrar, viewId: Any, arguments: Any?, channelName: String? = nil, plugin: InAppWebViewFlutterPlugin? = nil
     ) {
@@ -173,15 +197,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             injectionTime: .atDocumentStart, forMainFrameOnly: false)
         userContentController.addUserScript(webMessageInitScript)
 
-        let finalChannelName = channelName ?? "dev.zuzu/zikzak_inappwebview_\(viewId)"
-        channel = FlutterMethodChannel(name: finalChannelName, binaryMessenger: registrar.messenger)
-        channel.setMethodCallHandler(self.handle)
-        channelDelegate = WebViewChannelDelegate(channel: channel)
-
-        let findInteractionChannelName = "wtf.zikzak/zikzak_inappwebview_find_interaction_\(viewId)"
-        findInteractionChannel = FlutterMethodChannel(
-            name: findInteractionChannelName, binaryMessenger: registrar.messenger)
-        findInteractionChannel.setMethodCallHandler(self.handleFindInteraction)
+        bindChannels(registrar: registrar, viewId: viewId, channelName: channelName)
 
         if let args = arguments as? [String: Any] {
             if let initialUrlRequest = args["initialUrlRequest"] as? [String: Any] {
@@ -189,7 +205,12 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 self.load(request)
             }
 
-            if let settingsMap = args["settings"] as? [String: Any?] {
+            // The widget sends "initialSettings"; accept "settings" too for
+            // backward compatibility.
+            let settingsMap =
+                (args["initialSettings"] as? [String: Any?])
+                ?? (args["settings"] as? [String: Any?])
+            if let settingsMap = settingsMap {
                 let newSettings = InAppWebViewSettings()
                 let _ = newSettings.parse(settings: settingsMap)
                 self.setSettings(
@@ -215,6 +236,41 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         self.addObserver(self, forKeyPath: "title", options: .new, context: nil)
         // onZoomScaleChanged (#197): pageZoom is macOS 11+, floor is macOS 12.
         self.addObserver(self, forKeyPath: "pageZoom", options: .new, context: nil)
+    }
+
+    ///Binds the Flutter method channels for the platform view [viewId] to
+    ///this webview. Used both by the main initializer and when a popup
+    ///webview created by [createWebViewWith] is reparented into a new
+    ///Flutter platform view.
+    func bindChannels(registrar: FlutterPluginRegistrar, viewId: Any, channelName: String? = nil) {
+        let finalChannelName = channelName ?? "dev.zuzu/zikzak_inappwebview_\(viewId)"
+        channel = FlutterMethodChannel(name: finalChannelName, binaryMessenger: registrar.messenger)
+        channel.setMethodCallHandler(self.handle)
+        channelDelegate = WebViewChannelDelegate(channel: channel)
+
+        let findInteractionChannelName = "wtf.zikzak/zikzak_inappwebview_find_interaction_\(viewId)"
+        findInteractionChannel = FlutterMethodChannel(
+            name: findInteractionChannelName, binaryMessenger: registrar.messenger)
+        findInteractionChannel.setMethodCallHandler(self.handleFindInteraction)
+
+        // Replay any pending close event that occurred before the channel was bound
+        if let windowId = windowId, InAppWebView.pendingCloseEvents.contains(windowId) {
+            InAppWebView.pendingCloseEvents.remove(windowId)
+            channel?.invokeMethod("onCloseWindow", arguments: nil)
+        }
+    }
+
+    ///Initializes a popup webview created by [createWebViewWith].
+    ///
+    ///The popup shares the source webview's [WKWebViewConfiguration]
+    ///(including its userContentController, so the JS bridge and injected
+    ///scripts are already in place) and has its method channels bound later,
+    ///when the Flutter side creates a platform view for it.
+    public override init(frame frameRect: NSRect, configuration: WKWebViewConfiguration) {
+        super.init(frame: frameRect, configuration: configuration)
+        self.autoresizingMask = [.width, .height]
+        self.navigationDelegate = self
+        self.uiDelegate = self
     }
 
 
@@ -260,34 +316,44 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         return printJobId
     }
     deinit {
+        if let windowId = windowId {
+            InAppWebView.windowWebViews.removeValue(forKey: windowId)
+        }
+        popupWindow?.close()
         dispose()
     }
 
     public func dispose() {
         if !isDisposed {
-            self.configuration.userContentController.removeScriptMessageHandler(
-                forName: "consoleHandler")
-            self.configuration.userContentController.removeScriptMessageHandler(
-                forName: "onFindResultReceived")
-            self.configuration.userContentController.removeScriptMessageHandler(
-                forName: "callHandler")
-            self.configuration.userContentController.removeScriptMessageHandler(
-                forName: "onWebMessagePortMessageReceived")
-            self.configuration.userContentController.removeScriptMessageHandler(
-                forName: "onWebMessageListenerPostMessageReceived")
-            self.configuration.userContentController.removeScriptMessageHandler(
-                forName: "onScrollChangedReceived")
-            self.removeObserver(self, forKeyPath: "estimatedProgress")
-            self.removeObserver(self, forKeyPath: "url")
-            self.removeObserver(self, forKeyPath: "title")
-            self.removeObserver(self, forKeyPath: "pageZoom")
+            if windowId == nil {
+                // Only the main webview owns the userContentController
+                // registrations and KVO observers. Popup webviews share the
+                // source webview's configuration, so tearing those down here
+                // would break the opener.
+                self.configuration.userContentController.removeScriptMessageHandler(
+                    forName: "consoleHandler")
+                self.configuration.userContentController.removeScriptMessageHandler(
+                    forName: "onFindResultReceived")
+                self.configuration.userContentController.removeScriptMessageHandler(
+                    forName: "callHandler")
+                self.configuration.userContentController.removeScriptMessageHandler(
+                    forName: "onWebMessagePortMessageReceived")
+                self.configuration.userContentController.removeScriptMessageHandler(
+                    forName: "onWebMessageListenerPostMessageReceived")
+                self.configuration.userContentController.removeScriptMessageHandler(
+                    forName: "onScrollChangedReceived")
+                self.removeObserver(self, forKeyPath: "estimatedProgress")
+                self.removeObserver(self, forKeyPath: "url")
+                self.removeObserver(self, forKeyPath: "title")
+                self.removeObserver(self, forKeyPath: "pageZoom")
+            }
             // Dispose any active WebMessage channels / listeners (#197).
             for (_, wmc) in webMessageChannels { wmc.dispose() }
             webMessageChannels.removeAll()
             for (_, wml) in webMessageListeners { wml.dispose() }
             webMessageListeners.removeAll()
-            channel.setMethodCallHandler(nil)
-            findInteractionChannel.setMethodCallHandler(nil)
+            channel?.setMethodCallHandler(nil)
+            findInteractionChannel?.setMethodCallHandler(nil)
             isDisposed = true
         }
     }
@@ -794,7 +860,9 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             result(true)
         case "setSettings":
             if let args = call.arguments as? [String: Any],
-                let settingsMap = args["settings"] as? [String: Any?]
+                let settingsMap =
+                    (args["initialSettings"] as? [String: Any?])
+                    ?? (args["settings"] as? [String: Any?])
             {
                 let newSettings = InAppWebViewSettings()
                 let _ = newSettings.parse(settings: settingsMap)
@@ -2304,6 +2372,135 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             channel?.invokeMethod("onReceivedHttpError", arguments: arguments)
         }
         decisionHandler(.allow)
+    }
+
+    public func webView(
+        _ webView: WKWebView,
+        createWebViewWith configuration: WKWebViewConfiguration,
+        for navigationAction: WKNavigationAction,
+        windowFeatures: WKWindowFeatures
+    ) -> WKWebView? {
+        guard let settings = settings, settings.javaScriptCanOpenWindowsAutomatically else {
+            return nil
+        }
+
+        let windowId = InAppWebView.windowIdCount
+        InAppWebView.windowIdCount += 1
+
+        let frame = NSRect(
+            x: 0,
+            y: 0,
+            width: CGFloat(windowFeatures.width?.doubleValue ?? 800),
+            height: CGFloat(windowFeatures.height?.doubleValue ?? 600)
+        )
+
+        let popupWebView = InAppWebView(frame: frame, configuration: configuration)
+        popupWebView.windowId = windowId
+        popupWebView.settings = settings
+        popupWebView.navigationDelegate = popupWebView
+        popupWebView.uiDelegate = popupWebView
+        popupWebView.opener = self
+
+        // CRITICAL: On macOS, a popup WKWebView MUST be hosted in an NSWindow
+        // before WebKit will start any navigation. An off-screen window is
+        // enough to satisfy this requirement; it is closed when the popup is
+        // reparented into a Flutter platform view.
+        let window = NSWindow(
+            contentRect: frame,
+            styleMask: [],
+            backing: .buffered,
+            defer: false
+        )
+        // CRITICAL: prevent the window from releasing its contentView (the
+        // popup webview) when closed during reparenting. The default
+        // isReleasedWhenClosed=true would over-release the webview that
+        // WebKit still owns, causing a SIGSEGV in objc_release.
+        window.isReleasedWhenClosed = false
+        window.contentView = popupWebView
+        popupWebView.popupWindow = window
+
+        InAppWebView.windowWebViews[windowId] = popupWebView
+
+        // Build the same CreateWindowAction map the iOS implementation sends
+        // (see CreateWindowAction.toMap() / WKNavigationAction.toMap()).
+        let sourceFrame: [String: Any]? = {
+            let frame = navigationAction.sourceFrame
+            return [
+                "isMainFrame": frame.isMainFrame,
+                "request": ["url": frame.request.url?.absoluteString ?? ""],
+                "securityOrigin": [
+                    "host": frame.securityOrigin.host,
+                    "port": frame.securityOrigin.port,
+                    "protocol": frame.securityOrigin.protocol,
+                ],
+            ]
+        }()
+        let targetFrame: [String: Any]? = {
+            guard let frame = navigationAction.targetFrame else { return nil }
+            return [
+                "isMainFrame": frame.isMainFrame,
+                "request": ["url": frame.request.url?.absoluteString ?? ""],
+                "securityOrigin": [
+                    "host": frame.securityOrigin.host,
+                    "port": frame.securityOrigin.port,
+                    "protocol": frame.securityOrigin.protocol,
+                ],
+            ]
+        }()
+
+        let createWindowAction: [String: Any?] = [
+            "request": navigationAction.request.toMap(),
+            "isForMainFrame": navigationAction.targetFrame?.isMainFrame ?? false,
+            "hasGesture": navigationAction.navigationType == .linkActivated
+                || navigationAction.navigationType == .formSubmitted,
+            "isRedirect": false,
+            "navigationType": navigationAction.navigationType.rawValue,
+            "sourceFrame": sourceFrame,
+            "targetFrame": targetFrame,
+            "windowId": windowId,
+            "windowFeatures": [
+                "allowsResizing": windowFeatures.allowsResizing,
+                "height": windowFeatures.height,
+                "menuBarVisibility": windowFeatures.menuBarVisibility,
+                "statusBarVisibility": windowFeatures.statusBarVisibility,
+                "toolbarsVisibility": windowFeatures.toolbarsVisibility,
+                "width": windowFeatures.width,
+                "x": windowFeatures.x,
+                "y": windowFeatures.y,
+            ],
+            "isDialog": nil,
+        ]
+        // NOTE: the popup webview has no Flutter channel yet (it is created
+        // with init(frame:configuration:) and only gets a channel when a
+        // platform view binds it). Fire the event on the opener webview's
+        // channel so Dart receives it and can render the popup.
+        self.channel?.invokeMethod("onCreateWindow", arguments: createWindowAction)
+
+        return popupWebView
+    }
+
+    public func webViewDidClose(_ webView: WKWebView) {
+        // Called when the page closes its popup (window.close()). Without this,
+        // an unhandled popup's off-screen NSWindow + webview form a retain
+        // cycle (window.contentView <-> popupWindow) that would leak.
+        guard let windowId = windowId else { return }
+        InAppWebView.windowWebViews.removeValue(forKey: windowId)
+        popupWindow?.close()
+        popupWindow = nil
+
+        // If the channel is bound, invoke immediately; otherwise route through
+        // the opener's channel or queue the event for replay after bindChannels.
+        if let channel = channel {
+            channel.invokeMethod("onCloseWindow", arguments: nil)
+        } else if let opener = opener, let openerChannel = opener.channel {
+            // Route the event through the opener's channel with the windowId
+            // so Dart can associate it with the correct popup webview.
+            openerChannel.invokeMethod(
+                "onCloseWindow", arguments: ["windowId": windowId])
+        } else {
+            // Queue the event for replay when bindChannels is called
+            InAppWebView.pendingCloseEvents.insert(windowId)
+        }
     }
 
     public func webView(
