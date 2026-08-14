@@ -398,9 +398,14 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             if let args = call.arguments as? [String: Any],
                let assetFilePath = args["assetFilePath"] as? String
             {
+                guard let registrar = self.registrar else {
+                    result(
+                        FlutterError(code: "InAppWebView", message: "Registrar not available", details: nil))
+                    return
+                }
                 do {
                     let assetURL = try Util.getUrlAsset(
-                        registrar: self.registrar!, assetFilePath: assetFilePath)
+                        registrar: registrar, assetFilePath: assetFilePath)
                     if assetURL.isFileURL {
                         self.loadFileURL(
                             assetURL, allowingReadAccessTo: assetURL.deletingLastPathComponent())
@@ -2542,8 +2547,8 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     /// CodeRabbit's review of commit 62971480). It only fires when the
     /// delegate returned `nil`; when the delegate returned our custom
     /// `NSMenu`, the flag is false and we simply forward to `super`.
-    public override func willOpenMenu(_ menu: NSMenu, with event: NSEvent?) {
-        super.willOpenMenu(menu, with: event ?? NSEvent())
+    public override func willOpenMenu(_ menu: NSMenu, with event: NSEvent) {
+        super.willOpenMenu(menu, with: event)
         if suppressDefaultMenuNext {
             suppressDefaultMenuNext = false
             // Cancel tracking on the default menu so it is not displayed.
