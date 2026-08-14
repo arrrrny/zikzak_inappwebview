@@ -6,8 +6,11 @@ public class CredentialDatabase: ChannelDelegate {
 
     private var plugin: InAppWebViewFlutterPlugin?
 
-    init(plugin: InAppWebViewFlutterPlugin) {
-        super.init(channel: FlutterMethodChannel(name: CredentialDatabase.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar!.messenger()))
+    init?(plugin: InAppWebViewFlutterPlugin) {
+        guard let registrar = plugin.registrar else {
+            return nil
+        }
+        super.init(channel: FlutterMethodChannel(name: CredentialDatabase.METHOD_CHANNEL_NAME, binaryMessenger: registrar.messenger))
         self.plugin = plugin
     }
 
