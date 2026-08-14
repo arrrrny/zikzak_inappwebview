@@ -148,6 +148,8 @@ class MacOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
           eventHandler?.onTitleChanged(title),
       onConsoleMessage: (controller, consoleMessage) =>
           eventHandler?.onConsoleMessage(consoleMessage),
+      onWebContentProcessDidTerminate: (controller) =>
+          eventHandler?.onWebContentProcessDidTerminate(),
       shouldOverrideUrlLoading: (controller, navigationAction) async {
         return await eventHandler?.shouldOverrideUrlLoading(navigationAction);
       },
@@ -161,6 +163,7 @@ class MacOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
         return await eventHandler?.onJsPrompt(jsPromptRequest);
       },
       // Add other events as needed
+      contextMenu: contextMenu,
     );
 
     _webViewController = MacOSInAppWebViewController.fromInAppBrowser(
@@ -277,7 +280,7 @@ class MacOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
   }
 
   @override
-  void dispose() {
+  void dispose({bool isKeepAlive = false}) {
     _channel?.setMethodCallHandler(null);
     _webViewController?.dispose();
     _webViewController = null;

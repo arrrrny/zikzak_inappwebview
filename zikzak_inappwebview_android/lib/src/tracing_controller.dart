@@ -85,7 +85,7 @@ class AndroidTracingController extends PlatformTracingController
   }
 
   @override
-  void dispose() {
+  void dispose({bool isKeepAlive = false}) {
     // empty
   }
 }

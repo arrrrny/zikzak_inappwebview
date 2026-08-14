@@ -145,7 +145,7 @@ abstract class PlatformWebViewEnvironment extends PlatformInterface
   ///{@template zikzak_inappwebview_platform_interface.PlatformWebViewEnvironment.dispose}
   ///Disposes the WebView Environment reference.
   ///{@endtemplate}
-  Future<void> dispose() {
+  Future<void> dispose({bool isKeepAlive = false}) {
     throw UnimplementedError(
       'dispose is not implemented on the current platform',
     );

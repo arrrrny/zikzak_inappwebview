@@ -16,7 +16,7 @@ public class FlutterWebViewController: NSObject {
 
     init(
         registrar: FlutterPluginRegistrar, withFrame frame: NSRect, viewId: Any,
-        arguments args: Any?
+        arguments args: Any?, plugin: InAppWebViewFlutterPlugin? = nil
     ) {
         super.init()
 
@@ -26,7 +26,7 @@ public class FlutterWebViewController: NSObject {
         container.autoresizingMask = [.width, .height]
 
         let webView = InAppWebView(
-            registrar: registrar, viewId: viewId, arguments: args)
+            registrar: registrar, viewId: viewId, arguments: args, plugin: plugin)
         webView.autoresizingMask = [.width, .height]
         webView.frame = container.bounds
         container.addSubview(webView)

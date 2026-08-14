@@ -3,10 +3,12 @@ import FlutterMacOS
 
 public class InAppWebViewFactory: NSObject, FlutterPlatformViewFactory {
     private var registrar: FlutterPluginRegistrar
+    private var plugin: InAppWebViewFlutterPlugin?
     private static var associationKey: UInt8 = 0
 
-    init(registrar: FlutterPluginRegistrar) {
+    init(registrar: FlutterPluginRegistrar, plugin: InAppWebViewFlutterPlugin? = nil) {
         self.registrar = registrar
+        self.plugin = plugin
         super.init()
     }
 
@@ -36,7 +38,7 @@ public class InAppWebViewFactory: NSObject, FlutterPlatformViewFactory {
             registrar: registrar,
             withFrame: .zero,
             viewId: viewId,
-            arguments: args)
+            arguments: args, plugin: plugin)
 
         // Keep the FlutterWebViewController alive by associating it with the
         // container view. Flutter retains the view, so the controller stays

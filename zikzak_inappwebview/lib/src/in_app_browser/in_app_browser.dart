@@ -187,7 +187,8 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppBrowser.dispose}
   @mustCallSuper
-  void dispose() => platform.dispose();
+  void dispose({bool isKeepAlive = false}) =>
+      platform.dispose(isKeepAlive: isKeepAlive);
 
   @Deprecated('Use onFormResubmission instead')
   Future<FormResubmissionAction?>? androidOnFormResubmission(WebUri? url) {

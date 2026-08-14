@@ -68,7 +68,8 @@ class WebAuthenticationSession {
   Future<void> cancel() => platform.cancel();
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformWebAuthenticationSession.dispose}
-  Future<void> dispose() => platform.dispose();
+  Future<void> dispose({bool isKeepAlive = false}) =>
+      platform.dispose(isKeepAlive: isKeepAlive);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformWebAuthenticationSession.isAvailable}
   static Future<bool> isAvailable() =>

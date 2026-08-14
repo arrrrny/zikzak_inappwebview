@@ -462,7 +462,7 @@ class IOSCookieManager extends PlatformCookieManager with ChannelController {
   }
 
   @override
-  void dispose() {
+  void dispose({bool isKeepAlive = false}) {
     // empty
   }
 }

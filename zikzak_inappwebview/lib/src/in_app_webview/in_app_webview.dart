@@ -18,7 +18,7 @@ import '../pull_to_refresh/pull_to_refresh_controller.dart';
 import 'network_capture/network_capture_manager.dart';
 
 ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewWidget}
-class InAppWebView extends StatefulWidget {
+class InAppWebView extends StatefulWidget implements Disposable {
   /// Constructs a [InAppWebView].
   ///
   /// See [InAppWebView.fromPlatformCreationParams] for setting parameters for
@@ -603,6 +603,13 @@ class InAppWebView extends StatefulWidget {
 
   @override
   _InAppWebViewState createState() => _InAppWebViewState();
+
+  /// Disposes the WebView and releases its resources.
+  ///
+  /// If [isKeepAlive] is `true`, the WebView is kept alive.
+  @override
+  void dispose({bool isKeepAlive = false}) =>
+      platform.dispose(isKeepAlive: isKeepAlive);
 }
 
 class _InAppWebViewState extends State<InAppWebView> {

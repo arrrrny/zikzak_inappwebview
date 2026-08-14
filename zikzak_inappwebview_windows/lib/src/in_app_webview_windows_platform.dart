@@ -37,7 +37,7 @@ class InAppWebViewWindowsWidget extends PlatformInAppWebViewWidget {
   }
 
   @override
-  void dispose() {}
+  void dispose({bool isKeepAlive = false}) {}
 
   @override
   T controllerFromPlatform<T>(dynamic platformController) {
@@ -90,17 +90,24 @@ class _InAppWebViewWindowsWidgetStateImpl
 
   Future<void> initPlatformState() async {
     try {
-      // Determine user data folder from WebViewEnvironmentSettings or use default
-      String userDataPath;
+      // Resolve the WebView2 environment arguments from the user-supplied
+      // [WebViewEnvironmentSettings] (or platform defaults). Previously only
+      // `userDataFolder` was honored, which silently dropped
+      // `additionalBrowserArguments` — so Chromium flags such as
+      // `--disable-web-security` never reached WebView2 (issue #178).
       final settings = widget.params.webViewEnvironment?.settings;
-      if (settings?.userDataFolder != null) {
-        userDataPath = settings!.userDataFolder!;
-      } else {
-        userDataPath = await _getDefaultUserDataFolder();
-      }
+      final defaultUserDataFolder = await _getDefaultUserDataFolder();
+      final args = resolveEnvironmentInitArgs(
+        settings: settings,
+        defaultUserDataFolder: () => defaultUserDataFolder,
+      );
 
-      // Initialize the shared WebView2 environment with the user data folder
-      await WebviewController.initializeEnvironment(userDataPath: userDataPath);
+      // Initialize the shared WebView2 environment with the resolved args.
+      await WebviewController.initializeEnvironment(
+        userDataPath: args.userDataPath,
+        browserExePath: args.browserExePath,
+        additionalArguments: args.additionalArguments,
+      );
 
       await _controller.initialize();
 
@@ -199,4 +206,62 @@ class _InAppWebViewWindowsWidgetStateImpl
     _controller.dispose();
     super.dispose();
   }
+}
+
+/// Arguments forwarded to [WebviewController.initializeEnvironment] when
+/// bringing up the shared WebView2 environment.
+///
+/// Exposed as a typed record so the mapping from
+/// [WebViewEnvironmentSettings] to the underlying `webview_windows` API
+/// can be unit-tested without a live WebView2 runtime.
+class WebViewEnvironmentInitArgs {
+  const WebViewEnvironmentInitArgs({
+    required this.userDataPath,
+    this.browserExePath,
+    this.additionalArguments,
+  });
+
+  /// User-data folder to use for the WebView2 runtime. Always non-null —
+  /// falls back to the platform default when the caller did not supply one.
+  final String userDataPath;
+
+  /// Path to a fixed-version WebView2 runtime, or `null` to use the
+  /// installed runtime.
+  final String? browserExePath;
+
+  /// Raw Chromium command-line switches forwarded to WebView2's
+  /// `ICoreWebView2EnvironmentOptions::put_AdditionalBrowserArguments`.
+  ///
+  /// Example: `"--disable-web-security --allow-running-insecure-content"`.
+  final String? additionalArguments;
+}
+
+/// Maps a [WebViewEnvironmentSettings] into the parameters accepted by
+/// [WebviewController.initializeEnvironment].
+///
+/// This is the single source of truth for which Windows-only settings are
+/// forwarded to the WebView2 runtime. Before this helper existed, only
+/// [WebViewEnvironmentSettings.userDataFolder] was honored, silently
+/// dropping `additionalBrowserArguments` — so Chromium flags such as
+/// `--disable-web-security` never reached WebView2 and local CORS could
+/// not be disabled (issue #178).
+///
+/// Pure and synchronous so it can be unit-tested without a live WebView2
+/// runtime; the caller supplies the default user-data folder via
+/// [defaultUserDataFolder] (which is only invoked when [settings] is `null`
+/// or does not specify `userDataFolder`).
+WebViewEnvironmentInitArgs resolveEnvironmentInitArgs({
+  required WebViewEnvironmentSettings? settings,
+  required String Function() defaultUserDataFolder,
+}) {
+  if (settings == null) {
+    return WebViewEnvironmentInitArgs(
+      userDataPath: defaultUserDataFolder(),
+    );
+  }
+  return WebViewEnvironmentInitArgs(
+    userDataPath: settings.userDataFolder ?? defaultUserDataFolder(),
+    browserExePath: settings.browserExecutableFolder,
+    additionalArguments: settings.additionalBrowserArguments,
+  );
 }

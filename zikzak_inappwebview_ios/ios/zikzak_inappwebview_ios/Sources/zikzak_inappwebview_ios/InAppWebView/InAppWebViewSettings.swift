@@ -58,6 +58,14 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     var decelerationRate = "NORMAL"  // UIScrollView.DecelerationRate.normal
     var alwaysBounceVertical = false
     var alwaysBounceHorizontal = false
+    /// Controls whether the scroll view bounces horizontally when it reaches the
+    /// end of its content. iOS 17.4+ only; `nil` (default) leaves the scroll
+    /// view's own default (`true`) untouched.
+    var bouncesHorizontally: Bool? = nil
+    /// Controls whether the scroll view bounces vertically when it reaches the
+    /// end of its content. iOS 17.4+ only; `nil` (default) leaves the scroll
+    /// view's own default (`true`) untouched.
+    var bouncesVertically: Bool? = nil
     var scrollsToTop = true
     var isPagingEnabled = false
     var maximumZoomScale = 1.0
@@ -159,6 +167,13 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
                 type: webView.scrollView.decelerationRate)
             realSettings["alwaysBounceVertical"] = webView.scrollView.alwaysBounceVertical
             realSettings["alwaysBounceHorizontal"] = webView.scrollView.alwaysBounceHorizontal
+            if #available(iOS 17.4, *) {
+                realSettings["bouncesHorizontally"] = webView.scrollView.bouncesHorizontally
+                realSettings["bouncesVertically"] = webView.scrollView.bouncesVertically
+            } else {
+                realSettings["bouncesHorizontally"] = nil
+                realSettings["bouncesVertically"] = nil
+            }
             realSettings["scrollsToTop"] = webView.scrollView.scrollsToTop
             realSettings["isPagingEnabled"] = webView.scrollView.isPagingEnabled
             realSettings["maximumZoomScale"] = webView.scrollView.maximumZoomScale

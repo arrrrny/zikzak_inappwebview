@@ -11,7 +11,7 @@ import '../pull_to_refresh/pull_to_refresh_controller.dart';
 import 'network_capture/network_capture_manager.dart';
 
 ///{@macro zikzak_inappwebview_platform_interface.PlatformHeadlessInAppWebView}
-class HeadlessInAppWebView {
+class HeadlessInAppWebView implements Disposable {
   /// Constructs a [HeadlessInAppWebView].
   ///
   ///{@macro zikzak_inappwebview_platform_interface.PlatformHeadlessInAppWebView}

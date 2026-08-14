@@ -65,7 +65,7 @@ class IosProxyController extends PlatformProxyController
   Future<dynamic> _handleMethod(MethodCall call) async {}
 
   @override
-  void dispose() {
+  void dispose({bool isKeepAlive = false}) {
     // empty.
   }
 }

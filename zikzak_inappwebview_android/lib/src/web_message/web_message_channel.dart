@@ -123,7 +123,7 @@ class AndroidWebMessageChannel extends PlatformWebMessageChannel
   }
 
   @override
-  void dispose() {
+  void dispose({bool isKeepAlive = false}) {
     disposeChannel();
   }
 

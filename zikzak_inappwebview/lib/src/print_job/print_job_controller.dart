@@ -49,5 +49,6 @@ class PrintJobController {
   Future<PrintJobInfo?> getInfo() => platform.getInfo();
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformPrintJobController.dispose}
-  void dispose() => platform.dispose();
+  void dispose({bool isKeepAlive = false}) =>
+      platform.dispose(isKeepAlive: isKeepAlive);
 }

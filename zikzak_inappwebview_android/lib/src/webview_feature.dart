@@ -30,7 +30,7 @@ class AndroidWebViewFeature extends PlatformWebViewFeature
   }
 
   @override
-  void dispose() {
+  void dispose({bool isKeepAlive = false}) {
     // empty
   }
 

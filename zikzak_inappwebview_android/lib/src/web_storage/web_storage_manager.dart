@@ -117,7 +117,7 @@ class AndroidWebStorageManager extends PlatformWebStorageManager
   }
 
   @override
-  void dispose() {
+  void dispose({bool isKeepAlive = false}) {
     // empty
   }
 }

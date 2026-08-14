@@ -382,7 +382,7 @@ because there isn't any way to make the website data store non-persistent for th
 
   ///Set to `true` to disable context menu. The default value is `false`.
   @SupportedPlatforms(
-    platforms: [AndroidPlatform(), IOSPlatform(), WebPlatform()],
+    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform(), WebPlatform()],
   )
   bool? disableContextMenu;
 
@@ -1486,6 +1486,52 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   )
   bool? alwaysBounceHorizontal;
 
+  ///A Boolean value that controls whether the scroll view bounces when it reaches
+  ///the end of its horizontal content.
+  ///
+  ///When set to `false`, horizontal scrolling does not produce a bounce effect
+  ///even when [InAppWebViewSettings.disallowOverScroll] is `false` and
+  ///[InAppWebViewSettings.alwaysBounceHorizontal] is `false`. The default value
+  ///is `true`.
+  ///
+  ///This property is only applied on iOS 17.4 and newer; on earlier iOS versions
+  ///it is a no-op. When left `null`, no override is applied and the scroll view's
+  ///own default is preserved.
+  @SupportedPlatforms(
+    platforms: [
+      IOSPlatform(
+        available: "17.4",
+        apiName: "UIScrollView.bouncesHorizontally",
+        apiUrl:
+            "https://developer.apple.com/documentation/uikit/uiscrollview/4210610-bounceshorizontally",
+      ),
+    ],
+  )
+  bool? bouncesHorizontally;
+
+  ///A Boolean value that controls whether the scroll view bounces when it reaches
+  ///the end of its vertical content.
+  ///
+  ///When set to `false`, vertical scrolling does not produce a bounce effect
+  ///even when [InAppWebViewSettings.disallowOverScroll] is `false` and
+  ///[InAppWebViewSettings.alwaysBounceVertical] is `false`. The default value
+  ///is `true`.
+  ///
+  ///This property is only applied on iOS 17.4 and newer; on earlier iOS versions
+  ///it is a no-op. When left `null`, no override is applied and the scroll view's
+  ///own default is preserved.
+  @SupportedPlatforms(
+    platforms: [
+      IOSPlatform(
+        available: "17.4",
+        apiName: "UIScrollView.bouncesVertically",
+        apiUrl:
+            "https://developer.apple.com/documentation/uikit/uiscrollview/4210612-bouncesvertically",
+      ),
+    ],
+  )
+  bool? bouncesVertically;
+
   ///A Boolean value that controls whether the scroll-to-top gesture is enabled.
   ///The scroll-to-top gesture is a tap on the status bar. When a user makes this gesture,
   ///the system asks the scroll view closest to the status bar to scroll to the top.
@@ -1732,7 +1778,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   ///Set to `true` to disable the context menu (copy, select, etc.) that is shown when the user emits a long press event on a HTML link.
   ///This is implemented using also JavaScript, so it must be enabled or it won't work.
   ///The default value is `false`.
-  @SupportedPlatforms(platforms: [IOSPlatform()])
+  @SupportedPlatforms(platforms: [IOSPlatform(), MacOSPlatform()])
   bool? disableLongPressContextMenuOnLinks;
 
   ///Set to `true` to disable the [inputAccessoryView](https://developer.apple.com/documentation/uikit/uiresponder/1621119-inputaccessoryview) above system keyboard.
@@ -2033,6 +2079,30 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   )
   bool? dismissDialogues;
 
+  ///Which window insets the Android WebView should **ignore** when laying out
+  ///web content, so that content can render edge-to-edge behind the status bar,
+  ///navigation bar, IME (keyboard), display cutout and/or system-gesture areas.
+  ///
+  ///This is the zikzak equivalent of `webview_flutter_android`'s
+  ///`setInsetsForWebContentToIgnore` API. Each listed inset type is zeroed out
+  ///before reaching the WebView, so the WebView will not pad or shrink its
+  ///content for those insets.
+  ///
+  ///Example - render web content behind the status bar, navigation bar and IME:
+  ///```dart
+  ///InAppWebViewSettings(
+  ///  insetsForWebContentToIgnore: [
+  ///    AndroidWebViewInsets.systemBars,
+  ///    AndroidWebViewInsets.ime,
+  ///  ],
+  ///)
+  ///```
+  ///
+  ///Leave this `null` or empty to keep the default Android behavior (the
+  ///WebView is inset by the system bars / IME as usual).
+  @SupportedPlatforms(platforms: [AndroidPlatform()])
+  List<AndroidWebViewInsets>? insetsForWebContentToIgnore;
+
   ///Set to `true` to enable the Network Capture API: `XMLHttpRequest` and
   ///`fetch()` calls made by the page are intercepted and reported through
   ///the `onNetworkRequest`/`onNetworkResponse`/`onNetworkLoadingFinished`
@@ -2237,6 +2307,8 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.decelerationRate = ScrollViewDecelerationRate_.NORMAL,
     this.alwaysBounceVertical = false,
     this.alwaysBounceHorizontal = false,
+    this.bouncesHorizontally,
+    this.bouncesVertically,
     this.scrollsToTop = true,
     this.isPagingEnabled = false,
     this.maximumZoomScale = 1.0,
@@ -2271,6 +2343,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.iframeName,
     this.iframeCsp,
     this.dismissDialogues = false,
+    this.insetsForWebContentToIgnore,
     this.useNetworkCapture,
     this.networkCaptureMaxBodySize = 50000,
     this.networkCaptureBodies = true,
