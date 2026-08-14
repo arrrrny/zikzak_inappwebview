@@ -2293,7 +2293,7 @@ public final class InAppWebView
      * to this WebView.
      *
      * <p>For each ignored inset type the matching {@link WindowInsetsCompat.Type}
-     * mask is zeroed out via a {@link ViewCompat.OnApplyWindowInsetsListener}
+     * mask is zeroed out via a {@link OnApplyWindowInsetsListener}
      * (using {@link WindowInsetsCompat.Builder#setInsets(int, Insets)}) so the
      * WebView no longer pads or shrinks its content for those insets. This is
      * the zikzak equivalent of {@code webview_flutter_android}'s
@@ -2349,7 +2349,7 @@ public final class InAppWebView
         final int finalTypeMask = typeMask;
         ViewCompat.setOnApplyWindowInsetsListener(
             this,
-            new ViewCompat.OnApplyWindowInsetsListener() {
+            new androidx.core.view.OnApplyWindowInsetsListener() {
                 @Override
                 public WindowInsetsCompat onApplyWindowInsets(
                     View v, WindowInsetsCompat insets

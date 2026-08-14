@@ -95,6 +95,25 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
           );
         }
         break;
+      case 'onPageCommitVisible':
+        if (params.webviewParams?.onPageCommitVisible != null) {
+          String? url = call.arguments['url'];
+          params.webviewParams!.onPageCommitVisible!(
+            controller,
+            url != null ? WebUri(url) : null,
+          );
+        }
+        break;
+      case 'onDidReceiveServerRedirectForProvisionalNavigation':
+        if (params
+                .webviewParams
+                ?.onDidReceiveServerRedirectForProvisionalNavigation !=
+            null) {
+          params
+              .webviewParams!
+              .onDidReceiveServerRedirectForProvisionalNavigation!(controller);
+        }
+        break;
       case 'onReceivedError':
         if (params.webviewParams?.onReceivedError != null) {
           String? url = call.arguments['url'];
@@ -184,9 +203,7 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
         break;
       case 'onWebContentProcessDidTerminate':
         if (params.webviewParams?.onWebContentProcessDidTerminate != null) {
-          params.webviewParams!.onWebContentProcessDidTerminate!(
-            controller,
-          );
+          params.webviewParams!.onWebContentProcessDidTerminate!(controller);
         }
         break;
       case 'onJsAlert':
@@ -251,8 +268,7 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
             : webviewParams?.contextMenu;
         if (contextMenu != null && contextMenu.onCreateContextMenu != null) {
           Map<String, dynamic> arguments =
-              (call.arguments as Map<dynamic, dynamic>)
-                  .cast<String, dynamic>();
+              (call.arguments as Map<dynamic, dynamic>).cast<String, dynamic>();
           InAppWebViewHitTestResult hitTestResult =
               InAppWebViewHitTestResult.fromMap(arguments)!;
           contextMenu.onCreateContextMenu!(hitTestResult);
@@ -502,7 +518,6 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
     args.putIfAbsent('contentWorld', () => contentWorld?.toMap());
     return await _channel.invokeMethod('evaluateJavascript', args);
   }
-
 
   @override
   Future<MacOSPrintJobController?> printCurrentPage({
