@@ -2,7 +2,7 @@ import FlutterMacOS
 
 public class WebViewChannelDelegate: ChannelDelegate {
     
-    public init(channel: FlutterMethodChannel) {
+    public override init(channel: FlutterMethodChannel) {
         super.init(channel: channel)
     }
     

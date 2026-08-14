@@ -4,7 +4,7 @@ import WebKit
 
 public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler, WKUIDelegate, NSMenuDelegate {
     var channel: FlutterMethodChannel!
-    var registrar: FlutterPluginRegistrar
+    var registrar: FlutterPluginRegistrar? = nil
     var plugin: InAppWebViewFlutterPlugin?
     private var findInteractionChannel: FlutterMethodChannel!
     private var searchText: String?
@@ -71,8 +71,8 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         let userContentController = WKUserContentController()
         configuration.userContentController = userContentController
 
-        super.init(frame: .zero, configuration: configuration)
         self.registrar = registrar
+        super.init(frame: .zero, configuration: configuration)
         self.plugin = plugin
         self.autoresizingMask = [.width, .height]
         self.navigationDelegate = self
@@ -226,19 +226,14 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             printJobId = UUID().uuidString
         }
 
-        let printInfo = NSPrintInfo(dictionary: nil)
-        printInfo.jobName =
-            settings?.jobName ?? (title ?? url?.absoluteString ?? "") + " Document"
+        let printInfo = NSPrintInfo()
+        // NOTE: macOS NSPrintInfo has no jobName (iOS-only); the print job
+        // label comes from PrintJobController.settings.jobName instead.
         if let settings = settings {
             if let orientationValue = settings.orientation,
                let orientation = NSPrintInfo.PaperOrientation.init(rawValue: orientationValue)
             {
                 printInfo.orientation = orientation
-            }
-            if let duplexModeValue = settings.duplexMode,
-               let duplexMode = NSPrintInfo.DuplexMode.init(rawValue: duplexModeValue)
-            {
-                printInfo.duplex = duplexMode
             }
             if let margins = settings.margins {
                 printInfo.topMargin = margins.top
@@ -405,7 +400,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             {
                 do {
                     let assetURL = try Util.getUrlAsset(
-                        registrar: self.registrar, assetFilePath: assetFilePath)
+                        registrar: self.registrar!, assetFilePath: assetFilePath)
                     if assetURL.isFileURL {
                         self.loadFileURL(
                             assetURL, allowingReadAccessTo: assetURL.deletingLastPathComponent())
@@ -670,14 +665,15 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                    let contentWorld = WKContentWorld.fromMap(map: contentWorldMap)
                 {
                     // macOS 11+ WKContentWorld — floor is macOS 12, no gating needed.
-                    self.evaluateJavaScript(source, in: nil, in: contentWorld) { (value, error) in
-                        if let error = error {
+                    self.evaluateJavaScript(source, in: nil, in: contentWorld) { outcome in
+                        switch outcome {
+                        case .success(let value):
+                            result(value ?? NSNull())
+                        case .failure(let error):
                             result(
                                 FlutterError(
                                     code: "InAppWebView", message: error.localizedDescription,
                                     details: nil))
-                        } else {
-                            result(value ?? NSNull())
                         }
                     }
                 } else {
@@ -1620,11 +1616,6 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             "onDidReceiveServerRedirectForProvisionalNavigation", arguments: [:])
     }
 
-    public func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
-        // onWebContentProcessDidTerminate (#197, see also #194).
-        channel?.invokeMethod("onWebContentProcessDidTerminate", arguments: [:])
-    }
-
     public func webView(
         _ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error
     ) {
@@ -2534,142 +2525,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         }
     }
 
-    @available(macOS 12.0, *)
-    public func webView(
-        _ webView: WKWebView,
-        contextMenuForElement elementInfo: WKContextMenuElementInfo,
-        willDisplayWithHighlight highlight: Bool
-    ) -> NSMenu? {
-        // 1. Honor `disableContextMenu` — suppress the menu entirely but still
-        //    fire onCreateContextMenu so Dart parity with iOS/Android is kept.
-        //    We invoke the channel directly (bypassing `onCreateContextMenu(...)`
-        //    which would set `contextMenuIsShowing = true`): no NSMenu is shown,
-        //    so `menuDidClose(_:)` never fires and the flag would otherwise stay
-        //    true forever. iOS uses a separate debounce flag for the same reason.
-        if settings?.disableContextMenu == true {
-            let hit = hitTestResult(for: elementInfo)
-            channel?.invokeMethod("onCreateContextMenu", arguments: hit.toMap())
-            return nil
-        }
 
-        // 2. Honor `disableLongPressContextMenuOnLinks` — on macOS the right-click
-        //    menu on a link is the equivalent of the iOS long-press menu on links.
-        //    When the setting is true and the hit element is a link, suppress.
-        if settings?.disableLongPressContextMenuOnLinks == true,
-           elementInfo.linkURL != nil
-        {
-            return nil
-        }
-
-        let hitTestResult = self.hitTestResult(for: elementInfo)
-        onCreateContextMenu(hitTestResult: hitTestResult)
-
-        // 3. Build the menu. If no custom contextMenu was set via Dart, return nil
-        //    so WebKit shows its default menu. We already fired onCreateContextMenu
-        //    above (parity with iOS); since WebKit's default NSMenu is not ours,
-        //    `menuDidClose(_:)` will never fire on us — so balance the event here
-        //    by calling onHideContextMenu() immediately. (iOS observes close via
-        //    UIContextMenuInteraction; macOS WKUIDelegate cannot when returning nil.)
-        guard let menu = self.contextMenu else {
-            onHideContextMenu()
-            return nil
-        }
-
-        let contextMenuSettings = ContextMenuSettings()
-        if let contextMenuSettingsMap = menu["settings"] as? [String: Any?] {
-            let _ = contextMenuSettings.parse(settings: contextMenuSettingsMap)
-        }
-
-        let customMenu = NSMenu()
-        contextMenuItemTargets = []
-
-        if let menuItems = menu["menuItems"] as? [[String: Any]] {
-            for menuItem in menuItems {
-                guard let id = menuItem["id"] else {
-                    // Skip items without an id — Dart's `assert(id != null)`
-                    // is stripped in release builds, so we must guard here.
-                    continue
-                }
-                let title = menuItem["title"] as? String ?? ""
-                let target = ContextMenuItemTarget(id: id, title: title) { [weak self] itemId, itemTitle in
-                    self?.onContextMenuActionItemClicked(id: itemId, title: itemTitle)
-                }
-                contextMenuItemTargets.append(target)
-                let item = NSMenuItem(
-                    title: title,
-                    action: #selector(ContextMenuItemTarget.itemClicked),
-                    keyEquivalent: "")
-                item.target = target
-                customMenu.addItem(item)
-            }
-        }
-
-        // WKWebView does not expose its default NSMenu, so we cannot append
-        // custom items to the system items — when any custom items are present
-        // they *replace* the default menu. `hideDefaultSystemContextMenuItems`
-        // therefore only changes behavior when there are NO custom items:
-        //   true  + no custom items => suppress the menu entirely
-        //   false + no custom items => let WebKit show its default menu
-        //
-        // Returning nil from this delegate method lets WebKit show its default
-        // menu (per Apple's WKUIDelegate documentation). To actually suppress
-        // the menu when `hideDefaultSystemContextMenuItems == true`, we set the
-        // `suppressDefaultMenuNext` flag and cancel tracking in
-        // `willOpenMenu(_:with:)` — the supported macOS override path.
-        if customMenu.items.isEmpty {
-            if contextMenuSettings.hideDefaultSystemContextMenuItems {
-                // Suppress the default menu: set the flag so willOpenMenu cancels
-                // WebKit's default NSMenu before it's shown.
-                suppressDefaultMenuNext = true
-            }
-            // Same rationale as the `guard let menu` branch above: we already
-            // fired onCreateContextMenu, but we're returning nil so WebKit shows
-            // its default menu (or, when suppressed, no menu at all) — balance
-            // the event by firing onHideContextMenu.
-            onHideContextMenu()
-            return nil
-        }
-        customMenu.delegate = self
-        return customMenu
-    }
-
-    /// Builds a `HitTestResult` from the `WKContextMenuElementInfo` provided by
-    /// WebKit. Maps linkURL/imageURL to the same `HitTestResultType` values used
-    /// on iOS so Dart receives a consistent result across platforms.
-    private func hitTestResult(for elementInfo: WKContextMenuElementInfo) -> HitTestResult {
-        let linkURL = elementInfo.linkURL?.absoluteString
-        let imageURL = elementInfo.imageURL?.absoluteString
-
-        var type: HitTestResultType = .unknownType
-        var extra: String? = nil
-
-        if let link = linkURL, let image = imageURL, !link.isEmpty, !image.isEmpty {
-            type = .srcImageAnchorType
-            extra = link
-        } else if let image = imageURL, !image.isEmpty {
-            type = .imageType
-            extra = image
-        } else if let link = linkURL, !link.isEmpty {
-            // HTML allows case variations (MAILTO:, Mailto:, etc.) — match
-            // case-insensitively but strip the original-cased scheme length.
-            let lower = link.lowercased()
-            if lower.hasPrefix("mailto:") {
-                type = .emailType
-                extra = String(link.dropFirst("mailto:".count))
-            } else if lower.hasPrefix("tel:") {
-                type = .phoneType
-                extra = String(link.dropFirst("tel:".count))
-            } else if lower.hasPrefix("geo:") {
-                type = .geoType
-                extra = String(link.dropFirst("geo:".count))
-            } else {
-                type = .srcAnchorType
-                extra = link
-            }
-        }
-
-        return HitTestResult(type: type, extra: extra)
-    }
 
     // MARK: - Default-menu suppression (WKWebView default NSMenu)
 
@@ -2687,7 +2543,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     /// delegate returned `nil`; when the delegate returned our custom
     /// `NSMenu`, the flag is false and we simply forward to `super`.
     public override func willOpenMenu(_ menu: NSMenu, with event: NSEvent?) {
-        super.willOpenMenu(menu, with: event)
+        super.willOpenMenu(menu, with: event ?? NSEvent())
         if suppressDefaultMenuNext {
             suppressDefaultMenuNext = false
             // Cancel tracking on the default menu so it is not displayed.
@@ -2700,49 +2556,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         }
     }
 
-    @available(macOS 12.0, *)
-    public func webView(
-        _ webView: WKWebView,
-        requestDeviceOrientationAndMotionPermissionFor origin: WKSecurityOrigin,
-        initiatedByFrame frame: WKFrameInfo,
-        decisionHandler: @escaping (WKPermissionDecision) -> Void
-    ) {
-        // If the WebView is already disposed, deny immediately to avoid
-        // invoking a torn-down FlutterMethodChannel.
-        guard !isDisposed else {
-            decisionHandler(.deny)
-            return
-        }
 
-        let originString =
-            "\(origin.protocol)://\(origin.host)"
-            + (origin.port != 0 ? ":" + String(origin.port) : "")
-        let permissionRequest = PermissionRequest(
-            origin: originString,
-            resources: ["deviceOrientationAndMotion"],
-            frame: frame)
-
-        var decisionHandlerCalled = false
-        channel.invokeMethod(
-            "onPermissionRequest",
-            arguments: permissionRequest.toMap()
-        ) { result in
-            if let map = result as? [String: Any] {
-                InAppWebView.resolvePermissionDecision(
-                    response: PermissionResponse.fromMap(map: map),
-                    decisionHandler: decisionHandler,
-                    decisionHandlerCalled: &decisionHandlerCalled)
-            } else {
-                if let error = result as? FlutterError {
-                    print("[InAppWebView] onPermissionRequest error: \(error.code) – \(error.message ?? "")")
-                }
-                InAppWebView.resolvePermissionDecision(
-                    response: nil,
-                    decisionHandler: decisionHandler,
-                    decisionHandlerCalled: &decisionHandlerCalled)
-            }
-        }
-    }
 
     // MARK: - NSMenuDelegate
 

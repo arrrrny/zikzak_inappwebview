@@ -9,7 +9,7 @@ public class PrintAttributes: NSObject {
         super.init()
         if let printInfo = fromPrintJobController.printInfo {
             orientation = printInfo.orientation.rawValue
-            duplex = printInfo.duplex.rawValue
+            duplex = fromPrintJobController.settings?.duplexMode
             margins = NSEdgeInsets(
                 top: printInfo.topMargin,
                 left: printInfo.leftMargin,

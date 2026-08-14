@@ -71,7 +71,7 @@ public class WebMessageListener: NSObject {
         // approximate that by adding it to the user content controller.
         let userScript = WKUserScript(
             source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-        webView?.configuration.userContentController.addUserScript(userScript)
+        webView.configuration.userContentController.addUserScript(userScript)
     }
 
     public static func fromMap(plugin: InAppWebViewFlutterPlugin, map: [String: Any?]?)
