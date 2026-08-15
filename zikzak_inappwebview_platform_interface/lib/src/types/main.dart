@@ -39,8 +39,13 @@ export 'data_detector_types.dart' show DataDetectorTypes;
 export 'dismiss_button_style.dart' show DismissButtonStyle;
 export 'download_start_request.dart' show DownloadStartRequest;
 export 'favicon.dart' show Favicon;
-export 'fetch_request.dart' show FetchRequest;
-export 'fetch_request_action.dart' show FetchRequestAction;
+// Zorphy entities (migrated from @ExchangeableObject codegen, see PROGRESS.md).
+export '../domain/entities/fetch_request/fetch_request.dart'
+    show FetchRequest, FetchRequestSerialization;
+export '../domain/entities/enums/fetch_request_action.dart'
+    show FetchRequestAction;
+// Hand-written (migration skip/hierarchy — polymorphic credential wire
+// dispatch; see PROGRESS.md).
 export 'fetch_request_credential.dart' show FetchRequestCredential;
 export 'fetch_request_credential_default.dart'
     show FetchRequestCredentialDefault;

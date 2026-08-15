@@ -9,8 +9,9 @@ and the zikzak→zuraffa v6 migration (…7545).
 ## STATUS
 
 **Phase 1 (JS dialogue model family → Zorphy entities) — DONE (PR #218, merged b792cb9e)**
-**Phase 2a (ajax_request family → Zorphy entities) — DONE on branch
-`feat/migrate-models-zorphy-entities-phase2` (PR pending)**
+**Phase 2a (ajax_request family → Zorphy entities) — DONE (PR #219, merged bc0f757b)**
+**Phase 2b (fetch_request family → Zorphy entities) — DONE on branch
+`feat/migrate-models-zorphy-entities-phase2b` (PR pending)**
 
 - Phase 0 (mapping + toolchain) DONE.
 - Note on the task premise: this repo does **NOT** use Freezed. Upstream
@@ -56,8 +57,10 @@ and the zikzak→zuraffa v6 migration (…7545).
 
 ## RESUME FROM
 
-Phase 2b — next `types/` family (candidate: fetch_request + network capture
-family; recipe + zuraffa #351 patch documented above).
+Phase 2c — next `types/` family (candidate: network capture family —
+network_request/network_entry/network_response/network_response_body/
+resource_type/url_pattern_type; fork-custom, no sibling-entity refs; recipe
++ zuraffa #351/#349 patches documented above).
 
 ---
 
@@ -164,7 +167,17 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` converted · `[–]` skip/fo
       (codegen wrapper dropped, public API/wire identical).
 - [x] `types/ajax_request_ready_state.dart` → `AjaxRequestReadyState` (enum, int wire)
 
-### Phase 2b — remaining `types/` value objects + enums (upstream, ~175 files)
+### Phase 2b — fetch_request family (network fetch interception)
+- [x] `types/fetch_request.dart` → `FetchRequest` (lib/src/domain/entities/fetch_request/)
+- [x] `types/fetch_request_action.dart` → `FetchRequestAction` (enum, int wire)
+- [x] `types/fetch_request_credential.dart` + default/federated/password → `[–]`
+      skip/hierarchy: polymorphic base + subclasses dispatching on the wire
+      `type` key; Zorphy value objects cannot express inheritance. Rewritten as
+      plain Dart (codegen wrappers dropped, public API/is-a/wire identical);
+      `FetchRequest.credentials` typed `FetchRequestCredential?` via custom
+      fromJson/toJson dispatcher glue in the entity.
+
+### Phase 2c — remaining `types/` value objects + enums (upstream, ~170 files)
 TODO list generated from the inventory below (add `[ ]` per file as phases
 are carved out; each phase = one cohesive callback family).
 
@@ -267,4 +280,42 @@ dialogue_dismisser — hand-written toJson/fromJson today → Zorphy, core packa
   flutter test 45/45 (incl. new test/types/ajax_request_entities_test.dart);
   android/ios/macos/web/windows No issues; linux 4 pre-existing infos; core
   0 errors (21 infos).
+- 2026-08-15 — Phase 2b (fetch_request family) executed on branch
+  `feat/migrate-models-zorphy-entities-phase2b` (off development): 1 value
+  object (`FetchRequest`) + 1 enum (`FetchRequestAction`, int wire) generated
+  via zfa; the 4-file polymorphic credential hierarchy
+  (`FetchRequestCredential` + default/federated/password) handled as
+  skip/hierarchy (plain Dart rewrites — codegen wrappers + their `.g.dart`
+  dropped; public API/is-a/wire identical; dispatched on the wire `type` key).
+  Post-processed: WebUri glue, `Map<String,dynamic>` cast glue, string-wire
+  `ReferrerPolicy` glue (via the still-codegen `ReferrerPolicy.fromNativeValue`/
+  `toNativeValue`), polymorphic credentials dispatcher (`_credentialsFromJson`),
+  `action` default via `@JsonKey(defaultValue: PROCEED)`; #349 import fixes
+  (`$WebUri`/`$FetchRequestCredential`/`$ReferrerPolicy` → real imports) and
+  the #351 patch on the generated `.zorphy.dart` (`InvalidType` ×2 →
+  `FetchRequestCredential?`/`ReferrerPolicy?` incl. `Field<...>`/`_$x`
+  accessors + copyWith/patch; drop `required` on `body`). Old sources +
+  `.g.dart` deleted; barrels re-export entities. Glue in android/ios
+  controllers: `fromMap`→`fromJson`, `jsonEncode(await cb())` →
+  `jsonEncode((await cb())?.toJson())`. Added test
+  `test/types/fetch_request_entities_test.dart` (defaults, wire format,
+  null-tolerance, polymorphic credential round-trip, int enum values, copyWith,
+  credential hierarchy public API/is-a). Verified green: platform_interface
+  analyze 0 errors / flutter test 53/53; android 0 errors, ios 0 errors, core
+  0 errors.
+- 2026-08-15 — NOTE on the task lifecycle: task …8103 (this migration) was
+  marked `done` by the pool at 10:18 UTC after Phase 2a merged (result
+  prUrl=#218). The work continues as documented here (RESUME FROM); updates
+  are posted to the same task feed via r.sh --update.
+- 2026-08-15 — RESOLVED box quirk (was "mystery writer"): the identical 8-line
+  analyzer `exclude:` block (build/**/android/**/ios/**/web/**/windows/**/macos/**/linux/**)
+  appended to package `analysis_options.yaml` files is the **Flutter SDK's
+  built-in `AnalysisOptionsMigration`** (`flutter_tools` project.dart →
+  `ensureReadyForPlatformSpecificTooling`, triggered by `flutter analyze`/
+  `test` on packages lacking the excludes). Reproduced empirically (analyze
+  rewrote the file; verified the SDK source). It is harmless, official SDK
+  output, but NOT part of the migration PR — revert before committing with
+  `git checkout HEAD -- <pkg>/analysis_options.yaml` (the Phase 2a run
+  reverted it the same way). Future phases: expect it after any flutter
+  command; revert or keep at your discretion, but keep the PR diff scoped.
 
