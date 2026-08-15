@@ -1332,21 +1332,21 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
                     webviewParams!.shouldInterceptFetchRequest != null) ||
                 _inAppBrowserEventHandler != null) {
               Map<String, dynamic> arguments = args[0].cast<String, dynamic>();
-              FetchRequest request = FetchRequest.fromMap(arguments)!;
+              FetchRequest request = FetchRequest.fromJson(arguments);
 
               if (webviewParams != null &&
                   webviewParams!.shouldInterceptFetchRequest != null)
                 return jsonEncode(
-                  await webviewParams!.shouldInterceptFetchRequest!(
+                  (await webviewParams!.shouldInterceptFetchRequest!(
                     _controllerFromPlatform,
                     request,
-                  ),
+                  ))?.toJson(),
                 );
               else
                 return jsonEncode(
-                  await _inAppBrowserEventHandler!.shouldInterceptFetchRequest(
+                  (await _inAppBrowserEventHandler!.shouldInterceptFetchRequest(
                     request,
-                  ),
+                  ))?.toJson(),
                 );
             }
             return null;
