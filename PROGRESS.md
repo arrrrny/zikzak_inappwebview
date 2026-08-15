@@ -11,8 +11,9 @@ and the zikzak→zuraffa v6 migration (…7545).
 **Phase 1 (JS dialogue model family → Zorphy entities) — DONE (PR #218, merged b792cb9e)**
 **Phase 2a (ajax_request family → Zorphy entities) — DONE (PR #219, merged bc0f757b)**
 **Phase 2b (fetch_request family → Zorphy entities) — DONE (PR #220, merged 984bd850)**
-**Phase 2c (console_message + web_resource family → Zorphy entities) — DONE on
-branch `feat/migrate-models-zorphy-entities-phase2c` (PR #221, open)**
+**Phase 2c (console_message + web_resource family → Zorphy entities) — DONE (PR #221, merged 18d26075)**
+**Phase 2d (permission/safe-browsing family → Zorphy entities) — IN PROGRESS on
+branch `feat/migrate-models-zorphy-entities-phase2d` (PR pending)**
 
 - Phase 0 (mapping + toolchain) DONE.
 - Note on the task premise: this repo does **NOT** use Freezed. Upstream
@@ -54,13 +55,24 @@ branch `feat/migrate-models-zorphy-entities-phase2c` (PR #221, open)**
   outside `lib/src/domain/entities` (e.g. `WebUri`). Not blocking Phase 1:
   post-generation source fixes are part of the zfa workflow (`_fixEntityImports`
   does the same class of edit); the issue tracks the framework gap for a real
-  fix.
+  fix. **UPDATE 2026-08-15: FIXED + RELEASED** — pool task 070 implemented the
+  `!Type` external-type syntax (zuraffa def7d5f + zorphy 05feef3); future
+  phases should use `url:!WebUri` / `frame:!FrameInfo?` field syntax so zfa
+  emits the correct type + import with no `$` prefix.
+- **zuraffa #351** (2026-08-15, RE-CONFIRMED in Phase 2d): the InvalidType
+  defect struck `PermissionRequest.frame` (`FrameInfo?` external ref → the
+  generator emitted `required InvalidType this.frame` + `final InvalidType
+  frame`); #351 patch re-applied by hand. ALSO re-confirmed that a zorphy
+  regeneration of the previously-converted entities reintroduces the defect
+  (ajax_request/fetch_request .zorphy.dart regenerated with InvalidType by
+  the 05feef3 build — restored from git). The issue tracks the framework fix;
+  expect the hand-patch in every phase until it lands.
 
 ## RESUME FROM
 
-Phase 2d — next `types/` family (candidates: navigation/auth family
+Phase 2e — next `types/` family (candidates: navigation/auth family
 [navigation_action + navigation_response + http_auth/web_storage group] or
-permission/safe-browsing family; recipe + zuraffa #351/#349 patches documented
+window/JS-callback family; recipe + zuraffa #351/#349 patches documented
 above). NOTE: render_process_gone_detail + renderer_priority +
 renderer_priority_policy are COUPLED to the still-codegen
 InAppWebViewSettings.g.dart (`RendererPriorityPolicy.fromMap`) — convert them
@@ -201,7 +213,17 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` converted · `[–]` skip/fo
       fields) — not pure value types; Zorphy value objects cannot express
       them. Same category as AjaxRequestHeaders (documented skip).
 
-### Phase 2d — remaining `types/` value objects + enums (upstream, ~160 files)
+### Phase 2d — permission/safe-browsing family (permission + safe-browsing callbacks)
+- [x] `types/permission_request.dart` → `PermissionRequest` (lib/src/domain/entities/permission_request/; WebUri + sibling-enum native-value list + external `FrameInfo?` glue — #349 import fixes)
+- [x] `types/permission_resource_type.dart` → `PermissionResourceType` (enum, PLATFORM-DEPENDENT native wire: android `android.webkit.resource.*` strings / iOS-macOS `WKMediaCaptureType` raw values — replicated via `defaultTargetPlatform` switch helpers)
+- [x] `types/permission_response.dart` → `PermissionResponse` (native-value resource list + int-wire action; defaults `resources = const []`, `action = DENY`)
+- [x] `types/permission_response_action.dart` → `PermissionResponseAction` (enum, int wire)
+- [x] `types/safe_browsing_response.dart` → `SafeBrowsingResponse` (defaults `report = true`, `action = SHOW_INTERSTITIAL`)
+- [x] `types/safe_browsing_response_action.dart` → `SafeBrowsingResponseAction` (enum, int wire)
+- [x] `types/safe_browsing_threat.dart` → `SafeBrowsingThreat` (enum, int wire)
+- [x] `types/geolocation_permission_show_prompt_response.dart` → `GeolocationPermissionShowPromptResponse` (WebUri glue; default `retain = false`)
+
+### Phase 2e — remaining `types/` value objects + enums (upstream, ~150 files)
 TODO list generated from the inventory below (add `[ ]` per file as phases
 are carved out; each phase = one cohesive callback family).
 
@@ -370,3 +392,53 @@ dialogue_dismisser — hand-written toJson/fromJson today → Zorphy, core packa
   PR #221 (phase2c rebased onto the merged development; PROGRESS.md conflict
   resolved). Task resumed at 10:47 UTC.
 
+- 2026-08-15 — Task resumed (10:47Z). Merged Phase 2b + 2c into development:
+  PR #220 (984bd850) via gh squash; PR #221 rebased (PROGRESS.md + enums
+  index conflict resolved), merged as 18d26075.
+- 2026-08-15 — Phase 2d (permission/safe-browsing family) executed on branch
+  `feat/migrate-models-zorphy-entities-phase2d` (off development): 4 value
+  objects (PermissionRequest / PermissionResponse / SafeBrowsingResponse /
+  GeolocationPermissionShowPromptResponse) + 4 enums (PermissionResourceType /
+  PermissionResponseAction / SafeBrowsingThreat / SafeBrowsingResponseAction)
+  created via zfa. Post-processed: WebUri glue (×2), external FrameInfo?
+  glue + #349 import fixes (permission_request), sibling-enum NATIVE-VALUE
+  wire glue (PermissionResourceType — platform-dependent: android
+  `android.webkit.resource.*` strings / iOS-macOS WKMediaCaptureType raw
+  values; replicated with defaultTargetPlatform switch helpers in both
+  permission_request + permission_response), int-enum glue (action/report/
+  retain defaults via @JsonKey defaultValue → generated ctor defaults). Old
+  sources + .g.dart deleted; barrels re-export entities. Controller glue:
+  android + ios onSafeBrowsingHit (SafeBrowsingThreat.fromNativeValue →
+  index-range lookup), onPermissionRequest / onPermissionRequestCanceled
+  (fromMap→fromJson), onGeolocationPermissionsShowPrompt + callback returns
+  `?.toMap()`→`?.toJson()`. New test
+  test/types/permission_safe_browsing_entities_test.dart (defaults, wire
+  format per platform via debugDefaultTargetPlatformOverride, null-tolerance,
+  round-trips, int enum indices, unknown-native drop). Verified green:
+  platform_interface analyze 0 errors (2 pre-existing warnings in
+  ajax_request.zorphy.dart — committed state, not this PR) / tests 85/85;
+  android 0 errors, ios 0 errors, macos No issues (tests 35/35), linux 4
+  infos, web/windows No issues, core 0 errors (tests 95/95). Analyzed/
+  tested against the local platform_interface via untracked
+  pubspec_overrides.yaml (removed before commit).
+- 2026-08-15 — TOOLCHAIN/TASK-070 INTERACTION (documented for future phases):
+  zuraffa issue #349's fix task (pool task 070, `fix/349-external-type-
+  no-dollar-prefix`) was running CONCURRENTLY in this box while Phase 2d
+  built. Its WIP edits to /workspace/zuraffa broke the zfa CLI compile
+  mid-run (unescaped `$` in the help string) and the zorphy generator got a
+  new commit (05feef3 `!Type` prefix) WHILE the build was running. Handling:
+  (1) never touched /workspace/zuraffa or /workspace/zorphy (another task's
+  files); (2) ran the identical build pipeline directly
+  (`dart run build_runner build`, which is exactly what `zfa build` wraps)
+  instead of the broken CLI; (3) waited for task 070 to complete (11:19Z)
+  before final verification. The #349 fix landed (zuraffa def7d5f + zorphy
+  05feef3). ALSO: the zorphy regeneration REINTRODUCED the #351 InvalidType
+  defect into the previously-patched ajax_request/fetch_request .zorphy.dart
+  (confirmed: #351 "LOST on the next regeneration"); restored the committed
+  patched files via git checkout. And a build_runner gotcha: `dart run
+  build_runner build` can HANG indefinitely (event-loop idle, zero CPU) on a
+  stale build-script cache after an interrupted run — fix:
+  `dart run build_runner clean` first, then rebuild (the fresh run completed
+  in 44s). Also restored the ~40 checked-in @ExchangeableObject .g.dart files
+  the build deleted (they are claimed by no active builder; restore
+  everything except the current family's old .g.dart via git checkout).

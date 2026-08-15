@@ -1,6 +1,6 @@
 // Auto-generated enum barrel file
 // Exports all enums for easy importing
-// Generated at: 2026-08-15T10:38:46.327473
+// Generated at: 2026-08-15T10:53:32.353732
 
 library enums;
 
@@ -13,4 +13,8 @@ export 'js_alert_response_action.dart';
 export 'js_before_unload_response_action.dart';
 export 'js_confirm_response_action.dart';
 export 'js_prompt_response_action.dart';
+export 'permission_resource_type.dart';
+export 'permission_response_action.dart';
+export 'safe_browsing_response_action.dart';
+export 'safe_browsing_threat.dart';
 export 'web_resource_error_type.dart';
