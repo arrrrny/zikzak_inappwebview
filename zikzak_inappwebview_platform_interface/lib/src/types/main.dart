@@ -1,10 +1,17 @@
 export 'action_mode_menu_item.dart' show ActionModeMenuItem;
-export 'ajax_request.dart' show AjaxRequest;
-export 'ajax_request_action.dart' show AjaxRequestAction;
-export 'ajax_request_event.dart' show AjaxRequestEvent;
-export 'ajax_request_event_type.dart' show AjaxRequestEventType;
+// Zorphy entities (migrated from @ExchangeableObject codegen, see PROGRESS.md).
+export '../domain/entities/ajax_request/ajax_request.dart'
+    show AjaxRequest, AjaxRequestSerialization;
+export '../domain/entities/enums/ajax_request_action.dart'
+    show AjaxRequestAction;
+export '../domain/entities/ajax_request_event/ajax_request_event.dart'
+    show AjaxRequestEvent, AjaxRequestEventSerialization;
+export '../domain/entities/enums/ajax_request_event_type.dart'
+    show AjaxRequestEventType;
+// Hand-written (migration skip/fork — see PROGRESS.md).
 export 'ajax_request_headers.dart' show AjaxRequestHeaders;
-export 'ajax_request_ready_state.dart' show AjaxRequestReadyState;
+export '../domain/entities/enums/ajax_request_ready_state.dart'
+    show AjaxRequestReadyState;
 export 'attributed_string.dart' show AttributedString;
 export 'attributed_string_text_effect_style.dart'
     show AttributedStringTextEffectStyle;

@@ -1269,21 +1269,21 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
                     webviewParams!.shouldInterceptAjaxRequest != null) ||
                 _inAppBrowserEventHandler != null) {
               Map<String, dynamic> arguments = args[0].cast<String, dynamic>();
-              AjaxRequest request = AjaxRequest.fromMap(arguments)!;
+              AjaxRequest request = AjaxRequest.fromJson(arguments);
 
               if (webviewParams != null &&
                   webviewParams!.shouldInterceptAjaxRequest != null)
                 return jsonEncode(
-                  await params.webviewParams!.shouldInterceptAjaxRequest!(
+                  (await params.webviewParams!.shouldInterceptAjaxRequest!(
                     _controllerFromPlatform,
                     request,
-                  ),
+                  ))?.toJson(),
                 );
               else
                 return jsonEncode(
-                  await _inAppBrowserEventHandler!.shouldInterceptAjaxRequest(
+                  (await _inAppBrowserEventHandler!.shouldInterceptAjaxRequest(
                     request,
-                  ),
+                  ))?.toJson(),
                 );
             }
             return null;
@@ -1292,18 +1292,18 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
                     webviewParams!.onAjaxReadyStateChange != null) ||
                 _inAppBrowserEventHandler != null) {
               Map<String, dynamic> arguments = args[0].cast<String, dynamic>();
-              AjaxRequest request = AjaxRequest.fromMap(arguments)!;
+              AjaxRequest request = AjaxRequest.fromJson(arguments);
 
               if (webviewParams != null &&
                   webviewParams!.onAjaxReadyStateChange != null)
                 return (await webviewParams!.onAjaxReadyStateChange!(
                   _controllerFromPlatform,
                   request,
-                ))?.toNativeValue();
+                ))?.index;
               else
                 return (await _inAppBrowserEventHandler!.onAjaxReadyStateChange(
                   request,
-                ))?.toNativeValue();
+                ))?.index;
             }
             return null;
           case "onAjaxProgress":
@@ -1311,18 +1311,18 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
                     webviewParams!.onAjaxProgress != null) ||
                 _inAppBrowserEventHandler != null) {
               Map<String, dynamic> arguments = args[0].cast<String, dynamic>();
-              AjaxRequest request = AjaxRequest.fromMap(arguments)!;
+              AjaxRequest request = AjaxRequest.fromJson(arguments);
 
               if (webviewParams != null &&
                   webviewParams!.onAjaxProgress != null)
                 return (await webviewParams!.onAjaxProgress!(
                   _controllerFromPlatform,
                   request,
-                ))?.toNativeValue();
+                ))?.index;
               else
                 return (await _inAppBrowserEventHandler!.onAjaxProgress(
                   request,
-                ))?.toNativeValue();
+                ))?.index;
             }
             return null;
           case "shouldInterceptFetchRequest":

@@ -8,7 +8,9 @@ and the zikzak→zuraffa v6 migration (…7545).
 
 ## STATUS
 
-**Phase 1 (JS dialogue model family → Zorphy entities) — IN PROGRESS**
+**Phase 1 (JS dialogue model family → Zorphy entities) — DONE (PR #218, merged b792cb9e)**
+**Phase 2a (ajax_request family → Zorphy entities) — DONE on branch
+`feat/migrate-models-zorphy-entities-phase2` (PR pending)**
 
 - Phase 0 (mapping + toolchain) DONE.
 - Note on the task premise: this repo does **NOT** use Freezed. Upstream
@@ -26,6 +28,22 @@ and the zikzak→zuraffa v6 migration (…7545).
 
 ## LAST ISSUE FILED
 
+- **zuraffa #351** (2026-08-15): cross-entity reference defect — when a
+  Zorphy entity has a field whose type is ANOTHER Zorphy entity in the same
+  package, `zfa build` generates `InvalidType` in the generated class
+  (`*.zorphy.dart`) for that field and the build fails at the json_serializable
+  stage. Verified in a minimal scratch repro (ParentThing/ChildThing), even
+  with the referenced entity's parts already on disk. Also covers the secondary
+  finding: `dynamic` fields become `required dynamic this.x` in the generated
+  constructor (constructor-shape change). Workaround used (documented,
+  #349-style fallback): after `zfa build`, patch the COMMITTED generated
+  `*.zorphy.dart` — replace `InvalidType` with the real entity type and drop
+  `required`/`?` on `dynamic` params. The `.g.dart` is unaffected (uses the
+  per-field `fromJson`/`toJson` glue). LOST on the next regeneration — the
+  issue tracks the framework fix. AFFECTS every entity referencing a sibling
+  entity (e.g. `AjaxRequest.event`, `FetchRequest.credential`,
+  `HttpAuthenticationChallenge.credentials`) — expect this patch in every
+  Phase 2 sub-phase.
 - **zuraffa #349** (2026-08-15): `zfa entity create --allow-forward-refs`
   emits `$X` + a bogus import for external (non-entity) types — plugin model
   migration gap. Minimal repro in the issue body. Workaround used (documented,
@@ -38,8 +56,8 @@ and the zikzak→zuraffa v6 migration (…7545).
 
 ## RESUME FROM
 
-Phase 1 setup: platform_interface pubspec/build.yaml wiring, then zfa entity
-generation for the JS dialogue family (see Phase 1 checklist).
+Phase 2b — next `types/` family (candidate: fetch_request + network capture
+family; recipe + zuraffa #351 patch documented above).
 
 ---
 
@@ -71,19 +89,35 @@ generation for the JS dialogue family (see Phase 1 checklist).
      (zorphy emits non-required params; verified: `JsAlertResponse()` still
      works with the fork's defaults);
    - `@JsonKey(toJson: ..., fromJson: ...)` for non-JSON-native field types
-     (e.g. `WebUri`) and for enums that must keep the int wire contract
-     (`toNativeValue()` ints ↔ `.index`);
-   - fix imports (WebUri / enum references) — `--allow-forward-refs` skips
-     zfa's on-disk type validation for types living outside
-     `lib/src/domain/entities` (e.g. `WebUri`).
+     (e.g. `WebUri`), for enums that must keep the int wire contract
+     (`toNativeValue()` ints ↔ `.index`), for STRING-wire enums (native string
+     ↔ enum, e.g. `AjaxRequestEventType` "loadstart"↔`LOADSTART`), for
+     `Map<String,dynamic>` fields (`.cast<String,dynamic>()` — platform maps
+     arrive as `Map<dynamic,dynamic>` and a plain `as` cast throws), and for
+     nested sibling entities (`X.fromJson(value as Map)` / `x?.toJson()`);
+   - fix imports (WebUri / sibling-entity / external refs) —
+     `--allow-forward-refs` skips zfa's on-disk type validation for types
+     living outside `lib/src/domain/entities` (e.g. `WebUri`).
 4. `zfa build` (runs build_runner: zorphy + json_serializable).
+   THEN (zuraffa #351 workaround): patch the committed generated
+   `*.zorphy.dart` — replace `InvalidType` → real sibling-entity type (incl.
+   the `Field<X, InvalidType>`/`static InvalidType _$x` accessors — make them
+   nullable like the field), and drop `required` (+ optional `?`) from
+   `dynamic` constructor params. Restore any `.g.dart` files the
+   `--delete-conflicting-outputs` pass removed (only the ones NOT being
+   deleted by the migration: `git checkout --` everything except the current
+   family's old files).
 5. Delete the old `@ExchangeableObject` source + its `.g.dart` from
    `lib/src/types/`; update barrels (`types/main.dart` + root main.dart) to
    re-export the entity with the SAME public class name.
 6. Glue (manual by design — "platform channels stay manual"): replace
    `X.fromMap(m)!` → `X.fromJson(m)` and `?.toMap()` → `?.toJson()` in the
    platform controllers; enum native-value translation via the per-field
-   `toJson`/`fromJson` glue in step 3.
+   `toJson`/`fromJson` glue in step 3. Watch out for `jsonEncode(callback())`
+   return paths (an extension `toJson` is invisible to `jsonEncode` — wrap as
+   `jsonEncode((await cb())?.toJson())`) and for callback return values sent
+   back over the channel (`?.toNativeValue()` → `?.index` for int enums;
+   string-wire enums need a small switch helper).
 
 ### Public-API invariants preserved
 - Same public class/enum names, same fields (now final — verified no field
@@ -119,7 +153,18 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` converted · `[–]` skip/fo
 - [x] `types/js_prompt_response_action.dart` → `JsPromptResponseAction` (enum)
 - [x] `types/js_before_unload_response_action.dart` → `JsBeforeUnloadResponseAction` (enum)
 
-### Phase 2 — remaining `types/` value objects + enums (upstream, ~180 files)
+### Phase 2a — ajax_request family (network capture callbacks)
+- [x] `types/ajax_request.dart` → `AjaxRequest` (lib/src/domain/entities/ajax_request/)
+- [x] `types/ajax_request_action.dart` → `AjaxRequestAction` (enum, int wire)
+- [x] `types/ajax_request_event.dart` → `AjaxRequestEvent` (string-enum wire glue)
+- [x] `types/ajax_request_event_type.dart` → `AjaxRequestEventType` (enum, string wire)
+- [x] `types/ajax_request_headers.dart` → `[–]` skip/fork: mutable-by-design with
+      method surface (`getHeaders`/`setRequestHeader`) + wire = accumulated new
+      headers; Zorphy value objects cannot express it. Rewritten as plain Dart
+      (codegen wrapper dropped, public API/wire identical).
+- [x] `types/ajax_request_ready_state.dart` → `AjaxRequestReadyState` (enum, int wire)
+
+### Phase 2b — remaining `types/` value objects + enums (upstream, ~175 files)
 TODO list generated from the inventory below (add `[ ]` per file as phases
 are carved out; each phase = one cohesive callback family).
 
@@ -198,3 +243,28 @@ dialogue_dismisser — hand-written toJson/fromJson today → Zorphy, core packa
   warnings); core 95/95, macos 35/35, windows 13/13 tests green. Toolchain:
   Flutter 3.47.0 / Dart 3.13.0 at /opt/flutter. Next phase: see the Phase 2
   list at the top of this file.
+- 2026-08-15 — Phase 2a (ajax_request family) executed on branch
+  `feat/migrate-models-zorphy-entities-phase2` (off development): 3 value
+  objects + 3 enums generated via zfa; `AjaxRequestHeaders` handled as
+  skip/fork (plain Dart rewrite, codegen wrapper dropped). Post-processed:
+  int-enum glue (`.index`), string-enum glue (`AjaxRequestEventType`),
+  WebUri glue (×2), nested `AjaxRequestEvent` + `AjaxRequestHeaders` glue,
+  `Map<String,dynamic>` cast glue, `action` default via
+  `@JsonKey(defaultValue: PROCEED)`. Old sources deleted; barrels re-export
+  entities. Glue in android/ios controllers: `fromMap`→`fromJson`,
+  `?.toNativeValue()`→`?.index` (both onAjax* callbacks return
+  `AjaxRequestAction` — int wire), `jsonEncode(await cb())`→
+  `jsonEncode((await cb())?.toJson())` (extension toJson is invisible to
+  dart:convert jsonEncode).
+- 2026-08-15 — NEW zuraffa defect discovered + filed as **#351**: cross-entity
+  references (`AjaxRequest.event: AjaxRequestEvent`) generate `InvalidType` in
+  the built `*.zorphy.dart` and fail the build; `dynamic` fields become
+  `required dynamic` ctor params. Minimal repro in issue (scratch
+  ParentThing/ChildThing). Workaround (documented in the recipe above):
+  patch the committed generated part after `zfa build` (`InvalidType` →
+  sibling entity type incl. `Field<...>`/`_$x` accessors; drop `required` on
+  `dynamic` params). Verified green: platform_interface 0 errors/0 warnings,
+  flutter test 45/45 (incl. new test/types/ajax_request_entities_test.dart);
+  android/ios/macos/web/windows No issues; linux 4 pre-existing infos; core
+  0 errors (21 infos).
+
