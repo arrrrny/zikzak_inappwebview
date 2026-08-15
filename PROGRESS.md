@@ -47,18 +47,21 @@ starts after the PRs below are merged.
   Phase 1 note) does NOT exist in zorphy history. PROGRESS.md's earlier
   "FIXED + RELEASED" note was wrong (pool task 070 did not land).
   **FIXED in this run**: zorphy PR #84
-  (https://github.com/arrrrny/zorphy/pull/84, branch
+  (https://github.com/arrrrny/zorphy/pull/84 — **MERGED 2026-08-15** as 9cfb13f; branch
   `fix/349-external-type-no-dollar-prefix-cli`) — `FieldDefinition.parse`
   strips `!` → `isExternal`, `FieldNormalizer` keeps external types plain,
   `ImportResolver` skips them; regression suite (7 tests) added. The branch
   also carries the #351 (c09d966) + #310 (2d093f1) fixes so zuraffa can
-  point at one ref. **zuraffa PR** (to open, branch
-  `fix/349-external-type-zorphy-bump`) — merges the original fix/349 content
+  point at one ref. **zuraffa PR #362** (https://github.com/arrrrny/zuraffa/pull/362, open,
+  branch `fix/349-external-type-zorphy-bump`) — merges the original fix/349 content
   (def7d5f + CodeRabbit 154cfa8: validator + `_fixEntityImports` skip
   external fields), fixes the #349 regression test's compile assertion
   (correct relative import + the standard `@JsonKey` glue the migration
   recipe applies to custom types), and bumps the zorphy git ref to
-  `fix/349-external-type-no-dollar-prefix-cli`.
+  `fix/349-external-type-no-dollar-prefix-cli`. NOTE: zorphy #84 was merged
+  WITHOUT the #351 commit (merge happened at 1bf0d6d) — the #310+#351 fixes
+  are now tracked by **zorphy PR #85** (https://github.com/arrrrny/zorphy/pull/85,
+  branch `fix/310-351-into-development`, open).
   Verified locally: zfa emits `WebUri? get url;` (no `$`, no bogus imports),
   build_runner resolves the external type (no `InvalidType`), the remaining
   json_serializable ask is the NORMAL custom-type `@JsonKey` glue (documented
@@ -103,10 +106,13 @@ starts after the PRs below are merged.
 
 ## RESUME FROM
 
-**Framework-fix wait (BLOCKED):** zorphy PR #84 + zuraffa PR (branch
-`fix/349-external-type-zorphy-bump`) must merge BEFORE Phase 2e runs — the
-migration uses `!Type` external-field syntax for every non-entity type
-(WebUri, URLRequest-family externals). Once merged:
+**Framework-fix wait (BLOCKED):** zuraffa PR #362 (branch
+`fix/349-external-type-zorphy-bump`) + zorphy PR #85 (`fix/310-351-into-development`)
+must merge BEFORE Phase 2e runs — the migration uses `!Type` external-field
+syntax for every non-entity type (WebUri, URLRequest-family externals) and
+needs the #351 concrete-ref recovery for sibling refs. zorphy PR #84 (#349
+fix) is already merged. Until the merges land, run zfa from
+`/workspace/zuraffa-wt/bin/zuraffa.dart` (has both fixes). Once merged:
 Phase 2e = navigation family: `navigation_action` + `navigation_action_policy`
 + `navigation_response` + `navigation_response_action` + `navigation_type`
 + `url_request` (+ `url_request_cache_policy` / `url_request_network_service_type`
