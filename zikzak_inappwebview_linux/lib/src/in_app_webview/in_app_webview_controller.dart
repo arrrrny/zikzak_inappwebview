@@ -76,9 +76,10 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
             controller,
             WebResourceRequest(url: url != null ? WebUri(url) : WebUri('')),
             WebResourceError(
-              type:
-                  WebResourceErrorType.fromNativeValue(code) ??
-                  WebResourceErrorType.UNKNOWN,
+              type: WebResourceErrorType.values.firstWhere(
+                (t) => t.name == code,
+                orElse: () => WebResourceErrorType.UNKNOWN,
+              ),
               description: message,
             ),
           );
@@ -125,9 +126,9 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
         return NavigationActionPolicy.ALLOW.toNativeValue();
       case 'onConsoleMessage':
         if (params.webviewParams?.onConsoleMessage != null) {
-          var consoleMessage = ConsoleMessage.fromMap(
+          var consoleMessage = ConsoleMessage.fromJson(
             call.arguments.cast<String, dynamic>(),
-          )!;
+          );
           params.webviewParams!.onConsoleMessage!(controller, consoleMessage);
         }
         break;

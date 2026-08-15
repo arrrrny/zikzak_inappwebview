@@ -10,8 +10,9 @@ and the zikzak→zuraffa v6 migration (…7545).
 
 **Phase 1 (JS dialogue model family → Zorphy entities) — DONE (PR #218, merged b792cb9e)**
 **Phase 2a (ajax_request family → Zorphy entities) — DONE (PR #219, merged bc0f757b)**
-**Phase 2b (fetch_request family → Zorphy entities) — DONE on branch
-`feat/migrate-models-zorphy-entities-phase2b` (PR pending)**
+**Phase 2b (fetch_request family → Zorphy entities) — DONE (PR #220, merged 984bd850)**
+**Phase 2c (console_message + web_resource family → Zorphy entities) — DONE on
+branch `feat/migrate-models-zorphy-entities-phase2c` (PR #221, open)**
 
 - Phase 0 (mapping + toolchain) DONE.
 - Note on the task premise: this repo does **NOT** use Freezed. Upstream
@@ -57,10 +58,13 @@ and the zikzak→zuraffa v6 migration (…7545).
 
 ## RESUME FROM
 
-Phase 2c — next `types/` family (candidate: network capture family —
-network_request/network_entry/network_response/network_response_body/
-resource_type/url_pattern_type; fork-custom, no sibling-entity refs; recipe
-+ zuraffa #351/#349 patches documented above).
+Phase 2d — next `types/` family (candidates: navigation/auth family
+[navigation_action + navigation_response + http_auth/web_storage group] or
+permission/safe-browsing family; recipe + zuraffa #351/#349 patches documented
+above). NOTE: render_process_gone_detail + renderer_priority +
+renderer_priority_policy are COUPLED to the still-codegen
+InAppWebViewSettings.g.dart (`RendererPriorityPolicy.fromMap`) — convert them
+together with the settings family (Phase 3), not standalone.
 
 ---
 
@@ -177,7 +181,27 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` converted · `[–]` skip/fo
       `FetchRequest.credentials` typed `FetchRequestCredential?` via custom
       fromJson/toJson dispatcher glue in the entity.
 
-### Phase 2c — remaining `types/` value objects + enums (upstream, ~170 files)
+### Phase 2c — console_message + web_resource family (webview resource callbacks)
+- [x] `types/console_message.dart` → `ConsoleMessage` (lib/src/domain/entities/console_message/)
+- [x] `types/console_message_level.dart` → `ConsoleMessageLevel` (enum, int wire)
+- [x] `types/web_resource_error.dart` → `WebResourceError`
+- [x] `types/web_resource_error_type.dart` → `WebResourceErrorType` (enum,
+      string wire == enum name, 62 values)
+- [x] `types/web_resource_request.dart` → `WebResourceRequest` (WebUri + Map
+      String,String glue)
+- [x] `types/web_resource_response.dart` → `WebResourceResponse` (Uint8List
+      data glue: typed-list pass-through on the channel, List<int> on JSON
+      paths)
+- [x] network capture family (`network_request`/`network_entry`/
+      `network_response`/`network_response_body`/`resource_type`/
+      `url_pattern_type`) → `[–]` skip: already hand-written plain Dart with
+      ZERO codegen dependency (verified: no internal_annotations import, no
+      `.g.dart`), and stateful/mutable by design (NetworkResponseBody lazy
+      decode cache, NetworkEntry accumulator semantics, mutable NetworkRequest
+      fields) — not pure value types; Zorphy value objects cannot express
+      them. Same category as AjaxRequestHeaders (documented skip).
+
+### Phase 2d — remaining `types/` value objects + enums (upstream, ~160 files)
 TODO list generated from the inventory below (add `[ ]` per file as phases
 are carved out; each phase = one cohesive callback family).
 
@@ -302,7 +326,31 @@ dialogue_dismisser — hand-written toJson/fromJson today → Zorphy, core packa
   null-tolerance, polymorphic credential round-trip, int enum values, copyWith,
   credential hierarchy public API/is-a). Verified green: platform_interface
   analyze 0 errors / flutter test 53/53; android 0 errors, ios 0 errors, core
-  0 errors.
+  0 errors. PR #220 merged 984bd850.
+  ALSO resolved the "mystery analysis_options writer": it is the Flutter SDK
+  built-in `AnalysisOptionsMigration` (flutter_tools project.dart →
+  ensureReadyForPlatformSpecificTooling), which appends the analyzer
+  `exclude:` block on flutter analyze/test when the package lacks it —
+  harmless, reverted before commit (not part of the PRs).
+- 2026-08-15 — Phase 2c (console_message + web_resource family) executed on
+  branch `feat/migrate-models-zorphy-entities-phase2c` (off development):
+  `ConsoleMessage`/`WebResourceError`/`WebResourceRequest`/`WebResourceResponse`
+  value objects + `ConsoleMessageLevel` (int wire) + `WebResourceErrorType`
+  (string wire == name, 62 values) generated via zfa — this build resolved ALL
+  external types cleanly (no `$` prefixes, no InvalidType, no `required
+  dynamic`; Uint8List + Map<String,String> + WebUri all correct in the
+  generated constructor). Old sources + `.g.dart` deleted; barrels re-export
+  entities; direct import in platform_webview_asset_loader.dart re-pointed to
+  the entity. Controller glue: android/ios (onReceivedError, onReceivedHttpError,
+  onConsoleMessage, onLoadResourceWithCustomScheme, shouldInterceptRequest —
+  fromMap→fromJson, `?.toMap()`→`?.toJson()`), android service_worker
+  controller, android webview_asset_loader, macos + linux
+  (`WebResourceErrorType`/`ConsoleMessageLevel` native-value translations via
+  firstWhere on enum name/index). Old upstream console_message_test.dart ported
+  fromMap→fromJson (intent preserved); new web_resource_entities_test.dart
+  (wire, Uint8List jsonEncode smoke, round-trips). Verified: platform_interface
+  0 errors / 58/58; android/ios/macos/linux/web/windows/core all 0 errors.
+  Network capture family classified as documented skip (see migration map).
 - 2026-08-15 — NOTE on the task lifecycle: task …8103 (this migration) was
   marked `done` by the pool at 10:18 UTC after Phase 2a merged (result
   prUrl=#218). The work continues as documented here (RESUME FROM); updates
@@ -318,4 +366,7 @@ dialogue_dismisser — hand-written toJson/fromJson today → Zorphy, core packa
   `git checkout HEAD -- <pkg>/analysis_options.yaml` (the Phase 2a run
   reverted it the same way). Future phases: expect it after any flutter
   command; revert or keep at your discretion, but keep the PR diff scoped.
+- 2026-08-15 — Phase 2b + 2c merged into development: PR #220 (984bd850) and
+  PR #221 (phase2c rebased onto the merged development; PROGRESS.md conflict
+  resolved). Task resumed at 10:47 UTC.
 

@@ -4,7 +4,7 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'inappwebview_platform.dart';
-import 'types/web_resource_response.dart';
+import 'domain/entities/web_resource_response/web_resource_response.dart';
 
 part 'platform_webview_asset_loader.g.dart';
 
