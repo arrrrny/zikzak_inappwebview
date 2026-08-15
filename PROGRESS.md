@@ -128,6 +128,15 @@ together with the settings family (Phase 3), not standalone.
 - `zfa` = `dart run /workspace/zuraffa/bin/zuraffa.dart` (v6.0.0, development).
   Not on PATH; run from the target package dir with
   `export PATH=/opt/flutter/bin:$PATH`.
+  **IMPORTANT (Phase 2e+): the MAIN zuraffa checkout is on branch
+  `fix/354-...` (uncommitted user work, NOT touched) and does NOT carry the
+  #349 fixes. Run zfa from the fix-branch worktree instead:
+  `dart run /workspace/zuraffa-wt/bin/zuraffa.dart` (branch
+  `fix/349-external-type-zorphy-bump`, zuraffa PR #362) until that PR merges
+  and the main checkout is updated to development. zorphy resolves via the
+  target package's dependency_overrides → `/workspace/zorphy` (currently on
+  `fix/349-external-type-no-dollar-prefix-cli` — carries #349 + #351 + #310,
+  zorphy PR #84).
 - zorphy (generator) + zorphy_annotation from `/workspace/zorphy` (development,
   includes the merged autoId + ValueObject work from zuraffa#320/#321).
 - Entity output is hardcoded by zfa v6 to `lib/src/domain/entities/<snake>/`
