@@ -12,8 +12,8 @@ and the zikzak→zuraffa v6 migration (…7545).
 **Phase 2a (ajax_request family → Zorphy entities) — DONE (PR #219, merged bc0f757b)**
 **Phase 2b (fetch_request family → Zorphy entities) — DONE (PR #220, merged 984bd850)**
 **Phase 2c (console_message + web_resource family → Zorphy entities) — DONE (PR #221, merged 18d26075)**
-**Phase 2d (permission/safe-browsing family → Zorphy entities) — IN PROGRESS on
-branch `feat/migrate-models-zorphy-entities-phase2d` (PR pending)**
+**Phase 2d (permission/safe-browsing family → Zorphy entities) — DONE (PR #222, merged 6f64b60c)**
+**Phase 2e (navigation family) — BLOCKED on framework fixes (zorphy PR #84 + zuraffa PR)**
 
 - Phase 0 (mapping + toolchain) DONE.
 - Note on the task premise: this repo does **NOT** use Freezed. Upstream
@@ -27,10 +27,42 @@ branch `feat/migrate-models-zorphy-entities-phase2d` (PR pending)**
 
 ## STOPPED AT STEP
 
-(none — active run)
+Framework-fix wait (goal rule: stop at the first blocking misfire, report,
+fix the framework, THEN resume the migration). The `!Type` external-marker
+syntax is now fixed end-to-end and tested; the Phase 2e conversion itself
+starts after the PRs below are merged.
 
 ## LAST ISSUE FILED
 
+- **zorphy #349 (RE-OPENED as misfire, 2026-08-15)**: the documented `!Type`
+  external field syntax was broken end-to-end in the CURRENT checkouts.
+  `zfa entity create --field 'request:!URLRequest'` emitted
+  `$!URLRequest get request;` (FieldNormalizer treated `!URLRequest` as a
+  type name, found no on-disk entity, added the `$` forward-ref prefix), and
+  the builder then misparsed it into a phantom `$` field
+  (`required dynamic $`, `Field<..., dynamic>('$', ...)`) — build failed.
+  Root cause: the zuraffa-side fix (def7d5f on branch
+  `fix/349-external-type-no-dollar-prefix`) was NEVER MERGED, and the zorphy
+  half it depends on (`FieldDefinition.isExternal`, "zorphy 05feef3" per the
+  Phase 1 note) does NOT exist in zorphy history. PROGRESS.md's earlier
+  "FIXED + RELEASED" note was wrong (pool task 070 did not land).
+  **FIXED in this run**: zorphy PR #84
+  (https://github.com/arrrrny/zorphy/pull/84, branch
+  `fix/349-external-type-no-dollar-prefix-cli`) — `FieldDefinition.parse`
+  strips `!` → `isExternal`, `FieldNormalizer` keeps external types plain,
+  `ImportResolver` skips them; regression suite (7 tests) added. The branch
+  also carries the #351 (c09d966) + #310 (2d093f1) fixes so zuraffa can
+  point at one ref. **zuraffa PR** (to open, branch
+  `fix/349-external-type-zorphy-bump`) — merges the original fix/349 content
+  (def7d5f + CodeRabbit 154cfa8: validator + `_fixEntityImports` skip
+  external fields), fixes the #349 regression test's compile assertion
+  (correct relative import + the standard `@JsonKey` glue the migration
+  recipe applies to custom types), and bumps the zorphy git ref to
+  `fix/349-external-type-no-dollar-prefix-cli`.
+  Verified locally: zfa emits `WebUri? get url;` (no `$`, no bogus imports),
+  build_runner resolves the external type (no `InvalidType`), the remaining
+  json_serializable ask is the NORMAL custom-type `@JsonKey` glue (documented
+  recipe — not a defect).
 - **zuraffa #351** (2026-08-15): cross-entity reference defect — when a
   Zorphy entity has a field whose type is ANOTHER Zorphy entity in the same
   package, `zfa build` generates `InvalidType` in the generated class
@@ -46,7 +78,8 @@ branch `feat/migrate-models-zorphy-entities-phase2d` (PR pending)**
   issue tracks the framework fix. AFFECTS every entity referencing a sibling
   entity (e.g. `AjaxRequest.event`, `FetchRequest.credential`,
   `HttpAuthenticationChallenge.credentials`) — expect this patch in every
-  Phase 2 sub-phase.
+  Phase 2 sub-phase. **CARRIED on zorphy PR #84** (c09d966 merged into the
+  fix branch — the #351 regression test passes against the local checkout).
 - **zuraffa #349** (2026-08-15): `zfa entity create --allow-forward-refs`
   emits `$X` + a bogus import for external (non-entity) types — plugin model
   migration gap. Minimal repro in the issue body. Workaround used (documented,
@@ -55,10 +88,10 @@ branch `feat/migrate-models-zorphy-entities-phase2d` (PR pending)**
   outside `lib/src/domain/entities` (e.g. `WebUri`). Not blocking Phase 1:
   post-generation source fixes are part of the zfa workflow (`_fixEntityImports`
   does the same class of edit); the issue tracks the framework gap for a real
-  fix. **UPDATE 2026-08-15: FIXED + RELEASED** — pool task 070 implemented the
-  `!Type` external-type syntax (zuraffa def7d5f + zorphy 05feef3); future
-  phases should use `url:!WebUri` / `frame:!FrameInfo?` field syntax so zfa
-  emits the correct type + import with no `$` prefix.
+  fix. **UPDATE 2026-08-15 (REVISED in Phase 2e): the earlier "FIXED +
+  RELEASED" claim was WRONG** — the `!Type` syntax was broken end-to-end in
+  the current checkouts (see the new zorphy #349 entry above); now truly
+  fixed via zorphy PR #84 + zuraffa PR.
 - **zuraffa #351** (2026-08-15, RE-CONFIRMED in Phase 2d): the InvalidType
   defect struck `PermissionRequest.frame` (`FrameInfo?` external ref → the
   generator emitted `required InvalidType this.frame` + `final InvalidType
@@ -70,11 +103,18 @@ branch `feat/migrate-models-zorphy-entities-phase2d` (PR pending)**
 
 ## RESUME FROM
 
-Phase 2e — next `types/` family (candidates: navigation/auth family
-[navigation_action + navigation_response + http_auth/web_storage group] or
-window/JS-callback family; recipe + zuraffa #351/#349 patches documented
-above). NOTE: render_process_gone_detail + renderer_priority +
-renderer_priority_policy are COUPLED to the still-codegen
+**Framework-fix wait (BLOCKED):** zorphy PR #84 + zuraffa PR (branch
+`fix/349-external-type-zorphy-bump`) must merge BEFORE Phase 2e runs — the
+migration uses `!Type` external-field syntax for every non-entity type
+(WebUri, URLRequest-family externals). Once merged:
+Phase 2e = navigation family: `navigation_action` + `navigation_action_policy`
++ `navigation_response` + `navigation_response_action` + `navigation_type`
++ `url_request` (+ `url_request_cache_policy` / `url_request_network_service_type`
+/ `url_request_attribution` enums) + `url_response` + `frame_info` +
+`security_origin` + `window_features` + `login_request` +
+`create_window_action` (extends `NavigationAction` — zorphy `--extends`
+support, wire-format verification done in scratch). NOTE: render_process_gone_detail +
+renderer_priority + renderer_priority_policy are COUPLED to the still-codegen
 InAppWebViewSettings.g.dart (`RendererPriorityPolicy.fromMap`) — convert them
 together with the settings family (Phase 3), not standalone.
 
@@ -442,3 +482,25 @@ dialogue_dismisser — hand-written toJson/fromJson today → Zorphy, core packa
   in 44s). Also restored the ~40 checked-in @ExchangeableObject .g.dart files
   the build deleted (they are claimed by no active builder; restore
   everything except the current family's old .g.dart via git checkout).
+- 2026-08-15 — Task resumed (Phase 2d merged as 6f64b60c). Started Phase 2e
+  (navigation family) on branch `feat/migrate-models-zorphy-entities-phase2e`
+  (off development). FIRST BLOCKING MISFIRE hit on the very first zfa call:
+  `zfa entity create --field 'request:!URLRequest'` emitted
+  `$!URLRequest get request;` + a phantom `$` field (`required dynamic $`),
+  and `zfa build` failed. STOPPED per goal rule; diagnosed: the `!Type`
+  external marker fix was never actually merged anywhere (zuraffa def7d5f
+  sits on unmerged branch `fix/349-external-type-no-dollar-prefix`; zorphy
+  "05feef3" does not exist in history). Fixed zorphy first (PR #84,
+  `fix/349-external-type-no-dollar-prefix-cli`): FieldDefinition.parse
+  strips `!` → isExternal, FieldNormalizer keeps external types plain,
+  ImportResolver skips them; 7 regression tests; branch also carries the
+  #351 (c09d966) + #310 (2d093f1) fixes (single ref for zuraffa). Then
+  zuraffa (worktree `zuraffa-wt`, branch `fix/349-external-type-zorphy-bump`,
+  main checkout's uncommitted fix/354 work untouched): merged the original
+  fix/349 content, fixed the #349 compile regression test (correct relative
+  import path + the standard @JsonKey glue the recipe applies — the
+  framework contract is: type resolves, no InvalidType, no `$`; json_serializable
+  still needs the documented custom-type glue), bumped zorphy git ref. All
+  #349 + #351 regression tests green. Scratch verified end-to-end: plain
+  `WebUri? get url;` + build_runner resolves the external type. PROGRESS.md
+  updated; zikzak branch parked with no code changes (framework-wait).
