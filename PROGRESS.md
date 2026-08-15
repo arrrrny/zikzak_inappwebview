@@ -549,3 +549,10 @@ dialogue_dismisser — hand-written toJson/fromJson today → Zorphy, core packa
   #349 + #351 regression tests green. Scratch verified end-to-end: plain
   `WebUri? get url;` + build_runner resolves the external type. PROGRESS.md
   updated; zikzak branch parked with no code changes (framework-wait).
+- 2026-08-15 — Framework-wait continues: zuraffa #362 + zorphy #85 still OPEN
+  (no merge notification). Verified #85's CI failures are the pre-existing
+  "Fixture not generated" gap (also red on the merged #84) — fixed zorphy CI
+  (dart.yml: analyzer_compat now builds example/ fixtures before dart test,
+  commit 63f4a89 on the #85 branch). Deploy job failure is branch-secret
+  related (same on #84, merged anyway). Phase 2e/2f inventories scoped in
+  the migration map. Waiting on the user's merge; resume point unchanged.
