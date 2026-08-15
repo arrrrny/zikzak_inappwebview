@@ -448,11 +448,11 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
             return (await webviewParams!.onGeolocationPermissionsShowPrompt!(
               _controllerFromPlatform,
               origin,
-            ))?.toMap();
+            ))?.toJson();
           } else {
             return (await _inAppBrowserEventHandler!
                     .onGeolocationPermissionsShowPrompt(origin))
-                ?.toMap();
+                ?.toJson();
           }
         }
         break;
@@ -694,9 +694,13 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
                 webviewParams!.onSafeBrowsingHit != null) ||
             _inAppBrowserEventHandler != null) {
           String url = call.arguments["url"];
-          SafeBrowsingThreat? threatType = SafeBrowsingThreat.fromNativeValue(
-            call.arguments["threatType"],
-          );
+          SafeBrowsingThreat? threatType;
+          final threatIndex = call.arguments["threatType"];
+          if (threatIndex is int &&
+              threatIndex >= 0 &&
+              threatIndex < SafeBrowsingThreat.values.length) {
+            threatType = SafeBrowsingThreat.values[threatIndex];
+          }
           WebUri uri = WebUri(url);
 
           if (webviewParams != null) {
@@ -704,12 +708,12 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
               _controllerFromPlatform,
               uri,
               threatType,
-            ))?.toMap();
+            ))?.toJson();
           } else {
             return (await _inAppBrowserEventHandler!.onSafeBrowsingHit(
               uri,
               threatType,
-            ))?.toMap();
+            ))?.toJson();
           }
         }
         break;
@@ -737,9 +741,9 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          PermissionRequest permissionRequest = PermissionRequest.fromMap(
+          PermissionRequest permissionRequest = PermissionRequest.fromJson(
             arguments,
-          )!;
+          );
 
           if (webviewParams != null &&
               webviewParams!.onPermissionRequestCanceled != null)
@@ -874,19 +878,19 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          PermissionRequest permissionRequest = PermissionRequest.fromMap(
+          PermissionRequest permissionRequest = PermissionRequest.fromJson(
             arguments,
-          )!;
+          );
 
           if (webviewParams != null) {
             return (await webviewParams!.onPermissionRequest!(
               _controllerFromPlatform,
               permissionRequest,
-            ))?.toMap();
+            ))?.toJson();
           } else {
             return (await _inAppBrowserEventHandler!.onPermissionRequest(
               permissionRequest,
-            ))?.toMap();
+            ))?.toJson();
           }
         }
         break;

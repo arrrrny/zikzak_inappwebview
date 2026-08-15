@@ -60,8 +60,9 @@ export 'force_dark.dart' show ForceDark;
 export 'force_dark_strategy.dart' show ForceDarkStrategy;
 export 'form_resubmission_action.dart' show FormResubmissionAction;
 export 'frame_info.dart' show FrameInfo;
-export 'geolocation_permission_show_prompt_response.dart'
-    show GeolocationPermissionShowPromptResponse;
+export '../domain/entities/geolocation_permission_show_prompt_response/geolocation_permission_show_prompt_response.dart'
+    show GeolocationPermissionShowPromptResponse,
+        GeolocationPermissionShowPromptResponseSerialization;
 export 'http_auth_response.dart' show HttpAuthResponse;
 export 'http_auth_response_action.dart' show HttpAuthResponseAction;
 export 'http_authentication_challenge.dart' show HttpAuthenticationChallenge;
@@ -124,10 +125,14 @@ export 'navigation_type.dart' show NavigationType;
 export 'on_post_message_callback.dart' show OnPostMessageCallback;
 export 'over_scroll_mode.dart' show OverScrollMode;
 export 'pdf_configuration.dart' show PDFConfiguration;
-export 'permission_request.dart' show PermissionRequest;
-export 'permission_resource_type.dart' show PermissionResourceType;
-export 'permission_response.dart' show PermissionResponse;
-export 'permission_response_action.dart' show PermissionResponseAction;
+export '../domain/entities/permission_request/permission_request.dart'
+    show PermissionRequest, PermissionRequestSerialization;
+export '../domain/entities/enums/permission_resource_type.dart'
+    show PermissionResourceType;
+export '../domain/entities/permission_response/permission_response.dart'
+    show PermissionResponse, PermissionResponseSerialization;
+export '../domain/entities/enums/permission_response_action.dart'
+    show PermissionResponseAction;
 export 'print_job_attributes.dart' show PrintJobAttributes;
 export 'print_job_color_mode.dart' show PrintJobColorMode;
 export 'print_job_duplex_mode.dart' show PrintJobDuplexMode;
@@ -147,9 +152,12 @@ export 'renderer_priority.dart' show RendererPriority;
 export 'renderer_priority_policy.dart' show RendererPriorityPolicy;
 export 'request_focus_node_href_result.dart' show RequestFocusNodeHrefResult;
 export 'request_image_ref_result.dart' show RequestImageRefResult;
-export 'safe_browsing_response.dart' show SafeBrowsingResponse;
-export 'safe_browsing_response_action.dart' show SafeBrowsingResponseAction;
-export 'safe_browsing_threat.dart' show SafeBrowsingThreat;
+export '../domain/entities/safe_browsing_response/safe_browsing_response.dart'
+    show SafeBrowsingResponse, SafeBrowsingResponseSerialization;
+export '../domain/entities/enums/safe_browsing_response_action.dart'
+    show SafeBrowsingResponseAction;
+export '../domain/entities/enums/safe_browsing_threat.dart'
+    show SafeBrowsingThreat;
 export 'sandbox.dart' show Sandbox;
 export 'screenshot_configuration.dart' show ScreenshotConfiguration;
 export 'script_html_tag_attributes.dart' show ScriptHtmlTagAttributes;
