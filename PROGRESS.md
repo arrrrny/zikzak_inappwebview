@@ -278,9 +278,39 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` converted · `[–]` skip/fo
 - [x] `types/safe_browsing_threat.dart` → `SafeBrowsingThreat` (enum, int wire)
 - [x] `types/geolocation_permission_show_prompt_response.dart` → `GeolocationPermissionShowPromptResponse` (WebUri glue; default `retain = false`)
 
-### Phase 2e — remaining `types/` value objects + enums (upstream, ~150 files)
-TODO list generated from the inventory below (add `[ ]` per file as phases
-are carved out; each phase = one cohesive callback family).
+### Phase 2e — navigation family (navigation/URL/security callbacks; scoped 2026-08-15)
+Value objects (10): `navigation_action` (→URLRequest, NavigationType, FrameInfo×2),
+`navigation_response` (→URLResponse), `url_request` (→WebUri, 3 enums),
+`url_response` (→WebUri), `frame_info` (→URLRequest, SecurityOrigin),
+`security_origin`, `window_features`, `login_request`, `create_window_action`
+(EXTENDS NavigationAction — zorphy `--extends`/implements; wire-format
+verified in scratch; flattened super-fields on the wire, concrete class
+`implements` the abstract), `http_authentication_challenge` + auth group
+(URLAuthenticationChallenge hierarchy: HttpAuthenticationChallenge /
+ClientCertChallenge / ServerTrustChallenge EXTENDS URLAuthenticationChallenge;
+URLProtectionSpace →SslCertificate/SslError/X509Certificate; URLCredential;
+HttpAuthResponse/ClientCertResponse/ServerTrustAuthResponse + action enums)
+— CARVED OUT as Phase 2f (auth/ssl family), NOT part of 2e.
+Enums (6, int wire unless noted): `navigation_action_policy`, `navigation_response_action`,
+`navigation_type` (STRING wire + platform-dependent native values — needs the
+defaultTargetPlatform switch helper like PermissionResourceType),
+`url_request_cache_policy`, `url_request_network_service_type`, `url_request_attribution`.
+Stragglers converted together (they reference URLRequest_/URLResponse_):
+`create_window_action` (in 2e), `http_authentication_challenge` (in 2f).
+- [ ] navigation_action / navigation_action_policy / navigation_response /
+      navigation_response_action / navigation_type
+- [ ] url_request (+3 enums) / url_response / frame_info / security_origin
+- [ ] window_features / login_request / create_window_action (extends)
+- [ ] barrels + android/ios/macos/windows glue (fromMap→fromJson etc.)
+- [ ] regression test test/types/navigation_entities_test.dart
+- [ ] analyze + test all touched packages
+
+### Phase 2f — auth/ssl family: URLAuthenticationChallenge hierarchy
+(HttpAuthenticationChallenge/ClientCertChallenge/ServerTrustChallenge),
+URLProtectionSpace (+authentication_method/proxy_type enums), URLCredential
+(+persistence), HttpAuthResponse (+action), ClientCertResponse (+action),
+ServerTrustAuthResponse (+action), SslCertificate, SslError (+type),
+should_allow_deprecated_tls_action. (Scoped; not started.)
 
 ### Phase 3 — browser/settings objects (`in_app_browser/`, `in_app_webview/`,
 `chrome_safari_browser/`, `print_job/`, `pull_to_refresh/`, `context_menu/`,
