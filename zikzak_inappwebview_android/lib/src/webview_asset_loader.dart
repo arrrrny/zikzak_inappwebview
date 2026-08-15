@@ -48,7 +48,7 @@ mixin AndroidPathHandler implements ChannelController, PlatformPathHandler {
     switch (call.method) {
       case "handle":
         String path = call.arguments["path"];
-        return (await eventHandler?.handle(path))?.toMap();
+        return (await eventHandler?.handle(path))?.toJson();
       default:
         throw UnimplementedError("Unimplemented ${call.method} method");
     }

@@ -257,12 +257,12 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
       case "onReceivedError":
         if ((webviewParams != null && webviewParams!.onReceivedError != null) ||
             _inAppBrowserEventHandler != null) {
-          WebResourceRequest request = WebResourceRequest.fromMap(
+          WebResourceRequest request = WebResourceRequest.fromJson(
             call.arguments["request"].cast<String, dynamic>(),
-          )!;
-          WebResourceError error = WebResourceError.fromMap(
+          );
+          WebResourceError error = WebResourceError.fromJson(
             call.arguments["error"].cast<String, dynamic>(),
-          )!;
+          );
 
           if (webviewParams != null) {
             if (webviewParams!.onReceivedError != null)
@@ -280,12 +280,12 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
         if ((webviewParams != null &&
                 webviewParams!.onReceivedHttpError != null) ||
             _inAppBrowserEventHandler != null) {
-          WebResourceRequest request = WebResourceRequest.fromMap(
+          WebResourceRequest request = WebResourceRequest.fromJson(
             call.arguments["request"].cast<String, dynamic>(),
-          )!;
-          WebResourceResponse errorResponse = WebResourceResponse.fromMap(
+          );
+          WebResourceResponse errorResponse = WebResourceResponse.fromJson(
             call.arguments["errorResponse"].cast<String, dynamic>(),
-          )!;
+          );
 
           if (webviewParams != null) {
             if (webviewParams!.onReceivedHttpError != null)
@@ -343,7 +343,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          ConsoleMessage consoleMessage = ConsoleMessage.fromMap(arguments)!;
+          ConsoleMessage consoleMessage = ConsoleMessage.fromJson(arguments);
           if (webviewParams != null && webviewParams!.onConsoleMessage != null)
             webviewParams!.onConsoleMessage!(
               _controllerFromPlatform,
@@ -391,17 +391,17 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> requestMap = call.arguments["request"]
               .cast<String, dynamic>();
-          WebResourceRequest request = WebResourceRequest.fromMap(requestMap)!;
+          WebResourceRequest request = WebResourceRequest.fromJson(requestMap);
 
           if (webviewParams != null) {
             return (await webviewParams!.onLoadResourceWithCustomScheme!(
               _controllerFromPlatform,
               request,
-            ))?.toMap();
+            ))?.toJson();
           } else {
             return (await _inAppBrowserEventHandler!
                     .onLoadResourceWithCustomScheme(request))
-                ?.toMap();
+                ?.toJson();
           }
         }
         break;
@@ -475,17 +475,17 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          WebResourceRequest request = WebResourceRequest.fromMap(arguments)!;
+          WebResourceRequest request = WebResourceRequest.fromJson(arguments);
 
           if (webviewParams != null) {
             return (await webviewParams!.shouldInterceptRequest!(
               _controllerFromPlatform,
               request,
-            ))?.toMap();
+            ))?.toJson();
           } else {
             return (await _inAppBrowserEventHandler!.shouldInterceptRequest(
               request,
-            ))?.toMap();
+            ))?.toJson();
           }
         }
         break;

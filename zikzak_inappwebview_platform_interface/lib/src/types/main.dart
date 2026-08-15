@@ -21,8 +21,11 @@ export 'client_cert_challenge.dart' show ClientCertChallenge;
 export 'client_cert_response.dart' show ClientCertResponse;
 export 'client_cert_response_action.dart' show ClientCertResponseAction;
 export 'compress_format.dart' show CompressFormat;
-export 'console_message.dart' show ConsoleMessage;
-export 'console_message_level.dart' show ConsoleMessageLevel;
+// Zorphy entities (migrated from @ExchangeableObject codegen, see PROGRESS.md).
+export '../domain/entities/console_message/console_message.dart'
+    show ConsoleMessage, ConsoleMessageSerialization;
+export '../domain/entities/enums/console_message_level.dart'
+    show ConsoleMessageLevel;
 export 'content_blocker_action_type.dart' show ContentBlockerActionType;
 export 'content_blocker_trigger_load_type.dart'
     show ContentBlockerTriggerLoadType;
@@ -201,10 +204,15 @@ export 'web_authentication_support.dart' show WebAuthenticationSupport;
 export 'web_history.dart' show WebHistory;
 export 'web_history_item.dart' show WebHistoryItem;
 export 'web_message_callback.dart' show WebMessageCallback;
-export 'web_resource_error.dart' show WebResourceError;
-export 'web_resource_error_type.dart' show WebResourceErrorType;
-export 'web_resource_request.dart' show WebResourceRequest;
-export 'web_resource_response.dart' show WebResourceResponse;
+// Zorphy entities (migrated from @ExchangeableObject codegen, see PROGRESS.md).
+export '../domain/entities/web_resource_error/web_resource_error.dart'
+    show WebResourceError, WebResourceErrorSerialization;
+export '../domain/entities/enums/web_resource_error_type.dart'
+    show WebResourceErrorType;
+export '../domain/entities/web_resource_request/web_resource_request.dart'
+    show WebResourceRequest, WebResourceRequestSerialization;
+export '../domain/entities/web_resource_response/web_resource_response.dart'
+    show WebResourceResponse, WebResourceResponseSerialization;
 export 'web_storage_origin.dart' show WebStorageOrigin;
 export 'web_storage_type.dart' show WebStorageType;
 export 'website_data_record.dart' show WebsiteDataRecord;

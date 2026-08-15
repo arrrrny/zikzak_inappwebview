@@ -124,9 +124,10 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
             controller,
             WebResourceRequest(url: url != null ? WebUri(url) : WebUri('')),
             WebResourceError(
-              type:
-                  WebResourceErrorType.fromNativeValue(code) ??
-                  WebResourceErrorType.UNKNOWN,
+              type: WebResourceErrorType.values.firstWhere(
+                (t) => t.name == code,
+                orElse: () => WebResourceErrorType.UNKNOWN,
+              ),
               description: message,
             ),
           );
@@ -198,9 +199,10 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
               {};
           var consoleMessage = ConsoleMessage(
             message: map['message'] as String? ?? '',
-            messageLevel:
-                ConsoleMessageLevel.fromNativeValue(map['messageLevel']) ??
-                ConsoleMessageLevel.LOG,
+            messageLevel: ConsoleMessageLevel.values.firstWhere(
+              (level) => level.index == map['messageLevel'],
+              orElse: () => ConsoleMessageLevel.LOG,
+            ),
           );
           params.webviewParams!.onConsoleMessage!(controller, consoleMessage);
         }
@@ -211,9 +213,9 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
           var request = WebResourceRequest(
             url: url != null ? WebUri(url) : WebUri(''),
           );
-          var errorResponse = WebResourceResponse.fromMap(
+          var errorResponse = WebResourceResponse.fromJson(
             call.arguments['errorResponse'].cast<String, dynamic>(),
-          )!;
+          );
           params.webviewParams!.onReceivedHttpError!(
             controller,
             request,
