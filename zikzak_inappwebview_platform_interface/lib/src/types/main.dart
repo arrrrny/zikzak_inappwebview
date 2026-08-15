@@ -57,19 +57,31 @@ export 'in_app_webview_hit_test_result_type.dart'
 export 'in_app_webview_initial_data.dart' show InAppWebViewInitialData;
 export 'in_app_webview_rect.dart' show InAppWebViewRect;
 export 'javascript_handler_callback.dart' show JavaScriptHandlerCallback;
-export 'js_alert_request.dart' show JsAlertRequest;
-export 'js_alert_response.dart' show JsAlertResponse;
-export 'js_alert_response_action.dart' show JsAlertResponseAction;
-export 'js_before_unload_request.dart' show JsBeforeUnloadRequest;
-export 'js_before_unload_response.dart' show JsBeforeUnloadResponse;
-export 'js_before_unload_response_action.dart'
+// Zorphy entities (migrated from @ExchangeableObject codegen, see PROGRESS.md).
+export '../domain/entities/js_alert_request/js_alert_request.dart'
+    show JsAlertRequest, JsAlertRequestSerialization;
+export '../domain/entities/js_alert_response/js_alert_response.dart'
+    show JsAlertResponse, JsAlertResponseSerialization;
+export '../domain/entities/enums/js_alert_response_action.dart'
+    show JsAlertResponseAction;
+export '../domain/entities/js_before_unload_request/js_before_unload_request.dart'
+    show JsBeforeUnloadRequest, JsBeforeUnloadRequestSerialization;
+export '../domain/entities/js_before_unload_response/js_before_unload_response.dart'
+    show JsBeforeUnloadResponse, JsBeforeUnloadResponseSerialization;
+export '../domain/entities/enums/js_before_unload_response_action.dart'
     show JsBeforeUnloadResponseAction;
-export 'js_confirm_request.dart' show JsConfirmRequest;
-export 'js_confirm_response.dart' show JsConfirmResponse;
-export 'js_confirm_response_action.dart' show JsConfirmResponseAction;
-export 'js_prompt_request.dart' show JsPromptRequest;
-export 'js_prompt_response.dart' show JsPromptResponse;
-export 'js_prompt_response_action.dart' show JsPromptResponseAction;
+export '../domain/entities/js_confirm_request/js_confirm_request.dart'
+    show JsConfirmRequest, JsConfirmRequestSerialization;
+export '../domain/entities/js_confirm_response/js_confirm_response.dart'
+    show JsConfirmResponse, JsConfirmResponseSerialization;
+export '../domain/entities/enums/js_confirm_response_action.dart'
+    show JsConfirmResponseAction;
+export '../domain/entities/js_prompt_request/js_prompt_request.dart'
+    show JsPromptRequest, JsPromptRequestSerialization;
+export '../domain/entities/js_prompt_response/js_prompt_response.dart'
+    show JsPromptResponse, JsPromptResponseSerialization;
+export '../domain/entities/enums/js_prompt_response_action.dart'
+    show JsPromptResponseAction;
 export 'layout_algorithm.dart' show LayoutAlgorithm;
 export 'layout_in_display_cutout_mode.dart' show LayoutInDisplayCutoutMode;
 export 'loaded_resource.dart' show LoadedResource;

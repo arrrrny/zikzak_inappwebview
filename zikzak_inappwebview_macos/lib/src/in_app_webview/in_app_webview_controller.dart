@@ -230,36 +230,36 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
         if (params.webviewParams?.onJsAlert != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          var request = JsAlertRequest.fromMap(arguments)!;
+          var request = JsAlertRequest.fromJson(arguments);
           var response = await params.webviewParams!.onJsAlert!(
             controller,
             request,
           );
-          return response?.toMap();
+          return response?.toJson();
         }
         return null;
       case 'onJsConfirm':
         if (params.webviewParams?.onJsConfirm != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          var request = JsConfirmRequest.fromMap(arguments)!;
+          var request = JsConfirmRequest.fromJson(arguments);
           var response = await params.webviewParams!.onJsConfirm!(
             controller,
             request,
           );
-          return response?.toMap();
+          return response?.toJson();
         }
         return null;
       case 'onJsPrompt':
         if (params.webviewParams?.onJsPrompt != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          var request = JsPromptRequest.fromMap(arguments)!;
+          var request = JsPromptRequest.fromJson(arguments);
           var response = await params.webviewParams!.onJsPrompt!(
             controller,
             request,
           );
-          return response?.toMap();
+          return response?.toJson();
         }
         return null;
       case 'callHandler':
