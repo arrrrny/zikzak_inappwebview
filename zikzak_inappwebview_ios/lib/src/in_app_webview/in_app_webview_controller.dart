@@ -617,17 +617,17 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          JsAlertRequest jsAlertRequest = JsAlertRequest.fromMap(arguments)!;
+          JsAlertRequest jsAlertRequest = JsAlertRequest.fromJson(arguments);
 
           if (webviewParams != null && webviewParams!.onJsAlert != null)
             return (await webviewParams!.onJsAlert!(
               _controllerFromPlatform,
               jsAlertRequest,
-            ))?.toMap();
+            ))?.toJson();
           else
             return (await _inAppBrowserEventHandler!.onJsAlert(
               jsAlertRequest,
-            ))?.toMap();
+            ))?.toJson();
         }
         break;
       case "onJsConfirm":
@@ -635,19 +635,19 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          JsConfirmRequest jsConfirmRequest = JsConfirmRequest.fromMap(
+          JsConfirmRequest jsConfirmRequest = JsConfirmRequest.fromJson(
             arguments,
-          )!;
+          );
 
           if (webviewParams != null && webviewParams!.onJsConfirm != null)
             return (await webviewParams!.onJsConfirm!(
               _controllerFromPlatform,
               jsConfirmRequest,
-            ))?.toMap();
+            ))?.toJson();
           else
             return (await _inAppBrowserEventHandler!.onJsConfirm(
               jsConfirmRequest,
-            ))?.toMap();
+            ))?.toJson();
         }
         break;
       case "onJsPrompt":
@@ -655,17 +655,17 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          JsPromptRequest jsPromptRequest = JsPromptRequest.fromMap(arguments)!;
+          JsPromptRequest jsPromptRequest = JsPromptRequest.fromJson(arguments);
 
           if (webviewParams != null && webviewParams!.onJsPrompt != null)
             return (await webviewParams!.onJsPrompt!(
               _controllerFromPlatform,
               jsPromptRequest,
-            ))?.toMap();
+            ))?.toJson();
           else
             return (await _inAppBrowserEventHandler!.onJsPrompt(
               jsPromptRequest,
-            ))?.toMap();
+            ))?.toJson();
         }
         break;
       case "onJsBeforeUnload":
@@ -675,17 +675,17 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
           JsBeforeUnloadRequest jsBeforeUnloadRequest =
-              JsBeforeUnloadRequest.fromMap(arguments)!;
+              JsBeforeUnloadRequest.fromJson(arguments);
 
           if (webviewParams != null) {
             return (await webviewParams!.onJsBeforeUnload!(
               _controllerFromPlatform,
               jsBeforeUnloadRequest,
-            ))?.toMap();
+            ))?.toJson();
           } else {
             return (await _inAppBrowserEventHandler!.onJsBeforeUnload(
               jsBeforeUnloadRequest,
-            ))?.toMap();
+            ))?.toJson();
           }
         }
         break;
