@@ -190,3 +190,11 @@ dialogue_dismisser — hand-written toJson/fromJson today → Zorphy, core packa
   requires Dart >=3.12, so Flutter 3.41.1 (Dart 3.11) cannot resolve the core
   package. Installing Flutter 3.47.0 (Dart 3.13) at /opt/flutter and re-running
   the full verification chain.
+- 2026-08-15 — Phase 1 SHIPPED: PR #218
+  (https://github.com/arrrrny/zikzak_inappwebview/pull/218) merged into
+  development as b792cb9e (squash). Verification on the merged state:
+  platform_interface analyze 0 errors (2616 vs 2650 baseline), flutter test
+  35/35; android/ios/macos/linux/web/windows/core analyze clean (0 errors/0
+  warnings); core 95/95, macos 35/35, windows 13/13 tests green. Toolchain:
+  Flutter 3.47.0 / Dart 3.13.0 at /opt/flutter. Next phase: see the Phase 2
+  list at the top of this file.
