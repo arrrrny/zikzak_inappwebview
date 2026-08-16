@@ -19,7 +19,10 @@ export '../domain/entities/enums/ajax_request_ready_state.dart'
 export '../domain/entities/attributed_string/attributed_string.dart'
     show AttributedString, AttributedStringSerialization;
 export '../domain/entities/enums/attributed_string_text_effect_style.dart'
-    show AttributedStringTextEffectStyle;
+    show
+        AttributedStringTextEffectStyle,
+        attributedStringTextEffectStyleFromWire,
+        attributedStringTextEffectStyleToWire;
 export '../domain/entities/enums/cache_mode.dart'
     show CacheMode, cacheModeFromWire, cacheModeToWire;
 export '../domain/entities/call_async_javascript_result/call_async_javascript_result.dart'
@@ -219,7 +222,7 @@ export '../domain/entities/enums/print_job_state.dart'
 export '../domain/entities/proxy_rule/proxy_rule.dart'
     show ProxyRule, ProxyRuleSerialization;
 export '../domain/entities/enums/proxy_scheme_filter.dart'
-    show ProxySchemeFilter;
+    show ProxySchemeFilter, proxySchemeFilterFromWire, proxySchemeFilterToWire;
 export '../domain/entities/enums/pull_to_refresh_size.dart'
     show PullToRefreshSize, pullToRefreshSizeToWire;
 export '../domain/entities/enums/referrer_policy.dart' show ReferrerPolicy;
