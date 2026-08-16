@@ -227,8 +227,8 @@ class AndroidChromeSafariBrowser extends PlatformChromeSafariBrowser
     );
     args.putIfAbsent('referrer', () => referrer?.toString());
     args.putIfAbsent('settings', () => initialSettings);
-    args.putIfAbsent('actionButton', () => _actionButton?.toMap());
-    args.putIfAbsent('secondaryToolbar', () => _secondaryToolbar?.toMap());
+    args.putIfAbsent('actionButton', () => _actionButton?.toJson());
+    args.putIfAbsent('secondaryToolbar', () => _secondaryToolbar?.toJson());
     args.putIfAbsent('menuItemList', () => menuItemList);
     await _staticChannel.invokeMethod('open', args);
   }
@@ -313,7 +313,7 @@ class AndroidChromeSafariBrowser extends PlatformChromeSafariBrowser
     ChromeSafariBrowserSecondaryToolbar secondaryToolbar,
   ) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('secondaryToolbar', () => secondaryToolbar.toMap());
+    args.putIfAbsent('secondaryToolbar', () => secondaryToolbar.toJson());
     await channel?.invokeMethod("updateSecondaryToolbar", args);
     this._secondaryToolbar = secondaryToolbar;
   }
