@@ -141,7 +141,7 @@ class IOSChromeSafariBrowser extends PlatformChromeSafariBrowser
     });
 
     var initialSettings =
-        settings?.toMap() ?? ChromeSafariBrowserSettings().toMap();
+        settings?.toJson() ?? ChromeSafariBrowserSettings().toJson();
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('id', () => id);
