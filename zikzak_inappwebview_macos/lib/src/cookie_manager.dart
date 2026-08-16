@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
+import 'package:zikzak_inappwebview_platform_interface/src/domain/entities/enums/http_cookie_same_site_policy.dart'
+    show httpCookieSameSitePolicyFromWire, httpCookieSameSitePolicyToWire;
 
 class MacOSCookieManager extends PlatformCookieManager {
   static const MethodChannel _channel = MethodChannel(
@@ -37,7 +39,7 @@ class MacOSCookieManager extends PlatformCookieManager {
     args.putIfAbsent('maxAge', () => maxAge);
     args.putIfAbsent('isSecure', () => isSecure);
     args.putIfAbsent('isHttpOnly', () => isHttpOnly);
-    args.putIfAbsent('sameSite', () => sameSite?.toNativeValue());
+    args.putIfAbsent('sameSite', () => httpCookieSameSitePolicyToWire(sameSite));
 
     return await _channel.invokeMethod<bool>('setCookie', args) ?? false;
   }
@@ -65,7 +67,7 @@ class MacOSCookieManager extends PlatformCookieManager {
           expiresDate: cookieMap["expiresDate"],
           isSessionOnly: cookieMap["isSessionOnly"],
           domain: cookieMap["domain"],
-          sameSite: HTTPCookieSameSitePolicy.fromNativeValue(
+          sameSite: httpCookieSameSitePolicyFromWire(
             cookieMap["sameSite"],
           ),
           isSecure: cookieMap["isSecure"],
@@ -99,7 +101,7 @@ class MacOSCookieManager extends PlatformCookieManager {
           expiresDate: cookies[i]["expiresDate"],
           isSessionOnly: cookies[i]["isSessionOnly"],
           domain: cookies[i]["domain"],
-          sameSite: HTTPCookieSameSitePolicy.fromNativeValue(
+          sameSite: httpCookieSameSitePolicyFromWire(
             cookies[i]["sameSite"],
           ),
           isSecure: cookies[i]["isSecure"],
@@ -167,7 +169,7 @@ class MacOSCookieManager extends PlatformCookieManager {
           expiresDate: cookieMap["expiresDate"],
           isSessionOnly: cookieMap["isSessionOnly"],
           domain: cookieMap["domain"],
-          sameSite: HTTPCookieSameSitePolicy.fromNativeValue(
+          sameSite: httpCookieSameSitePolicyFromWire(
             cookieMap["sameSite"],
           ),
           isSecure: cookieMap["isSecure"],

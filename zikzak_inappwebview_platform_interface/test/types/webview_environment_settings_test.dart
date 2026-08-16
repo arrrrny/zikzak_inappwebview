@@ -2,9 +2,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
 void main() {
-  group('VirtualHostMapping.fromMap', () {
+  group('VirtualHostMapping.fromJson', () {
     test('with null fields returns safe defaults', () {
-      final result = VirtualHostMapping.fromMap({
+      final result = VirtualHostMapping.fromJson({
         'hostName': null,
         'folderPath': null,
         'accessKind': null,
@@ -16,20 +16,24 @@ void main() {
     });
 
     test('with empty map returns safe defaults', () {
-      final result = VirtualHostMapping.fromMap(<String, dynamic>{});
+      final result = VirtualHostMapping.fromJson(<String, dynamic>{});
       expect(result, isNotNull);
       expect(result!.hostName, '');
       expect(result.folderPath, '');
       expect(result.accessKind, HostResourceAccessKind.allow);
     });
 
-    test('with completely null map returns null', () {
-      final result = VirtualHostMapping.fromMap(null);
-      expect(result, isNull);
+    test('fromJson tolerates unknown wire values', () {
+      final result = VirtualHostMapping.fromJson({
+        'hostName': 'app.localhost',
+        'folderPath': 'C:/assets/web',
+        'accessKind': 99,
+      });
+      expect(result, isNotNull);
     });
 
     test('with valid values works correctly', () {
-      final result = VirtualHostMapping.fromMap({
+      final result = VirtualHostMapping.fromJson({
         'hostName': 'app.localhost',
         'folderPath': 'C:/assets/web',
         'accessKind': 2,
@@ -40,13 +44,13 @@ void main() {
       expect(result.accessKind, HostResourceAccessKind.allowCors);
     });
 
-    test('toMap round-trip preserves all fields', () {
+    test('toJson round-trip preserves all fields', () {
       final mapping = VirtualHostMapping(
         hostName: 'app.localhost',
         folderPath: 'C:/assets/web',
         accessKind: HostResourceAccessKind.allowCors,
       );
-      final restored = VirtualHostMapping.fromMap(mapping.toMap());
+      final restored = VirtualHostMapping.fromJson(mapping.toJson());
       expect(restored, isNotNull);
       expect(restored!.hostName, mapping.hostName);
       expect(restored.folderPath, mapping.folderPath);
@@ -56,9 +60,9 @@ void main() {
 
   group('HostResourceAccessKind', () {
     test('native values match WebView2 enum', () {
-      expect(HostResourceAccessKind.deny.toNativeValue(), 0);
-      expect(HostResourceAccessKind.allow.toNativeValue(), 1);
-      expect(HostResourceAccessKind.allowCors.toNativeValue(), 2);
+      expect(HostResourceAccessKind.deny.index, 0);
+      expect(HostResourceAccessKind.allow.index, 1);
+      expect(HostResourceAccessKind.allowCors.index, 2);
     });
   });
 
@@ -73,7 +77,7 @@ void main() {
           ),
         ],
       );
-      final map = settings.toMap();
+      final map = settings.toJson();
       expect(map['virtualHostMappings'], isA<List<Map<String, dynamic>>>());
       final mappings = map['virtualHostMappings'] as List<Map<String, dynamic>>;
       expect(mappings.single['hostName'], 'app.localhost');
@@ -90,7 +94,7 @@ void main() {
           ),
         ],
       );
-      final restored = WebViewEnvironmentSettings.fromMap(settings.toMap());
+      final restored = WebViewEnvironmentSettings.fromJson(settings.toJson());
       expect(restored, isNotNull);
       expect(restored!.virtualHostMappings, hasLength(1));
       expect(restored.virtualHostMappings!.single.hostName, 'app.localhost');
@@ -101,7 +105,7 @@ void main() {
     });
 
     test('fromMap with null virtualHostMappings returns null list', () {
-      final restored = WebViewEnvironmentSettings.fromMap(<String, dynamic>{
+      final restored = WebViewEnvironmentSettings.fromJson(<String, dynamic>{
         'virtualHostMappings': null,
       });
       expect(restored, isNotNull);

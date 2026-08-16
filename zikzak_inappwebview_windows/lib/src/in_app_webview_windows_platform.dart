@@ -120,12 +120,12 @@ class _InAppWebViewWindowsWidgetStateImpl
           if (registeredMappings.containsKey(canonicalHostName)) {
             final existing = registeredMappings[canonicalHostName]!;
             if (existing.folderPath != mapping.folderPath ||
-                existing.accessKind != mapping.accessKind.toNativeValue()) {
+                existing.accessKind != mapping.accessKind.index) {
               print(
                 'Warning: Skipping duplicate virtual host mapping for "$canonicalHostName" '
                 'with conflicting folderPath or accessKind. '
                 'Existing: folderPath="${existing.folderPath}", accessKind=${existing.accessKind}. '
-                'Conflicting: folderPath="${mapping.folderPath}", accessKind=${mapping.accessKind.toNativeValue()}.',
+                'Conflicting: folderPath="${mapping.folderPath}", accessKind=${mapping.accessKind.index}.',
               );
               continue;
             }
@@ -135,12 +135,11 @@ class _InAppWebViewWindowsWidgetStateImpl
           await _controller.addVirtualHostNameMapping(
             mapping.hostName,
             mapping.folderPath,
-            WebviewHostResourceAccessKind.values[mapping.accessKind
-                .toNativeValue()],
+            WebviewHostResourceAccessKind.values[mapping.accessKind.index],
           );
           registeredMappings[canonicalHostName] = _VirtualHostMappingInfo(
             folderPath: mapping.folderPath,
-            accessKind: mapping.accessKind.toNativeValue(),
+            accessKind: mapping.accessKind.index,
           );
         }
       }

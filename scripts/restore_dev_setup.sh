@@ -40,7 +40,6 @@ update_for_dev_mode() {
   BEGIN {
     in_dev_dependencies = 0;
     packages["zikzak_inappwebview_platform_interface"] = 1;
-    packages["zikzak_inappwebview_internal_annotations"] = 1;
     packages["zikzak_inappwebview_android"] = 1;
     packages["zikzak_inappwebview_ios"] = 1;
     packages["zikzak_inappwebview_web"] = 1;
@@ -87,8 +86,6 @@ update_for_dev_mode() {
   else
     echo "⚠️ Warning: awk processing failed for $pubspec_file"
   fi
-
-  sed -i.tmp -E "s|zikzak_inappwebview_internal_annotations: \\^[0-9]+\\.[0-9]+\\.[0-9]+|zikzak_inappwebview_internal_annotations:\\n    path: ${path_prefix}zikzak_inappwebview_internal_annotations|g" "$pubspec_file"
 
   # Replace zikzak_inappwebview_platform_interface dependency
   sed -i.tmp -E "s|zikzak_inappwebview_platform_interface: \\^[0-9]+\\.[0-9]+\\.[0-9]+|zikzak_inappwebview_platform_interface:\\n    path: ${path_prefix}zikzak_inappwebview_platform_interface|g" "$pubspec_file"

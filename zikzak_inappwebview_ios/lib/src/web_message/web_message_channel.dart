@@ -96,7 +96,7 @@ class IOSWebMessageChannel extends PlatformWebMessageChannel
         var port = index == 0 ? _iosPort1 : _iosPort2;
         if (port.onMessage != null) {
           WebMessage? message = call.arguments["message"] != null
-              ? WebMessage.fromMap(
+              ? WebMessage.fromJson(
                   call.arguments["message"].cast<String, dynamic>(),
                 )
               : null;

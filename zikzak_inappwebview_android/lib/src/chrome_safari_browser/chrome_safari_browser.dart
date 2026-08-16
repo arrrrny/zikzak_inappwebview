@@ -90,13 +90,13 @@ class AndroidChromeSafariBrowser extends PlatformChromeSafariBrowser
         eventHandler?.onCompletedInitialLoad(didLoadSuccessfully);
         break;
       case "onNavigationEvent":
-        final navigationEvent = CustomTabsNavigationEventType.fromNativeValue(
+        final navigationEvent = customTabsNavigationEventTypeFromWire(
           call.arguments["navigationEvent"],
         );
         eventHandler?.onNavigationEvent(navigationEvent);
         break;
       case "onRelationshipValidationResult":
-        final relation = CustomTabsRelationType.fromNativeValue(
+        final relation = customTabsRelationTypeFromWire(
           call.arguments["relation"],
         );
         final requestedOrigin = call.arguments["requestedOrigin"] != null
@@ -213,9 +213,9 @@ class AndroidChromeSafariBrowser extends PlatformChromeSafariBrowser
     });
 
     var initialSettings =
-        settings?.toMap() ??
-        options?.toMap() ??
-        ChromeSafariBrowserSettings().toMap();
+        settings?.toJson() ??
+        options?.toJson() ??
+        ChromeSafariBrowserSettings().toJson();
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('id', () => id);
@@ -227,8 +227,8 @@ class AndroidChromeSafariBrowser extends PlatformChromeSafariBrowser
     );
     args.putIfAbsent('referrer', () => referrer?.toString());
     args.putIfAbsent('settings', () => initialSettings);
-    args.putIfAbsent('actionButton', () => _actionButton?.toMap());
-    args.putIfAbsent('secondaryToolbar', () => _secondaryToolbar?.toMap());
+    args.putIfAbsent('actionButton', () => _actionButton?.toJson());
+    args.putIfAbsent('secondaryToolbar', () => _secondaryToolbar?.toJson());
     args.putIfAbsent('menuItemList', () => menuItemList);
     await _staticChannel.invokeMethod('open', args);
   }
@@ -271,7 +271,7 @@ class AndroidChromeSafariBrowser extends PlatformChromeSafariBrowser
     required WebUri origin,
   }) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('relation', () => relation.toNativeValue());
+    args.putIfAbsent('relation', () => customTabsRelationTypeToWire(relation));
     args.putIfAbsent('origin', () => origin.toString());
     return await channel?.invokeMethod<bool>("validateRelationship", args) ??
         false;
@@ -313,7 +313,7 @@ class AndroidChromeSafariBrowser extends PlatformChromeSafariBrowser
     ChromeSafariBrowserSecondaryToolbar secondaryToolbar,
   ) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('secondaryToolbar', () => secondaryToolbar.toMap());
+    args.putIfAbsent('secondaryToolbar', () => secondaryToolbar.toJson());
     await channel?.invokeMethod("updateSecondaryToolbar", args);
     this._secondaryToolbar = secondaryToolbar;
   }
@@ -349,7 +349,7 @@ class AndroidChromeSafariBrowser extends PlatformChromeSafariBrowser
   Future<CustomTabsPostMessageResultType> postMessage(String message) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("message", () => message);
-    return CustomTabsPostMessageResultType.fromNativeValue(
+    return customTabsPostMessageResultTypeFromWire(
           await channel?.invokeMethod<int>("postMessage", args),
         ) ??
         CustomTabsPostMessageResultType.FAILURE_MESSAGING_ERROR;

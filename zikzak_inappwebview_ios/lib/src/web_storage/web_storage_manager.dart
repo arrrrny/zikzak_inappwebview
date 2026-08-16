@@ -3,6 +3,9 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
+// ignore: implementation_imports
+import 'package:zikzak_inappwebview_platform_interface/src/domain/entities/enums/website_data_type.dart'
+    show websiteDataTypeFromWire, websiteDataTypeToWire;
 
 /// Object specifying creation parameters for creating a [IOSWebStorageManager].
 ///
@@ -71,7 +74,7 @@ class IOSWebStorageManager extends PlatformWebStorageManager
     List<WebsiteDataRecord> recordList = [];
     List<String> dataTypesList = [];
     for (var dataType in dataTypes) {
-      dataTypesList.add(dataType.toNativeValue());
+      dataTypesList.add(websiteDataTypeToWire(dataType) as String);
     }
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("dataTypes", () => dataTypesList);
@@ -85,7 +88,7 @@ class IOSWebStorageManager extends PlatformWebStorageManager
       List<String> dataTypesString = record["dataTypes"].cast<String>();
       Set<WebsiteDataType> dataTypes = Set();
       for (var dataTypeValue in dataTypesString) {
-        var dataType = WebsiteDataType.fromNativeValue(dataTypeValue);
+        var dataType = websiteDataTypeFromWire(dataTypeValue);
         if (dataType != null) {
           dataTypes.add(dataType);
         }
@@ -116,12 +119,12 @@ class IOSWebStorageManager extends PlatformWebStorageManager
   }) async {
     List<String> dataTypesList = [];
     for (var dataType in dataTypes) {
-      dataTypesList.add(dataType.toNativeValue());
+      dataTypesList.add(websiteDataTypeToWire(dataType) as String);
     }
 
     List<Map<String, dynamic>> recordList = [];
     for (var record in dataRecords) {
-      recordList.add(record.toMap());
+      recordList.add(record.toJson());
     }
 
     Map<String, dynamic> args = <String, dynamic>{};
@@ -137,7 +140,7 @@ class IOSWebStorageManager extends PlatformWebStorageManager
   }) async {
     List<String> dataTypesList = [];
     for (var dataType in dataTypes) {
-      dataTypesList.add(dataType.toNativeValue());
+      dataTypesList.add(websiteDataTypeToWire(dataType) as String);
     }
 
     var timestamp = date.millisecondsSinceEpoch;

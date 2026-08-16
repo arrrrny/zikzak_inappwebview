@@ -262,30 +262,30 @@ class AndroidHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     _started = true;
     _init();
 
-    final initialSettings = params.initialSettings ?? InAppWebViewSettings();
-    _inferInitialSettings(initialSettings);
+    var initialSettings = params.initialSettings ?? InAppWebViewSettings();
+    initialSettings = _inferInitialSettings(initialSettings);
 
-    Map<String, dynamic> settingsMap = initialSettings.toMap();
+    Map<String, dynamic> settingsMap = initialSettings.toJson();
 
     Map<String, dynamic> pullToRefreshSettings =
-        _androidParams.pullToRefreshController?.params.settings?.toMap() ??
-        PullToRefreshSettings(enabled: false).toMap();
+        _androidParams.pullToRefreshController?.params.settings?.toJson() ??
+        PullToRefreshSettings(enabled: false).toJson();
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('id', () => id);
     args.putIfAbsent(
       'params',
       () => <String, dynamic>{
-        'initialUrlRequest': params.initialUrlRequest?.toMap(),
+        'initialUrlRequest': params.initialUrlRequest?.toJson(),
         'initialFile': params.initialFile,
-        'initialData': params.initialData?.toMap(),
+        'initialData': params.initialData?.toJson(),
         'initialSettings': settingsMap,
-        'contextMenu': params.contextMenu?.toMap() ?? {},
+        'contextMenu': params.contextMenu?.toJson() ?? {},
         'windowId': params.windowId,
         'initialUserScripts':
-            params.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
+            params.initialUserScripts?.map((e) => e.toJson()).toList() ?? [],
         'pullToRefreshSettings': pullToRefreshSettings,
-        'initialSize': params.initialSize.toMap(),
+        'initialSize': params.initialSize.toJson(),
       },
     );
     final runCompleter = Completer<void>();
@@ -307,38 +307,40 @@ class AndroidHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     }
   }
 
-  void _inferInitialSettings(InAppWebViewSettings settings) {
+  InAppWebViewSettings _inferInitialSettings(InAppWebViewSettings settings) {
+    var inferred = settings;
     if (params.shouldOverrideUrlLoading != null &&
         settings.useShouldOverrideUrlLoading == null) {
-      settings.useShouldOverrideUrlLoading = true;
+      inferred = inferred.copyWith(useShouldOverrideUrlLoading: true);
     }
     if (params.onLoadResource != null && settings.useOnLoadResource == null) {
-      settings.useOnLoadResource = true;
+      inferred = inferred.copyWith(useOnLoadResource: true);
     }
     if (params.onDownloadStartRequest != null &&
         settings.useOnDownloadStart == null) {
-      settings.useOnDownloadStart = true;
+      inferred = inferred.copyWith(useOnDownloadStart: true);
     }
     if (params.shouldInterceptAjaxRequest != null &&
         settings.useShouldInterceptAjaxRequest == null) {
-      settings.useShouldInterceptAjaxRequest = true;
+      inferred = inferred.copyWith(useShouldInterceptAjaxRequest: true);
     }
     if (params.shouldInterceptFetchRequest != null &&
         settings.useShouldInterceptFetchRequest == null) {
-      settings.useShouldInterceptFetchRequest = true;
+      inferred = inferred.copyWith(useShouldInterceptFetchRequest: true);
     }
     if (params.shouldInterceptRequest != null &&
         settings.useShouldInterceptRequest == null) {
-      settings.useShouldInterceptRequest = true;
+      inferred = inferred.copyWith(useShouldInterceptRequest: true);
     }
     if (params.onRenderProcessGone != null &&
         settings.useOnRenderProcessGone == null) {
-      settings.useOnRenderProcessGone = true;
+      inferred = inferred.copyWith(useOnRenderProcessGone: true);
     }
     if (params.onNavigationResponse != null &&
         settings.useOnNavigationResponse == null) {
-      settings.useOnNavigationResponse = true;
+      inferred = inferred.copyWith(useOnNavigationResponse: true);
     }
+    return inferred;
   }
 
   @override
@@ -353,7 +355,7 @@ class AndroidHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     }
 
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('size', () => size.toMap());
+    args.putIfAbsent('size', () => size.toJson());
     await channel?.invokeMethod('setSize', args);
   }
 

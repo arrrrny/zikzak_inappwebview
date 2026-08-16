@@ -3,7 +3,7 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import '../inappwebview_platform.dart';
 import '../types/web_message_callback.dart';
-import 'web_message.dart';
+import '../domain/entities/web_message/web_message.dart';
 
 /// Object specifying creation parameters for creating a [PlatformWebMessagePort].
 ///

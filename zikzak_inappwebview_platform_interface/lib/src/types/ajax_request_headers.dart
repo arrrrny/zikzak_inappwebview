@@ -1,25 +1,25 @@
-import 'package:zikzak_inappwebview_internal_annotations/zikzak_inappwebview_internal_annotations.dart';
-
-import 'ajax_request.dart';
-
-part 'ajax_request_headers.g.dart';
-
 ///Class that represents the HTTP headers of an [AjaxRequest].
-@ExchangeableObject()
-class AjaxRequestHeaders_ {
+///
+///Hand-written (migration skip/fork — see PROGRESS.md migration map): this
+///class is mutable by design and carries a custom method surface
+///([getHeaders]/[setRequestHeader]) that Zorphy value objects cannot express,
+///and its wire form is the accumulated `new headers` map rather than the
+///fields of a value object. The `@ExchangeableObject` annotation here only
+///generated a thin public wrapper; it is now a plain Dart class with an
+///identical public API and wire format.
+class AjaxRequestHeaders {
   Map<String, dynamic> _headers;
   Map<String, dynamic> _newHeaders = {};
 
-  @ExchangeableObjectConstructor()
-  AjaxRequestHeaders_(this._headers);
+  AjaxRequestHeaders(this._headers);
 
   ///Gets a possible [AjaxRequestHeaders] instance from a [Map] value.
-  static AjaxRequestHeaders_? fromMap(Map<String, dynamic>? map) {
+  static AjaxRequestHeaders? fromMap(Map<String, dynamic>? map) {
     if (map == null) {
       return null;
     }
 
-    return AjaxRequestHeaders_(map);
+    return AjaxRequestHeaders(map);
   }
 
   ///Gets the HTTP headers of the [AjaxRequest].
@@ -38,6 +38,11 @@ class AjaxRequestHeaders_ {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return _newHeaders;
+  }
+
+  ///Converts instance to a map.
+  Map<String, dynamic> toJson() {
+    return toMap();
   }
 
   @override

@@ -124,9 +124,10 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
             controller,
             WebResourceRequest(url: url != null ? WebUri(url) : WebUri('')),
             WebResourceError(
-              type:
-                  WebResourceErrorType.fromNativeValue(code) ??
-                  WebResourceErrorType.UNKNOWN,
+              type: WebResourceErrorType.values.firstWhere(
+                (t) => t.name == code,
+                orElse: () => WebResourceErrorType.UNKNOWN,
+              ),
               description: message,
             ),
           );
@@ -159,30 +160,25 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
         if (params.webviewParams?.shouldOverrideUrlLoading != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          var navigationAction = NavigationAction.fromMap(
+          var navigationAction = NavigationAction.fromJson(
             arguments['navigationAction'].cast<String, dynamic>(),
-          )!;
+          );
           var policy = await params.webviewParams!.shouldOverrideUrlLoading!(
             controller,
             navigationAction,
           );
-          return policy?.toNativeValue() ??
-              NavigationActionPolicy.CANCEL.toNativeValue();
+          return policy?.index ?? NavigationActionPolicy.CANCEL.index;
         }
-        return NavigationActionPolicy.ALLOW.toNativeValue();
+        return NavigationActionPolicy.ALLOW.index;
       case 'onCreateWindow':
         if (params.webviewParams?.onCreateWindow != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          CreateWindowAction? createWindowAction = CreateWindowAction.fromMap(
-            arguments,
+          final createWindowAction = CreateWindowAction.fromJson(arguments);
+          return await params.webviewParams!.onCreateWindow!(
+            controller,
+            createWindowAction,
           );
-          if (createWindowAction != null) {
-            return await params.webviewParams!.onCreateWindow!(
-              controller,
-              createWindowAction,
-            );
-          }
         }
         break;
       case 'onCloseWindow':
@@ -198,9 +194,10 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
               {};
           var consoleMessage = ConsoleMessage(
             message: map['message'] as String? ?? '',
-            messageLevel:
-                ConsoleMessageLevel.fromNativeValue(map['messageLevel']) ??
-                ConsoleMessageLevel.LOG,
+            messageLevel: ConsoleMessageLevel.values.firstWhere(
+              (level) => level.index == map['messageLevel'],
+              orElse: () => ConsoleMessageLevel.LOG,
+            ),
           );
           params.webviewParams!.onConsoleMessage!(controller, consoleMessage);
         }
@@ -211,9 +208,9 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
           var request = WebResourceRequest(
             url: url != null ? WebUri(url) : WebUri(''),
           );
-          var errorResponse = WebResourceResponse.fromMap(
+          var errorResponse = WebResourceResponse.fromJson(
             call.arguments['errorResponse'].cast<String, dynamic>(),
-          )!;
+          );
           params.webviewParams!.onReceivedHttpError!(
             controller,
             request,
@@ -230,36 +227,36 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
         if (params.webviewParams?.onJsAlert != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          var request = JsAlertRequest.fromMap(arguments)!;
+          var request = JsAlertRequest.fromJson(arguments);
           var response = await params.webviewParams!.onJsAlert!(
             controller,
             request,
           );
-          return response?.toMap();
+          return response?.toJson();
         }
         return null;
       case 'onJsConfirm':
         if (params.webviewParams?.onJsConfirm != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          var request = JsConfirmRequest.fromMap(arguments)!;
+          var request = JsConfirmRequest.fromJson(arguments);
           var response = await params.webviewParams!.onJsConfirm!(
             controller,
             request,
           );
-          return response?.toMap();
+          return response?.toJson();
         }
         return null;
       case 'onJsPrompt':
         if (params.webviewParams?.onJsPrompt != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          var request = JsPromptRequest.fromMap(arguments)!;
+          var request = JsPromptRequest.fromJson(arguments);
           var response = await params.webviewParams!.onJsPrompt!(
             controller,
             request,
           );
-          return response?.toMap();
+          return response?.toJson();
         }
         return null;
       case 'callHandler':
@@ -290,7 +287,7 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
           Map<String, dynamic> arguments =
               (call.arguments as Map<dynamic, dynamic>).cast<String, dynamic>();
           InAppWebViewHitTestResult hitTestResult =
-              InAppWebViewHitTestResult.fromMap(arguments)!;
+              InAppWebViewHitTestResult.fromJson(arguments);
           contextMenu.onCreateContextMenu!(hitTestResult);
         }
         break;
@@ -334,37 +331,37 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
           HttpAuthenticationChallenge challenge =
-              HttpAuthenticationChallenge.fromMap(arguments)!;
+              HttpAuthenticationChallenge.fromJson(arguments)!;
           return (await params.webviewParams!.onReceivedHttpAuthRequest!(
             controller,
             challenge,
-          ))?.toMap();
+          ))?.toJson();
         }
         break;
       case 'onReceivedServerTrustAuthRequest':
         if (params.webviewParams?.onReceivedServerTrustAuthRequest != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          ServerTrustChallenge challenge = ServerTrustChallenge.fromMap(
+          ServerTrustChallenge challenge = ServerTrustChallenge.fromJson(
             arguments,
           )!;
           return (await params.webviewParams!.onReceivedServerTrustAuthRequest!(
             controller,
             challenge,
-          ))?.toMap();
+          ))?.toJson();
         }
         break;
       case 'onReceivedClientCertRequest':
         if (params.webviewParams?.onReceivedClientCertRequest != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          ClientCertChallenge challenge = ClientCertChallenge.fromMap(
+          ClientCertChallenge challenge = ClientCertChallenge.fromJson(
             arguments,
           )!;
           return (await params.webviewParams!.onReceivedClientCertRequest!(
             controller,
             challenge,
-          ))?.toMap();
+          ))?.toJson();
         }
         break;
       default:
@@ -418,7 +415,7 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
     WebUri? allowingReadAccessTo,
   }) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('urlRequest', () => urlRequest.toMap());
+    args.putIfAbsent('urlRequest', () => urlRequest.toJson());
     args.putIfAbsent(
       'allowingReadAccessTo',
       () => allowingReadAccessTo.toString(),
@@ -429,7 +426,7 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
   @override
   Future<void> setSettings({required InAppWebViewSettings settings}) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('settings', () => settings.toMap());
+    args.putIfAbsent('settings', () => settings.toJson());
     await _channel.invokeMethod('setSettings', args);
   }
 
@@ -439,7 +436,7 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
       'getSettings',
     );
     if (settings != null) {
-      return InAppWebViewSettings.fromMap(settings.cast<String, dynamic>());
+      return InAppWebViewSettings.fromJson(settings.cast<String, dynamic>());
     }
     return null;
   }
@@ -477,7 +474,7 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
   @override
   Future<Uint8List?> createPdf({PDFConfiguration? pdfConfiguration}) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('pdfConfiguration', () => pdfConfiguration?.toMap());
+    args.putIfAbsent('pdfConfiguration', () => pdfConfiguration?.toJson());
     return await _channel.invokeMethod<Uint8List?>('createPdf', args);
   }
 
@@ -488,7 +485,7 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent(
       'screenshotConfiguration',
-      () => screenshotConfiguration?.toMap(),
+      () => screenshotConfiguration?.toJson(),
     );
     return await _channel.invokeMethod<Uint8List?>('takeScreenshot', args);
   }
@@ -544,7 +541,7 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
     PrintJobSettings? settings,
   }) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("settings", () => settings?.toMap());
+    args.putIfAbsent("settings", () => settings?.toJson());
     String? jobId = await _channel.invokeMethod<String?>(
       'printCurrentPage',
       args,
@@ -569,7 +566,7 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
     // menu — see _contextMenuSet docs above.
     _contextMenuSet = true;
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("contextMenu", () => contextMenu?.toMap());
+    args.putIfAbsent("contextMenu", () => contextMenu?.toJson());
     await _channel.invokeMethod('setContextMenu', args);
   }
 

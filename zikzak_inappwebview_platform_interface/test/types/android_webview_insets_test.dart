@@ -50,15 +50,15 @@ void main() {
           AndroidWebViewInsets.displayCutout,
         ],
       );
-      final map = settings.toMap();
+      final map = settings.toJson();
       expect(map['insetsForWebContentToIgnore'], [
         'systemBars',
         'ime',
         'displayCutout',
       ]);
-      final back = InAppWebViewSettings.fromMap(
+      final back = InAppWebViewSettings.fromJson(
         Map<String, dynamic>.from(map),
-      )!;
+      );
       expect(
         back.insetsForWebContentToIgnore,
         [
@@ -70,12 +70,12 @@ void main() {
     });
 
     test('toMap serializes null as absent (null)', () {
-      final map = InAppWebViewSettings().toMap();
+      final map = InAppWebViewSettings().toJson();
       expect(map['insetsForWebContentToIgnore'], isNull);
     });
 
     test('fromMap handles absent key as null', () {
-      final back = InAppWebViewSettings.fromMap(<String, dynamic>{})!;
+      final back = InAppWebViewSettings.fromJson(<String, dynamic>{});
       expect(back.insetsForWebContentToIgnore, isNull);
     });
   });
