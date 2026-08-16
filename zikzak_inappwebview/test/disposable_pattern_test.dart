@@ -30,12 +30,16 @@ class _ProbeDisposable implements Disposable {
 class _FakePlatformController extends PlatformInAppWebViewController {
   int disposeCallCount = 0;
   bool? lastIsKeepAlive;
+  bool shouldThrowOnDispose = false;
 
   _FakePlatformController() : super.implementation(const PlatformInAppWebViewControllerCreationParams(id: 'fake'));
 
   @override
   void dispose({bool isKeepAlive = false}) {
     disposeCallCount++;
+    if (shouldThrowOnDispose) {
+      throw StateError('platform dispose error');
+    }
     lastIsKeepAlive = isKeepAlive;
   }
 }
@@ -53,10 +57,10 @@ class _FakePlatformHeadlessWebView extends PlatformHeadlessInAppWebView {
 
   @override
   Future<void> dispose({bool isKeepAlive = false}) async {
+    disposeCallCount++;
     if (shouldThrowOnDispose) {
       throw StateError('platform dispose error');
     }
-    disposeCallCount++;
     lastIsKeepAlive = isKeepAlive;
   }
 
@@ -148,6 +152,19 @@ void main() {
 
         expect(controller.disposed, true);
       });
+
+      test('dispose exception marks disposed and suppresses retry', () {
+        final fake = _FakePlatformController()..shouldThrowOnDispose = true;
+        final controller = InAppWebViewController.fromPlatform(platform: fake);
+
+        expect(() => controller.dispose(), throwsStateError);
+        expect(controller.disposed, true);
+        expect(fake.disposeCallCount, 1);
+
+        // Second call must not throw and must not re-forward to platform.
+        controller.dispose();
+        expect(fake.disposeCallCount, 1);
+      });
     });
 
     // ---------------------------------------------------------------
@@ -208,6 +225,19 @@ void main() {
 
         expect(fake.disposeCallCount, 1);
         expect(headless.disposed, true);
+      });
+
+      test('dispose exception marks disposed and suppresses retry', () async {
+        final fake = _FakePlatformHeadlessWebView()..shouldThrowOnDispose = true;
+        final headless = HeadlessInAppWebView.fromPlatform(platform: fake);
+
+        await expectLater(headless.dispose(), throwsA(isA<StateError>()));
+        expect(headless.disposed, true);
+        expect(fake.disposeCallCount, 1);
+
+        // Second call must complete normally without re-forwarding.
+        await headless.dispose();
+        expect(fake.disposeCallCount, 1);
       });
     });
 

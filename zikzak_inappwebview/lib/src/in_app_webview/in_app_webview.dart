@@ -32,7 +32,7 @@ class InAppWebView extends StatefulWidget implements Disposable {
        );
 
   /// Constructs a [InAppWebView] from a specific platform implementation.
-  InAppWebView.fromPlatform({super.key, required this.platform});
+  const InAppWebView.fromPlatform({super.key, required this.platform});
 
   /// Implementation of [PlatformInAppWebView] for the current platform.
   final PlatformInAppWebViewWidget platform;
