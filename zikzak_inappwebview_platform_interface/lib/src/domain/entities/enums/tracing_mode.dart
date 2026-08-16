@@ -1,11 +1,10 @@
-
-
 ///Constants that describe the results summary the find panel UI includes.
 enum TracingMode {
   ///Record trace events until the internal tracing buffer is full.
   ///Typically the buffer memory usage is larger than [RECORD_CONTINUOUSLY].
   ///Depending on the implementation typically allows up to 256k events to be stored.
   RECORD_UNTIL_FULL,
+
   ///Record trace events continuously using an internal ring buffer.
   ///Default tracing mode.
   ///Overwrites old events if they exceed buffer capacity.

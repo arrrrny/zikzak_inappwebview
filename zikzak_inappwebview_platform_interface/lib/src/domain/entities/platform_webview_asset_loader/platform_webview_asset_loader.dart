@@ -28,8 +28,10 @@ part 'platform_webview_asset_loader.g.dart';
 abstract class $WebViewAssetLoader {
   ///Set the domain under which app assets can be accessed. The default domain is `appassets.androidplatform.net`.
   String? get domain;
+
   ///Allow using the HTTP scheme in addition to HTTPS. The default is to not allow HTTP.
   bool? get httpAllowed;
+
   ///List of registered path handlers.
   ///
   ///[WebViewAssetLoader] will try Path Handlers in the order they're registered,
@@ -428,9 +430,8 @@ abstract class PlatformCustomPathHandler extends PlatformInterface
   String get path => params.path;
 }
 
-List<PlatformPathHandler>? _pathHandlersFromJson(Object? value) => value is List
-    ? List<PlatformPathHandler>.from(value.map((e) => e))
-    : null;
+List<PlatformPathHandler>? _pathHandlersFromJson(Object? value) =>
+    value is List ? List<PlatformPathHandler>.from(value.map((e) => e)) : null;
 
 Object? _pathHandlersToJson(List<PlatformPathHandler>? pathHandlers) =>
     pathHandlers?.map((e) => e.toMap()).toList();

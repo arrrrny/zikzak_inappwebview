@@ -7,7 +7,6 @@ import 'domain/entities/tracing_settings/tracing_settings.dart';
 import 'types/main.dart';
 import 'types/disposable.dart';
 
-
 /// Object specifying creation parameters for creating a [PlatformTracingController].
 ///
 /// Platform specific implementations can add additional fields by extending

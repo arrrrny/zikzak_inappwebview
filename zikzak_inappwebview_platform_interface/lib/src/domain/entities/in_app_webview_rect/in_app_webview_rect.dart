@@ -12,10 +12,13 @@ part 'in_app_webview_rect.g.dart';
 abstract class $InAppWebViewRect {
   ///x position
   double get x;
+
   ///y position
   double get y;
+
   ///rect width
   double get width;
+
   ///rect height
   double get height;
 }

@@ -2,6 +2,7 @@
 enum FormResubmissionAction {
   ///Resend data
   RESEND,
+
   ///Don't resend data
   DONT_RESEND,
 }

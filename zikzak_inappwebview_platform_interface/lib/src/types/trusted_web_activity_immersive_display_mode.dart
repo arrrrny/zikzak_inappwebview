@@ -32,7 +32,8 @@ class TrustedWebActivityImmersiveDisplayMode
     final instance = TrustedWebActivityImmersiveDisplayMode(
       isSticky: map['isSticky'],
     );
-    instance.displayCutoutMode = LayoutInDisplayCutoutMode.values[map['displayCutoutMode'] as int];
+    instance.displayCutoutMode =
+        LayoutInDisplayCutoutMode.values[map['displayCutoutMode'] as int];
     return instance;
   }
 
@@ -63,7 +64,8 @@ class TrustedWebActivityImmersiveDisplayMode
   }
 
   @override
-  TrustedWebActivityImmersiveDisplayMode copyWithTrustedWebActivityDisplayMode() {
+  TrustedWebActivityImmersiveDisplayMode
+  copyWithTrustedWebActivityDisplayMode() {
     return copyWith();
   }
 

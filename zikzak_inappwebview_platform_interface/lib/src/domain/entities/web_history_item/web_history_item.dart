@@ -17,18 +17,24 @@ abstract class $WebHistoryItem {
   ///Original url of this history item.
   @JsonKey(fromJson: _originalUrlFromJson, toJson: _originalUrlToJson)
   WebUri? get originalUrl;
+
   ///Document title of this history item.
   String? get title;
+
   ///Url of this history item.
   @JsonKey(fromJson: _urlFromJson, toJson: _urlToJson)
   WebUri? get url;
+
   ///0-based position index in the back-forward [WebHistory.list].
   int? get index;
+
   ///Position offset respect to the currentIndex of the back-forward [WebHistory.list].
   int? get offset;
+
   ///Unique id of the navigation history entry.
   int? get entryId;
 }
+
 WebUri? _originalUrlFromJson(Object? value) =>
     value == null ? null : WebUri(value as String);
 

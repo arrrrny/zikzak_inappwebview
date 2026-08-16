@@ -145,7 +145,9 @@ class ContentBlockerTrigger {
   Map<String, dynamic> toMap() {
     List<String> resourceTypeStringList = [];
     resourceType.forEach((type) {
-      resourceTypeStringList.add(contentBlockerTriggerResourceTypeToWire(type)!);
+      resourceTypeStringList.add(
+        contentBlockerTriggerResourceTypeToWire(type)!,
+      );
     });
     List<String> loadTypeStringList = [];
     loadType.forEach((type) {

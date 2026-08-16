@@ -27,7 +27,6 @@ import 'modules/platform_javascript_delegate.dart';
 
 import '../print_job/main.dart';
 
-
 /// Object specifying creation parameters for creating a [PlatformInAppWebViewController].
 ///
 /// Platform specific implementations can add additional fields by extending

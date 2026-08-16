@@ -112,11 +112,10 @@ CustomTabsShareState? _shareStateFromJson(Object? value) {
       : null;
 }
 
-Object? _shareStateToJson(CustomTabsShareState? shareState) => shareState?.index;
+Object? _shareStateToJson(CustomTabsShareState? shareState) =>
+    shareState?.index;
 
-TrustedWebActivityScreenOrientation? _screenOrientationFromJson(
-  Object? value,
-) {
+TrustedWebActivityScreenOrientation? _screenOrientationFromJson(Object? value) {
   if (value is! int) return null;
   return value >= 0 && value < TrustedWebActivityScreenOrientation.values.length
       ? TrustedWebActivityScreenOrientation.values[value]

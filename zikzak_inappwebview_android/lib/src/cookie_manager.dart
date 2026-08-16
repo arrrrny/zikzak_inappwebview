@@ -99,7 +99,10 @@ class AndroidCookieManager extends PlatformCookieManager
     args.putIfAbsent('maxAge', () => maxAge);
     args.putIfAbsent('isSecure', () => isSecure);
     args.putIfAbsent('isHttpOnly', () => isHttpOnly);
-    args.putIfAbsent('sameSite', () => httpCookieSameSitePolicyToWire(sameSite));
+    args.putIfAbsent(
+      'sameSite',
+      () => httpCookieSameSitePolicyToWire(sameSite),
+    );
 
     return await channel?.invokeMethod<bool>('setCookie', args) ?? false;
   }
@@ -129,9 +132,7 @@ class AndroidCookieManager extends PlatformCookieManager
           expiresDate: cookieMap["expiresDate"],
           isSessionOnly: cookieMap["isSessionOnly"],
           domain: cookieMap["domain"],
-          sameSite: httpCookieSameSitePolicyFromWire(
-            cookieMap["sameSite"],
-          ),
+          sameSite: httpCookieSameSitePolicyFromWire(cookieMap["sameSite"]),
           isSecure: cookieMap["isSecure"],
           isHttpOnly: cookieMap["isHttpOnly"],
           path: cookieMap["path"],
@@ -166,9 +167,7 @@ class AndroidCookieManager extends PlatformCookieManager
           expiresDate: cookies[i]["expiresDate"],
           isSessionOnly: cookies[i]["isSessionOnly"],
           domain: cookies[i]["domain"],
-          sameSite: httpCookieSameSitePolicyFromWire(
-            cookies[i]["sameSite"],
-          ),
+          sameSite: httpCookieSameSitePolicyFromWire(cookies[i]["sameSite"]),
           isSecure: cookies[i]["isSecure"],
           isHttpOnly: cookies[i]["isHttpOnly"],
           path: cookies[i]["path"],

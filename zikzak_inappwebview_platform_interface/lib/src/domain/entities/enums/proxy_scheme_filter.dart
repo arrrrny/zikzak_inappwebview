@@ -1,12 +1,11 @@
-
-
-
 ///Class that represent scheme filters used by [PlatformProxyController].
 enum ProxySchemeFilter {
   ///Matches all schemes.
   MATCH_ALL_SCHEMES,
+
   ///HTTP scheme.
   MATCH_HTTP,
+
   ///HTTPS scheme.
   MATCH_HTTPS,
 }

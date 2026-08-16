@@ -1,11 +1,11 @@
-
-
 ///Class that represents how a browser window should be added to the main window.
 enum WindowType {
   ///Adds the new browser window as a separate new window from the main window.
   WINDOW,
+
   ///Adds the new browser window as a child window of the main window.
   CHILD,
+
   ///Adds the new browser window as a new tab in a tabbed window of the main window.
   TABBED,
 }

@@ -1,6 +1,5 @@
 import 'package:zorphy_annotation/zorphy_annotation.dart';
 
-
 part 'prewarming_token.zorphy.dart';
 part 'prewarming_token.g.dart';
 

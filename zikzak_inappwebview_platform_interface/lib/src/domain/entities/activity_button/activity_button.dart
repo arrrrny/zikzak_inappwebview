@@ -22,10 +22,10 @@ abstract class $ActivityButton {
   ///The name of the image asset or file.
   @JsonKey(fromJson: _templateImageFromJson, toJson: _templateImageToJson)
   UIImage get templateImage;
+
   ///The name of the App or Share Extension to be called.
   String get extensionIdentifier;
 }
-
 
 UIImage _templateImageFromJson(Object? value) =>
     UIImage.fromJson((value as Map).cast<String, dynamic>())!;

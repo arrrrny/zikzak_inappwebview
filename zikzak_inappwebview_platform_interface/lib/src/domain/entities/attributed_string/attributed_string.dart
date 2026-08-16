@@ -1,7 +1,6 @@
 import 'package:zorphy_annotation/zorphy_annotation.dart';
 import 'dart:ui';
 
-
 import '../enums/underline_style.dart';
 import '../enums/attributed_string_text_effect_style.dart';
 import '../../../util.dart';
@@ -19,6 +18,7 @@ part 'attributed_string.g.dart';
 abstract class $AttributedString {
   ///The characters for the new object.
   String get string;
+
   ///The color of the background behind the text.
   ///
   ///The value of this attribute is a [Color] object.
@@ -26,16 +26,19 @@ abstract class $AttributedString {
   ///If you do not specify this attribute, no background color is drawn.
   @JsonKey(fromJson: _backgroundColorFromJson, toJson: _backgroundColorToJson)
   Color_? get backgroundColor;
+
   ///The vertical offset for the position of the text.
   ///
   ///The value of this attribute is a number containing a floating point value indicating the character’s offset from the baseline, in points.
   ///The default value is `0`.
   double? get baselineOffset;
+
   ///The expansion factor of the text.
   ///
   ///The value of this attribute is a number containing a floating point value indicating the log of the expansion factor to be applied to glyphs.
   ///The default value is `0`, indicating no expansion.
   double? get expansion;
+
   ///The color of the text.
   ///
   ///The value of this attribute is a [Color] object.
@@ -43,6 +46,7 @@ abstract class $AttributedString {
   ///If you do not specify this attribute, the text is rendered in black.
   @JsonKey(fromJson: _foregroundColorFromJson, toJson: _foregroundColorToJson)
   Color_? get foregroundColor;
+
   ///The kerning of the text.
   ///
   ///The value of this attribute is a number containing a floating-point value.
@@ -50,6 +54,7 @@ abstract class $AttributedString {
   ///Kerning prevents unwanted space from occurring between specific characters and depends on the font.
   ///The value `0` means kerning is disabled. The default value for this attribute is `0`.
   double? get kern;
+
   ///The ligature of the text.
   ///
   ///The value of this attribute is a number containing an integer.
@@ -58,22 +63,32 @@ abstract class $AttributedString {
   ///The value `2` indicates the use of all ligatures.
   ///The default value for this attribute is `1`. (Value `2` is unsupported on iOS.)
   int? get ligature;
+
   ///The obliqueness of the text.
   ///
   ///The value of this attribute is a number containing a floating point value indicating skew to be applied to glyphs.
   ///The default value is `0`, indicating no skew.
   double? get obliqueness;
+
   ///The color of the strikethrough.
   ///
   ///The value of this attribute is a [Color] object. The default value is `null`, indicating same as foreground color.
-  @JsonKey(fromJson: _strikethroughColorFromJson, toJson: _strikethroughColorToJson)
+  @JsonKey(
+    fromJson: _strikethroughColorFromJson,
+    toJson: _strikethroughColorToJson,
+  )
   Color_? get strikethroughColor;
+
   ///The strikethrough style of the text.
   ///
   ///This value indicates whether the text has a line through it and corresponds to one of the constants described in [UnderlineStyle].
   ///The default value for this attribute is [UnderlineStyle.STYLE_NONE].
-  @JsonKey(fromJson: _strikethroughStyleFromJson, toJson: _strikethroughStyleToJson)
+  @JsonKey(
+    fromJson: _strikethroughStyleFromJson,
+    toJson: _strikethroughStyleToJson,
+  )
   UnderlineStyle? get strikethroughStyle;
+
   ///The color of the stroke.
   ///
   ///The value of this parameter is a [Color] object.
@@ -81,6 +96,7 @@ abstract class $AttributedString {
   ///otherwise, it describes the outline color.
   @JsonKey(fromJson: _strokeColorFromJson, toJson: _strokeColorToJson)
   Color_? get strokeColor;
+
   ///The width of the stroke.
   ///
   ///The value of this attribute is a number containing a floating-point value.
@@ -90,23 +106,27 @@ abstract class $AttributedString {
   ///Specify negative values to stroke and fill the text.
   ///For example, a typical value for outlined text would be `3.0`.
   double? get strokeWidth;
+
   ///The text effect.
   ///
   ///The value of this attribute is a [AttributedStringTextEffectStyle] object.
   ///The default value of this property is `null`, indicating no text effect.
   AttributedStringTextEffectStyle? get textEffect;
+
   ///The color of the underline.
   ///
   ///The value of this attribute is a [Color] object.
   ///The default value is `null`, indicating same as foreground color.
   @JsonKey(fromJson: _underlineColorFromJson, toJson: _underlineColorToJson)
   Color_? get underlineColor;
+
   ///The underline style of the text.
   ///
   ///This value indicates whether the text is underlined and corresponds to one of the constants described in [UnderlineStyle].
   ///The default value for this attribute is [UnderlineStyle.STYLE_NONE].
   UnderlineStyle? get underlineStyle;
 }
+
 Color_? _backgroundColorFromJson(Object? value) {
   if (value == null) return null;
   final color = UtilColor.fromStringRepresentation(value as String);
@@ -143,10 +163,15 @@ Color_? _underlineColorFromJson(Object? value) {
 
 Object? _underlineColorToJson(Color_? value) => value?.toHex();
 
-UnderlineStyle? _strikethroughStyleFromJson(Object? value) => underlineStyleFromWire(value);
+UnderlineStyle? _strikethroughStyleFromJson(Object? value) =>
+    underlineStyleFromWire(value);
 
-Object? _strikethroughStyleToJson(UnderlineStyle? value) => underlineStyleToWire(value);
+Object? _strikethroughStyleToJson(UnderlineStyle? value) =>
+    underlineStyleToWire(value);
 
-AttributedStringTextEffectStyle _textEffectFromJson(Object? value) => attributedStringTextEffectStyleFromWire(value) ?? AttributedStringTextEffectStyle.values.first;
+AttributedStringTextEffectStyle _textEffectFromJson(Object? value) =>
+    attributedStringTextEffectStyleFromWire(value) ??
+    AttributedStringTextEffectStyle.values.first;
 
-Object? _textEffectToJson(AttributedStringTextEffectStyle value) => attributedStringTextEffectStyleToWire(value);
+Object? _textEffectToJson(AttributedStringTextEffectStyle value) =>
+    attributedStringTextEffectStyleToWire(value);

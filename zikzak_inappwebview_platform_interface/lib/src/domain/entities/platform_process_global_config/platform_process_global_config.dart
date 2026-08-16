@@ -125,6 +125,7 @@ abstract class $ProcessGlobalConfigSettings {
   ///
   ///**NOTE**: available only if [WebViewFeature.STARTUP_FEATURE_SET_DATA_DIRECTORY_SUFFIX] feature is supported.
   String? get dataDirectorySuffix;
+
   ///Set the base directories that `WebView` will use for the current process.
   ///If this method is not used, `WebView` uses the default base paths defined by the Android framework.
   ///
@@ -159,6 +160,7 @@ abstract class $ProcessGlobalConfigSettings {
 abstract class $ProcessGlobalConfigDirectoryBasePaths {
   ///The absolute base path for the WebView data directory.
   String get dataDirectoryBasePath;
+
   ///The absolute base path for the WebView cache directory.
   String get cacheDirectoryBasePath;
 }

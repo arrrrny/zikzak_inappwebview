@@ -1,11 +1,11 @@
-
-
 ///Class that describes whether a media device, like a camera or microphone, is currently capturing audio or video.
 enum MediaCaptureState {
   ///The media device is off.
   NONE,
+
   ///The media device is actively capturing audio or video.
   ACTIVE,
+
   ///The media device is muted, and not actively capturing audio or video.
   MUTED,
 }

@@ -14,8 +14,10 @@ part 'meta_tag.g.dart';
 abstract class $MetaTag {
   ///The meta tag name value.
   String? get name;
+
   ///The meta tag content value.
   String? get content;
+
   ///The meta tag attributes list.
   List<MetaTagAttribute>? get attrs;
 }

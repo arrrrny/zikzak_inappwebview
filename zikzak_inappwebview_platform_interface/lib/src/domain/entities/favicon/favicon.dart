@@ -15,13 +15,17 @@ abstract class $Favicon {
   ///The url of the favicon image.
   @JsonKey(fromJson: _urlFromJson, toJson: _urlToJson)
   WebUri get url;
+
   ///The relationship between the current web page and the favicon image.
   String? get rel;
+
   ///The width of the favicon image.
   int? get width;
+
   ///The height of the favicon image.
   int? get height;
 }
+
 WebUri _urlFromJson(Object? value) => WebUri(value as String);
 
 Object? _urlToJson(WebUri value) => value.toString();

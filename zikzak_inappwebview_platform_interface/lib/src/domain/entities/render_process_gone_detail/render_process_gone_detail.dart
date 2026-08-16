@@ -16,12 +16,18 @@ abstract class $RenderProcessGoneDetail {
   ///
   ///If the render process was killed, this is most likely caused by the system being low on memory.
   bool get didCrash;
+
   ///Returns the renderer priority that was set at the time that the renderer exited. This may be greater than the priority that
   ///any individual `WebView` requested using [].
-  @JsonKey(fromJson: _rendererPriorityAtExitFromJson, toJson: _rendererPriorityAtExitToJson)
+  @JsonKey(
+    fromJson: _rendererPriorityAtExitFromJson,
+    toJson: _rendererPriorityAtExitToJson,
+  )
   RendererPriority? get rendererPriorityAtExit;
 }
 
-RendererPriority? _rendererPriorityAtExitFromJson(Object? value) => rendererPriorityFromWire(value);
+RendererPriority? _rendererPriorityAtExitFromJson(Object? value) =>
+    rendererPriorityFromWire(value);
 
-Object? _rendererPriorityAtExitToJson(RendererPriority? value) => rendererPriorityToWire(value);
+Object? _rendererPriorityAtExitToJson(RendererPriority? value) =>
+    rendererPriorityToWire(value);

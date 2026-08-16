@@ -15,11 +15,14 @@ abstract class $RequestFocusNodeHrefResult {
   ///The anchor's href attribute.
   @JsonKey(fromJson: _urlFromJson, toJson: _urlToJson)
   WebUri? get url;
+
   ///The anchor's text.
   String? get title;
+
   ///The image's src attribute.
   String? get src;
 }
+
 WebUri? _urlFromJson(Object? value) =>
     value == null ? null : WebUri(value as String);
 

@@ -23,15 +23,17 @@ part 'ui_event_attribution.g.dart';
 abstract class $UIEventAttribution {
   ///An 8-bit number that identifies the source of the click for attribution. Value must be between 0 and 255.
   int get sourceIdentifier;
+
   ///The destination URL of the attribution.
   @JsonKey(fromJson: _destinationURLFromJson, toJson: _destinationURLToJson)
   WebUri get destinationURL;
+
   ///A description of the source of the attribution.
   String get sourceDescription;
+
   ///A string that describes the entity that purchased the attributed content.
   String get purchaser;
 }
-
 
 WebUri _destinationURLFromJson(Object? value) => WebUri(value as String);
 

@@ -40,9 +40,15 @@ abstract class $PrintJobSettings {
   @JsonKey(fromJson: _jobDispositionFromJson, toJson: _jobDispositionToJson)
   PrintJobDisposition? get jobDisposition;
   String? get paperName;
-  @JsonKey(fromJson: _horizontalPaginationFromJson, toJson: _horizontalPaginationToJson)
+  @JsonKey(
+    fromJson: _horizontalPaginationFromJson,
+    toJson: _horizontalPaginationToJson,
+  )
   PrintJobPaginationMode? get horizontalPagination;
-  @JsonKey(fromJson: _verticalPaginationFromJson, toJson: _verticalPaginationToJson)
+  @JsonKey(
+    fromJson: _verticalPaginationFromJson,
+    toJson: _verticalPaginationToJson,
+  )
   PrintJobPaginationMode? get verticalPagination;
   bool? get isHorizontallyCentered;
   bool? get isVerticallyCentered;
@@ -82,7 +88,10 @@ abstract class $PrintJobSettings {
   bool? get showsScaling;
   bool? get showsPageSetupAccessory;
   double? get scalingFactor;
-  @JsonKey(fromJson: _forceRenderingQualityFromJson, toJson: _forceRenderingQualityToJson)
+  @JsonKey(
+    fromJson: _forceRenderingQualityFromJson,
+    toJson: _forceRenderingQualityToJson,
+  )
   PrintJobRenderingQuality? get forceRenderingQuality;
   bool? get animated;
   bool? get canSpawnSeparateThread;
@@ -127,8 +136,9 @@ PrintJobPaginationMode? _verticalPaginationFromJson(Object? value) {
 Object? _verticalPaginationToJson(PrintJobPaginationMode? pagination) =>
     pagination?.index;
 
-EdgeInsets? _marginsFromJson(Object? value) =>
-    value == null ? null : MapEdgeInsets.fromMap((value as Map).cast<String, dynamic>());
+EdgeInsets? _marginsFromJson(Object? value) => value == null
+    ? null
+    : MapEdgeInsets.fromMap((value as Map).cast<String, dynamic>());
 
 Object? _marginsToJson(EdgeInsets? margins) => margins?.toMap();
 

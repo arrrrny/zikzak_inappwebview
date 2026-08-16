@@ -520,8 +520,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
             return null;
           } else {
             return webViewRenderProcessActionToWire(
-              await _inAppBrowserEventHandler!
-                  .onRenderProcessUnresponsive(uri),
+              await _inAppBrowserEventHandler!.onRenderProcessUnresponsive(uri),
             );
           }
         }
@@ -542,9 +541,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
             return null;
           } else {
             return webViewRenderProcessActionToWire(
-              await _inAppBrowserEventHandler!.onRenderProcessResponsive(
-                uri,
-              ),
+              await _inAppBrowserEventHandler!.onRenderProcessResponsive(uri),
             );
           }
         }
@@ -585,9 +582,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
             );
           } else {
             return formResubmissionActionToWire(
-              await _inAppBrowserEventHandler!.onFormResubmission(
-                uri,
-              ),
+              await _inAppBrowserEventHandler!.onFormResubmission(uri),
             );
           }
         }
@@ -1189,12 +1184,8 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
         if ((webviewParams != null &&
                 webviewParams!.onCameraCaptureStateChanged != null) ||
             _inAppBrowserEventHandler != null) {
-          var oldState = mediaCaptureStateFromWire(
-            call.arguments["oldState"],
-          );
-          var newState = mediaCaptureStateFromWire(
-            call.arguments["newState"],
-          );
+          var oldState = mediaCaptureStateFromWire(call.arguments["oldState"]);
+          var newState = mediaCaptureStateFromWire(call.arguments["newState"]);
 
           if (webviewParams != null &&
               webviewParams!.onCameraCaptureStateChanged != null)
@@ -1214,12 +1205,8 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
         if ((webviewParams != null &&
                 webviewParams!.onMicrophoneCaptureStateChanged != null) ||
             _inAppBrowserEventHandler != null) {
-          var oldState = mediaCaptureStateFromWire(
-            call.arguments["oldState"],
-          );
-          var newState = mediaCaptureStateFromWire(
-            call.arguments["newState"],
-          );
+          var oldState = mediaCaptureStateFromWire(call.arguments["oldState"]);
+          var newState = mediaCaptureStateFromWire(call.arguments["newState"]);
 
           if (webviewParams != null &&
               webviewParams!.onMicrophoneCaptureStateChanged != null)
@@ -2127,10 +2114,9 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
 
     hitTestResultMap = hitTestResultMap.cast<String, dynamic>();
 
-    InAppWebViewHitTestResultType? type =
-        inAppWebViewHitTestResultTypeFromWire(
-          hitTestResultMap["type"]?.toInt(),
-        );
+    InAppWebViewHitTestResultType? type = inAppWebViewHitTestResultTypeFromWire(
+      hitTestResultMap["type"]?.toInt(),
+    );
     String? extra = hitTestResultMap["extra"];
     return InAppWebViewHitTestResult(type: type, extra: extra);
   }

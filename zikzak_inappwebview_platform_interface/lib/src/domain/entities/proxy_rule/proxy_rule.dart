@@ -16,14 +16,18 @@ abstract class $ProxyRule {
   ///Represents the proxy URL.
   @JsonKey(fromJson: _urlFromJson, toJson: _urlToJson)
   WebUri get url;
+
   ///Represents the scheme filter.
   @JsonKey(fromJson: _schemeFilterFromJson, toJson: _schemeFilterToJson)
   ProxySchemeFilter? get schemeFilter;
 }
+
 WebUri _urlFromJson(Object? value) => WebUri(value as String);
 
 Object? _urlToJson(WebUri value) => value.toString();
 
-ProxySchemeFilter? _schemeFilterFromJson(Object? value) => proxySchemeFilterFromWire(value);
+ProxySchemeFilter? _schemeFilterFromJson(Object? value) =>
+    proxySchemeFilterFromWire(value);
 
-Object? _schemeFilterToJson(ProxySchemeFilter? value) => proxySchemeFilterToWire(value);
+Object? _schemeFilterToJson(ProxySchemeFilter? value) =>
+    proxySchemeFilterToWire(value);

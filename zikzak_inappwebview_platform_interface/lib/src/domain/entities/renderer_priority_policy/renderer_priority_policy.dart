@@ -17,12 +17,18 @@ part 'renderer_priority_policy.g.dart';
 )
 abstract class $RendererPriorityPolicy {
   ///The minimum priority at which this WebView desires the renderer process to be bound.
-  @JsonKey(fromJson: _rendererRequestedPriorityFromJson, toJson: _rendererRequestedPriorityToJson)
+  @JsonKey(
+    fromJson: _rendererRequestedPriorityFromJson,
+    toJson: _rendererRequestedPriorityToJson,
+  )
   RendererPriority? get rendererRequestedPriority;
+
   ///If `true`, this flag specifies that when this WebView is not visible, it will be treated as if it had requested a priority of [RendererPriority.RENDERER_PRIORITY_WAIVED].
   bool get waivedWhenNotVisible;
 }
 
-RendererPriority? _rendererRequestedPriorityFromJson(Object? value) => rendererPriorityFromWire(value);
+RendererPriority? _rendererRequestedPriorityFromJson(Object? value) =>
+    rendererPriorityFromWire(value);
 
-Object? _rendererRequestedPriorityToJson(RendererPriority? value) => rendererPriorityToWire(value);
+Object? _rendererRequestedPriorityToJson(RendererPriority? value) =>
+    rendererPriorityToWire(value);

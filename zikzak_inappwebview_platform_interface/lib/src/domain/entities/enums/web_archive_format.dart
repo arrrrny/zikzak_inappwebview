@@ -1,9 +1,8 @@
-
-
 ///Class that represents the known Web Archive formats used when saving a web page.
 enum WebArchiveFormat {
   ///Web Archive format used only by Android.
   MHT,
+
   ///Web Archive format used only by iOS.
   WEBARCHIVE,
 }

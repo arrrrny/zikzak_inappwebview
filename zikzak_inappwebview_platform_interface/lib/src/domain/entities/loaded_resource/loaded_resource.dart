@@ -14,14 +14,18 @@ part 'loaded_resource.g.dart';
 abstract class $LoadedResource {
   ///A string representing the type of resource.
   String? get initiatorType;
+
   ///Resource URL.
   @JsonKey(fromJson: _urlFromJson, toJson: _urlToJson)
   WebUri? get url;
+
   ///Returns the [DOMHighResTimeStamp](https://developer.mozilla.org/en-US/docs/Web/API/DOMHighResTimeStamp) for the time a resource fetch started.
   double? get startTime;
+
   ///Returns the [DOMHighResTimeStamp](https://developer.mozilla.org/en-US/docs/Web/API/DOMHighResTimeStamp) duration to fetch a resource.
   double? get duration;
 }
+
 WebUri? _urlFromJson(Object? value) =>
     value == null ? null : WebUri(value as String);
 

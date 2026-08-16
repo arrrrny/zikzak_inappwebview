@@ -15,10 +15,13 @@ abstract class $InAppWebViewHitTestResult {
   ///The type of the hit test result.
   @JsonKey(fromJson: _typeFromJson, toJson: _typeToJson)
   InAppWebViewHitTestResultType? get type;
+
   ///Additional type-dependant information about the result.
   String? get extra;
 }
 
-InAppWebViewHitTestResultType? _typeFromJson(Object? value) => inAppWebViewHitTestResultTypeFromWire(value);
+InAppWebViewHitTestResultType? _typeFromJson(Object? value) =>
+    inAppWebViewHitTestResultTypeFromWire(value);
 
-Object? _typeToJson(InAppWebViewHitTestResultType? value) => inAppWebViewHitTestResultTypeToWire(value);
+Object? _typeToJson(InAppWebViewHitTestResultType? value) =>
+    inAppWebViewHitTestResultTypeToWire(value);

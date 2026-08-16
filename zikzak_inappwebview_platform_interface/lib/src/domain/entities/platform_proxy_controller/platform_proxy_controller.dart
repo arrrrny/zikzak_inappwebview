@@ -111,6 +111,7 @@ abstract class $IOSProxySettings {
   ///Scheme is optional, if present must be `HTTP`, `HTTPS` or [SOCKS](https://tools.ietf.org/html/rfc1928) and defaults to `HTTP`.
   @JsonKey(defaultValue: '')
   String get proxyUrl;
+
   ///A Boolean that indicates whether or not a proxy configuration allows failover to non-proxied connections.
   ///Failover isn’t allowed by default.
   @JsonKey(defaultValue: false)
@@ -134,11 +135,13 @@ abstract class $AndroidProxySettings {
   ///instead, would be made directly to the origin specified by the URL.
   @JsonKey(defaultValue: const [])
   List<String> get bypassRules;
+
   ///List of scheme filters.
   ///
   ///URLs that match these scheme filters are connected to directly instead of using a proxy server.
   @JsonKey(defaultValue: const [])
   List<String> get directs;
+
   ///List of proxy rules to be used for all URLs. This method can be called multiple times to add multiple rules. Additional rules have decreasing precedence.
   ///
   ///Proxy is a string in the format `[scheme://]host[:port]`.
@@ -149,10 +152,12 @@ abstract class $AndroidProxySettings {
   ///The correct syntax for hosts is defined by [RFC 3986](https://tools.ietf.org/html/rfc3986#section-3.2.2).
   @JsonKey(defaultValue: const [])
   List<ProxyRule> get proxyRules;
+
   ///Hostnames without a period in them (and that are not IP literals) will skip proxy settings and be connected to directly instead. Examples: `"abc"`, `"local"`, `"some-domain"`.
   ///
   ///Hostnames with a trailing dot are not considered simple by this definition.
   bool? get bypassSimpleHostnames;
+
   ///By default, certain hostnames implicitly bypass the proxy if they are link-local IPs, or localhost addresses.
   ///For instance hostnames matching any of (non-exhaustive list):
   ///localhost
@@ -163,6 +168,7 @@ abstract class $AndroidProxySettings {
   ///[FE80::]/10
   ///Set this to `true` to override the default behavior and force localhost and link-local URLs to be sent through the proxy.
   bool? get removeImplicitRules;
+
   ///Reverse the bypass list.
   ///
   ///The default value is `false`, in which case all URLs will use proxy settings except the ones in the bypass list, which will be connected to directly instead.

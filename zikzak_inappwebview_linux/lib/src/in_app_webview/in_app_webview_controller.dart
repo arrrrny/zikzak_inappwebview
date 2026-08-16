@@ -120,8 +120,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
             controller,
             navigationAction,
           );
-          return policy?.index ??
-              NavigationActionPolicy.CANCEL.index;
+          return policy?.index ?? NavigationActionPolicy.CANCEL.index;
         }
         return NavigationActionPolicy.ALLOW.index;
       case 'onConsoleMessage':

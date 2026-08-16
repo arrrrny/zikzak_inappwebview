@@ -14,6 +14,7 @@ part 'web_history.g.dart';
 abstract class $WebHistory {
   ///List of all [WebHistoryItem]s.
   List<WebHistoryItem>? get list;
+
   ///Index of the current [WebHistoryItem].
   int? get currentIndex;
 }

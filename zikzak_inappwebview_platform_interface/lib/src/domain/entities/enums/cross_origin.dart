@@ -1,7 +1,5 @@
-
 import '../../../types/script_html_tag_attributes.dart';
 import '../css_link_html_tag_attributes/css_link_html_tag_attributes.dart';
-
 
 ///Class that represents the `crossorigin` content attribute on media elements, which is a CORS settings attribute.
 ///It could be used with [ScriptHtmlTagAttributes] and [CSSLinkHtmlTagAttributes]
@@ -9,10 +7,10 @@ import '../css_link_html_tag_attributes/css_link_html_tag_attributes.dart';
 enum CrossOrigin {
   ///CORS requests for this element will have the credentials flag set to 'same-origin'.
   ANONYMOUS,
+
   ///CORS requests for this element will have the credentials flag set to 'include'.
   USE_CREDENTIALS,
 }
-
 
 ///CrossOrigin wire values are strings — lookup by value.
 const _crossOrigin_wire = ['anonymous', 'use-credentials'];

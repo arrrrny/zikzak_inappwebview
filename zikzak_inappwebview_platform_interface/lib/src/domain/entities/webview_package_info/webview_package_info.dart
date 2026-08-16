@@ -12,6 +12,7 @@ part 'webview_package_info.g.dart';
 abstract class $WebViewPackageInfo {
   ///The version name of this WebView package.
   String? get versionName;
+
   ///The name of this WebView package.
   String? get packageName;
 }

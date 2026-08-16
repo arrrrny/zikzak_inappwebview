@@ -9,4 +9,3 @@ enum PermissionResourceType {
   MIDI_SYSEX,
   PROTECTED_MEDIA_ID,
 }
-

@@ -1,6 +1,5 @@
 import 'package:zorphy_annotation/zorphy_annotation.dart';
 
-
 part 'call_async_javascript_result.zorphy.dart';
 part 'call_async_javascript_result.g.dart';
 
@@ -13,6 +12,7 @@ part 'call_async_javascript_result.g.dart';
 abstract class $CallAsyncJavaScriptResult {
   ///It contains the success value.
   dynamic get value;
+
   ///It contains the failure value.
   String? get error;
 }

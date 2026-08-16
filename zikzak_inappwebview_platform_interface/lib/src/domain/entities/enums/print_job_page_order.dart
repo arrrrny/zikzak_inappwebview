@@ -1,14 +1,14 @@
-
-
-
 ///Class representing the page order that will be used to generate the pages of a [PlatformPrintJobController].
 enum PrintJobPageOrder {
   ///Descending (front to back) page order.
   DESCENDING,
+
   ///The spooler does not rearrange pages—they are printed in the order received by the spooler.
   SPECIAL,
+
   ///Ascending (back to front) page order.
   ASCENDING,
+
   ///No page order specified.
   UNKNOWN,
 }

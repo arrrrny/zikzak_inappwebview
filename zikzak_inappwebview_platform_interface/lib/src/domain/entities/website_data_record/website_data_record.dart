@@ -14,6 +14,7 @@ part 'website_data_record.g.dart';
 abstract class $WebsiteDataRecord {
   ///The display name for the data record. This is usually the domain name.
   String? get displayName;
+
   ///The various types of website data that exist for this data record.
   @JsonKey(fromJson: _dataTypesFromJson, toJson: _dataTypesToJson)
   Set<WebsiteDataType>? get dataTypes;

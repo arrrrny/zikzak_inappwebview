@@ -9,5 +9,4 @@ part 'trusted_web_activity_display_mode.g.dart';
   generateJson: true,
   generateCompareTo: true,
 )
-abstract class $TrustedWebActivityDisplayMode {
-}
+abstract class $TrustedWebActivityDisplayMode {}

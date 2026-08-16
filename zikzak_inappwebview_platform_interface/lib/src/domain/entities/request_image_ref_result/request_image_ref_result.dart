@@ -16,6 +16,7 @@ abstract class $RequestImageRefResult {
   @JsonKey(fromJson: _urlFromJson, toJson: _urlToJson)
   WebUri? get url;
 }
+
 WebUri? _urlFromJson(Object? value) =>
     value == null ? null : WebUri(value as String);
 

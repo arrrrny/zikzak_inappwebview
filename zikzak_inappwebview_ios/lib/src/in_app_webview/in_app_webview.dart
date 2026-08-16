@@ -319,7 +319,6 @@ class IOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
     return inferred;
   }
 
-
   /// Whether [dispose] has already run. Both the public widget-level
   /// dispose and the owning State's dispose route through this method, so
   /// the guard keeps the teardown idempotent.
