@@ -57,7 +57,7 @@ class _LinuxInAppWebViewState extends State<_LinuxInAppWebView> {
       var textureId = await _sharedChannel.invokeMethod('create', {
         'id': id,
         'params': {
-          'initialUrlRequest': widget.params.initialUrlRequest?.toMap(),
+          'initialUrlRequest': widget.params.initialUrlRequest?.toJson(),
           'initialData': widget.params.initialData?.toMap(),
           'initialUserScripts':
               widget.params.initialUserScripts

@@ -197,7 +197,7 @@ class AndroidInAppBrowser extends PlatformInAppBrowser with ChannelController {
       options: options,
       settings: settings,
     );
-    args.putIfAbsent('urlRequest', () => urlRequest.toMap());
+    args.putIfAbsent('urlRequest', () => urlRequest.toJson());
     await _staticChannel.invokeMethod('open', args);
   }
 

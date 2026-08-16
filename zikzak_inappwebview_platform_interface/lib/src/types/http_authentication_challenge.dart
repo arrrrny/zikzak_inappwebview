@@ -1,7 +1,7 @@
 import 'package:zikzak_inappwebview_internal_annotations/zikzak_inappwebview_internal_annotations.dart';
 
 import 'url_credential.dart';
-import 'url_response.dart';
+import '../domain/entities/url_response/url_response.dart';
 import 'url_authentication_challenge.dart';
 import 'url_protection_space.dart';
 import '../in_app_webview/platform_webview.dart';
@@ -27,7 +27,7 @@ class HttpAuthenticationChallenge_ extends URLAuthenticationChallenge_ {
   ///This value is `null` if the protocol doesn’t use responses to indicate an authentication failure.
   ///
   ///**NOTE**: available only on iOS.
-  URLResponse_? failureResponse;
+  URLResponse? failureResponse;
 
   ///The error object representing the last authentication failure.
   ///This value is `null` if the protocol doesn’t use errors to indicate an authentication failure.

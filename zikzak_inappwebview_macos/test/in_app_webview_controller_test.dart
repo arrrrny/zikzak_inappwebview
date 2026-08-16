@@ -193,7 +193,7 @@ void main() {
       final result = await controller.handleMethod(
         shouldOverrideUrlLoadingCall('https://example.com'),
       );
-      expect(result, NavigationActionPolicy.ALLOW.toNativeValue());
+      expect(result, NavigationActionPolicy.ALLOW.index);
     });
 
     test(
@@ -221,7 +221,7 @@ void main() {
         );
         expect(
           blockedResult,
-          NavigationActionPolicy.CANCEL.toNativeValue(),
+          NavigationActionPolicy.CANCEL.index,
           reason:
               'A blocked scheme must surface as CANCEL (0) so the macOS '
               'native side calls `decisionHandler(.cancel)` and stops the '
@@ -233,7 +233,7 @@ void main() {
         );
         expect(
           allowedResult,
-          NavigationActionPolicy.ALLOW.toNativeValue(),
+          NavigationActionPolicy.ALLOW.index,
           reason: 'Allowed schemes must surface as ALLOW (1).',
         );
       },
@@ -258,7 +258,7 @@ void main() {
         );
         expect(
           result,
-          NavigationActionPolicy.CANCEL.toNativeValue(),
+          NavigationActionPolicy.CANCEL.index,
           reason:
               'When the callback is registered but returns null, the Dart '
               'side must default to CANCEL so the native side never silently '

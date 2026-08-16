@@ -49,9 +49,11 @@ class HttpAuthenticationChallenge extends URLAuthenticationChallenge {
         map['protectionSpace']?.cast<String, dynamic>(),
       )!,
       error: map['error'],
-      failureResponse: URLResponse.fromMap(
-        map['failureResponse']?.cast<String, dynamic>(),
-      ),
+      failureResponse: map['failureResponse'] != null
+          ? URLResponse.fromJson(
+              map['failureResponse']!.cast<String, dynamic>(),
+            )
+          : null,
       previousFailureCount: map['previousFailureCount'],
       proposedCredential: URLCredential.fromMap(
         map['proposedCredential']?.cast<String, dynamic>(),
@@ -65,7 +67,7 @@ class HttpAuthenticationChallenge extends URLAuthenticationChallenge {
     return {
       "protectionSpace": protectionSpace.toMap(),
       "error": error,
-      "failureResponse": failureResponse?.toMap(),
+      "failureResponse": failureResponse?.toJson(),
       "previousFailureCount": previousFailureCount,
       "proposedCredential": proposedCredential?.toMap(),
     };

@@ -12,8 +12,10 @@ and the zikzak→zuraffa v6 migration (…7545).
 **Phase 2a (ajax_request family → Zorphy entities) — DONE (PR #219, merged bc0f757b)**
 **Phase 2b (fetch_request family → Zorphy entities) — DONE (PR #220, merged 984bd850)**
 **Phase 2c (console_message + web_resource family → Zorphy entities) — DONE (PR #221, merged 18d26075)**
-**Phase 2d (permission/safe-browsing family → Zorphy entities) — IN PROGRESS on
-branch `feat/migrate-models-zorphy-entities-phase2d` (PR pending)**
+**Phase 2d (permission/safe-browsing family → Zorphy entities) — DONE (PR #222, merged 6f64b60c)**
+**Phase 2e (navigation family) — BLOCKED on zorphy_migrator support (zorphy #86)**
+**Phase 2e (navigation family → Zorphy via zorphy_migrator) — DONE on branch
+`feat/migrate-models-zorphy-entities-phase2e` (not yet merged)**
 
 - Phase 0 (mapping + toolchain) DONE.
 - Note on the task premise: this repo does **NOT** use Freezed. Upstream
@@ -27,10 +29,59 @@ branch `feat/migrate-models-zorphy-entities-phase2d` (PR pending)**
 
 ## STOPPED AT STEP
 
-(none — active run)
+**Phase 2e DONE on the branch (not yet merged)** — the full navigation
+family was converted with zorphy_migrator (`--apply`), moved to
+`domain/entities/`, glued (wire formats incl. platform-native NavigationType
+and non-sequential URLRequestNetworkServiceType), barrels + controllers
+updated, build + analyze + tests green (see the worklog entry below). Next:
+Phase 2f (auth/ssl family — URLAuthenticationChallenge hierarchy, which now
+also needs its still-codegen http_authentication_challenge to be converted
+since its URLResponse reference was migrated in 2e).
 
 ## LAST ISSUE FILED
 
+- **zorphy #86 (2026-08-16)**: `zorphy_migrator` silently no-ops on this
+  repo — `@ExchangeableObject`/`@ExchangeableEnum` codegen models are not
+  freezed, and the migrator's `FreezedDetector` only resolves
+  `package:freezed_annotation` annotations (enums are skipped entirely).
+  Whole-`lib/src/types/` run → "Converted classes (0)" + "clean migration",
+  exit 0. Control: same tool converts 11 classes on its own smoke fixture.
+  Filed per the user's stop rule ("ONLY USE zorphy_migrator; issue → STOP +
+  file GitHub issue"); options in the issue: (1) add `@ExchangeableObject`/
+  `@ExchangeableEnum` as a second input dialect, (2) at minimum exit non-zero
+  on 0 detected classes instead of claiming success.
+- **zorphy #349 (RE-OPENED as misfire, 2026-08-15)**: the documented `!Type`
+  external field syntax was broken end-to-end in the CURRENT checkouts.
+  `zfa entity create --field 'request:!URLRequest'` emitted
+  `$!URLRequest get request;` (FieldNormalizer treated `!URLRequest` as a
+  type name, found no on-disk entity, added the `$` forward-ref prefix), and
+  the builder then misparsed it into a phantom `$` field
+  (`required dynamic $`, `Field<..., dynamic>('$', ...)`) — build failed.
+  Root cause: the zuraffa-side fix (def7d5f on branch
+  `fix/349-external-type-no-dollar-prefix`) was NEVER MERGED, and the zorphy
+  half it depends on (`FieldDefinition.isExternal`, "zorphy 05feef3" per the
+  Phase 1 note) does NOT exist in zorphy history. PROGRESS.md's earlier
+  "FIXED + RELEASED" note was wrong (pool task 070 did not land).
+  **FIXED in this run**: zorphy PR #84
+  (https://github.com/arrrrny/zorphy/pull/84 — **MERGED 2026-08-15** as 9cfb13f; branch
+  `fix/349-external-type-no-dollar-prefix-cli`) — `FieldDefinition.parse`
+  strips `!` → `isExternal`, `FieldNormalizer` keeps external types plain,
+  `ImportResolver` skips them; regression suite (7 tests) added. The branch
+  also carries the #351 (c09d966) + #310 (2d093f1) fixes so zuraffa can
+  point at one ref. **zuraffa PR #362** (https://github.com/arrrrny/zuraffa/pull/362, open,
+  branch `fix/349-external-type-zorphy-bump`) — merges the original fix/349 content
+  (def7d5f + CodeRabbit 154cfa8: validator + `_fixEntityImports` skip
+  external fields), fixes the #349 regression test's compile assertion
+  (correct relative import + the standard `@JsonKey` glue the migration
+  recipe applies to custom types), and bumps the zorphy git ref to
+  `fix/349-external-type-no-dollar-prefix-cli`. NOTE: zorphy #84 was merged
+  WITHOUT the #351 commit (merge happened at 1bf0d6d) — the #310+#351 fixes
+  are now tracked by **zorphy PR #85** (https://github.com/arrrrny/zorphy/pull/85,
+  branch `fix/310-351-into-development`, open).
+  Verified locally: zfa emits `WebUri? get url;` (no `$`, no bogus imports),
+  build_runner resolves the external type (no `InvalidType`), the remaining
+  json_serializable ask is the NORMAL custom-type `@JsonKey` glue (documented
+  recipe — not a defect).
 - **zuraffa #351** (2026-08-15): cross-entity reference defect — when a
   Zorphy entity has a field whose type is ANOTHER Zorphy entity in the same
   package, `zfa build` generates `InvalidType` in the generated class
@@ -46,7 +97,8 @@ branch `feat/migrate-models-zorphy-entities-phase2d` (PR pending)**
   issue tracks the framework fix. AFFECTS every entity referencing a sibling
   entity (e.g. `AjaxRequest.event`, `FetchRequest.credential`,
   `HttpAuthenticationChallenge.credentials`) — expect this patch in every
-  Phase 2 sub-phase.
+  Phase 2 sub-phase. **CARRIED on zorphy PR #84** (c09d966 merged into the
+  fix branch — the #351 regression test passes against the local checkout).
 - **zuraffa #349** (2026-08-15): `zfa entity create --allow-forward-refs`
   emits `$X` + a bogus import for external (non-entity) types — plugin model
   migration gap. Minimal repro in the issue body. Workaround used (documented,
@@ -55,10 +107,10 @@ branch `feat/migrate-models-zorphy-entities-phase2d` (PR pending)**
   outside `lib/src/domain/entities` (e.g. `WebUri`). Not blocking Phase 1:
   post-generation source fixes are part of the zfa workflow (`_fixEntityImports`
   does the same class of edit); the issue tracks the framework gap for a real
-  fix. **UPDATE 2026-08-15: FIXED + RELEASED** — pool task 070 implemented the
-  `!Type` external-type syntax (zuraffa def7d5f + zorphy 05feef3); future
-  phases should use `url:!WebUri` / `frame:!FrameInfo?` field syntax so zfa
-  emits the correct type + import with no `$` prefix.
+  fix. **UPDATE 2026-08-15 (REVISED in Phase 2e): the earlier "FIXED +
+  RELEASED" claim was WRONG** — the `!Type` syntax was broken end-to-end in
+  the current checkouts (see the new zorphy #349 entry above); now truly
+  fixed via zorphy PR #84 + zuraffa PR.
 - **zuraffa #351** (2026-08-15, RE-CONFIRMED in Phase 2d): the InvalidType
   defect struck `PermissionRequest.frame` (`FrameInfo?` external ref → the
   generator emitted `required InvalidType this.frame` + `final InvalidType
@@ -70,13 +122,25 @@ branch `feat/migrate-models-zorphy-entities-phase2d` (PR pending)**
 
 ## RESUME FROM
 
-Phase 2e — next `types/` family (candidates: navigation/auth family
-[navigation_action + navigation_response + http_auth/web_storage group] or
-window/JS-callback family; recipe + zuraffa #351/#349 patches documented
-above). NOTE: render_process_gone_detail + renderer_priority +
-renderer_priority_policy are COUPLED to the still-codegen
-InAppWebViewSettings.g.dart (`RendererPriorityPolicy.fromMap`) — convert them
-together with the settings family (Phase 3), not standalone.
+**Phase 2f (auth/ssl family) — next.** Phase 2e is DONE on the branch
+(not yet merged): the navigation family (`navigation_action`,
+`navigation_response`, `url_request`, `url_response`, `frame_info`,
+`security_origin`, `window_features`, `login_request`,
+`create_window_action` flattened + the 6 enums) are Zorphy entities
+converted with zorphy_migrator (`dart run
+/workspace/zorphy/zorphy_migrator/bin/zorphy_migrator.dart migrate <dir>
+--apply --report ...`). Phase 2f scope:
+`http_authentication_challenge` (still codegen; its source + .g.dart were
+patched in 2e to reference the converted URLResponse — convert together
+with the rest), URLAuthenticationChallenge hierarchy
+(HttpAuthenticationChallenge/ClientCertChallenge/ServerTrustChallenge),
+URLProtectionSpace (+authentication_method/proxy_type enums), URLCredential
+(+persistence), HttpAuthResponse (+action), ClientCertResponse (+action),
+ServerTrustAuthResponse (+action), SslCertificate, SslError (+type),
+should_allow_deprecated_tls_action. NOTE:
+render_process_gone_detail + renderer_priority + renderer_priority_policy
+are COUPLED to the still-codegen InAppWebViewSettings.g.dart — convert
+them with the settings family (Phase 3), not standalone.
 
 ---
 
@@ -88,6 +152,15 @@ together with the settings family (Phase 3), not standalone.
 - `zfa` = `dart run /workspace/zuraffa/bin/zuraffa.dart` (v6.0.0, development).
   Not on PATH; run from the target package dir with
   `export PATH=/opt/flutter/bin:$PATH`.
+  **IMPORTANT (Phase 2e+): the MAIN zuraffa checkout is on branch
+  `fix/354-...` (uncommitted user work, NOT touched) and does NOT carry the
+  #349 fixes. Run zfa from the fix-branch worktree instead:
+  `dart run /workspace/zuraffa-wt/bin/zuraffa.dart` (branch
+  `fix/349-external-type-zorphy-bump`, zuraffa PR #362) until that PR merges
+  and the main checkout is updated to development. zorphy resolves via the
+  target package's dependency_overrides → `/workspace/zorphy` (currently on
+  `fix/349-external-type-no-dollar-prefix-cli` — carries #349 + #351 + #310,
+  zorphy PR #84).
 - zorphy (generator) + zorphy_annotation from `/workspace/zorphy` (development,
   includes the merged autoId + ValueObject work from zuraffa#320/#321).
 - Entity output is hardcoded by zfa v6 to `lib/src/domain/entities/<snake>/`
@@ -223,9 +296,39 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` converted · `[–]` skip/fo
 - [x] `types/safe_browsing_threat.dart` → `SafeBrowsingThreat` (enum, int wire)
 - [x] `types/geolocation_permission_show_prompt_response.dart` → `GeolocationPermissionShowPromptResponse` (WebUri glue; default `retain = false`)
 
-### Phase 2e — remaining `types/` value objects + enums (upstream, ~150 files)
-TODO list generated from the inventory below (add `[ ]` per file as phases
-are carved out; each phase = one cohesive callback family).
+### Phase 2e — navigation family (navigation/URL/security callbacks; scoped 2026-08-15)
+Value objects (10): `navigation_action` (→URLRequest, NavigationType, FrameInfo×2),
+`navigation_response` (→URLResponse), `url_request` (→WebUri, 3 enums),
+`url_response` (→WebUri), `frame_info` (→URLRequest, SecurityOrigin),
+`security_origin`, `window_features`, `login_request`, `create_window_action`
+(EXTENDS NavigationAction — zorphy `--extends`/implements; wire-format
+verified in scratch; flattened super-fields on the wire, concrete class
+`implements` the abstract), `http_authentication_challenge` + auth group
+(URLAuthenticationChallenge hierarchy: HttpAuthenticationChallenge /
+ClientCertChallenge / ServerTrustChallenge EXTENDS URLAuthenticationChallenge;
+URLProtectionSpace →SslCertificate/SslError/X509Certificate; URLCredential;
+HttpAuthResponse/ClientCertResponse/ServerTrustAuthResponse + action enums)
+— CARVED OUT as Phase 2f (auth/ssl family), NOT part of 2e.
+Enums (6, int wire unless noted): `navigation_action_policy`, `navigation_response_action`,
+`navigation_type` (STRING wire + platform-dependent native values — needs the
+defaultTargetPlatform switch helper like PermissionResourceType),
+`url_request_cache_policy`, `url_request_network_service_type`, `url_request_attribution`.
+Stragglers converted together (they reference URLRequest_/URLResponse_):
+`create_window_action` (in 2e), `http_authentication_challenge` (in 2f).
+- [x] navigation_action / navigation_action_policy / navigation_response /
+      navigation_response_action / navigation_type
+- [x] url_request (+3 enums) / url_response / frame_info / security_origin
+- [x] window_features / login_request / create_window_action (extends)
+- [x] barrels + android/ios/macos/linux glue (fromMap→fromJson etc.)
+- [x] regression test test/types/navigation_entities_test.dart
+- [x] analyze + test all touched packages
+
+### Phase 2f — auth/ssl family: URLAuthenticationChallenge hierarchy
+(HttpAuthenticationChallenge/ClientCertChallenge/ServerTrustChallenge),
+URLProtectionSpace (+authentication_method/proxy_type enums), URLCredential
+(+persistence), HttpAuthResponse (+action), ClientCertResponse (+action),
+ServerTrustAuthResponse (+action), SslCertificate, SslError (+type),
+should_allow_deprecated_tls_action. (Scoped; not started.)
 
 ### Phase 3 — browser/settings objects (`in_app_browser/`, `in_app_webview/`,
 `chrome_safari_browser/`, `print_job/`, `pull_to_refresh/`, `context_menu/`,
@@ -442,3 +545,108 @@ dialogue_dismisser — hand-written toJson/fromJson today → Zorphy, core packa
   in 44s). Also restored the ~40 checked-in @ExchangeableObject .g.dart files
   the build deleted (they are claimed by no active builder; restore
   everything except the current family's old .g.dart via git checkout).
+- 2026-08-15 — Task resumed (Phase 2d merged as 6f64b60c). Started Phase 2e
+  (navigation family) on branch `feat/migrate-models-zorphy-entities-phase2e`
+  (off development). FIRST BLOCKING MISFIRE hit on the very first zfa call:
+  `zfa entity create --field 'request:!URLRequest'` emitted
+  `$!URLRequest get request;` + a phantom `$` field (`required dynamic $`),
+  and `zfa build` failed. STOPPED per goal rule; diagnosed: the `!Type`
+  external marker fix was never actually merged anywhere (zuraffa def7d5f
+  sits on unmerged branch `fix/349-external-type-no-dollar-prefix`; zorphy
+  "05feef3" does not exist in history). Fixed zorphy first (PR #84,
+  `fix/349-external-type-no-dollar-prefix-cli`): FieldDefinition.parse
+  strips `!` → isExternal, FieldNormalizer keeps external types plain,
+  ImportResolver skips them; 7 regression tests; branch also carries the
+  #351 (c09d966) + #310 (2d093f1) fixes (single ref for zuraffa). Then
+  zuraffa (worktree `zuraffa-wt`, branch `fix/349-external-type-zorphy-bump`,
+  main checkout's uncommitted fix/354 work untouched): merged the original
+  fix/349 content, fixed the #349 compile regression test (correct relative
+  import path + the standard @JsonKey glue the recipe applies — the
+  framework contract is: type resolves, no InvalidType, no `$`; json_serializable
+  still needs the documented custom-type glue), bumped zorphy git ref. All
+  #349 + #351 regression tests green. Scratch verified end-to-end: plain
+  `WebUri? get url;` + build_runner resolves the external type. PROGRESS.md
+  updated; zikzak branch parked with no code changes (framework-wait).
+- 2026-08-15 — Framework-wait continues: zuraffa #362 + zorphy #85 still OPEN
+  (no merge notification). Verified #85's CI failures are the pre-existing
+  "Fixture not generated" gap (also red on the merged #84) — fixed zorphy CI
+  (dart.yml: analyzer_compat now builds example/ fixtures before dart test,
+  commit 63f4a89 on the #85 branch). Deploy job failure is branch-secret
+  related (same on #84, merged anyway). Phase 2e/2f inventories scoped in
+  the migration map. Waiting on the user's merge; resume point unchanged.
+- 2026-08-16 — Framework-wait resolved: zorphy #85 merged into development
+  (7e37246, #351 + #310) and zuraffa #362 merged (ff9365f, `!Type` support)
+  — zfa is fully usable again. BUT the user's goal directive changed the
+  migration tool: "ONLY USE zorphy_migrator; if there is an issue or it does
+  not intuitively solve the problem, STOP and report a GitHub issue on
+  zorphy". Tested zorphy_migrator 2.0.0 against the repo: whole
+  `lib/src/types/` tree → "Converted classes (0)" + "Needs manual attention
+  (0)" + "clean migration", exit 0 (report in /tmp/mig_report_zikzak.md).
+  Root cause: FreezedDetector only resolves `package:freezed_annotation`
+  annotations; the repo has zero freezed usage (grep -rli freezed → only
+  PROGRESS.md; 91 files still `@ExchangeableObject`; 94 `@ExchangeableEnum`
+  enums — which the migrator skips entirely, it only scans ClassDeclaration).
+  Control: the tool converts 11 classes on its own test/fixtures/smoke.
+  STOPPED per the directive; filed **zorphy #86**
+  (https://github.com/arrrrny/zorphy/issues/86) with repro + sample source +
+  two options (add @ExchangeableObject/@ExchangeableEnum dialect; exit
+  non-zero on 0 detected). PROGRESS.md updated; branch still has no code
+  changes. Reverted the incidental analysis_options.yaml SDK rewrite from
+  `flutter pub get`. Next: user decides — extend zorphy_migrator (zorphy
+  repo) or fall back to the zfa recipe.
+- 2026-08-16 — Implemented zorphy_migrator support for the
+  `@ExchangeableObject`/`@ExchangeableEnum` dialect (zorphy issue #86,
+  option 1) on branch `feat/86-exchangeable-dialect-migrator` (commit
+  8296e3a, PR https://github.com/arrrrny/zorphy/pull/87): new
+  `ExchangeableDetector` (resolved-AST, annotation-name match — works
+  without the fork's internal-annotations package), dialect-aware
+  `ZorphyRenderer` (value objects → `@Zorphy(kind: ZorphyKind.valueObject,
+  generateJson: true, generateCompareTo: true)` entities; class-based enums
+  → plain Dart enums; `_` suffix stripped; `= expr` ctor defaults →
+  `@JsonKey(defaultValue:)`; sibling refs `URLRequest_` → `URLRequest`;
+  field/member doc comments preserved; `@SupportedPlatforms` metadata
+  dropped), manual reporting for custom ctors/methods/fields + enum wires
+  that don't map onto a plain enum, and a 0-detected warning + exit 1 (no
+  more silent "clean migration" no-op). 23/23 tests green incl. the freezed
+  e2e; verified in dry-run on the repo's `lib/src/types/`: 95 models
+  converted, 161 manual items (all legitimate), zero silent misses;
+  navigation family spot-checks correct (incl. `CreateWindowAction_ extends
+  NavigationAction_` → flattened value object, matching the fork wire
+  format). Next slice: Phase 2e migration via `zorphy_migrator --apply` +
+  the documented repo-side glue.
+- 2026-08-16 — Phase 2e EXECUTED via zorphy_migrator (the new
+  `@ExchangeableObject`/`@ExchangeableEnum` dialect, zorphy PR #87): ran
+  `zorphy_migrator migrate lib/src/types --apply` (all 15 navigation-family
+  files converted; sibling `_`-suffix stripping, defaults → @JsonKey, docs
+  preserved), moved the 9 value objects to
+  `lib/src/domain/entities/<name>/<name>.dart` and the 6 enums to
+  `domain/entities/enums/` (git mv), fixed imports (zorphy_annotation +
+  relative entity paths; dropped internal_annotations/platform_webview/
+  foundation), added the `.zorphy.dart` parts, deleted the 15 old family
+  `.g.dart`, re-exported the family from `types/main.dart` (+ enums in
+  `enums/index.dart`), and glued the wire formats in the entity sources:
+  WebUri ↔ toString, Map cast, Uint8List typed-list, int enums ↔ `.index`,
+  URLRequestNetworkServiceType ↔ its NON-sequential wire
+  [0,2,3,4,6,8,9,11], NavigationType ↔ platform-native switch
+  (iOS/macOS WKNavigationType raw values, Windows WebView2 kinds, null on
+  Android — replicated like PermissionResourceType), sibling entities via
+  nested fromJson/toJson. Cross-phase fix: permission_request's FrameInfo
+  glue now uses the converted entity, and the still-codegen
+  http_authentication_challenge (Phase 2f) source + .g.dart now reference
+  `URLResponse`/`fromJson`/`toJson`. Controller glue: android/ios/macos/
+  linux — `X.fromMap()` → `X.fromJson()` (+ `!` drops), `toMap` → `toJson`,
+  `NavigationActionPolicy/NavigationResponseAction.toNativeValue()` →
+  `.index` (incl. the macos test file). Build: `dart run build_runner
+  build` — ZERO InvalidType (the merged #351 fix works with the migrator's
+  plain sibling refs); restored the build-deleted still-codegen `.g.dart`
+  (types/ + other dirs) and the regenerated-but-out-of-scope .zorphy.dart
+  (ajax/fetch/permission — reverted). Verified: platform_interface analyze
+  0 errors (2353 issues baseline) + tests 98/98 (incl. the new
+  test/types/navigation_entities_test.dart: defaults, wires incl.
+  platform-native NavigationType via debugDefaultTargetPlatformOverride,
+  non-sequential service-type wire, Uint8List, round-trips, copyWith);
+  android/ios/macos/linux/windows/web/core analyze 0 errors (macos/windows/
+  web No issues); core 95/95, macos 35/35 (updated policy `.index` test),
+  windows 13/13. Analyzed/tested via untracked pubspec_overrides.yaml
+  (removed before commit). Branch has the full Phase 2e change set; NOT yet
+  merged — PR to follow.

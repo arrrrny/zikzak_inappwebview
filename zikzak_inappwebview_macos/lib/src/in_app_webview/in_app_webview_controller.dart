@@ -160,30 +160,26 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
         if (params.webviewParams?.shouldOverrideUrlLoading != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          var navigationAction = NavigationAction.fromMap(
+          var navigationAction = NavigationAction.fromJson(
             arguments['navigationAction'].cast<String, dynamic>(),
-          )!;
+          );
           var policy = await params.webviewParams!.shouldOverrideUrlLoading!(
             controller,
             navigationAction,
           );
-          return policy?.toNativeValue() ??
-              NavigationActionPolicy.CANCEL.toNativeValue();
+          return policy?.index ??
+              NavigationActionPolicy.CANCEL.index;
         }
-        return NavigationActionPolicy.ALLOW.toNativeValue();
+        return NavigationActionPolicy.ALLOW.index;
       case 'onCreateWindow':
         if (params.webviewParams?.onCreateWindow != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          CreateWindowAction? createWindowAction = CreateWindowAction.fromMap(
-            arguments,
+          final createWindowAction = CreateWindowAction.fromJson(arguments);
+          return await params.webviewParams!.onCreateWindow!(
+            controller,
+            createWindowAction,
           );
-          if (createWindowAction != null) {
-            return await params.webviewParams!.onCreateWindow!(
-              controller,
-              createWindowAction,
-            );
-          }
         }
         break;
       case 'onCloseWindow':
@@ -420,7 +416,7 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
     WebUri? allowingReadAccessTo,
   }) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('urlRequest', () => urlRequest.toMap());
+    args.putIfAbsent('urlRequest', () => urlRequest.toJson());
     args.putIfAbsent(
       'allowingReadAccessTo',
       () => allowingReadAccessTo.toString(),

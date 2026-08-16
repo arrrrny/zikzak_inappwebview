@@ -172,7 +172,7 @@ class LinuxInAppBrowser extends PlatformInAppBrowser with ChannelController {
     InAppBrowserClassSettings? settings,
   }) async {
     Map<String, dynamic> args = _prepareOpenRequest(settings: settings);
-    args.putIfAbsent('urlRequest', () => urlRequest.toMap());
+    args.putIfAbsent('urlRequest', () => urlRequest.toJson());
     await _staticChannel.invokeMethod('open', args);
   }
 
