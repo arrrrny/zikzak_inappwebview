@@ -1,3 +1,17 @@
+## 4.10.0 - 2026-08-16
+
+
+### Fixes
+
+- [iOS] Gate `HeadlessInAppWebView.run()` on web-process readiness — the first real `loadUrl` after `run()` could be silently dropped by WKWebView while its content process was still booting, surfacing as "Unable to fetch data" on the very first request. `run()` now completes only after the initial navigation reaches a terminal state (`didFinish`/`didFail`); signal-driven, no timeout constant
+- [iOS] Guard `run()` against a missing web view (no silent hang)
+- [Android] Same headless readiness gate — `run()` completes only after `onPageFinished` or a main-frame error (both `InAppWebViewClient` and `InAppWebViewClientCompat`)
+- [macOS] Same headless readiness gate — `run()` completes only after `didFinish`/`didFail`
+- [Linux] Same headless readiness gate — the headless "run" channel handler responds only after the first `WEBKIT_LOAD_FINISHED`
+
+### Features
+
+- [example] Add First-Load Race Stress screen — reproduces the first-load race for headless and visible webviews (fresh webview + immediate `loadUrl`, 10 sequential attempts)
 ## 4.9.0 - 2026-08-14
 
 
