@@ -56,71 +56,8 @@ class _FirstLoadRaceScreenState extends State<FirstLoadRaceScreen> {
       _headlessRunning = true;
       _headlessLog.clear();
     });
-
-    const attempts = 10;
-    var passed = 0;
-
-    for (var i = 1; i <= attempts; i++) {
-      final attemptLog = <String>[];
-      final stopwatch = Stopwatch()..start();
-      HeadlessInAppWebView? webview;
-
-      try {
-        // 1. Fresh webview — the exact dart_web_scraper setup. onLoadStop
-        //    is constructor-only, so wire the completer before run().
-        final loadStop = Completer<String?>();
-        webview = HeadlessInAppWebView(
-          initialUrlRequest: URLRequest(url: WebUri('about:blank')),
-          initialSettings: InAppWebViewSettings(isInspectable: kDebugMode),
-          onLoadStop: (c, url) {
-            if (!loadStop.isCompleted) loadStop.complete(url?.toString());
-          },
-        );
-
-        // 2. run() — with the gate this only completes when the web
-        //    process is ready; without it, returns immediately.
-        await webview.run().timeout(
-              const Duration(seconds: 15),
-              onTimeout: () => throw TimeoutException('run() HUNG'),
-            );
-        final runMs = stopwatch.elapsedMilliseconds;
-        attemptLog.add('run(): ${runMs}ms');
-
-        final controller = webview.webViewController!;
-
-        // 3. IMMEDIATELY issue the first real navigation.
-        await controller.loadUrl(urlRequest: URLRequest(url: WebUri(targetUrl)));
-        final stopUrl = await loadStop.future.timeout(
-              const Duration(seconds: 15),
-              onTimeout: () => throw TimeoutException('onLoadStop never fired'),
-            );
-        attemptLog.add('onLoadStop: ${stopwatch.elapsedMilliseconds}ms ($stopUrl)');
-
-        // 4. Verify content actually rendered.
-        final html = await controller.getHtml().timeout(
-              const Duration(seconds: 15),
-              onTimeout: () => throw TimeoutException('getHtml() HUNG'),
-            );
-        final ok = (html ?? '').contains(marker);
-        attemptLog.add('html: ${(html ?? '').length} chars, marker=$ok');
-        if (ok) passed++;
-        attemptLog.add(ok ? '✅ PASS' : '❌ FAIL (content mismatch)');
-      } catch (e) {
-        attemptLog.add('❌ FAIL: $e');
-      } finally {
-        try {
-          await webview?.dispose();
-        } catch (_) {}
-      }
-
-      _log(_headlessLog, '── attempt $i/$attempts ──');
-      for (final line in attemptLog.reversed) {
-        _log(_headlessLog, '   $line');
-      }
-      if (mounted) setState(() {});
-    }
-
-    _log(_headlessLog, '══════ RESULT: $passed/$attempts passed ══════');
+    final summary = await runHeadlessStressAttempts();
+    _log(_headlessLog, summary);
     setState(() {
       _headlessRunning = false;
     });
@@ -287,6 +224,86 @@ class _FirstLoadRaceScreenState extends State<FirstLoadRaceScreen> {
 
 /// Debug hook — invoke from the VM service / flutter run console:
 ///   debugRunHeadlessStress()
-Future<void> debugRunHeadlessStress() =>
-    _FirstLoadRaceScreenState._live?._runHeadlessStress() ??
-    Future.error('FirstLoadRaceScreen not open');
+Future<String> debugRunHeadlessStress() => runHeadlessStressAttempts();
+
+/// Runs the first-load race stress: N sequential attempts, each with a
+/// FRESH headless webview, run() → IMMEDIATE loadUrl → content verification.
+/// Logs every step via debugPrint and returns the summary line.
+///
+/// The per-attempt timeouts are TEST HARNESS measurement bounds so hangs are
+/// reported instead of hanging forever — not part of the fix.
+Future<String> runHeadlessStressAttempts({
+  int attempts = 10,
+  String targetUrl = 'https://example.com',
+  String marker = 'Example Domain',
+}) async {
+  var passed = 0;
+
+  for (var i = 1; i <= attempts; i++) {
+    final attemptLog = <String>[];
+    final stopwatch = Stopwatch()..start();
+    HeadlessInAppWebView? webview;
+
+    try {
+      // 1. Fresh webview — the exact dart_web_scraper setup. onLoadStop
+      //    is constructor-only, so wire the completer before run().
+      final loadStop = Completer<String?>();
+      webview = HeadlessInAppWebView(
+        initialUrlRequest: URLRequest(url: WebUri('about:blank')),
+        initialSettings: InAppWebViewSettings(isInspectable: kDebugMode),
+        onLoadStop: (c, url) {
+          // Ignore the INITIAL about:blank loadStop (the same event the
+          // readiness gate waits on) — we only care about the first REAL
+          // navigation's terminal event.
+          final u = url?.toString() ?? '';
+          if (u == 'about:blank') return;
+          if (!loadStop.isCompleted) loadStop.complete(u);
+        },
+      );
+
+      // 2. run() — with the gate this only completes when the web
+      //    process is ready; without it, returns immediately.
+      await webview.run().timeout(
+            const Duration(seconds: 15),
+            onTimeout: () => throw TimeoutException('run() HUNG'),
+          );
+      final runMs = stopwatch.elapsedMilliseconds;
+      attemptLog.add('run(): ${runMs}ms');
+
+      final controller = webview.webViewController!;
+
+      // 3. IMMEDIATELY issue the first real navigation.
+      await controller.loadUrl(urlRequest: URLRequest(url: WebUri(targetUrl)));
+      final stopUrl = await loadStop.future.timeout(
+            const Duration(seconds: 15),
+            onTimeout: () => throw TimeoutException('onLoadStop never fired'),
+          );
+      attemptLog.add('onLoadStop: ${stopwatch.elapsedMilliseconds}ms ($stopUrl)');
+
+      // 4. Verify content actually rendered.
+      final html = await controller.getHtml().timeout(
+            const Duration(seconds: 15),
+            onTimeout: () => throw TimeoutException('getHtml() HUNG'),
+          );
+      final ok = (html ?? '').contains(marker);
+      attemptLog.add('html: ${(html ?? '').length} chars, marker=$ok');
+      if (ok) passed++;
+      attemptLog.add(ok ? 'PASS' : 'FAIL (content mismatch)');
+    } catch (e) {
+      attemptLog.add('FAIL: $e');
+    } finally {
+      try {
+        await webview?.dispose();
+      } catch (_) {}
+    }
+
+    debugPrint('[FirstLoadRace] ── attempt $i/$attempts ──');
+    for (final line in attemptLog) {
+      debugPrint('[FirstLoadRace]    $line');
+    }
+  }
+
+  final summary = '══════ RESULT: $passed/$attempts passed ══════';
+  debugPrint('[FirstLoadRace] $summary');
+  return summary;
+}
