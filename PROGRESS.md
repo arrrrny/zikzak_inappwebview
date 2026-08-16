@@ -30,6 +30,8 @@ on the same branch (commit pending)**
 same branch (commit pending)**
 **Phase 3f (ChromeSafariBrowserSettings → Zorphy entity) — DONE on the same
 branch (commit pending)**
+**Phase 3g (print_job family → Zorphy via zorphy_migrator) — DONE on the
+same branch (commit pending)**
 
 - Phase 0 (mapping + toolchain) DONE.
 - Note on the task premise: this repo does **NOT** use Freezed. Upstream
@@ -363,6 +365,9 @@ should_allow_deprecated_tls_action. (Scoped; not started.)
 - [x] Phase 3f: ChromeSafariBrowserSettings (entity, ~28 fields, Color_ hex +
       still-codegen native-int + polymorphic displayMode glue) — migrated
       (see worklog); chrome_safari_browser family now complete
+- [x] Phase 3g: print_job family (Settings 45f + Attributes 25f hand-written,
+      Info/MediaSize/Resolution/Printer + 9 enums converted; NON-sequential
+      wires via helpers) — migrated (see worklog)
 
 ### Phase 3 — browser/settings objects (`in_app_browser/`, `in_app_webview/`,
 `chrome_safari_browser/`, `print_job/`, `pull_to_refresh/`, `context_menu/`,
