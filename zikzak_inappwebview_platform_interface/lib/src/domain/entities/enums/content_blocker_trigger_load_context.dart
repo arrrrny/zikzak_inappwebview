@@ -11,12 +11,11 @@ enum ContentBlockerTriggerLoadContext {
 }
 
 
-///ContentBlockerTriggerLoadContext wire values are the content-blocker strings (e.g. 'document'), which
-///differ from the member names — lookup by value.
+///ContentBlockerTriggerLoadContext wire values are the content-blocker strings ('top-frame', 'child-frame'),
+///which differ from the member names — lookup by value.
 
-
-///ContentBlockerTriggerLoadContext wire values are the content-blocker strings (child-frame, top-frame) — lookup by value.
-const _contentBlockerTriggerLoadContext_wire = ['child-frame', 'top-frame'];
+///ContentBlockerTriggerLoadContext wire values are the content-blocker strings (top-frame, child-frame) — lookup by value.
+const _contentBlockerTriggerLoadContext_wire = ['top-frame', 'child-frame'];
 
 ContentBlockerTriggerLoadContext? contentBlockerTriggerLoadContextFromWire(String? value) {
   if (value == null) return null;

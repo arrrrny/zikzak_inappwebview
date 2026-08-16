@@ -13,13 +13,13 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 void main() {
   group('MacOS ConsoleMessage.fromMap null safety', () {
     test('handles null message without crashing', () {
-      final msg = ConsoleMessage.fromMap({'message': null, 'messageLevel': 1});
+      final msg = ConsoleMessage.fromJson({'message': null, 'messageLevel': 1});
       expect(msg, isNotNull);
       expect(msg!.message, '');
     });
 
     test('handles null messageLevel without crashing', () {
-      final msg = ConsoleMessage.fromMap({
+      final msg = ConsoleMessage.fromJson({
         'message': 'test',
         'messageLevel': null,
       });
@@ -28,7 +28,7 @@ void main() {
     });
 
     test('handles both null without crashing', () {
-      final msg = ConsoleMessage.fromMap({
+      final msg = ConsoleMessage.fromJson({
         'message': null,
         'messageLevel': null,
       });
@@ -38,7 +38,7 @@ void main() {
     });
 
     test('empty map returns safe defaults', () {
-      final msg = ConsoleMessage.fromMap(<String, dynamic>{});
+      final msg = ConsoleMessage.fromJson(<String, dynamic>{});
       expect(msg, isNotNull);
       expect(msg!.message, '');
       expect(msg.messageLevel, ConsoleMessageLevel.LOG);

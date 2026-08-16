@@ -29,8 +29,20 @@ enum WebsiteDataType {
 }
 
 
-///WebsiteDataType wire values are strings — lookup by value.
-const _websiteDataType_wire = ['WKWebsiteDataTypeSessionStorage', 'WKWebsiteDataTypeWebSQLDatabases', 'WKWebsiteDataTypeIndexedDBDatabases'];
+///WebsiteDataType wire values are the WKWebsiteDataType strings — the enum
+///member names themselves, in enum order (matches upstream inappwebview).
+const _websiteDataType_wire = [
+  'WKWebsiteDataTypeFetchCache',
+  'WKWebsiteDataTypeDiskCache',
+  'WKWebsiteDataTypeMemoryCache',
+  'WKWebsiteDataTypeOfflineWebApplicationCache',
+  'WKWebsiteDataTypeCookies',
+  'WKWebsiteDataTypeSessionStorage',
+  'WKWebsiteDataTypeLocalStorage',
+  'WKWebsiteDataTypeWebSQLDatabases',
+  'WKWebsiteDataTypeIndexedDBDatabases',
+  'WKWebsiteDataTypeServiceWorkerRegistrations',
+];
 
 WebsiteDataType? websiteDataTypeFromWire(Object? value) {
   if (value is! String) return null;
