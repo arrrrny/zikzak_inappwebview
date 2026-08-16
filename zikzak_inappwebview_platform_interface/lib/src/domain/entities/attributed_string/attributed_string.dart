@@ -25,7 +25,7 @@ abstract class $AttributedString {
   ///Use this attribute to specify the color of the background area behind the text.
   ///If you do not specify this attribute, no background color is drawn.
   @JsonKey(fromJson: _backgroundColorFromJson, toJson: _backgroundColorToJson)
-  Color_? get backgroundColor;
+  Color? get backgroundColor;
 
   ///The vertical offset for the position of the text.
   ///
@@ -45,7 +45,7 @@ abstract class $AttributedString {
   ///Use this attribute to specify the color of the text during rendering.
   ///If you do not specify this attribute, the text is rendered in black.
   @JsonKey(fromJson: _foregroundColorFromJson, toJson: _foregroundColorToJson)
-  Color_? get foregroundColor;
+  Color? get foregroundColor;
 
   ///The kerning of the text.
   ///
@@ -77,7 +77,7 @@ abstract class $AttributedString {
     fromJson: _strikethroughColorFromJson,
     toJson: _strikethroughColorToJson,
   )
-  Color_? get strikethroughColor;
+  Color? get strikethroughColor;
 
   ///The strikethrough style of the text.
   ///
@@ -95,7 +95,7 @@ abstract class $AttributedString {
   ///If it is not defined (which is the case by default), it is assumed to be the same as the value of foregroundColor;
   ///otherwise, it describes the outline color.
   @JsonKey(fromJson: _strokeColorFromJson, toJson: _strokeColorToJson)
-  Color_? get strokeColor;
+  Color? get strokeColor;
 
   ///The width of the stroke.
   ///
@@ -118,7 +118,7 @@ abstract class $AttributedString {
   ///The value of this attribute is a [Color] object.
   ///The default value is `null`, indicating same as foreground color.
   @JsonKey(fromJson: _underlineColorFromJson, toJson: _underlineColorToJson)
-  Color_? get underlineColor;
+  Color? get underlineColor;
 
   ///The underline style of the text.
   ///
@@ -127,41 +127,41 @@ abstract class $AttributedString {
   UnderlineStyle? get underlineStyle;
 }
 
-Color_? _backgroundColorFromJson(Object? value) {
+Color? _backgroundColorFromJson(Object? value) {
   if (value == null) return null;
   final color = UtilColor.fromStringRepresentation(value as String);
   return color == null ? null : Color_(color.value);
 }
 
-Object? _backgroundColorToJson(Color_? value) => value?.toHex();
-Color_? _foregroundColorFromJson(Object? value) {
+Object? _backgroundColorToJson(Color? value) => value?.toHex();
+Color? _foregroundColorFromJson(Object? value) {
   if (value == null) return null;
   final color = UtilColor.fromStringRepresentation(value as String);
   return color == null ? null : Color_(color.value);
 }
 
-Object? _foregroundColorToJson(Color_? value) => value?.toHex();
-Color_? _strikethroughColorFromJson(Object? value) {
+Object? _foregroundColorToJson(Color? value) => value?.toHex();
+Color? _strikethroughColorFromJson(Object? value) {
   if (value == null) return null;
   final color = UtilColor.fromStringRepresentation(value as String);
   return color == null ? null : Color_(color.value);
 }
 
-Object? _strikethroughColorToJson(Color_? value) => value?.toHex();
-Color_? _strokeColorFromJson(Object? value) {
+Object? _strikethroughColorToJson(Color? value) => value?.toHex();
+Color? _strokeColorFromJson(Object? value) {
   if (value == null) return null;
   final color = UtilColor.fromStringRepresentation(value as String);
   return color == null ? null : Color_(color.value);
 }
 
-Object? _strokeColorToJson(Color_? value) => value?.toHex();
-Color_? _underlineColorFromJson(Object? value) {
+Object? _strokeColorToJson(Color? value) => value?.toHex();
+Color? _underlineColorFromJson(Object? value) {
   if (value == null) return null;
   final color = UtilColor.fromStringRepresentation(value as String);
   return color == null ? null : Color_(color.value);
 }
 
-Object? _underlineColorToJson(Color_? value) => value?.toHex();
+Object? _underlineColorToJson(Color? value) => value?.toHex();
 
 UnderlineStyle? _strikethroughStyleFromJson(Object? value) =>
     underlineStyleFromWire(value);

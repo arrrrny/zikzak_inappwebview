@@ -13,21 +13,21 @@ class InAppBrowserSettings {
   InAppBrowserSettings({
     bool? hidden,
     bool? hideToolbarTop,
-    Color_? this.toolbarTopBackgroundColor,
+    Color? this.toolbarTopBackgroundColor,
     bool? hideUrlBar,
     bool? hideProgressBar,
     bool? hideDefaultMenuItems,
     bool? toolbarTopTranslucent,
-    Color_? this.toolbarTopBarTintColor,
-    Color_? this.toolbarTopTintColor,
+    Color? this.toolbarTopBarTintColor,
+    Color? this.toolbarTopTintColor,
     bool? hideToolbarBottom,
-    Color_? this.toolbarBottomBackgroundColor,
-    Color_? this.toolbarBottomTintColor,
+    Color? this.toolbarBottomBackgroundColor,
+    Color? this.toolbarBottomTintColor,
     bool? toolbarBottomTranslucent,
     String? this.closeButtonCaption,
-    Color_? this.closeButtonColor,
+    Color? this.closeButtonColor,
     bool? hideCloseButton,
-    Color_? this.menuButtonColor,
+    Color? this.menuButtonColor,
     ModalPresentationStyle? presentationStyle,
     ModalTransitionStyle? transitionStyle,
     bool? hideTitleBar,
@@ -70,7 +70,7 @@ class InAppBrowserSettings {
   final bool? hideToolbarTop;
 
   @JsonKey(toJson: _colorToJson, fromJson: _colorFromJson)
-  final Color_? toolbarTopBackgroundColor;
+  final Color? toolbarTopBackgroundColor;
 
   @JsonKey(defaultValue: false)
   final bool? hideUrlBar;
@@ -85,19 +85,19 @@ class InAppBrowserSettings {
   final bool? toolbarTopTranslucent;
 
   @JsonKey(toJson: _colorToJson, fromJson: _colorFromJson)
-  final Color_? toolbarTopBarTintColor;
+  final Color? toolbarTopBarTintColor;
 
   @JsonKey(toJson: _colorToJson, fromJson: _colorFromJson)
-  final Color_? toolbarTopTintColor;
+  final Color? toolbarTopTintColor;
 
   @JsonKey(defaultValue: false)
   final bool? hideToolbarBottom;
 
   @JsonKey(toJson: _colorToJson, fromJson: _colorFromJson)
-  final Color_? toolbarBottomBackgroundColor;
+  final Color? toolbarBottomBackgroundColor;
 
   @JsonKey(toJson: _colorToJson, fromJson: _colorFromJson)
-  final Color_? toolbarBottomTintColor;
+  final Color? toolbarBottomTintColor;
 
   @JsonKey(defaultValue: true)
   final bool? toolbarBottomTranslucent;
@@ -105,13 +105,13 @@ class InAppBrowserSettings {
   final String? closeButtonCaption;
 
   @JsonKey(toJson: _colorToJson, fromJson: _colorFromJson)
-  final Color_? closeButtonColor;
+  final Color? closeButtonColor;
 
   @JsonKey(defaultValue: false)
   final bool? hideCloseButton;
 
   @JsonKey(toJson: _colorToJson, fromJson: _colorFromJson)
-  final Color_? menuButtonColor;
+  final Color? menuButtonColor;
 
   @JsonKey(
     defaultValue: ModalPresentationStyle.FULL_SCREEN,
@@ -162,21 +162,21 @@ class InAppBrowserSettings {
   InAppBrowserSettings copyWith({
     bool? hidden,
     bool? hideToolbarTop,
-    Color_? toolbarTopBackgroundColor,
+    Color? toolbarTopBackgroundColor,
     bool? hideUrlBar,
     bool? hideProgressBar,
     bool? hideDefaultMenuItems,
     bool? toolbarTopTranslucent,
-    Color_? toolbarTopBarTintColor,
-    Color_? toolbarTopTintColor,
+    Color? toolbarTopBarTintColor,
+    Color? toolbarTopTintColor,
     bool? hideToolbarBottom,
-    Color_? toolbarBottomBackgroundColor,
-    Color_? toolbarBottomTintColor,
+    Color? toolbarBottomBackgroundColor,
+    Color? toolbarBottomTintColor,
     bool? toolbarBottomTranslucent,
     String? closeButtonCaption,
-    Color_? closeButtonColor,
+    Color? closeButtonColor,
     bool? hideCloseButton,
-    Color_? menuButtonColor,
+    Color? menuButtonColor,
     ModalPresentationStyle? presentationStyle,
     ModalTransitionStyle? transitionStyle,
     bool? hideTitleBar,
@@ -235,21 +235,21 @@ class InAppBrowserSettings {
   InAppBrowserSettings copyWithInAppBrowserSettings({
     bool? hidden,
     bool? hideToolbarTop,
-    Color_? toolbarTopBackgroundColor,
+    Color? toolbarTopBackgroundColor,
     bool? hideUrlBar,
     bool? hideProgressBar,
     bool? hideDefaultMenuItems,
     bool? toolbarTopTranslucent,
-    Color_? toolbarTopBarTintColor,
-    Color_? toolbarTopTintColor,
+    Color? toolbarTopBarTintColor,
+    Color? toolbarTopTintColor,
     bool? hideToolbarBottom,
-    Color_? toolbarBottomBackgroundColor,
-    Color_? toolbarBottomTintColor,
+    Color? toolbarBottomBackgroundColor,
+    Color? toolbarBottomTintColor,
     bool? toolbarBottomTranslucent,
     String? closeButtonCaption,
-    Color_? closeButtonColor,
+    Color? closeButtonColor,
     bool? hideCloseButton,
-    Color_? menuButtonColor,
+    Color? menuButtonColor,
     ModalPresentationStyle? presentationStyle,
     ModalTransitionStyle? transitionStyle,
     bool? hideTitleBar,
@@ -847,7 +847,7 @@ extension InAppBrowserSettingsPropertyHelpers on InAppBrowserSettings {
     return this.toolbarTopBackgroundColor == null;
   }
 
-  Color_ get toolbarTopBackgroundColorRequired {
+  Color get toolbarTopBackgroundColorRequired {
     return this.toolbarTopBackgroundColor ??
         (throw StateError(
           'toolbarTopBackgroundColor is required but was null',
@@ -914,7 +914,7 @@ extension InAppBrowserSettingsPropertyHelpers on InAppBrowserSettings {
     return this.toolbarTopBarTintColor == null;
   }
 
-  Color_ get toolbarTopBarTintColorRequired {
+  Color get toolbarTopBarTintColorRequired {
     return this.toolbarTopBarTintColor ??
         (throw StateError('toolbarTopBarTintColor is required but was null'));
   }
@@ -927,7 +927,7 @@ extension InAppBrowserSettingsPropertyHelpers on InAppBrowserSettings {
     return this.toolbarTopTintColor == null;
   }
 
-  Color_ get toolbarTopTintColorRequired {
+  Color get toolbarTopTintColorRequired {
     return this.toolbarTopTintColor ??
         (throw StateError('toolbarTopTintColor is required but was null'));
   }
@@ -953,7 +953,7 @@ extension InAppBrowserSettingsPropertyHelpers on InAppBrowserSettings {
     return this.toolbarBottomBackgroundColor == null;
   }
 
-  Color_ get toolbarBottomBackgroundColorRequired {
+  Color get toolbarBottomBackgroundColorRequired {
     return this.toolbarBottomBackgroundColor ??
         (throw StateError(
           'toolbarBottomBackgroundColor is required but was null',
@@ -968,7 +968,7 @@ extension InAppBrowserSettingsPropertyHelpers on InAppBrowserSettings {
     return this.toolbarBottomTintColor == null;
   }
 
-  Color_ get toolbarBottomTintColorRequired {
+  Color get toolbarBottomTintColorRequired {
     return this.toolbarBottomTintColor ??
         (throw StateError('toolbarBottomTintColor is required but was null'));
   }
@@ -1007,7 +1007,7 @@ extension InAppBrowserSettingsPropertyHelpers on InAppBrowserSettings {
     return this.closeButtonColor == null;
   }
 
-  Color_ get closeButtonColorRequired {
+  Color get closeButtonColorRequired {
     return this.closeButtonColor ??
         (throw StateError('closeButtonColor is required but was null'));
   }
@@ -1033,7 +1033,7 @@ extension InAppBrowserSettingsPropertyHelpers on InAppBrowserSettings {
     return this.menuButtonColor == null;
   }
 
-  Color_ get menuButtonColorRequired {
+  Color get menuButtonColorRequired {
     return this.menuButtonColor ??
         (throw StateError('menuButtonColor is required but was null'));
   }
@@ -1388,7 +1388,7 @@ class InAppBrowserSettingsPatch
     return this;
   }
 
-  InAppBrowserSettingsPatch withToolbarTopBackgroundColor(Color_? value) {
+  InAppBrowserSettingsPatch withToolbarTopBackgroundColor(Color? value) {
     patchMap[InAppBrowserSettings$.toolbarTopBackgroundColor] = value;
     return this;
   }
@@ -1413,12 +1413,12 @@ class InAppBrowserSettingsPatch
     return this;
   }
 
-  InAppBrowserSettingsPatch withToolbarTopBarTintColor(Color_? value) {
+  InAppBrowserSettingsPatch withToolbarTopBarTintColor(Color? value) {
     patchMap[InAppBrowserSettings$.toolbarTopBarTintColor] = value;
     return this;
   }
 
-  InAppBrowserSettingsPatch withToolbarTopTintColor(Color_? value) {
+  InAppBrowserSettingsPatch withToolbarTopTintColor(Color? value) {
     patchMap[InAppBrowserSettings$.toolbarTopTintColor] = value;
     return this;
   }
@@ -1428,12 +1428,12 @@ class InAppBrowserSettingsPatch
     return this;
   }
 
-  InAppBrowserSettingsPatch withToolbarBottomBackgroundColor(Color_? value) {
+  InAppBrowserSettingsPatch withToolbarBottomBackgroundColor(Color? value) {
     patchMap[InAppBrowserSettings$.toolbarBottomBackgroundColor] = value;
     return this;
   }
 
-  InAppBrowserSettingsPatch withToolbarBottomTintColor(Color_? value) {
+  InAppBrowserSettingsPatch withToolbarBottomTintColor(Color? value) {
     patchMap[InAppBrowserSettings$.toolbarBottomTintColor] = value;
     return this;
   }
@@ -1448,7 +1448,7 @@ class InAppBrowserSettingsPatch
     return this;
   }
 
-  InAppBrowserSettingsPatch withCloseButtonColor(Color_? value) {
+  InAppBrowserSettingsPatch withCloseButtonColor(Color? value) {
     patchMap[InAppBrowserSettings$.closeButtonColor] = value;
     return this;
   }
@@ -1458,7 +1458,7 @@ class InAppBrowserSettingsPatch
     return this;
   }
 
-  InAppBrowserSettingsPatch withMenuButtonColor(Color_? value) {
+  InAppBrowserSettingsPatch withMenuButtonColor(Color? value) {
     patchMap[InAppBrowserSettings$.menuButtonColor] = value;
     return this;
   }
@@ -1552,7 +1552,7 @@ abstract final class InAppBrowserSettingsFields {
     _$hideToolbarTop,
   );
 
-  static const toolbarTopBackgroundColor = Field<InAppBrowserSettings, Color_?>(
+  static const toolbarTopBackgroundColor = Field<InAppBrowserSettings, Color?>(
     'toolbarTopBackgroundColor',
     _$toolbarTopBackgroundColor,
   );
@@ -1577,12 +1577,12 @@ abstract final class InAppBrowserSettingsFields {
     _$toolbarTopTranslucent,
   );
 
-  static const toolbarTopBarTintColor = Field<InAppBrowserSettings, Color_?>(
+  static const toolbarTopBarTintColor = Field<InAppBrowserSettings, Color?>(
     'toolbarTopBarTintColor',
     _$toolbarTopBarTintColor,
   );
 
-  static const toolbarTopTintColor = Field<InAppBrowserSettings, Color_?>(
+  static const toolbarTopTintColor = Field<InAppBrowserSettings, Color?>(
     'toolbarTopTintColor',
     _$toolbarTopTintColor,
   );
@@ -1593,12 +1593,12 @@ abstract final class InAppBrowserSettingsFields {
   );
 
   static const toolbarBottomBackgroundColor =
-      Field<InAppBrowserSettings, Color_?>(
+      Field<InAppBrowserSettings, Color?>(
         'toolbarBottomBackgroundColor',
         _$toolbarBottomBackgroundColor,
       );
 
-  static const toolbarBottomTintColor = Field<InAppBrowserSettings, Color_?>(
+  static const toolbarBottomTintColor = Field<InAppBrowserSettings, Color?>(
     'toolbarBottomTintColor',
     _$toolbarBottomTintColor,
   );
@@ -1613,7 +1613,7 @@ abstract final class InAppBrowserSettingsFields {
     _$closeButtonCaption,
   );
 
-  static const closeButtonColor = Field<InAppBrowserSettings, Color_?>(
+  static const closeButtonColor = Field<InAppBrowserSettings, Color?>(
     'closeButtonColor',
     _$closeButtonColor,
   );
@@ -1623,7 +1623,7 @@ abstract final class InAppBrowserSettingsFields {
     _$hideCloseButton,
   );
 
-  static const menuButtonColor = Field<InAppBrowserSettings, Color_?>(
+  static const menuButtonColor = Field<InAppBrowserSettings, Color?>(
     'menuButtonColor',
     _$menuButtonColor,
   );
@@ -1700,7 +1700,7 @@ abstract final class InAppBrowserSettingsFields {
     return e.hideToolbarTop;
   }
 
-  static Color_? _$toolbarTopBackgroundColor(InAppBrowserSettings e) {
+  static Color? _$toolbarTopBackgroundColor(InAppBrowserSettings e) {
     return e.toolbarTopBackgroundColor;
   }
 
@@ -1720,11 +1720,11 @@ abstract final class InAppBrowserSettingsFields {
     return e.toolbarTopTranslucent;
   }
 
-  static Color_? _$toolbarTopBarTintColor(InAppBrowserSettings e) {
+  static Color? _$toolbarTopBarTintColor(InAppBrowserSettings e) {
     return e.toolbarTopBarTintColor;
   }
 
-  static Color_? _$toolbarTopTintColor(InAppBrowserSettings e) {
+  static Color? _$toolbarTopTintColor(InAppBrowserSettings e) {
     return e.toolbarTopTintColor;
   }
 
@@ -1732,11 +1732,11 @@ abstract final class InAppBrowserSettingsFields {
     return e.hideToolbarBottom;
   }
 
-  static Color_? _$toolbarBottomBackgroundColor(InAppBrowserSettings e) {
+  static Color? _$toolbarBottomBackgroundColor(InAppBrowserSettings e) {
     return e.toolbarBottomBackgroundColor;
   }
 
-  static Color_? _$toolbarBottomTintColor(InAppBrowserSettings e) {
+  static Color? _$toolbarBottomTintColor(InAppBrowserSettings e) {
     return e.toolbarBottomTintColor;
   }
 
@@ -1748,7 +1748,7 @@ abstract final class InAppBrowserSettingsFields {
     return e.closeButtonCaption;
   }
 
-  static Color_? _$closeButtonColor(InAppBrowserSettings e) {
+  static Color? _$closeButtonColor(InAppBrowserSettings e) {
     return e.closeButtonColor;
   }
 
@@ -1756,7 +1756,7 @@ abstract final class InAppBrowserSettingsFields {
     return e.hideCloseButton;
   }
 
-  static Color_? _$menuButtonColor(InAppBrowserSettings e) {
+  static Color? _$menuButtonColor(InAppBrowserSettings e) {
     return e.menuButtonColor;
   }
 

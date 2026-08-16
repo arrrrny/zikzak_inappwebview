@@ -12,19 +12,19 @@ part of 'attributed_string.dart';
 class AttributedString {
   AttributedString({
     required String this.string,
-    Color_? this.backgroundColor,
+    Color? this.backgroundColor,
     double? this.baselineOffset,
     double? this.expansion,
-    Color_? this.foregroundColor,
+    Color? this.foregroundColor,
     double? this.kern,
     int? this.ligature,
     double? this.obliqueness,
-    Color_? this.strikethroughColor,
+    Color? this.strikethroughColor,
     UnderlineStyle? this.strikethroughStyle,
-    Color_? this.strokeColor,
+    Color? this.strokeColor,
     double? this.strokeWidth,
     AttributedStringTextEffectStyle? this.textEffect,
-    Color_? this.underlineColor,
+    Color? this.underlineColor,
     UnderlineStyle? this.underlineStyle,
   });
 
@@ -34,14 +34,14 @@ class AttributedString {
   final String string;
 
   @JsonKey(toJson: _backgroundColorToJson, fromJson: _backgroundColorFromJson)
-  final Color_? backgroundColor;
+  final Color? backgroundColor;
 
   final double? baselineOffset;
 
   final double? expansion;
 
   @JsonKey(toJson: _foregroundColorToJson, fromJson: _foregroundColorFromJson)
-  final Color_? foregroundColor;
+  final Color? foregroundColor;
 
   final double? kern;
 
@@ -53,7 +53,7 @@ class AttributedString {
     toJson: _strikethroughColorToJson,
     fromJson: _strikethroughColorFromJson,
   )
-  final Color_? strikethroughColor;
+  final Color? strikethroughColor;
 
   @JsonKey(
     toJson: _strikethroughStyleToJson,
@@ -62,32 +62,32 @@ class AttributedString {
   final UnderlineStyle? strikethroughStyle;
 
   @JsonKey(toJson: _strokeColorToJson, fromJson: _strokeColorFromJson)
-  final Color_? strokeColor;
+  final Color? strokeColor;
 
   final double? strokeWidth;
 
   final AttributedStringTextEffectStyle? textEffect;
 
   @JsonKey(toJson: _underlineColorToJson, fromJson: _underlineColorFromJson)
-  final Color_? underlineColor;
+  final Color? underlineColor;
 
   final UnderlineStyle? underlineStyle;
 
   AttributedString copyWith({
     String? string,
-    Color_? backgroundColor,
+    Color? backgroundColor,
     double? baselineOffset,
     double? expansion,
-    Color_? foregroundColor,
+    Color? foregroundColor,
     double? kern,
     int? ligature,
     double? obliqueness,
-    Color_? strikethroughColor,
+    Color? strikethroughColor,
     UnderlineStyle? strikethroughStyle,
-    Color_? strokeColor,
+    Color? strokeColor,
     double? strokeWidth,
     AttributedStringTextEffectStyle? textEffect,
-    Color_? underlineColor,
+    Color? underlineColor,
     UnderlineStyle? underlineStyle,
   }) {
     return AttributedString(
@@ -111,19 +111,19 @@ class AttributedString {
 
   AttributedString copyWithAttributedString({
     String? string,
-    Color_? backgroundColor,
+    Color? backgroundColor,
     double? baselineOffset,
     double? expansion,
-    Color_? foregroundColor,
+    Color? foregroundColor,
     double? kern,
     int? ligature,
     double? obliqueness,
-    Color_? strikethroughColor,
+    Color? strikethroughColor,
     UnderlineStyle? strikethroughStyle,
-    Color_? strokeColor,
+    Color? strokeColor,
     double? strokeWidth,
     AttributedStringTextEffectStyle? textEffect,
-    Color_? underlineColor,
+    Color? underlineColor,
     UnderlineStyle? underlineStyle,
   }) {
     return copyWith(
@@ -408,7 +408,7 @@ extension AttributedStringPropertyHelpers on AttributedString {
     return this.backgroundColor == null;
   }
 
-  Color_ get backgroundColorRequired {
+  Color get backgroundColorRequired {
     return this.backgroundColor ??
         (throw StateError('backgroundColor is required but was null'));
   }
@@ -447,7 +447,7 @@ extension AttributedStringPropertyHelpers on AttributedString {
     return this.foregroundColor == null;
   }
 
-  Color_ get foregroundColorRequired {
+  Color get foregroundColorRequired {
     return this.foregroundColor ??
         (throw StateError('foregroundColor is required but was null'));
   }
@@ -498,7 +498,7 @@ extension AttributedStringPropertyHelpers on AttributedString {
     return this.strikethroughColor == null;
   }
 
-  Color_ get strikethroughColorRequired {
+  Color get strikethroughColorRequired {
     return this.strikethroughColor ??
         (throw StateError('strikethroughColor is required but was null'));
   }
@@ -560,7 +560,7 @@ extension AttributedStringPropertyHelpers on AttributedString {
     return this.strokeColor == null;
   }
 
-  Color_ get strokeColorRequired {
+  Color get strokeColorRequired {
     return this.strokeColor ??
         (throw StateError('strokeColor is required but was null'));
   }
@@ -603,7 +603,7 @@ extension AttributedStringPropertyHelpers on AttributedString {
     return this.underlineColor == null;
   }
 
-  Color_ get underlineColorRequired {
+  Color get underlineColorRequired {
     return this.underlineColor ??
         (throw StateError('underlineColor is required but was null'));
   }
@@ -693,7 +693,7 @@ class AttributedStringPatch
     return this;
   }
 
-  AttributedStringPatch withBackgroundColor(Color_? value) {
+  AttributedStringPatch withBackgroundColor(Color? value) {
     patchMap[AttributedString$.backgroundColor] = value;
     return this;
   }
@@ -708,7 +708,7 @@ class AttributedStringPatch
     return this;
   }
 
-  AttributedStringPatch withForegroundColor(Color_? value) {
+  AttributedStringPatch withForegroundColor(Color? value) {
     patchMap[AttributedString$.foregroundColor] = value;
     return this;
   }
@@ -728,7 +728,7 @@ class AttributedStringPatch
     return this;
   }
 
-  AttributedStringPatch withStrikethroughColor(Color_? value) {
+  AttributedStringPatch withStrikethroughColor(Color? value) {
     patchMap[AttributedString$.strikethroughColor] = value;
     return this;
   }
@@ -738,7 +738,7 @@ class AttributedStringPatch
     return this;
   }
 
-  AttributedStringPatch withStrokeColor(Color_? value) {
+  AttributedStringPatch withStrokeColor(Color? value) {
     patchMap[AttributedString$.strokeColor] = value;
     return this;
   }
@@ -753,7 +753,7 @@ class AttributedStringPatch
     return this;
   }
 
-  AttributedStringPatch withUnderlineColor(Color_? value) {
+  AttributedStringPatch withUnderlineColor(Color? value) {
     patchMap[AttributedString$.underlineColor] = value;
     return this;
   }
@@ -768,7 +768,7 @@ class AttributedStringPatch
 abstract final class AttributedStringFields {
   static const string = Field<AttributedString, String>('string', _$string);
 
-  static const backgroundColor = Field<AttributedString, Color_?>(
+  static const backgroundColor = Field<AttributedString, Color?>(
     'backgroundColor',
     _$backgroundColor,
   );
@@ -783,7 +783,7 @@ abstract final class AttributedStringFields {
     _$expansion,
   );
 
-  static const foregroundColor = Field<AttributedString, Color_?>(
+  static const foregroundColor = Field<AttributedString, Color?>(
     'foregroundColor',
     _$foregroundColor,
   );
@@ -797,7 +797,7 @@ abstract final class AttributedStringFields {
     _$obliqueness,
   );
 
-  static const strikethroughColor = Field<AttributedString, Color_?>(
+  static const strikethroughColor = Field<AttributedString, Color?>(
     'strikethroughColor',
     _$strikethroughColor,
   );
@@ -807,7 +807,7 @@ abstract final class AttributedStringFields {
     _$strikethroughStyle,
   );
 
-  static const strokeColor = Field<AttributedString, Color_?>(
+  static const strokeColor = Field<AttributedString, Color?>(
     'strokeColor',
     _$strokeColor,
   );
@@ -823,7 +823,7 @@ abstract final class AttributedStringFields {
         _$textEffect,
       );
 
-  static const underlineColor = Field<AttributedString, Color_?>(
+  static const underlineColor = Field<AttributedString, Color?>(
     'underlineColor',
     _$underlineColor,
   );
@@ -837,7 +837,7 @@ abstract final class AttributedStringFields {
     return e.string;
   }
 
-  static Color_? _$backgroundColor(AttributedString e) {
+  static Color? _$backgroundColor(AttributedString e) {
     return e.backgroundColor;
   }
 
@@ -849,7 +849,7 @@ abstract final class AttributedStringFields {
     return e.expansion;
   }
 
-  static Color_? _$foregroundColor(AttributedString e) {
+  static Color? _$foregroundColor(AttributedString e) {
     return e.foregroundColor;
   }
 
@@ -865,7 +865,7 @@ abstract final class AttributedStringFields {
     return e.obliqueness;
   }
 
-  static Color_? _$strikethroughColor(AttributedString e) {
+  static Color? _$strikethroughColor(AttributedString e) {
     return e.strikethroughColor;
   }
 
@@ -873,7 +873,7 @@ abstract final class AttributedStringFields {
     return e.strikethroughStyle;
   }
 
-  static Color_? _$strokeColor(AttributedString e) {
+  static Color? _$strokeColor(AttributedString e) {
     return e.strokeColor;
   }
 
@@ -885,7 +885,7 @@ abstract final class AttributedStringFields {
     return e.textEffect;
   }
 
-  static Color_? _$underlineColor(AttributedString e) {
+  static Color? _$underlineColor(AttributedString e) {
     return e.underlineColor;
   }
 

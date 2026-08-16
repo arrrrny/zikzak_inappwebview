@@ -41,13 +41,11 @@ class _HeadlessInAppWebViewExampleScreenState
         debugPrint("CONSOLE MESSAGE: ${consoleMessage.message}");
       },
       onLoadStart: (controller, url) async {
-        debugPrint('HEADLESS onLoadStart: $url');
         setState(() {
           this.url = url.toString();
         });
       },
       onLoadStop: (controller, url) async {
-        debugPrint('HEADLESS onLoadStop: $url');
         setState(() {
           this.url = url.toString();
         });
@@ -58,17 +56,6 @@ class _HeadlessInAppWebViewExampleScreenState
         });
       },
     );
-    // TEMP DEBUG: auto-run headless webview after a short delay.
-    Future.delayed(const Duration(seconds: 2), () async {
-      debugPrint('HEADLESS AUTO-RUN START');
-      try {
-        await headlessWebView?.run();
-        debugPrint('HEADLESS RUN COMPLETED, isRunning=${headlessWebView?.isRunning()}');
-      } catch (e, st) {
-        debugPrint('HEADLESS RUN THREW: $e');
-        debugPrint('$st');
-      }
-    });
   }
 
   @override

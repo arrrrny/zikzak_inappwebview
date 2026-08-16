@@ -13,10 +13,10 @@ class ChromeSafariBrowserSettings {
   ChromeSafariBrowserSettings({
     CustomTabsShareState? shareState,
     bool? showTitle,
-    Color_? this.toolbarBackgroundColor,
-    Color_? this.navigationBarColor,
-    Color_? this.navigationBarDividerColor,
-    Color_? this.secondaryToolbarColor,
+    Color? this.toolbarBackgroundColor,
+    Color? this.navigationBarColor,
+    Color? this.navigationBarDividerColor,
+    Color? this.secondaryToolbarColor,
     bool? enableUrlBarHiding,
     bool? instantAppsEnabled,
     String? this.packageName,
@@ -33,8 +33,8 @@ class ChromeSafariBrowserSettings {
     bool? entersReaderIfAvailable,
     bool? barCollapsingEnabled,
     DismissButtonStyle? dismissButtonStyle,
-    Color_? this.preferredBarTintColor,
-    Color_? this.preferredControlTintColor,
+    Color? this.preferredBarTintColor,
+    Color? this.preferredControlTintColor,
     ModalPresentationStyle? presentationStyle,
     ModalTransitionStyle? transitionStyle,
     ActivityButton? this.activityButton,
@@ -73,16 +73,16 @@ class ChromeSafariBrowserSettings {
   final bool? showTitle;
 
   @JsonKey(toJson: _colorToJson, fromJson: _colorFromJson)
-  final Color_? toolbarBackgroundColor;
+  final Color? toolbarBackgroundColor;
 
   @JsonKey(toJson: _colorToJson, fromJson: _colorFromJson)
-  final Color_? navigationBarColor;
+  final Color? navigationBarColor;
 
   @JsonKey(toJson: _colorToJson, fromJson: _colorFromJson)
-  final Color_? navigationBarDividerColor;
+  final Color? navigationBarDividerColor;
 
   @JsonKey(toJson: _colorToJson, fromJson: _colorFromJson)
-  final Color_? secondaryToolbarColor;
+  final Color? secondaryToolbarColor;
 
   @JsonKey(defaultValue: false)
   final bool? enableUrlBarHiding;
@@ -140,10 +140,10 @@ class ChromeSafariBrowserSettings {
   final DismissButtonStyle? dismissButtonStyle;
 
   @JsonKey(toJson: _colorToJson, fromJson: _colorFromJson)
-  final Color_? preferredBarTintColor;
+  final Color? preferredBarTintColor;
 
   @JsonKey(toJson: _colorToJson, fromJson: _colorFromJson)
-  final Color_? preferredControlTintColor;
+  final Color? preferredControlTintColor;
 
   @JsonKey(
     defaultValue: ModalPresentationStyle.FULL_SCREEN,
@@ -168,10 +168,10 @@ class ChromeSafariBrowserSettings {
   ChromeSafariBrowserSettings copyWith({
     CustomTabsShareState? shareState,
     bool? showTitle,
-    Color_? toolbarBackgroundColor,
-    Color_? navigationBarColor,
-    Color_? navigationBarDividerColor,
-    Color_? secondaryToolbarColor,
+    Color? toolbarBackgroundColor,
+    Color? navigationBarColor,
+    Color? navigationBarDividerColor,
+    Color? secondaryToolbarColor,
     bool? enableUrlBarHiding,
     bool? instantAppsEnabled,
     String? packageName,
@@ -188,8 +188,8 @@ class ChromeSafariBrowserSettings {
     bool? entersReaderIfAvailable,
     bool? barCollapsingEnabled,
     DismissButtonStyle? dismissButtonStyle,
-    Color_? preferredBarTintColor,
-    Color_? preferredControlTintColor,
+    Color? preferredBarTintColor,
+    Color? preferredControlTintColor,
     ModalPresentationStyle? presentationStyle,
     ModalTransitionStyle? transitionStyle,
     ActivityButton? activityButton,
@@ -237,10 +237,10 @@ class ChromeSafariBrowserSettings {
   ChromeSafariBrowserSettings copyWithChromeSafariBrowserSettings({
     CustomTabsShareState? shareState,
     bool? showTitle,
-    Color_? toolbarBackgroundColor,
-    Color_? navigationBarColor,
-    Color_? navigationBarDividerColor,
-    Color_? secondaryToolbarColor,
+    Color? toolbarBackgroundColor,
+    Color? navigationBarColor,
+    Color? navigationBarDividerColor,
+    Color? secondaryToolbarColor,
     bool? enableUrlBarHiding,
     bool? instantAppsEnabled,
     String? packageName,
@@ -257,8 +257,8 @@ class ChromeSafariBrowserSettings {
     bool? entersReaderIfAvailable,
     bool? barCollapsingEnabled,
     DismissButtonStyle? dismissButtonStyle,
-    Color_? preferredBarTintColor,
-    Color_? preferredControlTintColor,
+    Color? preferredBarTintColor,
+    Color? preferredControlTintColor,
     ModalPresentationStyle? presentationStyle,
     ModalTransitionStyle? transitionStyle,
     ActivityButton? activityButton,
@@ -885,7 +885,7 @@ extension ChromeSafariBrowserSettingsPropertyHelpers
     return this.toolbarBackgroundColor == null;
   }
 
-  Color_ get toolbarBackgroundColorRequired {
+  Color get toolbarBackgroundColorRequired {
     return this.toolbarBackgroundColor ??
         (throw StateError('toolbarBackgroundColor is required but was null'));
   }
@@ -898,7 +898,7 @@ extension ChromeSafariBrowserSettingsPropertyHelpers
     return this.navigationBarColor == null;
   }
 
-  Color_ get navigationBarColorRequired {
+  Color get navigationBarColorRequired {
     return this.navigationBarColor ??
         (throw StateError('navigationBarColor is required but was null'));
   }
@@ -911,7 +911,7 @@ extension ChromeSafariBrowserSettingsPropertyHelpers
     return this.navigationBarDividerColor == null;
   }
 
-  Color_ get navigationBarDividerColorRequired {
+  Color get navigationBarDividerColorRequired {
     return this.navigationBarDividerColor ??
         (throw StateError(
           'navigationBarDividerColor is required but was null',
@@ -926,7 +926,7 @@ extension ChromeSafariBrowserSettingsPropertyHelpers
     return this.secondaryToolbarColor == null;
   }
 
-  Color_ get secondaryToolbarColorRequired {
+  Color get secondaryToolbarColorRequired {
     return this.secondaryToolbarColor ??
         (throw StateError('secondaryToolbarColor is required but was null'));
   }
@@ -1203,7 +1203,7 @@ extension ChromeSafariBrowserSettingsPropertyHelpers
     return this.preferredBarTintColor == null;
   }
 
-  Color_ get preferredBarTintColorRequired {
+  Color get preferredBarTintColorRequired {
     return this.preferredBarTintColor ??
         (throw StateError('preferredBarTintColor is required but was null'));
   }
@@ -1216,7 +1216,7 @@ extension ChromeSafariBrowserSettingsPropertyHelpers
     return this.preferredControlTintColor == null;
   }
 
-  Color_ get preferredControlTintColorRequired {
+  Color get preferredControlTintColorRequired {
     return this.preferredControlTintColor ??
         (throw StateError(
           'preferredControlTintColor is required but was null',
@@ -1388,24 +1388,24 @@ class ChromeSafariBrowserSettingsPatch
     return this;
   }
 
-  ChromeSafariBrowserSettingsPatch withToolbarBackgroundColor(Color_? value) {
+  ChromeSafariBrowserSettingsPatch withToolbarBackgroundColor(Color? value) {
     patchMap[ChromeSafariBrowserSettings$.toolbarBackgroundColor] = value;
     return this;
   }
 
-  ChromeSafariBrowserSettingsPatch withNavigationBarColor(Color_? value) {
+  ChromeSafariBrowserSettingsPatch withNavigationBarColor(Color? value) {
     patchMap[ChromeSafariBrowserSettings$.navigationBarColor] = value;
     return this;
   }
 
   ChromeSafariBrowserSettingsPatch withNavigationBarDividerColor(
-    Color_? value,
+    Color? value,
   ) {
     patchMap[ChromeSafariBrowserSettings$.navigationBarDividerColor] = value;
     return this;
   }
 
-  ChromeSafariBrowserSettingsPatch withSecondaryToolbarColor(Color_? value) {
+  ChromeSafariBrowserSettingsPatch withSecondaryToolbarColor(Color? value) {
     patchMap[ChromeSafariBrowserSettings$.secondaryToolbarColor] = value;
     return this;
   }
@@ -1502,13 +1502,13 @@ class ChromeSafariBrowserSettingsPatch
     return this;
   }
 
-  ChromeSafariBrowserSettingsPatch withPreferredBarTintColor(Color_? value) {
+  ChromeSafariBrowserSettingsPatch withPreferredBarTintColor(Color? value) {
     patchMap[ChromeSafariBrowserSettings$.preferredBarTintColor] = value;
     return this;
   }
 
   ChromeSafariBrowserSettingsPatch withPreferredControlTintColor(
-    Color_? value,
+    Color? value,
   ) {
     patchMap[ChromeSafariBrowserSettings$.preferredControlTintColor] = value;
     return this;
@@ -1555,24 +1555,24 @@ abstract final class ChromeSafariBrowserSettingsFields {
   );
 
   static const toolbarBackgroundColor =
-      Field<ChromeSafariBrowserSettings, Color_?>(
+      Field<ChromeSafariBrowserSettings, Color?>(
         'toolbarBackgroundColor',
         _$toolbarBackgroundColor,
       );
 
-  static const navigationBarColor = Field<ChromeSafariBrowserSettings, Color_?>(
+  static const navigationBarColor = Field<ChromeSafariBrowserSettings, Color?>(
     'navigationBarColor',
     _$navigationBarColor,
   );
 
   static const navigationBarDividerColor =
-      Field<ChromeSafariBrowserSettings, Color_?>(
+      Field<ChromeSafariBrowserSettings, Color?>(
         'navigationBarDividerColor',
         _$navigationBarDividerColor,
       );
 
   static const secondaryToolbarColor =
-      Field<ChromeSafariBrowserSettings, Color_?>(
+      Field<ChromeSafariBrowserSettings, Color?>(
         'secondaryToolbarColor',
         _$secondaryToolbarColor,
       );
@@ -1665,13 +1665,13 @@ abstract final class ChromeSafariBrowserSettingsFields {
       );
 
   static const preferredBarTintColor =
-      Field<ChromeSafariBrowserSettings, Color_?>(
+      Field<ChromeSafariBrowserSettings, Color?>(
         'preferredBarTintColor',
         _$preferredBarTintColor,
       );
 
   static const preferredControlTintColor =
-      Field<ChromeSafariBrowserSettings, Color_?>(
+      Field<ChromeSafariBrowserSettings, Color?>(
         'preferredControlTintColor',
         _$preferredControlTintColor,
       );
@@ -1708,19 +1708,19 @@ abstract final class ChromeSafariBrowserSettingsFields {
     return e.showTitle;
   }
 
-  static Color_? _$toolbarBackgroundColor(ChromeSafariBrowserSettings e) {
+  static Color? _$toolbarBackgroundColor(ChromeSafariBrowserSettings e) {
     return e.toolbarBackgroundColor;
   }
 
-  static Color_? _$navigationBarColor(ChromeSafariBrowserSettings e) {
+  static Color? _$navigationBarColor(ChromeSafariBrowserSettings e) {
     return e.navigationBarColor;
   }
 
-  static Color_? _$navigationBarDividerColor(ChromeSafariBrowserSettings e) {
+  static Color? _$navigationBarDividerColor(ChromeSafariBrowserSettings e) {
     return e.navigationBarDividerColor;
   }
 
-  static Color_? _$secondaryToolbarColor(ChromeSafariBrowserSettings e) {
+  static Color? _$secondaryToolbarColor(ChromeSafariBrowserSettings e) {
     return e.secondaryToolbarColor;
   }
 
@@ -1800,11 +1800,11 @@ abstract final class ChromeSafariBrowserSettingsFields {
     return e.dismissButtonStyle;
   }
 
-  static Color_? _$preferredBarTintColor(ChromeSafariBrowserSettings e) {
+  static Color? _$preferredBarTintColor(ChromeSafariBrowserSettings e) {
     return e.preferredBarTintColor;
   }
 
-  static Color_? _$preferredControlTintColor(ChromeSafariBrowserSettings e) {
+  static Color? _$preferredControlTintColor(ChromeSafariBrowserSettings e) {
     return e.preferredControlTintColor;
   }
 

@@ -7,6 +7,8 @@
 // as hex, displayMode via the polymorphic type-key deserializer.
 
 import 'package:zorphy_annotation/zorphy_annotation.dart';
+import 'dart:ui';
+
 import '../../../types/main.dart';
 import '../../../util.dart';
 
@@ -29,13 +31,13 @@ abstract class $ChromeSafariBrowserSettings {
   @JsonKey(defaultValue: true)
   bool? get showTitle;
   @JsonKey(fromJson: _colorFromJson, toJson: _colorToJson)
-  Color_? get toolbarBackgroundColor;
+  Color? get toolbarBackgroundColor;
   @JsonKey(fromJson: _colorFromJson, toJson: _colorToJson)
-  Color_? get navigationBarColor;
+  Color? get navigationBarColor;
   @JsonKey(fromJson: _colorFromJson, toJson: _colorToJson)
-  Color_? get navigationBarDividerColor;
+  Color? get navigationBarDividerColor;
   @JsonKey(fromJson: _colorFromJson, toJson: _colorToJson)
-  Color_? get secondaryToolbarColor;
+  Color? get secondaryToolbarColor;
   @JsonKey(defaultValue: false)
   bool? get enableUrlBarHiding;
   @JsonKey(defaultValue: false)
@@ -76,9 +78,9 @@ abstract class $ChromeSafariBrowserSettings {
   )
   DismissButtonStyle? get dismissButtonStyle;
   @JsonKey(fromJson: _colorFromJson, toJson: _colorToJson)
-  Color_? get preferredBarTintColor;
+  Color? get preferredBarTintColor;
   @JsonKey(fromJson: _colorFromJson, toJson: _colorToJson)
-  Color_? get preferredControlTintColor;
+  Color? get preferredControlTintColor;
   @JsonKey(
     defaultValue: ModalPresentationStyle.FULL_SCREEN,
     fromJson: _presentationStyleFromJson,
@@ -97,13 +99,13 @@ abstract class $ChromeSafariBrowserSettings {
   UIEventAttribution? get eventAttribution;
 }
 
-Color_? _colorFromJson(Object? value) {
+Color? _colorFromJson(Object? value) {
   if (value == null) return null;
   final color = UtilColor.fromStringRepresentation(value as String);
   return color == null ? null : Color_(color.value);
 }
 
-Object? _colorToJson(Color_? color) => color?.toHex();
+Object? _colorToJson(Color? color) => color?.toHex();
 
 CustomTabsShareState? _shareStateFromJson(Object? value) {
   if (value is! int) return null;

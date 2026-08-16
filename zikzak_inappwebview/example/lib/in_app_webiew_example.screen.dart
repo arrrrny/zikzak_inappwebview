@@ -4,8 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:zikzak_inappwebview/zikzak_inappwebview.dart';
-import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart'
-    show Color_;
 import 'package:url_launcher/url_launcher.dart';
 
 import 'main.dart';
@@ -83,7 +81,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
             ].contains(defaultTargetPlatform)
         ? null
         : PullToRefreshController(
-            settings: PullToRefreshSettings(color: Color_(Colors.blue.value)),
+            settings: PullToRefreshSettings(color: Colors.blue),
             onRefresh: () async {
               if (defaultTargetPlatform == TargetPlatform.android) {
                 webViewController?.reload();
@@ -187,14 +185,14 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                                     currentSettings.isFindInteractionEnabled ??
                                     false,
                                 onChanged: (value) async {
-                                  final updated = currentSettings.copyWith(
+                                  currentSettings = currentSettings.copyWith(
                                     isFindInteractionEnabled: value,
                                   );
                                   await webViewController?.setSettings(
-                                    settings: updated,
+                                    settings: currentSettings,
                                   );
                                   setState(() {
-                                    settings = updated;
+                                    settings = currentSettings;
                                   });
                                 },
                               ),
@@ -206,14 +204,14 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                                         .isElementFullscreenEnabled ??
                                     false,
                                 onChanged: (value) async {
-                                  final updated = currentSettings.copyWith(
+                                  currentSettings = currentSettings.copyWith(
                                     isElementFullscreenEnabled: value,
                                   );
                                   await webViewController?.setSettings(
-                                    settings: updated,
+                                    settings: currentSettings,
                                   );
                                   setState(() {
-                                    settings = updated;
+                                    settings = currentSettings;
                                   });
                                 },
                               ),
@@ -224,11 +222,11 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                                     currentSettings.upgradeKnownHostsToHTTPS ??
                                     false,
                                 onChanged: (value) {
-                                  final updated = currentSettings.copyWith(
-                                    upgradeKnownHostsToHTTPS: value,
-                                  );
                                   setState(() {
-                                    settings = updated;
+                                    currentSettings = currentSettings.copyWith(
+                                      upgradeKnownHostsToHTTPS: value,
+                                    );
+                                    settings = currentSettings;
                                   });
                                   this.setState(() {
                                     webViewKey = GlobalKey();
