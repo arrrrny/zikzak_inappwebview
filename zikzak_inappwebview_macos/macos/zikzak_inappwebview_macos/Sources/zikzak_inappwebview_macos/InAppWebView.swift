@@ -13,14 +13,6 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     var contextMenu: [String: Any]?
     var contextMenuIsShowing = false
 
-    /// One-shot callback fired on the FIRST terminal navigation event
-    /// (`didFinish` or any `didFail`/`didFailProvisionalNavigation`). Used by
-    /// `HeadlessInAppWebViewManager` to gate `run()` on web-process readiness
-    /// so a consumer's first real `loadUrl` is never issued while WKWebView is
-    /// still booting its content process (which can silently drop the
-    /// navigation). `nil` by default — no effect on regular web views.
-    var firstNavigationCompleted: (() -> Void)?
-
     /// Set by the WKUIDelegate when returning `nil` from
     /// `webView(_:contextMenuForElement:willDisplayWithHighlight:)` in the
     /// cases where we want to actually suppress the menu (not let WebKit
@@ -97,7 +89,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     public weak var opener: InAppWebView?
 
     init(
-        registrar: FlutterPluginRegistrar, viewId: Any, arguments: Any?, channelName: String? = nil, plugin: InAppWebViewFlutterPlugin? = nil
+        registrar: FlutterPluginRegistrar, viewId: Any, arguments: Any?, channelName: String? = nil, plugin: InAppWebViewFlutterPlugin? = nil, deferInitialLoad: Bool = false
     ) {
         let configuration = WKWebViewConfiguration()
         let userContentController = WKUserContentController()
@@ -208,9 +200,15 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         bindChannels(registrar: registrar, viewId: viewId, channelName: channelName)
 
         if let args = arguments as? [String: Any] {
-            if let initialUrlRequest = args["initialUrlRequest"] as? [String: Any] {
-                let request = URLRequest(fromPluginMap: initialUrlRequest)
-                self.load(request)
+            // The initial load is normally fired here, synchronously during
+            // construction. Headless webviews pass deferInitialLoad: true so
+            // the HeadlessInAppWebViewManager can arm its readiness gate
+            // BEFORE the first navigation is issued (see makeInitialLoad).
+            if !deferInitialLoad {
+                if let initialUrlRequest = args["initialUrlRequest"] as? [String: Any] {
+                    let request = URLRequest(fromPluginMap: initialUrlRequest)
+                    self.load(request)
+                }
             }
 
             // The widget sends "initialSettings"; accept "settings" too for
@@ -253,8 +251,13 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     func bindChannels(registrar: FlutterPluginRegistrar, viewId: Any, channelName: String? = nil) {
         let finalChannelName = channelName ?? "dev.zuzu/zikzak_inappwebview_\(viewId)"
         channel = FlutterMethodChannel(name: finalChannelName, binaryMessenger: registrar.messenger)
-        channel.setMethodCallHandler(self.handle)
+        // Create the delegate BEFORE registering our own handler:
+        // ChannelDelegate.init registers its own (empty) handle on the
+        // channel, so InAppWebView.handle must be registered LAST to stay
+        // effective — otherwise every Dart->Swift controller call would be
+        // swallowed by the delegate's no-op handle and hang forever.
         channelDelegate = WebViewChannelDelegate(channel: channel)
+        channel.setMethodCallHandler(self.handle)
 
         let findInteractionChannelName = "wtf.zikzak/zikzak_inappwebview_find_interaction_\(viewId)"
         findInteractionChannel = FlutterMethodChannel(
@@ -265,6 +268,51 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         if let windowId = windowId, InAppWebView.pendingCloseEvents.contains(windowId) {
             InAppWebView.pendingCloseEvents.remove(windowId)
             channel?.invokeMethod("onCloseWindow", arguments: nil)
+        }
+    }
+
+    ///Fires the initial load from the creation [params] (headless webviews).
+    ///
+    ///Deliberately separated from `init` so callers can arm a readiness gate
+    ///BEFORE the first navigation is issued. Handles `initialUrlRequest`,
+    ///`initialFile` and `initialData` (mirrors the iOS port). No-op when the
+    ///params carry no initial load.
+    func makeInitialLoad(params: [String: Any]) {
+        let initialUrlRequest = params["initialUrlRequest"] as? [String: Any]
+        let initialFile = params["initialFile"] as? String
+        let initialData = params["initialData"] as? [String: Any]
+
+        if let initialFile = initialFile {
+            // Resolve through the registrar like the channel "loadFile"
+            // handler does — initialFile may be a Flutter asset key, not an
+            // absolute native path.
+            guard let registrar = registrar,
+                let fileURL = try? Util.getUrlAsset(
+                    registrar: registrar, assetFilePath: initialFile)
+            else {
+                return
+            }
+            if fileURL.isFileURL {
+                self.loadFileURL(
+                    fileURL, allowingReadAccessTo: fileURL.deletingLastPathComponent())
+            } else {
+                self.load(URLRequest(url: fileURL))
+            }
+        } else if let initialData = initialData {
+            let data = initialData["data"] as? String ?? ""
+            let mimeType = initialData["mimeType"] as? String ?? "text/html"
+            let encoding = initialData["encoding"] as? String ?? "utf-8"
+            let baseURL = URL(string: initialData["baseUrl"] as? String ?? "about:blank")
+            if let dataData = data.data(using: .utf8) {
+                self.load(
+                    dataData, mimeType: mimeType,
+                    characterEncodingName: encoding, baseURL: baseURL ?? URL(string: "about:blank")!)
+            } else {
+                self.loadHTMLString(data, baseURL: baseURL)
+            }
+        } else if let initialUrlRequest = initialUrlRequest {
+            let request = URLRequest(fromPluginMap: initialUrlRequest)
+            self.load(request)
         }
     }
 
@@ -1679,7 +1727,6 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         InAppWebView.credentialsProposed = []
         channel?.invokeMethod("onLoadStop", arguments: ["url": webView.url?.absoluteString])
-        firstNavigationCompleted?()
     }
 
     public func webView(
@@ -1719,7 +1766,6 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         arguments["code"] = (error as NSError).code
         arguments["message"] = error.localizedDescription
         channel?.invokeMethod("onReceivedError", arguments: arguments)
-        firstNavigationCompleted?()
     }
     public func webView(
         _ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge,

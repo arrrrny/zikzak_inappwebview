@@ -212,7 +212,7 @@ class _MyAppState extends State<MyApp> {
     }
     if (defaultTargetPlatform == TargetPlatform.macOS) {
       return MaterialApp(
-        initialRoute: '/HeadlessInAppWebView',
+        initialRoute: '/',
         routes: {
           '/': (context) => const InAppWebViewExampleScreen(),
         '/EdgeToEdge': (context) =>

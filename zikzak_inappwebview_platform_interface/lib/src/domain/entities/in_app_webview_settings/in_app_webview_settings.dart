@@ -458,19 +458,19 @@ abstract class $InAppWebViewSettings {
 
   ///Sets the vertical scrollbar thumb color.
   @JsonKey(fromJson: _colorFromJson, toJson: _colorToJson)
-  Color_? get verticalScrollbarThumbColor;
+  Color? get verticalScrollbarThumbColor;
 
   ///Sets the vertical scrollbar track color.
   @JsonKey(fromJson: _colorFromJson, toJson: _colorToJson)
-  Color_? get verticalScrollbarTrackColor;
+  Color? get verticalScrollbarTrackColor;
 
   ///Sets the horizontal scrollbar thumb color.
   @JsonKey(fromJson: _colorFromJson, toJson: _colorToJson)
-  Color_? get horizontalScrollbarThumbColor;
+  Color? get horizontalScrollbarThumbColor;
 
   ///Sets the horizontal scrollbar track color.
   @JsonKey(fromJson: _colorFromJson, toJson: _colorToJson)
-  Color_? get horizontalScrollbarTrackColor;
+  Color? get horizontalScrollbarTrackColor;
 
   ///Control whether algorithmic darkening is allowed.
   ///
@@ -798,7 +798,7 @@ abstract class $InAppWebViewSettings {
   ///using the background colors of the `<html>` and `<body>` elements with the background color of the web view.
   ///To override the default color, set this property to a new color.
   @JsonKey(fromJson: _colorFromJson, toJson: _colorToJson)
-  Color_? get underPageBackgroundColor;
+  Color? get underPageBackgroundColor;
 
   ///A Boolean value indicating whether text interaction is enabled or not.
   ///The default value is `true`.
@@ -1007,13 +1007,13 @@ abstract class $InAppWebViewSettings {
   NetworkCaptureController? get networkCapture;
 }
 
-Color_? _colorFromJson(Object? value) {
+Color? _colorFromJson(Object? value) {
   if (value == null) return null;
   final color = UtilColor.fromStringRepresentation(value as String);
   return color == null ? null : Color_(color.value);
 }
 
-Object? _colorToJson(Color_? color) => color?.toHex();
+Object? _colorToJson(Color? color) => color?.toHex();
 
 Uint8List? _defaultVideoPosterFromJson(Object? value) =>
     value == null ? null : Uint8List.fromList((value as List).cast<int>());

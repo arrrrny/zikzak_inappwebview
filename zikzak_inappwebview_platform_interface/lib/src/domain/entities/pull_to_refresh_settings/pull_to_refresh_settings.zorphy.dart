@@ -12,8 +12,8 @@ part of 'pull_to_refresh_settings.dart';
 class PullToRefreshSettings {
   PullToRefreshSettings({
     bool? enabled,
-    Color_? this.color,
-    Color_? this.backgroundColor,
+    Color? this.color,
+    Color? this.backgroundColor,
     int? this.distanceToTriggerSync,
     int? this.slingshotDistance,
     PullToRefreshSize? this.size,
@@ -27,10 +27,10 @@ class PullToRefreshSettings {
   final bool? enabled;
 
   @JsonKey(toJson: _colorToJson, fromJson: _colorFromJson)
-  final Color_? color;
+  final Color? color;
 
   @JsonKey(toJson: _colorToJson, fromJson: _colorFromJson)
-  final Color_? backgroundColor;
+  final Color? backgroundColor;
 
   final int? distanceToTriggerSync;
 
@@ -44,8 +44,8 @@ class PullToRefreshSettings {
 
   PullToRefreshSettings copyWith({
     bool? enabled,
-    Color_? color,
-    Color_? backgroundColor,
+    Color? color,
+    Color? backgroundColor,
     int? distanceToTriggerSync,
     int? slingshotDistance,
     PullToRefreshSize? size,
@@ -65,8 +65,8 @@ class PullToRefreshSettings {
 
   PullToRefreshSettings copyWithPullToRefreshSettings({
     bool? enabled,
-    Color_? color,
-    Color_? backgroundColor,
+    Color? color,
+    Color? backgroundColor,
     int? distanceToTriggerSync,
     int? slingshotDistance,
     PullToRefreshSize? size,
@@ -248,7 +248,7 @@ extension PullToRefreshSettingsPropertyHelpers on PullToRefreshSettings {
     return this.color == null;
   }
 
-  Color_ get colorRequired {
+  Color get colorRequired {
     return this.color ?? (throw StateError('color is required but was null'));
   }
 
@@ -260,7 +260,7 @@ extension PullToRefreshSettingsPropertyHelpers on PullToRefreshSettings {
     return this.backgroundColor == null;
   }
 
-  Color_ get backgroundColorRequired {
+  Color get backgroundColorRequired {
     return this.backgroundColor ??
         (throw StateError('backgroundColor is required but was null'));
   }
@@ -352,12 +352,12 @@ class PullToRefreshSettingsPatch
     return this;
   }
 
-  PullToRefreshSettingsPatch withColor(Color_? value) {
+  PullToRefreshSettingsPatch withColor(Color? value) {
     patchMap[PullToRefreshSettings$.color] = value;
     return this;
   }
 
-  PullToRefreshSettingsPatch withBackgroundColor(Color_? value) {
+  PullToRefreshSettingsPatch withBackgroundColor(Color? value) {
     patchMap[PullToRefreshSettings$.backgroundColor] = value;
     return this;
   }
@@ -407,9 +407,9 @@ abstract final class PullToRefreshSettingsFields {
     _$enabled,
   );
 
-  static const color = Field<PullToRefreshSettings, Color_?>('color', _$color);
+  static const color = Field<PullToRefreshSettings, Color?>('color', _$color);
 
-  static const backgroundColor = Field<PullToRefreshSettings, Color_?>(
+  static const backgroundColor = Field<PullToRefreshSettings, Color?>(
     'backgroundColor',
     _$backgroundColor,
   );
@@ -439,11 +439,11 @@ abstract final class PullToRefreshSettingsFields {
     return e.enabled;
   }
 
-  static Color_? _$color(PullToRefreshSettings e) {
+  static Color? _$color(PullToRefreshSettings e) {
     return e.color;
   }
 
-  static Color_? _$backgroundColor(PullToRefreshSettings e) {
+  static Color? _$backgroundColor(PullToRefreshSettings e) {
     return e.backgroundColor;
   }
 

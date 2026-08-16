@@ -88,10 +88,10 @@ class InAppWebViewSettings {
     int? this.scrollBarFadeDuration,
     RendererPriorityPolicy? this.rendererPriorityPolicy,
     bool? disableDefaultErrorPage,
-    Color_? this.verticalScrollbarThumbColor,
-    Color_? this.verticalScrollbarTrackColor,
-    Color_? this.horizontalScrollbarThumbColor,
-    Color_? this.horizontalScrollbarTrackColor,
+    Color? this.verticalScrollbarThumbColor,
+    Color? this.verticalScrollbarTrackColor,
+    Color? this.horizontalScrollbarThumbColor,
+    Color? this.horizontalScrollbarTrackColor,
     bool? algorithmicDarkeningAllowed,
     bool? this.paymentRequestEnabled,
     WebAuthenticationSupport? this.webAuthenticationSupport,
@@ -132,7 +132,7 @@ class InAppWebViewSettings {
     WebUri? this.allowingReadAccessTo,
     bool? disableLongPressContextMenuOnLinks,
     bool? disableInputAccessoryView,
-    Color_? this.underPageBackgroundColor,
+    Color? this.underPageBackgroundColor,
     bool? isTextInteractionEnabled,
     bool? isSiteSpecificQuirksModeEnabled,
     bool? upgradeKnownHostsToHTTPS,
@@ -514,16 +514,16 @@ class InAppWebViewSettings {
   final bool? disableDefaultErrorPage;
 
   @JsonKey(toJson: _colorToJson, fromJson: _colorFromJson)
-  final Color_? verticalScrollbarThumbColor;
+  final Color? verticalScrollbarThumbColor;
 
   @JsonKey(toJson: _colorToJson, fromJson: _colorFromJson)
-  final Color_? verticalScrollbarTrackColor;
+  final Color? verticalScrollbarTrackColor;
 
   @JsonKey(toJson: _colorToJson, fromJson: _colorFromJson)
-  final Color_? horizontalScrollbarThumbColor;
+  final Color? horizontalScrollbarThumbColor;
 
   @JsonKey(toJson: _colorToJson, fromJson: _colorFromJson)
-  final Color_? horizontalScrollbarTrackColor;
+  final Color? horizontalScrollbarTrackColor;
 
   @JsonKey(defaultValue: false)
   final bool? algorithmicDarkeningAllowed;
@@ -645,7 +645,7 @@ class InAppWebViewSettings {
   final bool? disableInputAccessoryView;
 
   @JsonKey(toJson: _colorToJson, fromJson: _colorFromJson)
-  final Color_? underPageBackgroundColor;
+  final Color? underPageBackgroundColor;
 
   @JsonKey(defaultValue: true)
   final bool? isTextInteractionEnabled;
@@ -808,10 +808,10 @@ class InAppWebViewSettings {
     int? scrollBarFadeDuration,
     RendererPriorityPolicy? rendererPriorityPolicy,
     bool? disableDefaultErrorPage,
-    Color_? verticalScrollbarThumbColor,
-    Color_? verticalScrollbarTrackColor,
-    Color_? horizontalScrollbarThumbColor,
-    Color_? horizontalScrollbarTrackColor,
+    Color? verticalScrollbarThumbColor,
+    Color? verticalScrollbarTrackColor,
+    Color? horizontalScrollbarThumbColor,
+    Color? horizontalScrollbarTrackColor,
     bool? algorithmicDarkeningAllowed,
     bool? paymentRequestEnabled,
     WebAuthenticationSupport? webAuthenticationSupport,
@@ -852,7 +852,7 @@ class InAppWebViewSettings {
     WebUri? allowingReadAccessTo,
     bool? disableLongPressContextMenuOnLinks,
     bool? disableInputAccessoryView,
-    Color_? underPageBackgroundColor,
+    Color? underPageBackgroundColor,
     bool? isTextInteractionEnabled,
     bool? isSiteSpecificQuirksModeEnabled,
     bool? upgradeKnownHostsToHTTPS,
@@ -1202,10 +1202,10 @@ class InAppWebViewSettings {
     int? scrollBarFadeDuration,
     RendererPriorityPolicy? rendererPriorityPolicy,
     bool? disableDefaultErrorPage,
-    Color_? verticalScrollbarThumbColor,
-    Color_? verticalScrollbarTrackColor,
-    Color_? horizontalScrollbarThumbColor,
-    Color_? horizontalScrollbarTrackColor,
+    Color? verticalScrollbarThumbColor,
+    Color? verticalScrollbarTrackColor,
+    Color? horizontalScrollbarThumbColor,
+    Color? horizontalScrollbarTrackColor,
     bool? algorithmicDarkeningAllowed,
     bool? paymentRequestEnabled,
     WebAuthenticationSupport? webAuthenticationSupport,
@@ -1246,7 +1246,7 @@ class InAppWebViewSettings {
     WebUri? allowingReadAccessTo,
     bool? disableLongPressContextMenuOnLinks,
     bool? disableInputAccessoryView,
-    Color_? underPageBackgroundColor,
+    Color? underPageBackgroundColor,
     bool? isTextInteractionEnabled,
     bool? isSiteSpecificQuirksModeEnabled,
     bool? upgradeKnownHostsToHTTPS,
@@ -5314,7 +5314,7 @@ extension InAppWebViewSettingsPropertyHelpers on InAppWebViewSettings {
     return this.verticalScrollbarThumbColor == null;
   }
 
-  Color_ get verticalScrollbarThumbColorRequired {
+  Color get verticalScrollbarThumbColorRequired {
     return this.verticalScrollbarThumbColor ??
         (throw StateError(
           'verticalScrollbarThumbColor is required but was null',
@@ -5329,7 +5329,7 @@ extension InAppWebViewSettingsPropertyHelpers on InAppWebViewSettings {
     return this.verticalScrollbarTrackColor == null;
   }
 
-  Color_ get verticalScrollbarTrackColorRequired {
+  Color get verticalScrollbarTrackColorRequired {
     return this.verticalScrollbarTrackColor ??
         (throw StateError(
           'verticalScrollbarTrackColor is required but was null',
@@ -5344,7 +5344,7 @@ extension InAppWebViewSettingsPropertyHelpers on InAppWebViewSettings {
     return this.horizontalScrollbarThumbColor == null;
   }
 
-  Color_ get horizontalScrollbarThumbColorRequired {
+  Color get horizontalScrollbarThumbColorRequired {
     return this.horizontalScrollbarThumbColor ??
         (throw StateError(
           'horizontalScrollbarThumbColor is required but was null',
@@ -5359,7 +5359,7 @@ extension InAppWebViewSettingsPropertyHelpers on InAppWebViewSettings {
     return this.horizontalScrollbarTrackColor == null;
   }
 
-  Color_ get horizontalScrollbarTrackColorRequired {
+  Color get horizontalScrollbarTrackColorRequired {
     return this.horizontalScrollbarTrackColor ??
         (throw StateError(
           'horizontalScrollbarTrackColor is required but was null',
@@ -5976,7 +5976,7 @@ extension InAppWebViewSettingsPropertyHelpers on InAppWebViewSettings {
     return this.underPageBackgroundColor == null;
   }
 
-  Color_ get underPageBackgroundColorRequired {
+  Color get underPageBackgroundColorRequired {
     return this.underPageBackgroundColor ??
         (throw StateError('underPageBackgroundColor is required but was null'));
   }
@@ -6976,22 +6976,22 @@ class InAppWebViewSettingsPatch
     return this;
   }
 
-  InAppWebViewSettingsPatch withVerticalScrollbarThumbColor(Color_? value) {
+  InAppWebViewSettingsPatch withVerticalScrollbarThumbColor(Color? value) {
     patchMap[InAppWebViewSettings$.verticalScrollbarThumbColor] = value;
     return this;
   }
 
-  InAppWebViewSettingsPatch withVerticalScrollbarTrackColor(Color_? value) {
+  InAppWebViewSettingsPatch withVerticalScrollbarTrackColor(Color? value) {
     patchMap[InAppWebViewSettings$.verticalScrollbarTrackColor] = value;
     return this;
   }
 
-  InAppWebViewSettingsPatch withHorizontalScrollbarThumbColor(Color_? value) {
+  InAppWebViewSettingsPatch withHorizontalScrollbarThumbColor(Color? value) {
     patchMap[InAppWebViewSettings$.horizontalScrollbarThumbColor] = value;
     return this;
   }
 
-  InAppWebViewSettingsPatch withHorizontalScrollbarTrackColor(Color_? value) {
+  InAppWebViewSettingsPatch withHorizontalScrollbarTrackColor(Color? value) {
     patchMap[InAppWebViewSettings$.horizontalScrollbarTrackColor] = value;
     return this;
   }
@@ -7223,7 +7223,7 @@ class InAppWebViewSettingsPatch
     return this;
   }
 
-  InAppWebViewSettingsPatch withUnderPageBackgroundColor(Color_? value) {
+  InAppWebViewSettingsPatch withUnderPageBackgroundColor(Color? value) {
     patchMap[InAppWebViewSettings$.underPageBackgroundColor] = value;
     return this;
   }
@@ -7800,25 +7800,25 @@ abstract final class InAppWebViewSettingsFields {
   );
 
   static const verticalScrollbarThumbColor =
-      Field<InAppWebViewSettings, Color_?>(
+      Field<InAppWebViewSettings, Color?>(
         'verticalScrollbarThumbColor',
         _$verticalScrollbarThumbColor,
       );
 
   static const verticalScrollbarTrackColor =
-      Field<InAppWebViewSettings, Color_?>(
+      Field<InAppWebViewSettings, Color?>(
         'verticalScrollbarTrackColor',
         _$verticalScrollbarTrackColor,
       );
 
   static const horizontalScrollbarThumbColor =
-      Field<InAppWebViewSettings, Color_?>(
+      Field<InAppWebViewSettings, Color?>(
         'horizontalScrollbarThumbColor',
         _$horizontalScrollbarThumbColor,
       );
 
   static const horizontalScrollbarTrackColor =
-      Field<InAppWebViewSettings, Color_?>(
+      Field<InAppWebViewSettings, Color?>(
         'horizontalScrollbarTrackColor',
         _$horizontalScrollbarTrackColor,
       );
@@ -8039,7 +8039,7 @@ abstract final class InAppWebViewSettingsFields {
     _$disableInputAccessoryView,
   );
 
-  static const underPageBackgroundColor = Field<InAppWebViewSettings, Color_?>(
+  static const underPageBackgroundColor = Field<InAppWebViewSettings, Color?>(
     'underPageBackgroundColor',
     _$underPageBackgroundColor,
   );
@@ -8509,19 +8509,19 @@ abstract final class InAppWebViewSettingsFields {
     return e.disableDefaultErrorPage;
   }
 
-  static Color_? _$verticalScrollbarThumbColor(InAppWebViewSettings e) {
+  static Color? _$verticalScrollbarThumbColor(InAppWebViewSettings e) {
     return e.verticalScrollbarThumbColor;
   }
 
-  static Color_? _$verticalScrollbarTrackColor(InAppWebViewSettings e) {
+  static Color? _$verticalScrollbarTrackColor(InAppWebViewSettings e) {
     return e.verticalScrollbarTrackColor;
   }
 
-  static Color_? _$horizontalScrollbarThumbColor(InAppWebViewSettings e) {
+  static Color? _$horizontalScrollbarThumbColor(InAppWebViewSettings e) {
     return e.horizontalScrollbarThumbColor;
   }
 
-  static Color_? _$horizontalScrollbarTrackColor(InAppWebViewSettings e) {
+  static Color? _$horizontalScrollbarTrackColor(InAppWebViewSettings e) {
     return e.horizontalScrollbarTrackColor;
   }
 
@@ -8696,7 +8696,7 @@ abstract final class InAppWebViewSettingsFields {
     return e.disableInputAccessoryView;
   }
 
-  static Color_? _$underPageBackgroundColor(InAppWebViewSettings e) {
+  static Color? _$underPageBackgroundColor(InAppWebViewSettings e) {
     return e.underPageBackgroundColor;
   }
 

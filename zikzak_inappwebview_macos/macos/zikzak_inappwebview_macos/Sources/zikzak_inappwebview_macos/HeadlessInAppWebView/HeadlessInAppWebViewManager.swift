@@ -48,30 +48,29 @@ public class HeadlessInAppWebViewManager: NSObject {
         headlessInAppWebView.prepare(params: params)
         headlessInAppWebView.onWebViewCreated()
 
-        // Readiness gate — same WKWebView process-boot race as iOS: a
-        // navigation issued while the content process is still starting can
-        // be silently dropped. The initial load is fired inside
-        // InAppWebView.init (synchronously, before this point), and its
-        // terminal event (didFinish / didFail) arrives on a later runloop
-        // turn, so arming the hook here still catches it. Signal-driven on
-        // purpose: no timeout constant — a missing terminal event is a wiring
-        // bug that must surface loudly, not be masked by a magic number.
-        // If no initial load was requested there is nothing to wait for —
-        // complete immediately.
-        // If no initial load was requested there is nothing to wait for —
-        // complete immediately.
-        guard params["initialUrlRequest"] != nil
-            || params["initialFile"] != nil
-            || params["initialData"] != nil,
-            let webView = headlessInAppWebView.webView else {
+        guard let webView = headlessInAppWebView.webView else {
             completion()
             return
         }
-        var gateFired = false
-        webView.firstNavigationCompleted = { [weak webView] in
-            guard !gateFired else { return }
-            gateFired = true
-            webView?.firstNavigationCompleted = nil
+
+        // Process-readiness ping — a signal-driven replacement for a
+        // navigation-based gate. WKWebView can SILENTLY DROP a navigation
+        // issued while its WebContent XPC process is still booting (no
+        // didStart / didFinish / didFail — the navigation simply never
+        // happens), and a fresh macOS WKWebView fires no navigation events
+        // at all until an explicit load is issued (no automatic about:blank
+        // navigation, unlike iOS). WebKit guarantees that
+        // evaluateJavaScript messages are queued until the WebContent
+        // process is fully up and its default JS context exists, so the
+        // completion handler below is the exact "process ready" signal —
+        // local IPC, no network, no timeout constant.
+        webView.evaluateJavaScript("true") { [weak webView, weak headlessInAppWebView] (_, _) in
+            // Fire the initial load only now: with the process confirmed
+            // ready, the navigation cannot be dropped by the boot race. A
+            // stalled initial load (slow network) no longer blocks run()
+            // either — it proceeds in the background and surfaces through
+            // the regular onLoadStart/onReceivedError/onLoadStop events.
+            headlessInAppWebView?.webView?.makeInitialLoad(params: params)
             completion()
         }
     }
