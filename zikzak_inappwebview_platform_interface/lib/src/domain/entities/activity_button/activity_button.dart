@@ -1,7 +1,7 @@
 import 'package:zorphy_annotation/zorphy_annotation.dart';
 import 'package:zikzak_inappwebview_internal_annotations/zikzak_inappwebview_internal_annotations.dart';
 
-import '../../../types/ui_image.dart';
+import '../ui_image/ui_image.dart';
 
 part 'activity_button.zorphy.dart';
 part 'activity_button.g.dart';
@@ -29,6 +29,6 @@ abstract class $ActivityButton {
 
 
 UIImage _templateImageFromJson(Object? value) =>
-    UIImage.fromMap((value as Map).cast<String, dynamic>())!;
+    UIImage.fromJson((value as Map).cast<String, dynamic>())!;
 
-Object? _templateImageToJson(UIImage value) => value.toMap();
+Object? _templateImageToJson(UIImage value) => value.toJson();

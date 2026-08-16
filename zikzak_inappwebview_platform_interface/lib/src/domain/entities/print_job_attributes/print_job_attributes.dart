@@ -115,19 +115,19 @@ EdgeInsets? _marginsFromJson(Object? value) => value == null
     ? null
     : MapEdgeInsets.fromMap((value as Map).cast<String, dynamic>());
 
-Object? _marginsToJson(EdgeInsets? margins) => margins?.toMap();
+Object? _marginsToJson(EdgeInsets? margins) => margins?.toJson();
 
 InAppWebViewRect? _printableRectFromJson(Object? value) => value == null
     ? null
-    : InAppWebViewRect.fromMap((value as Map).cast<String, dynamic>());
+    : InAppWebViewRect.fromJson((value as Map).cast<String, dynamic>());
 
-Object? _printableRectToJson(InAppWebViewRect? rect) => rect?.toMap();
+Object? _printableRectToJson(InAppWebViewRect? rect) => rect?.toJson();
 
 InAppWebViewRect? _paperRectFromJson(Object? value) => value == null
     ? null
-    : InAppWebViewRect.fromMap((value as Map).cast<String, dynamic>());
+    : InAppWebViewRect.fromJson((value as Map).cast<String, dynamic>());
 
-Object? _paperRectToJson(InAppWebViewRect? rect) => rect?.toMap();
+Object? _paperRectToJson(InAppWebViewRect? rect) => rect?.toJson();
 
 PrintJobPaginationMode? _horizontalPaginationFromJson(Object? value) {
   if (value is! int) return null;

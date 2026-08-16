@@ -138,6 +138,21 @@ class ActivityButtonPatch extends PatchBase<ActivityButton, ActivityButton$> {
     return this;
   }
 
+  ActivityButtonPatch withTemplateImagePatch(UIImagePatch patch) {
+    patchMap[ActivityButton$.templateImage] = patch;
+    return this;
+  }
+
+  ActivityButtonPatch withTemplateImagePatchFunc(
+    UIImagePatch Function(UIImagePatch) patch,
+  ) {
+    patchMap[ActivityButton$.templateImage] = (dynamic current) {
+      var currentPatch = UIImagePatch();
+      return patch(currentPatch).applyTo(current as UIImage);
+    };
+    return this;
+  }
+
   ActivityButtonPatch withExtensionIdentifier(String? value) {
     patchMap[ActivityButton$.extensionIdentifier] = value;
     return this;

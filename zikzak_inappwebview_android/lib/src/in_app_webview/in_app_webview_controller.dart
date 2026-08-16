@@ -1948,7 +1948,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent(
       'screenshotConfiguration',
-      () => screenshotConfiguration?.toMap(),
+      () => screenshotConfiguration?.toJson(),
     );
     return await channel?.invokeMethod<Uint8List?>('takeScreenshot', args);
   }

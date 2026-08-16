@@ -1526,6 +1526,21 @@ class InAppBrowserSettingsPatch
     patchMap[InAppBrowserSettings$.windowFrame] = value;
     return this;
   }
+
+  InAppBrowserSettingsPatch withWindowFramePatch(InAppWebViewRectPatch patch) {
+    patchMap[InAppBrowserSettings$.windowFrame] = patch;
+    return this;
+  }
+
+  InAppBrowserSettingsPatch withWindowFramePatchFunc(
+    InAppWebViewRectPatch Function(InAppWebViewRectPatch) patch,
+  ) {
+    patchMap[InAppBrowserSettings$.windowFrame] = (dynamic current) {
+      var currentPatch = InAppWebViewRectPatch();
+      return patch(currentPatch).applyTo(current as InAppWebViewRect);
+    };
+    return this;
+  }
 }
 
 /// Field descriptors for [InAppBrowserSettings] query construction

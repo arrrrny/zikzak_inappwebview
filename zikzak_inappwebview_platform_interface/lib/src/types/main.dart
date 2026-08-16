@@ -74,7 +74,7 @@ export '../domain/entities/enums/http_cookie_same_site_policy.dart' show HTTPCoo
 export '../domain/entities/in_app_webview_hit_test_result/in_app_webview_hit_test_result.dart' show InAppWebViewHitTestResult, InAppWebViewHitTestResultSerialization;
 export '../domain/entities/enums/in_app_webview_hit_test_result_type.dart' show InAppWebViewHitTestResultType, inAppWebViewHitTestResultTypeFromWire, inAppWebViewHitTestResultTypeToWire;
 export '../domain/entities/in_app_webview_initial_data/in_app_webview_initial_data.dart' show InAppWebViewInitialData, InAppWebViewInitialDataSerialization;
-export 'in_app_webview_rect.dart' show InAppWebViewRect;
+export '../domain/entities/in_app_webview_rect/in_app_webview_rect.dart' show InAppWebViewRect, InAppWebViewRectSerialization;
 export 'javascript_handler_callback.dart' show JavaScriptHandlerCallback;
 // Zorphy entities (migrated from @ExchangeableObject codegen, see PROGRESS.md).
 export '../domain/entities/js_alert_request/js_alert_request.dart'
@@ -167,7 +167,7 @@ export '../domain/entities/enums/safe_browsing_response_action.dart'
 export '../domain/entities/enums/safe_browsing_threat.dart'
     show SafeBrowsingThreat;
 export '../domain/entities/enums/sandbox.dart' show Sandbox;
-export 'screenshot_configuration.dart' show ScreenshotConfiguration;
+export '../domain/entities/screenshot_configuration/screenshot_configuration.dart' show ScreenshotConfiguration, ScreenshotConfigurationSerialization;
 export 'script_html_tag_attributes.dart' show ScriptHtmlTagAttributes;
 export '../domain/entities/enums/scrollbar_style.dart' show ScrollBarStyle;
 export '../domain/entities/enums/scrollview_content_inset_adjustment_behavior.dart' show ScrollViewContentInsetAdjustmentBehavior;
@@ -262,7 +262,7 @@ export '../domain/entities/enums/custom_tabs_navigation_event_type.dart' show Cu
 export '../domain/entities/enums/custom_tabs_relation_type.dart' show CustomTabsRelationType, customTabsRelationTypeFromWire, customTabsRelationTypeToWire;
 export '../domain/entities/prewarming_token/prewarming_token.dart' show PrewarmingToken, PrewarmingTokenSerialization;
 export '../domain/entities/android_resource/android_resource.dart' show AndroidResource, AndroidResourceSerialization;
-export 'ui_image.dart' show UIImage;
+export '../domain/entities/ui_image/ui_image.dart' show UIImage, UIImageSerialization;
 export '../domain/entities/activity_button/activity_button.dart' show ActivityButton, ActivityButtonSerialization;
 export '../domain/entities/ui_event_attribution/ui_event_attribution.dart' show UIEventAttribution, UIEventAttributionSerialization;
 export '../domain/entities/enums/tracing_mode.dart' show TracingMode;

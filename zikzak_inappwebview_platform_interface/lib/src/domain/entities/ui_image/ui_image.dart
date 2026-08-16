@@ -1,7 +1,9 @@
+import 'package:zorphy_annotation/zorphy_annotation.dart';
 import 'dart:typed_data';
 
 import 'package:zikzak_inappwebview_internal_annotations/zikzak_inappwebview_internal_annotations.dart';
 
+part 'ui_image.zorphy.dart';
 part 'ui_image.g.dart';
 
 ///Class that represents an object that manages iOS and MacOS image data in your app.
@@ -10,27 +12,26 @@ part 'ui_image.g.dart';
 ///Check MacOS [AppKit.NSImage](https://developer.apple.com/documentation/appkit/nsimage) for more details.
 ///
 ///**Officially Supported Platforms/Implementations**:
-///- iOS
-///- MacOS
-@ExchangeableObject()
-class UIImage_ {
+///iOS
+///MacOS
+@Zorphy(
+  kind: ZorphyKind.valueObject,
+  generateJson: true,
+  generateCompareTo: true,
+)
+abstract class $UIImage {
   ///The name of the image asset or file.
-  String? name;
-
+  String? get name;
   ///The name of the system symbol image.
-  @SupportedPlatforms(
-    platforms: [
-      IOSPlatform(available: "13.0"),
-      MacOSPlatform(available: "11.0"),
-    ],
-  )
-  String? systemName;
-
+  String? get systemName;
   ///The data object containing the image data.
-  Uint8List? data;
-
-  @ExchangeableObjectConstructor()
-  UIImage_({this.name, this.systemName, this.data}) {
-    assert(this.name != null || this.systemName != null || this.data != null);
-  }
+  @JsonKey(fromJson: _dataFromJson, toJson: _dataToJson)
+  Uint8List? get data;
 }
+
+
+Uint8List? _dataFromJson(Object? value) => value == null
+    ? null
+    : Uint8List.fromList((value as List).cast<int>());
+
+Object? _dataToJson(Uint8List? value) => value?.toList();

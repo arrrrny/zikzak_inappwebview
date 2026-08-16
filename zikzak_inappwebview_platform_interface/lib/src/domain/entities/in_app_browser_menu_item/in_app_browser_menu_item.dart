@@ -10,7 +10,7 @@ import '../../../types/main.dart';
 import '../../../util.dart';
 
 dynamic _serializeIcon(dynamic icon) {
-  return icon is Uint8List ? icon : icon?.toMap();
+  return icon is Uint8List ? icon : icon?.toJson();
 }
 
 dynamic _deserializeIcon(dynamic icon) {
@@ -23,7 +23,7 @@ dynamic _deserializeIcon(dynamic icon) {
       return AndroidResource.fromJson(iconMap);
     }
     if (iconMap.containsKey('systemName')) {
-      return UIImage.fromMap(iconMap);
+      return UIImage.fromJson(iconMap);
     }
   }
   return null;

@@ -3,7 +3,7 @@ import 'dart:ui';
 
 import 'package:zikzak_inappwebview_internal_annotations/zikzak_inappwebview_internal_annotations.dart';
 
-import '../../../types/in_app_webview_rect.dart';
+import '../in_app_webview_rect/in_app_webview_rect.dart';
 import '../enums/modal_presentation_style.dart';
 import '../enums/modal_transition_style.dart';
 import '../enums/window_style_mask.dart';
@@ -209,6 +209,6 @@ Object? _windowTitlebarSeparatorStyleToJson(
 
 InAppWebViewRect? _windowFrameFromJson(Object? value) => value == null
     ? null
-    : InAppWebViewRect.fromMap((value as Map).cast<String, dynamic>());
+    : InAppWebViewRect.fromJson((value as Map).cast<String, dynamic>());
 
-Object? _windowFrameToJson(InAppWebViewRect? value) => value?.toMap();
+Object? _windowFrameToJson(InAppWebViewRect? value) => value?.toJson();

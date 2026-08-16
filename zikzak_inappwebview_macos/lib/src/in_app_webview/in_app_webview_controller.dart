@@ -485,7 +485,7 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent(
       'screenshotConfiguration',
-      () => screenshotConfiguration?.toMap(),
+      () => screenshotConfiguration?.toJson(),
     );
     return await _channel.invokeMethod<Uint8List?>('takeScreenshot', args);
   }

@@ -1,6 +1,6 @@
 import 'package:zorphy_annotation/zorphy_annotation.dart';
 
-import '../../../types/in_app_webview_rect.dart';
+import '../in_app_webview_rect/in_app_webview_rect.dart';
 
 part 'pdf_configuration.zorphy.dart';
 part 'pdf_configuration.g.dart';
@@ -21,6 +21,6 @@ abstract class $PDFConfiguration {
 
 InAppWebViewRect? _rectFromJson(Object? value) => value == null
     ? null
-    : InAppWebViewRect.fromMap((value as Map).cast<String, dynamic>());
+    : InAppWebViewRect.fromJson((value as Map).cast<String, dynamic>());
 
-Object? _rectToJson(InAppWebViewRect? value) => value?.toMap();
+Object? _rectToJson(InAppWebViewRect? value) => value?.toJson();

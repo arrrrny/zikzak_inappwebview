@@ -4,7 +4,7 @@
 // Plain Dart class preserving the public API and the old wire (id, label,
 // image; onClick excluded).
 
-import '../../../types/ui_image.dart';
+import '../ui_image/ui_image.dart';
 import '../../../web_uri.dart';
 
 ///Class that represents a menu item of the Chrome Custom Tabs.
@@ -36,13 +36,15 @@ class ChromeSafariBrowserMenuItem {
     return ChromeSafariBrowserMenuItem(
       id: map['id'],
       label: map['label'],
-      image: UIImage.fromMap(map['image']?.cast<String, dynamic>()),
+      image: map['image'] == null
+          ? null
+          : UIImage.fromJson((map['image'] as Map).cast<String, dynamic>()),
     );
   }
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
-    return {"id": id, "image": image?.toMap(), "label": label};
+    return {"id": id, "image": image?.toJson(), "label": label};
   }
 
   ///Gets a possible [ChromeSafariBrowserMenuItem] instance from a [Map] value.
