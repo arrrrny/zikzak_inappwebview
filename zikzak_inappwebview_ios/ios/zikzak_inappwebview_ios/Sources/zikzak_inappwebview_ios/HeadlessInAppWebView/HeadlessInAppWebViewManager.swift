@@ -65,9 +65,14 @@ public class HeadlessInAppWebViewManager: ChannelDelegate {
         // terminal state (didFinish or didFail). Signal-driven on purpose:
         // no timeout constant — if no terminal event ever fires, that is a
         // wiring bug that must surface loudly, not be masked by a magic number.
-        let webView = flutterWebView.webView()
+        guard let webView = flutterWebView.webView() else {
+            // No web view — fail run() immediately instead of leaving the
+            // readiness gate unarmed and the caller hanging forever.
+            completion()
+            return
+        }
         var gateFired = false
-        webView?.firstNavigationCompleted = { [weak webView] in
+        webView.firstNavigationCompleted = { [weak webView] in
             guard !gateFired else { return }
             gateFired = true
             webView?.firstNavigationCompleted = nil
