@@ -30,8 +30,9 @@ public class HeadlessInAppWebViewManager: ChannelDelegate {
         switch call.method {
             case "run":
                 let params = arguments!["params"] as! [String: Any?]
-                run(id: id, params: params)
-                result(true)
+                run(id: id, params: params) {
+                    result(true)
+                }
                 break
             default:
                 result(FlutterMethodNotImplemented)
@@ -39,8 +40,9 @@ public class HeadlessInAppWebViewManager: ChannelDelegate {
         }
     }
 
-    public func run(id: String, params: [String: Any?]) {
+    public func run(id: String, params: [String: Any?], completion: @escaping () -> Void) {
         guard let plugin = plugin else {
+            completion()
             return
         }
         let flutterWebView = FlutterWebViewController(plugin: plugin,
@@ -52,6 +54,26 @@ public class HeadlessInAppWebViewManager: ChannelDelegate {
 
         headlessInAppWebView.prepare(params: params as NSDictionary)
         headlessInAppWebView.onWebViewCreated()
+
+        // Readiness gate: WKWebView can silently DROP a navigation issued
+        // while its content process is still booting (the initial about:blank
+        // load from makeInitialLoad is in flight and the web process is
+        // spawning). A consumer calling loadUrl immediately after run()
+        // would see the first real navigation never start — no didStart,
+        // no didFinish — and would only discover it via its own timeout.
+        // So run() completes only after the initial navigation reaches a
+        // terminal state (didFinish or didFail). Signal-driven on purpose:
+        // no timeout constant — if no terminal event ever fires, that is a
+        // wiring bug that must surface loudly, not be masked by a magic number.
+        let webView = flutterWebView.webView()
+        var gateFired = false
+        webView?.firstNavigationCompleted = { [weak webView] in
+            guard !gateFired else { return }
+            gateFired = true
+            webView?.firstNavigationCompleted = nil
+            completion()
+        }
+
         flutterWebView.makeInitialLoad(params: params as NSDictionary)
     }
 
