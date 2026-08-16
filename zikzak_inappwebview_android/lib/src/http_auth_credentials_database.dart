@@ -75,7 +75,7 @@ class AndroidHttpAuthCredentialDatabase
     List<URLProtectionSpaceHttpAuthCredentials> result = [];
 
     for (Map<dynamic, dynamic> map in allCredentials) {
-      var element = URLProtectionSpaceHttpAuthCredentials.fromMap(
+      var element = URLProtectionSpaceHttpAuthCredentials.fromJson(
         map.cast<String, dynamic>(),
       );
       if (element != null) {
@@ -98,7 +98,7 @@ class AndroidHttpAuthCredentialDatabase
         await channel?.invokeMethod<List>('getHttpAuthCredentials', args) ?? [];
     List<URLCredential> credentials = [];
     for (Map<dynamic, dynamic> map in credentialList) {
-      var credential = URLCredential.fromMap(map.cast<String, dynamic>());
+      var credential = URLCredential.fromJson(map.cast<String, dynamic>());
       if (credential != null) {
         credentials.add(credential);
       }

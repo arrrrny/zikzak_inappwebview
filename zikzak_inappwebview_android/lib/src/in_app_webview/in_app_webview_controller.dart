@@ -782,18 +782,18 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
           HttpAuthenticationChallenge challenge =
-              HttpAuthenticationChallenge.fromMap(arguments)!;
+              HttpAuthenticationChallenge.fromJson(arguments)!;
 
           if (webviewParams != null &&
               webviewParams!.onReceivedHttpAuthRequest != null)
             return (await webviewParams!.onReceivedHttpAuthRequest!(
               _controllerFromPlatform,
               challenge,
-            ))?.toMap();
+            ))?.toJson();
           else
             return (await _inAppBrowserEventHandler!.onReceivedHttpAuthRequest(
               challenge,
-            ))?.toMap();
+            ))?.toJson();
         }
         break;
       case "onReceivedServerTrustAuthRequest":
@@ -802,7 +802,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          ServerTrustChallenge challenge = ServerTrustChallenge.fromMap(
+          ServerTrustChallenge challenge = ServerTrustChallenge.fromJson(
             arguments,
           )!;
 
@@ -811,11 +811,11 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
             return (await webviewParams!.onReceivedServerTrustAuthRequest!(
               _controllerFromPlatform,
               challenge,
-            ))?.toMap();
+            ))?.toJson();
           else
             return (await _inAppBrowserEventHandler!
                     .onReceivedServerTrustAuthRequest(challenge))
-                ?.toMap();
+                ?.toJson();
         }
         break;
       case "onReceivedClientCertRequest":
@@ -824,7 +824,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          ClientCertChallenge challenge = ClientCertChallenge.fromMap(
+          ClientCertChallenge challenge = ClientCertChallenge.fromJson(
             arguments,
           )!;
 
@@ -833,11 +833,11 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
             return (await webviewParams!.onReceivedClientCertRequest!(
               _controllerFromPlatform,
               challenge,
-            ))?.toMap();
+            ))?.toJson();
           else
             return (await _inAppBrowserEventHandler!
                     .onReceivedClientCertRequest(challenge))
-                ?.toMap();
+                ?.toJson();
         }
         break;
       case "onFindResultReceived":
@@ -985,11 +985,11 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
             return (await webviewParams!.shouldAllowDeprecatedTLS!(
               _controllerFromPlatform,
               challenge,
-            ))?.toNativeValue();
+            ))?.index;
           } else {
             return (await _inAppBrowserEventHandler!.shouldAllowDeprecatedTLS(
               challenge,
-            ))?.toNativeValue();
+            ))?.index;
           }
         }
         break;

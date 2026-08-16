@@ -167,8 +167,7 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
             controller,
             navigationAction,
           );
-          return policy?.index ??
-              NavigationActionPolicy.CANCEL.index;
+          return policy?.index ?? NavigationActionPolicy.CANCEL.index;
         }
         return NavigationActionPolicy.ALLOW.index;
       case 'onCreateWindow':
@@ -332,37 +331,37 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
           HttpAuthenticationChallenge challenge =
-              HttpAuthenticationChallenge.fromMap(arguments)!;
+              HttpAuthenticationChallenge.fromJson(arguments)!;
           return (await params.webviewParams!.onReceivedHttpAuthRequest!(
             controller,
             challenge,
-          ))?.toMap();
+          ))?.toJson();
         }
         break;
       case 'onReceivedServerTrustAuthRequest':
         if (params.webviewParams?.onReceivedServerTrustAuthRequest != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          ServerTrustChallenge challenge = ServerTrustChallenge.fromMap(
+          ServerTrustChallenge challenge = ServerTrustChallenge.fromJson(
             arguments,
           )!;
           return (await params.webviewParams!.onReceivedServerTrustAuthRequest!(
             controller,
             challenge,
-          ))?.toMap();
+          ))?.toJson();
         }
         break;
       case 'onReceivedClientCertRequest':
         if (params.webviewParams?.onReceivedClientCertRequest != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          ClientCertChallenge challenge = ClientCertChallenge.fromMap(
+          ClientCertChallenge challenge = ClientCertChallenge.fromJson(
             arguments,
           )!;
           return (await params.webviewParams!.onReceivedClientCertRequest!(
             controller,
             challenge,
-          ))?.toMap();
+          ))?.toJson();
         }
         break;
       default:

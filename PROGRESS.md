@@ -16,6 +16,8 @@ and the zikzak→zuraffa v6 migration (…7545).
 **Phase 2e (navigation family) — BLOCKED on zorphy_migrator support (zorphy #86)**
 **Phase 2e (navigation family → Zorphy via zorphy_migrator) — DONE on branch
 `feat/migrate-models-zorphy-entities-phase2e` (not yet merged)**
+**Phase 2f (auth/ssl family → Zorphy via zorphy_migrator) — DONE on the same
+branch (commit pending)**
 
 - Phase 0 (mapping + toolchain) DONE.
 - Note on the task premise: this repo does **NOT** use Freezed. Upstream
@@ -329,6 +331,8 @@ URLProtectionSpace (+authentication_method/proxy_type enums), URLCredential
 (+persistence), HttpAuthResponse (+action), ClientCertResponse (+action),
 ServerTrustAuthResponse (+action), SslCertificate, SslError (+type),
 should_allow_deprecated_tls_action. (Scoped; not started.)
+- [x] challenge hierarchy + URLProtectionSpace/URLCredential/SslCertificate/
+      SslError + responses + 8 enums — migrated (see worklog)
 
 ### Phase 3 — browser/settings objects (`in_app_browser/`, `in_app_webview/`,
 `chrome_safari_browser/`, `print_job/`, `pull_to_refresh/`, `context_menu/`,
@@ -650,3 +654,32 @@ dialogue_dismisser — hand-written toJson/fromJson today → Zorphy, core packa
   windows 13/13. Analyzed/tested via untracked pubspec_overrides.yaml
   (removed before commit). Branch has the full Phase 2e change set; NOT yet
   merged — PR to follow.
+- 2026-08-16 — Phase 2f EXECUTED via zorphy_migrator (same recipe as 2e):
+  the auth/ssl family. 17 of 21 files converted by the migrator (value
+  objects URLProtectionSpace/URLCredential/SslCertificateDName/SslError/
+  HttpAuthResponse/ServerTrustAuthResponse/URLProtectionSpaceHttpAuthCredentials
+  + enums URLCredentialPersistence/URLProtectionSpaceAuthenticationMethod/
+  URLProtectionSpaceProxyType/SslErrorType/HttpAuthResponseAction/
+  ClientCertResponseAction/ServerTrustAuthResponseAction/
+  ShouldAllowDeprecatedTLSAction) + the 4 flagged-manual files handled per
+  the report: URLCredential + URLProtectionSpace + ClientCertResponse became
+  entities with hand-written glue (X509 data deserializers, string-wire
+  NSURL enum lookups, @JsonKey defaults, dropped ctor asserts), and
+  SslCertificate became a plain-Dart skip/fork class (custom iOS/Android
+  fromMap preserved). The URLAuthenticationChallenge hierarchy
+  (extends) was ALSO reverted to plain-Dart skip/hierarchy (Phase 2b
+  precedent): zorphy value objects cannot express is-a, and the callbacks
+  are typed with the base — the 4 classes now hand-written in types/ with
+  the public is-a + flat wire preserved. Wire glue: nested entities
+  (URLProtectionSpace/URLCredential/URLResponse/SslError), int enums ↔
+  .index, SslErrorType ↔ platform-native switch (iOS/macOS SecTrustResult-
+  derived / Android SSL_ERROR_*), auth-method/proxy-type ↔ their NSURL
+  strings. Controllers (android/ios/macos): challenge fromMap→fromJson +
+  `!`, callback returns toJson, ShouldAllowDeprecatedTLSAction
+  toNativeValue→index; http_auth_credentials_database fromJson. Verified:
+  platform_interface 0 errors + tests 109/109 (new
+  test/types/auth_ssl_entities_test.dart: flattened challenge wires, NSURL
+  string wires, SslErrorType platform natives via
+  debugDefaultTargetPlatformOverride, SslCertificate glue, fork defaults);
+  android/ios/macos/linux/windows/web/core 0 errors; core 95/95, macos
+  35/35, windows 13/13. Committed as 2f + PR #224.

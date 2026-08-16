@@ -18,8 +18,10 @@ export 'attributed_string_text_effect_style.dart'
 export 'cache_mode.dart' show CacheMode;
 export 'call_async_javascript_result.dart' show CallAsyncJavaScriptResult;
 export 'client_cert_challenge.dart' show ClientCertChallenge;
-export 'client_cert_response.dart' show ClientCertResponse;
-export 'client_cert_response_action.dart' show ClientCertResponseAction;
+export '../domain/entities/client_cert_response/client_cert_response.dart'
+    show ClientCertResponse, ClientCertResponseSerialization;
+export '../domain/entities/enums/client_cert_response_action.dart'
+    show ClientCertResponseAction;
 export 'compress_format.dart' show CompressFormat;
 // Zorphy entities (migrated from @ExchangeableObject codegen, see PROGRESS.md).
 export '../domain/entities/console_message/console_message.dart'
@@ -33,7 +35,8 @@ export 'content_blocker_trigger_resource_type.dart'
     show ContentBlockerTriggerResourceType;
 export 'content_world.dart' show ContentWorld;
 export 'cookie.dart' show Cookie;
-export '../domain/entities/create_window_action/create_window_action.dart' show CreateWindowAction, CreateWindowActionSerialization;
+export '../domain/entities/create_window_action/create_window_action.dart'
+    show CreateWindowAction, CreateWindowActionSerialization;
 export 'cross_origin.dart' show CrossOrigin;
 export 'css_link_html_tag_attributes.dart' show CSSLinkHtmlTagAttributes;
 export 'custom_scheme_response.dart' show CustomSchemeResponse;
@@ -59,12 +62,16 @@ export 'fetch_request_password_credential.dart'
 export 'force_dark.dart' show ForceDark;
 export 'force_dark_strategy.dart' show ForceDarkStrategy;
 export 'form_resubmission_action.dart' show FormResubmissionAction;
-export '../domain/entities/frame_info/frame_info.dart' show FrameInfo, FrameInfoSerialization;
+export '../domain/entities/frame_info/frame_info.dart'
+    show FrameInfo, FrameInfoSerialization;
 export '../domain/entities/geolocation_permission_show_prompt_response/geolocation_permission_show_prompt_response.dart'
-    show GeolocationPermissionShowPromptResponse,
+    show
+        GeolocationPermissionShowPromptResponse,
         GeolocationPermissionShowPromptResponseSerialization;
-export 'http_auth_response.dart' show HttpAuthResponse;
-export 'http_auth_response_action.dart' show HttpAuthResponseAction;
+export '../domain/entities/http_auth_response/http_auth_response.dart'
+    show HttpAuthResponse, HttpAuthResponseSerialization;
+export '../domain/entities/enums/http_auth_response_action.dart'
+    show HttpAuthResponseAction;
 export 'http_authentication_challenge.dart' show HttpAuthenticationChallenge;
 export 'http_cookie_same_site_policy.dart' show HTTPCookieSameSitePolicy;
 export 'in_app_webview_hit_test_result.dart' show InAppWebViewHitTestResult;
@@ -101,7 +108,8 @@ export '../domain/entities/enums/js_prompt_response_action.dart'
 export 'layout_algorithm.dart' show LayoutAlgorithm;
 export 'layout_in_display_cutout_mode.dart' show LayoutInDisplayCutoutMode;
 export 'loaded_resource.dart' show LoadedResource;
-export '../domain/entities/login_request/login_request.dart' show LoginRequest, LoginRequestSerialization;
+export '../domain/entities/login_request/login_request.dart'
+    show LoginRequest, LoginRequestSerialization;
 export 'media_capture_state.dart' show MediaCaptureState;
 export 'media_playback_state.dart' show MediaPlaybackState;
 export 'meta_tag.dart' show MetaTag;
@@ -109,7 +117,8 @@ export 'meta_tag_attribute.dart' show MetaTagAttribute;
 export 'mixed_content_mode.dart' show MixedContentMode;
 export 'modal_presentation_style.dart' show ModalPresentationStyle;
 export 'modal_transition_style.dart' show ModalTransitionStyle;
-export '../domain/entities/navigation_action/navigation_action.dart' show NavigationAction, NavigationActionSerialization;
+export '../domain/entities/navigation_action/navigation_action.dart'
+    show NavigationAction, NavigationActionSerialization;
 export 'network_capture_controller.dart' show NetworkCaptureController;
 export 'network_entry.dart' show NetworkEntry;
 export 'network_request.dart' show NetworkRequest;
@@ -118,9 +127,12 @@ export 'network_response_body.dart' show NetworkResponseBody;
 export 'resource_type.dart' show ResourceType;
 export 'android_webview_insets.dart' show AndroidWebViewInsets;
 export 'url_pattern_type.dart' show UrlPatternType;
-export '../domain/entities/enums/navigation_action_policy.dart' show NavigationActionPolicy;
-export '../domain/entities/navigation_response/navigation_response.dart' show NavigationResponse, NavigationResponseSerialization;
-export '../domain/entities/enums/navigation_response_action.dart' show NavigationResponseAction;
+export '../domain/entities/enums/navigation_action_policy.dart'
+    show NavigationActionPolicy;
+export '../domain/entities/navigation_response/navigation_response.dart'
+    show NavigationResponse, NavigationResponseSerialization;
+export '../domain/entities/enums/navigation_response_action.dart'
+    show NavigationResponseAction;
 export '../domain/entities/enums/navigation_type.dart' show NavigationType;
 export 'on_post_message_callback.dart' show OnPostMessageCallback;
 export 'over_scroll_mode.dart' show OverScrollMode;
@@ -165,18 +177,23 @@ export 'scrollbar_style.dart' show ScrollBarStyle;
 export 'scrollview_content_inset_adjustment_behavior.dart'
     show ScrollViewContentInsetAdjustmentBehavior;
 export 'scrollview_deceleration_rate.dart' show ScrollViewDecelerationRate;
-export '../domain/entities/security_origin/security_origin.dart' show SecurityOrigin, SecurityOriginSerialization;
+export '../domain/entities/security_origin/security_origin.dart'
+    show SecurityOrigin, SecurityOriginSerialization;
 export 'selection_granularity.dart' show SelectionGranularity;
-export 'server_trust_auth_response.dart' show ServerTrustAuthResponse;
-export 'server_trust_auth_response_action.dart'
+export '../domain/entities/server_trust_auth_response/server_trust_auth_response.dart'
+    show ServerTrustAuthResponse, ServerTrustAuthResponseSerialization;
+export '../domain/entities/enums/server_trust_auth_response_action.dart'
     show ServerTrustAuthResponseAction;
 export 'server_trust_challenge.dart' show ServerTrustChallenge;
-export 'should_allow_deprecated_tls_action.dart'
+export '../domain/entities/enums/should_allow_deprecated_tls_action.dart'
     show ShouldAllowDeprecatedTLSAction;
-export 'ssl_certificate.dart' show SslCertificate;
-export 'ssl_certificate_dname.dart' show SslCertificateDName;
-export 'ssl_error.dart' show SslError;
-export 'ssl_error_type.dart' show SslErrorType;
+export '../domain/entities/ssl_certificate/ssl_certificate.dart'
+    show SslCertificate;
+export '../domain/entities/ssl_certificate_dname/ssl_certificate_dname.dart'
+    show SslCertificateDName, SslCertificateDNameSerialization;
+export '../domain/entities/ssl_error/ssl_error.dart'
+    show SslError, SslErrorSerialization;
+export '../domain/entities/enums/ssl_error_type.dart' show SslErrorType;
 export 'trusted_web_activity_default_display_mode.dart'
     show TrustedWebActivityDefaultDisplayMode;
 export 'trusted_web_activity_display_mode.dart'
@@ -187,19 +204,30 @@ export 'trusted_web_activity_screen_orientation.dart'
     show TrustedWebActivityScreenOrientation;
 export 'underline_style.dart' show UnderlineStyle;
 export 'url_authentication_challenge.dart' show URLAuthenticationChallenge;
-export 'url_credential.dart' show URLCredential;
-export 'url_credential_persistence.dart' show URLCredentialPersistence;
-export 'url_protection_space.dart' show URLProtectionSpace;
-export 'url_protection_space_authentication_method.dart'
+export '../domain/entities/url_credential/url_credential.dart'
+    show URLCredential, URLCredentialSerialization;
+export '../domain/entities/enums/url_credential_persistence.dart'
+    show URLCredentialPersistence;
+export '../domain/entities/url_protection_space/url_protection_space.dart'
+    show URLProtectionSpace, URLProtectionSpaceSerialization;
+export '../domain/entities/enums/url_protection_space_authentication_method.dart'
     show URLProtectionSpaceAuthenticationMethod;
-export 'url_protection_space_http_auth_credentials.dart'
-    show URLProtectionSpaceHttpAuthCredentials;
-export 'url_protection_space_proxy_type.dart' show URLProtectionSpaceProxyType;
-export '../domain/entities/url_request/url_request.dart' show URLRequest, URLRequestSerialization;
-export '../domain/entities/enums/url_request_attribution.dart' show URLRequestAttribution;
-export '../domain/entities/enums/url_request_cache_policy.dart' show URLRequestCachePolicy;
-export '../domain/entities/enums/url_request_network_service_type.dart' show URLRequestNetworkServiceType;
-export '../domain/entities/url_response/url_response.dart' show URLResponse, URLResponseSerialization;
+export '../domain/entities/url_protection_space_http_auth_credentials/url_protection_space_http_auth_credentials.dart'
+    show
+        URLProtectionSpaceHttpAuthCredentials,
+        URLProtectionSpaceHttpAuthCredentialsSerialization;
+export '../domain/entities/enums/url_protection_space_proxy_type.dart'
+    show URLProtectionSpaceProxyType;
+export '../domain/entities/url_request/url_request.dart'
+    show URLRequest, URLRequestSerialization;
+export '../domain/entities/enums/url_request_attribution.dart'
+    show URLRequestAttribution;
+export '../domain/entities/enums/url_request_cache_policy.dart'
+    show URLRequestCachePolicy;
+export '../domain/entities/enums/url_request_network_service_type.dart'
+    show URLRequestNetworkServiceType;
+export '../domain/entities/url_response/url_response.dart'
+    show URLResponse, URLResponseSerialization;
 export 'user_preferred_content_mode.dart' show UserPreferredContentMode;
 export 'user_script.dart' show UserScript;
 export 'user_script_injection_time.dart' show UserScriptInjectionTime;
@@ -226,7 +254,8 @@ export 'website_data_record.dart' show WebsiteDataRecord;
 export 'website_data_type.dart' show WebsiteDataType;
 export 'webview_package_info.dart' show WebViewPackageInfo;
 export 'webview_render_process_action.dart' show WebViewRenderProcessAction;
-export '../domain/entities/window_features/window_features.dart' show WindowFeatures, WindowFeaturesSerialization;
+export '../domain/entities/window_features/window_features.dart'
+    show WindowFeatures, WindowFeaturesSerialization;
 export 'find_session.dart' show FindSession;
 export 'search_result_display_style.dart' show SearchResultDisplayStyle;
 export 'content_blocker_trigger_load_context.dart'
