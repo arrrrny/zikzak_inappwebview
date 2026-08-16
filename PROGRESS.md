@@ -45,11 +45,14 @@ longer blocks; PR #95) and #96 (static factory methods returning the class
 type preserved on the migrated $ class, reported informational instead of
 blocking; PR #97). Entity glue added for Color_ hex (UtilColor), enum
 FromWire/ToWire, still-codegen UIImage/InAppWebViewRect fromMap/toMap.
-Parts 2-3 (below): UIImage/InAppWebViewRect/ScreenshotConfiguration (zorphy
-#99), TracingSettings + UserScript entities, trusted display siblings
-de-codegened (skip/fork). Remaining hand-migrate: script_html_tag_attributes
-(Function fields — zorphy #89 skip/fork), in_app_webview_settings (the big
-one).***
+Parts 2-4 (below): UIImage/InAppWebViewRect/ScreenshotConfiguration (zorphy
+#99), TracingSettings + UserScript entities, trusted display siblings and
+script_html_tag_attributes de-codegened (skip/fork, zorphy #89), and
+in_app_webview_settings (the last big one) converted via the migrator
+(assert-only body + stripped custom property + ctor param fix) with glue for
+Color_/WebUri/EdgeInsets/Uint8List/AndroidWebViewInsets/ResourceType/
+UrlPatternType/Sandbox/contentBlockers. **ALL @ExchangeableObject/
+@ExchangeableEnum MODELS ARE MIGRATED — migration complete.***
 
 - Phase 0 (mapping + toolchain) DONE.
 - Note on the task premise: this repo does **NOT** use Freezed. Upstream
@@ -863,3 +866,24 @@ dialogue_dismisser — hand-written toJson/fromJson today → Zorphy, core packa
   -> toJson(). Verified: platform_interface 0 errors + tests 138/138; all
   platform packages + core 0 errors; core 95/95, macos 34/34, windows 13/13.
   Committed as 3j-part3 (PR #224).
+- 2026-08-16 — Phase 3j part 4 (FINAL) EXECUTED: the last two models migrated.
+  script_html_tag_attributes de-codegened to hand-written plain Dart
+  (Function-typed onLoad/onError callbacks — zorphy #89 skip/fork; callbacks
+  not part of the wire). in_app_webview_settings converted via zorphy_migrator
+  after source pre-fixes (stripped the non-assert if-default + the custom
+  @ExchangeableObjectProperty on contentBlockers, added the missing
+  stylusHandwritingEnabled ctor param; asserts dropped per #99) — the migrator
+  mechanically converted all ~150 fields with @JsonKey(defaultValue:).
+  Post-processing: json_serializable glue for Color_ hex (UtilColor), WebUri,
+  EdgeInsets/MapEdgeInsets, Uint8List, AndroidWebViewInsets (fromNativeValue),
+  ResourceType/UrlPatternType (still-codegen enums), NetworkCaptureController
+  (runtime-only, not serialized), contentBlockers (_deserialize/
+  _serializeContentBlockers), iframeSandbox (sandboxFromWire/ToWire — the
+  Sandbox enum's private _ALL/_NONE members are inaccessible cross-library),
+  and removal of non-literal enum-list defaultValue JsonKeys. Immutable
+  entity: platform packages' _inferInitialSettings rewritten to copyWith
+  (var + return) across android/ios/linux/macos; settings.toMap()->toJson() /
+  fromMap->fromJson everywhere; in_app_webview_settings.g.dart regenerated.
+  Verified: platform_interface 0 errors + tests 138/138; all platform packages
+  + core 0 errors; core 95/95, macos 34/34, windows 13/13. Committed as
+  3j-part4 (PR #224) — **migration complete**.

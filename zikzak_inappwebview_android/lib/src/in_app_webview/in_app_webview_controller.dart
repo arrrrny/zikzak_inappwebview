@@ -1957,7 +1957,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
   Future<void> setSettings({required InAppWebViewSettings settings}) async {
     Map<String, dynamic> args = <String, dynamic>{};
 
-    args.putIfAbsent('settings', () => settings.toMap());
+    args.putIfAbsent('settings', () => settings.toJson());
     await channel?.invokeMethod('setSettings', args);
   }
 
@@ -1971,7 +1971,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
     );
     if (settings != null) {
       settings = settings.cast<String, dynamic>();
-      return InAppWebViewSettings.fromMap(settings as Map<String, dynamic>);
+      return InAppWebViewSettings.fromJson(settings as Map<String, dynamic>);
     }
 
     return null;

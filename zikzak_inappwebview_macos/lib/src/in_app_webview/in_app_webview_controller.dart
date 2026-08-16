@@ -426,7 +426,7 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
   @override
   Future<void> setSettings({required InAppWebViewSettings settings}) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('settings', () => settings.toMap());
+    args.putIfAbsent('settings', () => settings.toJson());
     await _channel.invokeMethod('setSettings', args);
   }
 
@@ -436,7 +436,7 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
       'getSettings',
     );
     if (settings != null) {
-      return InAppWebViewSettings.fromMap(settings.cast<String, dynamic>());
+      return InAppWebViewSettings.fromJson(settings.cast<String, dynamic>());
     }
     return null;
   }

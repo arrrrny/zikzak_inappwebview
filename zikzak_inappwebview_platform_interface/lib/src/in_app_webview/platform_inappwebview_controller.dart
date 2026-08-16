@@ -21,7 +21,7 @@ import 'platform_inappwebview_widget.dart';
 import '../domain/entities/platform_webview_feature/platform_webview_feature.dart';
 import 'platform_webview.dart';
 import 'in_app_webview_keep_alive.dart';
-import 'in_app_webview_settings.dart';
+import '../domain/entities/in_app_webview_settings/in_app_webview_settings.dart';
 import 'modules/platform_navigation_delegate.dart';
 import 'modules/platform_javascript_delegate.dart';
 

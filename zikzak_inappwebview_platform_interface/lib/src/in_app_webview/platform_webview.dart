@@ -10,7 +10,7 @@ import '../domain/entities/context_menu/context_menu.dart';
 import '../types/main.dart';
 
 import '../web_uri.dart';
-import 'in_app_webview_settings.dart';
+import '../domain/entities/in_app_webview_settings/in_app_webview_settings.dart';
 import 'platform_inappwebview_controller.dart';
 import '../print_job/main.dart';
 

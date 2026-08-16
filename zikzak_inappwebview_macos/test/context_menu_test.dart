@@ -386,7 +386,7 @@ void main() {
     test('disableContextMenu defaults to false and is serializable', () {
       final settings = InAppWebViewSettings();
       expect(settings.disableContextMenu, false);
-      final map = settings.toMap();
+      final map = settings.toJson();
       expect(map.containsKey('disableContextMenu'), isTrue);
       expect(map['disableContextMenu'], false);
     });
@@ -395,7 +395,7 @@ void main() {
         () {
       final settings = InAppWebViewSettings();
       expect(settings.disableLongPressContextMenuOnLinks, false);
-      final map = settings.toMap();
+      final map = settings.toJson();
       expect(map.containsKey('disableLongPressContextMenuOnLinks'), isTrue);
       expect(map['disableLongPressContextMenuOnLinks'], false);
     });
@@ -405,8 +405,8 @@ void main() {
         disableContextMenu: true,
         disableLongPressContextMenuOnLinks: true,
       );
-      final map = settings.toMap();
-      final restored = InAppWebViewSettings.fromMap(map)!;
+      final map = settings.toJson();
+      final restored = InAppWebViewSettings.fromJson(map)!;
       expect(restored.disableContextMenu, isTrue);
       expect(restored.disableLongPressContextMenuOnLinks, isTrue);
     });

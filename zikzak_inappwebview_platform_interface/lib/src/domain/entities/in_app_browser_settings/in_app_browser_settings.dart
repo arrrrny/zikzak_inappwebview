@@ -11,7 +11,7 @@ import '../enums/window_titlebar_separator_style.dart';
 import '../enums/window_type.dart';
 import '../../../util.dart';
 
-import '../../../in_app_webview/in_app_webview_settings.dart';
+import '../in_app_webview_settings/in_app_webview_settings.dart';
 
 part 'in_app_browser_settings.zorphy.dart';
 part 'in_app_browser_settings.g.dart';
@@ -60,7 +60,7 @@ class InAppBrowserClassSettings {
     instance.browserSettings =
         InAppBrowserSettings.fromJson(settings) ?? InAppBrowserSettings();
     instance.webViewSettings =
-        InAppWebViewSettings.fromMap(settings) ?? InAppWebViewSettings();
+        InAppWebViewSettings.fromJson(settings) ?? InAppWebViewSettings();
     return instance;
   }
 

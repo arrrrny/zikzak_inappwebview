@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
-import '../in_app_webview/in_app_webview_settings.dart';
+import '../domain/entities/in_app_webview_settings/in_app_webview_settings.dart';
 import '../debug_logging_settings.dart';
 import '../inappwebview_platform.dart';
 import '../types/main.dart';

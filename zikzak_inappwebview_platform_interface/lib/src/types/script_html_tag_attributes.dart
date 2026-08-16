@@ -1,20 +1,12 @@
-import 'package:zikzak_inappwebview_internal_annotations/zikzak_inappwebview_internal_annotations.dart';
-
 import '../domain/entities/enums/cross_origin.dart';
 import '../domain/entities/enums/referrer_policy.dart';
 
-part 'script_html_tag_attributes.g.dart';
-
 ///Class that represents the possible the `<script>` HTML attributes to be set used by [PlatformInAppWebViewController.injectJavascriptFileFromUrl].
-@ExchangeableObject()
-class ScriptHtmlTagAttributes_ {
-  ///This attribute indicates the type of script represented. The value of this attribute will be in one of the following categories.
-  ///The default value is `text/javascript`.
-  String type;
-
-  ///The HTML [id] attribute is used to specify a unique id for the `<script>` HTML element.
-  String? id;
-
+///
+///Hand-written (migration skip/fork — carries FUNCTION-typed callback fields
+///onLoad/onError that the zorphy generator cannot express; see zorphy #89).
+///The callbacks are not part of the wire.
+class ScriptHtmlTagAttributes {
   ///For classic scripts, if the [async] attribute is present,
   ///then the classic script will be fetched in parallel to parsing and evaluated as soon as it is available.
   ///
@@ -29,6 +21,10 @@ class ScriptHtmlTagAttributes_ {
   ///and the absence of the attribute represents the false value.
   bool? async;
 
+  ///Normal script elements pass minimal information to the `window.onerror` for scripts which do not pass the standard CORS checks.
+  ///To allow error logging for sites which use a separate domain for static media, use this attribute.
+  CrossOrigin? crossOrigin;
+
   ///This Boolean attribute is set to indicate to a browser that the script is meant to be executed after the document has been parsed, but before firing `DOMContentLoaded`.
   ///
   ///Scripts with the [defer] attribute will prevent the `DOMContentLoaded` event from firing until the script has loaded and finished evaluating.
@@ -39,9 +35,8 @@ class ScriptHtmlTagAttributes_ {
   ///[async] has a similar effect in this case.
   bool? defer;
 
-  ///Normal script elements pass minimal information to the `window.onerror` for scripts which do not pass the standard CORS checks.
-  ///To allow error logging for sites which use a separate domain for static media, use this attribute.
-  CrossOrigin? crossOrigin;
+  ///The HTML [id] attribute is used to specify a unique id for the `<script>` HTML element.
+  String? id;
 
   ///This attribute contains inline metadata that a user agent can use to verify that a fetched resource has been delivered free of unexpected manipulation.
   String? integrity;
@@ -55,21 +50,24 @@ class ScriptHtmlTagAttributes_ {
   ///It is critical to provide a nonce that cannot be guessed as bypassing a resource's policy is otherwise trivial.
   String? nonce;
 
-  ///Indicates which referrer to send when fetching the script, or resources fetched by the script.
-  ReferrerPolicy? referrerPolicy;
+  ///Represents a callback function that will be called if an error occurred while trying to load the script.
+  ///
+  ///**NOTE**: This callback requires the [id] property to be set.
+  Function? onError;
 
   ///Represents a callback function that will be called as soon as the script has been loaded successfully.
   ///
   ///**NOTE**: This callback requires the [id] property to be set.
   Function? onLoad;
 
-  ///Represents a callback function that will be called if an error occurred while trying to load the script.
-  ///
-  ///**NOTE**: This callback requires the [id] property to be set.
-  Function? onError;
+  ///Indicates which referrer to send when fetching the script, or resources fetched by the script.
+  ReferrerPolicy? referrerPolicy;
 
-  @ExchangeableObjectConstructor()
-  ScriptHtmlTagAttributes_({
+  ///This attribute indicates the type of script represented. The value of this attribute will be in one of the following categories.
+  ///The default value is `text/javascript`.
+  String type;
+
+  ScriptHtmlTagAttributes({
     this.type = "text/javascript",
     this.id,
     this.async,
@@ -88,5 +86,49 @@ class ScriptHtmlTagAttributes_ {
         'onLoad and onError callbacks require the id property to be set.',
       );
     }
+  }
+
+  ///Gets a possible [ScriptHtmlTagAttributes] instance from a [Map] value.
+  static ScriptHtmlTagAttributes? fromMap(Map<String, dynamic>? map) {
+    if (map == null) {
+      return null;
+    }
+    final instance = ScriptHtmlTagAttributes(
+      async: map['async'],
+      crossOrigin: crossOriginFromWire(map['crossOrigin']),
+      defer: map['defer'],
+      id: map['id'],
+      integrity: map['integrity'],
+      noModule: map['noModule'],
+      nonce: map['nonce'],
+      referrerPolicy: referrerPolicyFromWire(map['referrerPolicy']),
+    );
+    instance.type = map['type'];
+    return instance;
+  }
+
+  ///Converts instance to a map.
+  Map<String, dynamic> toMap() {
+    return {
+      "async": async,
+      "crossOrigin": crossOriginToWire(crossOrigin),
+      "defer": defer,
+      "id": id,
+      "integrity": integrity,
+      "noModule": noModule,
+      "nonce": nonce,
+      "referrerPolicy": referrerPolicyToWire(referrerPolicy),
+      "type": type,
+    };
+  }
+
+  ///Converts instance to a map.
+  Map<String, dynamic> toJson() {
+    return toMap();
+  }
+
+  @override
+  String toString() {
+    return 'ScriptHtmlTagAttributes{async: $async, crossOrigin: $crossOrigin, defer: $defer, id: $id, integrity: $integrity, noModule: $noModule, nonce: $nonce, referrerPolicy: $referrerPolicy, type: $type}';
   }
 }
