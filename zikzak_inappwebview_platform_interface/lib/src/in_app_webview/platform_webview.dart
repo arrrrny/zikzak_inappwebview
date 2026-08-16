@@ -5,7 +5,7 @@ import 'dart:ui';
 import '../find_interaction/platform_find_interaction_controller.dart';
 import '../pull_to_refresh/platform_pull_to_refresh_controller.dart';
 
-import '../context_menu/context_menu.dart';
+import '../domain/entities/context_menu/context_menu.dart';
 import '../types/main.dart';
 
 import '../web_uri.dart';

@@ -9,7 +9,7 @@ import 'package:meta/meta.dart';
 import 'package:zikzak_inappwebview_platform_interface/src/types/disposable.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
-import '../context_menu/context_menu.dart';
+import '../domain/entities/context_menu/context_menu.dart';
 import '../find_interaction/platform_find_interaction_controller.dart';
 import '../inappwebview_platform.dart';
 import '../pull_to_refresh/main.dart';

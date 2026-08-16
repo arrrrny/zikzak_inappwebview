@@ -2147,7 +2147,7 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
   @override
   Future<void> setContextMenu(ContextMenu? contextMenu) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("contextMenu", () => contextMenu?.toMap());
+    args.putIfAbsent("contextMenu", () => contextMenu?.toJson());
     await channel?.invokeMethod('setContextMenu', args);
     _inAppBrowser?.setContextMenu(contextMenu);
   }

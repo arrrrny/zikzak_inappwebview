@@ -566,7 +566,7 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
     // menu — see _contextMenuSet docs above.
     _contextMenuSet = true;
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("contextMenu", () => contextMenu?.toMap());
+    args.putIfAbsent("contextMenu", () => contextMenu?.toJson());
     await _channel.invokeMethod('setContextMenu', args);
   }
 

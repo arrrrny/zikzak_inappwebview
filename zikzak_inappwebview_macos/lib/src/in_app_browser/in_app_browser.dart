@@ -190,7 +190,7 @@ class MacOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('id', () => id);
     args.putIfAbsent('settings', () => initialSettings);
-    args.putIfAbsent('contextMenu', () => contextMenu?.toMap() ?? {});
+    args.putIfAbsent('contextMenu', () => contextMenu?.toJson() ?? {});
     args.putIfAbsent('windowId', () => windowId);
     args.putIfAbsent(
       'initialUserScripts',

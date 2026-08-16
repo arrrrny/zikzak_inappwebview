@@ -261,7 +261,7 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
               'initialFile': this.params.initialFile,
               'initialData': this.params.initialData?.toMap(),
               'initialSettings': settingsMap,
-              'contextMenu': this.params.contextMenu?.toMap() ?? {},
+              'contextMenu': this.params.contextMenu?.toJson() ?? {},
               'windowId': this.params.windowId,
               'headlessWebViewId':
                   this.params.headlessWebView?.isRunning() ?? false

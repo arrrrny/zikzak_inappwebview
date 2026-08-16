@@ -22,6 +22,8 @@ branch (commit pending)**
 zorphy_migrator) — DONE on the same branch (commit pending)**
 **Phase 3b (web_message + web_authentication_session families → Zorphy via
 zorphy_migrator) — DONE on the same branch (commit pending)**
+**Phase 3c (context_menu family → Zorphy via zorphy_migrator) — DONE on the
+same branch (commit pending)**
 
 - Phase 0 (mapping + toolchain) DONE.
 - Note on the task premise: this repo does **NOT** use Freezed. Upstream
@@ -344,6 +346,9 @@ should_allow_deprecated_tls_action. (Scoped; not started.)
       (WebMessage/WebMessageType, WebAuthenticationSessionSettings,
       WebAuthenticationSessionError 1-based wire, WebAuthenticationSupport) —
       migrated (see worklog)
+- [x] Phase 3c: context_menu family (ContextMenuSettings entity;
+      ContextMenu + ContextMenuItem skip/fork — function-typed callbacks
+      cannot be expressed as zorphy value objects) — migrated (see worklog)
 
 ### Phase 3 — browser/settings objects (`in_app_browser/`, `in_app_webview/`,
 `chrome_safari_browser/`, `print_job/`, `pull_to_refresh/`, `context_menu/`,
@@ -736,3 +741,19 @@ dialogue_dismisser — hand-written toJson/fromJson today → Zorphy, core packa
   test/types/web_message_auth_session_entities_test.dart); all platform
   packages + core 0 errors; core 95/95, macos 35/35, windows 13/13.
   Committed as 3b + PR #226.
+- 2026-08-16 — Phase 3c EXECUTED via zorphy_migrator: context_menu family.
+  Converted by the tool: ContextMenuSettings (entity, hideDefaultSystemContextMenuItems
+  default false). Skip/fork (plain Dart, per the migrator's manual report +
+  a NEW framework limitation): ContextMenu + ContextMenuItem carry
+  FUNCTION-typed callback fields (onCreateContextMenu/onHideContextMenu/
+  onContextMenuActionItemClicked, action) that the zorphy generator cannot
+  express (function-typed getters break the generated source — related to
+  zorphy #88's doc/parse fragility) — hand-written plain classes preserving
+  the public API and the old wire (ContextMenu: menuItems + settings only;
+  ContextMenuItem: id + title only; callbacks excluded). Controller glue:
+  contextMenu?.toMap() → toJson across android/ios/macos/linux (in_app_webview,
+  headless, in_app_browser, controllers); platform_in_app_browser import
+  re-pointed. Verified: platform_interface 0 errors + tests 126/126 (new
+  test/types/context_menu_entities_test.dart); all platform packages + core
+  0 errors; core 95/95, macos 35/35 (incl. context_menu_test), windows
+  13/13. Committed as 3c + PR #226.

@@ -19,7 +19,7 @@ class MacOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
       'initialUserScripts': params.initialUserScripts
           ?.map((e) => e.toMap())
           .toList(),
-      'contextMenu': params.contextMenu?.toMap(),
+      'contextMenu': params.contextMenu?.toJson(),
       'windowId': params.windowId,
       'initialData': params.initialData?.toMap(),
       'initialFile': params.initialFile,

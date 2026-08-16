@@ -5,7 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:zikzak_inappwebview_internal_annotations/zikzak_inappwebview_internal_annotations.dart';
 
 import '../content_blocker.dart';
-import '../context_menu/context_menu.dart';
+import '../domain/entities/context_menu/context_menu.dart';
 import '../in_app_browser/platform_in_app_browser.dart';
 import '../in_app_webview/platform_inappwebview_controller.dart';
 import '../platform_webview_asset_loader.dart';

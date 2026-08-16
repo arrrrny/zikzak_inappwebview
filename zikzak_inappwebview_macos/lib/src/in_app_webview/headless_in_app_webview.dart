@@ -284,7 +284,7 @@ class MacOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
         'initialFile': params.initialFile,
         'initialData': params.initialData?.toMap(),
         'initialSettings': settingsMap,
-        'contextMenu': params.contextMenu?.toMap() ?? {},
+        'contextMenu': params.contextMenu?.toJson() ?? {},
         'windowId': params.windowId,
         'initialUserScripts':
             params.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],

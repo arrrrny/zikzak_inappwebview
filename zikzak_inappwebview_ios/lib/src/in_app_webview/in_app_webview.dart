@@ -237,7 +237,7 @@ class IOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
         'initialFile': params.initialFile,
         'initialData': params.initialData?.toMap(),
         'initialSettings': settingsMap,
-        'contextMenu': params.contextMenu?.toMap() ?? {},
+        'contextMenu': params.contextMenu?.toJson() ?? {},
         'windowId': params.windowId,
         'headlessWebViewId': params.headlessWebView?.isRunning() ?? false
             ? params.headlessWebView?.id
