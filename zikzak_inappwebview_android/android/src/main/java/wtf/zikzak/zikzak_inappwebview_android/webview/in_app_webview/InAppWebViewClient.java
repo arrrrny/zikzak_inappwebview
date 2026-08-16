@@ -465,6 +465,10 @@ public class InAppWebViewClient extends WebViewClient {
         if (webView.channelDelegate != null) {
             webView.channelDelegate.onLoadStop(url);
         }
+
+        if (webView.firstNavigationCompleted != null) {
+            webView.firstNavigationCompleted.run();
+        }
     }
 
     @Override
@@ -522,6 +526,10 @@ public class InAppWebViewClient extends WebViewClient {
                 WebResourceErrorExt.fromWebResourceError(error)
             );
         }
+
+        if (request.isForMainFrame() && webView.firstNavigationCompleted != null) {
+            webView.firstNavigationCompleted.run();
+        }
     }
 
     @SuppressLint("RestrictedApi")
@@ -569,6 +577,11 @@ public class InAppWebViewClient extends WebViewClient {
 
         if (webView.channelDelegate != null) {
             webView.channelDelegate.onReceivedError(request, error);
+        }
+
+        // Deprecated overload: always a main-frame error.
+        if (webView.firstNavigationCompleted != null) {
+            webView.firstNavigationCompleted.run();
         }
 
         super.onReceivedError(view, errorCode, description, failingUrl);

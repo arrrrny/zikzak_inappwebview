@@ -59,17 +59,19 @@ public class HeadlessInAppWebViewManager extends ChannelDelegateImpl {
       case "run":
         {
           HashMap<String, Object> params = (HashMap<String, Object>) call.argument("params");
-          run(id, params);
+          run(id, params, () -> result.success(true));
         }
-        result.success(true);
         break;
       default:
         result.notImplemented();
     }
   }
 
-  public void run(String id, HashMap<String, Object> params) {
-    if (plugin == null || (plugin.activity == null && plugin.applicationContext == null)) return;
+  public void run(String id, HashMap<String, Object> params, Runnable completion) {
+    if (plugin == null || (plugin.activity == null && plugin.applicationContext == null)) {
+      completion.run();
+      return;
+    }
     Context context = plugin.activity;
     if (context == null) {
       context = plugin.applicationContext;
@@ -80,6 +82,32 @@ public class HeadlessInAppWebViewManager extends ChannelDelegateImpl {
 
     headlessInAppWebView.prepare(params);
     headlessInAppWebView.onWebViewCreated();
+
+    // Readiness gate: completes run() only after the initial navigation
+    // reaches a terminal state (onPageFinished or a main-frame error). This
+    // guarantees the webview / renderer is up before a consumer issues its
+    // first real loadUrl. Signal-driven on purpose: no timeout constant — a
+    // missing terminal event is a wiring bug that must surface loudly, not be
+    // masked by a magic number.
+    if (flutterWebView.webView == null) {
+      completion.run();
+      return;
+    }
+    // Nothing to wait for if no initial load was requested.
+    if (params.get("initialUrlRequest") == null
+        && params.get("initialFile") == null
+        && params.get("initialData") == null) {
+      completion.run();
+      return;
+    }
+    final boolean[] gateFired = {false};
+    flutterWebView.webView.firstNavigationCompleted = () -> {
+      if (gateFired[0]) return;
+      gateFired[0] = true;
+      flutterWebView.webView.firstNavigationCompleted = null;
+      completion.run();
+    };
+
     flutterWebView.makeInitialLoad(params);
   }
 

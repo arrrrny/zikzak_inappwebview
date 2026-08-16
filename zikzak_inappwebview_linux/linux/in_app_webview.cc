@@ -25,6 +25,12 @@ struct _InAppWebView {
   uint8_t *buffer;
   int32_t width;
   int32_t height;
+
+  // One-shot readiness gate for the headless "run" flow (see
+  // in_app_webview_set_first_load_callback). NULL by default — no effect on
+  // regular web views.
+  InAppWebViewFirstLoadCallback first_load_callback;
+  gpointer first_load_callback_data;
 };
 
 G_DEFINE_TYPE(InAppWebView, in_app_webview, fl_pixel_buffer_texture_get_type())
@@ -313,7 +319,25 @@ static void on_load_changed(WebKitWebView *web_view, WebKitLoadEvent load_event,
     fl_method_channel_invoke_method(self->channel, "onLoadStop", args, nullptr,
                                     nullptr, nullptr);
     update_texture(self);
+
+    // One-shot readiness gate: fire and disarm. WEBKIT_LOAD_FINISHED is the
+    // terminal load event (WebKitGTK emits it for both success and failure),
+    // and its arrival proves the web process handled the load.
+    if (self->first_load_callback) {
+      InAppWebViewFirstLoadCallback callback = self->first_load_callback;
+      gpointer data = self->first_load_callback_data;
+      self->first_load_callback = NULL;
+      self->first_load_callback_data = NULL;
+      callback(self, data);
+    }
   }
+}
+
+void in_app_webview_set_first_load_callback(InAppWebView *self,
+                                            InAppWebViewFirstLoadCallback callback,
+                                            gpointer user_data) {
+  self->first_load_callback = callback;
+  self->first_load_callback_data = user_data;
 }
 
 // ---------------- network capture support: JS bridge & events ----------------
