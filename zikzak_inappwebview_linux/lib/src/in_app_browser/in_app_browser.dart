@@ -156,11 +156,11 @@ class LinuxInAppBrowser extends PlatformInAppBrowser with ChannelController {
     args.putIfAbsent('windowId', () => windowId);
     args.putIfAbsent(
       'initialUserScripts',
-      () => initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
+      () => initialUserScripts?.map((e) => e.toJson()).toList() ?? [],
     );
     args.putIfAbsent(
       'menuItems',
-      () => _menuItems.values.map((e) => e.toMap()).toList(),
+      () => _menuItems.values.map((e) => e.toJson()).toList(),
     );
 
     return args;

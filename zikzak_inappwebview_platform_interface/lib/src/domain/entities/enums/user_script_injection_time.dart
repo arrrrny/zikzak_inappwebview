@@ -1,5 +1,5 @@
 
-import '../../../types/user_script.dart';
+import '../user_script/user_script.dart';
 
 
 ///Class that represents contains the constants for the times at which to inject script content into a `WebView` used by an [UserScript].

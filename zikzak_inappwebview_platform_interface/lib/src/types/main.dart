@@ -222,7 +222,7 @@ export '../domain/entities/enums/url_request_network_service_type.dart'
 export '../domain/entities/url_response/url_response.dart'
     show URLResponse, URLResponseSerialization;
 export '../domain/entities/enums/user_preferred_content_mode.dart' show UserPreferredContentMode;
-export 'user_script.dart' show UserScript;
+export '../domain/entities/user_script/user_script.dart' show UserScript, UserScriptSerialization;
 export '../domain/entities/enums/user_script_injection_time.dart' show UserScriptInjectionTime;
 export '../domain/entities/enums/vertical_scrollbar_position.dart' show VerticalScrollbarPosition;
 export '../domain/entities/enums/web_archive_format.dart' show WebArchiveFormat, webArchiveFormatFromWire, webArchiveFormatToWire;

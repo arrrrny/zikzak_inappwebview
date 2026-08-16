@@ -269,7 +269,7 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
                   : null,
               'initialUserScripts':
                   this.params.initialUserScripts
-                      ?.map((e) => e.toMap())
+                      ?.map((e) => e.toJson())
                       .toList() ??
                   [],
               'pullToRefreshSettings': pullToRefreshSettings,

@@ -2312,7 +2312,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
   @override
   Future<void> addUserScript({required UserScript userScript}) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('userScript', () => userScript.toMap());
+    args.putIfAbsent('userScript', () => userScript.toJson());
     if (!(_userScripts[userScript.injectionTime]?.contains(userScript) ??
         false)) {
       _userScripts[userScript.injectionTime]?.add(userScript);
@@ -2336,7 +2336,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
 
     _userScripts[userScript.injectionTime]?.remove(userScript);
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('userScript', () => userScript.toMap());
+    args.putIfAbsent('userScript', () => userScript.toJson());
     args.putIfAbsent('index', () => index);
     await channel?.invokeMethod('removeUserScript', args);
 

@@ -287,10 +287,10 @@ class MacOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
         'contextMenu': params.contextMenu?.toJson() ?? {},
         'windowId': params.windowId,
         'initialUserScripts':
-            params.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
+            params.initialUserScripts?.map((e) => e.toJson()).toList() ?? [],
         'pullToRefreshSettings': pullToRefreshSettings,
         'findInteractionSettings': findInteractionSettings,
-        'initialSize': params.initialSize.toMap(),
+        'initialSize': params.initialSize.toJson(),
       },
     );
     final runCompleter = Completer<void>();
@@ -358,7 +358,7 @@ class MacOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     }
 
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('size', () => size.toMap());
+    args.putIfAbsent('size', () => size.toJson());
     await channel?.invokeMethod('setSize', args);
   }
 

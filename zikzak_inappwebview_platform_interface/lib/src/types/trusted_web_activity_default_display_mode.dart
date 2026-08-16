@@ -1,23 +1,48 @@
-import 'package:zikzak_inappwebview_internal_annotations/zikzak_inappwebview_internal_annotations.dart';
-
 import '../domain/entities/trusted_web_activity_display_mode/trusted_web_activity_display_mode.dart';
-
-part 'trusted_web_activity_default_display_mode.g.dart';
 
 ///Class that represents the default display mode of a Trusted Web Activity.
 ///The system UI (status bar, navigation bar) is shown, and the browser toolbar is hidden while the user is on a verified origin.
-@ExchangeableObject(fromMapFactory: false)
-class TrustedWebActivityDefaultDisplayMode_
+///
+///Hand-written (migration skip/fork — the concrete display-mode classes are
+///polymorphic subtypes of the Zorphy [TrustedWebActivityDisplayMode] base;
+///Zorphy value objects cannot implement each other).
+class TrustedWebActivityDefaultDisplayMode
     implements TrustedWebActivityDisplayMode {
   static final _type = "DEFAULT_MODE";
 
-  @ExchangeableObjectMethod(toMapMergeWith: true)
-  // ignore: unused_element
+  TrustedWebActivityDefaultDisplayMode();
+
   Map<String, dynamic> _toMapMergeWith() {
     return {"type": _type};
   }
 
+  ///Converts instance to a map.
+  Map<String, dynamic> toMap() {
+    return {..._toMapMergeWith()};
+  }
+
+  ///Converts instance to a map.
+  Map<String, dynamic> toJson() {
+    return toMap();
+  }
+
   @override
-  @ExchangeableObjectMethod(ignore: true)
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+  TrustedWebActivityDefaultDisplayMode copyWith() {
+    return TrustedWebActivityDefaultDisplayMode();
+  }
+
+  @override
+  TrustedWebActivityDefaultDisplayMode copyWithTrustedWebActivityDisplayMode() {
+    return copyWith();
+  }
+
+  @override
+  Map<String, dynamic> toJsonLean() {
+    return toMap();
+  }
+
+  @override
+  String toString() {
+    return 'TrustedWebActivityDefaultDisplayMode{}';
+  }
 }

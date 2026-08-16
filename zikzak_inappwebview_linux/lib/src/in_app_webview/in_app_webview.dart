@@ -61,7 +61,7 @@ class _LinuxInAppWebViewState extends State<_LinuxInAppWebView> {
           'initialData': widget.params.initialData?.toJson(),
           'initialUserScripts':
               widget.params.initialUserScripts
-                  ?.map((e) => e.toMap())
+                  ?.map((e) => e.toJson())
                   .toList() ??
               [],
         },

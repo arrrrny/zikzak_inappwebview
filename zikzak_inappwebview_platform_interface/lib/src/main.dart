@@ -24,7 +24,9 @@ export 'domain/entities/platform_webview_feature/platform_webview_feature.dart'
 export 'domain/entities/platform_proxy_controller/platform_proxy_controller.dart'
     hide IOSProxySettings_, AndroidProxySettings_;
 export 'domain/entities/platform_webview_asset_loader/platform_webview_asset_loader.dart';
-export 'platform_tracing_controller.dart' hide TracingSettings_;
+export 'platform_tracing_controller.dart';
+export 'domain/entities/tracing_settings/tracing_settings.dart'
+    show TracingSettings, TracingSettingsSerialization;
 export 'domain/entities/platform_process_global_config/platform_process_global_config.dart'
     hide ProcessGlobalConfigSettings_, ProcessGlobalConfigDirectoryBasePaths_;
 export 'platform_in_app_localhost_server.dart';

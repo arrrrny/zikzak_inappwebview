@@ -2328,7 +2328,7 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
     assert(webviewParams?.windowId == null);
 
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('userScript', () => userScript.toMap());
+    args.putIfAbsent('userScript', () => userScript.toJson());
     if (!(_userScripts[userScript.injectionTime]?.contains(userScript) ??
         false)) {
       _userScripts[userScript.injectionTime]?.add(userScript);
@@ -2356,7 +2356,7 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
 
     _userScripts[userScript.injectionTime]?.remove(userScript);
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('userScript', () => userScript.toMap());
+    args.putIfAbsent('userScript', () => userScript.toJson());
     args.putIfAbsent('index', () => index);
     await channel?.invokeMethod('removeUserScript', args);
 

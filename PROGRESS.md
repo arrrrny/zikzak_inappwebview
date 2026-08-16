@@ -45,12 +45,11 @@ longer blocks; PR #95) and #96 (static factory methods returning the class
 type preserved on the migrated $ class, reported informational instead of
 blocking; PR #97). Entity glue added for Color_ hex (UtilColor), enum
 FromWire/ToWire, still-codegen UIImage/InAppWebViewRect fromMap/toMap.
-Part 2 (below): UIImage/InAppWebViewRect/ScreenshotConfiguration converted
-via zorphy #99 (assert-only bodies dropped informational). Remaining
-hand-migrate: user_script (non-assert body), script_html_tag_attributes
-(Function fields — zorphy #89), platform_tracing_controller
-(@ExchangeableObjectProperty), in_app_webview_settings, trusted display
-siblings.***
+Parts 2-3 (below): UIImage/InAppWebViewRect/ScreenshotConfiguration (zorphy
+#99), TracingSettings + UserScript entities, trusted display siblings
+de-codegened (skip/fork). Remaining hand-migrate: script_html_tag_attributes
+(Function fields — zorphy #89 skip/fork), in_app_webview_settings (the big
+one).***
 
 - Phase 0 (mapping + toolchain) DONE.
 - Note on the task premise: this repo does **NOT** use Freezed. Upstream
@@ -851,3 +850,16 @@ dialogue_dismisser — hand-written toJson/fromJson today → Zorphy, core packa
   (menu_item/print_job/pdf/browser_settings). Verified: platform_interface
   0 errors + tests 138/138; all platform packages + core 0 errors; core
   95/95, macos 34/34, windows 13/13. Committed as 3j-part2 (PR #224).
+- 2026-08-16 — Phase 3j part 3 EXECUTED: trusted display-mode siblings
+  de-codegened to hand-written plain Dart (polymorphic subtypes of the Zorphy
+  TrustedWebActivityDisplayMode base; Zorphy value objects cannot implement
+  each other — skip/fork, preserving toMap/toJson/copyWith/toJsonLean);
+  TracingSettings_ extracted to domain/entities/tracing_settings as a Zorphy
+  entity (categories via @JsonKey glue to _deserialize/_serializeCategories,
+  tracingMode via tracingModeFromWire/ToWire; assert dropped); UserScript
+  hand-migrated to a Zorphy entity (contentWorld nullable + PAGE default
+  glue, allowedOriginRules default {'*'}, injectionTime index wire, source/
+  groupName/forMainFrameOnly). Platform packages re-glued userScript.toMap()
+  -> toJson(). Verified: platform_interface 0 errors + tests 138/138; all
+  platform packages + core 0 errors; core 95/95, macos 34/34, windows 13/13.
+  Committed as 3j-part3 (PR #224).

@@ -243,7 +243,7 @@ class IOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
             ? params.headlessWebView?.id
             : null,
         'initialUserScripts':
-            params.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
+            params.initialUserScripts?.map((e) => e.toJson()).toList() ?? [],
         'pullToRefreshSettings': pullToRefreshSettings,
         'keepAliveId': params.keepAlive?.id,
         'preventGestureDelay': params.preventGestureDelay,
