@@ -946,3 +946,20 @@ dialogue_dismisser — hand-written toJson/fromJson today → Zorphy, core packa
   ran scripts/restore_dev_setup.sh so the whole monorepo tests the LOCAL
   migrated platform_interface. All suites green; example builds + runs on
   Linux. NOTE for publishing: prepare_for_publish.sh strips these overrides.
+- 2026-08-16 — Phase 4 continued — controller coverage. Added fake-platform
+  delegation tests for the remaining public feature wrappers: CookieManager
+  (all 8 ops, arg passthrough), ProxyController (+ AndroidProxySettings/
+  IOSProxySettings wire), TracingController, WebStorageManager,
+  FindInteractionController, PullToRefreshController, PrintJobController,
+  ServiceWorkerController — pinning the public method contract that the
+  zuraffa-only rewrite's MCP tools will expose. Also the first linux test
+  file: LinuxInAppWebViewController channel-args serialization (loadUrl
+  URLRequest map, evaluateJavascript source+contentWorld, navigation
+  queries) + handleMethod deserialization (onLoadStart/onLoadStop WebUri
+  delivery, onCallJsHandler routing) via an injected mock MethodChannel.
+  NOTE: mid-session the working tree carried an unrelated in-progress
+  dispose-pattern refactor (idempotent `disposed` guards on
+  InAppWebView/InAppWebViewController/HeadlessInAppWebView + web + test
+  files) that was uncompilable (`const` ctor + non-final `_disposed`);
+  dropped the `const` to unblock, left the WIP uncommitted for its owner.
+  Suites: platform_interface 268, core 127, macos 34, windows 13, linux 6.
