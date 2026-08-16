@@ -41,7 +41,10 @@ void main() {
     }
 
     print('CHANNEL CALLS: $calls');
-    final params = capturedArgs?['params'] as Map<String, dynamic>?;
+    final rawParams = capturedArgs?['params'];
+    final params = rawParams is Map
+        ? Map<String, dynamic>.from(rawParams)
+        : null;
     print('initialUrlRequest: ${params?['initialUrlRequest']}');
     print('initialSettings: ${params?['initialSettings']}');
     print('initialSize: ${params?['initialSize']}');
