@@ -78,7 +78,11 @@ public class HeadlessInAppWebView: NSObject {
         webView?.removeFromSuperview()
         webView?.dispose()
         webView = nil
-        offscreenWindow?.close()
+        // The window was never ordered in, so close() is unsafe here (it can
+        // over-release a never-shown borderless window and crash with
+        // objc_release on the next autorelease pool pop). Detach the content
+        // view and drop the reference instead — ARC deallocates the window.
+        offscreenWindow?.contentView = nil
         offscreenWindow = nil
         manager?.dispose(id: id)
         manager = nil
