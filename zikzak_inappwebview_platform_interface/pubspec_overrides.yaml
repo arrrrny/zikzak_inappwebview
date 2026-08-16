@@ -1,7 +1,0 @@
-dependency_overrides:
-  zikzak_inappwebview_platform_interface:
-    path: ../zikzak_inappwebview_platform_interface
-  zorphy_annotation:
-    path: /workspace/zorphy/zorphy_annotation
-  zorphy:
-    path: /workspace/zorphy/zorphy
