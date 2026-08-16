@@ -19,6 +19,35 @@ class AndroidResource {
   factory AndroidResource.fromJson(Map<String, dynamic> json) =>
       _$AndroidResourceFromJson(json);
 
+  // @preserve
+  // Static factories kept on the concrete class for API compatibility with
+  // the pre-migration codegen (the zorphy generator skips static methods that
+  // return the class's own type, so these are restored by hand).
+  static AndroidResource anim({required String name, String? defPackage}) {
+    return AndroidResource(name: name, defType: "anim", defPackage: defPackage);
+  }
+
+  static AndroidResource layout({required String name, String? defPackage}) {
+    return AndroidResource(
+      name: name,
+      defType: "layout",
+      defPackage: defPackage,
+    );
+  }
+
+  static AndroidResource id({required String name, String? defPackage}) {
+    return AndroidResource(name: name, defType: "id", defPackage: defPackage);
+  }
+
+  static AndroidResource drawable({required String name, String? defPackage}) {
+    return AndroidResource(
+      name: name,
+      defType: "drawable",
+      defPackage: defPackage,
+    );
+  }
+  // @end-preserve
+
   final String name;
 
   final String? defType;

@@ -16,7 +16,7 @@ public class HeadlessInAppWebView: NSObject {
         self.registrar = registrar
         super.init()
 
-        self.webView = InAppWebView(registrar: registrar, viewId: id, arguments: params)
+        self.webView = InAppWebView(registrar: registrar, viewId: id, arguments: params, deferInitialLoad: true)
 
         let channel = FlutterMethodChannel(name: "wtf.zikzak/flutter_headless_inappwebview_" + id,
                                            binaryMessenger: registrar.messenger)

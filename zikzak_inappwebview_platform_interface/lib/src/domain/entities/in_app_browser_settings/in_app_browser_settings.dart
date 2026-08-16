@@ -85,7 +85,7 @@ abstract class $InAppBrowserSettings {
 
   ///Set the custom background color of the toolbar at the top.
   @JsonKey(fromJson: _colorFromJson, toJson: _colorToJson)
-  Color_? get toolbarTopBackgroundColor;
+  Color? get toolbarTopBackgroundColor;
 
   ///Set to `true` to hide the url bar on the toolbar at the top. The default value is `false`.
   @JsonKey(defaultValue: false)
@@ -105,11 +105,11 @@ abstract class $InAppBrowserSettings {
 
   ///Set the tint color to apply to the navigation bar background.
   @JsonKey(fromJson: _colorFromJson, toJson: _colorToJson)
-  Color_? get toolbarTopBarTintColor;
+  Color? get toolbarTopBarTintColor;
 
   ///Set the tint color to apply to the navigation items and bar button items.
   @JsonKey(fromJson: _colorFromJson, toJson: _colorToJson)
-  Color_? get toolbarTopTintColor;
+  Color? get toolbarTopTintColor;
 
   ///Set to `true` to hide the toolbar at the bottom of the WebView. The default value is `false`.
   @JsonKey(defaultValue: false)
@@ -117,11 +117,11 @@ abstract class $InAppBrowserSettings {
 
   ///Set the custom background color of the toolbar at the bottom.
   @JsonKey(fromJson: _colorFromJson, toJson: _colorToJson)
-  Color_? get toolbarBottomBackgroundColor;
+  Color? get toolbarBottomBackgroundColor;
 
   ///Set the tint color to apply to the bar button items.
   @JsonKey(fromJson: _colorFromJson, toJson: _colorToJson)
-  Color_? get toolbarBottomTintColor;
+  Color? get toolbarBottomTintColor;
 
   ///Set to `true` to set the toolbar at the bottom translucent. The default value is `true`.
   @JsonKey(defaultValue: true)
@@ -132,7 +132,7 @@ abstract class $InAppBrowserSettings {
 
   ///Set the custom color for the close button.
   @JsonKey(fromJson: _colorFromJson, toJson: _colorToJson)
-  Color_? get closeButtonColor;
+  Color? get closeButtonColor;
 
   ///Set to `true` to hide the close button. The default value is `false`.
   @JsonKey(defaultValue: false)
@@ -140,7 +140,7 @@ abstract class $InAppBrowserSettings {
 
   ///Set the custom color for the menu button.
   @JsonKey(fromJson: _colorFromJson, toJson: _colorToJson)
-  Color_? get menuButtonColor;
+  Color? get menuButtonColor;
 
   ///Set the custom modal presentation style when presenting the WebView. The default value is [ModalPresentationStyle.FULL_SCREEN].
   @JsonKey(
@@ -204,13 +204,13 @@ abstract class $InAppBrowserSettings {
   InAppWebViewRect? get windowFrame;
 }
 
-Color_? _colorFromJson(Object? value) {
+Color? _colorFromJson(Object? value) {
   if (value == null) return null;
   final color = UtilColor.fromStringRepresentation(value as String);
   return color == null ? null : Color_(color.value);
 }
 
-Object? _colorToJson(Color_? color) => color?.toHex();
+Object? _colorToJson(Color? color) => color?.toHex();
 
 ModalPresentationStyle? _presentationStyleFromJson(Object? value) =>
     modalPresentationStyleFromWire(value);

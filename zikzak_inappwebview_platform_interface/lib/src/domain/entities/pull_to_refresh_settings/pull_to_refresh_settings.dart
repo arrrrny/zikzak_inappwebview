@@ -26,13 +26,13 @@ abstract class $PullToRefreshSettings {
   ///
   ///**Officially Supported Platforms/Implementations**:
   @JsonKey(fromJson: _colorFromJson, toJson: _colorToJson)
-  Color_? get color;
+  Color? get color;
 
   ///The background color of the refresh control.
   ///
   ///**Officially Supported Platforms/Implementations**:
   @JsonKey(fromJson: _colorFromJson, toJson: _colorToJson)
-  Color_? get backgroundColor;
+  Color? get backgroundColor;
 
   ///The distance to trigger a sync in dips.
   ///
@@ -57,13 +57,13 @@ abstract class $PullToRefreshSettings {
   AttributedString? get attributedTitle;
 }
 
-Color_? _colorFromJson(Object? value) {
+Color? _colorFromJson(Object? value) {
   if (value == null) return null;
   final color = UtilColor.fromStringRepresentation(value as String);
   return color == null ? null : Color_(color.value);
 }
 
-Object? _colorToJson(Color_? color) => color?.toHex();
+Object? _colorToJson(Color? color) => color?.toHex();
 
 AttributedString? _attributedTitleFromJson(Object? value) => value == null
     ? null

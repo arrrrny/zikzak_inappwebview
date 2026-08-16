@@ -97,7 +97,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     public weak var opener: InAppWebView?
 
     init(
-        registrar: FlutterPluginRegistrar, viewId: Any, arguments: Any?, channelName: String? = nil, plugin: InAppWebViewFlutterPlugin? = nil
+        registrar: FlutterPluginRegistrar, viewId: Any, arguments: Any?, channelName: String? = nil, plugin: InAppWebViewFlutterPlugin? = nil, deferInitialLoad: Bool = false
     ) {
         let configuration = WKWebViewConfiguration()
         let userContentController = WKUserContentController()
@@ -208,9 +208,15 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         bindChannels(registrar: registrar, viewId: viewId, channelName: channelName)
 
         if let args = arguments as? [String: Any] {
-            if let initialUrlRequest = args["initialUrlRequest"] as? [String: Any] {
-                let request = URLRequest(fromPluginMap: initialUrlRequest)
-                self.load(request)
+            // The initial load is normally fired here, synchronously during
+            // construction. Headless webviews pass deferInitialLoad: true so
+            // the HeadlessInAppWebViewManager can arm its readiness gate
+            // BEFORE the first navigation is issued (see makeInitialLoad).
+            if !deferInitialLoad {
+                if let initialUrlRequest = args["initialUrlRequest"] as? [String: Any] {
+                    let request = URLRequest(fromPluginMap: initialUrlRequest)
+                    self.load(request)
+                }
             }
 
             // The widget sends "initialSettings"; accept "settings" too for
@@ -265,6 +271,39 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         if let windowId = windowId, InAppWebView.pendingCloseEvents.contains(windowId) {
             InAppWebView.pendingCloseEvents.remove(windowId)
             channel?.invokeMethod("onCloseWindow", arguments: nil)
+        }
+    }
+
+    ///Fires the initial load from the creation [params] (headless webviews).
+    ///
+    ///Deliberately separated from `init` so callers can arm a readiness gate
+    ///BEFORE the first navigation is issued. Handles `initialUrlRequest`,
+    ///`initialFile` and `initialData` (mirrors the iOS port). No-op when the
+    ///params carry no initial load — the WKWebView's intrinsic about:blank
+    ///load then serves as the first navigation.
+    func makeInitialLoad(params: [String: Any]) {
+        let initialUrlRequest = params["initialUrlRequest"] as? [String: Any]
+        let initialFile = params["initialFile"] as? String
+        let initialData = params["initialData"] as? [String: Any]
+
+        if let initialFile = initialFile {
+            let fileURL = URL(fileURLWithPath: initialFile)
+            self.loadFileURL(fileURL, allowingReadAccessTo: fileURL.deletingLastPathComponent())
+        } else if let initialData = initialData {
+            let data = initialData["data"] as? String ?? ""
+            let mimeType = initialData["mimeType"] as? String ?? "text/html"
+            let encoding = initialData["encoding"] as? String ?? "utf-8"
+            let baseURL = URL(string: initialData["baseUrl"] as? String ?? "about:blank")
+            if let dataData = data.data(using: .utf8) {
+                self.load(
+                    dataData, mimeType: mimeType,
+                    characterEncodingName: encoding, baseURL: baseURL ?? URL(string: "about:blank")!)
+            } else {
+                self.loadHTMLString(data, baseURL: baseURL)
+            }
+        } else if let initialUrlRequest = initialUrlRequest {
+            let request = URLRequest(fromPluginMap: initialUrlRequest)
+            self.load(request)
         }
     }
 
