@@ -189,8 +189,21 @@ TrustedWebActivityDisplayMode? _displayModeFromJson(Object? value) {
   }
 }
 
-Object? _displayModeToJson(TrustedWebActivityDisplayMode? displayMode) =>
-    displayMode?.toJson();
+Object? _displayModeToJson(TrustedWebActivityDisplayMode? displayMode) {
+  if (displayMode == null) return null;
+  // The base class has no toMap/toJson member of its own (zorphy puts
+  // toJson on an extension), so static dispatch would emit `{}` and lose the
+  // type-key wire. Dispatch on the concrete subtype to restore the old wire
+  // ({"type": ..., <subtype fields>}).
+  switch (displayMode) {
+    case final TrustedWebActivityImmersiveDisplayMode immersive:
+      return immersive.toMap();
+    case final TrustedWebActivityDefaultDisplayMode defaultMode:
+      return defaultMode.toMap();
+    default:
+      return TrustedWebActivityDefaultDisplayMode().toMap();
+  }
+}
 
 List<AndroidResource>? _startAnimationsFromJson(Object? value) {
   if (value is! List) return null;
