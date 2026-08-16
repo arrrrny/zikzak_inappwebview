@@ -963,3 +963,13 @@ dialogue_dismisser — hand-written toJson/fromJson today → Zorphy, core packa
   files) that was uncompilable (`const` ctor + non-final `_disposed`);
   dropped the `const` to unblock, left the WIP uncommitted for its owner.
   Suites: platform_interface 268, core 127, macos 34, windows 13, linux 6.
+- 2026-08-16 — Phase 4 final — first test files for android + ios.
+  AndroidInAppWebViewController + IOSInAppWebViewController channel-args
+  serialization (loadUrl URLRequest map, postUrl url+postData,
+  evaluateJavascript source+contentWorld) + handleMethod deserialization
+  (onLoadStart/onLoadStop; android throws UnimplementedError on unknown
+  methods) via a same-named mock MethodChannel. Web package is browser-only
+  (dart:js_interop) — not VM-testable; its behavior is covered by the
+  example's browser tests. EVERY package in the monorepo now has automated
+  tests. Final suite: core 127, platform_interface 268, macos 34, windows 13,
+  linux 6, android 5, ios 4 = 457.
