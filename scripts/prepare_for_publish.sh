@@ -43,7 +43,6 @@ echo -e "${GREEN}Created branch: $BRANCH_NAME${NC}"
 
 # List of all packages to update (v3.0: all platforms)
 PACKAGES=(
-    "zikzak_inappwebview_internal_annotations"
     "zikzak_inappwebview_platform_interface"
     "zikzak_inappwebview_android"
     "zikzak_inappwebview_ios"
@@ -92,7 +91,6 @@ convert_path_to_versioned() {
 
     # List of zikzak packages to convert/update (v3.0: all platforms)
     local packages=(
-        "zikzak_inappwebview_internal_annotations"
         "zikzak_inappwebview_platform_interface"
         "zikzak_inappwebview_android"
         "zikzak_inappwebview_ios"
@@ -147,9 +145,8 @@ convert_path_to_versioned() {
         }' "$temp_file" > "${temp_file}.fixed"
         mv "${temp_file}.fixed" "$temp_file"
 
-        # Remove generators dependency from dev_dependencies (it causes conflicts during publish)
-        sed -i '' '/^[[:space:]]*generators:/d' "$temp_file"
-        sed -i '' '/path:.*dev_packages\/generators/d' "$temp_file"
+        # (the former @ExchangeableObject `generators` dev dependency and its
+        # dev_packages path were removed with the Zorphy migration)
     done
 
     # Remove the entire dependency_overrides section (dev-only, must not be in published packages)
