@@ -21,7 +21,7 @@ import '../in_app_webview/in_app_webview_settings.dart';
 import '../print_job/main.dart';
 import '../web_uri.dart';
 import '../webview_environment/platform_webview_environment.dart';
-import 'in_app_browser_menu_item.dart';
+import '../domain/entities/in_app_browser_menu_item/in_app_browser_menu_item.dart';
 import 'in_app_browser_settings.dart';
 import '../debug_logging_settings.dart';
 import '../pull_to_refresh/platform_pull_to_refresh_controller.dart';
