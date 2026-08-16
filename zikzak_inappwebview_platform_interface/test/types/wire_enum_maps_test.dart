@@ -73,15 +73,23 @@ void main() {
       expect(proxySchemeFilterToWire(ProxySchemeFilter.MATCH_HTTPS), 'https');
     });
 
-    test('round-trips and rejects unknown wire strings', () {
-      for (final value in ProxySchemeFilter.values) {
+    test('round-trips values with a wire representation', () {
+      for (final value in [
+        ProxySchemeFilter.MATCH_ALL_SCHEMES,
+        ProxySchemeFilter.MATCH_HTTP,
+        ProxySchemeFilter.MATCH_HTTPS,
+      ]) {
         expect(
           proxySchemeFilterFromWire(proxySchemeFilterToWire(value)),
           value,
         );
       }
+    });
+
+    test('rejects unknown wire strings', () {
       expect(proxySchemeFilterFromWire('ws'), isNull);
       expect(proxySchemeFilterFromWire('wss'), isNull);
+      expect(proxySchemeFilterFromWire('ftp'), isNull);
     });
   });
 
@@ -105,6 +113,10 @@ void main() {
         attributedStringTextEffectStyleFromWire('LETTERPRESS_STYLE'),
         isNull,
       );
+    });
+
+    test('toWire returns null for the default (NONE/null) value', () {
+      expect(attributedStringTextEffectStyleToWire(null), isNull);
     });
   });
 
