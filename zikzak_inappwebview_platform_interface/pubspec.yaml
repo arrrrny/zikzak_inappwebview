@@ -19,7 +19,6 @@ dependencies:
   flutter:
     sdk: flutter
   plugin_platform_interface: ^2.1.8
-  zikzak_inappwebview_internal_annotations: ^4.8.0
 
   json_annotation: ^4.12.0
   # Zorphy entities (migration from @ExchangeableObject codegen; see PROGRESS.md).

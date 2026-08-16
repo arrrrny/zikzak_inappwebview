@@ -1,5 +1,4 @@
 import 'package:zorphy_annotation/zorphy_annotation.dart';
-import 'package:zikzak_inappwebview_internal_annotations/zikzak_inappwebview_internal_annotations.dart';
 
 import '../../../web_uri.dart';
 

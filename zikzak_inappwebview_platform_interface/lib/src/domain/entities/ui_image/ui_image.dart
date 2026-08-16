@@ -1,7 +1,6 @@
 import 'package:zorphy_annotation/zorphy_annotation.dart';
 import 'dart:typed_data';
 
-import 'package:zikzak_inappwebview_internal_annotations/zikzak_inappwebview_internal_annotations.dart';
 
 part 'ui_image.zorphy.dart';
 part 'ui_image.g.dart';

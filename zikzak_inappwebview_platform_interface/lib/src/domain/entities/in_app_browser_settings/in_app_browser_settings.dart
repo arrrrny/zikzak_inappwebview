@@ -1,7 +1,6 @@
 import 'package:zorphy_annotation/zorphy_annotation.dart';
 import 'dart:ui';
 
-import 'package:zikzak_inappwebview_internal_annotations/zikzak_inappwebview_internal_annotations.dart';
 
 import '../in_app_webview_rect/in_app_webview_rect.dart';
 import '../enums/modal_presentation_style.dart';
