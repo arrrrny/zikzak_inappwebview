@@ -157,7 +157,7 @@ class AndroidInAppBrowser extends PlatformInAppBrowser with ChannelController {
     _init();
 
     var initialSettings =
-        settings?.toMap() ??
+        settings?.toJson() ??
         options?.toMap() ??
         InAppBrowserClassSettings().toMap();
 

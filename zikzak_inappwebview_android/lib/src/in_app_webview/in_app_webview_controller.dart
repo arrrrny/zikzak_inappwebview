@@ -2008,7 +2008,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
     PrintJobSettings? settings,
   }) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("settings", () => settings?.toMap());
+    args.putIfAbsent("settings", () => settings?.toJson());
     String? jobId = await channel?.invokeMethod<String?>(
       'printCurrentPage',
       args,

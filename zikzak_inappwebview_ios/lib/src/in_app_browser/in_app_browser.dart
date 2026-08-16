@@ -155,7 +155,7 @@ class IOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
     _init();
 
     var initialSettings =
-        settings?.toMap() ?? InAppBrowserClassSettings().toMap();
+        settings?.toJson() ?? InAppBrowserClassSettings().toMap();
 
     Map<String, dynamic> pullToRefreshSettings =
         _iosParams.pullToRefreshController?.settings?.toJson() ??
