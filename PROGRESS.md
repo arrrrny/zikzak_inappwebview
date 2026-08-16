@@ -887,3 +887,17 @@ dialogue_dismisser — hand-written toJson/fromJson today → Zorphy, core packa
   Verified: platform_interface 0 errors + tests 138/138; all platform packages
   + core 0 errors; core 95/95, macos 34/34, windows 13/13. Committed as
   3j-part4 (PR #224) — **migration complete**.
+- 2026-08-16 — Polymorphism exploration: zorphy supports polymorphism
+  extensively (sealed `$$Base` with `explicitSubTypes: [$Sub1, ...]`,
+  `implements`-based subtypes, `__typename` JSON dispatch, nonSealed
+  variant, subtype copyWith — verified end-to-end in a scratch build).
+  The hand-written polymorphic pieces (TrustedWebActivityDisplayMode family,
+  FetchRequestCredential family) ARE structurally expressible, but zorphy
+  does not allow a seamless migration: the polymorphic type-key is hardcoded
+  to `__typename` + class names in json_generator.dart, while both families
+  use the native wire `{"type": "DEFAULT_MODE"|"IMMERSIVE_MODE"}` and
+  `{"type": "default"|"federated"|"password"}`. Filed as zorphy #103
+  (custom typeKey + per-subtype wire values). Related migrator gap: the
+  exchangeable dialect does not detect/emit sealed hierarchies — polymorphic
+  families are flagged manual instead of converted to explicitSubTypes +
+  implements. The families stay hand-written (skip/fork) until #103 lands.
