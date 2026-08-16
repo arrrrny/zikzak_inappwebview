@@ -233,9 +233,8 @@ export 'user_script.dart' show UserScript;
 export 'user_script_injection_time.dart' show UserScriptInjectionTime;
 export 'vertical_scrollbar_position.dart' show VerticalScrollbarPosition;
 export 'web_archive_format.dart' show WebArchiveFormat;
-export 'web_authentication_session_error.dart'
-    show WebAuthenticationSessionError;
-export 'web_authentication_support.dart' show WebAuthenticationSupport;
+export '../domain/entities/enums/web_authentication_session_error.dart' show WebAuthenticationSessionError, webAuthenticationSessionErrorFromWire, webAuthenticationSessionErrorToWire;
+export '../domain/entities/enums/web_authentication_support.dart' show WebAuthenticationSupport;
 export 'web_history.dart' show WebHistory;
 export 'web_history_item.dart' show WebHistoryItem;
 export 'web_message_callback.dart' show WebMessageCallback;

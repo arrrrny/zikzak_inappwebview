@@ -20,6 +20,8 @@ and the zikzak→zuraffa v6 migration (…7545).
 branch (commit pending)**
 **Phase 3a (pull_to_refresh + web_storage families → Zorphy via
 zorphy_migrator) — DONE on the same branch (commit pending)**
+**Phase 3b (web_message + web_authentication_session families → Zorphy via
+zorphy_migrator) — DONE on the same branch (commit pending)**
 
 - Phase 0 (mapping + toolchain) DONE.
 - Note on the task premise: this repo does **NOT** use Freezed. Upstream
@@ -337,6 +339,10 @@ should_allow_deprecated_tls_action. (Scoped; not started.)
       SslError + responses + 8 enums — migrated (see worklog)
 - [x] Phase 3a: pull_to_refresh + web_storage families (PullToRefreshSettings/
       PullToRefreshSize, WebStorageItem/WebStorageOrigin/WebStorageType) —
+      migrated (see worklog)
+- [x] Phase 3b: web_message + web_authentication_session families
+      (WebMessage/WebMessageType, WebAuthenticationSessionSettings,
+      WebAuthenticationSessionError 1-based wire, WebAuthenticationSupport) —
       migrated (see worklog)
 
 ### Phase 3 — browser/settings objects (`in_app_browser/`, `in_app_webview/`,
@@ -709,3 +715,24 @@ dialogue_dismisser — hand-written toJson/fromJson today → Zorphy, core packa
   test/types/pull_refresh_web_storage_entities_test.dart); all platform
   packages + core 0 errors; core 95/95, macos 35/35, windows 13/13.
   Committed as 3a + PR #225.
+- 2026-08-16 — Phase 3b EXECUTED via zorphy_migrator: web_message +
+  web_authentication_session families. Converted by the tool:
+  WebMessageType (inner enum in web_message.dart) + WebAuthenticationSupport
+  (sequential 0..2). Hand-written (per the migrator's manual report):
+  WebMessage (custom @ExchangeableObjectConstructor + assert dropped; type
+  default STRING via @JsonKey + .index wire; ports pass-through glue via
+  IWebMessagePort.toMap), WebAuthenticationSessionSettings (custom toMap
+  replicated by generated toJson; prefersEphemeralWebBrowserSession default
+  false; Map<String,String> cast glue), WebAuthenticationSessionError (1-based
+  wire 1..3 — `webAuthenticationSessionErrorFromWire`/`ToWire` helpers).
+  Cross-family: the still-codegen in_app_webview_settings (Phase 3c) now
+  references the converted WebAuthenticationSupport via index glue in its
+  source + .g.dart. Controllers: ios web_authenticate_session
+  (initialSettings?.toMap→toJson, WebAuthenticationSessionError.fromNativeValue
+  → wire helper), macos in_app_webview initialSettings toJson, and the
+  android/ios web_message channel/listener/port + in_app_webview_controller
+  WebMessage fromMap→fromJson / toMap→toJson. Verified: platform_interface
+  0 errors + tests 122/122 (new
+  test/types/web_message_auth_session_entities_test.dart); all platform
+  packages + core 0 errors; core 95/95, macos 35/35, windows 13/13.
+  Committed as 3b + PR #226.

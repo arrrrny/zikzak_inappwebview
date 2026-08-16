@@ -15,7 +15,7 @@ class MacOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
   Widget build(BuildContext context) {
     final Map<String, dynamic> creationParams = <String, dynamic>{
       'initialUrlRequest': params.initialUrlRequest?.toJson(),
-      'initialSettings': params.initialSettings?.toMap(),
+      'initialSettings': params.initialSettings?.toJson(),
       'initialUserScripts': params.initialUserScripts
           ?.map((e) => e.toMap())
           .toList(),

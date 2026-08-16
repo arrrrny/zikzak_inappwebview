@@ -1629,9 +1629,11 @@ class InAppWebViewSettings {
               map['verticalScrollbarTrackColor'],
             )
           : null,
-      webAuthenticationSupport: WebAuthenticationSupport.fromNativeValue(
-        map['webAuthenticationSupport'],
-      ),
+      webAuthenticationSupport: map['webAuthenticationSupport'] != null
+          ? WebAuthenticationSupport.values[
+              map['webAuthenticationSupport'] as int
+            ]
+          : null,
       webViewAssetLoader: WebViewAssetLoader.fromMap(
         map['webViewAssetLoader']?.cast<String, dynamic>(),
       ),
@@ -1983,7 +1985,7 @@ class InAppWebViewSettings {
       "verticalScrollbarPosition": verticalScrollbarPosition?.toNativeValue(),
       "verticalScrollbarThumbColor": verticalScrollbarThumbColor?.toHex(),
       "verticalScrollbarTrackColor": verticalScrollbarTrackColor?.toHex(),
-      "webAuthenticationSupport": webAuthenticationSupport?.toNativeValue(),
+      "webAuthenticationSupport": webAuthenticationSupport?.index,
       "webViewAssetLoader": webViewAssetLoader?.toMap(),
     };
   }

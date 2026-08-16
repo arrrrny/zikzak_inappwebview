@@ -2473,7 +2473,7 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
       targetOrigin = WebUri('');
     }
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('message', () => message.toMap());
+    args.putIfAbsent('message', () => message.toJson());
     args.putIfAbsent('targetOrigin', () => targetOrigin.toString());
     await channel?.invokeMethod('postWebMessage', args);
   }

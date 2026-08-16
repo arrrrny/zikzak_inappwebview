@@ -59,7 +59,7 @@ class IOSWebMessagePort extends PlatformWebMessagePort {
   Future<void> postMessage(WebMessage message) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('index', () => params.index);
-    args.putIfAbsent('message', () => message.toMap());
+    args.putIfAbsent('message', () => message.toJson());
     await _webMessageChannel.internalChannel?.invokeMethod('postMessage', args);
   }
 

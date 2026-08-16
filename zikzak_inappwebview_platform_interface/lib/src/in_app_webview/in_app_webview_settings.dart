@@ -28,7 +28,7 @@ import '../types/scrollview_deceleration_rate.dart';
 import '../types/selection_granularity.dart';
 import '../types/user_preferred_content_mode.dart';
 import '../types/vertical_scrollbar_position.dart';
-import '../types/web_authentication_support.dart';
+import '../domain/entities/enums/web_authentication_support.dart';
 import '../util.dart';
 import '../web_uri.dart';
 import 'platform_webview.dart';
@@ -1195,7 +1195,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
       ),
     ],
   )
-  WebAuthenticationSupport_? webAuthenticationSupport;
+  WebAuthenticationSupport? webAuthenticationSupport;
 
   ///Sets whether EnterpriseAuthenticationAppLinkPolicy if set by admin is allowed to have any
   ///effect on WebView.
