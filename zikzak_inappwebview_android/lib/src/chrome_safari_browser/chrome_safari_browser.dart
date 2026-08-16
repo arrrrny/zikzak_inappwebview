@@ -90,13 +90,13 @@ class AndroidChromeSafariBrowser extends PlatformChromeSafariBrowser
         eventHandler?.onCompletedInitialLoad(didLoadSuccessfully);
         break;
       case "onNavigationEvent":
-        final navigationEvent = CustomTabsNavigationEventType.fromNativeValue(
+        final navigationEvent = customTabsNavigationEventTypeFromWire(
           call.arguments["navigationEvent"],
         );
         eventHandler?.onNavigationEvent(navigationEvent);
         break;
       case "onRelationshipValidationResult":
-        final relation = CustomTabsRelationType.fromNativeValue(
+        final relation = customTabsRelationTypeFromWire(
           call.arguments["relation"],
         );
         final requestedOrigin = call.arguments["requestedOrigin"] != null
@@ -271,7 +271,7 @@ class AndroidChromeSafariBrowser extends PlatformChromeSafariBrowser
     required WebUri origin,
   }) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('relation', () => relation.toNativeValue());
+    args.putIfAbsent('relation', () => customTabsRelationTypeToWire(relation));
     args.putIfAbsent('origin', () => origin.toString());
     return await channel?.invokeMethod<bool>("validateRelationship", args) ??
         false;
@@ -349,7 +349,7 @@ class AndroidChromeSafariBrowser extends PlatformChromeSafariBrowser
   Future<CustomTabsPostMessageResultType> postMessage(String message) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("message", () => message);
-    return CustomTabsPostMessageResultType.fromNativeValue(
+    return customTabsPostMessageResultTypeFromWire(
           await channel?.invokeMethod<int>("postMessage", args),
         ) ??
         CustomTabsPostMessageResultType.FAILURE_MESSAGING_ERROR;

@@ -259,7 +259,7 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
             creationParams: <String, dynamic>{
               'initialUrlRequest': this.params.initialUrlRequest?.toJson(),
               'initialFile': this.params.initialFile,
-              'initialData': this.params.initialData?.toMap(),
+              'initialData': this.params.initialData?.toJson(),
               'initialSettings': settingsMap,
               'contextMenu': this.params.contextMenu?.toJson() ?? {},
               'windowId': this.params.windowId,

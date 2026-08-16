@@ -18,7 +18,7 @@ import '../types/main.dart';
 import '../in_app_browser/platform_in_app_browser.dart';
 import 'platform_headless_in_app_webview.dart';
 import 'platform_inappwebview_widget.dart';
-import '../platform_webview_feature.dart';
+import '../domain/entities/platform_webview_feature/platform_webview_feature.dart';
 import 'platform_webview.dart';
 import 'in_app_webview_keep_alive.dart';
 import 'in_app_webview_settings.dart';
@@ -26,6 +26,7 @@ import 'modules/platform_navigation_delegate.dart';
 import 'modules/platform_javascript_delegate.dart';
 
 import '../print_job/main.dart';
+
 
 /// Object specifying creation parameters for creating a [PlatformInAppWebViewController].
 ///

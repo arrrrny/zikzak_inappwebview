@@ -79,9 +79,10 @@ class ScreenshotConfiguration {
       snapshotWidth: map['snapshotWidth'],
     );
     instance.afterScreenUpdates = map['afterScreenUpdates'];
-    instance.compressFormat = CompressFormat.fromNativeValue(
-      map['compressFormat'],
-    )!;
+    instance.compressFormat = CompressFormat.values.firstWhere(
+      (e) => e.name == map['compressFormat'],
+      orElse: () => CompressFormat.PNG,
+    );
     instance.quality = map['quality'];
     return instance;
   }
@@ -90,7 +91,7 @@ class ScreenshotConfiguration {
   Map<String, dynamic> toMap() {
     return {
       "afterScreenUpdates": afterScreenUpdates,
-      "compressFormat": compressFormat.toNativeValue(),
+      "compressFormat": compressFormat.name,
       "quality": quality,
       "rect": rect?.toMap(),
       "snapshotWidth": snapshotWidth,

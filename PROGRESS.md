@@ -33,8 +33,9 @@ branch (commit pending)**
 **Phase 3g (print_job family → Zorphy via zorphy_migrator) — DONE on the
 same branch (commit pending)**
 **Phase 3h (InAppBrowserMenuItem → Zorphy skip/fork) — DONE on the same
-branch (commit pending); InAppBrowserSettings pending (coupled to
-InAppWebViewSettings)***
+branch (commit pending)**
+**Phase 3i (remaining types/ batch — 79 files) — DONE, committed as 3i on
+the same branch (PR #224 keeps accumulating)***
 
 - Phase 0 (mapping + toolchain) DONE.
 - Note on the task premise: this repo does **NOT** use Freezed. Upstream
@@ -781,3 +782,36 @@ dialogue_dismisser — hand-written toJson/fromJson today → Zorphy, core packa
   test/types/context_menu_entities_test.dart); all platform packages + core
   0 errors; core 95/95, macos 35/35 (incl. context_menu_test), windows
   13/13. Committed as 3c + PR #226.
+- 2026-08-16 — Phase 3i EXECUTED via zorphy_migrator: remaining types/ batch
+  (79 files — 29 value objects → domain/entities/<name>/, 50 enums →
+  domain/entities/enums/). All remaining codegen models converted in one
+  pass; barrels (types/main.dart) re-pointed with show-clauses incl. wire
+  helpers; import fixes for entities + platform files; InAppWebViewSettings
+  source + .g.dart re-glued (19 enum types: fromNativeValue→FromWire,
+  toNativeValue→ToWire, fromMap→fromJson, toMap→toJson; RendererPriorityPolicy
+  + WebViewAssetLoader null-guarded fromJson). New wire helpers added for
+  non-sequential/offset wires verified against the old .g.dart: TracingCategory
+  (bit flags 1,2,64,8,32,0,16,4), WindowStyleMask (0,1,2,4,8,16384,32768,16,64,
+  128,8192), CustomTabsNavigationEventType (1..6), CustomTabsRelationType
+  (1,2), CustomTabsPostMessageResultType (0,-1,-2,-3), ReferrerPolicy (fixed
+  missing 'strict-origin-when-cross-origin'), web_archive_format ('mht'/
+  'webarchive'); sequential enums use index glue (ModalPresentationStyle,
+  ModalTransitionStyle, WindowType, WindowTitlebarSeparatorStyle,
+  MediaCaptureState, MediaPlaybackState, FormResubmissionAction,
+  WebViewRenderProcessAction, TracingMode). TrustedWebActivityDisplayMode
+  base converted to Zorphy; the still-codegen default/immersive siblings now
+  implement the generated base (added copyWith/copyWithTrustedWebActivity
+  DisplayMode/toJsonLean) and ChromeSafariBrowserSettings restores the
+  type-key polymorphic dispatch for displayMode. platform_webview_feature:
+  the migrator left stray zorphy part directives on the platform-interface
+  class — removed (plain enum WebViewFeature stays; android webview_feature
+  toNativeValue→.name). Cross-package glue: android/ios/linux/macos
+  controllers fromMap→fromJson + toMap→toJson + enum FromWire/ToWire (9
+  packages, 94 errors fixed); wire helpers for 8 more enums exported from the
+  types/main.dart barrel (http_cookie_same_site_policy, webview_render_
+  process_action, form_resubmission_action, media_capture_state,
+  in_app_webview_hit_test_result_type, web_archive_format, media_playback_
+  state, website_data_type). Verified: platform_interface 0 errors + tests
+  138/138; all platform packages + core 0 errors; core 95/95, macos 34/34
+  (context_menu_test enum member names fixed to SCREAMING_SNAKE), windows
+  13/13. Committed as 3i (PR #224 keeps accumulating).

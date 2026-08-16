@@ -9,6 +9,24 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
+// ignore: implementation_imports
+import 'package:zikzak_inappwebview_platform_interface/src/domain/entities/enums/form_resubmission_action.dart'
+    show formResubmissionActionToWire;
+// ignore: implementation_imports
+import 'package:zikzak_inappwebview_platform_interface/src/domain/entities/enums/in_app_webview_hit_test_result_type.dart'
+    show inAppWebViewHitTestResultTypeFromWire;
+// ignore: implementation_imports
+import 'package:zikzak_inappwebview_platform_interface/src/domain/entities/enums/media_capture_state.dart'
+    show mediaCaptureStateFromWire, mediaCaptureStateToWire;
+// ignore: implementation_imports
+import 'package:zikzak_inappwebview_platform_interface/src/domain/entities/enums/media_playback_state.dart'
+    show mediaPlaybackStateFromWire;
+// ignore: implementation_imports
+import 'package:zikzak_inappwebview_platform_interface/src/domain/entities/enums/web_archive_format.dart'
+    show webArchiveFormatToWire;
+// ignore: implementation_imports
+import 'package:zikzak_inappwebview_platform_interface/src/domain/entities/enums/webview_render_process_action.dart'
+    show webViewRenderProcessActionToWire;
 
 import '../web_message/main.dart';
 
@@ -368,7 +386,7 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
           DownloadStartRequest downloadStartRequest =
-              DownloadStartRequest.fromMap(arguments)!;
+              DownloadStartRequest.fromJson(arguments);
 
           if (webviewParams != null) {
             webviewParams!.onDownloadStartRequest!(
@@ -499,9 +517,9 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
             );
             return null;
           } else {
-            return (await _inAppBrowserEventHandler!
-                    .onRenderProcessUnresponsive(uri))
-                ?.toNativeValue();
+            return webViewRenderProcessActionToWire(
+              await _inAppBrowserEventHandler!.onRenderProcessUnresponsive(uri),
+            );
           }
         }
         break;
@@ -516,9 +534,9 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
             webviewParams!.onRenderProcessResponsive!(_controllerFromPlatform);
             return null;
           } else {
-            return (await _inAppBrowserEventHandler!.onRenderProcessResponsive(
-              uri,
-            ))?.toNativeValue();
+            return webViewRenderProcessActionToWire(
+              await _inAppBrowserEventHandler!.onRenderProcessResponsive(uri),
+            );
           }
         }
         break;
@@ -528,9 +546,9 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          RenderProcessGoneDetail detail = RenderProcessGoneDetail.fromMap(
+          RenderProcessGoneDetail detail = RenderProcessGoneDetail.fromJson(
             arguments,
-          )!;
+          );
 
           if (webviewParams != null) {
             webviewParams!.onRenderProcessGone!(
@@ -550,14 +568,16 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
           WebUri? uri = url != null ? WebUri(url) : null;
 
           if (webviewParams != null) {
-            return (await webviewParams!.onFormResubmission!(
-              _controllerFromPlatform,
-              uri,
-            ))?.toNativeValue();
+            return formResubmissionActionToWire(
+              await webviewParams!.onFormResubmission!(
+                _controllerFromPlatform,
+                uri,
+              ),
+            );
           } else {
-            return (await _inAppBrowserEventHandler!.onFormResubmission(
-              uri,
-            ))?.toNativeValue();
+            return formResubmissionActionToWire(
+              await _inAppBrowserEventHandler!.onFormResubmission(uri),
+            );
           }
         }
         break;
@@ -998,7 +1018,7 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
           InAppWebViewHitTestResult hitTestResult =
-              InAppWebViewHitTestResult.fromMap(arguments)!;
+              InAppWebViewHitTestResult.fromJson(arguments);
 
           if (webviewParams != null &&
               webviewParams!.onLongPressHitTestResult != null)
@@ -1023,7 +1043,7 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
           InAppWebViewHitTestResult hitTestResult =
-              InAppWebViewHitTestResult.fromMap(arguments)!;
+              InAppWebViewHitTestResult.fromJson(arguments);
 
           contextMenu.onCreateContextMenu!(hitTestResult);
         }
@@ -1165,12 +1185,8 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
         if ((webviewParams != null &&
                 webviewParams!.onCameraCaptureStateChanged != null) ||
             _inAppBrowserEventHandler != null) {
-          var oldState = MediaCaptureState.fromNativeValue(
-            call.arguments["oldState"],
-          );
-          var newState = MediaCaptureState.fromNativeValue(
-            call.arguments["newState"],
-          );
+          var oldState = mediaCaptureStateFromWire(call.arguments["oldState"]);
+          var newState = mediaCaptureStateFromWire(call.arguments["newState"]);
 
           if (webviewParams != null &&
               webviewParams!.onCameraCaptureStateChanged != null)
@@ -1190,12 +1206,8 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
         if ((webviewParams != null &&
                 webviewParams!.onMicrophoneCaptureStateChanged != null) ||
             _inAppBrowserEventHandler != null) {
-          var oldState = MediaCaptureState.fromNativeValue(
-            call.arguments["oldState"],
-          );
-          var newState = MediaCaptureState.fromNativeValue(
-            call.arguments["newState"],
-          );
+          var oldState = mediaCaptureStateFromWire(call.arguments["oldState"]);
+          var newState = mediaCaptureStateFromWire(call.arguments["newState"]);
 
           if (webviewParams != null &&
               webviewParams!.onMicrophoneCaptureStateChanged != null)
@@ -1256,7 +1268,7 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
                   ? arguments["duration"].toDouble()
                   : arguments["duration"];
 
-              var response = LoadedResource.fromMap(arguments)!;
+              var response = LoadedResource.fromJson(arguments);
 
               if (webviewParams != null &&
                   webviewParams!.onLoadResource != null)
@@ -1875,7 +1887,7 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
     args.putIfAbsent('urlFile', () => urlFile.toString());
     args.putIfAbsent(
       'cssLinkHtmlTagAttributes',
-      () => cssLinkHtmlTagAttributes?.toMap(),
+      () => cssLinkHtmlTagAttributes?.toJson(),
     );
     await channel?.invokeMethod('injectCSSFileFromUrl', args);
   }
@@ -1953,7 +1965,7 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
       'getCopyBackForwardList',
       args,
     ))?.cast<String, dynamic>();
-    return WebHistory.fromMap(result);
+    return result == null ? null : WebHistory.fromJson(result);
   }
 
   @Deprecated("Use InAppWebViewController.clearAllCache instead")
@@ -2130,10 +2142,9 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
 
     hitTestResultMap = hitTestResultMap.cast<String, dynamic>();
 
-    InAppWebViewHitTestResultType? type =
-        InAppWebViewHitTestResultType.fromNativeValue(
-          hitTestResultMap["type"]?.toInt(),
-        );
+    InAppWebViewHitTestResultType? type = inAppWebViewHitTestResultTypeFromWire(
+      hitTestResultMap["type"]?.toInt(),
+    );
     String? extra = hitTestResultMap["extra"];
     return InAppWebViewHitTestResult(type: type, extra: extra);
   }
@@ -2434,7 +2445,9 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
   }) async {
     if (!autoname) {
       assert(
-        filePath.endsWith("." + WebArchiveFormat.WEBARCHIVE.toNativeValue()),
+        filePath.endsWith(
+          "." + (webArchiveFormatToWire(WebArchiveFormat.WEBARCHIVE) as String),
+        ),
       );
     }
 
@@ -2531,7 +2544,7 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
   @override
   Future<Uint8List?> createPdf({PDFConfiguration? pdfConfiguration}) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('pdfConfiguration', () => pdfConfiguration?.toMap());
+    args.putIfAbsent('pdfConfiguration', () => pdfConfiguration?.toJson());
     return await channel?.invokeMethod<Uint8List?>('createPdf', args);
   }
 
@@ -2573,7 +2586,7 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
   @override
   Future<MediaPlaybackState?> requestMediaPlaybackState() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return MediaPlaybackState.fromNativeValue(
+    return mediaPlaybackStateFromWire(
       await channel?.invokeMethod('requestMediaPlaybackState', args),
     );
   }
@@ -2587,7 +2600,7 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
   @override
   Future<MediaCaptureState?> getCameraCaptureState() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return MediaCaptureState.fromNativeValue(
+    return mediaCaptureStateFromWire(
       await channel?.invokeMethod('getCameraCaptureState', args),
     );
   }
@@ -2595,14 +2608,14 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
   @override
   Future<void> setCameraCaptureState({required MediaCaptureState state}) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('state', () => state.toNativeValue());
+    args.putIfAbsent('state', () => mediaCaptureStateToWire(state));
     await channel?.invokeMethod('setCameraCaptureState', args);
   }
 
   @override
   Future<MediaCaptureState?> getMicrophoneCaptureState() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return MediaCaptureState.fromNativeValue(
+    return mediaCaptureStateFromWire(
       await channel?.invokeMethod('getMicrophoneCaptureState', args),
     );
   }
@@ -2612,7 +2625,7 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
     required MediaCaptureState state,
   }) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('state', () => state.toNativeValue());
+    args.putIfAbsent('state', () => mediaCaptureStateToWire(state));
     await channel?.invokeMethod('setMicrophoneCaptureState', args);
   }
 

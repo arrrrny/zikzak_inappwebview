@@ -138,7 +138,7 @@ class IOSFindInteractionController extends PlatformFindInteractionController
       'getActiveFindSession',
       args,
     ))?.cast<String, dynamic>();
-    return FindSession.fromMap(result);
+    return result == null ? null : FindSession.fromJson(result);
   }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformFindInteractionController.dispose}

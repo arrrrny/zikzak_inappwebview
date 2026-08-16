@@ -296,7 +296,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
     args.putIfAbsent('urlFile', () => urlFile.toString());
     args.putIfAbsent(
       'cssLinkHtmlTagAttributes',
-      () => cssLinkHtmlTagAttributes?.toMap(),
+      () => cssLinkHtmlTagAttributes?.toJson(),
     );
     await _channel.invokeMethod('injectCSSFileFromUrl', args);
   }
@@ -333,7 +333,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
   @override
   Future<Uint8List?> createPdf({PDFConfiguration? pdfConfiguration}) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('pdfConfiguration', () => pdfConfiguration?.toMap());
+    args.putIfAbsent('pdfConfiguration', () => pdfConfiguration?.toJson());
     return await _channel.invokeMethod<Uint8List?>('createPdf', args);
   }
 

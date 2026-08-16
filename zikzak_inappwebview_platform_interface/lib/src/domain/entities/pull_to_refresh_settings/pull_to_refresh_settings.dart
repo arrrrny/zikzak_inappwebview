@@ -1,7 +1,7 @@
 import 'package:zorphy_annotation/zorphy_annotation.dart';
 import 'dart:ui';
 
-import '../../../types/attributed_string.dart';
+import '../attributed_string/attributed_string.dart';
 import '../enums/pull_to_refresh_size.dart';
 import '../../../util.dart';
 
@@ -67,10 +67,10 @@ Object? _colorToJson(Color_? color) => color?.toHex();
 
 AttributedString? _attributedTitleFromJson(Object? value) => value == null
     ? null
-    : AttributedString.fromMap((value as Map).cast<String, dynamic>());
+    : AttributedString.fromJson((value as Map).cast<String, dynamic>());
 
 Object? _attributedTitleToJson(AttributedString? attributedTitle) =>
-    attributedTitle?.toMap();
+    attributedTitle?.toJson();
 
 PullToRefreshSize? _sizeFromJson(Object? value) {
   if (value is! int) return null;

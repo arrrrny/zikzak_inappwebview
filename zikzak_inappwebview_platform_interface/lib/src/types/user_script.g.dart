@@ -53,9 +53,7 @@ class UserScript {
     }
     final instance = UserScript(
       groupName: map['groupName'],
-      injectionTime: UserScriptInjectionTime.fromNativeValue(
-        map['injectionTime'],
-      )!,
+      injectionTime: UserScriptInjectionTime.values[map['injectionTime'] as int],
       source: map['source'],
     );
     instance.allowedOriginRules = Set<String>.from(
@@ -73,7 +71,7 @@ class UserScript {
       "contentWorld": contentWorld.toMap(),
       "forMainFrameOnly": forMainFrameOnly,
       "groupName": groupName,
-      "injectionTime": injectionTime.toNativeValue(),
+      "injectionTime": injectionTime.index,
       "source": source,
     };
   }

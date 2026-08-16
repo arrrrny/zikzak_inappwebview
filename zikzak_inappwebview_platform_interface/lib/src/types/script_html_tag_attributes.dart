@@ -1,8 +1,7 @@
 import 'package:zikzak_inappwebview_internal_annotations/zikzak_inappwebview_internal_annotations.dart';
 
-import '../in_app_webview/platform_inappwebview_controller.dart';
-import 'cross_origin.dart';
-import 'referrer_policy.dart';
+import '../domain/entities/enums/cross_origin.dart';
+import '../domain/entities/enums/referrer_policy.dart';
 
 part 'script_html_tag_attributes.g.dart';
 
@@ -42,7 +41,7 @@ class ScriptHtmlTagAttributes_ {
 
   ///Normal script elements pass minimal information to the `window.onerror` for scripts which do not pass the standard CORS checks.
   ///To allow error logging for sites which use a separate domain for static media, use this attribute.
-  CrossOrigin_? crossOrigin;
+  CrossOrigin? crossOrigin;
 
   ///This attribute contains inline metadata that a user agent can use to verify that a fetched resource has been delivered free of unexpected manipulation.
   String? integrity;
@@ -57,7 +56,7 @@ class ScriptHtmlTagAttributes_ {
   String? nonce;
 
   ///Indicates which referrer to send when fetching the script, or resources fetched by the script.
-  ReferrerPolicy_? referrerPolicy;
+  ReferrerPolicy? referrerPolicy;
 
   ///Represents a callback function that will be called as soon as the script has been loaded successfully.
   ///

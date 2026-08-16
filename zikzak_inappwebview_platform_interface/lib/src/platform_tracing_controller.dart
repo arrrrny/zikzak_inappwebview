@@ -3,7 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:zikzak_inappwebview_internal_annotations/zikzak_inappwebview_internal_annotations.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'inappwebview_platform.dart';
-import 'types/tracing_mode.dart';
+import 'domain/entities/enums/tracing_mode.dart';
+import 'domain/entities/enums/tracing_category.dart';
 import 'types/main.dart';
 import 'types/disposable.dart';
 
@@ -113,7 +114,7 @@ List<dynamic> _deserializeCategories(List<dynamic> categories) {
     if (category is String) {
       deserializedCategories.add(category);
     } else if (category is int) {
-      final mode = TracingCategory.fromNativeValue(category);
+      final mode = tracingCategoryFromWire(category);
       if (mode != null) {
         deserializedCategories.add(mode);
       }
@@ -128,7 +129,7 @@ List<dynamic> _serializeCategories(List<dynamic> categories) {
     if (category is String) {
       serializedCategories.add(category);
     } else if (category is TracingCategory) {
-      serializedCategories.add(category.toNativeValue());
+      serializedCategories.add(tracingCategoryToWire(category));
     }
   }
   return serializedCategories;
@@ -156,7 +157,7 @@ class TracingSettings_ {
 
   ///The tracing mode for this configuration.
   ///When tracingMode is not set explicitly, the default is [TracingMode.RECORD_CONTINUOUSLY].
-  TracingMode_? tracingMode;
+  TracingMode? tracingMode;
 
   @ExchangeableObjectConstructor()
   TracingSettings_({this.categories = const [], this.tracingMode}) {

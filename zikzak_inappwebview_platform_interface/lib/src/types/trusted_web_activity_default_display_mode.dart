@@ -1,6 +1,6 @@
 import 'package:zikzak_inappwebview_internal_annotations/zikzak_inappwebview_internal_annotations.dart';
 
-import 'trusted_web_activity_display_mode.dart';
+import '../domain/entities/trusted_web_activity_display_mode/trusted_web_activity_display_mode.dart';
 
 part 'trusted_web_activity_default_display_mode.g.dart';
 
@@ -8,7 +8,7 @@ part 'trusted_web_activity_default_display_mode.g.dart';
 ///The system UI (status bar, navigation bar) is shown, and the browser toolbar is hidden while the user is on a verified origin.
 @ExchangeableObject(fromMapFactory: false)
 class TrustedWebActivityDefaultDisplayMode_
-    implements TrustedWebActivityDisplayMode_ {
+    implements TrustedWebActivityDisplayMode {
   static final _type = "DEFAULT_MODE";
 
   @ExchangeableObjectMethod(toMapMergeWith: true)

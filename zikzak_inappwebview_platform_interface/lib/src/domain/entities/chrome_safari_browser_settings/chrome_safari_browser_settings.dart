@@ -105,37 +105,57 @@ Color_? _colorFromJson(Object? value) {
 
 Object? _colorToJson(Color_? color) => color?.toHex();
 
-CustomTabsShareState? _shareStateFromJson(Object? value) =>
-    CustomTabsShareState.fromNativeValue(value as int?);
+CustomTabsShareState? _shareStateFromJson(Object? value) {
+  if (value is! int) return null;
+  return value >= 0 && value < CustomTabsShareState.values.length
+      ? CustomTabsShareState.values[value]
+      : null;
+}
 
-Object? _shareStateToJson(CustomTabsShareState? shareState) =>
-    shareState?.toNativeValue();
+Object? _shareStateToJson(CustomTabsShareState? shareState) => shareState?.index;
 
 TrustedWebActivityScreenOrientation? _screenOrientationFromJson(
   Object? value,
-) => TrustedWebActivityScreenOrientation.fromNativeValue(value as int?);
+) {
+  if (value is! int) return null;
+  return value >= 0 && value < TrustedWebActivityScreenOrientation.values.length
+      ? TrustedWebActivityScreenOrientation.values[value]
+      : null;
+}
 
 Object? _screenOrientationToJson(
   TrustedWebActivityScreenOrientation? screenOrientation,
-) => screenOrientation?.toNativeValue();
+) => screenOrientation?.index;
 
-DismissButtonStyle? _dismissButtonStyleFromJson(Object? value) =>
-    DismissButtonStyle.fromNativeValue(value as int?);
+DismissButtonStyle? _dismissButtonStyleFromJson(Object? value) {
+  if (value is! int) return null;
+  return value >= 0 && value < DismissButtonStyle.values.length
+      ? DismissButtonStyle.values[value]
+      : null;
+}
 
 Object? _dismissButtonStyleToJson(DismissButtonStyle? dismissButtonStyle) =>
-    dismissButtonStyle?.toNativeValue();
+    dismissButtonStyle?.index;
 
-ModalPresentationStyle? _presentationStyleFromJson(Object? value) =>
-    ModalPresentationStyle.fromNativeValue(value as int?);
+ModalPresentationStyle? _presentationStyleFromJson(Object? value) {
+  if (value is! int) return null;
+  return value >= 0 && value < ModalPresentationStyle.values.length
+      ? ModalPresentationStyle.values[value]
+      : null;
+}
 
 Object? _presentationStyleToJson(ModalPresentationStyle? presentationStyle) =>
-    presentationStyle?.toNativeValue();
+    presentationStyle?.index;
 
-ModalTransitionStyle? _transitionStyleFromJson(Object? value) =>
-    ModalTransitionStyle.fromNativeValue(value as int?);
+ModalTransitionStyle? _transitionStyleFromJson(Object? value) {
+  if (value is! int) return null;
+  return value >= 0 && value < ModalTransitionStyle.values.length
+      ? ModalTransitionStyle.values[value]
+      : null;
+}
 
 Object? _transitionStyleToJson(ModalTransitionStyle? transitionStyle) =>
-    transitionStyle?.toNativeValue();
+    transitionStyle?.index;
 
 ActivityButton? _activityButtonFromJson(Object? value) => value == null
     ? null
@@ -157,17 +177,19 @@ TrustedWebActivityDisplayMode? _displayModeFromJson(Object? value) {
   if (displayMode == null) {
     return null;
   }
-  switch (displayMode["type"]) {
-    case "IMMERSIVE_MODE":
+  // The concrete display-mode classes are still codegen; dispatch on the
+  // type-key wire to restore the concrete subtype.
+  switch (displayMode['type']) {
+    case 'IMMERSIVE_MODE':
       return TrustedWebActivityImmersiveDisplayMode.fromMap(displayMode);
-    case "DEFAULT_MODE":
+    case 'DEFAULT_MODE':
     default:
       return TrustedWebActivityDefaultDisplayMode();
   }
 }
 
 Object? _displayModeToJson(TrustedWebActivityDisplayMode? displayMode) =>
-    displayMode?.toMap();
+    displayMode?.toJson();
 
 List<AndroidResource>? _startAnimationsFromJson(Object? value) {
   if (value is! List) return null;

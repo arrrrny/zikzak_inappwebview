@@ -852,6 +852,18 @@ extension ChromeSafariBrowserSettingsPropertyHelpers
         (throw StateError('shareState is required but was null'));
   }
 
+  bool get isShareStateSHARE_STATE_DEFAULT {
+    return this.shareState == CustomTabsShareState.SHARE_STATE_DEFAULT;
+  }
+
+  bool get isShareStateSHARE_STATE_ON {
+    return this.shareState == CustomTabsShareState.SHARE_STATE_ON;
+  }
+
+  bool get isShareStateSHARE_STATE_OFF {
+    return this.shareState == CustomTabsShareState.SHARE_STATE_OFF;
+  }
+
   bool get hasShowTitle {
     return this.showTitle != null;
   }
@@ -1049,6 +1061,50 @@ extension ChromeSafariBrowserSettingsPropertyHelpers
         (throw StateError('screenOrientation is required but was null'));
   }
 
+  bool get isScreenOrientationDEFAULT {
+    return this.screenOrientation ==
+        TrustedWebActivityScreenOrientation.DEFAULT;
+  }
+
+  bool get isScreenOrientationPORTRAIT_PRIMARY {
+    return this.screenOrientation ==
+        TrustedWebActivityScreenOrientation.PORTRAIT_PRIMARY;
+  }
+
+  bool get isScreenOrientationPORTRAIT_SECONDARY {
+    return this.screenOrientation ==
+        TrustedWebActivityScreenOrientation.PORTRAIT_SECONDARY;
+  }
+
+  bool get isScreenOrientationLANDSCAPE_PRIMARY {
+    return this.screenOrientation ==
+        TrustedWebActivityScreenOrientation.LANDSCAPE_PRIMARY;
+  }
+
+  bool get isScreenOrientationLANDSCAPE_SECONDARY {
+    return this.screenOrientation ==
+        TrustedWebActivityScreenOrientation.LANDSCAPE_SECONDARY;
+  }
+
+  bool get isScreenOrientationANY {
+    return this.screenOrientation == TrustedWebActivityScreenOrientation.ANY;
+  }
+
+  bool get isScreenOrientationLANDSCAPE {
+    return this.screenOrientation ==
+        TrustedWebActivityScreenOrientation.LANDSCAPE;
+  }
+
+  bool get isScreenOrientationPORTRAIT {
+    return this.screenOrientation ==
+        TrustedWebActivityScreenOrientation.PORTRAIT;
+  }
+
+  bool get isScreenOrientationNATURAL {
+    return this.screenOrientation ==
+        TrustedWebActivityScreenOrientation.NATURAL;
+  }
+
   List<AndroidResource> get startAnimationsRequired {
     return this.startAnimations ??
         (throw StateError('startAnimations is required but was null'));
@@ -1127,6 +1183,18 @@ extension ChromeSafariBrowserSettingsPropertyHelpers
         (throw StateError('dismissButtonStyle is required but was null'));
   }
 
+  bool get isDismissButtonStyleDONE {
+    return this.dismissButtonStyle == DismissButtonStyle.DONE;
+  }
+
+  bool get isDismissButtonStyleCLOSE {
+    return this.dismissButtonStyle == DismissButtonStyle.CLOSE;
+  }
+
+  bool get isDismissButtonStyleCANCEL {
+    return this.dismissButtonStyle == DismissButtonStyle.CANCEL;
+  }
+
   bool get hasPreferredBarTintColor {
     return this.preferredBarTintColor != null;
   }
@@ -1168,6 +1236,47 @@ extension ChromeSafariBrowserSettingsPropertyHelpers
         (throw StateError('presentationStyle is required but was null'));
   }
 
+  bool get isPresentationStyleFULL_SCREEN {
+    return this.presentationStyle == ModalPresentationStyle.FULL_SCREEN;
+  }
+
+  bool get isPresentationStylePAGE_SHEET {
+    return this.presentationStyle == ModalPresentationStyle.PAGE_SHEET;
+  }
+
+  bool get isPresentationStyleFORM_SHEET {
+    return this.presentationStyle == ModalPresentationStyle.FORM_SHEET;
+  }
+
+  bool get isPresentationStyleCURRENT_CONTEXT {
+    return this.presentationStyle == ModalPresentationStyle.CURRENT_CONTEXT;
+  }
+
+  bool get isPresentationStyleCUSTOM {
+    return this.presentationStyle == ModalPresentationStyle.CUSTOM;
+  }
+
+  bool get isPresentationStyleOVER_FULL_SCREEN {
+    return this.presentationStyle == ModalPresentationStyle.OVER_FULL_SCREEN;
+  }
+
+  bool get isPresentationStyleOVER_CURRENT_CONTEXT {
+    return this.presentationStyle ==
+        ModalPresentationStyle.OVER_CURRENT_CONTEXT;
+  }
+
+  bool get isPresentationStylePOPOVER {
+    return this.presentationStyle == ModalPresentationStyle.POPOVER;
+  }
+
+  bool get isPresentationStyleNONE {
+    return this.presentationStyle == ModalPresentationStyle.NONE;
+  }
+
+  bool get isPresentationStyleAUTOMATIC {
+    return this.presentationStyle == ModalPresentationStyle.AUTOMATIC;
+  }
+
   bool get hasTransitionStyle {
     return this.transitionStyle != null;
   }
@@ -1179,6 +1288,22 @@ extension ChromeSafariBrowserSettingsPropertyHelpers
   ModalTransitionStyle get transitionStyleRequired {
     return this.transitionStyle ??
         (throw StateError('transitionStyle is required but was null'));
+  }
+
+  bool get isTransitionStyleCOVER_VERTICAL {
+    return this.transitionStyle == ModalTransitionStyle.COVER_VERTICAL;
+  }
+
+  bool get isTransitionStyleFLIP_HORIZONTAL {
+    return this.transitionStyle == ModalTransitionStyle.FLIP_HORIZONTAL;
+  }
+
+  bool get isTransitionStyleCROSS_DISSOLVE {
+    return this.transitionStyle == ModalTransitionStyle.CROSS_DISSOLVE;
+  }
+
+  bool get isTransitionStylePARTIAL_CURL {
+    return this.transitionStyle == ModalTransitionStyle.PARTIAL_CURL;
   }
 
   bool get hasActivityButton {

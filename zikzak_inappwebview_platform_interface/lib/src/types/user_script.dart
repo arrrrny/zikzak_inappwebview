@@ -1,8 +1,8 @@
 import 'package:zikzak_inappwebview_internal_annotations/zikzak_inappwebview_internal_annotations.dart';
 
-import 'user_script_injection_time.dart';
+import '../domain/entities/enums/user_script_injection_time.dart';
 import 'content_world.dart';
-import '../platform_webview_feature.dart';
+import '../domain/entities/platform_webview_feature/platform_webview_feature.dart';
 
 part 'user_script.g.dart';
 
@@ -16,7 +16,7 @@ class UserScript_ {
   String source;
 
   ///The time at which to inject the script into the `WebView`.
-  UserScriptInjectionTime_ injectionTime;
+  UserScriptInjectionTime injectionTime;
 
   ///A Boolean value that indicates whether to inject the script into the main frame.
   ///Specify true to inject the script only into the main frame, or false to inject it into all frames.

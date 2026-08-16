@@ -125,7 +125,7 @@ class AndroidServiceWorkerController extends PlatformServiceWorkerController
   @override
   Future<CacheMode?> getCacheMode() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return CacheMode.fromNativeValue(
+    return cacheModeFromWire(
       await channel?.invokeMethod<int?>('getCacheMode', args),
     );
   }
@@ -154,7 +154,7 @@ class AndroidServiceWorkerController extends PlatformServiceWorkerController
   @override
   Future<void> setCacheMode(CacheMode mode) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("mode", () => mode.toNativeValue());
+    args.putIfAbsent("mode", () => cacheModeToWire(mode));
     await channel?.invokeMethod('setCacheMode', args);
   }
 

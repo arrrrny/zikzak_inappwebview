@@ -58,7 +58,7 @@ class _LinuxInAppWebViewState extends State<_LinuxInAppWebView> {
         'id': id,
         'params': {
           'initialUrlRequest': widget.params.initialUrlRequest?.toJson(),
-          'initialData': widget.params.initialData?.toMap(),
+          'initialData': widget.params.initialData?.toJson(),
           'initialUserScripts':
               widget.params.initialUserScripts
                   ?.map((e) => e.toMap())

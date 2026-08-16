@@ -3,11 +3,11 @@ import 'dart:ui';
 import 'package:zikzak_inappwebview_internal_annotations/zikzak_inappwebview_internal_annotations.dart';
 
 import '../types/in_app_webview_rect.dart';
-import '../types/modal_presentation_style.dart';
-import '../types/modal_transition_style.dart';
-import '../types/window_style_mask.dart';
-import '../types/window_titlebar_separator_style.dart';
-import '../types/window_type.dart';
+import '../domain/entities/enums/modal_presentation_style.dart';
+import '../domain/entities/enums/modal_transition_style.dart';
+import '../domain/entities/enums/window_style_mask.dart';
+import '../domain/entities/enums/window_titlebar_separator_style.dart';
+import '../domain/entities/enums/window_type.dart';
 import '../util.dart';
 
 import '../in_app_webview/in_app_webview_settings.dart';
@@ -180,16 +180,16 @@ class InAppBrowserSettings_ {
 
   ///Set the custom modal presentation style when presenting the WebView. The default value is [ModalPresentationStyle.FULL_SCREEN].
   @SupportedPlatforms(platforms: [IOSPlatform()])
-  ModalPresentationStyle_? presentationStyle;
+  ModalPresentationStyle? presentationStyle;
 
   ///Set to the custom transition style when presenting the WebView. The default value is [ModalTransitionStyle.COVER_VERTICAL].
   @SupportedPlatforms(platforms: [IOSPlatform()])
-  ModalTransitionStyle_? transitionStyle;
+  ModalTransitionStyle? transitionStyle;
 
   ///How the browser window should be added to the main window.
   ///The default value is [WindowType.WINDOW].
   @SupportedPlatforms(platforms: [MacOSPlatform(), WindowsPlatform()])
-  WindowType_? windowType;
+  WindowType? windowType;
 
   ///The window’s alpha value.
   ///The default value is `1.0`.
@@ -198,11 +198,11 @@ class InAppBrowserSettings_ {
 
   ///Flags that describe the window’s current style, such as if it’s resizable or in full-screen mode.
   @SupportedPlatforms(platforms: [MacOSPlatform()])
-  WindowStyleMask_? windowStyleMask;
+  WindowStyleMask? windowStyleMask;
 
   ///The type of separator that the app displays between the title bar and content of a window.
   @SupportedPlatforms(platforms: [MacOSPlatform(available: '11.0')])
-  WindowTitlebarSeparatorStyle_? windowTitlebarSeparatorStyle;
+  WindowTitlebarSeparatorStyle? windowTitlebarSeparatorStyle;
 
   ///Sets the origin and size of the window’s frame rectangle according to a given frame rectangle,
   ///thereby setting its position and size onscreen.
@@ -226,8 +226,8 @@ class InAppBrowserSettings_ {
     this.closeButtonColor,
     this.hideCloseButton = false,
     this.menuButtonColor,
-    this.presentationStyle = ModalPresentationStyle_.FULL_SCREEN,
-    this.transitionStyle = ModalTransitionStyle_.COVER_VERTICAL,
+    this.presentationStyle = ModalPresentationStyle.FULL_SCREEN,
+    this.transitionStyle = ModalTransitionStyle.COVER_VERTICAL,
     this.hideTitleBar = false,
     this.toolbarTopFixedTitle,
     this.closeOnCannotGoBack = true,

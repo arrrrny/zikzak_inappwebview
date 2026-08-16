@@ -10,7 +10,12 @@ ChromeSafariBrowserSettings _$ChromeSafariBrowserSettingsFromJson(
   Map<String, dynamic> json,
 ) => $checkedCreate('ChromeSafariBrowserSettings', json, ($checkedConvert) {
   final val = ChromeSafariBrowserSettings(
-    shareState: $checkedConvert('shareState', (v) => _shareStateFromJson(v)),
+    shareState: $checkedConvert(
+      'shareState',
+      (v) => v == null
+          ? CustomTabsShareState.SHARE_STATE_DEFAULT
+          : _shareStateFromJson(v),
+    ),
     showTitle: $checkedConvert('showTitle', (v) => v as bool? ?? true),
     toolbarBackgroundColor: $checkedConvert(
       'toolbarBackgroundColor',
@@ -57,7 +62,9 @@ ChromeSafariBrowserSettings _$ChromeSafariBrowserSettingsFromJson(
     displayMode: $checkedConvert('displayMode', (v) => _displayModeFromJson(v)),
     screenOrientation: $checkedConvert(
       'screenOrientation',
-      (v) => _screenOrientationFromJson(v),
+      (v) => v == null
+          ? TrustedWebActivityScreenOrientation.DEFAULT
+          : _screenOrientationFromJson(v),
     ),
     startAnimations: $checkedConvert(
       'startAnimations',
@@ -81,7 +88,8 @@ ChromeSafariBrowserSettings _$ChromeSafariBrowserSettingsFromJson(
     ),
     dismissButtonStyle: $checkedConvert(
       'dismissButtonStyle',
-      (v) => _dismissButtonStyleFromJson(v),
+      (v) =>
+          v == null ? DismissButtonStyle.DONE : _dismissButtonStyleFromJson(v),
     ),
     preferredBarTintColor: $checkedConvert(
       'preferredBarTintColor',
@@ -93,11 +101,15 @@ ChromeSafariBrowserSettings _$ChromeSafariBrowserSettingsFromJson(
     ),
     presentationStyle: $checkedConvert(
       'presentationStyle',
-      (v) => _presentationStyleFromJson(v),
+      (v) => v == null
+          ? ModalPresentationStyle.FULL_SCREEN
+          : _presentationStyleFromJson(v),
     ),
     transitionStyle: $checkedConvert(
       'transitionStyle',
-      (v) => _transitionStyleFromJson(v),
+      (v) => v == null
+          ? ModalTransitionStyle.COVER_VERTICAL
+          : _transitionStyleFromJson(v),
     ),
     activityButton: $checkedConvert(
       'activityButton',

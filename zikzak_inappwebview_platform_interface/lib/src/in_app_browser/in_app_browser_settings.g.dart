@@ -265,12 +265,12 @@ class InAppBrowserSettings {
       windowFrame: InAppWebViewRect.fromMap(
         map['windowFrame']?.cast<String, dynamic>(),
       ),
-      windowStyleMask: WindowStyleMask.fromNativeValue(map['windowStyleMask']),
+      windowStyleMask: windowStyleMaskFromWire(map['windowStyleMask']),
       windowTitlebarSeparatorStyle:
-          WindowTitlebarSeparatorStyle.fromNativeValue(
+          windowTitlebarSeparatorStyleFromWire(
             map['windowTitlebarSeparatorStyle'],
           ),
-      windowType: WindowType.fromNativeValue(map['windowType']),
+      windowType: windowTypeFromWire(map['windowType']),
     );
     instance.allowGoBackWithBackButton = map['allowGoBackWithBackButton'];
     instance.closeOnCannotGoBack = map['closeOnCannotGoBack'];
@@ -282,7 +282,7 @@ class InAppBrowserSettings {
     instance.hideToolbarBottom = map['hideToolbarBottom'];
     instance.hideToolbarTop = map['hideToolbarTop'];
     instance.hideUrlBar = map['hideUrlBar'];
-    instance.presentationStyle = ModalPresentationStyle.fromNativeValue(
+    instance.presentationStyle = modalPresentationStyleFromWire(
       map['presentationStyle'],
     );
     instance.shouldCloseOnBackButtonPressed =
@@ -292,7 +292,7 @@ class InAppBrowserSettings {
         ? UtilColor.fromStringRepresentation(map['toolbarTopBarTintColor'])
         : null;
     instance.toolbarTopTranslucent = map['toolbarTopTranslucent'];
-    instance.transitionStyle = ModalTransitionStyle.fromNativeValue(
+    instance.transitionStyle = modalTransitionStyleFromWire(
       map['transitionStyle'],
     );
     instance.windowAlphaValue = map['windowAlphaValue'];
@@ -315,7 +315,7 @@ class InAppBrowserSettings {
       "hideToolbarTop": hideToolbarTop,
       "hideUrlBar": hideUrlBar,
       "menuButtonColor": menuButtonColor?.toHex(),
-      "presentationStyle": presentationStyle?.toNativeValue(),
+      "presentationStyle": modalPresentationStyleToWire(presentationStyle),
       "shouldCloseOnBackButtonPressed": shouldCloseOnBackButtonPressed,
       "toolbarBottomBackgroundColor": toolbarBottomBackgroundColor?.toHex(),
       "toolbarBottomTintColor": toolbarBottomTintColor?.toHex(),
@@ -325,13 +325,12 @@ class InAppBrowserSettings {
       "toolbarTopFixedTitle": toolbarTopFixedTitle,
       "toolbarTopTintColor": toolbarTopTintColor?.toHex(),
       "toolbarTopTranslucent": toolbarTopTranslucent,
-      "transitionStyle": transitionStyle?.toNativeValue(),
+      "transitionStyle": modalTransitionStyleToWire(transitionStyle),
       "windowAlphaValue": windowAlphaValue,
       "windowFrame": windowFrame?.toMap(),
-      "windowStyleMask": windowStyleMask?.toNativeValue(),
-      "windowTitlebarSeparatorStyle": windowTitlebarSeparatorStyle
-          ?.toNativeValue(),
-      "windowType": windowType?.toNativeValue(),
+      "windowStyleMask": windowStyleMaskToWire(windowStyleMask),
+      "windowTitlebarSeparatorStyle": windowTitlebarSeparatorStyleToWire(windowTitlebarSeparatorStyle),
+      "windowType": windowTypeToWire(windowType),
     };
   }
 

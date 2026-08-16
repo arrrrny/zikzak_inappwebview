@@ -4,6 +4,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
+// ignore: implementation_imports
+import 'package:zikzak_inappwebview_platform_interface/src/domain/entities/enums/http_cookie_same_site_policy.dart'
+    show httpCookieSameSitePolicyFromWire, httpCookieSameSitePolicyToWire;
 
 /// Object specifying creation parameters for creating a [AndroidCookieManager].
 ///
@@ -96,7 +99,7 @@ class AndroidCookieManager extends PlatformCookieManager
     args.putIfAbsent('maxAge', () => maxAge);
     args.putIfAbsent('isSecure', () => isSecure);
     args.putIfAbsent('isHttpOnly', () => isHttpOnly);
-    args.putIfAbsent('sameSite', () => sameSite?.toNativeValue());
+    args.putIfAbsent('sameSite', () => httpCookieSameSitePolicyToWire(sameSite));
 
     return await channel?.invokeMethod<bool>('setCookie', args) ?? false;
   }
@@ -126,7 +129,7 @@ class AndroidCookieManager extends PlatformCookieManager
           expiresDate: cookieMap["expiresDate"],
           isSessionOnly: cookieMap["isSessionOnly"],
           domain: cookieMap["domain"],
-          sameSite: HTTPCookieSameSitePolicy.fromNativeValue(
+          sameSite: httpCookieSameSitePolicyFromWire(
             cookieMap["sameSite"],
           ),
           isSecure: cookieMap["isSecure"],
@@ -163,7 +166,7 @@ class AndroidCookieManager extends PlatformCookieManager
           expiresDate: cookies[i]["expiresDate"],
           isSessionOnly: cookies[i]["isSessionOnly"],
           domain: cookies[i]["domain"],
-          sameSite: HTTPCookieSameSitePolicy.fromNativeValue(
+          sameSite: httpCookieSameSitePolicyFromWire(
             cookies[i]["sameSite"],
           ),
           isSecure: cookies[i]["isSecure"],

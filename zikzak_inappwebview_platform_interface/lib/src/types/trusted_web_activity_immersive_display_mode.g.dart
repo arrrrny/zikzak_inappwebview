@@ -32,9 +32,7 @@ class TrustedWebActivityImmersiveDisplayMode
     final instance = TrustedWebActivityImmersiveDisplayMode(
       isSticky: map['isSticky'],
     );
-    instance.displayCutoutMode = LayoutInDisplayCutoutMode.fromNativeValue(
-      map['displayCutoutMode'],
-    )!;
+    instance.displayCutoutMode = LayoutInDisplayCutoutMode.values[map['displayCutoutMode'] as int];
     return instance;
   }
 
@@ -46,7 +44,7 @@ class TrustedWebActivityImmersiveDisplayMode
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "displayCutoutMode": displayCutoutMode.toNativeValue(),
+      "displayCutoutMode": displayCutoutMode.index,
       "isSticky": isSticky,
       ..._toMapMergeWith(),
     };
@@ -54,6 +52,24 @@ class TrustedWebActivityImmersiveDisplayMode
 
   ///Converts instance to a map.
   Map<String, dynamic> toJson() {
+    return toMap();
+  }
+
+  @override
+  TrustedWebActivityImmersiveDisplayMode copyWith() {
+    return TrustedWebActivityImmersiveDisplayMode(
+      isSticky: isSticky,
+      displayCutoutMode: displayCutoutMode,
+    );
+  }
+
+  @override
+  TrustedWebActivityImmersiveDisplayMode copyWithTrustedWebActivityDisplayMode() {
+    return copyWith();
+  }
+
+  @override
+  Map<String, dynamic> toJsonLean() {
     return toMap();
   }
 

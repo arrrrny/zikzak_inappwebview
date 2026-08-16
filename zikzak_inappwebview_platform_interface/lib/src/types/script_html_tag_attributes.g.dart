@@ -95,13 +95,13 @@ class ScriptHtmlTagAttributes {
     }
     final instance = ScriptHtmlTagAttributes(
       async: map['async'],
-      crossOrigin: CrossOrigin.fromNativeValue(map['crossOrigin']),
+      crossOrigin: crossOriginFromWire(map['crossOrigin']),
       defer: map['defer'],
       id: map['id'],
       integrity: map['integrity'],
       noModule: map['noModule'],
       nonce: map['nonce'],
-      referrerPolicy: ReferrerPolicy.fromNativeValue(map['referrerPolicy']),
+      referrerPolicy: referrerPolicyFromWire(map['referrerPolicy']),
     );
     instance.type = map['type'];
     return instance;
@@ -111,13 +111,13 @@ class ScriptHtmlTagAttributes {
   Map<String, dynamic> toMap() {
     return {
       "async": async,
-      "crossOrigin": crossOrigin?.toNativeValue(),
+      "crossOrigin": crossOriginToWire(crossOrigin),
       "defer": defer,
       "id": id,
       "integrity": integrity,
       "noModule": noModule,
       "nonce": nonce,
-      "referrerPolicy": referrerPolicy?.toNativeValue(),
+      "referrerPolicy": referrerPolicyToWire(referrerPolicy),
       "type": type,
     };
   }

@@ -282,7 +282,7 @@ class MacOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
       () => <String, dynamic>{
         'initialUrlRequest': params.initialUrlRequest?.toJson(),
         'initialFile': params.initialFile,
-        'initialData': params.initialData?.toMap(),
+        'initialData': params.initialData?.toJson(),
         'initialSettings': settingsMap,
         'contextMenu': params.contextMenu?.toJson() ?? {},
         'windowId': params.windowId,

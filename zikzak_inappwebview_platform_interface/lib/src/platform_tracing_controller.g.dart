@@ -41,7 +41,7 @@ class TracingSettings {
       return null;
     }
     final instance = TracingSettings(
-      tracingMode: TracingMode.fromNativeValue(map['tracingMode']),
+      tracingMode: tracingModeFromWire(map['tracingMode']),
     );
     instance.categories = _deserializeCategories(map['categories']);
     return instance;
@@ -51,7 +51,7 @@ class TracingSettings {
   Map<String, dynamic> toMap() {
     return {
       "categories": _serializeCategories(categories),
-      "tracingMode": tracingMode?.toNativeValue(),
+      "tracingMode": tracingModeToWire(tracingMode),
     };
   }
 

@@ -9,6 +9,21 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
+// ignore: implementation_imports
+import 'package:zikzak_inappwebview_platform_interface/src/domain/entities/enums/form_resubmission_action.dart'
+    show formResubmissionActionToWire;
+// ignore: implementation_imports
+import 'package:zikzak_inappwebview_platform_interface/src/domain/entities/enums/in_app_webview_hit_test_result_type.dart'
+    show inAppWebViewHitTestResultTypeFromWire;
+// ignore: implementation_imports
+import 'package:zikzak_inappwebview_platform_interface/src/domain/entities/enums/media_capture_state.dart'
+    show mediaCaptureStateFromWire;
+// ignore: implementation_imports
+import 'package:zikzak_inappwebview_platform_interface/src/domain/entities/enums/web_archive_format.dart'
+    show webArchiveFormatToWire;
+// ignore: implementation_imports
+import 'package:zikzak_inappwebview_platform_interface/src/domain/entities/enums/webview_render_process_action.dart'
+    show webViewRenderProcessActionToWire;
 
 import '../web_message/main.dart';
 
@@ -371,7 +386,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
           DownloadStartRequest downloadStartRequest =
-              DownloadStartRequest.fromMap(arguments)!;
+              DownloadStartRequest.fromJson(arguments);
 
           if (webviewParams != null) {
             webviewParams!.onDownloadStartRequest!(
@@ -504,9 +519,10 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
             }
             return null;
           } else {
-            return (await _inAppBrowserEventHandler!
-                    .onRenderProcessUnresponsive(uri))
-                ?.toNativeValue();
+            return webViewRenderProcessActionToWire(
+              await _inAppBrowserEventHandler!
+                  .onRenderProcessUnresponsive(uri),
+            );
           }
         }
         break;
@@ -525,9 +541,11 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
             }
             return null;
           } else {
-            return (await _inAppBrowserEventHandler!.onRenderProcessResponsive(
-              uri,
-            ))?.toNativeValue();
+            return webViewRenderProcessActionToWire(
+              await _inAppBrowserEventHandler!.onRenderProcessResponsive(
+                uri,
+              ),
+            );
           }
         }
         break;
@@ -537,9 +555,9 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          RenderProcessGoneDetail detail = RenderProcessGoneDetail.fromMap(
+          RenderProcessGoneDetail detail = RenderProcessGoneDetail.fromJson(
             arguments,
-          )!;
+          );
 
           if (webviewParams != null &&
               webviewParams!.onRenderProcessGone != null)
@@ -559,14 +577,18 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
           WebUri? uri = url != null ? WebUri(url) : null;
 
           if (webviewParams != null) {
-            return (await webviewParams!.onFormResubmission!(
-              _controllerFromPlatform,
-              uri,
-            ))?.toNativeValue();
+            return formResubmissionActionToWire(
+              await webviewParams!.onFormResubmission!(
+                _controllerFromPlatform,
+                uri,
+              ),
+            );
           } else {
-            return (await _inAppBrowserEventHandler!.onFormResubmission(
-              uri,
-            ))?.toNativeValue();
+            return formResubmissionActionToWire(
+              await _inAppBrowserEventHandler!.onFormResubmission(
+                uri,
+              ),
+            );
           }
         }
         break;
@@ -1000,7 +1022,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
           InAppWebViewHitTestResult hitTestResult =
-              InAppWebViewHitTestResult.fromMap(arguments)!;
+              InAppWebViewHitTestResult.fromJson(arguments);
 
           if (webviewParams != null &&
               webviewParams!.onLongPressHitTestResult != null)
@@ -1025,7 +1047,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
           InAppWebViewHitTestResult hitTestResult =
-              InAppWebViewHitTestResult.fromMap(arguments)!;
+              InAppWebViewHitTestResult.fromJson(arguments);
 
           contextMenu.onCreateContextMenu!(hitTestResult);
         }
@@ -1167,10 +1189,10 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
         if ((webviewParams != null &&
                 webviewParams!.onCameraCaptureStateChanged != null) ||
             _inAppBrowserEventHandler != null) {
-          var oldState = MediaCaptureState.fromNativeValue(
+          var oldState = mediaCaptureStateFromWire(
             call.arguments["oldState"],
           );
-          var newState = MediaCaptureState.fromNativeValue(
+          var newState = mediaCaptureStateFromWire(
             call.arguments["newState"],
           );
 
@@ -1192,10 +1214,10 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
         if ((webviewParams != null &&
                 webviewParams!.onMicrophoneCaptureStateChanged != null) ||
             _inAppBrowserEventHandler != null) {
-          var oldState = MediaCaptureState.fromNativeValue(
+          var oldState = mediaCaptureStateFromWire(
             call.arguments["oldState"],
           );
-          var newState = MediaCaptureState.fromNativeValue(
+          var newState = mediaCaptureStateFromWire(
             call.arguments["newState"],
           );
 
@@ -1258,7 +1280,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
                   ? arguments["duration"].toDouble()
                   : arguments["duration"];
 
-              var response = LoadedResource.fromMap(arguments)!;
+              var response = LoadedResource.fromJson(arguments);
 
               if (webviewParams != null &&
                   webviewParams!.onLoadResource != null)
@@ -1884,7 +1906,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
     args.putIfAbsent('urlFile', () => urlFile.toString());
     args.putIfAbsent(
       'cssLinkHtmlTagAttributes',
-      () => cssLinkHtmlTagAttributes?.toMap(),
+      () => cssLinkHtmlTagAttributes?.toJson(),
     );
     await channel?.invokeMethod('injectCSSFileFromUrl', args);
   }
@@ -1962,7 +1984,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
       'getCopyBackForwardList',
       args,
     ))?.cast<String, dynamic>();
-    return WebHistory.fromMap(result);
+    return result == null ? null : WebHistory.fromJson(result);
   }
 
   @override
@@ -2106,7 +2128,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
     hitTestResultMap = hitTestResultMap.cast<String, dynamic>();
 
     InAppWebViewHitTestResultType? type =
-        InAppWebViewHitTestResultType.fromNativeValue(
+        inAppWebViewHitTestResultTypeFromWire(
           hitTestResultMap["type"]?.toInt(),
         );
     String? extra = hitTestResultMap["extra"];
@@ -2397,7 +2419,11 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
     bool autoname = false,
   }) async {
     if (!autoname) {
-      assert(filePath.endsWith("." + WebArchiveFormat.MHT.toNativeValue()));
+      assert(
+        filePath.endsWith(
+          "." + (webArchiveFormatToWire(WebArchiveFormat.MHT) as String),
+        ),
+      );
     }
 
     Map<String, dynamic> args = <String, dynamic>{};
@@ -2506,7 +2532,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
   @override
   Future<Uint8List?> createPdf({PDFConfiguration? pdfConfiguration}) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('pdfConfiguration', () => pdfConfiguration?.toMap());
+    args.putIfAbsent('pdfConfiguration', () => pdfConfiguration?.toJson());
     return await channel?.invokeMethod<Uint8List?>('createPdf', args);
   }
 
@@ -2609,7 +2635,9 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
       'getCurrentWebViewPackage',
       args,
     ))?.cast<String, dynamic>();
-    return WebViewPackageInfo.fromMap(packageInfo);
+    return packageInfo == null
+        ? null
+        : WebViewPackageInfo.fromJson(packageInfo);
   }
 
   @override

@@ -28,6 +28,21 @@ class TrustedWebActivityDefaultDisplayMode
   }
 
   @override
+  TrustedWebActivityDefaultDisplayMode copyWith() {
+    return TrustedWebActivityDefaultDisplayMode();
+  }
+
+  @override
+  TrustedWebActivityDefaultDisplayMode copyWithTrustedWebActivityDisplayMode() {
+    return copyWith();
+  }
+
+  @override
+  Map<String, dynamic> toJsonLean() {
+    return toMap();
+  }
+
+  @override
   String toString() {
     return 'TrustedWebActivityDefaultDisplayMode{}';
   }

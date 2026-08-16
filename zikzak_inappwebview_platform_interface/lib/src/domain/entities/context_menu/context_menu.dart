@@ -5,7 +5,7 @@
 // settings, menuItems) and the wire format of the old codegen (only
 // menuItems + settings on the wire).
 
-import '../../../types/in_app_webview_hit_test_result.dart';
+import '../in_app_webview_hit_test_result/in_app_webview_hit_test_result.dart';
 import '../context_menu_item/context_menu_item.dart';
 import '../context_menu_settings/context_menu_settings.dart';
 

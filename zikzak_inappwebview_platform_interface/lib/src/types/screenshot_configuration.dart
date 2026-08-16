@@ -1,8 +1,7 @@
 import 'package:zikzak_inappwebview_internal_annotations/zikzak_inappwebview_internal_annotations.dart';
 
-import '../in_app_webview/platform_inappwebview_controller.dart';
 import 'in_app_webview_rect.dart';
-import 'compress_format.dart';
+import '../domain/entities/enums/compress_format.dart';
 
 part 'screenshot_configuration.g.dart';
 
@@ -42,7 +41,7 @@ class ScreenshotConfiguration_ {
       WindowsPlatform(),
     ],
   )
-  CompressFormat_ compressFormat;
+  CompressFormat compressFormat;
 
   ///Hint to the compressor, `0-100`. The value is interpreted differently depending on the [CompressFormat].
   ///[CompressFormat.PNG] is lossless, so this value is ignored.
@@ -71,7 +70,7 @@ class ScreenshotConfiguration_ {
   ScreenshotConfiguration_({
     this.rect,
     this.snapshotWidth,
-    this.compressFormat = CompressFormat_.PNG,
+    this.compressFormat = CompressFormat.PNG,
     this.quality = 100,
     this.afterScreenUpdates = true,
   }) {

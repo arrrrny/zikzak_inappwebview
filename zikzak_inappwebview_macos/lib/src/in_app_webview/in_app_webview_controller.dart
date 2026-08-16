@@ -287,7 +287,7 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
           Map<String, dynamic> arguments =
               (call.arguments as Map<dynamic, dynamic>).cast<String, dynamic>();
           InAppWebViewHitTestResult hitTestResult =
-              InAppWebViewHitTestResult.fromMap(arguments)!;
+              InAppWebViewHitTestResult.fromJson(arguments);
           contextMenu.onCreateContextMenu!(hitTestResult);
         }
         break;
@@ -474,7 +474,7 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
   @override
   Future<Uint8List?> createPdf({PDFConfiguration? pdfConfiguration}) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('pdfConfiguration', () => pdfConfiguration?.toMap());
+    args.putIfAbsent('pdfConfiguration', () => pdfConfiguration?.toJson());
     return await _channel.invokeMethod<Uint8List?>('createPdf', args);
   }
 

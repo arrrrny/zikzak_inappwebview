@@ -196,7 +196,7 @@ class IOSChromeSafariBrowser extends PlatformChromeSafariBrowser
       "prewarmConnections",
       args,
     ))?.cast<String, dynamic>();
-    return PrewarmingToken.fromMap(result);
+    return result == null ? null : PrewarmingToken.fromJson(result);
   }
 
   @override
@@ -204,7 +204,7 @@ class IOSChromeSafariBrowser extends PlatformChromeSafariBrowser
     PrewarmingToken prewarmingToken,
   ) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('prewarmingToken', () => prewarmingToken.toMap());
+    args.putIfAbsent('prewarmingToken', () => prewarmingToken.toJson());
     await _staticChannel.invokeMethod("invalidatePrewarmingToken", args);
   }
 

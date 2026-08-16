@@ -381,6 +381,23 @@ class PullToRefreshSettingsPatch
     patchMap[PullToRefreshSettings$.attributedTitle] = value;
     return this;
   }
+
+  PullToRefreshSettingsPatch withAttributedTitlePatch(
+    AttributedStringPatch patch,
+  ) {
+    patchMap[PullToRefreshSettings$.attributedTitle] = patch;
+    return this;
+  }
+
+  PullToRefreshSettingsPatch withAttributedTitlePatchFunc(
+    AttributedStringPatch Function(AttributedStringPatch) patch,
+  ) {
+    patchMap[PullToRefreshSettings$.attributedTitle] = (dynamic current) {
+      var currentPatch = AttributedStringPatch();
+      return patch(currentPatch).applyTo(current as AttributedString);
+    };
+    return this;
+  }
 }
 
 /// Field descriptors for [PullToRefreshSettings] query construction
