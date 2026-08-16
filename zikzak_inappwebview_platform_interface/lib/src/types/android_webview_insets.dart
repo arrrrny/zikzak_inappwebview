@@ -18,36 +18,42 @@ class AndroidWebViewInsets {
 
   ///Insets for the IME (the on-screen keyboard). Ignoring this lets web
   ///content render behind the keyboard instead of being resized by it.
-  static const ime =
-      AndroidWebViewInsets._internal('ime', 'ime');
+  static const ime = AndroidWebViewInsets._internal('ime', 'ime');
 
   ///Insets for the system bars (status bar + navigation bar). Ignoring this
   ///lets web content render behind the status bar and navigation bar — the
   ///primary edge-to-edge / immersive case.
-  static const systemBars =
-      AndroidWebViewInsets._internal('systemBars', 'systemBars');
+  static const systemBars = AndroidWebViewInsets._internal(
+    'systemBars',
+    'systemBars',
+  );
 
   ///Insets for system gestures (such as the swipe-from-edge back gesture).
-  static const systemGestures =
-      AndroidWebViewInsets._internal('systemGestures', 'systemGestures');
+  static const systemGestures = AndroidWebViewInsets._internal(
+    'systemGestures',
+    'systemGestures',
+  );
 
   ///Insets for mandatory system gestures that the system reserves for itself
   ///and that cannot be overridden by the app.
-  static const mandatorySystemGestures =
-      AndroidWebViewInsets._internal(
-        'mandatorySystemGestures',
-        'mandatorySystemGestures',
-      );
+  static const mandatorySystemGestures = AndroidWebViewInsets._internal(
+    'mandatorySystemGestures',
+    'mandatorySystemGestures',
+  );
 
   ///Insets for the tappable element area (the region reserved for system
   ///gestures that should remain tappable).
-  static const tappableElement =
-      AndroidWebViewInsets._internal('tappableElement', 'tappableElement');
+  static const tappableElement = AndroidWebViewInsets._internal(
+    'tappableElement',
+    'tappableElement',
+  );
 
   ///Insets for the display cutout (notches / punch-holes). Ignoring this lets
   ///web content render behind the cutout.
-  static const displayCutout =
-      AndroidWebViewInsets._internal('displayCutout', 'displayCutout');
+  static const displayCutout = AndroidWebViewInsets._internal(
+    'displayCutout',
+    'displayCutout',
+  );
 
   ///Set of all values of [AndroidWebViewInsets].
   static final Set<AndroidWebViewInsets> values = [

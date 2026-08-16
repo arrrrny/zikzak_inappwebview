@@ -8,7 +8,13 @@ library;
 ///
 ///`all` is a meta-preset meaning the union of the four concrete presets —
 ///it is NOT the legacy brute-force `dismissDialogues` behaviour.
-enum DialogueDismissPreset { cookieConsent, gdpr, inAppDownload, newsletter, all }
+enum DialogueDismissPreset {
+  cookieConsent,
+  gdpr,
+  inAppDownload,
+  newsletter,
+  all,
+}
 
 ///Keyword rules used to classify candidate overlay elements by their text
 ///content. A candidate overlay is dismissed ONLY when its (normalized) text
@@ -119,5 +125,4 @@ class DialogueDismissRules {
     }
     return null;
   }
-
 }

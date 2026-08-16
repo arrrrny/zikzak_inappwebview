@@ -34,6 +34,15 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     var preventGestureDelay = false
     private var isDisposed = false
 
+    /// One-shot callback fired on the FIRST terminal navigation event
+    /// (`didFinish` or `didFail`). Used by `HeadlessInAppWebViewManager` to
+    /// gate `run()` on web-process readiness so a consumer's first real
+    /// `loadUrl` is never issued while WKWebView is still booting its content
+    /// process (which can silently drop the navigation). `nil` by default —
+    /// no effect on regular web views.
+    var firstNavigationCompleted: (() -> Void)?
+
+
     private static var sslCertificatesMap: [String: SslCertificate] = [:]  // [URL host name : SslCertificate]
     private static var credentialsProposed: [URLCredential] = []
 
@@ -2384,6 +2393,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         channelDelegate?.onLoadStop(url: url?.absoluteString)
 
         inAppBrowserDelegate?.didFinishNavigation(url: url)
+
+        firstNavigationCompleted?()
     }
 
     public func webView(
@@ -2427,6 +2438,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         channelDelegate?.onReceivedError(request: webResourceRequest, error: webResourceError)
 
         inAppBrowserDelegate?.didFailNavigation(url: url, error: error)
+
+        firstNavigationCompleted?()
     }
 
     public func webView(

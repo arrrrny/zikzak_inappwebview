@@ -8,9 +8,7 @@ import 'dialogue_dismissal.dart';
 import 'dialogue_dismisser_js.dart';
 
 ///Signature of the [DialogueDismisser] dismissal callback.
-typedef DialogueDismissalCallback = void Function(
-  DialogueDismissal dismissal,
-);
+typedef DialogueDismissalCallback = void Function(DialogueDismissal dismissal);
 
 ///Content-aware popup/cookie-banner dismisser.
 ///

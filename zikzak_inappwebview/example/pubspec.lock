@@ -578,71 +578,71 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "4.8.0"
+    version: "4.10.0"
   zikzak_inappwebview_android:
     dependency: transitive
     description:
       name: zikzak_inappwebview_android
-      sha256: "8e8895245cef577d8f95262b62d3ee9632e7ce6ee5d2374863d5170e1c9a2607"
+      sha256: "4d2652b36204b7f8db659ff3881d06b5459ea77028d2ff6e8b2e8a965c332ca7"
       url: "https://pub.dev"
     source: hosted
-    version: "4.8.0"
+    version: "4.10.0"
   zikzak_inappwebview_internal_annotations:
     dependency: transitive
     description:
       name: zikzak_inappwebview_internal_annotations
-      sha256: "29e80af0edf370fa76a26ed263d70b387f9bbfac6e46c99fe2e8ec6062ca7839"
+      sha256: "1847400165648caff711a48e024aa0ee0c041bec522640b1bd5fff018e77ea79"
       url: "https://pub.dev"
     source: hosted
-    version: "4.8.0"
+    version: "4.10.0"
   zikzak_inappwebview_ios:
     dependency: transitive
     description:
       name: zikzak_inappwebview_ios
-      sha256: "7f0e7492720a38695a38e670c1c949c22b220cc1fcaea040abf2adf07c7fe135"
+      sha256: fefdfafc2d0061dfaa40b451ac07b8c1bf9bc1f3fd3b1ef3aba3712274d5a8ba
       url: "https://pub.dev"
     source: hosted
-    version: "4.8.0"
+    version: "4.10.0"
   zikzak_inappwebview_linux:
     dependency: transitive
     description:
       name: zikzak_inappwebview_linux
-      sha256: c510cf62422246bf5fd6be6eda9e9a432f968d6dbe028d9f89a3cbe9d59dc417
+      sha256: ddb58a154aab6832dd2bda2d62e8a059384516af592f2b2b706ffb93deb16ae3
       url: "https://pub.dev"
     source: hosted
-    version: "4.8.0"
+    version: "4.10.0"
   zikzak_inappwebview_macos:
     dependency: transitive
     description:
       name: zikzak_inappwebview_macos
-      sha256: "1cc4b581fb9f213070ebc8864e8442f5c4b88a1bbeba3484b15180f394d351dc"
+      sha256: bd3a889982ce67774b3c2db4c4915c42eaf1daacc744cf2b5ec0a2dcac9b8a5e
       url: "https://pub.dev"
     source: hosted
-    version: "4.8.0"
+    version: "4.10.0"
   zikzak_inappwebview_platform_interface:
     dependency: "direct main"
     description:
       name: zikzak_inappwebview_platform_interface
-      sha256: d05452b522844763892fbea84e4390d11d19407714d92cdc62dedb6082935568
+      sha256: c495af0b84d4cd9f32952b15c43e8bda0531304987b62f780d08f4d5ec8952b2
       url: "https://pub.dev"
     source: hosted
-    version: "4.8.0"
+    version: "4.10.0"
   zikzak_inappwebview_web:
     dependency: "direct main"
     description:
       name: zikzak_inappwebview_web
-      sha256: d155b4df9512a0111d6435d7a90a08e027c542a34a7fc07c86f173d07d9e5afd
+      sha256: f23e0556167f5498f5e94e9a32ec13fbb6d5338585050993c01bc1e86fed4e38
       url: "https://pub.dev"
     source: hosted
-    version: "4.8.0"
+    version: "4.10.0"
   zikzak_inappwebview_windows:
     dependency: transitive
     description:
       name: zikzak_inappwebview_windows
-      sha256: ea1b21f79d8b7d495b7ac4d32e5ceebb33831f9557f6a1d6f35706c6d3d8acf4
+      sha256: fa3c37c017fe8fd8857776a780e481017a0b1888c203aa97db4a7b3de62dad7a
       url: "https://pub.dev"
     source: hosted
-    version: "4.8.0"
+    version: "4.10.0"
 sdks:
   dart: ">=3.12.2 <4.0.0"
   flutter: ">=3.44.0"

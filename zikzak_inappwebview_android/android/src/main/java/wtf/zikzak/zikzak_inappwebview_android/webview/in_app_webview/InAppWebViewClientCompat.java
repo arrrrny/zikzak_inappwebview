@@ -317,6 +317,10 @@ public class InAppWebViewClientCompat extends WebViewClientCompat {
             inAppBrowserDelegate.didFinishNavigation(url);
         }
 
+        if (webView.firstNavigationCompleted != null) {
+            webView.firstNavigationCompleted.run();
+        }
+
         // WebView not storing cookies reliable to local device storage
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             CookieManager.getInstance().flush();
@@ -408,6 +412,10 @@ public class InAppWebViewClientCompat extends WebViewClientCompat {
                 WebResourceErrorExt.fromWebResourceError(error)
             );
         }
+
+        if (request.isForMainFrame() && webView.firstNavigationCompleted != null) {
+            webView.firstNavigationCompleted.run();
+        }
     }
 
     @SuppressLint("RestrictedApi")
@@ -455,6 +463,11 @@ public class InAppWebViewClientCompat extends WebViewClientCompat {
 
         if (webView.channelDelegate != null) {
             webView.channelDelegate.onReceivedError(request, error);
+        }
+
+        // Deprecated overload: always a main-frame error.
+        if (webView.firstNavigationCompleted != null) {
+            webView.firstNavigationCompleted.run();
         }
 
         super.onReceivedError(view, errorCode, description, failingUrl);

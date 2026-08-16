@@ -26,8 +26,10 @@ String buildDialogueDismisserJs(Set<DialogueDismissPreset> presets) {
       if (expanded.contains(preset))
         preset.name: DialogueDismissRules.keywordPatterns[preset]!,
   };
-  return dialogueDismisserJsTemplate
-      .replaceFirst('__PRESET_PATTERNS__', jsonEncode(patternMap));
+  return dialogueDismisserJsTemplate.replaceFirst(
+    '__PRESET_PATTERNS__',
+    jsonEncode(patternMap),
+  );
 }
 
 ///The raw dismisser source.

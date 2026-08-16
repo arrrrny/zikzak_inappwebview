@@ -1,3 +1,48 @@
+## 4.10.0 - 2026-08-16
+
+### Fixes
+
+- [iOS] Gate `HeadlessInAppWebView.run()` on web-process readiness — the first real `loadUrl` after `run()` could be silently dropped by WKWebView while its content process was still booting, surfacing as "Unable to fetch data" on the very first request. `run()` now completes only after the initial navigation reaches a terminal state (`didFinish`/`didFail`); signal-driven, no timeout constant
+- [iOS] Guard `run()` against a missing web view (no silent hang)
+- [Android] Same headless readiness gate — `run()` completes only after `onPageFinished` or a main-frame error (both `InAppWebViewClient` and `InAppWebViewClientCompat`)
+- [macOS] Same headless readiness gate — `run()` completes only after `didFinish`/`didFail`
+- [Linux] Same headless readiness gate — the headless "run" channel handler responds only after the first `WEBKIT_LOAD_FINISHED`
+
+### Features
+
+- [example] Add First-Load Race Stress screen — reproduces the first-load race for headless and visible webviews (fresh webview + immediate `loadUrl`, 10 sequential attempts)
+
+## 4.9.0 - 2026-08-14
+
+### Features
+
+- Session recipe — record and replay user sessions in the WebView: JS
+  tap-listener injection, selector-candidate extraction, scripted click replay,
+  and recipe models (#216)
+- Navigation tracker — JS-assisted URL-cycle tracking through the webview (#216)
+- Dialogue dismisser — inject JS to auto-dismiss modal dialogs (#216)
+- Navigation guards — `keepNavigationInWebView` helper that keeps user-tapped
+  links inside the WebView, avoiding iOS universal-link handoff (#216)
+- [Windows] Virtual host name to folder mapping — CORS-safe serving of local
+  folders (CORS bypass for local resources) (#185)
+- [macOS] Popup windows — `window.open` / `target=_blank` now load their URL
+  via `WKUIDelegate createWebViewWith` off-screen-window support, reparented
+  into a Flutter platform view when `onCreateWindow` is handled (#182, #183, #187)
+
+### Fixes
+
+- [macOS] Popup window crash, settings key, and event delivery fixes (#187)
+- [macOS] Network Capture API callbacks never fired — JS bridge name aligned
+  with iOS/Android so `onNetworkRequest` / `onNetworkResponse` /
+  `onNetworkLoadingFinished` reach Dart (#182)
+- [Linux] Blue screen instead of webview — offscreen rendering via
+  `GtkOffscreenWindow` + software rendering, plus `openDevTools` support (#184)
+- [Linux] Native plugin compile regression — broken `takeScreenshot` string
+  literal and missing include path (#179)
+- Chore: renamed remaining `flutter_inappwebview` residuals to
+  `zikzak_inappwebview` (JS bridge name, method channel, platform view type id) (#186)
+- Chore: dependency bumps (npm deps, brace-expansion) (#189, #210)
+
 ## 4.8.0 - 2026-08-14
 
 ### Features

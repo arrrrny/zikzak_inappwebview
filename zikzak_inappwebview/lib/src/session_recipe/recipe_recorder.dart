@@ -372,9 +372,7 @@ class RecipeRecorder {
     if (domain.startsWith('.')) domain = domain.substring(1);
     if (domain.isEmpty) return false;
     final h = host.toLowerCase();
-    return h == domain ||
-        h.endsWith('.$domain') ||
-        domain.endsWith('.$h');
+    return h == domain || h.endsWith('.$domain') || domain.endsWith('.$h');
   }
 
   String get _siteHost {
