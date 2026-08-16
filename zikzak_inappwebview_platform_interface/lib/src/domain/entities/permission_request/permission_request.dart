@@ -8,7 +8,7 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:zorphy_annotation/zorphy_annotation.dart';
-import '../../../types/frame_info.dart';
+import '../frame_info/frame_info.dart';
 import '../../../web_uri.dart';
 import '../enums/index.dart';
 
@@ -60,9 +60,9 @@ Object? _resourcesToJson(List<PermissionResourceType>? resources) =>
 
 FrameInfo? _frameFromJson(Object? value) => value == null
     ? null
-    : FrameInfo.fromMap((value as Map).cast<String, dynamic>());
+    : FrameInfo.fromJson((value as Map).cast<String, dynamic>());
 
-Object? _frameToJson(FrameInfo? frame) => frame?.toMap();
+Object? _frameToJson(FrameInfo? frame) => frame?.toJson();
 
 ///PermissionResourceType native values are platform-dependent (the old
 ///ExchangeableEnum codegen dispatched on `defaultTargetPlatform`): Android

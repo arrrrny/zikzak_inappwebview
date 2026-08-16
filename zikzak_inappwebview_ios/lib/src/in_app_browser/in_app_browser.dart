@@ -188,7 +188,7 @@ class IOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
     assert(urlRequest.url != null && urlRequest.url.toString().isNotEmpty);
 
     Map<String, dynamic> args = _prepareOpenRequest(settings: settings);
-    args.putIfAbsent('urlRequest', () => urlRequest.toMap());
+    args.putIfAbsent('urlRequest', () => urlRequest.toJson());
     await _staticChannel.invokeMethod('open', args);
   }
 

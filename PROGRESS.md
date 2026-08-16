@@ -13,7 +13,9 @@ and the zikzak→zuraffa v6 migration (…7545).
 **Phase 2b (fetch_request family → Zorphy entities) — DONE (PR #220, merged 984bd850)**
 **Phase 2c (console_message + web_resource family → Zorphy entities) — DONE (PR #221, merged 18d26075)**
 **Phase 2d (permission/safe-browsing family → Zorphy entities) — DONE (PR #222, merged 6f64b60c)**
-**Phase 2e (navigation family) — BLOCKED on framework fixes (zorphy PR #84 + zuraffa PR)**
+**Phase 2e (navigation family) — BLOCKED on zorphy_migrator support (zorphy #86)**
+**Phase 2e (navigation family → Zorphy via zorphy_migrator) — DONE on branch
+`feat/migrate-models-zorphy-entities-phase2e` (not yet merged)**
 
 - Phase 0 (mapping + toolchain) DONE.
 - Note on the task premise: this repo does **NOT** use Freezed. Upstream
@@ -27,13 +29,27 @@ and the zikzak→zuraffa v6 migration (…7545).
 
 ## STOPPED AT STEP
 
-Framework-fix wait (goal rule: stop at the first blocking misfire, report,
-fix the framework, THEN resume the migration). The `!Type` external-marker
-syntax is now fixed end-to-end and tested; the Phase 2e conversion itself
-starts after the PRs below are merged.
+**Phase 2e DONE on the branch (not yet merged)** — the full navigation
+family was converted with zorphy_migrator (`--apply`), moved to
+`domain/entities/`, glued (wire formats incl. platform-native NavigationType
+and non-sequential URLRequestNetworkServiceType), barrels + controllers
+updated, build + analyze + tests green (see the worklog entry below). Next:
+Phase 2f (auth/ssl family — URLAuthenticationChallenge hierarchy, which now
+also needs its still-codegen http_authentication_challenge to be converted
+since its URLResponse reference was migrated in 2e).
 
 ## LAST ISSUE FILED
 
+- **zorphy #86 (2026-08-16)**: `zorphy_migrator` silently no-ops on this
+  repo — `@ExchangeableObject`/`@ExchangeableEnum` codegen models are not
+  freezed, and the migrator's `FreezedDetector` only resolves
+  `package:freezed_annotation` annotations (enums are skipped entirely).
+  Whole-`lib/src/types/` run → "Converted classes (0)" + "clean migration",
+  exit 0. Control: same tool converts 11 classes on its own smoke fixture.
+  Filed per the user's stop rule ("ONLY USE zorphy_migrator; issue → STOP +
+  file GitHub issue"); options in the issue: (1) add `@ExchangeableObject`/
+  `@ExchangeableEnum` as a second input dialect, (2) at minimum exit non-zero
+  on 0 detected classes instead of claiming success.
 - **zorphy #349 (RE-OPENED as misfire, 2026-08-15)**: the documented `!Type`
   external field syntax was broken end-to-end in the CURRENT checkouts.
   `zfa entity create --field 'request:!URLRequest'` emitted
@@ -106,23 +122,25 @@ starts after the PRs below are merged.
 
 ## RESUME FROM
 
-**Framework-fix wait (BLOCKED):** zuraffa PR #362 (branch
-`fix/349-external-type-zorphy-bump`) + zorphy PR #85 (`fix/310-351-into-development`)
-must merge BEFORE Phase 2e runs — the migration uses `!Type` external-field
-syntax for every non-entity type (WebUri, URLRequest-family externals) and
-needs the #351 concrete-ref recovery for sibling refs. zorphy PR #84 (#349
-fix) is already merged. Until the merges land, run zfa from
-`/workspace/zuraffa-wt/bin/zuraffa.dart` (has both fixes). Once merged:
-Phase 2e = navigation family: `navigation_action` + `navigation_action_policy`
-+ `navigation_response` + `navigation_response_action` + `navigation_type`
-+ `url_request` (+ `url_request_cache_policy` / `url_request_network_service_type`
-/ `url_request_attribution` enums) + `url_response` + `frame_info` +
-`security_origin` + `window_features` + `login_request` +
-`create_window_action` (extends `NavigationAction` — zorphy `--extends`
-support, wire-format verification done in scratch). NOTE: render_process_gone_detail +
-renderer_priority + renderer_priority_policy are COUPLED to the still-codegen
-InAppWebViewSettings.g.dart (`RendererPriorityPolicy.fromMap`) — convert them
-together with the settings family (Phase 3), not standalone.
+**Phase 2f (auth/ssl family) — next.** Phase 2e is DONE on the branch
+(not yet merged): the navigation family (`navigation_action`,
+`navigation_response`, `url_request`, `url_response`, `frame_info`,
+`security_origin`, `window_features`, `login_request`,
+`create_window_action` flattened + the 6 enums) are Zorphy entities
+converted with zorphy_migrator (`dart run
+/workspace/zorphy/zorphy_migrator/bin/zorphy_migrator.dart migrate <dir>
+--apply --report ...`). Phase 2f scope:
+`http_authentication_challenge` (still codegen; its source + .g.dart were
+patched in 2e to reference the converted URLResponse — convert together
+with the rest), URLAuthenticationChallenge hierarchy
+(HttpAuthenticationChallenge/ClientCertChallenge/ServerTrustChallenge),
+URLProtectionSpace (+authentication_method/proxy_type enums), URLCredential
+(+persistence), HttpAuthResponse (+action), ClientCertResponse (+action),
+ServerTrustAuthResponse (+action), SslCertificate, SslError (+type),
+should_allow_deprecated_tls_action. NOTE:
+render_process_gone_detail + renderer_priority + renderer_priority_policy
+are COUPLED to the still-codegen InAppWebViewSettings.g.dart — convert
+them with the settings family (Phase 3), not standalone.
 
 ---
 
@@ -297,13 +315,13 @@ defaultTargetPlatform switch helper like PermissionResourceType),
 `url_request_cache_policy`, `url_request_network_service_type`, `url_request_attribution`.
 Stragglers converted together (they reference URLRequest_/URLResponse_):
 `create_window_action` (in 2e), `http_authentication_challenge` (in 2f).
-- [ ] navigation_action / navigation_action_policy / navigation_response /
+- [x] navigation_action / navigation_action_policy / navigation_response /
       navigation_response_action / navigation_type
-- [ ] url_request (+3 enums) / url_response / frame_info / security_origin
-- [ ] window_features / login_request / create_window_action (extends)
-- [ ] barrels + android/ios/macos/windows glue (fromMap→fromJson etc.)
-- [ ] regression test test/types/navigation_entities_test.dart
-- [ ] analyze + test all touched packages
+- [x] url_request (+3 enums) / url_response / frame_info / security_origin
+- [x] window_features / login_request / create_window_action (extends)
+- [x] barrels + android/ios/macos/linux glue (fromMap→fromJson etc.)
+- [x] regression test test/types/navigation_entities_test.dart
+- [x] analyze + test all touched packages
 
 ### Phase 2f — auth/ssl family: URLAuthenticationChallenge hierarchy
 (HttpAuthenticationChallenge/ClientCertChallenge/ServerTrustChallenge),
@@ -556,3 +574,79 @@ dialogue_dismisser — hand-written toJson/fromJson today → Zorphy, core packa
   commit 63f4a89 on the #85 branch). Deploy job failure is branch-secret
   related (same on #84, merged anyway). Phase 2e/2f inventories scoped in
   the migration map. Waiting on the user's merge; resume point unchanged.
+- 2026-08-16 — Framework-wait resolved: zorphy #85 merged into development
+  (7e37246, #351 + #310) and zuraffa #362 merged (ff9365f, `!Type` support)
+  — zfa is fully usable again. BUT the user's goal directive changed the
+  migration tool: "ONLY USE zorphy_migrator; if there is an issue or it does
+  not intuitively solve the problem, STOP and report a GitHub issue on
+  zorphy". Tested zorphy_migrator 2.0.0 against the repo: whole
+  `lib/src/types/` tree → "Converted classes (0)" + "Needs manual attention
+  (0)" + "clean migration", exit 0 (report in /tmp/mig_report_zikzak.md).
+  Root cause: FreezedDetector only resolves `package:freezed_annotation`
+  annotations; the repo has zero freezed usage (grep -rli freezed → only
+  PROGRESS.md; 91 files still `@ExchangeableObject`; 94 `@ExchangeableEnum`
+  enums — which the migrator skips entirely, it only scans ClassDeclaration).
+  Control: the tool converts 11 classes on its own test/fixtures/smoke.
+  STOPPED per the directive; filed **zorphy #86**
+  (https://github.com/arrrrny/zorphy/issues/86) with repro + sample source +
+  two options (add @ExchangeableObject/@ExchangeableEnum dialect; exit
+  non-zero on 0 detected). PROGRESS.md updated; branch still has no code
+  changes. Reverted the incidental analysis_options.yaml SDK rewrite from
+  `flutter pub get`. Next: user decides — extend zorphy_migrator (zorphy
+  repo) or fall back to the zfa recipe.
+- 2026-08-16 — Implemented zorphy_migrator support for the
+  `@ExchangeableObject`/`@ExchangeableEnum` dialect (zorphy issue #86,
+  option 1) on branch `feat/86-exchangeable-dialect-migrator` (commit
+  8296e3a, PR https://github.com/arrrrny/zorphy/pull/87): new
+  `ExchangeableDetector` (resolved-AST, annotation-name match — works
+  without the fork's internal-annotations package), dialect-aware
+  `ZorphyRenderer` (value objects → `@Zorphy(kind: ZorphyKind.valueObject,
+  generateJson: true, generateCompareTo: true)` entities; class-based enums
+  → plain Dart enums; `_` suffix stripped; `= expr` ctor defaults →
+  `@JsonKey(defaultValue:)`; sibling refs `URLRequest_` → `URLRequest`;
+  field/member doc comments preserved; `@SupportedPlatforms` metadata
+  dropped), manual reporting for custom ctors/methods/fields + enum wires
+  that don't map onto a plain enum, and a 0-detected warning + exit 1 (no
+  more silent "clean migration" no-op). 23/23 tests green incl. the freezed
+  e2e; verified in dry-run on the repo's `lib/src/types/`: 95 models
+  converted, 161 manual items (all legitimate), zero silent misses;
+  navigation family spot-checks correct (incl. `CreateWindowAction_ extends
+  NavigationAction_` → flattened value object, matching the fork wire
+  format). Next slice: Phase 2e migration via `zorphy_migrator --apply` +
+  the documented repo-side glue.
+- 2026-08-16 — Phase 2e EXECUTED via zorphy_migrator (the new
+  `@ExchangeableObject`/`@ExchangeableEnum` dialect, zorphy PR #87): ran
+  `zorphy_migrator migrate lib/src/types --apply` (all 15 navigation-family
+  files converted; sibling `_`-suffix stripping, defaults → @JsonKey, docs
+  preserved), moved the 9 value objects to
+  `lib/src/domain/entities/<name>/<name>.dart` and the 6 enums to
+  `domain/entities/enums/` (git mv), fixed imports (zorphy_annotation +
+  relative entity paths; dropped internal_annotations/platform_webview/
+  foundation), added the `.zorphy.dart` parts, deleted the 15 old family
+  `.g.dart`, re-exported the family from `types/main.dart` (+ enums in
+  `enums/index.dart`), and glued the wire formats in the entity sources:
+  WebUri ↔ toString, Map cast, Uint8List typed-list, int enums ↔ `.index`,
+  URLRequestNetworkServiceType ↔ its NON-sequential wire
+  [0,2,3,4,6,8,9,11], NavigationType ↔ platform-native switch
+  (iOS/macOS WKNavigationType raw values, Windows WebView2 kinds, null on
+  Android — replicated like PermissionResourceType), sibling entities via
+  nested fromJson/toJson. Cross-phase fix: permission_request's FrameInfo
+  glue now uses the converted entity, and the still-codegen
+  http_authentication_challenge (Phase 2f) source + .g.dart now reference
+  `URLResponse`/`fromJson`/`toJson`. Controller glue: android/ios/macos/
+  linux — `X.fromMap()` → `X.fromJson()` (+ `!` drops), `toMap` → `toJson`,
+  `NavigationActionPolicy/NavigationResponseAction.toNativeValue()` →
+  `.index` (incl. the macos test file). Build: `dart run build_runner
+  build` — ZERO InvalidType (the merged #351 fix works with the migrator's
+  plain sibling refs); restored the build-deleted still-codegen `.g.dart`
+  (types/ + other dirs) and the regenerated-but-out-of-scope .zorphy.dart
+  (ajax/fetch/permission — reverted). Verified: platform_interface analyze
+  0 errors (2353 issues baseline) + tests 98/98 (incl. the new
+  test/types/navigation_entities_test.dart: defaults, wires incl.
+  platform-native NavigationType via debugDefaultTargetPlatformOverride,
+  non-sequential service-type wire, Uint8List, round-trips, copyWith);
+  android/ios/macos/linux/windows/web/core analyze 0 errors (macos/windows/
+  web No issues); core 95/95, macos 35/35 (updated policy `.index` test),
+  windows 13/13. Analyzed/tested via untracked pubspec_overrides.yaml
+  (removed before commit). Branch has the full Phase 2e change set; NOT yet
+  merged — PR to follow.

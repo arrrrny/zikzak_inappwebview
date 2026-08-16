@@ -233,7 +233,7 @@ class IOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
       onPlatformViewCreated: _onPlatformViewCreated,
       gestureRecognizers: params.gestureRecognizers,
       creationParams: <String, dynamic>{
-        'initialUrlRequest': params.initialUrlRequest?.toMap(),
+        'initialUrlRequest': params.initialUrlRequest?.toJson(),
         'initialFile': params.initialFile,
         'initialData': params.initialData?.toMap(),
         'initialSettings': settingsMap,

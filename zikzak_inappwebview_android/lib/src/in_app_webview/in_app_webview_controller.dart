@@ -322,19 +322,19 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          NavigationAction navigationAction = NavigationAction.fromMap(
+          NavigationAction navigationAction = NavigationAction.fromJson(
             arguments,
-          )!;
+          );
 
           if (webviewParams != null &&
               webviewParams!.shouldOverrideUrlLoading != null)
             return (await webviewParams!.shouldOverrideUrlLoading!(
               _controllerFromPlatform,
               navigationAction,
-            ))?.toNativeValue();
+            ))?.index;
           return (await _inAppBrowserEventHandler!.shouldOverrideUrlLoading(
             navigationAction,
-          ))?.toNativeValue();
+          ))?.index;
         }
         break;
       case "onConsoleMessage":
@@ -410,9 +410,9 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          CreateWindowAction createWindowAction = CreateWindowAction.fromMap(
+          CreateWindowAction createWindowAction = CreateWindowAction.fromJson(
             arguments,
-          )!;
+          );
 
           if (webviewParams != null && webviewParams!.onCreateWindow != null)
             return await webviewParams!.onCreateWindow!(
@@ -732,7 +732,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          LoginRequest loginRequest = LoginRequest.fromMap(arguments)!;
+          LoginRequest loginRequest = LoginRequest.fromJson(arguments);
 
           if (webviewParams != null) {
             webviewParams!.onReceivedLoginRequest!(
@@ -956,19 +956,19 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          NavigationResponse navigationResponse = NavigationResponse.fromMap(
+          NavigationResponse navigationResponse = NavigationResponse.fromJson(
             arguments,
-          )!;
+          );
 
           if (webviewParams != null) {
             return (await webviewParams!.onNavigationResponse!(
               _controllerFromPlatform,
               navigationResponse,
-            ))?.toNativeValue();
+            ))?.index;
           } else {
             return (await _inAppBrowserEventHandler!.onNavigationResponse(
               navigationResponse,
-            ))?.toNativeValue();
+            ))?.index;
           }
         }
         break;
@@ -1685,7 +1685,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
     );
 
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('urlRequest', () => urlRequest.toMap());
+    args.putIfAbsent('urlRequest', () => urlRequest.toJson());
     args.putIfAbsent(
       'allowingReadAccessTo',
       () =>

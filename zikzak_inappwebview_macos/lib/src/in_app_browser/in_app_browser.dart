@@ -211,7 +211,7 @@ class MacOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
   }) async {
     Map<String, dynamic> args = _prepareOpenRequest(settings: settings);
     if (args.isEmpty) return; // Already opened
-    args.putIfAbsent('urlRequest', () => urlRequest.toMap());
+    args.putIfAbsent('urlRequest', () => urlRequest.toJson());
     await _staticChannel.invokeMethod('open', args);
   }
 

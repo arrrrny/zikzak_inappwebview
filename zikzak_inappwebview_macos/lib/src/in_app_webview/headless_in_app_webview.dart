@@ -280,7 +280,7 @@ class MacOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     args.putIfAbsent(
       'params',
       () => <String, dynamic>{
-        'initialUrlRequest': params.initialUrlRequest?.toMap(),
+        'initialUrlRequest': params.initialUrlRequest?.toJson(),
         'initialFile': params.initialFile,
         'initialData': params.initialData?.toMap(),
         'initialSettings': settingsMap,

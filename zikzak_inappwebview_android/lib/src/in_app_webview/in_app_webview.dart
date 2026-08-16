@@ -257,7 +257,7 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
                 Directionality.maybeOf(context) ??
                 TextDirection.rtl,
             creationParams: <String, dynamic>{
-              'initialUrlRequest': this.params.initialUrlRequest?.toMap(),
+              'initialUrlRequest': this.params.initialUrlRequest?.toJson(),
               'initialFile': this.params.initialFile,
               'initialData': this.params.initialData?.toMap(),
               'initialSettings': settingsMap,

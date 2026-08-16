@@ -319,19 +319,19 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          NavigationAction navigationAction = NavigationAction.fromMap(
+          NavigationAction navigationAction = NavigationAction.fromJson(
             arguments,
-          )!;
+          );
 
           if (webviewParams != null &&
               webviewParams!.shouldOverrideUrlLoading != null)
             return (await webviewParams!.shouldOverrideUrlLoading!(
               _controllerFromPlatform,
               navigationAction,
-            ))?.toNativeValue();
+            ))?.index;
           return (await _inAppBrowserEventHandler!.shouldOverrideUrlLoading(
             navigationAction,
-          ))?.toNativeValue();
+          ))?.index;
         }
         break;
       case "onConsoleMessage":
@@ -407,9 +407,9 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          CreateWindowAction createWindowAction = CreateWindowAction.fromMap(
+          CreateWindowAction createWindowAction = CreateWindowAction.fromJson(
             arguments,
-          )!;
+          );
 
           if (webviewParams != null && webviewParams!.onCreateWindow != null)
             return await webviewParams!.onCreateWindow!(
@@ -723,7 +723,7 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          LoginRequest loginRequest = LoginRequest.fromMap(arguments)!;
+          LoginRequest loginRequest = LoginRequest.fromJson(arguments);
 
           if (webviewParams != null) {
             webviewParams!.onReceivedLoginRequest!(
@@ -954,19 +954,19 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
 
-          NavigationResponse navigationResponse = NavigationResponse.fromMap(
+          NavigationResponse navigationResponse = NavigationResponse.fromJson(
             arguments,
-          )!;
+          );
 
           if (webviewParams != null) {
             return (await webviewParams!.onNavigationResponse!(
               _controllerFromPlatform,
               navigationResponse,
-            ))?.toNativeValue();
+            ))?.index;
           } else {
             return (await _inAppBrowserEventHandler!.onNavigationResponse(
               navigationResponse,
-            ))?.toNativeValue();
+            ))?.index;
           }
         }
         break;
@@ -1683,7 +1683,7 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
     );
 
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('urlRequest', () => urlRequest.toMap());
+    args.putIfAbsent('urlRequest', () => urlRequest.toJson());
     args.putIfAbsent(
       'allowingReadAccessTo',
       () =>
@@ -2623,9 +2623,9 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
     URLResponse? urlResponse,
   }) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('urlRequest', () => urlRequest.toMap());
+    args.putIfAbsent('urlRequest', () => urlRequest.toJson());
     args.putIfAbsent('data', () => data);
-    args.putIfAbsent('urlResponse', () => urlResponse?.toMap());
+    args.putIfAbsent('urlResponse', () => urlResponse?.toJson());
     await channel?.invokeMethod('loadSimulatedRequest', args);
   }
 
