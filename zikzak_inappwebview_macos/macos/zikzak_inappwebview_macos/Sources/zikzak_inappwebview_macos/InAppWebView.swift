@@ -287,8 +287,21 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         let initialData = params["initialData"] as? [String: Any]
 
         if let initialFile = initialFile {
-            let fileURL = URL(fileURLWithPath: initialFile)
-            self.loadFileURL(fileURL, allowingReadAccessTo: fileURL.deletingLastPathComponent())
+            guard let registrar = self.registrar else {
+                return
+            }
+            do {
+                let assetURL = try Util.getUrlAsset(
+                    registrar: registrar, assetFilePath: initialFile)
+                if assetURL.isFileURL {
+                    self.loadFileURL(
+                        assetURL, allowingReadAccessTo: assetURL.deletingLastPathComponent())
+                } else {
+                    self.load(URLRequest(url: assetURL))
+                }
+            } catch {
+                // If asset resolution fails, silently skip initial load
+            }
         } else if let initialData = initialData {
             let data = initialData["data"] as? String ?? ""
             let mimeType = initialData["mimeType"] as? String ?? "text/html"
