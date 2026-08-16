@@ -4,7 +4,7 @@
 // express (zorphy #89). Plain Dart classes preserving the public API and the
 // old wire (layout + clickableIDs; onClick excluded).
 
-import '../../../types/android_resource.dart';
+import '../android_resource/android_resource.dart';
 import '../../../web_uri.dart';
 
 ///Class that represents the secondary toolbar of the Chrome Custom Tabs.
@@ -28,7 +28,7 @@ class ChromeSafariBrowserSecondaryToolbar {
       return null;
     }
     return ChromeSafariBrowserSecondaryToolbar(
-      layout: AndroidResource.fromMap(map['layout']?.cast<String, dynamic>())!,
+      layout: AndroidResource.fromJson(map['layout']?.cast<String, dynamic>())!,
       clickableIDs: (map['clickableIDs'] as List? ?? [])
           .map(
             (e) => ChromeSafariBrowserSecondaryToolbarClickableID.fromMap(
@@ -42,8 +42,8 @@ class ChromeSafariBrowserSecondaryToolbar {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "layout": layout.toMap(),
-      "clickableIDs": clickableIDs.map((e) => e.toMap()).toList(),
+      "layout": layout.toJson(),
+      "clickableIDs": clickableIDs.map((e) => e.toJson()).toList(),
     };
   }
 
@@ -79,13 +79,13 @@ class ChromeSafariBrowserSecondaryToolbarClickableID {
       return null;
     }
     return ChromeSafariBrowserSecondaryToolbarClickableID(
-      id: AndroidResource.fromMap(map['id']?.cast<String, dynamic>())!,
+      id: AndroidResource.fromJson(map['id']?.cast<String, dynamic>())!,
     );
   }
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
-    return {"id": id.toMap()};
+    return {"id": id.toJson()};
   }
 
   ///Gets a possible [ChromeSafariBrowserSecondaryToolbarClickableID] instance from a [Map] value.

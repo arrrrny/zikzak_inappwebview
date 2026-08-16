@@ -20,7 +20,7 @@ dynamic _deserializeIcon(dynamic icon) {
   if (icon is Map<String, dynamic>) {
     final iconMap = icon as Map<String, dynamic>;
     if (iconMap.containsKey('defType')) {
-      return AndroidResource.fromMap(iconMap);
+      return AndroidResource.fromJson(iconMap);
     }
     if (iconMap.containsKey('systemName')) {
       return UIImage.fromMap(iconMap);

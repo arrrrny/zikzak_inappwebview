@@ -1,7 +1,9 @@
+import 'package:zorphy_annotation/zorphy_annotation.dart';
 import 'package:zikzak_inappwebview_internal_annotations/zikzak_inappwebview_internal_annotations.dart';
 
-import 'ui_image.dart';
+import '../../../types/ui_image.dart';
 
+part 'activity_button.zorphy.dart';
 part 'activity_button.g.dart';
 
 ///Class that represents a custom button to show in `SFSafariViewController`'s toolbar.
@@ -11,18 +13,22 @@ part 'activity_button.g.dart';
 ///Check [Official Apple App Extensions](https://developer.apple.com/app-extensions/) for more details.
 ///
 ///**Officially Supported Platforms/Implementations**:
-///- iOS
-@ExchangeableObject()
-class ActivityButton_ {
+///iOS
+@Zorphy(
+  kind: ZorphyKind.valueObject,
+  generateJson: true,
+  generateCompareTo: true,
+)
+abstract class $ActivityButton {
   ///The name of the image asset or file.
-  UIImage_ templateImage;
-
+  @JsonKey(fromJson: _templateImageFromJson, toJson: _templateImageToJson)
+  UIImage get templateImage;
   ///The name of the App or Share Extension to be called.
-  String extensionIdentifier;
-
-  @ExchangeableObjectConstructor()
-  ActivityButton_({
-    required this.templateImage,
-    required this.extensionIdentifier,
-  });
+  String get extensionIdentifier;
 }
+
+
+UIImage _templateImageFromJson(Object? value) =>
+    UIImage.fromMap((value as Map).cast<String, dynamic>())!;
+
+Object? _templateImageToJson(UIImage value) => value.toMap();

@@ -159,17 +159,17 @@ Object? _transitionStyleToJson(ModalTransitionStyle? transitionStyle) =>
 
 ActivityButton? _activityButtonFromJson(Object? value) => value == null
     ? null
-    : ActivityButton.fromMap((value as Map).cast<String, dynamic>());
+    : ActivityButton.fromJson((value as Map).cast<String, dynamic>());
 
 Object? _activityButtonToJson(ActivityButton? activityButton) =>
-    activityButton?.toMap();
+    activityButton?.toJson();
 
 UIEventAttribution? _eventAttributionFromJson(Object? value) => value == null
     ? null
-    : UIEventAttribution.fromMap((value as Map).cast<String, dynamic>());
+    : UIEventAttribution.fromJson((value as Map).cast<String, dynamic>());
 
 Object? _eventAttributionToJson(UIEventAttribution? eventAttribution) =>
-    eventAttribution?.toMap();
+    eventAttribution?.toJson();
 
 ///The old wire deserialized the polymorphic display mode by its `type` key.
 TrustedWebActivityDisplayMode? _displayModeFromJson(Object? value) {
@@ -194,19 +194,19 @@ Object? _displayModeToJson(TrustedWebActivityDisplayMode? displayMode) =>
 List<AndroidResource>? _startAnimationsFromJson(Object? value) {
   if (value is! List) return null;
   return value
-      .map((e) => AndroidResource.fromMap((e as Map).cast<String, dynamic>())!)
+      .map((e) => AndroidResource.fromJson((e as Map).cast<String, dynamic>())!)
       .toList();
 }
 
 Object? _startAnimationsToJson(List<AndroidResource>? startAnimations) =>
-    startAnimations?.map((e) => e.toMap()).toList();
+    startAnimations?.map((e) => e.toJson()).toList();
 
 List<AndroidResource>? _exitAnimationsFromJson(Object? value) {
   if (value is! List) return null;
   return value
-      .map((e) => AndroidResource.fromMap((e as Map).cast<String, dynamic>())!)
+      .map((e) => AndroidResource.fromJson((e as Map).cast<String, dynamic>())!)
       .toList();
 }
 
 Object? _exitAnimationsToJson(List<AndroidResource>? exitAnimations) =>
-    exitAnimations?.map((e) => e.toMap()).toList();
+    exitAnimations?.map((e) => e.toJson()).toList();

@@ -24,9 +24,9 @@ dependencies:
   json_annotation: ^4.12.0
   # Zorphy entities (migration from @ExchangeableObject codegen; see PROGRESS.md).
   # Declared as a version constraint (publishable); the local box path is wired
-  # via dependency_overrides below — swap to the published zorphy_annotation/
-  # zorphy once 2.x is released on pub.dev (then drop the override).
-  zorphy_annotation: ^2.2.0
+  # via dependency_overrides below — pinned to the latest local development
+  # branch of zorphy (v2.0.0 + in-flight fixes, e.g. migrator #94).
+  zorphy_annotation: ^2.0.0
 
   meta: ^1.15.0
 
@@ -36,7 +36,7 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   build_runner: ^2.4.13
   json_serializable: ^6.8.0
-  zorphy: ^2.2.0
+  zorphy: ^2.0.0
 
 dependency_overrides:
   zorphy_annotation:

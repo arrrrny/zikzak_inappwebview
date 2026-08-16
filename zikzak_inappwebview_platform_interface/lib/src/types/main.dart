@@ -261,10 +261,10 @@ export '../domain/entities/enums/window_titlebar_separator_style.dart' show Wind
 export '../domain/entities/enums/custom_tabs_navigation_event_type.dart' show CustomTabsNavigationEventType, customTabsNavigationEventTypeFromWire, customTabsNavigationEventTypeToWire;
 export '../domain/entities/enums/custom_tabs_relation_type.dart' show CustomTabsRelationType, customTabsRelationTypeFromWire, customTabsRelationTypeToWire;
 export '../domain/entities/prewarming_token/prewarming_token.dart' show PrewarmingToken, PrewarmingTokenSerialization;
-export 'android_resource.dart' show AndroidResource;
+export '../domain/entities/android_resource/android_resource.dart' show AndroidResource, AndroidResourceSerialization;
 export 'ui_image.dart' show UIImage;
-export 'activity_button.dart' show ActivityButton;
-export 'ui_event_attribution.dart' show UIEventAttribution;
+export '../domain/entities/activity_button/activity_button.dart' show ActivityButton, ActivityButtonSerialization;
+export '../domain/entities/ui_event_attribution/ui_event_attribution.dart' show UIEventAttribution, UIEventAttributionSerialization;
 export '../domain/entities/enums/tracing_mode.dart' show TracingMode;
 export '../domain/entities/enums/tracing_category.dart' show TracingCategory, tracingCategoryFromWire, tracingCategoryToWire;
 export '../domain/entities/enums/custom_tabs_post_message_result_type.dart' show CustomTabsPostMessageResultType, customTabsPostMessageResultTypeFromWire, customTabsPostMessageResultTypeToWire;

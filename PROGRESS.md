@@ -37,6 +37,18 @@ branch (commit pending)**
 **Phase 3i (remaining types/ batch — 79 files) — DONE, committed as 3i on
 the same branch (PR #224 keeps accumulating)***
 
+**Phase 3j (last still-codegen settings/UI batch, part 1) — DONE, committed as 3j:
+migrator-convertible models (activity_button, ui_event_attribution,
+android_resource, in_app_browser_settings) converted via zorphy_migrator.
+NEW zorphy migrator fixes: #94 (empty-body @ExchangeableObjectConstructor no
+longer blocks; PR #95) and #96 (static factory methods returning the class
+type preserved on the migrated $ class, reported informational instead of
+blocking; PR #97). Entity glue added for Color_ hex (UtilColor), enum
+FromWire/ToWire, still-codegen UIImage/InAppWebViewRect fromMap/toMap.
+Remaining hand-migrate (assert-body ctors): user_script, script_html_tag_attributes,
+screenshot_configuration, ui_image, in_app_webview_rect, platform_tracing_controller,
+in_app_webview_settings, trusted display siblings.***
+
 - Phase 0 (mapping + toolchain) DONE.
 - Note on the task premise: this repo does **NOT** use Freezed. Upstream
   flutter_inappwebview dropped Freezed before 4.x; both upstream 4.x and this
@@ -815,3 +827,15 @@ dialogue_dismisser — hand-written toJson/fromJson today → Zorphy, core packa
   138/138; all platform packages + core 0 errors; core 95/95, macos 34/34
   (context_menu_test enum member names fixed to SCREAMING_SNAKE), windows
   13/13. Committed as 3i (PR #224 keeps accumulating).
+- 2026-08-16 — Phase 3j part 1 EXECUTED via zorphy_migrator: the four
+  migratable remaining models converted — ActivityButton + UIEventAttribution
+  (empty-body @ExchangeableObjectConstructor — fixed via zorphy #94/PR #95),
+  AndroidResource (static factories preserved via zorphy #96/PR #97),
+  InAppBrowserSettings (missing ctor param toolbarTopBarTintColor added to
+  the source first; 1 converted / 0 manual). Entity glue: Color_ hex via
+  UtilColor, enums via FromWire/ToWire, still-codegen UIImage/InAppWebViewRect
+  via fromMap/toMap (stripped-class names). ChromeSafari family re-glued to
+  AndroidResource/ActivityButton/UIEventAttribution fromJson/toJson;
+  platform_in_app_browser import re-pointed. Verified: platform_interface
+  0 errors + tests 138/138; all platform packages + core 0 errors; core
+  95/95, macos 34/34, windows 13/13. Committed as 3j (PR #224 accumulates).
