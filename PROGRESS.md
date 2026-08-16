@@ -32,6 +32,9 @@ same branch (commit pending)**
 branch (commit pending)**
 **Phase 3g (print_job family → Zorphy via zorphy_migrator) — DONE on the
 same branch (commit pending)**
+**Phase 3h (InAppBrowserMenuItem → Zorphy skip/fork) — DONE on the same
+branch (commit pending); InAppBrowserSettings pending (coupled to
+InAppWebViewSettings)***
 
 - Phase 0 (mapping + toolchain) DONE.
 - Note on the task premise: this repo does **NOT** use Freezed. Upstream
@@ -368,6 +371,8 @@ should_allow_deprecated_tls_action. (Scoped; not started.)
 - [x] Phase 3g: print_job family (Settings 45f + Attributes 25f hand-written,
       Info/MediaSize/Resolution/Printer + 9 enums converted; NON-sequential
       wires via helpers) — migrated (see worklog)
+- [x] Phase 3h: InAppBrowserMenuItem (skip/fork, onClick — zorphy #89) —
+      migrated (see worklog); InAppBrowserSettings next (coupled)
 
 ### Phase 3 — browser/settings objects (`in_app_browser/`, `in_app_webview/`,
 `chrome_safari_browser/`, `print_job/`, `pull_to_refresh/`, `context_menu/`,
