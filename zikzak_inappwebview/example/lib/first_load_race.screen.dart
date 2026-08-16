@@ -39,7 +39,11 @@ class _FirstLoadRaceScreenState extends State<FirstLoadRaceScreen> {
   String? _visibleLoadStopUrl;
   final _visibleLoadStopCompleters = <Completer<String?>>[];
 
+  /// Live state instance for the debug hook below.
+  static _FirstLoadRaceScreenState? _live;
+
   void _log(List<String> log, String line) {
+    debugPrint('[FirstLoadRace] $line');
     log.insert(0, line);
     if (log.length > 60) log.removeLast();
   }
@@ -182,6 +186,18 @@ class _FirstLoadRaceScreenState extends State<FirstLoadRaceScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _live = this;
+  }
+
+  @override
+  void dispose() {
+    if (identical(_live, this)) _live = null;
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('First-Load Race Stress')),
@@ -268,3 +284,9 @@ class _FirstLoadRaceScreenState extends State<FirstLoadRaceScreen> {
     );
   }
 }
+
+/// Debug hook — invoke from the VM service / flutter run console:
+///   debugRunHeadlessStress()
+Future<void> debugRunHeadlessStress() =>
+    _FirstLoadRaceScreenState._live?._runHeadlessStress() ??
+    Future.error('FirstLoadRaceScreen not open');
