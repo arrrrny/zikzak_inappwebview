@@ -81,9 +81,7 @@ class _HeadlessInAppWebViewExampleScreenState
             Center(
               child: ElevatedButton(
                 onPressed: () async {
-                  // NOTE: dispose() is terminal — a disposed headless webview
-                  // can no longer be run (run() guards on _disposed), so the
-                  // Run button must not dispose first.
+                  // Run (or re-run after a dispose — run() starts fresh).
                   await headlessWebView?.run();
                 },
                 child: const Text("Run HeadlessInAppWebView"),
