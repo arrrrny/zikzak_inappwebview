@@ -1,3 +1,18 @@
+## 5.0.0 - 2026-08-16
+
+
+### Breaking Changes
+
+- Migrated the entire `platform_interface` model layer to **Zorphy entities** — every model class is now a Zorphy entity instead of a hand-written `@ExchangeableObject`-style class (Phases 1–3j). This changes the public API surface of the platform interface (class structure, `toJson`/`fromJson`, equality) and may require updates to custom platform implementations.
+
+### Features
+
+- [platform_interface] Migrated model families to Zorphy entities: JS dialogue, ajax request, fetch request, console message, web resource, permission/safe-browsing, navigation, auth/ssl, pull-to-refresh, web storage, web message, web authentication session, context menu, webview environment, chrome safari browser, print job, `InAppBrowserMenuItem`, tracing settings, user script, image/rect/screenshot config, in-app webview settings, and script HTML tag attributes
+
+### Chores
+
+- Removed the dead `@ExchangeableObject` codegen toolchain
+- Removed the Docusaurus website (to be replaced by a zread wiki)
 ## 4.10.0 - 2026-08-16
 
 
