@@ -364,6 +364,50 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
           ))?.toJson();
         }
         break;
+      case 'onScrollChanged':
+        if (params.webviewParams?.onScrollChanged != null) {
+          int x = call.arguments['x'];
+          int y = call.arguments['y'];
+          params.webviewParams!.onScrollChanged!(controller, x, y);
+        }
+        break;
+      case 'onOverScrolled':
+        if (params.webviewParams?.onOverScrolled != null) {
+          int x = call.arguments['x'];
+          int y = call.arguments['y'];
+          bool clampedX = call.arguments['clampedX'];
+          bool clampedY = call.arguments['clampedY'];
+          params.webviewParams!.onOverScrolled!(
+            controller,
+            x,
+            y,
+            clampedX,
+            clampedY,
+          );
+        }
+        break;
+      case 'onZoomScaleChanged':
+        if (params.webviewParams?.onZoomScaleChanged != null) {
+          double oldScale = call.arguments['oldScale'];
+          double newScale = call.arguments['newScale'];
+          params.webviewParams!.onZoomScaleChanged!(
+            controller,
+            oldScale,
+            newScale,
+          );
+        }
+        break;
+      case 'onContentSizeChanged':
+        if (params.webviewParams?.onContentSizeChanged != null) {
+          Map oldMap = call.arguments['oldContentSize'];
+          Map newMap = call.arguments['newContentSize'];
+          params.webviewParams!.onContentSizeChanged!(
+            controller,
+            Size(oldMap['width'], oldMap['height']),
+            Size(newMap['width'], newMap['height']),
+          );
+        }
+        break;
       default:
         throw UnimplementedError("Unimplemented ${call.method} method");
     }
