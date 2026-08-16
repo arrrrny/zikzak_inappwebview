@@ -1,58 +1,62 @@
-import 'package:zikzak_inappwebview_internal_annotations/zikzak_inappwebview_internal_annotations.dart';
+import 'package:zorphy_annotation/zorphy_annotation.dart';
 
-import 'platform_webview_environment.dart';
+import '../../../webview_environment/platform_webview_environment.dart';
 
+part 'webview_environment_settings.zorphy.dart';
 part 'webview_environment_settings.g.dart';
 
 ///The access kind for resources mapped by [VirtualHostMapping].
 ///
 ///The values match the WebView2
 ///`COREWEBVIEW2_HOST_RESOURCE_ACCESS_KIND` enum.
-@ExchangeableEnum()
-class HostResourceAccessKind_ {
-  // ignore: unused_field
-  final int _value;
-  const HostResourceAccessKind_._internal(this._value);
-
+enum HostResourceAccessKind {
   ///The host resource access is denied.
-  static const deny = const HostResourceAccessKind_._internal(0);
+  deny,
 
   ///The host resource can be accessed from the same origin.
-  static const allow = const HostResourceAccessKind_._internal(1);
+  allow,
 
   ///The host resource can be accessed from any origin (CORS allowed).
-  static const allowCors = const HostResourceAccessKind_._internal(2);
+  allowCors,
 }
 
 ///Represents a mapping between a virtual host name and a local folder,
 ///used to serve local content through the WebView.
 ///
 ///The WebView serves the [folderPath] content at `https://[hostName]/`.
-@ExchangeableObject()
-class VirtualHostMapping_ {
+@Zorphy(
+  kind: ZorphyKind.valueObject,
+  generateJson: true,
+  generateCompareTo: true,
+)
+abstract class $VirtualHostMapping {
   ///The host name to map (e.g. `app.localhost`).
-  final String hostName;
+  @JsonKey(fromJson: _hostNameFromJson, toJson: _hostNameToJson)
+  String get hostName;
 
   ///The absolute folder path to map to the host name.
-  final String folderPath;
+  @JsonKey(fromJson: _folderPathFromJson, toJson: _folderPathToJson)
+  String get folderPath;
 
   ///The access kind for the mapped resources.
-  final HostResourceAccessKind_ accessKind;
-
-  VirtualHostMapping_({
-    required this.hostName,
-    required this.folderPath,
-    this.accessKind = HostResourceAccessKind_.allow,
-  });
+  @JsonKey(
+    defaultValue: HostResourceAccessKind.allow,
+    fromJson: _accessKindFromJson,
+    toJson: _accessKindToJson,
+  )
+  HostResourceAccessKind get accessKind;
 }
 
 ///This class represents all the [PlatformWebViewEnvironment] settings available.
 ///
 ///The [browserExecutableFolder], [userDataFolder] and [additionalBrowserArguments]
 ///may be overridden by values either specified in environment variables or in the registry.
-@SupportedPlatforms(platforms: [WindowsPlatform()])
-@ExchangeableObject(copyMethod: true)
-class WebViewEnvironmentSettings_ {
+@Zorphy(
+  kind: ZorphyKind.valueObject,
+  generateJson: true,
+  generateCompareTo: true,
+)
+abstract class $WebViewEnvironmentSettings {
   ///Use [browserExecutableFolder] to specify whether WebView2 controls use a fixed
   ///or installed version of the WebView2 Runtime that exists on a user machine.
   ///To use a fixed version of the WebView2 Runtime, pass the folder path that contains
@@ -68,17 +72,7 @@ class WebViewEnvironmentSettings_ {
   ///The default channel search order is the WebView2 Runtime, Beta, Dev, and Canary.
   ///When an override `WEBVIEW2_RELEASE_CHANNEL_PREFERENCE` environment variable or
   ///applicable `releaseChannelPreference` registry value is set to `1`, the channel search order is reversed.
-  @SupportedPlatforms(
-    platforms: [
-      WindowsPlatform(
-        apiName:
-            'CreateCoreWebView2EnvironmentWithOptions.browserExecutableFolder',
-        apiUrl:
-            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#createcorewebview2environmentwithoptions',
-      ),
-    ],
-  )
-  final String? browserExecutableFolder;
+  String? get browserExecutableFolder;
 
   ///You may specify the [userDataFolder] to change the default user data folder location for WebView2.
   ///The path is either an absolute file path or a relative file path that is interpreted as relative
@@ -94,71 +88,23 @@ class WebViewEnvironmentSettings_ {
   ///WebView creation fails with `HRESULT_FROM_WIN32(ERROR_INVALID_STATE)` if the specified
   ///settings does not match the settings of the WebViews that are currently
   ///running in the shared browser process.
-  @SupportedPlatforms(
-    platforms: [
-      WindowsPlatform(
-        apiName: 'CreateCoreWebView2EnvironmentWithOptions.userDataFolder',
-        apiUrl:
-            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#createcorewebview2environmentwithoptions',
-      ),
-    ],
-  )
-  final String? userDataFolder;
+  String? get userDataFolder;
 
   ///If there are multiple switches, there should be a space in between them.
   ///The one exception is if multiple features are being enabled/disabled for a single switch,
   ///in which case the features should be comma-seperated.
   ///Example: `"--disable-features=feature1,feature2 --some-other-switch --do-something"`
-  @SupportedPlatforms(
-    platforms: [
-      WindowsPlatform(
-        apiName:
-            'ICoreWebView2EnvironmentOptions.put_AdditionalBrowserArguments',
-        apiUrl:
-            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions?view=webview2-1.0.2210.55#put_additionalbrowserarguments',
-      ),
-    ],
-  )
-  final String? additionalBrowserArguments;
+  String? get additionalBrowserArguments;
 
   ///This property is used to enable single sign on with Azure Active Directory (AAD)
   ///and personal Microsoft Account (MSA) resources inside WebView.
-  @SupportedPlatforms(
-    platforms: [
-      WindowsPlatform(
-        apiName:
-            'ICoreWebView2EnvironmentOptions.put_AllowSingleSignOnUsingOSPrimaryAccount',
-        apiUrl:
-            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions?view=webview2-1.0.2210.55#put_allowsinglesignonusingosprimaryaccount',
-      ),
-    ],
-  )
-  final bool? allowSingleSignOnUsingOSPrimaryAccount;
+  bool? get allowSingleSignOnUsingOSPrimaryAccount;
 
   ///The default display language for WebView.
-  @SupportedPlatforms(
-    platforms: [
-      WindowsPlatform(
-        apiName: 'ICoreWebView2EnvironmentOptions.put_Language',
-        apiUrl:
-            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions?view=webview2-1.0.2210.55#put_language',
-      ),
-    ],
-  )
-  final String? language;
+  String? get language;
 
   ///Specifies the version of the WebView2 Runtime binaries required to be compatible with your app.
-  @SupportedPlatforms(
-    platforms: [
-      WindowsPlatform(
-        apiName:
-            'ICoreWebView2EnvironmentOptions.put_TargetCompatibleBrowserVersion',
-        apiUrl:
-            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions?view=webview2-1.0.2210.55#put_targetcompatiblebrowserversion',
-      ),
-    ],
-  )
-  final String? targetCompatibleBrowserVersion;
+  String? get targetCompatibleBrowserVersion;
 
   ///Virtual host name to folder path mappings applied to the WebView.
   ///
@@ -166,15 +112,41 @@ class WebViewEnvironmentSettings_ {
   ///`https://[VirtualHostMapping.hostName]/`, which bypasses CORS for local
   ///resources (use [HostResourceAccessKind.allowCors] to allow cross-origin
   ///access). Currently honored by the Windows implementation.
-  final List<VirtualHostMapping_>? virtualHostMappings;
-
-  WebViewEnvironmentSettings_({
-    this.browserExecutableFolder,
-    this.userDataFolder,
-    this.additionalBrowserArguments,
-    this.allowSingleSignOnUsingOSPrimaryAccount,
-    this.language,
-    this.targetCompatibleBrowserVersion,
-    this.virtualHostMappings,
-  });
+  @JsonKey(
+    fromJson: _virtualHostMappingsFromJson,
+    toJson: _virtualHostMappingsToJson,
+  )
+  List<VirtualHostMapping>? get virtualHostMappings;
 }
+
+String _hostNameFromJson(Object? value) => value as String? ?? '';
+
+Object? _hostNameToJson(String value) => value;
+
+String _folderPathFromJson(Object? value) => value as String? ?? '';
+
+Object? _folderPathToJson(String value) => value;
+
+///The old wire coerced a missing/invalid accessKind to
+///[HostResourceAccessKind.allow].
+HostResourceAccessKind _accessKindFromJson(Object? value) {
+  if (value is! int) return HostResourceAccessKind.allow;
+  return value >= 0 && value < HostResourceAccessKind.values.length
+      ? HostResourceAccessKind.values[value]
+      : HostResourceAccessKind.allow;
+}
+
+Object? _accessKindToJson(HostResourceAccessKind accessKind) =>
+    accessKind.index;
+
+List<VirtualHostMapping>? _virtualHostMappingsFromJson(Object? value) {
+  if (value is! List) return null;
+  return value
+      .map(
+        (e) => VirtualHostMapping.fromJson((e as Map).cast<String, dynamic>()),
+      )
+      .toList();
+}
+
+Object? _virtualHostMappingsToJson(List<VirtualHostMapping>? mappings) =>
+    mappings?.map((e) => e.toJson()).toList();

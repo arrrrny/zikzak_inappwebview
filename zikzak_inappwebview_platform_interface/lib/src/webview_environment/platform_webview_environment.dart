@@ -4,7 +4,7 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import '../debug_logging_settings.dart';
 import '../inappwebview_platform.dart';
 import '../types/disposable.dart';
-import 'webview_environment_settings.dart';
+import '../domain/entities/webview_environment_settings/webview_environment_settings.dart';
 
 /// Object specifying creation parameters for creating a [PlatformWebViewEnvironment].
 ///
