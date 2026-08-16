@@ -18,6 +18,8 @@ and the zikzak→zuraffa v6 migration (…7545).
 `feat/migrate-models-zorphy-entities-phase2e` (not yet merged)**
 **Phase 2f (auth/ssl family → Zorphy via zorphy_migrator) — DONE on the same
 branch (commit pending)**
+**Phase 3a (pull_to_refresh + web_storage families → Zorphy via
+zorphy_migrator) — DONE on the same branch (commit pending)**
 
 - Phase 0 (mapping + toolchain) DONE.
 - Note on the task premise: this repo does **NOT** use Freezed. Upstream
@@ -333,6 +335,9 @@ ServerTrustAuthResponse (+action), SslCertificate, SslError (+type),
 should_allow_deprecated_tls_action. (Scoped; not started.)
 - [x] challenge hierarchy + URLProtectionSpace/URLCredential/SslCertificate/
       SslError + responses + 8 enums — migrated (see worklog)
+- [x] Phase 3a: pull_to_refresh + web_storage families (PullToRefreshSettings/
+      PullToRefreshSize, WebStorageItem/WebStorageOrigin/WebStorageType) —
+      migrated (see worklog)
 
 ### Phase 3 — browser/settings objects (`in_app_browser/`, `in_app_webview/`,
 `chrome_safari_browser/`, `print_job/`, `pull_to_refresh/`, `context_menu/`,
@@ -683,3 +688,24 @@ dialogue_dismisser — hand-written toJson/fromJson today → Zorphy, core packa
   debugDefaultTargetPlatformOverride, SslCertificate glue, fork defaults);
   android/ios/macos/linux/windows/web/core 0 errors; core 95/95, macos
   35/35, windows 13/13. Committed as 2f + PR #224.
+- 2026-08-16 — Phase 3a EXECUTED via zorphy_migrator: pull_to_refresh +
+  web_storage families. Converted: PullToRefreshSettings (entity; Color_ hex
+  glue via UtilColor, AttributedString nested glue via the still-codegen
+  fromMap/toMap, size wire glue via a new `pullToRefreshSizeToWire` helper —
+  DEFAULT=1/LARGE=0 NON-sequential, `///- ` doc lines sanitized),
+  PullToRefreshSize (enum + wire helper), WebStorageItem/WebStorageOrigin
+  (entities, dynamic value), WebStorageType (enum + `webStorageTypeToWire`
+  helper — 'localStorage'/'sessionStorage' strings). Controllers: `toMap()`→
+  `toJson()` for PullToRefreshSettings (all platforms incl. the
+  `settings?.toMap()` variant), `size.toNativeValue()`→`pullToRefreshSizeToWire`,
+  and the android/ios web_storage JS templates now interpolate
+  `webStorageTypeToWire(webStorageType)` (the old enum's toString returned
+  the wire string). **NEW zorphy generator bug found + reported as zorphy
+  #88**: doc-comment lines `///- X` (and `/// X`) leak the token into the
+  generated constructor and break the build — workaround: sanitize the doc
+  lines (migrator-side fix committed to zorphy PR #87, f7ea418/6174a84:
+  normalize to `///X`); the generator fix is tracked by #88. Verified:
+  platform_interface 0 errors + tests 116/116 (new
+  test/types/pull_refresh_web_storage_entities_test.dart); all platform
+  packages + core 0 errors; core 95/95, macos 35/35, windows 13/13.
+  Committed as 3a + PR #225.

@@ -5,7 +5,7 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import '../in_app_webview/platform_inappwebview_controller.dart';
 import '../inappwebview_platform.dart';
 import '../types/main.dart';
-import 'web_storage_item.dart';
+import '../domain/entities/web_storage_item/web_storage_item.dart';
 
 /// Object specifying creation parameters for creating a [PlatformWebStorage].
 ///

@@ -6,7 +6,7 @@ import '../in_app_webview/in_app_webview_settings.dart';
 import '../debug_logging_settings.dart';
 import '../inappwebview_platform.dart';
 import '../types/main.dart';
-import 'pull_to_refresh_settings.dart';
+import '../domain/entities/pull_to_refresh_settings/pull_to_refresh_settings.dart';
 import '../in_app_webview/platform_webview.dart';
 import '../in_app_browser/platform_in_app_browser.dart';
 

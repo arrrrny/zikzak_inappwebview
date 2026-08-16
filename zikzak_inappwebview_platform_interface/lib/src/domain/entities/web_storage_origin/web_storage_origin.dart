@@ -1,21 +1,22 @@
-import 'package:zikzak_inappwebview_internal_annotations/zikzak_inappwebview_internal_annotations.dart';
+import 'package:zorphy_annotation/zorphy_annotation.dart';
 
-import '../web_storage/platform_web_storage_manager.dart';
-
+part 'web_storage_origin.zorphy.dart';
 part 'web_storage_origin.g.dart';
 
 ///Class that encapsulates information about the amount of storage currently used by an origin for the JavaScript storage APIs.
 ///An origin comprises the host, scheme and port of a URI. See [PlatformWebStorageManager] for details.
-@ExchangeableObject()
-class WebStorageOrigin_ {
+@Zorphy(
+  kind: ZorphyKind.valueObject,
+  generateJson: true,
+  generateCompareTo: true,
+)
+abstract class $WebStorageOrigin {
   ///The string representation of this origin.
-  String? origin;
+  String? get origin;
 
   ///The quota for this origin, for the Web SQL Database API, in bytes.
-  int? quota;
+  int? get quota;
 
   ///The total amount of storage currently being used by this origin, for all JavaScript storage APIs, in bytes.
-  int? usage;
-
-  WebStorageOrigin_({this.origin, this.quota, this.usage});
+  int? get usage;
 }

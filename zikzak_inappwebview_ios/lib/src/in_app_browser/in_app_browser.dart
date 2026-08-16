@@ -158,8 +158,8 @@ class IOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
         settings?.toMap() ?? InAppBrowserClassSettings().toMap();
 
     Map<String, dynamic> pullToRefreshSettings =
-        _iosParams.pullToRefreshController?.settings?.toMap() ??
-        PullToRefreshSettings(enabled: false).toMap();
+        _iosParams.pullToRefreshController?.settings?.toJson() ??
+        PullToRefreshSettings(enabled: false).toJson();
 
     List<Map<String, dynamic>> menuItemList = [];
     _menuItems.forEach((key, value) {

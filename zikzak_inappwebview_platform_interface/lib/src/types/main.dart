@@ -157,7 +157,7 @@ export 'print_job_resolution.dart' show PrintJobResolution;
 export 'print_job_state.dart' show PrintJobState;
 export 'proxy_rule.dart' show ProxyRule;
 export 'proxy_scheme_filter.dart' show ProxySchemeFilter;
-export 'pull_to_refresh_size.dart' show PullToRefreshSize;
+export '../domain/entities/enums/pull_to_refresh_size.dart' show PullToRefreshSize, pullToRefreshSizeToWire;
 export 'referrer_policy.dart' show ReferrerPolicy;
 export 'render_process_gone_detail.dart' show RenderProcessGoneDetail;
 export 'renderer_priority.dart' show RendererPriority;
@@ -248,8 +248,8 @@ export '../domain/entities/web_resource_request/web_resource_request.dart'
     show WebResourceRequest, WebResourceRequestSerialization;
 export '../domain/entities/web_resource_response/web_resource_response.dart'
     show WebResourceResponse, WebResourceResponseSerialization;
-export 'web_storage_origin.dart' show WebStorageOrigin;
-export 'web_storage_type.dart' show WebStorageType;
+export '../domain/entities/web_storage_origin/web_storage_origin.dart' show WebStorageOrigin, WebStorageOriginSerialization;
+export '../domain/entities/enums/web_storage_type.dart' show WebStorageType, webStorageTypeToWire;
 export 'website_data_record.dart' show WebsiteDataRecord;
 export 'website_data_type.dart' show WebsiteDataType;
 export 'webview_package_info.dart' show WebViewPackageInfo;

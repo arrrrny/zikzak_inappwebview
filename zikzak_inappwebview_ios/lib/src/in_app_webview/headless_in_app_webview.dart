@@ -264,8 +264,8 @@ class IOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
         initialSettings.toMap();
 
     Map<String, dynamic> pullToRefreshSettings =
-        _iosParams.pullToRefreshController?.settings?.toMap() ??
-        PullToRefreshSettings(enabled: false).toMap();
+        _iosParams.pullToRefreshController?.settings?.toJson() ??
+        PullToRefreshSettings(enabled: false).toJson();
 
     Map<String, dynamic> findInteractionSettings =
         _iosParams.findInteractionController?.onFindResultReceived != null

@@ -255,7 +255,7 @@ class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
 
     Map<String, dynamic> pullToRefreshSettings = PullToRefreshSettings(
       enabled: false,
-    ).toMap();
+    ).toJson();
 
     Map<String, dynamic> findInteractionSettings =
         _linuxParams.findInteractionController?.onFindResultReceived != null

@@ -216,8 +216,8 @@ class IOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
         initialSettings.toMap();
 
     Map<String, dynamic> pullToRefreshSettings =
-        params.pullToRefreshController?.params.settings?.toMap() ??
-        PullToRefreshSettings(enabled: false).toMap();
+        params.pullToRefreshController?.params.settings?.toJson() ??
+        PullToRefreshSettings(enabled: false).toJson();
 
     if ((params.headlessWebView?.isRunning() ?? false) &&
         params.keepAlive != null) {

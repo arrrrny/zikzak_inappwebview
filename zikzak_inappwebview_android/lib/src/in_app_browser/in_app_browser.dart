@@ -162,8 +162,8 @@ class AndroidInAppBrowser extends PlatformInAppBrowser with ChannelController {
         InAppBrowserClassSettings().toMap();
 
     Map<String, dynamic> pullToRefreshSettings =
-        pullToRefreshController?.settings?.toMap() ??
-        PullToRefreshSettings(enabled: false).toMap();
+        pullToRefreshController?.settings?.toJson() ??
+        PullToRefreshSettings(enabled: false).toJson();
 
     List<Map<String, dynamic>> menuItemList = [];
     _menuItems.forEach((key, value) {

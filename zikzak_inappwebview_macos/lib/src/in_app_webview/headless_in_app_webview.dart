@@ -268,7 +268,7 @@ class MacOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
 
     Map<String, dynamic> pullToRefreshSettings = PullToRefreshSettings(
       enabled: false,
-    ).toMap();
+    ).toJson();
 
     Map<String, dynamic> findInteractionSettings =
         _macosParams.findInteractionController?.onFindResultReceived != null
