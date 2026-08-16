@@ -13,6 +13,14 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     var contextMenu: [String: Any]?
     var contextMenuIsShowing = false
 
+    /// One-shot callback fired on the FIRST terminal navigation event
+    /// (`didFinish` or any `didFail`/`didFailProvisionalNavigation`). Used by
+    /// `HeadlessInAppWebViewManager` to gate `run()` on web-process readiness
+    /// so a consumer's first real `loadUrl` is never issued while WKWebView is
+    /// still booting its content process (which can silently drop the
+    /// navigation). `nil` by default — no effect on regular web views.
+    var firstNavigationCompleted: (() -> Void)?
+
     /// Set by the WKUIDelegate when returning `nil` from
     /// `webView(_:contextMenuForElement:willDisplayWithHighlight:)` in the
     /// cases where we want to actually suppress the menu (not let WebKit
@@ -1671,6 +1679,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         InAppWebView.credentialsProposed = []
         channel?.invokeMethod("onLoadStop", arguments: ["url": webView.url?.absoluteString])
+        firstNavigationCompleted?()
     }
 
     public func webView(
@@ -1710,6 +1719,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         arguments["code"] = (error as NSError).code
         arguments["message"] = error.localizedDescription
         channel?.invokeMethod("onReceivedError", arguments: arguments)
+        firstNavigationCompleted?()
     }
     public func webView(
         _ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge,

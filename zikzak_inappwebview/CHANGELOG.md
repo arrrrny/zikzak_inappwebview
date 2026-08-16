@@ -1,3 +1,34 @@
+## 4.9.0 - 2026-08-14
+
+### Features
+
+- Session recipe — record and replay user sessions in the WebView: JS
+  tap-listener injection, selector-candidate extraction, scripted click replay,
+  and recipe models (#216)
+- Navigation tracker — JS-assisted URL-cycle tracking through the webview (#216)
+- Dialogue dismisser — inject JS to auto-dismiss modal dialogs (#216)
+- Navigation guards — `keepNavigationInWebView` helper that keeps user-tapped
+  links inside the WebView, avoiding iOS universal-link handoff (#216)
+- [Windows] Virtual host name to folder mapping — CORS-safe serving of local
+  folders (CORS bypass for local resources) (#185)
+- [macOS] Popup windows — `window.open` / `target=_blank` now load their URL
+  via `WKUIDelegate createWebViewWith` off-screen-window support, reparented
+  into a Flutter platform view when `onCreateWindow` is handled (#182, #183, #187)
+
+### Fixes
+
+- [macOS] Popup window crash, settings key, and event delivery fixes (#187)
+- [macOS] Network Capture API callbacks never fired — JS bridge name aligned
+  with iOS/Android so `onNetworkRequest` / `onNetworkResponse` /
+  `onNetworkLoadingFinished` reach Dart (#182)
+- [Linux] Blue screen instead of webview — offscreen rendering via
+  `GtkOffscreenWindow` + software rendering, plus `openDevTools` support (#184)
+- [Linux] Native plugin compile regression — broken `takeScreenshot` string
+  literal and missing include path (#179)
+- Chore: renamed remaining `flutter_inappwebview` residuals to
+  `zikzak_inappwebview` (JS bridge name, method channel, platform view type id) (#186)
+- Chore: dependency bumps (npm deps, brace-expansion) (#189, #210)
+
 ## 4.8.0 - 2026-08-14
 
 ### Features

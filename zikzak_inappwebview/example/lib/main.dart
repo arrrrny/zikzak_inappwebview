@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:zikzak_inappwebview/zikzak_inappwebview.dart';
 
 import 'package:zikzak_inappwebview_example/chrome_safari_browser_example.screen.dart';
+import 'package:zikzak_inappwebview_example/first_load_race.screen.dart';
 import 'package:zikzak_inappwebview_example/headless_in_app_webview.screen.dart';
 import 'package:zikzak_inappwebview_example/in_app_webiew_example.screen.dart';
 import 'package:zikzak_inappwebview_example/in_app_webview_edge_to_edge.screen.dart';
@@ -72,6 +73,12 @@ PointerInterceptor myDrawer({required BuildContext context}) {
       title: const Text('HeadlessInAppWebView'),
       onTap: () {
         Navigator.pushReplacementNamed(context, '/HeadlessInAppWebView');
+      },
+    ),
+    ListTile(
+      title: const Text('First-Load Race Stress'),
+      onTap: () {
+        Navigator.pushReplacementNamed(context, '/FirstLoadRace');
       },
     ),
   ];
@@ -239,6 +246,7 @@ class _MyAppState extends State<MyApp> {
         '/ChromeSafariBrowser': (context) => ChromeSafariBrowserExampleScreen(),
         '/HeadlessInAppWebView': (context) =>
             const HeadlessInAppWebViewExampleScreen(),
+        '/FirstLoadRace': (context) => const FirstLoadRaceScreen(),
       },
     );
   }

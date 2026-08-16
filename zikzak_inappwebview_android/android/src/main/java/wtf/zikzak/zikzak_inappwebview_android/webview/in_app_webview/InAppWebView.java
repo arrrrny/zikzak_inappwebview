@@ -162,6 +162,15 @@ public final class InAppWebView
     @Nullable
     public JavaScriptBridgeInterface javaScriptBridgeInterface;
 
+    /// One-shot callback fired on the FIRST terminal navigation event
+    /// (`onPageFinished` or a main-frame `onReceivedError`). Used by
+    /// `HeadlessInAppWebViewManager` to gate `run()` on webview readiness so
+    /// a consumer's first real `loadUrl` is never issued while the webview /
+    /// renderer is still starting up. `null` by default — no effect on
+    /// regular web views.
+    @Nullable
+    public Runnable firstNavigationCompleted;
+
     public InAppWebViewSettings customSettings = new InAppWebViewSettings();
     public boolean isLoading = false;
     private boolean inFullscreen = false;
