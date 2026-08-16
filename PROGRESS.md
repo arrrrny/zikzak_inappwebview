@@ -24,6 +24,8 @@ zorphy_migrator) — DONE on the same branch (commit pending)**
 zorphy_migrator) — DONE on the same branch (commit pending)**
 **Phase 3c (context_menu family → Zorphy via zorphy_migrator) — DONE on the
 same branch (commit pending)**
+**Phase 3d (webview_environment family → Zorphy via zorphy_migrator) — DONE
+on the same branch (commit pending)**
 
 - Phase 0 (mapping + toolchain) DONE.
 - Note on the task premise: this repo does **NOT** use Freezed. Upstream
@@ -349,6 +351,8 @@ should_allow_deprecated_tls_action. (Scoped; not started.)
 - [x] Phase 3c: context_menu family (ContextMenuSettings entity;
       ContextMenu + ContextMenuItem skip/fork — function-typed callbacks
       cannot be expressed as zorphy value objects) — migrated (see worklog)
+- [x] Phase 3d: webview_environment family (WebViewEnvironmentSettings +
+      VirtualHostMapping + HostResourceAccessKind) — migrated (see worklog)
 
 ### Phase 3 — browser/settings objects (`in_app_browser/`, `in_app_webview/`,
 `chrome_safari_browser/`, `print_job/`, `pull_to_refresh/`, `context_menu/`,
