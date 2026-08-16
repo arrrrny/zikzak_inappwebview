@@ -29,6 +29,12 @@ class InAppWebViewController implements Disposable {
   /// Implementation of [PlatformInAppWebViewController] for the current platform.
   final PlatformInAppWebViewController platform;
 
+  /// Whether [dispose] has been called.
+  bool _disposed = false;
+
+  /// Returns `true` after [dispose] has been called.
+  bool get disposed => _disposed;
+
   ///The [NetworkCaptureController] accumulating captured network entries for
   ///this WebView, or `null` when the Network Capture API is not enabled.
   ///
@@ -564,7 +570,16 @@ class InAppWebViewController implements Disposable {
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getViewId}
   dynamic getViewId() => platform.getViewId();
 
+  @override
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.dispose}
-  void dispose({bool isKeepAlive = false}) =>
-      platform.dispose(isKeepAlive: isKeepAlive);
+  ///
+  /// Idempotent: calling this method more than once is safe — subsequent
+  /// calls return immediately without forwarding to the platform.
+  void dispose({bool isKeepAlive = false}) {
+    if (_disposed) {
+      return;
+    }
+    _disposed = true;
+    platform.dispose(isKeepAlive: isKeepAlive);
+  }
 }

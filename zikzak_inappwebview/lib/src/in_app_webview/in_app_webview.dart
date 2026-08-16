@@ -32,7 +32,7 @@ class InAppWebView extends StatefulWidget implements Disposable {
        );
 
   /// Constructs a [InAppWebView] from a specific platform implementation.
-  const InAppWebView.fromPlatform({super.key, required this.platform});
+  InAppWebView.fromPlatform({super.key, required this.platform});
 
   /// Implementation of [PlatformInAppWebView] for the current platform.
   final PlatformInAppWebViewWidget platform;
@@ -613,6 +613,12 @@ class InAppWebView extends StatefulWidget implements Disposable {
 }
 
 class _InAppWebViewState extends State<InAppWebView> {
+  /// Whether [dispose] has been called.
+  bool _disposed = false;
+
+  /// Returns `true` after [dispose] has been called.
+  bool get disposed => _disposed;
+
   @override
   Widget build(BuildContext context) {
     return widget.platform.build(context);
@@ -620,7 +626,12 @@ class _InAppWebViewState extends State<InAppWebView> {
 
   @override
   void dispose() {
-    widget.platform.dispose();
+    if (_disposed) {
+      super.dispose();
+      return;
+    }
+    _disposed = true;
+    widget.platform.dispose(isKeepAlive: false);
     super.dispose();
   }
 }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:collection';
 import 'dart:typed_data';
 import 'dart:ui';
@@ -24,6 +25,12 @@ class HeadlessInAppWebView implements Disposable {
 
   /// Implementation of [PlatformHeadlessInAppWebView] for the current platform.
   final PlatformHeadlessInAppWebView platform;
+
+  /// Whether [dispose] has been called.
+  bool _disposed = false;
+
+  /// Returns `true` after [dispose] has been called.
+  bool get disposed => _disposed;
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformHeadlessInAppWebView.id}
   String get id => platform.id;
@@ -653,8 +660,16 @@ class HeadlessInAppWebView implements Disposable {
   ///{@macro zikzak_inappwebview_platform_interface.PlatformHeadlessInAppWebView.getSize}
   Future<Size?> getSize() => platform.getSize();
 
+  @override
   ///{@macro zikzak_inappwebview_platform_interface.PlatformHeadlessInAppWebView.dispose}
+  ///
+  /// Idempotent: calling this method more than once is safe — subsequent
+  /// calls return immediately without forwarding to the platform.
   Future<void> dispose({bool isKeepAlive = false}) async {
+    if (_disposed) {
+      return;
+    }
+    _disposed = true;
     await platform.dispose(isKeepAlive: isKeepAlive);
   }
 }
