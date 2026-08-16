@@ -183,11 +183,13 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
       return;
     }
     if (result is Future) {
-      result.then((Object? value) {
-        _reply(callId, true, value);
-      }).catchError((Object error) {
-        _reply(callId, false, error.toString());
-      });
+      result
+          .then((Object? value) {
+            _reply(callId, true, value);
+          })
+          .catchError((Object error) {
+            _reply(callId, false, error.toString());
+          });
     } else {
       _reply(callId, true, result);
     }
@@ -200,7 +202,8 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
     } catch (_) {
       jsonResult = 'null';
     }
-    final js = 'window._zikzakInAppWebViewResolveHandler && '
+    final js =
+        'window._zikzakInAppWebViewResolveHandler && '
         'window._zikzakInAppWebViewResolveHandler('
         '${jsonEncode(callId)}, ${success ? 'true' : 'false'}, '
         '${jsonEncode(jsonResult)});';

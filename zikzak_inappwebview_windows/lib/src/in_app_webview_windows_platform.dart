@@ -13,10 +13,7 @@ class _VirtualHostMappingInfo {
   final String folderPath;
   final int accessKind;
 
-  _VirtualHostMappingInfo({
-    required this.folderPath,
-    required this.accessKind,
-  });
+  _VirtualHostMappingInfo({required this.folderPath, required this.accessKind});
 }
 
 class InAppWebViewWindowsPlatform extends PlatformInAppWebViewController {
@@ -255,9 +252,7 @@ WebViewEnvironmentInitArgs resolveEnvironmentInitArgs({
   required String Function() defaultUserDataFolder,
 }) {
   if (settings == null) {
-    return WebViewEnvironmentInitArgs(
-      userDataPath: defaultUserDataFolder(),
-    );
+    return WebViewEnvironmentInitArgs(userDataPath: defaultUserDataFolder());
   }
   return WebViewEnvironmentInitArgs(
     userDataPath: settings.userDataFolder ?? defaultUserDataFolder(),

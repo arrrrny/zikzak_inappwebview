@@ -1699,12 +1699,12 @@ class InAppWebViewSettings {
     instance.dismissDialogues = map['dismissDialogues'];
     instance.insetsForWebContentToIgnore =
         map['insetsForWebContentToIgnore'] != null
-            ? List<AndroidWebViewInsets>.from(
-                map['insetsForWebContentToIgnore'].map(
-                  (e) => AndroidWebViewInsets.fromNativeValue(e)!,
-                ),
-              )
-            : null;
+        ? List<AndroidWebViewInsets>.from(
+            map['insetsForWebContentToIgnore'].map(
+              (e) => AndroidWebViewInsets.fromNativeValue(e)!,
+            ),
+          )
+        : null;
     instance.useNetworkCapture = map['useNetworkCapture'];
     instance.networkCaptureMaxBodySize = map['networkCaptureMaxBodySize'];
     instance.networkCaptureBodies = map['networkCaptureBodies'];

@@ -382,7 +382,12 @@ because there isn't any way to make the website data store non-persistent for th
 
   ///Set to `true` to disable context menu. The default value is `false`.
   @SupportedPlatforms(
-    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform(), WebPlatform()],
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      WebPlatform(),
+    ],
   )
   bool? disableContextMenu;
 

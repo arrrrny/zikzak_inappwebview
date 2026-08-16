@@ -74,7 +74,8 @@ class HostResourceAccessKind {
   int get hashCode => _value.hashCode;
 
   @override
-  bool operator ==(value) => value is HostResourceAccessKind && value._value == _value;
+  bool operator ==(value) =>
+      value is HostResourceAccessKind && value._value == _value;
 
   @override
   String toString() {
@@ -259,15 +260,15 @@ class WebViewEnvironmentSettings {
       userDataFolder: map['userDataFolder'],
       virtualHostMappings: map['virtualHostMappings'] != null
           ? List<VirtualHostMapping>.from(
-              map['virtualHostMappings'].map(
-                (e) {
-                  final mapping = VirtualHostMapping.fromMap(e?.cast<String, dynamic>());
-                  if (mapping == null) {
-                    throw FormatException('Invalid virtualHostMapping entry: $e');
-                  }
-                  return mapping;
-                },
-              ),
+              map['virtualHostMappings'].map((e) {
+                final mapping = VirtualHostMapping.fromMap(
+                  e?.cast<String, dynamic>(),
+                );
+                if (mapping == null) {
+                  throw FormatException('Invalid virtualHostMapping entry: $e');
+                }
+                return mapping;
+              }),
             )
           : null,
     );
