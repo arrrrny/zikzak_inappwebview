@@ -24,6 +24,9 @@ class HeadlessInAppWebViewWeb extends PlatformHeadlessInAppWebView {
 
   @override
   Future<void> run() async {
+    if (_disposed) {
+      throw StateError('Cannot run HeadlessInAppWebView after dispose');
+    }
     if (_iframe != null) return;
 
     _iframe = web.HTMLIFrameElement();

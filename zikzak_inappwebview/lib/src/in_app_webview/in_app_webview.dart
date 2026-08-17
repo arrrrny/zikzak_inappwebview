@@ -627,7 +627,6 @@ class _InAppWebViewState extends State<InAppWebView> {
   @override
   void dispose() {
     if (_disposed) {
-      super.dispose();
       return;
     }
     _disposed = true;

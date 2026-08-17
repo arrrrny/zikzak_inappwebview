@@ -216,6 +216,16 @@ void main() {
         expect(headless.isRunning(), false);
       });
 
+      test('run after dispose throws StateError', () async {
+        final fake = _FakePlatformHeadlessWebView();
+        final headless = HeadlessInAppWebView.fromPlatform(platform: fake);
+
+        await headless.dispose();
+
+        expect(headless.disposed, true);
+        expect(() => headless.run(), throwsStateError);
+      });
+
       test('dispose after run cleans up correctly', () async {
         final fake = _FakePlatformHeadlessWebView();
         final headless = HeadlessInAppWebView.fromPlatform(platform: fake);

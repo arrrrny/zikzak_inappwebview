@@ -649,7 +649,12 @@ class HeadlessInAppWebView implements Disposable {
   }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformHeadlessInAppWebView.run}
-  Future<void> run() => platform.run();
+  Future<void> run() {
+    if (_disposed) {
+      throw StateError('Cannot run HeadlessInAppWebView after dispose');
+    }
+    return platform.run();
+  }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformHeadlessInAppWebView.isRunning}
   bool isRunning() => platform.isRunning();
