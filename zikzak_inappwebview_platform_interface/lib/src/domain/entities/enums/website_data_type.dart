@@ -36,10 +36,20 @@ enum WebsiteDataType {
 }
 
 ///WebsiteDataType wire values are strings — lookup by value.
+///
+///Wire values match the `WKWebsiteDataType*` constants the platform channels
+///emit (same strings as the pre-migration `@ExchangeableEnum` codegen).
 const _websiteDataType_wire = [
+  'WKWebsiteDataTypeFetchCache',
+  'WKWebsiteDataTypeDiskCache',
+  'WKWebsiteDataTypeMemoryCache',
+  'WKWebsiteDataTypeOfflineWebApplicationCache',
+  'WKWebsiteDataTypeCookies',
   'WKWebsiteDataTypeSessionStorage',
+  'WKWebsiteDataTypeLocalStorage',
   'WKWebsiteDataTypeWebSQLDatabases',
   'WKWebsiteDataTypeIndexedDBDatabases',
+  'WKWebsiteDataTypeServiceWorkerRegistrations',
 ];
 
 WebsiteDataType? websiteDataTypeFromWire(Object? value) {
