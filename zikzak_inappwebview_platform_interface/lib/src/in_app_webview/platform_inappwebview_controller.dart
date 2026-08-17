@@ -24,6 +24,8 @@ import 'in_app_webview_keep_alive.dart';
 import 'in_app_webview_settings.dart';
 import 'modules/platform_navigation_delegate.dart';
 import 'modules/platform_javascript_delegate.dart';
+import 'modules/platform_cookie_delegate.dart';
+import 'modules/platform_settings_delegate.dart';
 
 import '../print_job/main.dart';
 
@@ -126,6 +128,20 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
 
   /// Delegate for JavaScript-related methods.
   PlatformJavaScriptDelegate? get javaScriptDelegate => null;
+
+  /// Delegate for cookie-management methods scoped to this WebView.
+  ///
+  /// Returns `null` by default; platform implementations override
+  /// this to return a concrete [PlatformCookieDelegate] that wraps the
+  /// controller's cookie operations.
+  PlatformCookieDelegate? get cookieDelegate => null;
+
+  /// Delegate for reading and updating the WebView settings.
+  ///
+  /// Returns `null` by default; platform implementations override
+  /// this to return a concrete [PlatformSettingsDelegate] that wraps the
+  /// controller's settings operations.
+  PlatformSettingsDelegate? get settingsDelegate => null;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.webStorage}
   ///Provides access to the JavaScript [Web Storage API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API): `window.sessionStorage` and `window.localStorage`.
