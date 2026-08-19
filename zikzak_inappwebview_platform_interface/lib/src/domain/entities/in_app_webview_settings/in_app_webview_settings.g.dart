@@ -58,9 +58,9 @@ InAppWebViewSettings _$InAppWebViewSettingsFromJson(
     ),
     preferredContentMode: $checkedConvert(
       'preferredContentMode',
-      (v) =>
-          $enumDecodeNullable(_$UserPreferredContentModeEnumMap, v) ??
-          UserPreferredContentMode.RECOMMENDED,
+      (v) => v == null
+          ? UserPreferredContentMode.RECOMMENDED
+          : userPreferredContentModeFromWire(v),
     ),
     useShouldInterceptAjaxRequest: $checkedConvert(
       'useShouldInterceptAjaxRequest',
@@ -131,7 +131,7 @@ InAppWebViewSettings _$InAppWebViewSettingsFromJson(
     ),
     mixedContentMode: $checkedConvert(
       'mixedContentMode',
-      (v) => $enumDecodeNullable(_$MixedContentModeEnumMap, v),
+      (v) => mixedContentModeFromWire(v),
     ),
     allowContentAccess: $checkedConvert(
       'allowContentAccess',
@@ -151,8 +151,7 @@ InAppWebViewSettings _$InAppWebViewSettingsFromJson(
     ),
     cacheMode: $checkedConvert(
       'cacheMode',
-      (v) =>
-          $enumDecodeNullable(_$CacheModeEnumMap, v) ?? CacheMode.LOAD_DEFAULT,
+      (v) => v == null ? CacheMode.LOAD_DEFAULT : cacheModeFromWire(v),
     ),
     cursiveFontFamily: $checkedConvert(
       'cursiveFontFamily',
@@ -172,7 +171,7 @@ InAppWebViewSettings _$InAppWebViewSettingsFromJson(
     ),
     disabledActionModeMenuItems: $checkedConvert(
       'disabledActionModeMenuItems',
-      (v) => $enumDecodeNullable(_$ActionModeMenuItemEnumMap, v),
+      (v) => actionModeMenuItemFromWire(v),
     ),
     fantasyFontFamily: $checkedConvert(
       'fantasyFontFamily',
@@ -184,13 +183,13 @@ InAppWebViewSettings _$InAppWebViewSettingsFromJson(
     ),
     forceDark: $checkedConvert(
       'forceDark',
-      (v) => $enumDecodeNullable(_$ForceDarkEnumMap, v) ?? ForceDark.OFF,
+      (v) => v == null ? ForceDark.OFF : forceDarkFromWire(v),
     ),
     forceDarkStrategy: $checkedConvert(
       'forceDarkStrategy',
-      (v) =>
-          $enumDecodeNullable(_$ForceDarkStrategyEnumMap, v) ??
-          ForceDarkStrategy.PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING,
+      (v) => v == null
+          ? ForceDarkStrategy.PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING
+          : forceDarkStrategyFromWire(v),
     ),
     geolocationEnabled: $checkedConvert(
       'geolocationEnabled',
@@ -271,22 +270,22 @@ InAppWebViewSettings _$InAppWebViewSettingsFromJson(
     ),
     overScrollMode: $checkedConvert(
       'overScrollMode',
-      (v) =>
-          $enumDecodeNullable(_$OverScrollModeEnumMap, v) ??
-          OverScrollMode.IF_CONTENT_SCROLLS,
+      (v) => v == null
+          ? OverScrollMode.IF_CONTENT_SCROLLS
+          : overScrollModeFromWire(v),
     ),
     networkAvailable: $checkedConvert('networkAvailable', (v) => v as bool?),
     scrollBarStyle: $checkedConvert(
       'scrollBarStyle',
-      (v) =>
-          $enumDecodeNullable(_$ScrollBarStyleEnumMap, v) ??
-          ScrollBarStyle.SCROLLBARS_INSIDE_OVERLAY,
+      (v) => v == null
+          ? ScrollBarStyle.SCROLLBARS_INSIDE_OVERLAY
+          : scrollBarStyleFromWire(v),
     ),
     verticalScrollbarPosition: $checkedConvert(
       'verticalScrollbarPosition',
-      (v) =>
-          $enumDecodeNullable(_$VerticalScrollbarPositionEnumMap, v) ??
-          VerticalScrollbarPosition.SCROLLBAR_POSITION_DEFAULT,
+      (v) => v == null
+          ? VerticalScrollbarPosition.SCROLLBAR_POSITION_DEFAULT
+          : verticalScrollbarPositionFromWire(v),
     ),
     scrollBarDefaultDelayBeforeFade: $checkedConvert(
       'scrollBarDefaultDelayBeforeFade',
@@ -336,7 +335,7 @@ InAppWebViewSettings _$InAppWebViewSettingsFromJson(
     ),
     webAuthenticationSupport: $checkedConvert(
       'webAuthenticationSupport',
-      (v) => $enumDecodeNullable(_$WebAuthenticationSupportEnumMap, v),
+      (v) => webAuthenticationSupportFromWire(v),
     ),
     enterpriseAuthenticationAppLinkPolicyEnabled: $checkedConvert(
       'enterpriseAuthenticationAppLinkPolicyEnabled',
@@ -608,8 +607,9 @@ Map<String, dynamic> _$InAppWebViewSettingsToJson(
   'horizontalScrollBarEnabled': instance.horizontalScrollBarEnabled,
   'resourceCustomSchemes': instance.resourceCustomSchemes,
   'contentBlockers': _serializeContentBlockers(instance.contentBlockers),
-  'preferredContentMode':
-      _$UserPreferredContentModeEnumMap[instance.preferredContentMode],
+  'preferredContentMode': userPreferredContentModeToWire(
+    instance.preferredContentMode,
+  ),
   'useShouldInterceptAjaxRequest': instance.useShouldInterceptAjaxRequest,
   'interceptOnlyAsyncAjaxRequests': instance.interceptOnlyAsyncAjaxRequests,
   'useShouldInterceptFetchRequest': instance.useShouldInterceptFetchRequest,
@@ -629,22 +629,23 @@ Map<String, dynamic> _$InAppWebViewSettingsToJson(
   'domStorageEnabled': instance.domStorageEnabled,
   'useWideViewPort': instance.useWideViewPort,
   'safeBrowsingEnabled': instance.safeBrowsingEnabled,
-  'mixedContentMode': _$MixedContentModeEnumMap[instance.mixedContentMode],
+  'mixedContentMode': mixedContentModeToWire(instance.mixedContentMode),
   'allowContentAccess': instance.allowContentAccess,
   'allowFileAccess': instance.allowFileAccess,
   'blockNetworkImage': instance.blockNetworkImage,
   'blockNetworkLoads': instance.blockNetworkLoads,
-  'cacheMode': _$CacheModeEnumMap[instance.cacheMode],
+  'cacheMode': cacheModeToWire(instance.cacheMode),
   'cursiveFontFamily': instance.cursiveFontFamily,
   'defaultFixedFontSize': instance.defaultFixedFontSize,
   'defaultFontSize': instance.defaultFontSize,
   'defaultTextEncodingName': instance.defaultTextEncodingName,
-  'disabledActionModeMenuItems':
-      _$ActionModeMenuItemEnumMap[instance.disabledActionModeMenuItems],
+  'disabledActionModeMenuItems': actionModeMenuItemToWire(
+    instance.disabledActionModeMenuItems,
+  ),
   'fantasyFontFamily': instance.fantasyFontFamily,
   'fixedFontFamily': instance.fixedFontFamily,
-  'forceDark': _$ForceDarkEnumMap[instance.forceDark],
-  'forceDarkStrategy': _$ForceDarkStrategyEnumMap[instance.forceDarkStrategy],
+  'forceDark': forceDarkToWire(instance.forceDark),
+  'forceDarkStrategy': forceDarkStrategyToWire(instance.forceDarkStrategy),
   'geolocationEnabled': instance.geolocationEnabled,
   'layoutAlgorithm': _$LayoutAlgorithmEnumMap[instance.layoutAlgorithm],
   'loadWithOverviewMode': instance.loadWithOverviewMode,
@@ -665,11 +666,12 @@ Map<String, dynamic> _$InAppWebViewSettingsToJson(
   'useHybridComposition': instance.useHybridComposition,
   'useShouldInterceptRequest': instance.useShouldInterceptRequest,
   'useOnRenderProcessGone': instance.useOnRenderProcessGone,
-  'overScrollMode': _$OverScrollModeEnumMap[instance.overScrollMode],
+  'overScrollMode': overScrollModeToWire(instance.overScrollMode),
   'networkAvailable': instance.networkAvailable,
-  'scrollBarStyle': _$ScrollBarStyleEnumMap[instance.scrollBarStyle],
-  'verticalScrollbarPosition':
-      _$VerticalScrollbarPositionEnumMap[instance.verticalScrollbarPosition],
+  'scrollBarStyle': scrollBarStyleToWire(instance.scrollBarStyle),
+  'verticalScrollbarPosition': verticalScrollbarPositionToWire(
+    instance.verticalScrollbarPosition,
+  ),
   'scrollBarDefaultDelayBeforeFade': instance.scrollBarDefaultDelayBeforeFade,
   'scrollbarFadingEnabled': instance.scrollbarFadingEnabled,
   'scrollBarFadeDuration': instance.scrollBarFadeDuration,
@@ -689,8 +691,9 @@ Map<String, dynamic> _$InAppWebViewSettingsToJson(
   ),
   'algorithmicDarkeningAllowed': instance.algorithmicDarkeningAllowed,
   'paymentRequestEnabled': instance.paymentRequestEnabled,
-  'webAuthenticationSupport':
-      _$WebAuthenticationSupportEnumMap[instance.webAuthenticationSupport],
+  'webAuthenticationSupport': webAuthenticationSupportToWire(
+    instance.webAuthenticationSupport,
+  ),
   'enterpriseAuthenticationAppLinkPolicyEnabled':
       instance.enterpriseAuthenticationAppLinkPolicyEnabled,
   'defaultVideoPoster': _defaultVideoPosterToJson(instance.defaultVideoPoster),
@@ -786,77 +789,10 @@ Map<String, dynamic> _$InAppWebViewSettingsToJson(
   'networkCaptureMimeTypes': instance.networkCaptureMimeTypes,
 };
 
-const _$UserPreferredContentModeEnumMap = {
-  UserPreferredContentMode.RECOMMENDED: 'RECOMMENDED',
-  UserPreferredContentMode.MOBILE: 'MOBILE',
-  UserPreferredContentMode.DESKTOP: 'DESKTOP',
-};
-
-const _$MixedContentModeEnumMap = {
-  MixedContentMode.MIXED_CONTENT_ALWAYS_ALLOW: 'MIXED_CONTENT_ALWAYS_ALLOW',
-  MixedContentMode.MIXED_CONTENT_NEVER_ALLOW: 'MIXED_CONTENT_NEVER_ALLOW',
-  MixedContentMode.MIXED_CONTENT_COMPATIBILITY_MODE:
-      'MIXED_CONTENT_COMPATIBILITY_MODE',
-};
-
-const _$CacheModeEnumMap = {
-  CacheMode.LOAD_DEFAULT: 'LOAD_DEFAULT',
-  CacheMode.LOAD_CACHE_ELSE_NETWORK: 'LOAD_CACHE_ELSE_NETWORK',
-  CacheMode.LOAD_NO_CACHE: 'LOAD_NO_CACHE',
-  CacheMode.LOAD_CACHE_ONLY: 'LOAD_CACHE_ONLY',
-};
-
-const _$ActionModeMenuItemEnumMap = {
-  ActionModeMenuItem.MENU_ITEM_NONE: 'MENU_ITEM_NONE',
-  ActionModeMenuItem.MENU_ITEM_SHARE: 'MENU_ITEM_SHARE',
-  ActionModeMenuItem.MENU_ITEM_WEB_SEARCH: 'MENU_ITEM_WEB_SEARCH',
-  ActionModeMenuItem.MENU_ITEM_PROCESS_TEXT: 'MENU_ITEM_PROCESS_TEXT',
-};
-
-const _$ForceDarkEnumMap = {
-  ForceDark.OFF: 'OFF',
-  ForceDark.AUTO: 'AUTO',
-  ForceDark.ON: 'ON',
-};
-
-const _$ForceDarkStrategyEnumMap = {
-  ForceDarkStrategy.USER_AGENT_DARKENING_ONLY: 'USER_AGENT_DARKENING_ONLY',
-  ForceDarkStrategy.WEB_THEME_DARKENING_ONLY: 'WEB_THEME_DARKENING_ONLY',
-  ForceDarkStrategy.PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING:
-      'PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING',
-};
-
 const _$LayoutAlgorithmEnumMap = {
   LayoutAlgorithm.NORMAL: 'NORMAL',
   LayoutAlgorithm.TEXT_AUTOSIZING: 'TEXT_AUTOSIZING',
   LayoutAlgorithm.NARROW_COLUMNS: 'NARROW_COLUMNS',
-};
-
-const _$OverScrollModeEnumMap = {
-  OverScrollMode.ALWAYS: 'ALWAYS',
-  OverScrollMode.IF_CONTENT_SCROLLS: 'IF_CONTENT_SCROLLS',
-  OverScrollMode.NEVER: 'NEVER',
-};
-
-const _$ScrollBarStyleEnumMap = {
-  ScrollBarStyle.SCROLLBARS_INSIDE_OVERLAY: 'SCROLLBARS_INSIDE_OVERLAY',
-  ScrollBarStyle.SCROLLBARS_INSIDE_INSET: 'SCROLLBARS_INSIDE_INSET',
-  ScrollBarStyle.SCROLLBARS_OUTSIDE_OVERLAY: 'SCROLLBARS_OUTSIDE_OVERLAY',
-  ScrollBarStyle.SCROLLBARS_OUTSIDE_INSET: 'SCROLLBARS_OUTSIDE_INSET',
-};
-
-const _$VerticalScrollbarPositionEnumMap = {
-  VerticalScrollbarPosition.SCROLLBAR_POSITION_DEFAULT:
-      'SCROLLBAR_POSITION_DEFAULT',
-  VerticalScrollbarPosition.SCROLLBAR_POSITION_LEFT: 'SCROLLBAR_POSITION_LEFT',
-  VerticalScrollbarPosition.SCROLLBAR_POSITION_RIGHT:
-      'SCROLLBAR_POSITION_RIGHT',
-};
-
-const _$WebAuthenticationSupportEnumMap = {
-  WebAuthenticationSupport.NONE: 'NONE',
-  WebAuthenticationSupport.FOR_APP: 'FOR_APP',
-  WebAuthenticationSupport.FOR_BROWSER: 'FOR_BROWSER',
 };
 
 const _$SelectionGranularityEnumMap = {

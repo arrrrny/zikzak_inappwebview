@@ -131,7 +131,11 @@ abstract class $InAppWebViewSettings {
   List<ContentBlocker>? get contentBlockers;
 
   ///Sets the content mode that the WebView needs to use when loading and rendering a webpage. The default value is [UserPreferredContentMode.RECOMMENDED].
-  @JsonKey(defaultValue: UserPreferredContentMode.RECOMMENDED)
+  @JsonKey(
+    defaultValue: UserPreferredContentMode.RECOMMENDED,
+    toJson: userPreferredContentModeToWire,
+    fromJson: userPreferredContentModeFromWire,
+  )
   UserPreferredContentMode? get preferredContentMode;
 
   ///Set to `true` to be able to listen at the [PlatformWebViewCreationParams.shouldInterceptAjaxRequest] event.
@@ -248,6 +252,10 @@ abstract class $InAppWebViewSettings {
   bool? get safeBrowsingEnabled;
 
   ///Configures the WebView's behavior when a secure origin attempts to load a resource from an insecure origin.
+  @JsonKey(
+    toJson: mixedContentModeToWire,
+    fromJson: mixedContentModeFromWire,
+  )
   MixedContentMode? get mixedContentMode;
 
   ///Enables or disables content URL access within WebView. Content URL access allows WebView to load content from a content provider installed in the system. The default value is `true`.
@@ -269,7 +277,11 @@ abstract class $InAppWebViewSettings {
 
   ///Overrides the way the cache is used. The way the cache is used is based on the navigation type. For a normal page load, the cache is checked and content is re-validated as needed.
   ///When navigating back, content is not revalidated, instead the content is just retrieved from the cache. The default value is [CacheMode.LOAD_DEFAULT].
-  @JsonKey(defaultValue: CacheMode.LOAD_DEFAULT)
+  @JsonKey(
+    defaultValue: CacheMode.LOAD_DEFAULT,
+    toJson: cacheModeToWire,
+    fromJson: cacheModeFromWire,
+  )
   CacheMode? get cacheMode;
 
   ///Sets the cursive font family name. The default value is `"cursive"`.
@@ -289,6 +301,10 @@ abstract class $InAppWebViewSettings {
   String? get defaultTextEncodingName;
 
   ///Disables the action mode menu items according to menuItems flag.
+  @JsonKey(
+    toJson: actionModeMenuItemToWire,
+    fromJson: actionModeMenuItemFromWire,
+  )
   ActionModeMenuItem? get disabledActionModeMenuItems;
 
   ///Sets the fantasy font family name. The default value is `"fantasy"`.
@@ -300,13 +316,19 @@ abstract class $InAppWebViewSettings {
   String? get fixedFontFamily;
 
   ///Set the force dark mode for this WebView. The default value is [ForceDark.OFF].
-  @JsonKey(defaultValue: ForceDark.OFF)
+  @JsonKey(
+    defaultValue: ForceDark.OFF,
+    toJson: forceDarkToWire,
+    fromJson: forceDarkFromWire,
+  )
   ForceDark? get forceDark;
 
   ///Set how WebView content should be darkened.
   ///The default value is [ForceDarkStrategy.PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING].
   @JsonKey(
     defaultValue: ForceDarkStrategy.PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING,
+    toJson: forceDarkStrategyToWire,
+    fromJson: forceDarkStrategyFromWire,
   )
   ForceDarkStrategy? get forceDarkStrategy;
 
@@ -416,7 +438,11 @@ abstract class $InAppWebViewSettings {
   ///Sets the WebView's over-scroll mode.
   ///Setting the over-scroll mode of a WebView will have an effect only if the WebView is capable of scrolling.
   ///The default value is [OverScrollMode.IF_CONTENT_SCROLLS].
-  @JsonKey(defaultValue: OverScrollMode.IF_CONTENT_SCROLLS)
+  @JsonKey(
+    defaultValue: OverScrollMode.IF_CONTENT_SCROLLS,
+    toJson: overScrollModeToWire,
+    fromJson: overScrollModeFromWire,
+  )
   OverScrollMode? get overScrollMode;
 
   ///Informs WebView of the network state.
@@ -429,12 +455,20 @@ abstract class $InAppWebViewSettings {
   ///you can use SCROLLBARS_INSIDE_OVERLAY or SCROLLBARS_INSIDE_INSET. If you want them to appear at the edge of the view, ignoring the padding,
   ///then you can use SCROLLBARS_OUTSIDE_OVERLAY or SCROLLBARS_OUTSIDE_INSET.
   ///The default value is [ScrollBarStyle.SCROLLBARS_INSIDE_OVERLAY].
-  @JsonKey(defaultValue: ScrollBarStyle.SCROLLBARS_INSIDE_OVERLAY)
+  @JsonKey(
+    defaultValue: ScrollBarStyle.SCROLLBARS_INSIDE_OVERLAY,
+    toJson: scrollBarStyleToWire,
+    fromJson: scrollBarStyleFromWire,
+  )
   ScrollBarStyle? get scrollBarStyle;
 
   ///Sets the position of the vertical scroll bar.
   ///The default value is [VerticalScrollbarPosition.SCROLLBAR_POSITION_DEFAULT].
-  @JsonKey(defaultValue: VerticalScrollbarPosition.SCROLLBAR_POSITION_DEFAULT)
+  @JsonKey(
+    defaultValue: VerticalScrollbarPosition.SCROLLBAR_POSITION_DEFAULT,
+    toJson: verticalScrollbarPositionToWire,
+    fromJson: verticalScrollbarPositionFromWire,
+  )
   VerticalScrollbarPosition? get verticalScrollbarPosition;
 
   ///Defines the delay in milliseconds that a scrollbar waits before fade out.
@@ -490,6 +524,10 @@ abstract class $InAppWebViewSettings {
   bool? get paymentRequestEnabled;
 
   ///Sets the Web Authentication support level for the WebView. The default value is [WebAuthenticationSupport.NONE].
+  @JsonKey(
+    toJson: webAuthenticationSupportToWire,
+    fromJson: webAuthenticationSupportFromWire,
+  )
   WebAuthenticationSupport? get webAuthenticationSupport;
 
   ///Sets whether EnterpriseAuthenticationAppLinkPolicy if set by admin is allowed to have any

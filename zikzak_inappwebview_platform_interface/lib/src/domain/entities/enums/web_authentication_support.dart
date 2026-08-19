@@ -9,3 +9,13 @@ enum WebAuthenticationSupport {
   ///Enable Web Authentication support for browser delegations.
   FOR_BROWSER,
 }
+
+WebAuthenticationSupport? webAuthenticationSupportFromWire(Object? value) {
+  if (value is! int) return null;
+  return value >= 0 && value < WebAuthenticationSupport.values.length
+      ? WebAuthenticationSupport.values[value]
+      : null;
+}
+
+Object? webAuthenticationSupportToWire(WebAuthenticationSupport? value) =>
+    value?.index;
