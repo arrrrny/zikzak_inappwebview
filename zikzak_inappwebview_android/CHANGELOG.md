@@ -1,3 +1,45 @@
+## 4.9.1 - 2026-08-21
+
+
+### Fixes
+
+- Android settings parser (`InAppWebViewSettings`,
+  `PullToRefreshSettings`, `ChromeCustomTabsSettings`,
+  `PrintJobSettings`, `TracingSettings`) now coerces every
+  `(Integer) value` cast through a defensive
+  `ISettings.coerceInteger(value)` helper. The Flutter platform
+  channel's `StandardMessageCodec` normally preserves the Dart
+  runtime type so a Dart `int` arrives as `java.lang.Integer`, but
+  in practice hand-built maps, persisted settings, and the
+  json_serializable codegen on the 5.x line can all push enum /
+  integer fields across the wire as `java.lang.String`. Direct casts
+  then crashed WebView creation with
+  `ClassCastException: java.lang.String cannot be cast to
+  java.lang.Integer` at
+  `InAppWebViewSettings.parse(InAppWebViewSettings.java:332)` (#245).
+  The new helper accepts `Integer`, any other `Number`, and numeric
+  `String` values, falling back to the field default with a warning
+  log for enum-name strings. This makes the 4.x maintenance line
+  forward-compatible with the 5.x json_serializable models, which is
+  the regression that broke published 5.0.0 builds on Android.
+
+
+### Tests
+
+- Added `in_app_webview_settings_test.dart` pinning the
+  Dart-side wire format for all 10 enum settings fields
+  (`forceDark`, `forceDarkStrategy`, `mixedContentMode`,
+  `cacheMode`, `disabledActionModeMenuItems`, `overScrollMode`,
+  `scrollBarStyle`, `verticalScrollbarPosition`,
+  `preferredContentMode`, `webAuthenticationSupport`) — every
+  field must serialize to an `int`, never a `String`. Guards
+  against the regression that broke 5.0.0 (issue #245) if
+  `InAppWebViewSettings` is migrated to `json_serializable`
+  without explicit `toJson`/`fromJson` converters.
+
+
+## 4.9.0 - 2026-08-14
+
 ## 4.9.0 - 2026-08-14
 
 

@@ -35,7 +35,7 @@ public class TracingSettings implements ISettings<TracingController> {
           categories = (List<Object>) value;
           break;
         case "tracingMode":
-          tracingMode = (Integer) value;
+          tracingMode = ISettings.coerceInteger(value);
           break;
       }
     }

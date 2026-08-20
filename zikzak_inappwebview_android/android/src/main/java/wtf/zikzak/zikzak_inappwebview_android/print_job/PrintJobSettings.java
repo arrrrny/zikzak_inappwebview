@@ -52,7 +52,7 @@ public class PrintJobSettings implements ISettings<PrintJobController> {
           jobName = (String) value;
           break;
         case "orientation":
-          orientation = (Integer) value;
+          orientation = ISettings.coerceInteger(value);
           break;
 //        case "margins":
 //          margins = MarginsExt.fromMap((Map<String, Object>) value);
@@ -61,10 +61,10 @@ public class PrintJobSettings implements ISettings<PrintJobController> {
           mediaSize = MediaSizeExt.fromMap((Map<String, Object>) value);
           break;
         case "colorMode":
-          colorMode = (Integer) value;
+          colorMode = ISettings.coerceInteger(value);
           break;
         case "duplexMode":
-          duplexMode = (Integer) value;
+          duplexMode = ISettings.coerceInteger(value);
           break;
         case "resolution":
           resolution = ResolutionExt.fromMap((Map<String, Object>) value);

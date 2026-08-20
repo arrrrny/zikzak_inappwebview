@@ -207,7 +207,7 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
                     mediaPlaybackRequiresUserGesture = (Boolean) value;
                     break;
                 case "minimumFontSize":
-                    minimumFontSize = (Integer) value;
+                    minimumFontSize = ISettings.coerceInteger(value);
                     break;
                 case "verticalScrollBarEnabled":
                     verticalScrollBarEnabled = (Boolean) value;
@@ -224,7 +224,7 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
                         >) value;
                     break;
                 case "preferredContentMode":
-                    preferredContentMode = (Integer) value;
+                    preferredContentMode = ISettings.coerceInteger(value);
                     break;
                 case "useShouldInterceptAjaxRequest":
                     useShouldInterceptAjaxRequest = (Boolean) value;
@@ -254,7 +254,7 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
                     disableContextMenu = (Boolean) value;
                     break;
                 case "textZoom":
-                    textZoom = (Integer) value;
+                    textZoom = ISettings.coerceInteger(value);
                     break;
                 case "clearSessionCache":
                     clearSessionCache = (Boolean) value;
@@ -281,7 +281,7 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
                     safeBrowsingEnabled = (Boolean) value;
                     break;
                 case "mixedContentMode":
-                    mixedContentMode = (Integer) value;
+                    mixedContentMode = ISettings.coerceInteger(value);
                     break;
                 case "allowContentAccess":
                     allowContentAccess = (Boolean) value;
@@ -305,22 +305,22 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
                     blockNetworkLoads = (Boolean) value;
                     break;
                 case "cacheMode":
-                    cacheMode = (Integer) value;
+                    cacheMode = ISettings.coerceInteger(value);
                     break;
                 case "cursiveFontFamily":
                     cursiveFontFamily = (String) value;
                     break;
                 case "defaultFixedFontSize":
-                    defaultFixedFontSize = (Integer) value;
+                    defaultFixedFontSize = ISettings.coerceInteger(value);
                     break;
                 case "defaultFontSize":
-                    defaultFontSize = (Integer) value;
+                    defaultFontSize = ISettings.coerceInteger(value);
                     break;
                 case "defaultTextEncodingName":
                     defaultTextEncodingName = (String) value;
                     break;
                 case "disabledActionModeMenuItems":
-                    disabledActionModeMenuItems = (Integer) value;
+                    disabledActionModeMenuItems = ISettings.coerceInteger(value);
                     break;
                 case "fantasyFontFamily":
                     fantasyFontFamily = (String) value;
@@ -329,10 +329,10 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
                     fixedFontFamily = (String) value;
                     break;
                 case "forceDark":
-                    forceDark = (Integer) value;
+                    forceDark = ISettings.coerceInteger(value);
                     break;
                 case "forceDarkStrategy":
-                    forceDarkStrategy = (Integer) value;
+                    forceDarkStrategy = ISettings.coerceInteger(value);
                     break;
                 case "geolocationEnabled":
                     geolocationEnabled = (Boolean) value;
@@ -347,10 +347,10 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
                     loadsImagesAutomatically = (Boolean) value;
                     break;
                 case "minimumLogicalFontSize":
-                    minimumLogicalFontSize = (Integer) value;
+                    minimumLogicalFontSize = ISettings.coerceInteger(value);
                     break;
                 case "initialScale":
-                    initialScale = (Integer) value;
+                    initialScale = ISettings.coerceInteger(value);
                     break;
                 case "needInitialFocus":
                     needInitialFocus = (Boolean) value;
@@ -386,25 +386,25 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
                     regexToCancelOverrideUrlLoading = (String) value;
                     break;
                 case "overScrollMode":
-                    overScrollMode = (Integer) value;
+                    overScrollMode = ISettings.coerceInteger(value);
                     break;
                 case "networkAvailable":
                     networkAvailable = (Boolean) value;
                     break;
                 case "scrollBarStyle":
-                    scrollBarStyle = (Integer) value;
+                    scrollBarStyle = ISettings.coerceInteger(value);
                     break;
                 case "verticalScrollbarPosition":
-                    verticalScrollbarPosition = (Integer) value;
+                    verticalScrollbarPosition = ISettings.coerceInteger(value);
                     break;
                 case "scrollBarDefaultDelayBeforeFade":
-                    scrollBarDefaultDelayBeforeFade = (Integer) value;
+                    scrollBarDefaultDelayBeforeFade = ISettings.coerceInteger(value);
                     break;
                 case "scrollbarFadingEnabled":
                     scrollbarFadingEnabled = (Boolean) value;
                     break;
                 case "scrollBarFadeDuration":
-                    scrollBarFadeDuration = (Integer) value;
+                    scrollBarFadeDuration = ISettings.coerceInteger(value);
                     break;
                 case "rendererPriorityPolicy":
                     rendererPriorityPolicy = (Map<String, Object>) value;
@@ -440,7 +440,7 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
                     paymentRequestEnabled = (Boolean) value;
                     break;
                 case "webAuthenticationSupport":
-                    webAuthenticationSupport = (Integer) value;
+                    webAuthenticationSupport = ISettings.coerceInteger(value);
                     break;
                 case "enterpriseAuthenticationAppLinkPolicyEnabled":
                     enterpriseAuthenticationAppLinkPolicyEnabled =

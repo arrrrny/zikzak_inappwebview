@@ -61,7 +61,7 @@ public class ChromeCustomTabsSettings implements ISettings<ChromeCustomTabsActiv
           addDefaultShareMenuItem = (Boolean) value;
           break;
         case "shareState":
-          shareState = (Integer) value;
+          shareState = ISettings.coerceInteger(value);
           break;
         case "showTitle":
           showTitle = (Boolean) value;
@@ -119,7 +119,7 @@ public class ChromeCustomTabsSettings implements ISettings<ChromeCustomTabsActiv
           }
           break;
         case "screenOrientation":
-          screenOrientation = (Integer) value;
+          screenOrientation = ISettings.coerceInteger(value);
           break;
         case "startAnimations":
           List<Map<String, Object>> startAnimationsList = (List<Map<String, Object>>) value;
