@@ -1,3 +1,26 @@
+## 4.9.1 - Unreleased
+
+
+### Tests
+
+- Added a wire-format regression test for `InAppWebViewSettings`
+  pinning every enum field (`forceDark`, `forceDarkStrategy`,
+  `mixedContentMode`, `cacheMode`, `disabledActionModeMenuItems`,
+  `overScrollMode`, `scrollBarStyle`, `verticalScrollbarPosition`,
+  `preferredContentMode`, `webAuthenticationSupport`) to its integer
+  wire value via `toMap()`. A `String` here is exactly the
+  regression that crashed published 5.0.0 on Android with
+  `ClassCastException: java.lang.String cannot be cast to
+  java.lang.Integer` at
+  `InAppWebViewSettings.parse(InAppWebViewSettings.java:332)` (#245).
+  The test guards the 4.x maintenance line against the same
+  regression if `InAppWebViewSettings` is migrated to
+  `json_serializable` without explicit `toJson`/`fromJson` converters
+  on every enum field.
+
+
+## 4.9.0 - 2026-08-14
+
 ## 4.9.0 - 2026-08-14
 
 

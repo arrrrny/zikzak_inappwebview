@@ -44,13 +44,13 @@ public class PullToRefreshSettings implements ISettings<PullToRefreshLayout> {
           backgroundColor = (String) value;
           break;
         case "distanceToTriggerSync":
-          distanceToTriggerSync = (Integer) value;
+          distanceToTriggerSync = ISettings.coerceInteger(value);
           break;
         case "slingshotDistance":
-          slingshotDistance = (Integer) value;
+          slingshotDistance = ISettings.coerceInteger(value);
           break;
         case "size":
-          size = (Integer) value;
+          size = ISettings.coerceInteger(value);
           break;
       }
     }
