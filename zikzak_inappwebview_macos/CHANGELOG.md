@@ -1,3 +1,12 @@
+## Unreleased
+
+### Fixes
+
+- [macOS] Prevent `addJavaScriptHandler` callbacks from crashing when their
+  JSON-encoded result is a top-level value such as `null`, a string, or a
+  number. The native bridge now consumes the JSON text already encoded by
+  Dart instead of passing it through `JSONSerialization` a second time.
+
 ## 5.0.0 - 2026-08-16
 
 
