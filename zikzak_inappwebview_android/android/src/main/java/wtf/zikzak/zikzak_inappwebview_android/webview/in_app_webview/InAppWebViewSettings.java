@@ -207,7 +207,10 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
                     mediaPlaybackRequiresUserGesture = (Boolean) value;
                     break;
                 case "minimumFontSize":
-                    minimumFontSize = ISettings.coerceInteger(value);
+                    Integer coercedMinimumFontSize = ISettings.coerceInteger(value);
+                    if (coercedMinimumFontSize != null) {
+                        minimumFontSize = coercedMinimumFontSize;
+                    }
                     break;
                 case "verticalScrollBarEnabled":
                     verticalScrollBarEnabled = (Boolean) value;
@@ -224,7 +227,10 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
                         >) value;
                     break;
                 case "preferredContentMode":
-                    preferredContentMode = ISettings.coerceInteger(value);
+                    Integer coercedPreferredContentMode = ISettings.coerceInteger(value);
+                    if (coercedPreferredContentMode != null) {
+                        preferredContentMode = coercedPreferredContentMode;
+                    }
                     break;
                 case "useShouldInterceptAjaxRequest":
                     useShouldInterceptAjaxRequest = (Boolean) value;
@@ -254,7 +260,10 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
                     disableContextMenu = (Boolean) value;
                     break;
                 case "textZoom":
-                    textZoom = ISettings.coerceInteger(value);
+                    Integer coercedTextZoom = ISettings.coerceInteger(value);
+                    if (coercedTextZoom != null) {
+                        textZoom = coercedTextZoom;
+                    }
                     break;
                 case "clearSessionCache":
                     clearSessionCache = (Boolean) value;
@@ -305,16 +314,25 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
                     blockNetworkLoads = (Boolean) value;
                     break;
                 case "cacheMode":
-                    cacheMode = ISettings.coerceInteger(value);
+                    Integer coercedCacheMode = ISettings.coerceInteger(value);
+                    if (coercedCacheMode != null) {
+                        cacheMode = coercedCacheMode;
+                    }
                     break;
                 case "cursiveFontFamily":
                     cursiveFontFamily = (String) value;
                     break;
                 case "defaultFixedFontSize":
-                    defaultFixedFontSize = ISettings.coerceInteger(value);
+                    Integer coercedDefaultFixedFontSize = ISettings.coerceInteger(value);
+                    if (coercedDefaultFixedFontSize != null) {
+                        defaultFixedFontSize = coercedDefaultFixedFontSize;
+                    }
                     break;
                 case "defaultFontSize":
-                    defaultFontSize = ISettings.coerceInteger(value);
+                    Integer coercedDefaultFontSize = ISettings.coerceInteger(value);
+                    if (coercedDefaultFontSize != null) {
+                        defaultFontSize = coercedDefaultFontSize;
+                    }
                     break;
                 case "defaultTextEncodingName":
                     defaultTextEncodingName = (String) value;
@@ -329,10 +347,16 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
                     fixedFontFamily = (String) value;
                     break;
                 case "forceDark":
-                    forceDark = ISettings.coerceInteger(value);
+                    Integer coercedForceDark = ISettings.coerceInteger(value);
+                    if (coercedForceDark != null) {
+                        forceDark = coercedForceDark;
+                    }
                     break;
                 case "forceDarkStrategy":
-                    forceDarkStrategy = ISettings.coerceInteger(value);
+                    Integer coercedForceDarkStrategy = ISettings.coerceInteger(value);
+                    if (coercedForceDarkStrategy != null) {
+                        forceDarkStrategy = coercedForceDarkStrategy;
+                    }
                     break;
                 case "geolocationEnabled":
                     geolocationEnabled = (Boolean) value;
@@ -347,10 +371,16 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
                     loadsImagesAutomatically = (Boolean) value;
                     break;
                 case "minimumLogicalFontSize":
-                    minimumLogicalFontSize = ISettings.coerceInteger(value);
+                    Integer coercedMinimumLogicalFontSize = ISettings.coerceInteger(value);
+                    if (coercedMinimumLogicalFontSize != null) {
+                        minimumLogicalFontSize = coercedMinimumLogicalFontSize;
+                    }
                     break;
                 case "initialScale":
-                    initialScale = ISettings.coerceInteger(value);
+                    Integer coercedInitialScale = ISettings.coerceInteger(value);
+                    if (coercedInitialScale != null) {
+                        initialScale = coercedInitialScale;
+                    }
                     break;
                 case "needInitialFocus":
                     needInitialFocus = (Boolean) value;
@@ -386,16 +416,25 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
                     regexToCancelOverrideUrlLoading = (String) value;
                     break;
                 case "overScrollMode":
-                    overScrollMode = ISettings.coerceInteger(value);
+                    Integer coercedOverScrollMode = ISettings.coerceInteger(value);
+                    if (coercedOverScrollMode != null) {
+                        overScrollMode = coercedOverScrollMode;
+                    }
                     break;
                 case "networkAvailable":
                     networkAvailable = (Boolean) value;
                     break;
                 case "scrollBarStyle":
-                    scrollBarStyle = ISettings.coerceInteger(value);
+                    Integer coercedScrollBarStyle = ISettings.coerceInteger(value);
+                    if (coercedScrollBarStyle != null) {
+                        scrollBarStyle = coercedScrollBarStyle;
+                    }
                     break;
                 case "verticalScrollbarPosition":
-                    verticalScrollbarPosition = ISettings.coerceInteger(value);
+                    Integer coercedVerticalScrollbarPosition = ISettings.coerceInteger(value);
+                    if (coercedVerticalScrollbarPosition != null) {
+                        verticalScrollbarPosition = coercedVerticalScrollbarPosition;
+                    }
                     break;
                 case "scrollBarDefaultDelayBeforeFade":
                     scrollBarDefaultDelayBeforeFade = ISettings.coerceInteger(value);
@@ -990,8 +1029,10 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
             switch (value) {
                 case "NARROW_COLUMNS":
                     layoutAlgorithm = NARROW_COLUMNS;
+                    break;
                 case "NORMAL":
                     layoutAlgorithm = NORMAL;
+                    break;
                 case "TEXT_AUTOSIZING":
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                         layoutAlgorithm =

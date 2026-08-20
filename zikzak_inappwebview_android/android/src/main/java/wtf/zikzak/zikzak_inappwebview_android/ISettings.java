@@ -65,7 +65,12 @@ public interface ISettings<T> {
    *   <li>{@link Integer} → returned as-is</li>
    *   <li>any other {@link Number} (e.g. {@link java.lang.Long},
    *       {@link java.lang.Double}, {@link java.math.BigInteger}) →
-   *       {@link Number#intValue()}</li>
+   *       validated to ensure it is finite, integral (no fractional part),
+   *       and within the int range [{@link Integer#MIN_VALUE},
+   *       {@link Integer#MAX_VALUE}], then coerced via
+   *       {@link Number#intValue()}. Non-finite (NaN, Infinity),
+   *       fractional, or out-of-range values are rejected with {@code null}
+   *       and a warning log.</li>
    *   <li>{@link String} → parsed via {@link Integer#parseInt(String)} if
    *       numeric, otherwise {@code null} with a warning log
    *       (the wire value is most likely an enum name like {@code "OFF"}
@@ -104,7 +109,40 @@ public interface ISettings<T> {
       return (Integer) value;
     }
     if (value instanceof Number) {
-      return ((Number) value).intValue();
+      Number num = (Number) value;
+      double dval = num.doubleValue();
+
+      // Reject non-finite (NaN, Infinity)
+      if (!Double.isFinite(dval)) {
+        Log.w(
+          LOG_TAG,
+          "Cannot coerce Number->Integer (non-finite value=" + dval + "); " +
+          "keeping field default."
+        );
+        return null;
+      }
+
+      // Reject fractional values
+      if (dval != Math.floor(dval)) {
+        Log.w(
+          LOG_TAG,
+          "Cannot coerce Number->Integer (fractional value=" + dval + "); " +
+          "keeping field default."
+        );
+        return null;
+      }
+
+      // Reject out-of-range values
+      if (dval < Integer.MIN_VALUE || dval > Integer.MAX_VALUE) {
+        Log.w(
+          LOG_TAG,
+          "Cannot coerce Number->Integer (out of range value=" + dval + "); " +
+          "keeping field default."
+        );
+        return null;
+      }
+
+      return num.intValue();
     }
     if (value instanceof String) {
       String s = ((String) value).trim();
