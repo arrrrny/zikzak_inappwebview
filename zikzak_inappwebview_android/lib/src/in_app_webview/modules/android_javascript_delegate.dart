@@ -21,7 +21,7 @@ class AndroidJavaScriptDelegate extends PlatformJavaScriptDelegate {
       _controller.evaluateJavascript(source: source);
 
   @override
-  Future<String?> callAsyncJavaScript({
+  Future<CallAsyncJavaScriptResult?> callAsyncJavaScript({
     required String functionBody,
     Map<String, dynamic> arguments = const <String, dynamic>{},
     ContentWorld? contentWorld,
@@ -71,7 +71,7 @@ class AndroidJavaScriptDelegate extends PlatformJavaScriptDelegate {
   );
 
   @override
-  Future<JavaScriptHandlerCallback?> removeJavaScriptHandler({
+  JavaScriptHandlerCallback? removeJavaScriptHandler({
     required String handlerName,
   }) => _controller.removeJavaScriptHandler(handlerName: handlerName);
 }

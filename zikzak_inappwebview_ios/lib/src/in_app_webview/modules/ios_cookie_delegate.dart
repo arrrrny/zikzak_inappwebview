@@ -1,7 +1,7 @@
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
 import '../in_app_webview_controller.dart';
-import '../cookie_manager.dart';
+import '../../cookie_manager.dart';
 
 /// iOS implementation of [PlatformCookieDelegate].
 ///
