@@ -2133,7 +2133,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                     // Dart's callHandler implementation already returns the callback value
                     // encoded with jsonEncode. Re-encoding this String with
                     // JSONSerialization crashes for top-level fragments (for example
-                    // "null") and would also change the value's JavaScript semantics.
+                    // null) and would also change the value's JavaScript semantics.
                     let json = result as? String ?? "null"
 #if DEBUG
                     let resultType = result.map {
