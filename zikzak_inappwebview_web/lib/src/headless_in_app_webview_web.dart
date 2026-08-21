@@ -13,6 +13,9 @@ class HeadlessInAppWebViewWeb extends PlatformHeadlessInAppWebView {
   web.HTMLIFrameElement? _iframe;
   InAppWebViewWebController? _webViewController;
 
+  /// Whether [dispose] has been called.
+  bool _disposed = false;
+
   @override
   PlatformInAppWebViewController? get webViewController => _webViewController;
 
@@ -21,6 +24,9 @@ class HeadlessInAppWebViewWeb extends PlatformHeadlessInAppWebView {
 
   @override
   Future<void> run() async {
+    if (_disposed) {
+      throw StateError('Cannot run HeadlessInAppWebView after dispose');
+    }
     if (_iframe != null) return;
 
     _iframe = web.HTMLIFrameElement();
@@ -109,7 +115,14 @@ class HeadlessInAppWebViewWeb extends PlatformHeadlessInAppWebView {
   }
 
   @override
+  ///
+  /// Idempotent: calling this method more than once is safe — subsequent
+  /// calls return immediately.
   Future<void> dispose({bool isKeepAlive = false}) async {
+    if (_disposed) {
+      return;
+    }
+    _disposed = true;
     _iframe?.remove();
     _iframe = null;
     _webViewController = null;

@@ -613,6 +613,12 @@ class InAppWebView extends StatefulWidget implements Disposable {
 }
 
 class _InAppWebViewState extends State<InAppWebView> {
+  /// Whether [dispose] has been called.
+  bool _disposed = false;
+
+  /// Returns `true` after [dispose] has been called.
+  bool get disposed => _disposed;
+
   @override
   Widget build(BuildContext context) {
     return widget.platform.build(context);
@@ -620,7 +626,11 @@ class _InAppWebViewState extends State<InAppWebView> {
 
   @override
   void dispose() {
-    widget.platform.dispose();
+    if (_disposed) {
+      return;
+    }
+    _disposed = true;
+    widget.platform.dispose(isKeepAlive: false);
     super.dispose();
   }
 }
