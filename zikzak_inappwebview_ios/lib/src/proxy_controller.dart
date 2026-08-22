@@ -53,7 +53,7 @@ class IosProxyController extends PlatformProxyController
   @override
   Future<void> setProxyOverride({required ProxySettings settings}) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("settings", () => settings.iOSProxySettings?.toMap());
+    args.putIfAbsent("settings", () => settings.iOSProxySettings?.toJson());
     await channel?.invokeMethod('setProxyOverride', args);
   }
 

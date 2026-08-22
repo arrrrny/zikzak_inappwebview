@@ -37,14 +37,14 @@ class AndroidWebViewFeature extends PlatformWebViewFeature
   @override
   Future<bool> isFeatureSupported(WebViewFeature feature) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("feature", () => feature.toNativeValue());
+    args.putIfAbsent("feature", () => feature.name);
     return await channel?.invokeMethod<bool>('isFeatureSupported', args) ??
         false;
   }
 
   Future<bool> isStartupFeatureSupported(WebViewFeature startupFeature) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("startupFeature", () => startupFeature.toNativeValue());
+    args.putIfAbsent("startupFeature", () => startupFeature.name);
     return await channel?.invokeMethod<bool>(
           'isStartupFeatureSupported',
           args,

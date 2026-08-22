@@ -13,7 +13,7 @@ import '../../../types/fetch_request_credential.dart';
 import '../../../types/fetch_request_credential_default.dart';
 import '../../../types/fetch_request_federated_credential.dart';
 import '../../../types/fetch_request_password_credential.dart';
-import '../../../types/referrer_policy.dart';
+import '../enums/referrer_policy.dart';
 import '../../../web_uri.dart';
 import '../enums/index.dart';
 
@@ -106,11 +106,11 @@ Object? _credentialsToJson(FetchRequestCredential? credentials) =>
 
 ReferrerPolicy? _referrerPolicyFromJson(Object? value) {
   if (value is! String) return null;
-  return ReferrerPolicy.fromNativeValue(value);
+  return referrerPolicyFromWire(value);
 }
 
 Object? _referrerPolicyToJson(ReferrerPolicy? referrerPolicy) =>
-    referrerPolicy?.toNativeValue();
+    referrerPolicyToWire(referrerPolicy);
 
 FetchRequestAction? _actionFromJson(Object? value) {
   if (value is! int) return null;

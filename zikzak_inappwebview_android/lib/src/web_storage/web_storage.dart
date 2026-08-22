@@ -89,7 +89,7 @@ mixin AndroidStorage implements PlatformStorage {
     var result = await controller?.evaluateJavascript(
       source:
           """
-    window.$webStorageType.length;
+    window.${webStorageTypeToWire(webStorageType)}.length;
     """,
     );
     return result != null ? int.parse(json.decode(result)) : null;
@@ -101,7 +101,7 @@ mixin AndroidStorage implements PlatformStorage {
     await controller?.evaluateJavascript(
       source:
           """
-    window.$webStorageType.setItem("$key", ${value is String ? encodedValue : "JSON.stringify($encodedValue)"});
+    window.${webStorageTypeToWire(webStorageType)}.setItem("$key", ${value is String ? encodedValue : "JSON.stringify($encodedValue)"});
     """,
     );
   }
@@ -111,7 +111,7 @@ mixin AndroidStorage implements PlatformStorage {
     var itemValue = await controller?.evaluateJavascript(
       source:
           """
-    window.$webStorageType.getItem("$key");
+    window.${webStorageTypeToWire(webStorageType)}.getItem("$key");
     """,
     );
 
@@ -131,7 +131,7 @@ mixin AndroidStorage implements PlatformStorage {
     await controller?.evaluateJavascript(
       source:
           """
-    window.$webStorageType.removeItem("$key");
+    window.${webStorageTypeToWire(webStorageType)}.removeItem("$key");
     """,
     );
   }
@@ -145,12 +145,12 @@ mixin AndroidStorage implements PlatformStorage {
           """
 (function() {
   var webStorageItems = [];
-  for(var i = 0; i < window.$webStorageType.length; i++){
-    var key = window.$webStorageType.key(i);
+  for(var i = 0; i < window.${webStorageTypeToWire(webStorageType)}.length; i++){
+    var key = window.${webStorageTypeToWire(webStorageType)}.key(i);
     webStorageItems.push(
       {
         key: key,
-        value: window.$webStorageType.getItem(key)
+        value: window.${webStorageTypeToWire(webStorageType)}.getItem(key)
       }
     );
   }
@@ -177,7 +177,7 @@ mixin AndroidStorage implements PlatformStorage {
     await controller?.evaluateJavascript(
       source:
           """
-    window.$webStorageType.clear();
+    window.${webStorageTypeToWire(webStorageType)}.clear();
     """,
     );
   }
@@ -187,7 +187,7 @@ mixin AndroidStorage implements PlatformStorage {
     var result = await controller?.evaluateJavascript(
       source:
           """
-    window.$webStorageType.key($index);
+    window.${webStorageTypeToWire(webStorageType)}.key($index);
     """,
     );
     return result != null ? json.decode(result) : null;

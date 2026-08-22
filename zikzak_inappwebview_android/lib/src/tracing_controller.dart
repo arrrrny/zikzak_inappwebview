@@ -67,7 +67,7 @@ class AndroidTracingController extends PlatformTracingController
   @override
   Future<void> start({required TracingSettings settings}) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("settings", () => settings.toMap());
+    args.putIfAbsent("settings", () => settings.toJson());
     await channel?.invokeMethod('start', args);
   }
 

@@ -16,6 +16,43 @@ and the zikzak→zuraffa v6 migration (…7545).
 **Phase 2e (navigation family) — BLOCKED on zorphy_migrator support (zorphy #86)**
 **Phase 2e (navigation family → Zorphy via zorphy_migrator) — DONE on branch
 `feat/migrate-models-zorphy-entities-phase2e` (not yet merged)**
+**Phase 2f (auth/ssl family → Zorphy via zorphy_migrator) — DONE on the same
+branch (commit pending)**
+**Phase 3a (pull_to_refresh + web_storage families → Zorphy via
+zorphy_migrator) — DONE on the same branch (commit pending)**
+**Phase 3b (web_message + web_authentication_session families → Zorphy via
+zorphy_migrator) — DONE on the same branch (commit pending)**
+**Phase 3c (context_menu family → Zorphy via zorphy_migrator) — DONE on the
+same branch (commit pending)**
+**Phase 3d (webview_environment family → Zorphy via zorphy_migrator) — DONE
+on the same branch (commit pending)**
+**Phase 3e (chrome_safari_browser sibling classes → Zorphy) — DONE on the
+same branch (commit pending)**
+**Phase 3f (ChromeSafariBrowserSettings → Zorphy entity) — DONE on the same
+branch (commit pending)**
+**Phase 3g (print_job family → Zorphy via zorphy_migrator) — DONE on the
+same branch (commit pending)**
+**Phase 3h (InAppBrowserMenuItem → Zorphy skip/fork) — DONE on the same
+branch (commit pending)**
+**Phase 3i (remaining types/ batch — 79 files) — DONE, committed as 3i on
+the same branch (PR #224 keeps accumulating)***
+
+**Phase 3j (last still-codegen settings/UI batch, part 1) — DONE, committed as 3j:
+migrator-convertible models (activity_button, ui_event_attribution,
+android_resource, in_app_browser_settings) converted via zorphy_migrator.
+NEW zorphy migrator fixes: #94 (empty-body @ExchangeableObjectConstructor no
+longer blocks; PR #95) and #96 (static factory methods returning the class
+type preserved on the migrated $ class, reported informational instead of
+blocking; PR #97). Entity glue added for Color_ hex (UtilColor), enum
+FromWire/ToWire, still-codegen UIImage/InAppWebViewRect fromMap/toMap.
+Parts 2-4 (below): UIImage/InAppWebViewRect/ScreenshotConfiguration (zorphy
+#99), TracingSettings + UserScript entities, trusted display siblings and
+script_html_tag_attributes de-codegened (skip/fork, zorphy #89), and
+in_app_webview_settings (the last big one) converted via the migrator
+(assert-only body + stripped custom property + ctor param fix) with glue for
+Color_/WebUri/EdgeInsets/Uint8List/AndroidWebViewInsets/ResourceType/
+UrlPatternType/Sandbox/contentBlockers. **ALL @ExchangeableObject/
+@ExchangeableEnum MODELS ARE MIGRATED — migration complete.***
 
 - Phase 0 (mapping + toolchain) DONE.
 - Note on the task premise: this repo does **NOT** use Freezed. Upstream
@@ -329,6 +366,31 @@ URLProtectionSpace (+authentication_method/proxy_type enums), URLCredential
 (+persistence), HttpAuthResponse (+action), ClientCertResponse (+action),
 ServerTrustAuthResponse (+action), SslCertificate, SslError (+type),
 should_allow_deprecated_tls_action. (Scoped; not started.)
+- [x] challenge hierarchy + URLProtectionSpace/URLCredential/SslCertificate/
+      SslError + responses + 8 enums — migrated (see worklog)
+- [x] Phase 3a: pull_to_refresh + web_storage families (PullToRefreshSettings/
+      PullToRefreshSize, WebStorageItem/WebStorageOrigin/WebStorageType) —
+      migrated (see worklog)
+- [x] Phase 3b: web_message + web_authentication_session families
+      (WebMessage/WebMessageType, WebAuthenticationSessionSettings,
+      WebAuthenticationSessionError 1-based wire, WebAuthenticationSupport) —
+      migrated (see worklog)
+- [x] Phase 3c: context_menu family (ContextMenuSettings entity;
+      ContextMenu + ContextMenuItem skip/fork — function-typed callbacks
+      cannot be expressed as zorphy value objects) — migrated (see worklog)
+- [x] Phase 3d: webview_environment family (WebViewEnvironmentSettings +
+      VirtualHostMapping + HostResourceAccessKind) — migrated (see worklog)
+- [x] Phase 3e: chrome_safari_browser sibling classes (ActionButton,
+      MenuItem, SecondaryToolbar+ClickableID — skip/fork, function callbacks,
+      zorphy #89) — migrated (see worklog)
+- [x] Phase 3f: ChromeSafariBrowserSettings (entity, ~28 fields, Color_ hex +
+      still-codegen native-int + polymorphic displayMode glue) — migrated
+      (see worklog); chrome_safari_browser family now complete
+- [x] Phase 3g: print_job family (Settings 45f + Attributes 25f hand-written,
+      Info/MediaSize/Resolution/Printer + 9 enums converted; NON-sequential
+      wires via helpers) — migrated (see worklog)
+- [x] Phase 3h: InAppBrowserMenuItem (skip/fork, onClick — zorphy #89) —
+      migrated (see worklog); InAppBrowserSettings next (coupled)
 
 ### Phase 3 — browser/settings objects (`in_app_browser/`, `in_app_webview/`,
 `chrome_safari_browser/`, `print_job/`, `pull_to_refresh/`, `context_menu/`,
@@ -650,3 +712,192 @@ dialogue_dismisser — hand-written toJson/fromJson today → Zorphy, core packa
   windows 13/13. Analyzed/tested via untracked pubspec_overrides.yaml
   (removed before commit). Branch has the full Phase 2e change set; NOT yet
   merged — PR to follow.
+- 2026-08-16 — Phase 2f EXECUTED via zorphy_migrator (same recipe as 2e):
+  the auth/ssl family. 17 of 21 files converted by the migrator (value
+  objects URLProtectionSpace/URLCredential/SslCertificateDName/SslError/
+  HttpAuthResponse/ServerTrustAuthResponse/URLProtectionSpaceHttpAuthCredentials
+  + enums URLCredentialPersistence/URLProtectionSpaceAuthenticationMethod/
+  URLProtectionSpaceProxyType/SslErrorType/HttpAuthResponseAction/
+  ClientCertResponseAction/ServerTrustAuthResponseAction/
+  ShouldAllowDeprecatedTLSAction) + the 4 flagged-manual files handled per
+  the report: URLCredential + URLProtectionSpace + ClientCertResponse became
+  entities with hand-written glue (X509 data deserializers, string-wire
+  NSURL enum lookups, @JsonKey defaults, dropped ctor asserts), and
+  SslCertificate became a plain-Dart skip/fork class (custom iOS/Android
+  fromMap preserved). The URLAuthenticationChallenge hierarchy
+  (extends) was ALSO reverted to plain-Dart skip/hierarchy (Phase 2b
+  precedent): zorphy value objects cannot express is-a, and the callbacks
+  are typed with the base — the 4 classes now hand-written in types/ with
+  the public is-a + flat wire preserved. Wire glue: nested entities
+  (URLProtectionSpace/URLCredential/URLResponse/SslError), int enums ↔
+  .index, SslErrorType ↔ platform-native switch (iOS/macOS SecTrustResult-
+  derived / Android SSL_ERROR_*), auth-method/proxy-type ↔ their NSURL
+  strings. Controllers (android/ios/macos): challenge fromMap→fromJson +
+  `!`, callback returns toJson, ShouldAllowDeprecatedTLSAction
+  toNativeValue→index; http_auth_credentials_database fromJson. Verified:
+  platform_interface 0 errors + tests 109/109 (new
+  test/types/auth_ssl_entities_test.dart: flattened challenge wires, NSURL
+  string wires, SslErrorType platform natives via
+  debugDefaultTargetPlatformOverride, SslCertificate glue, fork defaults);
+  android/ios/macos/linux/windows/web/core 0 errors; core 95/95, macos
+  35/35, windows 13/13. Committed as 2f + PR #224.
+- 2026-08-16 — Phase 3a EXECUTED via zorphy_migrator: pull_to_refresh +
+  web_storage families. Converted: PullToRefreshSettings (entity; Color_ hex
+  glue via UtilColor, AttributedString nested glue via the still-codegen
+  fromMap/toMap, size wire glue via a new `pullToRefreshSizeToWire` helper —
+  DEFAULT=1/LARGE=0 NON-sequential, `///- ` doc lines sanitized),
+  PullToRefreshSize (enum + wire helper), WebStorageItem/WebStorageOrigin
+  (entities, dynamic value), WebStorageType (enum + `webStorageTypeToWire`
+  helper — 'localStorage'/'sessionStorage' strings). Controllers: `toMap()`→
+  `toJson()` for PullToRefreshSettings (all platforms incl. the
+  `settings?.toMap()` variant), `size.toNativeValue()`→`pullToRefreshSizeToWire`,
+  and the android/ios web_storage JS templates now interpolate
+  `webStorageTypeToWire(webStorageType)` (the old enum's toString returned
+  the wire string). **NEW zorphy generator bug found + reported as zorphy
+  #88**: doc-comment lines `///- X` (and `/// X`) leak the token into the
+  generated constructor and break the build — workaround: sanitize the doc
+  lines (migrator-side fix committed to zorphy PR #87, f7ea418/6174a84:
+  normalize to `///X`); the generator fix is tracked by #88. Verified:
+  platform_interface 0 errors + tests 116/116 (new
+  test/types/pull_refresh_web_storage_entities_test.dart); all platform
+  packages + core 0 errors; core 95/95, macos 35/35, windows 13/13.
+  Committed as 3a + PR #225.
+- 2026-08-16 — Phase 3b EXECUTED via zorphy_migrator: web_message +
+  web_authentication_session families. Converted by the tool:
+  WebMessageType (inner enum in web_message.dart) + WebAuthenticationSupport
+  (sequential 0..2). Hand-written (per the migrator's manual report):
+  WebMessage (custom @ExchangeableObjectConstructor + assert dropped; type
+  default STRING via @JsonKey + .index wire; ports pass-through glue via
+  IWebMessagePort.toMap), WebAuthenticationSessionSettings (custom toMap
+  replicated by generated toJson; prefersEphemeralWebBrowserSession default
+  false; Map<String,String> cast glue), WebAuthenticationSessionError (1-based
+  wire 1..3 — `webAuthenticationSessionErrorFromWire`/`ToWire` helpers).
+  Cross-family: the still-codegen in_app_webview_settings (Phase 3c) now
+  references the converted WebAuthenticationSupport via index glue in its
+  source + .g.dart. Controllers: ios web_authenticate_session
+  (initialSettings?.toMap→toJson, WebAuthenticationSessionError.fromNativeValue
+  → wire helper), macos in_app_webview initialSettings toJson, and the
+  android/ios web_message channel/listener/port + in_app_webview_controller
+  WebMessage fromMap→fromJson / toMap→toJson. Verified: platform_interface
+  0 errors + tests 122/122 (new
+  test/types/web_message_auth_session_entities_test.dart); all platform
+  packages + core 0 errors; core 95/95, macos 35/35, windows 13/13.
+  Committed as 3b + PR #226.
+- 2026-08-16 — Phase 3c EXECUTED via zorphy_migrator: context_menu family.
+  Converted by the tool: ContextMenuSettings (entity, hideDefaultSystemContextMenuItems
+  default false). Skip/fork (plain Dart, per the migrator's manual report +
+  a NEW framework limitation): ContextMenu + ContextMenuItem carry
+  FUNCTION-typed callback fields (onCreateContextMenu/onHideContextMenu/
+  onContextMenuActionItemClicked, action) that the zorphy generator cannot
+  express (function-typed getters break the generated source — related to
+  zorphy #88's doc/parse fragility) — hand-written plain classes preserving
+  the public API and the old wire (ContextMenu: menuItems + settings only;
+  ContextMenuItem: id + title only; callbacks excluded). Controller glue:
+  contextMenu?.toMap() → toJson across android/ios/macos/linux (in_app_webview,
+  headless, in_app_browser, controllers); platform_in_app_browser import
+  re-pointed. Verified: platform_interface 0 errors + tests 126/126 (new
+  test/types/context_menu_entities_test.dart); all platform packages + core
+  0 errors; core 95/95, macos 35/35 (incl. context_menu_test), windows
+  13/13. Committed as 3c + PR #226.
+- 2026-08-16 — Phase 3i EXECUTED via zorphy_migrator: remaining types/ batch
+  (79 files — 29 value objects → domain/entities/<name>/, 50 enums →
+  domain/entities/enums/). All remaining codegen models converted in one
+  pass; barrels (types/main.dart) re-pointed with show-clauses incl. wire
+  helpers; import fixes for entities + platform files; InAppWebViewSettings
+  source + .g.dart re-glued (19 enum types: fromNativeValue→FromWire,
+  toNativeValue→ToWire, fromMap→fromJson, toMap→toJson; RendererPriorityPolicy
+  + WebViewAssetLoader null-guarded fromJson). New wire helpers added for
+  non-sequential/offset wires verified against the old .g.dart: TracingCategory
+  (bit flags 1,2,64,8,32,0,16,4), WindowStyleMask (0,1,2,4,8,16384,32768,16,64,
+  128,8192), CustomTabsNavigationEventType (1..6), CustomTabsRelationType
+  (1,2), CustomTabsPostMessageResultType (0,-1,-2,-3), ReferrerPolicy (fixed
+  missing 'strict-origin-when-cross-origin'), web_archive_format ('mht'/
+  'webarchive'); sequential enums use index glue (ModalPresentationStyle,
+  ModalTransitionStyle, WindowType, WindowTitlebarSeparatorStyle,
+  MediaCaptureState, MediaPlaybackState, FormResubmissionAction,
+  WebViewRenderProcessAction, TracingMode). TrustedWebActivityDisplayMode
+  base converted to Zorphy; the still-codegen default/immersive siblings now
+  implement the generated base (added copyWith/copyWithTrustedWebActivity
+  DisplayMode/toJsonLean) and ChromeSafariBrowserSettings restores the
+  type-key polymorphic dispatch for displayMode. platform_webview_feature:
+  the migrator left stray zorphy part directives on the platform-interface
+  class — removed (plain enum WebViewFeature stays; android webview_feature
+  toNativeValue→.name). Cross-package glue: android/ios/linux/macos
+  controllers fromMap→fromJson + toMap→toJson + enum FromWire/ToWire (9
+  packages, 94 errors fixed); wire helpers for 8 more enums exported from the
+  types/main.dart barrel (http_cookie_same_site_policy, webview_render_
+  process_action, form_resubmission_action, media_capture_state,
+  in_app_webview_hit_test_result_type, web_archive_format, media_playback_
+  state, website_data_type). Verified: platform_interface 0 errors + tests
+  138/138; all platform packages + core 0 errors; core 95/95, macos 34/34
+  (context_menu_test enum member names fixed to SCREAMING_SNAKE), windows
+  13/13. Committed as 3i (PR #224 keeps accumulating).
+- 2026-08-16 — Phase 3j part 1 EXECUTED via zorphy_migrator: the four
+  migratable remaining models converted — ActivityButton + UIEventAttribution
+  (empty-body @ExchangeableObjectConstructor — fixed via zorphy #94/PR #95),
+  AndroidResource (static factories preserved via zorphy #96/PR #97),
+  InAppBrowserSettings (missing ctor param toolbarTopBarTintColor added to
+  the source first; 1 converted / 0 manual). Entity glue: Color_ hex via
+  UtilColor, enums via FromWire/ToWire, still-codegen UIImage/InAppWebViewRect
+  via fromMap/toMap (stripped-class names). ChromeSafari family re-glued to
+  AndroidResource/ActivityButton/UIEventAttribution fromJson/toJson;
+  platform_in_app_browser import re-pointed. Verified: platform_interface
+  0 errors + tests 138/138; all platform packages + core 0 errors; core
+  95/95, macos 34/34, windows 13/13. Committed as 3j (PR #224 accumulates).
+- 2026-08-16 — Phase 3j part 2 EXECUTED via zorphy_migrator: UIImage,
+  InAppWebViewRect, ScreenshotConfiguration converted (assert-only
+  @ExchangeableObjectConstructor bodies dropped as informational — zorphy
+  #99/PR #100; dev-time invariant checks only). Entity glue: Uint8List
+  base64-free List<int> wire, CompressFormat name wire (== member names),
+  nested converted entities via fromJson/toJson; consumers re-glued
+  (menu_item/print_job/pdf/browser_settings). Verified: platform_interface
+  0 errors + tests 138/138; all platform packages + core 0 errors; core
+  95/95, macos 34/34, windows 13/13. Committed as 3j-part2 (PR #224).
+- 2026-08-16 — Phase 3j part 3 EXECUTED: trusted display-mode siblings
+  de-codegened to hand-written plain Dart (polymorphic subtypes of the Zorphy
+  TrustedWebActivityDisplayMode base; Zorphy value objects cannot implement
+  each other — skip/fork, preserving toMap/toJson/copyWith/toJsonLean);
+  TracingSettings_ extracted to domain/entities/tracing_settings as a Zorphy
+  entity (categories via @JsonKey glue to _deserialize/_serializeCategories,
+  tracingMode via tracingModeFromWire/ToWire; assert dropped); UserScript
+  hand-migrated to a Zorphy entity (contentWorld nullable + PAGE default
+  glue, allowedOriginRules default {'*'}, injectionTime index wire, source/
+  groupName/forMainFrameOnly). Platform packages re-glued userScript.toMap()
+  -> toJson(). Verified: platform_interface 0 errors + tests 138/138; all
+  platform packages + core 0 errors; core 95/95, macos 34/34, windows 13/13.
+  Committed as 3j-part3 (PR #224).
+- 2026-08-16 — Phase 3j part 4 (FINAL) EXECUTED: the last two models migrated.
+  script_html_tag_attributes de-codegened to hand-written plain Dart
+  (Function-typed onLoad/onError callbacks — zorphy #89 skip/fork; callbacks
+  not part of the wire). in_app_webview_settings converted via zorphy_migrator
+  after source pre-fixes (stripped the non-assert if-default + the custom
+  @ExchangeableObjectProperty on contentBlockers, added the missing
+  stylusHandwritingEnabled ctor param; asserts dropped per #99) — the migrator
+  mechanically converted all ~150 fields with @JsonKey(defaultValue:).
+  Post-processing: json_serializable glue for Color_ hex (UtilColor), WebUri,
+  EdgeInsets/MapEdgeInsets, Uint8List, AndroidWebViewInsets (fromNativeValue),
+  ResourceType/UrlPatternType (still-codegen enums), NetworkCaptureController
+  (runtime-only, not serialized), contentBlockers (_deserialize/
+  _serializeContentBlockers), iframeSandbox (sandboxFromWire/ToWire — the
+  Sandbox enum's private _ALL/_NONE members are inaccessible cross-library),
+  and removal of non-literal enum-list defaultValue JsonKeys. Immutable
+  entity: platform packages' _inferInitialSettings rewritten to copyWith
+  (var + return) across android/ios/linux/macos; settings.toMap()->toJson() /
+  fromMap->fromJson everywhere; in_app_webview_settings.g.dart regenerated.
+  Verified: platform_interface 0 errors + tests 138/138; all platform packages
+  + core 0 errors; core 95/95, macos 34/34, windows 13/13. Committed as
+  3j-part4 (PR #224) — **migration complete**.
+- 2026-08-16 — Polymorphism exploration: zorphy supports polymorphism
+  extensively (sealed `$$Base` with `explicitSubTypes: [$Sub1, ...]`,
+  `implements`-based subtypes, `__typename` JSON dispatch, nonSealed
+  variant, subtype copyWith — verified end-to-end in a scratch build).
+  The hand-written polymorphic pieces (TrustedWebActivityDisplayMode family,
+  FetchRequestCredential family) ARE structurally expressible, but zorphy
+  does not allow a seamless migration: the polymorphic type-key is hardcoded
+  to `__typename` + class names in json_generator.dart, while both families
+  use the native wire `{"type": "DEFAULT_MODE"|"IMMERSIVE_MODE"}` and
+  `{"type": "default"|"federated"|"password"}`. Filed as zorphy #103
+  (custom typeKey + per-subtype wire values). Related migrator gap: the
+  exchangeable dialect does not detect/emit sealed hierarchies — polymorphic
+  families are flagged manual instead of converted to explicitSubTypes +
+  implements. The families stay hand-written (skip/fork) until #103 lands.

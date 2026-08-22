@@ -104,7 +104,7 @@ class AndroidWebMessageChannel extends PlatformWebMessageChannel
         var port = index == 0 ? _androidPort1 : _androidPort2;
         if (port.onMessage != null) {
           WebMessage? message = call.arguments["message"] != null
-              ? WebMessage.fromMap(
+              ? WebMessage.fromJson(
                   call.arguments["message"].cast<String, dynamic>(),
                 )
               : null;

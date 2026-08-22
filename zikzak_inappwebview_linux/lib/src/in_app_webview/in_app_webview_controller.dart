@@ -120,8 +120,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
             controller,
             navigationAction,
           );
-          return policy?.index ??
-              NavigationActionPolicy.CANCEL.index;
+          return policy?.index ?? NavigationActionPolicy.CANCEL.index;
         }
         return NavigationActionPolicy.ALLOW.index;
       case 'onConsoleMessage':
@@ -296,7 +295,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
     args.putIfAbsent('urlFile', () => urlFile.toString());
     args.putIfAbsent(
       'cssLinkHtmlTagAttributes',
-      () => cssLinkHtmlTagAttributes?.toMap(),
+      () => cssLinkHtmlTagAttributes?.toJson(),
     );
     await _channel.invokeMethod('injectCSSFileFromUrl', args);
   }
@@ -320,7 +319,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent(
       'screenshotConfiguration',
-      () => screenshotConfiguration?.toMap(),
+      () => screenshotConfiguration?.toJson(),
     );
     return await _channel.invokeMethod<Uint8List?>('takeScreenshot', args);
   }
@@ -333,7 +332,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
   @override
   Future<Uint8List?> createPdf({PDFConfiguration? pdfConfiguration}) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('pdfConfiguration', () => pdfConfiguration?.toMap());
+    args.putIfAbsent('pdfConfiguration', () => pdfConfiguration?.toJson());
     return await _channel.invokeMethod<Uint8List?>('createPdf', args);
   }
 

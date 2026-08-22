@@ -122,7 +122,7 @@ class IOSPullToRefreshController extends PlatformPullToRefreshController
   @override
   Future<void> setStyledTitle(AttributedString attributedTitle) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('attributedTitle', () => attributedTitle.toMap());
+    args.putIfAbsent('attributedTitle', () => attributedTitle.toJson());
     await channel?.invokeMethod('setStyledTitle', args);
   }
 

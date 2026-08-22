@@ -145,15 +145,17 @@ class ContentBlockerTrigger {
   Map<String, dynamic> toMap() {
     List<String> resourceTypeStringList = [];
     resourceType.forEach((type) {
-      resourceTypeStringList.add(type.toNativeValue());
+      resourceTypeStringList.add(
+        contentBlockerTriggerResourceTypeToWire(type)!,
+      );
     });
     List<String> loadTypeStringList = [];
     loadType.forEach((type) {
-      loadTypeStringList.add(type.toNativeValue());
+      loadTypeStringList.add(contentBlockerTriggerLoadTypeToWire(type)!);
     });
     List<String> loadContextStringList = [];
     loadContext.forEach((type) {
-      loadContextStringList.add(type.toNativeValue());
+      loadContextStringList.add(contentBlockerTriggerLoadContextToWire(type)!);
     });
 
     Map<String, dynamic> map = {
@@ -190,7 +192,7 @@ class ContentBlockerTrigger {
       map["resource-type"] ?? [],
     );
     resourceTypeStringList.forEach((typeValue) {
-      var type = ContentBlockerTriggerResourceType.fromNativeValue(typeValue);
+      var type = contentBlockerTriggerResourceTypeFromWire(typeValue);
       if (type != null) {
         resourceType.add(type);
       }
@@ -198,7 +200,7 @@ class ContentBlockerTrigger {
 
     List<String> loadTypeStringList = List<String>.from(map["load-type"] ?? []);
     loadTypeStringList.forEach((typeValue) {
-      var type = ContentBlockerTriggerLoadType.fromNativeValue(typeValue);
+      var type = contentBlockerTriggerLoadTypeFromWire(typeValue);
       if (type != null) {
         loadType.add(type);
       }
@@ -208,7 +210,7 @@ class ContentBlockerTrigger {
       map["load-context"] ?? [],
     );
     loadContextStringList.forEach((typeValue) {
-      var context = ContentBlockerTriggerLoadContext.fromNativeValue(typeValue);
+      var context = contentBlockerTriggerLoadContextFromWire(typeValue);
       if (context != null) {
         loadContext.add(context);
       }
@@ -255,7 +257,7 @@ class ContentBlockerAction {
 
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = {
-      "type": type.toNativeValue(),
+      "type": contentBlockerActionTypeToWire(type),
       "selector": selector,
     };
 
@@ -273,7 +275,7 @@ class ContentBlockerAction {
 
   static ContentBlockerAction fromMap(Map<String, dynamic> map) {
     return ContentBlockerAction(
-      type: ContentBlockerActionType.fromNativeValue(map["type"])!,
+      type: contentBlockerActionTypeFromWire(map["type"])!,
       selector: map["selector"],
     );
   }

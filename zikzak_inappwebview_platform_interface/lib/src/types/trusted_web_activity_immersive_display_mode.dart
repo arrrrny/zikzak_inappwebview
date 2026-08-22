@@ -1,36 +1,81 @@
-import 'package:zikzak_inappwebview_internal_annotations/zikzak_inappwebview_internal_annotations.dart';
-
-import 'trusted_web_activity_display_mode.dart';
-import 'layout_in_display_cutout_mode.dart';
-
-part 'trusted_web_activity_immersive_display_mode.g.dart';
+import '../domain/entities/trusted_web_activity_display_mode/trusted_web_activity_display_mode.dart';
+import '../domain/entities/enums/layout_in_display_cutout_mode.dart';
 
 ///Class that represents the default display mode of a Trusted Web Activity.
 ///The system UI (status bar, navigation bar) is shown, and the browser toolbar is hidden while the user is on a verified origin.
-@ExchangeableObject()
-class TrustedWebActivityImmersiveDisplayMode_
-    implements TrustedWebActivityDisplayMode_ {
+///
+///Hand-written (migration skip/fork — the concrete display-mode classes are
+///polymorphic subtypes of the Zorphy [TrustedWebActivityDisplayMode] base;
+///Zorphy value objects cannot implement each other).
+class TrustedWebActivityImmersiveDisplayMode
+    implements TrustedWebActivityDisplayMode {
+  static final _type = "IMMERSIVE_MODE";
+
+  ///The constant defining how to deal with display cutouts.
+  LayoutInDisplayCutoutMode displayCutoutMode;
+
   ///Whether the Trusted Web Activity should be in sticky immersive mode.
   bool isSticky;
 
-  ///The constant defining how to deal with display cutouts.
-  LayoutInDisplayCutoutMode_ displayCutoutMode;
-
-  static final _type = "IMMERSIVE_MODE";
-
-  @ExchangeableObjectConstructor()
-  TrustedWebActivityImmersiveDisplayMode_({
+  TrustedWebActivityImmersiveDisplayMode({
     required this.isSticky,
-    this.displayCutoutMode = LayoutInDisplayCutoutMode_.DEFAULT,
+    this.displayCutoutMode = LayoutInDisplayCutoutMode.DEFAULT,
   }) {}
 
-  @ExchangeableObjectMethod(toMapMergeWith: true)
-  // ignore: unused_element
+  ///Gets a possible [TrustedWebActivityImmersiveDisplayMode] instance from a [Map] value.
+  static TrustedWebActivityImmersiveDisplayMode? fromMap(
+    Map<String, dynamic>? map,
+  ) {
+    if (map == null) {
+      return null;
+    }
+    final instance = TrustedWebActivityImmersiveDisplayMode(
+      isSticky: map['isSticky'],
+    );
+    instance.displayCutoutMode =
+        LayoutInDisplayCutoutMode.values[map['displayCutoutMode'] as int];
+    return instance;
+  }
+
   Map<String, dynamic> _toMapMergeWith() {
     return {"type": _type};
   }
 
+  ///Converts instance to a map.
+  Map<String, dynamic> toMap() {
+    return {
+      "displayCutoutMode": displayCutoutMode.index,
+      "isSticky": isSticky,
+      ..._toMapMergeWith(),
+    };
+  }
+
+  ///Converts instance to a map.
+  Map<String, dynamic> toJson() {
+    return toMap();
+  }
+
   @override
-  @ExchangeableObjectMethod(ignore: true)
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+  TrustedWebActivityImmersiveDisplayMode copyWith() {
+    return TrustedWebActivityImmersiveDisplayMode(
+      isSticky: isSticky,
+      displayCutoutMode: displayCutoutMode,
+    );
+  }
+
+  @override
+  TrustedWebActivityImmersiveDisplayMode
+  copyWithTrustedWebActivityDisplayMode() {
+    return copyWith();
+  }
+
+  @override
+  Map<String, dynamic> toJsonLean() {
+    return toMap();
+  }
+
+  @override
+  String toString() {
+    return 'TrustedWebActivityImmersiveDisplayMode{displayCutoutMode: $displayCutoutMode, isSticky: $isSticky}';
+  }
 }

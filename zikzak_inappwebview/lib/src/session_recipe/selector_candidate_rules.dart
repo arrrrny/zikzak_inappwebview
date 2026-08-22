@@ -78,10 +78,10 @@ class SelectorCandidateRules {
 
   ///CSS-escapes an identifier (id/class) for use in a selector.
   static String escapeIdentifier(String value) {
-    return value.replaceAll('\\', '\\\\').replaceAll('.', '\\.').replaceAll(
-          '#',
-          '\\#',
-        );
+    return value
+        .replaceAll('\\', '\\\\')
+        .replaceAll('.', '\\.')
+        .replaceAll('#', '\\#');
   }
 
   ///Builds the ranked candidate list.
@@ -110,9 +110,7 @@ class SelectorCandidateRules {
     final orderedKeys = <String>[
       if (data.containsKey('data-testid')) 'data-testid',
       if (data.containsKey('data-test')) 'data-test',
-      ...data.keys.where(
-        (k) => k != 'data-testid' && k != 'data-test',
-      ),
+      ...data.keys.where((k) => k != 'data-testid' && k != 'data-test'),
     ];
     for (final key in orderedKeys) {
       final value = data[key];
@@ -125,9 +123,7 @@ class SelectorCandidateRules {
         .where((c) => !isUtilityClass(c))
         .toList();
     if (semanticClasses.isNotEmpty) {
-      candidates.add(
-        '$tag.${semanticClasses.map(escapeIdentifier).join('.')}',
-      );
+      candidates.add('$tag.${semanticClasses.map(escapeIdentifier).join('.')}');
     }
 
     // 4. Positional nth-of-type path (limited depth).

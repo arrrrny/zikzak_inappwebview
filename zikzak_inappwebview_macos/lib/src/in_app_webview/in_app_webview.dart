@@ -15,13 +15,13 @@ class MacOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
   Widget build(BuildContext context) {
     final Map<String, dynamic> creationParams = <String, dynamic>{
       'initialUrlRequest': params.initialUrlRequest?.toJson(),
-      'initialSettings': params.initialSettings?.toMap(),
+      'initialSettings': params.initialSettings?.toJson(),
       'initialUserScripts': params.initialUserScripts
-          ?.map((e) => e.toMap())
+          ?.map((e) => e.toJson())
           .toList(),
-      'contextMenu': params.contextMenu?.toMap(),
+      'contextMenu': params.contextMenu?.toJson(),
       'windowId': params.windowId,
-      'initialData': params.initialData?.toMap(),
+      'initialData': params.initialData?.toJson(),
       'initialFile': params.initialFile,
     };
 

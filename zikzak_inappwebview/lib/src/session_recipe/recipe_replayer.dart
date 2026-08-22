@@ -40,7 +40,10 @@ class InAppWebViewReplayDriver implements ReplayDriver {
   InAppWebViewReplayDriver(this.controller);
 
   @override
-  Future<void> restoreCookies(List<CookieEntry> cookies, String entryUrl) async {
+  Future<void> restoreCookies(
+    List<CookieEntry> cookies,
+    String entryUrl,
+  ) async {
     final manager = CookieManager.instance();
     for (final cookie in cookies) {
       try {
@@ -165,7 +168,10 @@ class RecipeReplayer {
     }
 
     // Cookies are restored before the first loadUrl.
-    await d.restoreCookies(recording.session?.cookies ?? const [], recipe.entryUrl);
+    await d.restoreCookies(
+      recording.session?.cookies ?? const [],
+      recipe.entryUrl,
+    );
 
     final completedSteps = <String>[];
 
@@ -173,9 +179,8 @@ class RecipeReplayer {
       final recorded = recording.steps[i];
       final stepDef = _stepDefinitionFor(recipe, recorded.stepId);
 
-      void progress(ReplayStepState state) => onProgress?.call(
-        ReplayProgress(stepId: stepDef.id, state: state),
-      );
+      void progress(ReplayStepState state) =>
+          onProgress?.call(ReplayProgress(stepId: stepDef.id, state: state));
 
       progress(ReplayStepState.navigating);
 

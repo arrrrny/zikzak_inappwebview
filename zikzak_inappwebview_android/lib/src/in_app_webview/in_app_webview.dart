@@ -212,16 +212,16 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
 
   @override
   Widget build(BuildContext context) {
-    final initialSettings = params.initialSettings ?? InAppWebViewSettings();
-    _inferInitialSettings(initialSettings);
+    var initialSettings = params.initialSettings ?? InAppWebViewSettings();
+    initialSettings = _inferInitialSettings(initialSettings);
 
     Map<String, dynamic> settingsMap =
-        (params.initialSettings != null ? initialSettings.toMap() : null) ??
-        initialSettings.toMap();
+        (params.initialSettings != null ? initialSettings.toJson() : null) ??
+        initialSettings.toJson();
 
     Map<String, dynamic> pullToRefreshSettings =
-        params.pullToRefreshController?.params.settings?.toMap() ??
-        PullToRefreshSettings(enabled: false).toMap();
+        params.pullToRefreshController?.params.settings?.toJson() ??
+        PullToRefreshSettings(enabled: false).toJson();
 
     if ((params.headlessWebView?.isRunning() ?? false) &&
         params.keepAlive != null) {
@@ -259,9 +259,9 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
             creationParams: <String, dynamic>{
               'initialUrlRequest': this.params.initialUrlRequest?.toJson(),
               'initialFile': this.params.initialFile,
-              'initialData': this.params.initialData?.toMap(),
+              'initialData': this.params.initialData?.toJson(),
               'initialSettings': settingsMap,
-              'contextMenu': this.params.contextMenu?.toMap() ?? {},
+              'contextMenu': this.params.contextMenu?.toJson() ?? {},
               'windowId': this.params.windowId,
               'headlessWebViewId':
                   this.params.headlessWebView?.isRunning() ?? false
@@ -269,7 +269,7 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
                   : null,
               'initialUserScripts':
                   this.params.initialUserScripts
-                      ?.map((e) => e.toMap())
+                      ?.map((e) => e.toJson())
                       .toList() ??
                   [],
               'pullToRefreshSettings': pullToRefreshSettings,
@@ -337,40 +337,42 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
     }
   }
 
-  void _inferInitialSettings(InAppWebViewSettings settings) {
+  InAppWebViewSettings _inferInitialSettings(InAppWebViewSettings settings) {
+    var inferred = settings;
     if (params.shouldOverrideUrlLoading != null &&
         settings.useShouldOverrideUrlLoading == null) {
-      settings.useShouldOverrideUrlLoading = true;
+      inferred = inferred.copyWith(useShouldOverrideUrlLoading: true);
     }
     if (params.onLoadResource != null && settings.useOnLoadResource == null) {
-      settings.useOnLoadResource = true;
+      inferred = inferred.copyWith(useOnLoadResource: true);
     }
     if (params.onDownloadStartRequest != null &&
         settings.useOnDownloadStart == null) {
-      settings.useOnDownloadStart = true;
+      inferred = inferred.copyWith(useOnDownloadStart: true);
     }
     if ((params.shouldInterceptAjaxRequest != null ||
             params.onAjaxProgress != null ||
             params.onAjaxReadyStateChange != null) &&
         settings.useShouldInterceptAjaxRequest == null) {
-      settings.useShouldInterceptAjaxRequest = true;
+      inferred = inferred.copyWith(useShouldInterceptAjaxRequest: true);
     }
     if (params.shouldInterceptFetchRequest != null &&
         settings.useShouldInterceptFetchRequest == null) {
-      settings.useShouldInterceptFetchRequest = true;
+      inferred = inferred.copyWith(useShouldInterceptFetchRequest: true);
     }
     if (params.shouldInterceptRequest != null &&
         settings.useShouldInterceptRequest == null) {
-      settings.useShouldInterceptRequest = true;
+      inferred = inferred.copyWith(useShouldInterceptRequest: true);
     }
     if (params.onRenderProcessGone != null &&
         settings.useOnRenderProcessGone == null) {
-      settings.useOnRenderProcessGone = true;
+      inferred = inferred.copyWith(useOnRenderProcessGone: true);
     }
     if (params.onNavigationResponse != null &&
         settings.useOnNavigationResponse == null) {
-      settings.useOnNavigationResponse = true;
+      inferred = inferred.copyWith(useOnNavigationResponse: true);
     }
+    return inferred;
   }
 
   /// Whether [dispose] has already run. Both the public widget-level

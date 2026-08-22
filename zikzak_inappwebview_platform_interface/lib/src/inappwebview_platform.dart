@@ -17,12 +17,12 @@ import 'web_message/platform_web_message_listener.dart';
 import 'web_message/platform_web_message_port.dart';
 import 'web_storage/platform_web_storage.dart';
 import 'web_storage/platform_web_storage_manager.dart';
-import 'platform_process_global_config.dart';
-import 'platform_proxy_controller.dart';
+import 'domain/entities/platform_process_global_config/platform_process_global_config.dart';
+import 'domain/entities/platform_proxy_controller/platform_proxy_controller.dart';
 import 'platform_service_worker_controller.dart';
 import 'platform_tracing_controller.dart';
-import 'platform_webview_asset_loader.dart';
-import 'platform_webview_feature.dart';
+import 'domain/entities/platform_webview_asset_loader/platform_webview_asset_loader.dart';
+import 'domain/entities/platform_webview_feature/platform_webview_feature.dart';
 import 'in_app_localhost_server.dart';
 import 'webview_environment/platform_webview_environment.dart';
 
