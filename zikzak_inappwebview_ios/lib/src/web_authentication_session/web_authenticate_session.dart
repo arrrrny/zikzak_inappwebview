@@ -83,7 +83,7 @@ class IOSWebAuthenticationSession extends PlatformWebAuthenticationSession
     args.putIfAbsent("id", () => session.id);
     args.putIfAbsent("url", () => session.url.toString());
     args.putIfAbsent("callbackURLScheme", () => session.callbackURLScheme);
-    args.putIfAbsent("initialSettings", () => initialSettings?.toMap());
+    args.putIfAbsent("initialSettings", () => initialSettings?.toJson());
     await _staticChannel.invokeMethod('create', args);
     return session;
   }
@@ -125,7 +125,7 @@ class IOSWebAuthenticationSession extends PlatformWebAuthenticationSession
       case "onComplete":
         String? url = call.arguments["url"];
         WebUri? uri = url != null ? WebUri(url) : null;
-        var error = WebAuthenticationSessionError.fromNativeValue(
+        var error = webAuthenticationSessionErrorFromWire(
           call.arguments["errorCode"],
         );
         if (onComplete != null) {

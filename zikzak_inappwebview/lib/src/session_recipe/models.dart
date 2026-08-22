@@ -36,8 +36,7 @@ class SessionRecipe {
     List<String>? loggedOutUrlPatterns,
     List<String>? loggedOutSelectors,
     this.version = 1,
-  }) : loggedOutUrlPatterns =
-           loggedOutUrlPatterns ?? const <String>[],
+  }) : loggedOutUrlPatterns = loggedOutUrlPatterns ?? const <String>[],
        loggedOutSelectors = loggedOutSelectors ?? const <String>[];
 
   ///Whether the recipe is structurally valid: non-empty [steps] and unique
@@ -66,7 +65,11 @@ class SessionRecipe {
     name: json['name'] as String,
     entryUrl: json['entryUrl'] as String,
     steps: (json['steps'] as List<dynamic>)
-        .map((e) => RecipeStepDefinition.fromJson(Map<String, dynamic>.from(e as Map)))
+        .map(
+          (e) => RecipeStepDefinition.fromJson(
+            Map<String, dynamic>.from(e as Map),
+          ),
+        )
         .toList(),
     loggedOutUrlPatterns: (json['loggedOutUrlPatterns'] as List<dynamic>?)
         ?.map((e) => e.toString())
@@ -180,7 +183,9 @@ class RecipeRecording {
         siteHost: json['siteHost'] as String,
         createdAt: json['createdAt'] as String,
         steps: (json['steps'] as List<dynamic>)
-            .map((e) => RecordedStep.fromJson(Map<String, dynamic>.from(e as Map)))
+            .map(
+              (e) => RecordedStep.fromJson(Map<String, dynamic>.from(e as Map)),
+            )
             .toList(),
         session: json['session'] != null
             ? SessionSnapshot.fromJson(
@@ -238,10 +243,14 @@ class RecordedStep {
         ?.map((e) => e.toString())
         .toList(),
     tapTarget: json['tapTarget'] != null
-        ? TapTarget.fromJson(Map<String, dynamic>.from(json['tapTarget'] as Map))
+        ? TapTarget.fromJson(
+            Map<String, dynamic>.from(json['tapTarget'] as Map),
+          )
         : null,
     signals: (json['signals'] as List<dynamic>?)
-        ?.map((e) => RecordedSignal.fromJson(Map<String, dynamic>.from(e as Map)))
+        ?.map(
+          (e) => RecordedSignal.fromJson(Map<String, dynamic>.from(e as Map)),
+        )
         .toList(),
     confirmedAt: json['confirmedAt'] as String? ?? '',
     pageHtml: json['pageHtml'] as String?,
@@ -357,7 +366,9 @@ class SessionSnapshot {
   factory SessionSnapshot.fromJson(Map<String, dynamic> json) =>
       SessionSnapshot(
         cookies: (json['cookies'] as List<dynamic>?)
-            ?.map((e) => CookieEntry.fromJson(Map<String, dynamic>.from(e as Map)))
+            ?.map(
+              (e) => CookieEntry.fromJson(Map<String, dynamic>.from(e as Map)),
+            )
             .toList(),
         capturedAt: json['capturedAt'] as String,
       );

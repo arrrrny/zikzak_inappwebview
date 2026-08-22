@@ -185,8 +185,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                                     currentSettings.isFindInteractionEnabled ??
                                     false,
                                 onChanged: (value) async {
-                                  currentSettings.isFindInteractionEnabled =
-                                      value;
+                                  currentSettings = currentSettings.copyWith(
+                                    isFindInteractionEnabled: value,
+                                  );
                                   await webViewController?.setSettings(
                                     settings: currentSettings,
                                   );
@@ -203,8 +204,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                                         .isElementFullscreenEnabled ??
                                     false,
                                 onChanged: (value) async {
-                                  currentSettings.isElementFullscreenEnabled =
-                                      value;
+                                  currentSettings = currentSettings.copyWith(
+                                    isElementFullscreenEnabled: value,
+                                  );
                                   await webViewController?.setSettings(
                                     settings: currentSettings,
                                   );
@@ -221,8 +223,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                                     false,
                                 onChanged: (value) {
                                   setState(() {
-                                    currentSettings.upgradeKnownHostsToHTTPS =
-                                        value;
+                                    currentSettings = currentSettings.copyWith(
+                                      upgradeKnownHostsToHTTPS: value,
+                                    );
                                     settings = currentSettings;
                                   });
                                   this.setState(() {

@@ -63,6 +63,33 @@ void main() {
     });
   });
 
+  group('callHandler channel contract', () {
+    Future<dynamic> invokeHandler(dynamic callbackResult) {
+      controller.addJavaScriptHandler(
+        handlerName: 'channelContract',
+        callback: (args) async => callbackResult,
+      );
+      return controller.handleMethod(
+        const MethodCall('callHandler', {
+          'handlerName': 'channelContract',
+          'args': '[]',
+        }),
+      );
+    }
+
+    test('returns null as JSON text for the native bridge', () async {
+      expect(await invokeHandler(null), 'null');
+    });
+
+    test('returns strings as JSON text for the native bridge', () async {
+      expect(await invokeHandler('ready'), '"ready"');
+    });
+
+    test('returns objects as JSON text for the native bridge', () async {
+      expect(await invokeHandler({'ready': true}), '{"ready":true}');
+    });
+  });
+
   group('removeJavaScriptHandler', () {
     test('returns null when handler does not exist', () {
       final result = controller.removeJavaScriptHandler(

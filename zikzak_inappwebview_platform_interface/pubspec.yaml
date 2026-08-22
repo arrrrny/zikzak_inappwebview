@@ -1,6 +1,6 @@
 name: zikzak_inappwebview_platform_interface
 description: A common platform interface for the zikzak_inappwebview plugin.
-version: 4.9.0
+version: 5.0.1
 homepage: https://inappwebview.dev/
 repository: https://github.com/arrrrny/zikzak_inappwebview/tree/master/zikzak_inappwebview_platform_interface
 issue_tracker: https://github.com/arrrrny/zikzak_inappwebview/issues
@@ -19,15 +19,11 @@ dependencies:
   flutter:
     sdk: flutter
   plugin_platform_interface: ^2.1.8
-  zikzak_inappwebview_internal_annotations:
-    path: ../zikzak_inappwebview_internal_annotations
 
   json_annotation: ^4.12.0
   # Zorphy entities (migration from @ExchangeableObject codegen; see PROGRESS.md).
-  # Declared as a version constraint (publishable); the local box path is wired
-  # zorphy 2.0.0 is published on pub.dev; the local box path is wired via
-  # dependency_overrides below for development (drop when not needed).
-  zorphy_annotation: ^2.0.0
+  # Declared as a version constraint so this package remains publishable.
+  zorphy_annotation: ^2.2.0
 
   meta: ^1.15.0
 
@@ -37,19 +33,7 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   build_runner: ^2.4.13
   json_serializable: ^6.8.0
-  zorphy: ^2.0.0
-
-dependency_overrides:
-  zorphy_annotation:
-    path: /workspace/zorphy/zorphy_annotation
-  zorphy:
-    path: /workspace/zorphy/zorphy
-  # zuraffa#279: zorphy's build-time analyzer requires meta >=1.18 while the
-  # bundled Flutter pins meta 1.17.0 — the framework's own wiring (zuraffa
-  # module scaffold / zuraffa_flutter pubspec) overrides both. meta is a
-  # pure-annotations package; safe to bump.
-  analyzer: ^13.1.0
-  meta: ^1.19.0
+  zorphy: ^2.2.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

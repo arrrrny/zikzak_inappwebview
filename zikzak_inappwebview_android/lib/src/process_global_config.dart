@@ -67,7 +67,7 @@ class AndroidProcessGlobalConfig extends PlatformProcessGlobalConfig
   @override
   Future<void> apply({required ProcessGlobalConfigSettings settings}) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("settings", () => settings.toMap());
+    args.putIfAbsent("settings", () => settings.toJson());
     await channel?.invokeMethod('apply', args);
   }
 

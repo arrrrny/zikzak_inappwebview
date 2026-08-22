@@ -1,5 +1,41 @@
-## 4.9.0 - 2026-08-14
+## [Unreleased]
 
+## 5.0.1 - 2026-08-22
+
+### Fixes
+
+- Fixed Android enum settings serialization so platform-channel consumers receive the expected integer wire values.
+
+## 5.0.0 - 2026-08-16
+
+### Breaking Changes
+
+- Migrated the entire `platform_interface` model layer to **Zorphy entities** — every model class is now a Zorphy entity instead of a hand-written `@ExchangeableObject`-style class (Phases 1–3j). This changes the public API surface of the platform interface (class structure, `toJson`/`fromJson`, equality) and may require updates to custom platform implementations.
+
+### Features
+
+- [platform_interface] Migrated model families to Zorphy entities: JS dialogue, ajax request, fetch request, console message, web resource, permission/safe-browsing, navigation, auth/ssl, pull-to-refresh, web storage, web message, web authentication session, context menu, webview environment, chrome safari browser, print job, `InAppBrowserMenuItem`, tracing settings, user script, image/rect/screenshot config, in-app webview settings, and script HTML tag attributes
+
+### Chores
+
+- Removed the dead `@ExchangeableObject` codegen toolchain
+- Removed the Docusaurus website (to be replaced by a zread wiki)
+
+## 4.10.0 - 2026-08-16
+
+### Fixes
+
+- [iOS] Gate `HeadlessInAppWebView.run()` on web-process readiness — the first real `loadUrl` after `run()` could be silently dropped by WKWebView while its content process was still booting, surfacing as "Unable to fetch data" on the very first request. `run()` now completes only after the initial navigation reaches a terminal state (`didFinish`/`didFail`); signal-driven, no timeout constant
+- [iOS] Guard `run()` against a missing web view (no silent hang)
+- [Android] Same headless readiness gate — `run()` completes only after `onPageFinished` or a main-frame error (both `InAppWebViewClient` and `InAppWebViewClientCompat`)
+- [macOS] Same headless readiness gate — `run()` completes only after `didFinish`/`didFail`
+- [Linux] Same headless readiness gate — the headless "run" channel handler responds only after the first `WEBKIT_LOAD_FINISHED`
+
+### Features
+
+- [example] Add First-Load Race Stress screen — reproduces the first-load race for headless and visible webviews (fresh webview + immediate `loadUrl`, 10 sequential attempts)
+
+## 4.9.0 - 2026-08-14
 
 ### Features
 
@@ -29,8 +65,8 @@
 - Chore: renamed remaining `flutter_inappwebview` residuals to
   `zikzak_inappwebview` (JS bridge name, method channel, platform view type id) (#186)
 - Chore: dependency bumps (npm deps, brace-expansion) (#189, #210)
-## 4.8.0 - 2026-08-14
 
+## 4.8.0 - 2026-08-14
 
 ### Features
 
@@ -59,7 +95,6 @@
 
 ## 4.7.0 - 2026-07-29
 
-
 ### Features
 
 - Added iOS proxy support (iOS 17.0+) — set process-wide proxy for WKWebView
@@ -84,7 +119,6 @@
 - Added `.clangd` and `compile_flags.txt` for Linux Flutter header resolution
 - Bumped svgo dependency
 
-
 ## 4.6.3 - 2026-07-21
 
 ## Unreleased
@@ -92,24 +126,23 @@
 - Added iOS proxy support (iOS 17.0+) — set process-wide proxy for WKWebView
 - Added `bouncesHorizontally` / `bouncesVertically` to `InAppWebViewSettings` (iOS 17.4+) — per-axis `UIScrollView` bounce control. No-op below iOS 17.4 and when left `null`. Closes #199.
 
-
 - Fixed: Web/WASM build failure — `HeadlessInAppWebViewWeb.dispose()` missing
   `isKeepAlive` parameter that was added to `PlatformHeadlessInAppWebView.dispose`
   interface, causing `dart2wasm` and `dart2js` compile errors
-## 4.6.2 - 2026-07-21
 
+## 4.6.2 - 2026-07-21
 
 - Fixed: Web/WASM compilation broken by unconditional `dart:io` import in platform
   interface — replaced with conditional export `if (dart.library.io)` to compile
   a stub on Web/WASM and the real `HttpServer`-based implementation on native
-## 4.6.1 - 2026-07-21
 
+## 4.6.1 - 2026-07-21
 
 - Fixed: iOS compile error in `URLValidationManager` integration — removed extraneous
   argument label `url:` from `validateURL` call that caused Swift compiler error
   when archiving for device
-## 4.6.0 - 2026-07-21
 
+## 4.6.0 - 2026-07-21
 
 - Fixed: iOS InAppBrowser crash after SPM migration — storyboard now loaded via
   `Bundle.module` instead of main bundle, resolving "Could not find a storyboard
@@ -136,13 +169,14 @@
 - Security: iOS native URL scheme validation via `URLValidationManager`
 - Perf: CookieManager — all 7 methods wrapped with `Lock.synchronized()` for
   thread-safe concurrent access
-## 4.5.3 - 2026-07-20
 
+## 4.5.3 - 2026-07-20
 
 - Fixed: iOS InAppBrowser crash after SPM migration — storyboard now loaded via
   `Bundle.module` instead of main bundle, resolving "Could not find a storyboard
   named 'WebView'" exception when opening the in-app browser
 - Cleaned up `any` version constraints from dev/example pubspec files
+
 ## 4.5.3 - 2026-07-20
 
 - Fixed: iOS InAppBrowser crash after SPM migration — storyboard now loaded via

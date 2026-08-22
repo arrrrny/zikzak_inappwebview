@@ -13,7 +13,6 @@ readonly PROJECT_DIR="$(dirname $SCRIPT_PATH)"
 
 # The order of packages for publishing (v3.0: all platforms)
 PACKAGES=(
-    "zikzak_inappwebview_internal_annotations"
     "zikzak_inappwebview_platform_interface"
     "zikzak_inappwebview_android"
     "zikzak_inappwebview_ios"

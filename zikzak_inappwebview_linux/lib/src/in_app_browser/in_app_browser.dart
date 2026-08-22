@@ -147,20 +147,20 @@ class LinuxInAppBrowser extends PlatformInAppBrowser with ChannelController {
     _init();
 
     var initialSettings =
-        settings?.toMap() ?? InAppBrowserClassSettings().toMap();
+        settings?.toJson() ?? InAppBrowserClassSettings().toMap();
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('id', () => id);
     args.putIfAbsent('settings', () => initialSettings);
-    args.putIfAbsent('contextMenu', () => contextMenu?.toMap() ?? {});
+    args.putIfAbsent('contextMenu', () => contextMenu?.toJson() ?? {});
     args.putIfAbsent('windowId', () => windowId);
     args.putIfAbsent(
       'initialUserScripts',
-      () => initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
+      () => initialUserScripts?.map((e) => e.toJson()).toList() ?? [],
     );
     args.putIfAbsent(
       'menuItems',
-      () => _menuItems.values.map((e) => e.toMap()).toList(),
+      () => _menuItems.values.map((e) => e.toJson()).toList(),
     );
 
     return args;

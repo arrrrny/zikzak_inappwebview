@@ -82,7 +82,7 @@ class IOSWebMessageListener extends PlatformWebMessageListener
         }
         if (onPostMessage != null) {
           WebMessage? message = call.arguments["message"] != null
-              ? WebMessage.fromMap(
+              ? WebMessage.fromJson(
                   call.arguments["message"].cast<String, dynamic>(),
                 )
               : null;
@@ -167,7 +167,7 @@ class IOSJavaScriptReplyProxy extends PlatformJavaScriptReplyProxy {
   @override
   Future<void> postMessage(WebMessage message) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('message', () => message.toMap());
+    args.putIfAbsent('message', () => message.toJson());
     await _iosWebMessageListener.channel?.invokeMethod('postMessage', args);
   }
 

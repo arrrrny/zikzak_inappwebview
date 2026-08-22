@@ -6,7 +6,7 @@ import '../debug_logging_settings.dart';
 import '../inappwebview_platform.dart';
 import '../types/main.dart';
 import '../web_uri.dart';
-import 'web_authenticate_session_settings.dart';
+import '../domain/entities/web_authentication_session_settings/web_authenticate_session_settings.dart';
 
 ///A completion handler for the [PlatformWebAuthenticationSession].
 typedef WebAuthenticationSessionCompletionHandler =

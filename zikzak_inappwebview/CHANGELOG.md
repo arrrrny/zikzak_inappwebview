@@ -1,3 +1,40 @@
+## [Unreleased]
+
+## 5.0.1 - 2026-08-22
+
+### Fixes
+
+- Fixed Android `ClassCastException` failures when enum settings were serialized as string names instead of their expected integer wire values. Added the missing enum wire converters and corrected affected platform-interface JSON mappings.
+
+## 5.0.0 - 2026-08-16
+
+### Breaking Changes
+
+- Migrated the entire `platform_interface` model layer to **Zorphy entities** — every model class is now a Zorphy entity instead of a hand-written `@ExchangeableObject`-style class (Phases 1–3j). This changes the public API surface of the platform interface (class structure, `toJson`/`fromJson`, equality) and may require updates to custom platform implementations.
+
+### Features
+
+- [platform_interface] Migrated model families to Zorphy entities: JS dialogue, ajax request, fetch request, console message, web resource, permission/safe-browsing, navigation, auth/ssl, pull-to-refresh, web storage, web message, web authentication session, context menu, webview environment, chrome safari browser, print job, `InAppBrowserMenuItem`, tracing settings, user script, image/rect/screenshot config, in-app webview settings, and script HTML tag attributes
+
+### Chores
+
+- Removed the dead `@ExchangeableObject` codegen toolchain
+- Removed the Docusaurus website (to be replaced by a zread wiki)
+
+## 4.10.0 - 2026-08-16
+
+### Fixes
+
+- [iOS] Gate `HeadlessInAppWebView.run()` on web-process readiness — the first real `loadUrl` after `run()` could be silently dropped by WKWebView while its content process was still booting, surfacing as "Unable to fetch data" on the very first request. `run()` now completes only after the initial navigation reaches a terminal state (`didFinish`/`didFail`); signal-driven, no timeout constant
+- [iOS] Guard `run()` against a missing web view (no silent hang)
+- [Android] Same headless readiness gate — `run()` completes only after `onPageFinished` or a main-frame error (both `InAppWebViewClient` and `InAppWebViewClientCompat`)
+- [macOS] Same headless readiness gate — `run()` completes only after `didFinish`/`didFail`
+- [Linux] Same headless readiness gate — the headless "run" channel handler responds only after the first `WEBKIT_LOAD_FINISHED`
+
+### Features
+
+- [example] Add First-Load Race Stress screen — reproduces the first-load race for headless and visible webviews (fresh webview + immediate `loadUrl`, 10 sequential attempts)
+
 ## 4.9.0 - 2026-08-14
 
 ### Features

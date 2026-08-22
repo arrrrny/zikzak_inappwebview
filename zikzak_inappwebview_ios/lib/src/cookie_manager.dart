@@ -4,6 +4,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
+// ignore: implementation_imports
+import 'package:zikzak_inappwebview_platform_interface/src/domain/entities/enums/http_cookie_same_site_policy.dart'
+    show httpCookieSameSitePolicyFromWire, httpCookieSameSitePolicyToWire;
 
 import 'in_app_webview/headless_in_app_webview.dart';
 import 'platform_util.dart';
@@ -116,7 +119,10 @@ class IOSCookieManager extends PlatformCookieManager with ChannelController {
     args.putIfAbsent('maxAge', () => maxAge);
     args.putIfAbsent('isSecure', () => isSecure);
     args.putIfAbsent('isHttpOnly', () => isHttpOnly);
-    args.putIfAbsent('sameSite', () => sameSite?.toNativeValue());
+    args.putIfAbsent(
+      'sameSite',
+      () => httpCookieSameSitePolicyToWire(sameSite),
+    );
 
     return await channel?.invokeMethod<bool>('setCookie', args) ?? false;
   }
@@ -145,7 +151,8 @@ class IOSCookieManager extends PlatformCookieManager with ChannelController {
     if (isSecure != null && isSecure) cookieValue += "; Secure";
 
     if (sameSite != null)
-      cookieValue += "; SameSite=" + sameSite.toNativeValue();
+      cookieValue +=
+          "; SameSite=" + (httpCookieSameSitePolicyToWire(sameSite) as String);
 
     cookieValue += ";";
 
@@ -211,9 +218,7 @@ class IOSCookieManager extends PlatformCookieManager with ChannelController {
           expiresDate: cookieMap["expiresDate"],
           isSessionOnly: cookieMap["isSessionOnly"],
           domain: cookieMap["domain"],
-          sameSite: HTTPCookieSameSitePolicy.fromNativeValue(
-            cookieMap["sameSite"],
-          ),
+          sameSite: httpCookieSameSitePolicyFromWire(cookieMap["sameSite"]),
           isSecure: cookieMap["isSecure"],
           isHttpOnly: cookieMap["isHttpOnly"],
           path: cookieMap["path"],
@@ -321,9 +326,7 @@ class IOSCookieManager extends PlatformCookieManager with ChannelController {
           expiresDate: cookies[i]["expiresDate"],
           isSessionOnly: cookies[i]["isSessionOnly"],
           domain: cookies[i]["domain"],
-          sameSite: HTTPCookieSameSitePolicy.fromNativeValue(
-            cookies[i]["sameSite"],
-          ),
+          sameSite: httpCookieSameSitePolicyFromWire(cookies[i]["sameSite"]),
           isSecure: cookies[i]["isSecure"],
           isHttpOnly: cookies[i]["isHttpOnly"],
           path: cookies[i]["path"],
@@ -430,9 +433,7 @@ class IOSCookieManager extends PlatformCookieManager with ChannelController {
           expiresDate: cookieMap["expiresDate"],
           isSessionOnly: cookieMap["isSessionOnly"],
           domain: cookieMap["domain"],
-          sameSite: HTTPCookieSameSitePolicy.fromNativeValue(
-            cookieMap["sameSite"],
-          ),
+          sameSite: httpCookieSameSitePolicyFromWire(cookieMap["sameSite"]),
           isSecure: cookieMap["isSecure"],
           isHttpOnly: cookieMap["isHttpOnly"],
           path: cookieMap["path"],

@@ -224,7 +224,7 @@ void main() {
       expect(createCalled, isTrue);
       expect(receivedHitTestResult, isNotNull);
       expect(receivedHitTestResult!.type,
-          InAppWebViewHitTestResultType.srcAnchorType);
+          InAppWebViewHitTestResultType.SRC_ANCHOR_TYPE);
       expect(receivedHitTestResult!.extra, 'https://example.com');
     });
 
@@ -386,7 +386,7 @@ void main() {
     test('disableContextMenu defaults to false and is serializable', () {
       final settings = InAppWebViewSettings();
       expect(settings.disableContextMenu, false);
-      final map = settings.toMap();
+      final map = settings.toJson();
       expect(map.containsKey('disableContextMenu'), isTrue);
       expect(map['disableContextMenu'], false);
     });
@@ -395,7 +395,7 @@ void main() {
         () {
       final settings = InAppWebViewSettings();
       expect(settings.disableLongPressContextMenuOnLinks, false);
-      final map = settings.toMap();
+      final map = settings.toJson();
       expect(map.containsKey('disableLongPressContextMenuOnLinks'), isTrue);
       expect(map['disableLongPressContextMenuOnLinks'], false);
     });
@@ -405,8 +405,8 @@ void main() {
         disableContextMenu: true,
         disableLongPressContextMenuOnLinks: true,
       );
-      final map = settings.toMap();
-      final restored = InAppWebViewSettings.fromMap(map)!;
+      final map = settings.toJson();
+      final restored = InAppWebViewSettings.fromJson(map)!;
       expect(restored.disableContextMenu, isTrue);
       expect(restored.disableLongPressContextMenuOnLinks, isTrue);
     });
@@ -427,30 +427,29 @@ void main() {
   group('HitTestResult', () {
     test('can be created with type and extra', () {
       final result = InAppWebViewHitTestResult(
-        type: InAppWebViewHitTestResultType.srcAnchorType,
+        type: InAppWebViewHitTestResultType.SRC_ANCHOR_TYPE,
         extra: 'https://example.com',
       );
-      expect(result.type, InAppWebViewHitTestResultType.srcAnchorType);
+      expect(result.type, InAppWebViewHitTestResultType.SRC_ANCHOR_TYPE);
       expect(result.extra, 'https://example.com');
     });
 
     test('can be created from a map', () {
-      final result = InAppWebViewHitTestResult.fromMap({
+      final result = InAppWebViewHitTestResult.fromJson({
         'type': 5,
         'extra': 'https://example.com/image.png',
-      })!;
-      expect(result.type, InAppWebViewHitTestResultType.imageType);
+      });
+      expect(result.type, InAppWebViewHitTestResultType.IMAGE_TYPE);
       expect(result.extra, 'https://example.com/image.png');
     });
 
-    test('fromMap returns null for null input', () {
-      expect(InAppWebViewHitTestResult.fromMap(null), isNull);
-    });
-
-    test('fromMap handles unknown type gracefully', () {
-      final result = InAppWebViewHitTestResult.fromMap({'type': 999, 'extra': null})!;
+    test('fromJson handles unknown type gracefully', () {
+      final result = InAppWebViewHitTestResult.fromJson({
+        'type': 999,
+        'extra': null,
+      });
       // Invalid type values map to null on the Dart side (the native side
-      // falls back to unknownType, but Dart's enum fromNativeValue returns
+      // falls back to unknownType, but the fromJson wire lookup returns
       // null for unrecognized values).
       expect(result.type, isNull);
       expect(result.extra, isNull);
