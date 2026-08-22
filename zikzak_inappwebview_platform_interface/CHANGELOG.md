@@ -1,3 +1,10 @@
+## 5.0.1 - 2026-08-19
+
+### Fixes
+
+- [Android] Fix `ClassCastException: java.lang.String cannot be cast to java.lang.Integer` in `InAppWebViewSettings.parse()` — the Dart `toJson()` was serializing enum settings (`forceDark`, `forceDarkStrategy`, `mixedContentMode`, `cacheMode`, `disabledActionModeMenuItems`, `overScrollMode`, `scrollBarStyle`, `verticalScrollbarPosition`, `preferredContentMode`, `webAuthenticationSupport`) as string names instead of the integer wire values that the Android platform channel expects. Added `toJson`/`fromJson` converters on all affected `@JsonKey` annotations using the existing `toWire`/`fromWire` functions, which correctly handle non-sequential wire values (e.g., `CacheMode` → -1/1/2/3, `ScrollBarStyle` → 0/16777216/...).
+- Added missing `webAuthenticationSupportToWire`/`webAuthenticationSupportFromWire` helper functions.
+
 ## 5.0.0 - 2026-08-16
 
 

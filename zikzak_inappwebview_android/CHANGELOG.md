@@ -1,3 +1,9 @@
+## 5.0.1 - 2026-08-19
+
+### Fixes
+
+- [Android] Fix `ClassCastException: java.lang.String cannot be cast to java.lang.Integer` in `InAppWebViewSettings.parse()` — enum settings (`forceDark`, `forceDarkStrategy`, `mixedContentMode`, `cacheMode`, `disabledActionModeMenuItems`, `overScrollMode`, `scrollBarStyle`, `verticalScrollbarPosition`, `preferredContentMode`, `webAuthenticationSupport`) were being serialized as strings by the Dart side instead of their expected integer wire values. Fixed in `zikzak_inappwebview_platform_interface` 5.0.1.
+
 ## 5.0.0 - 2026-08-16
 
 

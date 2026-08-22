@@ -333,7 +333,11 @@ class InAppWebViewSettings {
   )
   final List<ContentBlocker>? contentBlockers;
 
-  @JsonKey(defaultValue: UserPreferredContentMode.RECOMMENDED)
+  @JsonKey(
+    defaultValue: UserPreferredContentMode.RECOMMENDED,
+    toJson: userPreferredContentModeToWire,
+    fromJson: userPreferredContentModeFromWire,
+  )
   final UserPreferredContentMode? preferredContentMode;
 
   final bool? useShouldInterceptAjaxRequest;
@@ -390,6 +394,7 @@ class InAppWebViewSettings {
   @JsonKey(defaultValue: true)
   final bool? safeBrowsingEnabled;
 
+  @JsonKey(toJson: mixedContentModeToWire, fromJson: mixedContentModeFromWire)
   final MixedContentMode? mixedContentMode;
 
   @JsonKey(defaultValue: true)
@@ -404,7 +409,11 @@ class InAppWebViewSettings {
   @JsonKey(defaultValue: false)
   final bool? blockNetworkLoads;
 
-  @JsonKey(defaultValue: CacheMode.LOAD_DEFAULT)
+  @JsonKey(
+    defaultValue: CacheMode.LOAD_DEFAULT,
+    toJson: cacheModeToWire,
+    fromJson: cacheModeFromWire,
+  )
   final CacheMode? cacheMode;
 
   @JsonKey(defaultValue: "cursive")
@@ -419,6 +428,10 @@ class InAppWebViewSettings {
   @JsonKey(defaultValue: "UTF-8")
   final String? defaultTextEncodingName;
 
+  @JsonKey(
+    toJson: actionModeMenuItemToWire,
+    fromJson: actionModeMenuItemFromWire,
+  )
   final ActionModeMenuItem? disabledActionModeMenuItems;
 
   @JsonKey(defaultValue: "fantasy")
@@ -427,11 +440,17 @@ class InAppWebViewSettings {
   @JsonKey(defaultValue: "monospace")
   final String? fixedFontFamily;
 
-  @JsonKey(defaultValue: ForceDark.OFF)
+  @JsonKey(
+    defaultValue: ForceDark.OFF,
+    toJson: forceDarkToWire,
+    fromJson: forceDarkFromWire,
+  )
   final ForceDark? forceDark;
 
   @JsonKey(
     defaultValue: ForceDarkStrategy.PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING,
+    toJson: forceDarkStrategyToWire,
+    fromJson: forceDarkStrategyFromWire,
   )
   final ForceDarkStrategy? forceDarkStrategy;
 
@@ -490,15 +509,27 @@ class InAppWebViewSettings {
 
   final bool? useOnRenderProcessGone;
 
-  @JsonKey(defaultValue: OverScrollMode.IF_CONTENT_SCROLLS)
+  @JsonKey(
+    defaultValue: OverScrollMode.IF_CONTENT_SCROLLS,
+    toJson: overScrollModeToWire,
+    fromJson: overScrollModeFromWire,
+  )
   final OverScrollMode? overScrollMode;
 
   final bool? networkAvailable;
 
-  @JsonKey(defaultValue: ScrollBarStyle.SCROLLBARS_INSIDE_OVERLAY)
+  @JsonKey(
+    defaultValue: ScrollBarStyle.SCROLLBARS_INSIDE_OVERLAY,
+    toJson: scrollBarStyleToWire,
+    fromJson: scrollBarStyleFromWire,
+  )
   final ScrollBarStyle? scrollBarStyle;
 
-  @JsonKey(defaultValue: VerticalScrollbarPosition.SCROLLBAR_POSITION_DEFAULT)
+  @JsonKey(
+    defaultValue: VerticalScrollbarPosition.SCROLLBAR_POSITION_DEFAULT,
+    toJson: verticalScrollbarPositionToWire,
+    fromJson: verticalScrollbarPositionFromWire,
+  )
   final VerticalScrollbarPosition? verticalScrollbarPosition;
 
   final int? scrollBarDefaultDelayBeforeFade;
@@ -530,6 +561,10 @@ class InAppWebViewSettings {
 
   final bool? paymentRequestEnabled;
 
+  @JsonKey(
+    toJson: webAuthenticationSupportToWire,
+    fromJson: webAuthenticationSupportFromWire,
+  )
   final WebAuthenticationSupport? webAuthenticationSupport;
 
   @JsonKey(defaultValue: true)
@@ -1443,2022 +1478,2275 @@ class InAppWebViewSettings {
           _patchMap.containsKey(
             InAppWebViewSettings$.useShouldOverrideUrlLoading,
           )
-          ? (_patchMap[InAppWebViewSettings$.useShouldOverrideUrlLoading]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.useShouldOverrideUrlLoading](
-                    this.useShouldOverrideUrlLoading,
-                  )
-                : (_patchMap[InAppWebViewSettings$.useShouldOverrideUrlLoading]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.useShouldOverrideUrlLoading]
-                      .applyTo(this.useShouldOverrideUrlLoading)
-                : _patchMap[InAppWebViewSettings$.useShouldOverrideUrlLoading]
+          ? ((_patchMap[InAppWebViewSettings$.useShouldOverrideUrlLoading]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .useShouldOverrideUrlLoading](
+                        this.useShouldOverrideUrlLoading,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .useShouldOverrideUrlLoading]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .useShouldOverrideUrlLoading]
+                          .applyTo(this.useShouldOverrideUrlLoading)
+                    : _patchMap[InAppWebViewSettings$
+                          .useShouldOverrideUrlLoading])
+                as bool?
           : this.useShouldOverrideUrlLoading,
       useOnLoadResource:
           _patchMap.containsKey(InAppWebViewSettings$.useOnLoadResource)
-          ? (_patchMap[InAppWebViewSettings$.useOnLoadResource] is Function)
-                ? _patchMap[InAppWebViewSettings$.useOnLoadResource](
-                    this.useOnLoadResource,
-                  )
-                : (_patchMap[InAppWebViewSettings$.useOnLoadResource] is Patch)
-                ? _patchMap[InAppWebViewSettings$.useOnLoadResource].applyTo(
-                    this.useOnLoadResource,
-                  )
-                : _patchMap[InAppWebViewSettings$.useOnLoadResource]
+          ? ((_patchMap[InAppWebViewSettings$.useOnLoadResource] is Function)
+                    ? _patchMap[InAppWebViewSettings$.useOnLoadResource](
+                        this.useOnLoadResource,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.useOnLoadResource]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.useOnLoadResource]
+                          .applyTo(this.useOnLoadResource)
+                    : _patchMap[InAppWebViewSettings$.useOnLoadResource])
+                as bool?
           : this.useOnLoadResource,
       useOnDownloadStart:
           _patchMap.containsKey(InAppWebViewSettings$.useOnDownloadStart)
-          ? (_patchMap[InAppWebViewSettings$.useOnDownloadStart] is Function)
-                ? _patchMap[InAppWebViewSettings$.useOnDownloadStart](
-                    this.useOnDownloadStart,
-                  )
-                : (_patchMap[InAppWebViewSettings$.useOnDownloadStart] is Patch)
-                ? _patchMap[InAppWebViewSettings$.useOnDownloadStart].applyTo(
-                    this.useOnDownloadStart,
-                  )
-                : _patchMap[InAppWebViewSettings$.useOnDownloadStart]
+          ? ((_patchMap[InAppWebViewSettings$.useOnDownloadStart] is Function)
+                    ? _patchMap[InAppWebViewSettings$.useOnDownloadStart](
+                        this.useOnDownloadStart,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.useOnDownloadStart]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.useOnDownloadStart]
+                          .applyTo(this.useOnDownloadStart)
+                    : _patchMap[InAppWebViewSettings$.useOnDownloadStart])
+                as bool?
           : this.useOnDownloadStart,
       userAgent: _patchMap.containsKey(InAppWebViewSettings$.userAgent)
-          ? (_patchMap[InAppWebViewSettings$.userAgent] is Function)
-                ? _patchMap[InAppWebViewSettings$.userAgent](this.userAgent)
-                : (_patchMap[InAppWebViewSettings$.userAgent] is Patch)
-                ? _patchMap[InAppWebViewSettings$.userAgent].applyTo(
-                    this.userAgent,
-                  )
-                : _patchMap[InAppWebViewSettings$.userAgent]
+          ? ((_patchMap[InAppWebViewSettings$.userAgent] is Function)
+                    ? _patchMap[InAppWebViewSettings$.userAgent](this.userAgent)
+                    : (_patchMap[InAppWebViewSettings$.userAgent] is Patch)
+                    ? _patchMap[InAppWebViewSettings$.userAgent].applyTo(
+                        this.userAgent,
+                      )
+                    : _patchMap[InAppWebViewSettings$.userAgent])
+                as String?
           : this.userAgent,
       applicationNameForUserAgent:
           _patchMap.containsKey(
             InAppWebViewSettings$.applicationNameForUserAgent,
           )
-          ? (_patchMap[InAppWebViewSettings$.applicationNameForUserAgent]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.applicationNameForUserAgent](
-                    this.applicationNameForUserAgent,
-                  )
-                : (_patchMap[InAppWebViewSettings$.applicationNameForUserAgent]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.applicationNameForUserAgent]
-                      .applyTo(this.applicationNameForUserAgent)
-                : _patchMap[InAppWebViewSettings$.applicationNameForUserAgent]
+          ? ((_patchMap[InAppWebViewSettings$.applicationNameForUserAgent]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .applicationNameForUserAgent](
+                        this.applicationNameForUserAgent,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .applicationNameForUserAgent]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .applicationNameForUserAgent]
+                          .applyTo(this.applicationNameForUserAgent)
+                    : _patchMap[InAppWebViewSettings$
+                          .applicationNameForUserAgent])
+                as String?
           : this.applicationNameForUserAgent,
       javaScriptEnabled:
           _patchMap.containsKey(InAppWebViewSettings$.javaScriptEnabled)
-          ? (_patchMap[InAppWebViewSettings$.javaScriptEnabled] is Function)
-                ? _patchMap[InAppWebViewSettings$.javaScriptEnabled](
-                    this.javaScriptEnabled,
-                  )
-                : (_patchMap[InAppWebViewSettings$.javaScriptEnabled] is Patch)
-                ? _patchMap[InAppWebViewSettings$.javaScriptEnabled].applyTo(
-                    this.javaScriptEnabled,
-                  )
-                : _patchMap[InAppWebViewSettings$.javaScriptEnabled]
+          ? ((_patchMap[InAppWebViewSettings$.javaScriptEnabled] is Function)
+                    ? _patchMap[InAppWebViewSettings$.javaScriptEnabled](
+                        this.javaScriptEnabled,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.javaScriptEnabled]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.javaScriptEnabled]
+                          .applyTo(this.javaScriptEnabled)
+                    : _patchMap[InAppWebViewSettings$.javaScriptEnabled])
+                as bool?
           : this.javaScriptEnabled,
       javaScriptCanOpenWindowsAutomatically:
           _patchMap.containsKey(
             InAppWebViewSettings$.javaScriptCanOpenWindowsAutomatically,
           )
-          ? (_patchMap[InAppWebViewSettings$
-                        .javaScriptCanOpenWindowsAutomatically]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$
-                      .javaScriptCanOpenWindowsAutomatically](
-                    this.javaScriptCanOpenWindowsAutomatically,
-                  )
-                : (_patchMap[InAppWebViewSettings$
-                          .javaScriptCanOpenWindowsAutomatically]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$
-                          .javaScriptCanOpenWindowsAutomatically]
-                      .applyTo(this.javaScriptCanOpenWindowsAutomatically)
-                : _patchMap[InAppWebViewSettings$
-                      .javaScriptCanOpenWindowsAutomatically]
+          ? ((_patchMap[InAppWebViewSettings$
+                            .javaScriptCanOpenWindowsAutomatically]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .javaScriptCanOpenWindowsAutomatically](
+                        this.javaScriptCanOpenWindowsAutomatically,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .javaScriptCanOpenWindowsAutomatically]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .javaScriptCanOpenWindowsAutomatically]
+                          .applyTo(this.javaScriptCanOpenWindowsAutomatically)
+                    : _patchMap[InAppWebViewSettings$
+                          .javaScriptCanOpenWindowsAutomatically])
+                as bool?
           : this.javaScriptCanOpenWindowsAutomatically,
       mediaPlaybackRequiresUserGesture:
           _patchMap.containsKey(
             InAppWebViewSettings$.mediaPlaybackRequiresUserGesture,
           )
-          ? (_patchMap[InAppWebViewSettings$.mediaPlaybackRequiresUserGesture]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$
-                      .mediaPlaybackRequiresUserGesture](
-                    this.mediaPlaybackRequiresUserGesture,
-                  )
-                : (_patchMap[InAppWebViewSettings$
-                          .mediaPlaybackRequiresUserGesture]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$
-                          .mediaPlaybackRequiresUserGesture]
-                      .applyTo(this.mediaPlaybackRequiresUserGesture)
-                : _patchMap[InAppWebViewSettings$
-                      .mediaPlaybackRequiresUserGesture]
+          ? ((_patchMap[InAppWebViewSettings$.mediaPlaybackRequiresUserGesture]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .mediaPlaybackRequiresUserGesture](
+                        this.mediaPlaybackRequiresUserGesture,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .mediaPlaybackRequiresUserGesture]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .mediaPlaybackRequiresUserGesture]
+                          .applyTo(this.mediaPlaybackRequiresUserGesture)
+                    : _patchMap[InAppWebViewSettings$
+                          .mediaPlaybackRequiresUserGesture])
+                as bool?
           : this.mediaPlaybackRequiresUserGesture,
       minimumFontSize:
           _patchMap.containsKey(InAppWebViewSettings$.minimumFontSize)
-          ? (_patchMap[InAppWebViewSettings$.minimumFontSize] is Function)
-                ? _patchMap[InAppWebViewSettings$.minimumFontSize](
-                    this.minimumFontSize,
-                  )
-                : (_patchMap[InAppWebViewSettings$.minimumFontSize] is Patch)
-                ? _patchMap[InAppWebViewSettings$.minimumFontSize].applyTo(
-                    this.minimumFontSize,
-                  )
-                : _patchMap[InAppWebViewSettings$.minimumFontSize]
+          ? ((_patchMap[InAppWebViewSettings$.minimumFontSize] is Function)
+                    ? _patchMap[InAppWebViewSettings$.minimumFontSize](
+                        this.minimumFontSize,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.minimumFontSize]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.minimumFontSize].applyTo(
+                        this.minimumFontSize,
+                      )
+                    : _patchMap[InAppWebViewSettings$.minimumFontSize])
+                as int?
           : this.minimumFontSize,
       verticalScrollBarEnabled:
           _patchMap.containsKey(InAppWebViewSettings$.verticalScrollBarEnabled)
-          ? (_patchMap[InAppWebViewSettings$.verticalScrollBarEnabled]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.verticalScrollBarEnabled](
-                    this.verticalScrollBarEnabled,
-                  )
-                : (_patchMap[InAppWebViewSettings$.verticalScrollBarEnabled]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.verticalScrollBarEnabled]
-                      .applyTo(this.verticalScrollBarEnabled)
-                : _patchMap[InAppWebViewSettings$.verticalScrollBarEnabled]
+          ? ((_patchMap[InAppWebViewSettings$.verticalScrollBarEnabled]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$.verticalScrollBarEnabled](
+                        this.verticalScrollBarEnabled,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.verticalScrollBarEnabled]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.verticalScrollBarEnabled]
+                          .applyTo(this.verticalScrollBarEnabled)
+                    : _patchMap[InAppWebViewSettings$.verticalScrollBarEnabled])
+                as bool?
           : this.verticalScrollBarEnabled,
       horizontalScrollBarEnabled:
           _patchMap.containsKey(
             InAppWebViewSettings$.horizontalScrollBarEnabled,
           )
-          ? (_patchMap[InAppWebViewSettings$.horizontalScrollBarEnabled]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.horizontalScrollBarEnabled](
-                    this.horizontalScrollBarEnabled,
-                  )
-                : (_patchMap[InAppWebViewSettings$.horizontalScrollBarEnabled]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.horizontalScrollBarEnabled]
-                      .applyTo(this.horizontalScrollBarEnabled)
-                : _patchMap[InAppWebViewSettings$.horizontalScrollBarEnabled]
+          ? ((_patchMap[InAppWebViewSettings$.horizontalScrollBarEnabled]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .horizontalScrollBarEnabled](
+                        this.horizontalScrollBarEnabled,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .horizontalScrollBarEnabled]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .horizontalScrollBarEnabled]
+                          .applyTo(this.horizontalScrollBarEnabled)
+                    : _patchMap[InAppWebViewSettings$
+                          .horizontalScrollBarEnabled])
+                as bool?
           : this.horizontalScrollBarEnabled,
       resourceCustomSchemes:
           _patchMap.containsKey(InAppWebViewSettings$.resourceCustomSchemes)
-          ? (_patchMap[InAppWebViewSettings$.resourceCustomSchemes] is Function)
-                ? _patchMap[InAppWebViewSettings$.resourceCustomSchemes](
-                    this.resourceCustomSchemes,
-                  )
-                : (_patchMap[InAppWebViewSettings$.resourceCustomSchemes]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.resourceCustomSchemes]
-                      .applyTo(this.resourceCustomSchemes)
-                : _patchMap[InAppWebViewSettings$.resourceCustomSchemes]
+          ? ((_patchMap[InAppWebViewSettings$.resourceCustomSchemes]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$.resourceCustomSchemes](
+                        this.resourceCustomSchemes,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.resourceCustomSchemes]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.resourceCustomSchemes]
+                          .applyTo(this.resourceCustomSchemes)
+                    : _patchMap[InAppWebViewSettings$.resourceCustomSchemes])
+                as List<String>?
           : this.resourceCustomSchemes,
       contentBlockers:
           _patchMap.containsKey(InAppWebViewSettings$.contentBlockers)
-          ? (_patchMap[InAppWebViewSettings$.contentBlockers] is Function)
-                ? _patchMap[InAppWebViewSettings$.contentBlockers](
-                    this.contentBlockers,
-                  )
-                : (_patchMap[InAppWebViewSettings$.contentBlockers] is Patch)
-                ? _patchMap[InAppWebViewSettings$.contentBlockers].applyTo(
-                    this.contentBlockers,
-                  )
-                : _patchMap[InAppWebViewSettings$.contentBlockers]
+          ? ((_patchMap[InAppWebViewSettings$.contentBlockers] is Function)
+                    ? _patchMap[InAppWebViewSettings$.contentBlockers](
+                        this.contentBlockers,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.contentBlockers]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.contentBlockers].applyTo(
+                        this.contentBlockers,
+                      )
+                    : _patchMap[InAppWebViewSettings$.contentBlockers])
+                as List<ContentBlocker>?
           : this.contentBlockers,
       preferredContentMode:
           _patchMap.containsKey(InAppWebViewSettings$.preferredContentMode)
-          ? (_patchMap[InAppWebViewSettings$.preferredContentMode] is Function)
-                ? _patchMap[InAppWebViewSettings$.preferredContentMode](
-                    this.preferredContentMode,
-                  )
-                : (_patchMap[InAppWebViewSettings$.preferredContentMode]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.preferredContentMode].applyTo(
-                    this.preferredContentMode,
-                  )
-                : _patchMap[InAppWebViewSettings$.preferredContentMode]
+          ? ((_patchMap[InAppWebViewSettings$.preferredContentMode] is Function)
+                    ? _patchMap[InAppWebViewSettings$.preferredContentMode](
+                        this.preferredContentMode,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.preferredContentMode]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.preferredContentMode]
+                          .applyTo(this.preferredContentMode)
+                    : _patchMap[InAppWebViewSettings$.preferredContentMode])
+                as UserPreferredContentMode?
           : this.preferredContentMode,
       useShouldInterceptAjaxRequest:
           _patchMap.containsKey(
             InAppWebViewSettings$.useShouldInterceptAjaxRequest,
           )
-          ? (_patchMap[InAppWebViewSettings$.useShouldInterceptAjaxRequest]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$
-                      .useShouldInterceptAjaxRequest](
-                    this.useShouldInterceptAjaxRequest,
-                  )
-                : (_patchMap[InAppWebViewSettings$
-                          .useShouldInterceptAjaxRequest]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.useShouldInterceptAjaxRequest]
-                      .applyTo(this.useShouldInterceptAjaxRequest)
-                : _patchMap[InAppWebViewSettings$.useShouldInterceptAjaxRequest]
+          ? ((_patchMap[InAppWebViewSettings$.useShouldInterceptAjaxRequest]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .useShouldInterceptAjaxRequest](
+                        this.useShouldInterceptAjaxRequest,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .useShouldInterceptAjaxRequest]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .useShouldInterceptAjaxRequest]
+                          .applyTo(this.useShouldInterceptAjaxRequest)
+                    : _patchMap[InAppWebViewSettings$
+                          .useShouldInterceptAjaxRequest])
+                as bool?
           : this.useShouldInterceptAjaxRequest,
       interceptOnlyAsyncAjaxRequests:
           _patchMap.containsKey(
             InAppWebViewSettings$.interceptOnlyAsyncAjaxRequests,
           )
-          ? (_patchMap[InAppWebViewSettings$.interceptOnlyAsyncAjaxRequests]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$
-                      .interceptOnlyAsyncAjaxRequests](
-                    this.interceptOnlyAsyncAjaxRequests,
-                  )
-                : (_patchMap[InAppWebViewSettings$
-                          .interceptOnlyAsyncAjaxRequests]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$
-                          .interceptOnlyAsyncAjaxRequests]
-                      .applyTo(this.interceptOnlyAsyncAjaxRequests)
-                : _patchMap[InAppWebViewSettings$
-                      .interceptOnlyAsyncAjaxRequests]
+          ? ((_patchMap[InAppWebViewSettings$.interceptOnlyAsyncAjaxRequests]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .interceptOnlyAsyncAjaxRequests](
+                        this.interceptOnlyAsyncAjaxRequests,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .interceptOnlyAsyncAjaxRequests]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .interceptOnlyAsyncAjaxRequests]
+                          .applyTo(this.interceptOnlyAsyncAjaxRequests)
+                    : _patchMap[InAppWebViewSettings$
+                          .interceptOnlyAsyncAjaxRequests])
+                as bool?
           : this.interceptOnlyAsyncAjaxRequests,
       useShouldInterceptFetchRequest:
           _patchMap.containsKey(
             InAppWebViewSettings$.useShouldInterceptFetchRequest,
           )
-          ? (_patchMap[InAppWebViewSettings$.useShouldInterceptFetchRequest]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$
-                      .useShouldInterceptFetchRequest](
-                    this.useShouldInterceptFetchRequest,
-                  )
-                : (_patchMap[InAppWebViewSettings$
-                          .useShouldInterceptFetchRequest]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$
-                          .useShouldInterceptFetchRequest]
-                      .applyTo(this.useShouldInterceptFetchRequest)
-                : _patchMap[InAppWebViewSettings$
-                      .useShouldInterceptFetchRequest]
+          ? ((_patchMap[InAppWebViewSettings$.useShouldInterceptFetchRequest]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .useShouldInterceptFetchRequest](
+                        this.useShouldInterceptFetchRequest,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .useShouldInterceptFetchRequest]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .useShouldInterceptFetchRequest]
+                          .applyTo(this.useShouldInterceptFetchRequest)
+                    : _patchMap[InAppWebViewSettings$
+                          .useShouldInterceptFetchRequest])
+                as bool?
           : this.useShouldInterceptFetchRequest,
       incognito: _patchMap.containsKey(InAppWebViewSettings$.incognito)
-          ? (_patchMap[InAppWebViewSettings$.incognito] is Function)
-                ? _patchMap[InAppWebViewSettings$.incognito](this.incognito)
-                : (_patchMap[InAppWebViewSettings$.incognito] is Patch)
-                ? _patchMap[InAppWebViewSettings$.incognito].applyTo(
-                    this.incognito,
-                  )
-                : _patchMap[InAppWebViewSettings$.incognito]
+          ? ((_patchMap[InAppWebViewSettings$.incognito] is Function)
+                    ? _patchMap[InAppWebViewSettings$.incognito](this.incognito)
+                    : (_patchMap[InAppWebViewSettings$.incognito] is Patch)
+                    ? _patchMap[InAppWebViewSettings$.incognito].applyTo(
+                        this.incognito,
+                      )
+                    : _patchMap[InAppWebViewSettings$.incognito])
+                as bool?
           : this.incognito,
       cacheEnabled: _patchMap.containsKey(InAppWebViewSettings$.cacheEnabled)
-          ? (_patchMap[InAppWebViewSettings$.cacheEnabled] is Function)
-                ? _patchMap[InAppWebViewSettings$.cacheEnabled](
-                    this.cacheEnabled,
-                  )
-                : (_patchMap[InAppWebViewSettings$.cacheEnabled] is Patch)
-                ? _patchMap[InAppWebViewSettings$.cacheEnabled].applyTo(
-                    this.cacheEnabled,
-                  )
-                : _patchMap[InAppWebViewSettings$.cacheEnabled]
+          ? ((_patchMap[InAppWebViewSettings$.cacheEnabled] is Function)
+                    ? _patchMap[InAppWebViewSettings$.cacheEnabled](
+                        this.cacheEnabled,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.cacheEnabled] is Patch)
+                    ? _patchMap[InAppWebViewSettings$.cacheEnabled].applyTo(
+                        this.cacheEnabled,
+                      )
+                    : _patchMap[InAppWebViewSettings$.cacheEnabled])
+                as bool?
           : this.cacheEnabled,
       transparentBackground:
           _patchMap.containsKey(InAppWebViewSettings$.transparentBackground)
-          ? (_patchMap[InAppWebViewSettings$.transparentBackground] is Function)
-                ? _patchMap[InAppWebViewSettings$.transparentBackground](
-                    this.transparentBackground,
-                  )
-                : (_patchMap[InAppWebViewSettings$.transparentBackground]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.transparentBackground]
-                      .applyTo(this.transparentBackground)
-                : _patchMap[InAppWebViewSettings$.transparentBackground]
+          ? ((_patchMap[InAppWebViewSettings$.transparentBackground]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$.transparentBackground](
+                        this.transparentBackground,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.transparentBackground]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.transparentBackground]
+                          .applyTo(this.transparentBackground)
+                    : _patchMap[InAppWebViewSettings$.transparentBackground])
+                as bool?
           : this.transparentBackground,
       disableVerticalScroll:
           _patchMap.containsKey(InAppWebViewSettings$.disableVerticalScroll)
-          ? (_patchMap[InAppWebViewSettings$.disableVerticalScroll] is Function)
-                ? _patchMap[InAppWebViewSettings$.disableVerticalScroll](
-                    this.disableVerticalScroll,
-                  )
-                : (_patchMap[InAppWebViewSettings$.disableVerticalScroll]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.disableVerticalScroll]
-                      .applyTo(this.disableVerticalScroll)
-                : _patchMap[InAppWebViewSettings$.disableVerticalScroll]
+          ? ((_patchMap[InAppWebViewSettings$.disableVerticalScroll]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$.disableVerticalScroll](
+                        this.disableVerticalScroll,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.disableVerticalScroll]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.disableVerticalScroll]
+                          .applyTo(this.disableVerticalScroll)
+                    : _patchMap[InAppWebViewSettings$.disableVerticalScroll])
+                as bool?
           : this.disableVerticalScroll,
       disableHorizontalScroll:
           _patchMap.containsKey(InAppWebViewSettings$.disableHorizontalScroll)
-          ? (_patchMap[InAppWebViewSettings$.disableHorizontalScroll]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.disableHorizontalScroll](
-                    this.disableHorizontalScroll,
-                  )
-                : (_patchMap[InAppWebViewSettings$.disableHorizontalScroll]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.disableHorizontalScroll]
-                      .applyTo(this.disableHorizontalScroll)
-                : _patchMap[InAppWebViewSettings$.disableHorizontalScroll]
+          ? ((_patchMap[InAppWebViewSettings$.disableHorizontalScroll]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$.disableHorizontalScroll](
+                        this.disableHorizontalScroll,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.disableHorizontalScroll]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.disableHorizontalScroll]
+                          .applyTo(this.disableHorizontalScroll)
+                    : _patchMap[InAppWebViewSettings$.disableHorizontalScroll])
+                as bool?
           : this.disableHorizontalScroll,
       disableContextMenu:
           _patchMap.containsKey(InAppWebViewSettings$.disableContextMenu)
-          ? (_patchMap[InAppWebViewSettings$.disableContextMenu] is Function)
-                ? _patchMap[InAppWebViewSettings$.disableContextMenu](
-                    this.disableContextMenu,
-                  )
-                : (_patchMap[InAppWebViewSettings$.disableContextMenu] is Patch)
-                ? _patchMap[InAppWebViewSettings$.disableContextMenu].applyTo(
-                    this.disableContextMenu,
-                  )
-                : _patchMap[InAppWebViewSettings$.disableContextMenu]
+          ? ((_patchMap[InAppWebViewSettings$.disableContextMenu] is Function)
+                    ? _patchMap[InAppWebViewSettings$.disableContextMenu](
+                        this.disableContextMenu,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.disableContextMenu]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.disableContextMenu]
+                          .applyTo(this.disableContextMenu)
+                    : _patchMap[InAppWebViewSettings$.disableContextMenu])
+                as bool?
           : this.disableContextMenu,
       stylusHandwritingEnabled:
           _patchMap.containsKey(InAppWebViewSettings$.stylusHandwritingEnabled)
-          ? (_patchMap[InAppWebViewSettings$.stylusHandwritingEnabled]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.stylusHandwritingEnabled](
-                    this.stylusHandwritingEnabled,
-                  )
-                : (_patchMap[InAppWebViewSettings$.stylusHandwritingEnabled]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.stylusHandwritingEnabled]
-                      .applyTo(this.stylusHandwritingEnabled)
-                : _patchMap[InAppWebViewSettings$.stylusHandwritingEnabled]
+          ? ((_patchMap[InAppWebViewSettings$.stylusHandwritingEnabled]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$.stylusHandwritingEnabled](
+                        this.stylusHandwritingEnabled,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.stylusHandwritingEnabled]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.stylusHandwritingEnabled]
+                          .applyTo(this.stylusHandwritingEnabled)
+                    : _patchMap[InAppWebViewSettings$.stylusHandwritingEnabled])
+                as bool?
           : this.stylusHandwritingEnabled,
       supportZoom: _patchMap.containsKey(InAppWebViewSettings$.supportZoom)
-          ? (_patchMap[InAppWebViewSettings$.supportZoom] is Function)
-                ? _patchMap[InAppWebViewSettings$.supportZoom](this.supportZoom)
-                : (_patchMap[InAppWebViewSettings$.supportZoom] is Patch)
-                ? _patchMap[InAppWebViewSettings$.supportZoom].applyTo(
-                    this.supportZoom,
-                  )
-                : _patchMap[InAppWebViewSettings$.supportZoom]
+          ? ((_patchMap[InAppWebViewSettings$.supportZoom] is Function)
+                    ? _patchMap[InAppWebViewSettings$.supportZoom](
+                        this.supportZoom,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.supportZoom] is Patch)
+                    ? _patchMap[InAppWebViewSettings$.supportZoom].applyTo(
+                        this.supportZoom,
+                      )
+                    : _patchMap[InAppWebViewSettings$.supportZoom])
+                as bool?
           : this.supportZoom,
       allowFileAccessFromFileURLs:
           _patchMap.containsKey(
             InAppWebViewSettings$.allowFileAccessFromFileURLs,
           )
-          ? (_patchMap[InAppWebViewSettings$.allowFileAccessFromFileURLs]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.allowFileAccessFromFileURLs](
-                    this.allowFileAccessFromFileURLs,
-                  )
-                : (_patchMap[InAppWebViewSettings$.allowFileAccessFromFileURLs]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.allowFileAccessFromFileURLs]
-                      .applyTo(this.allowFileAccessFromFileURLs)
-                : _patchMap[InAppWebViewSettings$.allowFileAccessFromFileURLs]
+          ? ((_patchMap[InAppWebViewSettings$.allowFileAccessFromFileURLs]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .allowFileAccessFromFileURLs](
+                        this.allowFileAccessFromFileURLs,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .allowFileAccessFromFileURLs]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .allowFileAccessFromFileURLs]
+                          .applyTo(this.allowFileAccessFromFileURLs)
+                    : _patchMap[InAppWebViewSettings$
+                          .allowFileAccessFromFileURLs])
+                as bool?
           : this.allowFileAccessFromFileURLs,
       allowUniversalAccessFromFileURLs:
           _patchMap.containsKey(
             InAppWebViewSettings$.allowUniversalAccessFromFileURLs,
           )
-          ? (_patchMap[InAppWebViewSettings$.allowUniversalAccessFromFileURLs]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$
-                      .allowUniversalAccessFromFileURLs](
-                    this.allowUniversalAccessFromFileURLs,
-                  )
-                : (_patchMap[InAppWebViewSettings$
-                          .allowUniversalAccessFromFileURLs]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$
-                          .allowUniversalAccessFromFileURLs]
-                      .applyTo(this.allowUniversalAccessFromFileURLs)
-                : _patchMap[InAppWebViewSettings$
-                      .allowUniversalAccessFromFileURLs]
+          ? ((_patchMap[InAppWebViewSettings$.allowUniversalAccessFromFileURLs]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .allowUniversalAccessFromFileURLs](
+                        this.allowUniversalAccessFromFileURLs,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .allowUniversalAccessFromFileURLs]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .allowUniversalAccessFromFileURLs]
+                          .applyTo(this.allowUniversalAccessFromFileURLs)
+                    : _patchMap[InAppWebViewSettings$
+                          .allowUniversalAccessFromFileURLs])
+                as bool?
           : this.allowUniversalAccessFromFileURLs,
       builtInZoomControls:
           _patchMap.containsKey(InAppWebViewSettings$.builtInZoomControls)
-          ? (_patchMap[InAppWebViewSettings$.builtInZoomControls] is Function)
-                ? _patchMap[InAppWebViewSettings$.builtInZoomControls](
-                    this.builtInZoomControls,
-                  )
-                : (_patchMap[InAppWebViewSettings$.builtInZoomControls]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.builtInZoomControls].applyTo(
-                    this.builtInZoomControls,
-                  )
-                : _patchMap[InAppWebViewSettings$.builtInZoomControls]
+          ? ((_patchMap[InAppWebViewSettings$.builtInZoomControls] is Function)
+                    ? _patchMap[InAppWebViewSettings$.builtInZoomControls](
+                        this.builtInZoomControls,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.builtInZoomControls]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.builtInZoomControls]
+                          .applyTo(this.builtInZoomControls)
+                    : _patchMap[InAppWebViewSettings$.builtInZoomControls])
+                as bool?
           : this.builtInZoomControls,
       displayZoomControls:
           _patchMap.containsKey(InAppWebViewSettings$.displayZoomControls)
-          ? (_patchMap[InAppWebViewSettings$.displayZoomControls] is Function)
-                ? _patchMap[InAppWebViewSettings$.displayZoomControls](
-                    this.displayZoomControls,
-                  )
-                : (_patchMap[InAppWebViewSettings$.displayZoomControls]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.displayZoomControls].applyTo(
-                    this.displayZoomControls,
-                  )
-                : _patchMap[InAppWebViewSettings$.displayZoomControls]
+          ? ((_patchMap[InAppWebViewSettings$.displayZoomControls] is Function)
+                    ? _patchMap[InAppWebViewSettings$.displayZoomControls](
+                        this.displayZoomControls,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.displayZoomControls]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.displayZoomControls]
+                          .applyTo(this.displayZoomControls)
+                    : _patchMap[InAppWebViewSettings$.displayZoomControls])
+                as bool?
           : this.displayZoomControls,
       databaseEnabled:
           _patchMap.containsKey(InAppWebViewSettings$.databaseEnabled)
-          ? (_patchMap[InAppWebViewSettings$.databaseEnabled] is Function)
-                ? _patchMap[InAppWebViewSettings$.databaseEnabled](
-                    this.databaseEnabled,
-                  )
-                : (_patchMap[InAppWebViewSettings$.databaseEnabled] is Patch)
-                ? _patchMap[InAppWebViewSettings$.databaseEnabled].applyTo(
-                    this.databaseEnabled,
-                  )
-                : _patchMap[InAppWebViewSettings$.databaseEnabled]
+          ? ((_patchMap[InAppWebViewSettings$.databaseEnabled] is Function)
+                    ? _patchMap[InAppWebViewSettings$.databaseEnabled](
+                        this.databaseEnabled,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.databaseEnabled]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.databaseEnabled].applyTo(
+                        this.databaseEnabled,
+                      )
+                    : _patchMap[InAppWebViewSettings$.databaseEnabled])
+                as bool?
           : this.databaseEnabled,
       domStorageEnabled:
           _patchMap.containsKey(InAppWebViewSettings$.domStorageEnabled)
-          ? (_patchMap[InAppWebViewSettings$.domStorageEnabled] is Function)
-                ? _patchMap[InAppWebViewSettings$.domStorageEnabled](
-                    this.domStorageEnabled,
-                  )
-                : (_patchMap[InAppWebViewSettings$.domStorageEnabled] is Patch)
-                ? _patchMap[InAppWebViewSettings$.domStorageEnabled].applyTo(
-                    this.domStorageEnabled,
-                  )
-                : _patchMap[InAppWebViewSettings$.domStorageEnabled]
+          ? ((_patchMap[InAppWebViewSettings$.domStorageEnabled] is Function)
+                    ? _patchMap[InAppWebViewSettings$.domStorageEnabled](
+                        this.domStorageEnabled,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.domStorageEnabled]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.domStorageEnabled]
+                          .applyTo(this.domStorageEnabled)
+                    : _patchMap[InAppWebViewSettings$.domStorageEnabled])
+                as bool?
           : this.domStorageEnabled,
       useWideViewPort:
           _patchMap.containsKey(InAppWebViewSettings$.useWideViewPort)
-          ? (_patchMap[InAppWebViewSettings$.useWideViewPort] is Function)
-                ? _patchMap[InAppWebViewSettings$.useWideViewPort](
-                    this.useWideViewPort,
-                  )
-                : (_patchMap[InAppWebViewSettings$.useWideViewPort] is Patch)
-                ? _patchMap[InAppWebViewSettings$.useWideViewPort].applyTo(
-                    this.useWideViewPort,
-                  )
-                : _patchMap[InAppWebViewSettings$.useWideViewPort]
+          ? ((_patchMap[InAppWebViewSettings$.useWideViewPort] is Function)
+                    ? _patchMap[InAppWebViewSettings$.useWideViewPort](
+                        this.useWideViewPort,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.useWideViewPort]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.useWideViewPort].applyTo(
+                        this.useWideViewPort,
+                      )
+                    : _patchMap[InAppWebViewSettings$.useWideViewPort])
+                as bool?
           : this.useWideViewPort,
       safeBrowsingEnabled:
           _patchMap.containsKey(InAppWebViewSettings$.safeBrowsingEnabled)
-          ? (_patchMap[InAppWebViewSettings$.safeBrowsingEnabled] is Function)
-                ? _patchMap[InAppWebViewSettings$.safeBrowsingEnabled](
-                    this.safeBrowsingEnabled,
-                  )
-                : (_patchMap[InAppWebViewSettings$.safeBrowsingEnabled]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.safeBrowsingEnabled].applyTo(
-                    this.safeBrowsingEnabled,
-                  )
-                : _patchMap[InAppWebViewSettings$.safeBrowsingEnabled]
+          ? ((_patchMap[InAppWebViewSettings$.safeBrowsingEnabled] is Function)
+                    ? _patchMap[InAppWebViewSettings$.safeBrowsingEnabled](
+                        this.safeBrowsingEnabled,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.safeBrowsingEnabled]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.safeBrowsingEnabled]
+                          .applyTo(this.safeBrowsingEnabled)
+                    : _patchMap[InAppWebViewSettings$.safeBrowsingEnabled])
+                as bool?
           : this.safeBrowsingEnabled,
       mixedContentMode:
           _patchMap.containsKey(InAppWebViewSettings$.mixedContentMode)
-          ? (_patchMap[InAppWebViewSettings$.mixedContentMode] is Function)
-                ? _patchMap[InAppWebViewSettings$.mixedContentMode](
-                    this.mixedContentMode,
-                  )
-                : (_patchMap[InAppWebViewSettings$.mixedContentMode] is Patch)
-                ? _patchMap[InAppWebViewSettings$.mixedContentMode].applyTo(
-                    this.mixedContentMode,
-                  )
-                : _patchMap[InAppWebViewSettings$.mixedContentMode]
+          ? ((_patchMap[InAppWebViewSettings$.mixedContentMode] is Function)
+                    ? _patchMap[InAppWebViewSettings$.mixedContentMode](
+                        this.mixedContentMode,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.mixedContentMode]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.mixedContentMode].applyTo(
+                        this.mixedContentMode,
+                      )
+                    : _patchMap[InAppWebViewSettings$.mixedContentMode])
+                as MixedContentMode?
           : this.mixedContentMode,
       allowContentAccess:
           _patchMap.containsKey(InAppWebViewSettings$.allowContentAccess)
-          ? (_patchMap[InAppWebViewSettings$.allowContentAccess] is Function)
-                ? _patchMap[InAppWebViewSettings$.allowContentAccess](
-                    this.allowContentAccess,
-                  )
-                : (_patchMap[InAppWebViewSettings$.allowContentAccess] is Patch)
-                ? _patchMap[InAppWebViewSettings$.allowContentAccess].applyTo(
-                    this.allowContentAccess,
-                  )
-                : _patchMap[InAppWebViewSettings$.allowContentAccess]
+          ? ((_patchMap[InAppWebViewSettings$.allowContentAccess] is Function)
+                    ? _patchMap[InAppWebViewSettings$.allowContentAccess](
+                        this.allowContentAccess,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.allowContentAccess]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.allowContentAccess]
+                          .applyTo(this.allowContentAccess)
+                    : _patchMap[InAppWebViewSettings$.allowContentAccess])
+                as bool?
           : this.allowContentAccess,
       allowFileAccess:
           _patchMap.containsKey(InAppWebViewSettings$.allowFileAccess)
-          ? (_patchMap[InAppWebViewSettings$.allowFileAccess] is Function)
-                ? _patchMap[InAppWebViewSettings$.allowFileAccess](
-                    this.allowFileAccess,
-                  )
-                : (_patchMap[InAppWebViewSettings$.allowFileAccess] is Patch)
-                ? _patchMap[InAppWebViewSettings$.allowFileAccess].applyTo(
-                    this.allowFileAccess,
-                  )
-                : _patchMap[InAppWebViewSettings$.allowFileAccess]
+          ? ((_patchMap[InAppWebViewSettings$.allowFileAccess] is Function)
+                    ? _patchMap[InAppWebViewSettings$.allowFileAccess](
+                        this.allowFileAccess,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.allowFileAccess]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.allowFileAccess].applyTo(
+                        this.allowFileAccess,
+                      )
+                    : _patchMap[InAppWebViewSettings$.allowFileAccess])
+                as bool?
           : this.allowFileAccess,
       blockNetworkImage:
           _patchMap.containsKey(InAppWebViewSettings$.blockNetworkImage)
-          ? (_patchMap[InAppWebViewSettings$.blockNetworkImage] is Function)
-                ? _patchMap[InAppWebViewSettings$.blockNetworkImage](
-                    this.blockNetworkImage,
-                  )
-                : (_patchMap[InAppWebViewSettings$.blockNetworkImage] is Patch)
-                ? _patchMap[InAppWebViewSettings$.blockNetworkImage].applyTo(
-                    this.blockNetworkImage,
-                  )
-                : _patchMap[InAppWebViewSettings$.blockNetworkImage]
+          ? ((_patchMap[InAppWebViewSettings$.blockNetworkImage] is Function)
+                    ? _patchMap[InAppWebViewSettings$.blockNetworkImage](
+                        this.blockNetworkImage,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.blockNetworkImage]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.blockNetworkImage]
+                          .applyTo(this.blockNetworkImage)
+                    : _patchMap[InAppWebViewSettings$.blockNetworkImage])
+                as bool?
           : this.blockNetworkImage,
       blockNetworkLoads:
           _patchMap.containsKey(InAppWebViewSettings$.blockNetworkLoads)
-          ? (_patchMap[InAppWebViewSettings$.blockNetworkLoads] is Function)
-                ? _patchMap[InAppWebViewSettings$.blockNetworkLoads](
-                    this.blockNetworkLoads,
-                  )
-                : (_patchMap[InAppWebViewSettings$.blockNetworkLoads] is Patch)
-                ? _patchMap[InAppWebViewSettings$.blockNetworkLoads].applyTo(
-                    this.blockNetworkLoads,
-                  )
-                : _patchMap[InAppWebViewSettings$.blockNetworkLoads]
+          ? ((_patchMap[InAppWebViewSettings$.blockNetworkLoads] is Function)
+                    ? _patchMap[InAppWebViewSettings$.blockNetworkLoads](
+                        this.blockNetworkLoads,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.blockNetworkLoads]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.blockNetworkLoads]
+                          .applyTo(this.blockNetworkLoads)
+                    : _patchMap[InAppWebViewSettings$.blockNetworkLoads])
+                as bool?
           : this.blockNetworkLoads,
       cacheMode: _patchMap.containsKey(InAppWebViewSettings$.cacheMode)
-          ? (_patchMap[InAppWebViewSettings$.cacheMode] is Function)
-                ? _patchMap[InAppWebViewSettings$.cacheMode](this.cacheMode)
-                : (_patchMap[InAppWebViewSettings$.cacheMode] is Patch)
-                ? _patchMap[InAppWebViewSettings$.cacheMode].applyTo(
-                    this.cacheMode,
-                  )
-                : _patchMap[InAppWebViewSettings$.cacheMode]
+          ? ((_patchMap[InAppWebViewSettings$.cacheMode] is Function)
+                    ? _patchMap[InAppWebViewSettings$.cacheMode](this.cacheMode)
+                    : (_patchMap[InAppWebViewSettings$.cacheMode] is Patch)
+                    ? _patchMap[InAppWebViewSettings$.cacheMode].applyTo(
+                        this.cacheMode,
+                      )
+                    : _patchMap[InAppWebViewSettings$.cacheMode])
+                as CacheMode?
           : this.cacheMode,
       cursiveFontFamily:
           _patchMap.containsKey(InAppWebViewSettings$.cursiveFontFamily)
-          ? (_patchMap[InAppWebViewSettings$.cursiveFontFamily] is Function)
-                ? _patchMap[InAppWebViewSettings$.cursiveFontFamily](
-                    this.cursiveFontFamily,
-                  )
-                : (_patchMap[InAppWebViewSettings$.cursiveFontFamily] is Patch)
-                ? _patchMap[InAppWebViewSettings$.cursiveFontFamily].applyTo(
-                    this.cursiveFontFamily,
-                  )
-                : _patchMap[InAppWebViewSettings$.cursiveFontFamily]
+          ? ((_patchMap[InAppWebViewSettings$.cursiveFontFamily] is Function)
+                    ? _patchMap[InAppWebViewSettings$.cursiveFontFamily](
+                        this.cursiveFontFamily,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.cursiveFontFamily]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.cursiveFontFamily]
+                          .applyTo(this.cursiveFontFamily)
+                    : _patchMap[InAppWebViewSettings$.cursiveFontFamily])
+                as String?
           : this.cursiveFontFamily,
       defaultFixedFontSize:
           _patchMap.containsKey(InAppWebViewSettings$.defaultFixedFontSize)
-          ? (_patchMap[InAppWebViewSettings$.defaultFixedFontSize] is Function)
-                ? _patchMap[InAppWebViewSettings$.defaultFixedFontSize](
-                    this.defaultFixedFontSize,
-                  )
-                : (_patchMap[InAppWebViewSettings$.defaultFixedFontSize]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.defaultFixedFontSize].applyTo(
-                    this.defaultFixedFontSize,
-                  )
-                : _patchMap[InAppWebViewSettings$.defaultFixedFontSize]
+          ? ((_patchMap[InAppWebViewSettings$.defaultFixedFontSize] is Function)
+                    ? _patchMap[InAppWebViewSettings$.defaultFixedFontSize](
+                        this.defaultFixedFontSize,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.defaultFixedFontSize]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.defaultFixedFontSize]
+                          .applyTo(this.defaultFixedFontSize)
+                    : _patchMap[InAppWebViewSettings$.defaultFixedFontSize])
+                as int?
           : this.defaultFixedFontSize,
       defaultFontSize:
           _patchMap.containsKey(InAppWebViewSettings$.defaultFontSize)
-          ? (_patchMap[InAppWebViewSettings$.defaultFontSize] is Function)
-                ? _patchMap[InAppWebViewSettings$.defaultFontSize](
-                    this.defaultFontSize,
-                  )
-                : (_patchMap[InAppWebViewSettings$.defaultFontSize] is Patch)
-                ? _patchMap[InAppWebViewSettings$.defaultFontSize].applyTo(
-                    this.defaultFontSize,
-                  )
-                : _patchMap[InAppWebViewSettings$.defaultFontSize]
+          ? ((_patchMap[InAppWebViewSettings$.defaultFontSize] is Function)
+                    ? _patchMap[InAppWebViewSettings$.defaultFontSize](
+                        this.defaultFontSize,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.defaultFontSize]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.defaultFontSize].applyTo(
+                        this.defaultFontSize,
+                      )
+                    : _patchMap[InAppWebViewSettings$.defaultFontSize])
+                as int?
           : this.defaultFontSize,
       defaultTextEncodingName:
           _patchMap.containsKey(InAppWebViewSettings$.defaultTextEncodingName)
-          ? (_patchMap[InAppWebViewSettings$.defaultTextEncodingName]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.defaultTextEncodingName](
-                    this.defaultTextEncodingName,
-                  )
-                : (_patchMap[InAppWebViewSettings$.defaultTextEncodingName]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.defaultTextEncodingName]
-                      .applyTo(this.defaultTextEncodingName)
-                : _patchMap[InAppWebViewSettings$.defaultTextEncodingName]
+          ? ((_patchMap[InAppWebViewSettings$.defaultTextEncodingName]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$.defaultTextEncodingName](
+                        this.defaultTextEncodingName,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.defaultTextEncodingName]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.defaultTextEncodingName]
+                          .applyTo(this.defaultTextEncodingName)
+                    : _patchMap[InAppWebViewSettings$.defaultTextEncodingName])
+                as String?
           : this.defaultTextEncodingName,
       disabledActionModeMenuItems:
           _patchMap.containsKey(
             InAppWebViewSettings$.disabledActionModeMenuItems,
           )
-          ? (_patchMap[InAppWebViewSettings$.disabledActionModeMenuItems]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.disabledActionModeMenuItems](
-                    this.disabledActionModeMenuItems,
-                  )
-                : (_patchMap[InAppWebViewSettings$.disabledActionModeMenuItems]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.disabledActionModeMenuItems]
-                      .applyTo(this.disabledActionModeMenuItems)
-                : _patchMap[InAppWebViewSettings$.disabledActionModeMenuItems]
+          ? ((_patchMap[InAppWebViewSettings$.disabledActionModeMenuItems]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .disabledActionModeMenuItems](
+                        this.disabledActionModeMenuItems,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .disabledActionModeMenuItems]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .disabledActionModeMenuItems]
+                          .applyTo(this.disabledActionModeMenuItems)
+                    : _patchMap[InAppWebViewSettings$
+                          .disabledActionModeMenuItems])
+                as ActionModeMenuItem?
           : this.disabledActionModeMenuItems,
       fantasyFontFamily:
           _patchMap.containsKey(InAppWebViewSettings$.fantasyFontFamily)
-          ? (_patchMap[InAppWebViewSettings$.fantasyFontFamily] is Function)
-                ? _patchMap[InAppWebViewSettings$.fantasyFontFamily](
-                    this.fantasyFontFamily,
-                  )
-                : (_patchMap[InAppWebViewSettings$.fantasyFontFamily] is Patch)
-                ? _patchMap[InAppWebViewSettings$.fantasyFontFamily].applyTo(
-                    this.fantasyFontFamily,
-                  )
-                : _patchMap[InAppWebViewSettings$.fantasyFontFamily]
+          ? ((_patchMap[InAppWebViewSettings$.fantasyFontFamily] is Function)
+                    ? _patchMap[InAppWebViewSettings$.fantasyFontFamily](
+                        this.fantasyFontFamily,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.fantasyFontFamily]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.fantasyFontFamily]
+                          .applyTo(this.fantasyFontFamily)
+                    : _patchMap[InAppWebViewSettings$.fantasyFontFamily])
+                as String?
           : this.fantasyFontFamily,
       fixedFontFamily:
           _patchMap.containsKey(InAppWebViewSettings$.fixedFontFamily)
-          ? (_patchMap[InAppWebViewSettings$.fixedFontFamily] is Function)
-                ? _patchMap[InAppWebViewSettings$.fixedFontFamily](
-                    this.fixedFontFamily,
-                  )
-                : (_patchMap[InAppWebViewSettings$.fixedFontFamily] is Patch)
-                ? _patchMap[InAppWebViewSettings$.fixedFontFamily].applyTo(
-                    this.fixedFontFamily,
-                  )
-                : _patchMap[InAppWebViewSettings$.fixedFontFamily]
+          ? ((_patchMap[InAppWebViewSettings$.fixedFontFamily] is Function)
+                    ? _patchMap[InAppWebViewSettings$.fixedFontFamily](
+                        this.fixedFontFamily,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.fixedFontFamily]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.fixedFontFamily].applyTo(
+                        this.fixedFontFamily,
+                      )
+                    : _patchMap[InAppWebViewSettings$.fixedFontFamily])
+                as String?
           : this.fixedFontFamily,
       forceDark: _patchMap.containsKey(InAppWebViewSettings$.forceDark)
-          ? (_patchMap[InAppWebViewSettings$.forceDark] is Function)
-                ? _patchMap[InAppWebViewSettings$.forceDark](this.forceDark)
-                : (_patchMap[InAppWebViewSettings$.forceDark] is Patch)
-                ? _patchMap[InAppWebViewSettings$.forceDark].applyTo(
-                    this.forceDark,
-                  )
-                : _patchMap[InAppWebViewSettings$.forceDark]
+          ? ((_patchMap[InAppWebViewSettings$.forceDark] is Function)
+                    ? _patchMap[InAppWebViewSettings$.forceDark](this.forceDark)
+                    : (_patchMap[InAppWebViewSettings$.forceDark] is Patch)
+                    ? _patchMap[InAppWebViewSettings$.forceDark].applyTo(
+                        this.forceDark,
+                      )
+                    : _patchMap[InAppWebViewSettings$.forceDark])
+                as ForceDark?
           : this.forceDark,
       forceDarkStrategy:
           _patchMap.containsKey(InAppWebViewSettings$.forceDarkStrategy)
-          ? (_patchMap[InAppWebViewSettings$.forceDarkStrategy] is Function)
-                ? _patchMap[InAppWebViewSettings$.forceDarkStrategy](
-                    this.forceDarkStrategy,
-                  )
-                : (_patchMap[InAppWebViewSettings$.forceDarkStrategy] is Patch)
-                ? _patchMap[InAppWebViewSettings$.forceDarkStrategy].applyTo(
-                    this.forceDarkStrategy,
-                  )
-                : _patchMap[InAppWebViewSettings$.forceDarkStrategy]
+          ? ((_patchMap[InAppWebViewSettings$.forceDarkStrategy] is Function)
+                    ? _patchMap[InAppWebViewSettings$.forceDarkStrategy](
+                        this.forceDarkStrategy,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.forceDarkStrategy]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.forceDarkStrategy]
+                          .applyTo(this.forceDarkStrategy)
+                    : _patchMap[InAppWebViewSettings$.forceDarkStrategy])
+                as ForceDarkStrategy?
           : this.forceDarkStrategy,
       geolocationEnabled:
           _patchMap.containsKey(InAppWebViewSettings$.geolocationEnabled)
-          ? (_patchMap[InAppWebViewSettings$.geolocationEnabled] is Function)
-                ? _patchMap[InAppWebViewSettings$.geolocationEnabled](
-                    this.geolocationEnabled,
-                  )
-                : (_patchMap[InAppWebViewSettings$.geolocationEnabled] is Patch)
-                ? _patchMap[InAppWebViewSettings$.geolocationEnabled].applyTo(
-                    this.geolocationEnabled,
-                  )
-                : _patchMap[InAppWebViewSettings$.geolocationEnabled]
+          ? ((_patchMap[InAppWebViewSettings$.geolocationEnabled] is Function)
+                    ? _patchMap[InAppWebViewSettings$.geolocationEnabled](
+                        this.geolocationEnabled,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.geolocationEnabled]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.geolocationEnabled]
+                          .applyTo(this.geolocationEnabled)
+                    : _patchMap[InAppWebViewSettings$.geolocationEnabled])
+                as bool?
           : this.geolocationEnabled,
       layoutAlgorithm:
           _patchMap.containsKey(InAppWebViewSettings$.layoutAlgorithm)
-          ? (_patchMap[InAppWebViewSettings$.layoutAlgorithm] is Function)
-                ? _patchMap[InAppWebViewSettings$.layoutAlgorithm](
-                    this.layoutAlgorithm,
-                  )
-                : (_patchMap[InAppWebViewSettings$.layoutAlgorithm] is Patch)
-                ? _patchMap[InAppWebViewSettings$.layoutAlgorithm].applyTo(
-                    this.layoutAlgorithm,
-                  )
-                : _patchMap[InAppWebViewSettings$.layoutAlgorithm]
+          ? ((_patchMap[InAppWebViewSettings$.layoutAlgorithm] is Function)
+                    ? _patchMap[InAppWebViewSettings$.layoutAlgorithm](
+                        this.layoutAlgorithm,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.layoutAlgorithm]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.layoutAlgorithm].applyTo(
+                        this.layoutAlgorithm,
+                      )
+                    : _patchMap[InAppWebViewSettings$.layoutAlgorithm])
+                as LayoutAlgorithm?
           : this.layoutAlgorithm,
       loadWithOverviewMode:
           _patchMap.containsKey(InAppWebViewSettings$.loadWithOverviewMode)
-          ? (_patchMap[InAppWebViewSettings$.loadWithOverviewMode] is Function)
-                ? _patchMap[InAppWebViewSettings$.loadWithOverviewMode](
-                    this.loadWithOverviewMode,
-                  )
-                : (_patchMap[InAppWebViewSettings$.loadWithOverviewMode]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.loadWithOverviewMode].applyTo(
-                    this.loadWithOverviewMode,
-                  )
-                : _patchMap[InAppWebViewSettings$.loadWithOverviewMode]
+          ? ((_patchMap[InAppWebViewSettings$.loadWithOverviewMode] is Function)
+                    ? _patchMap[InAppWebViewSettings$.loadWithOverviewMode](
+                        this.loadWithOverviewMode,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.loadWithOverviewMode]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.loadWithOverviewMode]
+                          .applyTo(this.loadWithOverviewMode)
+                    : _patchMap[InAppWebViewSettings$.loadWithOverviewMode])
+                as bool?
           : this.loadWithOverviewMode,
       loadsImagesAutomatically:
           _patchMap.containsKey(InAppWebViewSettings$.loadsImagesAutomatically)
-          ? (_patchMap[InAppWebViewSettings$.loadsImagesAutomatically]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.loadsImagesAutomatically](
-                    this.loadsImagesAutomatically,
-                  )
-                : (_patchMap[InAppWebViewSettings$.loadsImagesAutomatically]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.loadsImagesAutomatically]
-                      .applyTo(this.loadsImagesAutomatically)
-                : _patchMap[InAppWebViewSettings$.loadsImagesAutomatically]
+          ? ((_patchMap[InAppWebViewSettings$.loadsImagesAutomatically]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$.loadsImagesAutomatically](
+                        this.loadsImagesAutomatically,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.loadsImagesAutomatically]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.loadsImagesAutomatically]
+                          .applyTo(this.loadsImagesAutomatically)
+                    : _patchMap[InAppWebViewSettings$.loadsImagesAutomatically])
+                as bool?
           : this.loadsImagesAutomatically,
       minimumLogicalFontSize:
           _patchMap.containsKey(InAppWebViewSettings$.minimumLogicalFontSize)
-          ? (_patchMap[InAppWebViewSettings$.minimumLogicalFontSize]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.minimumLogicalFontSize](
-                    this.minimumLogicalFontSize,
-                  )
-                : (_patchMap[InAppWebViewSettings$.minimumLogicalFontSize]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.minimumLogicalFontSize]
-                      .applyTo(this.minimumLogicalFontSize)
-                : _patchMap[InAppWebViewSettings$.minimumLogicalFontSize]
+          ? ((_patchMap[InAppWebViewSettings$.minimumLogicalFontSize]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$.minimumLogicalFontSize](
+                        this.minimumLogicalFontSize,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.minimumLogicalFontSize]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.minimumLogicalFontSize]
+                          .applyTo(this.minimumLogicalFontSize)
+                    : _patchMap[InAppWebViewSettings$.minimumLogicalFontSize])
+                as int?
           : this.minimumLogicalFontSize,
       needInitialFocus:
           _patchMap.containsKey(InAppWebViewSettings$.needInitialFocus)
-          ? (_patchMap[InAppWebViewSettings$.needInitialFocus] is Function)
-                ? _patchMap[InAppWebViewSettings$.needInitialFocus](
-                    this.needInitialFocus,
-                  )
-                : (_patchMap[InAppWebViewSettings$.needInitialFocus] is Patch)
-                ? _patchMap[InAppWebViewSettings$.needInitialFocus].applyTo(
-                    this.needInitialFocus,
-                  )
-                : _patchMap[InAppWebViewSettings$.needInitialFocus]
+          ? ((_patchMap[InAppWebViewSettings$.needInitialFocus] is Function)
+                    ? _patchMap[InAppWebViewSettings$.needInitialFocus](
+                        this.needInitialFocus,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.needInitialFocus]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.needInitialFocus].applyTo(
+                        this.needInitialFocus,
+                      )
+                    : _patchMap[InAppWebViewSettings$.needInitialFocus])
+                as bool?
           : this.needInitialFocus,
       offscreenPreRaster:
           _patchMap.containsKey(InAppWebViewSettings$.offscreenPreRaster)
-          ? (_patchMap[InAppWebViewSettings$.offscreenPreRaster] is Function)
-                ? _patchMap[InAppWebViewSettings$.offscreenPreRaster](
-                    this.offscreenPreRaster,
-                  )
-                : (_patchMap[InAppWebViewSettings$.offscreenPreRaster] is Patch)
-                ? _patchMap[InAppWebViewSettings$.offscreenPreRaster].applyTo(
-                    this.offscreenPreRaster,
-                  )
-                : _patchMap[InAppWebViewSettings$.offscreenPreRaster]
+          ? ((_patchMap[InAppWebViewSettings$.offscreenPreRaster] is Function)
+                    ? _patchMap[InAppWebViewSettings$.offscreenPreRaster](
+                        this.offscreenPreRaster,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.offscreenPreRaster]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.offscreenPreRaster]
+                          .applyTo(this.offscreenPreRaster)
+                    : _patchMap[InAppWebViewSettings$.offscreenPreRaster])
+                as bool?
           : this.offscreenPreRaster,
       sansSerifFontFamily:
           _patchMap.containsKey(InAppWebViewSettings$.sansSerifFontFamily)
-          ? (_patchMap[InAppWebViewSettings$.sansSerifFontFamily] is Function)
-                ? _patchMap[InAppWebViewSettings$.sansSerifFontFamily](
-                    this.sansSerifFontFamily,
-                  )
-                : (_patchMap[InAppWebViewSettings$.sansSerifFontFamily]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.sansSerifFontFamily].applyTo(
-                    this.sansSerifFontFamily,
-                  )
-                : _patchMap[InAppWebViewSettings$.sansSerifFontFamily]
+          ? ((_patchMap[InAppWebViewSettings$.sansSerifFontFamily] is Function)
+                    ? _patchMap[InAppWebViewSettings$.sansSerifFontFamily](
+                        this.sansSerifFontFamily,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.sansSerifFontFamily]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.sansSerifFontFamily]
+                          .applyTo(this.sansSerifFontFamily)
+                    : _patchMap[InAppWebViewSettings$.sansSerifFontFamily])
+                as String?
           : this.sansSerifFontFamily,
       serifFontFamily:
           _patchMap.containsKey(InAppWebViewSettings$.serifFontFamily)
-          ? (_patchMap[InAppWebViewSettings$.serifFontFamily] is Function)
-                ? _patchMap[InAppWebViewSettings$.serifFontFamily](
-                    this.serifFontFamily,
-                  )
-                : (_patchMap[InAppWebViewSettings$.serifFontFamily] is Patch)
-                ? _patchMap[InAppWebViewSettings$.serifFontFamily].applyTo(
-                    this.serifFontFamily,
-                  )
-                : _patchMap[InAppWebViewSettings$.serifFontFamily]
+          ? ((_patchMap[InAppWebViewSettings$.serifFontFamily] is Function)
+                    ? _patchMap[InAppWebViewSettings$.serifFontFamily](
+                        this.serifFontFamily,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.serifFontFamily]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.serifFontFamily].applyTo(
+                        this.serifFontFamily,
+                      )
+                    : _patchMap[InAppWebViewSettings$.serifFontFamily])
+                as String?
           : this.serifFontFamily,
       standardFontFamily:
           _patchMap.containsKey(InAppWebViewSettings$.standardFontFamily)
-          ? (_patchMap[InAppWebViewSettings$.standardFontFamily] is Function)
-                ? _patchMap[InAppWebViewSettings$.standardFontFamily](
-                    this.standardFontFamily,
-                  )
-                : (_patchMap[InAppWebViewSettings$.standardFontFamily] is Patch)
-                ? _patchMap[InAppWebViewSettings$.standardFontFamily].applyTo(
-                    this.standardFontFamily,
-                  )
-                : _patchMap[InAppWebViewSettings$.standardFontFamily]
+          ? ((_patchMap[InAppWebViewSettings$.standardFontFamily] is Function)
+                    ? _patchMap[InAppWebViewSettings$.standardFontFamily](
+                        this.standardFontFamily,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.standardFontFamily]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.standardFontFamily]
+                          .applyTo(this.standardFontFamily)
+                    : _patchMap[InAppWebViewSettings$.standardFontFamily])
+                as String?
           : this.standardFontFamily,
       saveFormData: _patchMap.containsKey(InAppWebViewSettings$.saveFormData)
-          ? (_patchMap[InAppWebViewSettings$.saveFormData] is Function)
-                ? _patchMap[InAppWebViewSettings$.saveFormData](
-                    this.saveFormData,
-                  )
-                : (_patchMap[InAppWebViewSettings$.saveFormData] is Patch)
-                ? _patchMap[InAppWebViewSettings$.saveFormData].applyTo(
-                    this.saveFormData,
-                  )
-                : _patchMap[InAppWebViewSettings$.saveFormData]
+          ? ((_patchMap[InAppWebViewSettings$.saveFormData] is Function)
+                    ? _patchMap[InAppWebViewSettings$.saveFormData](
+                        this.saveFormData,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.saveFormData] is Patch)
+                    ? _patchMap[InAppWebViewSettings$.saveFormData].applyTo(
+                        this.saveFormData,
+                      )
+                    : _patchMap[InAppWebViewSettings$.saveFormData])
+                as bool?
           : this.saveFormData,
       thirdPartyCookiesEnabled:
           _patchMap.containsKey(InAppWebViewSettings$.thirdPartyCookiesEnabled)
-          ? (_patchMap[InAppWebViewSettings$.thirdPartyCookiesEnabled]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.thirdPartyCookiesEnabled](
-                    this.thirdPartyCookiesEnabled,
-                  )
-                : (_patchMap[InAppWebViewSettings$.thirdPartyCookiesEnabled]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.thirdPartyCookiesEnabled]
-                      .applyTo(this.thirdPartyCookiesEnabled)
-                : _patchMap[InAppWebViewSettings$.thirdPartyCookiesEnabled]
+          ? ((_patchMap[InAppWebViewSettings$.thirdPartyCookiesEnabled]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$.thirdPartyCookiesEnabled](
+                        this.thirdPartyCookiesEnabled,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.thirdPartyCookiesEnabled]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.thirdPartyCookiesEnabled]
+                          .applyTo(this.thirdPartyCookiesEnabled)
+                    : _patchMap[InAppWebViewSettings$.thirdPartyCookiesEnabled])
+                as bool?
           : this.thirdPartyCookiesEnabled,
       hardwareAcceleration:
           _patchMap.containsKey(InAppWebViewSettings$.hardwareAcceleration)
-          ? (_patchMap[InAppWebViewSettings$.hardwareAcceleration] is Function)
-                ? _patchMap[InAppWebViewSettings$.hardwareAcceleration](
-                    this.hardwareAcceleration,
-                  )
-                : (_patchMap[InAppWebViewSettings$.hardwareAcceleration]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.hardwareAcceleration].applyTo(
-                    this.hardwareAcceleration,
-                  )
-                : _patchMap[InAppWebViewSettings$.hardwareAcceleration]
+          ? ((_patchMap[InAppWebViewSettings$.hardwareAcceleration] is Function)
+                    ? _patchMap[InAppWebViewSettings$.hardwareAcceleration](
+                        this.hardwareAcceleration,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.hardwareAcceleration]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.hardwareAcceleration]
+                          .applyTo(this.hardwareAcceleration)
+                    : _patchMap[InAppWebViewSettings$.hardwareAcceleration])
+                as bool?
           : this.hardwareAcceleration,
       initialScale: _patchMap.containsKey(InAppWebViewSettings$.initialScale)
-          ? (_patchMap[InAppWebViewSettings$.initialScale] is Function)
-                ? _patchMap[InAppWebViewSettings$.initialScale](
-                    this.initialScale,
-                  )
-                : (_patchMap[InAppWebViewSettings$.initialScale] is Patch)
-                ? _patchMap[InAppWebViewSettings$.initialScale].applyTo(
-                    this.initialScale,
-                  )
-                : _patchMap[InAppWebViewSettings$.initialScale]
+          ? ((_patchMap[InAppWebViewSettings$.initialScale] is Function)
+                    ? _patchMap[InAppWebViewSettings$.initialScale](
+                        this.initialScale,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.initialScale] is Patch)
+                    ? _patchMap[InAppWebViewSettings$.initialScale].applyTo(
+                        this.initialScale,
+                      )
+                    : _patchMap[InAppWebViewSettings$.initialScale])
+                as int?
           : this.initialScale,
       supportMultipleWindows:
           _patchMap.containsKey(InAppWebViewSettings$.supportMultipleWindows)
-          ? (_patchMap[InAppWebViewSettings$.supportMultipleWindows]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.supportMultipleWindows](
-                    this.supportMultipleWindows,
-                  )
-                : (_patchMap[InAppWebViewSettings$.supportMultipleWindows]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.supportMultipleWindows]
-                      .applyTo(this.supportMultipleWindows)
-                : _patchMap[InAppWebViewSettings$.supportMultipleWindows]
+          ? ((_patchMap[InAppWebViewSettings$.supportMultipleWindows]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$.supportMultipleWindows](
+                        this.supportMultipleWindows,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.supportMultipleWindows]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.supportMultipleWindows]
+                          .applyTo(this.supportMultipleWindows)
+                    : _patchMap[InAppWebViewSettings$.supportMultipleWindows])
+                as bool?
           : this.supportMultipleWindows,
       regexToCancelSubFramesLoading:
           _patchMap.containsKey(
             InAppWebViewSettings$.regexToCancelSubFramesLoading,
           )
-          ? (_patchMap[InAppWebViewSettings$.regexToCancelSubFramesLoading]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$
-                      .regexToCancelSubFramesLoading](
-                    this.regexToCancelSubFramesLoading,
-                  )
-                : (_patchMap[InAppWebViewSettings$
-                          .regexToCancelSubFramesLoading]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.regexToCancelSubFramesLoading]
-                      .applyTo(this.regexToCancelSubFramesLoading)
-                : _patchMap[InAppWebViewSettings$.regexToCancelSubFramesLoading]
+          ? ((_patchMap[InAppWebViewSettings$.regexToCancelSubFramesLoading]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .regexToCancelSubFramesLoading](
+                        this.regexToCancelSubFramesLoading,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .regexToCancelSubFramesLoading]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .regexToCancelSubFramesLoading]
+                          .applyTo(this.regexToCancelSubFramesLoading)
+                    : _patchMap[InAppWebViewSettings$
+                          .regexToCancelSubFramesLoading])
+                as String?
           : this.regexToCancelSubFramesLoading,
       regexToCancelOverrideUrlLoading:
           _patchMap.containsKey(
             InAppWebViewSettings$.regexToCancelOverrideUrlLoading,
           )
-          ? (_patchMap[InAppWebViewSettings$.regexToCancelOverrideUrlLoading]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$
-                      .regexToCancelOverrideUrlLoading](
-                    this.regexToCancelOverrideUrlLoading,
-                  )
-                : (_patchMap[InAppWebViewSettings$
-                          .regexToCancelOverrideUrlLoading]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$
-                          .regexToCancelOverrideUrlLoading]
-                      .applyTo(this.regexToCancelOverrideUrlLoading)
-                : _patchMap[InAppWebViewSettings$
-                      .regexToCancelOverrideUrlLoading]
+          ? ((_patchMap[InAppWebViewSettings$.regexToCancelOverrideUrlLoading]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .regexToCancelOverrideUrlLoading](
+                        this.regexToCancelOverrideUrlLoading,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .regexToCancelOverrideUrlLoading]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .regexToCancelOverrideUrlLoading]
+                          .applyTo(this.regexToCancelOverrideUrlLoading)
+                    : _patchMap[InAppWebViewSettings$
+                          .regexToCancelOverrideUrlLoading])
+                as String?
           : this.regexToCancelOverrideUrlLoading,
       useHybridComposition:
           _patchMap.containsKey(InAppWebViewSettings$.useHybridComposition)
-          ? (_patchMap[InAppWebViewSettings$.useHybridComposition] is Function)
-                ? _patchMap[InAppWebViewSettings$.useHybridComposition](
-                    this.useHybridComposition,
-                  )
-                : (_patchMap[InAppWebViewSettings$.useHybridComposition]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.useHybridComposition].applyTo(
-                    this.useHybridComposition,
-                  )
-                : _patchMap[InAppWebViewSettings$.useHybridComposition]
+          ? ((_patchMap[InAppWebViewSettings$.useHybridComposition] is Function)
+                    ? _patchMap[InAppWebViewSettings$.useHybridComposition](
+                        this.useHybridComposition,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.useHybridComposition]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.useHybridComposition]
+                          .applyTo(this.useHybridComposition)
+                    : _patchMap[InAppWebViewSettings$.useHybridComposition])
+                as bool?
           : this.useHybridComposition,
       useShouldInterceptRequest:
           _patchMap.containsKey(InAppWebViewSettings$.useShouldInterceptRequest)
-          ? (_patchMap[InAppWebViewSettings$.useShouldInterceptRequest]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.useShouldInterceptRequest](
-                    this.useShouldInterceptRequest,
-                  )
-                : (_patchMap[InAppWebViewSettings$.useShouldInterceptRequest]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.useShouldInterceptRequest]
-                      .applyTo(this.useShouldInterceptRequest)
-                : _patchMap[InAppWebViewSettings$.useShouldInterceptRequest]
+          ? ((_patchMap[InAppWebViewSettings$.useShouldInterceptRequest]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .useShouldInterceptRequest](
+                        this.useShouldInterceptRequest,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .useShouldInterceptRequest]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.useShouldInterceptRequest]
+                          .applyTo(this.useShouldInterceptRequest)
+                    : _patchMap[InAppWebViewSettings$
+                          .useShouldInterceptRequest])
+                as bool?
           : this.useShouldInterceptRequest,
       useOnRenderProcessGone:
           _patchMap.containsKey(InAppWebViewSettings$.useOnRenderProcessGone)
-          ? (_patchMap[InAppWebViewSettings$.useOnRenderProcessGone]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.useOnRenderProcessGone](
-                    this.useOnRenderProcessGone,
-                  )
-                : (_patchMap[InAppWebViewSettings$.useOnRenderProcessGone]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.useOnRenderProcessGone]
-                      .applyTo(this.useOnRenderProcessGone)
-                : _patchMap[InAppWebViewSettings$.useOnRenderProcessGone]
+          ? ((_patchMap[InAppWebViewSettings$.useOnRenderProcessGone]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$.useOnRenderProcessGone](
+                        this.useOnRenderProcessGone,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.useOnRenderProcessGone]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.useOnRenderProcessGone]
+                          .applyTo(this.useOnRenderProcessGone)
+                    : _patchMap[InAppWebViewSettings$.useOnRenderProcessGone])
+                as bool?
           : this.useOnRenderProcessGone,
       overScrollMode:
           _patchMap.containsKey(InAppWebViewSettings$.overScrollMode)
-          ? (_patchMap[InAppWebViewSettings$.overScrollMode] is Function)
-                ? _patchMap[InAppWebViewSettings$.overScrollMode](
-                    this.overScrollMode,
-                  )
-                : (_patchMap[InAppWebViewSettings$.overScrollMode] is Patch)
-                ? _patchMap[InAppWebViewSettings$.overScrollMode].applyTo(
-                    this.overScrollMode,
-                  )
-                : _patchMap[InAppWebViewSettings$.overScrollMode]
+          ? ((_patchMap[InAppWebViewSettings$.overScrollMode] is Function)
+                    ? _patchMap[InAppWebViewSettings$.overScrollMode](
+                        this.overScrollMode,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.overScrollMode] is Patch)
+                    ? _patchMap[InAppWebViewSettings$.overScrollMode].applyTo(
+                        this.overScrollMode,
+                      )
+                    : _patchMap[InAppWebViewSettings$.overScrollMode])
+                as OverScrollMode?
           : this.overScrollMode,
       networkAvailable:
           _patchMap.containsKey(InAppWebViewSettings$.networkAvailable)
-          ? (_patchMap[InAppWebViewSettings$.networkAvailable] is Function)
-                ? _patchMap[InAppWebViewSettings$.networkAvailable](
-                    this.networkAvailable,
-                  )
-                : (_patchMap[InAppWebViewSettings$.networkAvailable] is Patch)
-                ? _patchMap[InAppWebViewSettings$.networkAvailable].applyTo(
-                    this.networkAvailable,
-                  )
-                : _patchMap[InAppWebViewSettings$.networkAvailable]
+          ? ((_patchMap[InAppWebViewSettings$.networkAvailable] is Function)
+                    ? _patchMap[InAppWebViewSettings$.networkAvailable](
+                        this.networkAvailable,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.networkAvailable]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.networkAvailable].applyTo(
+                        this.networkAvailable,
+                      )
+                    : _patchMap[InAppWebViewSettings$.networkAvailable])
+                as bool?
           : this.networkAvailable,
       scrollBarStyle:
           _patchMap.containsKey(InAppWebViewSettings$.scrollBarStyle)
-          ? (_patchMap[InAppWebViewSettings$.scrollBarStyle] is Function)
-                ? _patchMap[InAppWebViewSettings$.scrollBarStyle](
-                    this.scrollBarStyle,
-                  )
-                : (_patchMap[InAppWebViewSettings$.scrollBarStyle] is Patch)
-                ? _patchMap[InAppWebViewSettings$.scrollBarStyle].applyTo(
-                    this.scrollBarStyle,
-                  )
-                : _patchMap[InAppWebViewSettings$.scrollBarStyle]
+          ? ((_patchMap[InAppWebViewSettings$.scrollBarStyle] is Function)
+                    ? _patchMap[InAppWebViewSettings$.scrollBarStyle](
+                        this.scrollBarStyle,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.scrollBarStyle] is Patch)
+                    ? _patchMap[InAppWebViewSettings$.scrollBarStyle].applyTo(
+                        this.scrollBarStyle,
+                      )
+                    : _patchMap[InAppWebViewSettings$.scrollBarStyle])
+                as ScrollBarStyle?
           : this.scrollBarStyle,
       verticalScrollbarPosition:
           _patchMap.containsKey(InAppWebViewSettings$.verticalScrollbarPosition)
-          ? (_patchMap[InAppWebViewSettings$.verticalScrollbarPosition]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.verticalScrollbarPosition](
-                    this.verticalScrollbarPosition,
-                  )
-                : (_patchMap[InAppWebViewSettings$.verticalScrollbarPosition]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.verticalScrollbarPosition]
-                      .applyTo(this.verticalScrollbarPosition)
-                : _patchMap[InAppWebViewSettings$.verticalScrollbarPosition]
+          ? ((_patchMap[InAppWebViewSettings$.verticalScrollbarPosition]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .verticalScrollbarPosition](
+                        this.verticalScrollbarPosition,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .verticalScrollbarPosition]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.verticalScrollbarPosition]
+                          .applyTo(this.verticalScrollbarPosition)
+                    : _patchMap[InAppWebViewSettings$
+                          .verticalScrollbarPosition])
+                as VerticalScrollbarPosition?
           : this.verticalScrollbarPosition,
       scrollBarDefaultDelayBeforeFade:
           _patchMap.containsKey(
             InAppWebViewSettings$.scrollBarDefaultDelayBeforeFade,
           )
-          ? (_patchMap[InAppWebViewSettings$.scrollBarDefaultDelayBeforeFade]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$
-                      .scrollBarDefaultDelayBeforeFade](
-                    this.scrollBarDefaultDelayBeforeFade,
-                  )
-                : (_patchMap[InAppWebViewSettings$
-                          .scrollBarDefaultDelayBeforeFade]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$
-                          .scrollBarDefaultDelayBeforeFade]
-                      .applyTo(this.scrollBarDefaultDelayBeforeFade)
-                : _patchMap[InAppWebViewSettings$
-                      .scrollBarDefaultDelayBeforeFade]
+          ? ((_patchMap[InAppWebViewSettings$.scrollBarDefaultDelayBeforeFade]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .scrollBarDefaultDelayBeforeFade](
+                        this.scrollBarDefaultDelayBeforeFade,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .scrollBarDefaultDelayBeforeFade]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .scrollBarDefaultDelayBeforeFade]
+                          .applyTo(this.scrollBarDefaultDelayBeforeFade)
+                    : _patchMap[InAppWebViewSettings$
+                          .scrollBarDefaultDelayBeforeFade])
+                as int?
           : this.scrollBarDefaultDelayBeforeFade,
       scrollbarFadingEnabled:
           _patchMap.containsKey(InAppWebViewSettings$.scrollbarFadingEnabled)
-          ? (_patchMap[InAppWebViewSettings$.scrollbarFadingEnabled]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.scrollbarFadingEnabled](
-                    this.scrollbarFadingEnabled,
-                  )
-                : (_patchMap[InAppWebViewSettings$.scrollbarFadingEnabled]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.scrollbarFadingEnabled]
-                      .applyTo(this.scrollbarFadingEnabled)
-                : _patchMap[InAppWebViewSettings$.scrollbarFadingEnabled]
+          ? ((_patchMap[InAppWebViewSettings$.scrollbarFadingEnabled]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$.scrollbarFadingEnabled](
+                        this.scrollbarFadingEnabled,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.scrollbarFadingEnabled]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.scrollbarFadingEnabled]
+                          .applyTo(this.scrollbarFadingEnabled)
+                    : _patchMap[InAppWebViewSettings$.scrollbarFadingEnabled])
+                as bool?
           : this.scrollbarFadingEnabled,
       scrollBarFadeDuration:
           _patchMap.containsKey(InAppWebViewSettings$.scrollBarFadeDuration)
-          ? (_patchMap[InAppWebViewSettings$.scrollBarFadeDuration] is Function)
-                ? _patchMap[InAppWebViewSettings$.scrollBarFadeDuration](
-                    this.scrollBarFadeDuration,
-                  )
-                : (_patchMap[InAppWebViewSettings$.scrollBarFadeDuration]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.scrollBarFadeDuration]
-                      .applyTo(this.scrollBarFadeDuration)
-                : _patchMap[InAppWebViewSettings$.scrollBarFadeDuration]
+          ? ((_patchMap[InAppWebViewSettings$.scrollBarFadeDuration]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$.scrollBarFadeDuration](
+                        this.scrollBarFadeDuration,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.scrollBarFadeDuration]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.scrollBarFadeDuration]
+                          .applyTo(this.scrollBarFadeDuration)
+                    : _patchMap[InAppWebViewSettings$.scrollBarFadeDuration])
+                as int?
           : this.scrollBarFadeDuration,
       rendererPriorityPolicy:
           _patchMap.containsKey(InAppWebViewSettings$.rendererPriorityPolicy)
-          ? (_patchMap[InAppWebViewSettings$.rendererPriorityPolicy]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.rendererPriorityPolicy](
-                    this.rendererPriorityPolicy,
-                  )
-                : (_patchMap[InAppWebViewSettings$.rendererPriorityPolicy]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.rendererPriorityPolicy]
-                      .applyTo(this.rendererPriorityPolicy)
-                : _patchMap[InAppWebViewSettings$.rendererPriorityPolicy]
+          ? ((_patchMap[InAppWebViewSettings$.rendererPriorityPolicy]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$.rendererPriorityPolicy](
+                        this.rendererPriorityPolicy,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.rendererPriorityPolicy]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.rendererPriorityPolicy]
+                          .applyTo(this.rendererPriorityPolicy)
+                    : _patchMap[InAppWebViewSettings$.rendererPriorityPolicy])
+                as RendererPriorityPolicy?
           : this.rendererPriorityPolicy,
       disableDefaultErrorPage:
           _patchMap.containsKey(InAppWebViewSettings$.disableDefaultErrorPage)
-          ? (_patchMap[InAppWebViewSettings$.disableDefaultErrorPage]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.disableDefaultErrorPage](
-                    this.disableDefaultErrorPage,
-                  )
-                : (_patchMap[InAppWebViewSettings$.disableDefaultErrorPage]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.disableDefaultErrorPage]
-                      .applyTo(this.disableDefaultErrorPage)
-                : _patchMap[InAppWebViewSettings$.disableDefaultErrorPage]
+          ? ((_patchMap[InAppWebViewSettings$.disableDefaultErrorPage]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$.disableDefaultErrorPage](
+                        this.disableDefaultErrorPage,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.disableDefaultErrorPage]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.disableDefaultErrorPage]
+                          .applyTo(this.disableDefaultErrorPage)
+                    : _patchMap[InAppWebViewSettings$.disableDefaultErrorPage])
+                as bool?
           : this.disableDefaultErrorPage,
       verticalScrollbarThumbColor:
           _patchMap.containsKey(
             InAppWebViewSettings$.verticalScrollbarThumbColor,
           )
-          ? (_patchMap[InAppWebViewSettings$.verticalScrollbarThumbColor]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.verticalScrollbarThumbColor](
-                    this.verticalScrollbarThumbColor,
-                  )
-                : (_patchMap[InAppWebViewSettings$.verticalScrollbarThumbColor]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.verticalScrollbarThumbColor]
-                      .applyTo(this.verticalScrollbarThumbColor)
-                : _patchMap[InAppWebViewSettings$.verticalScrollbarThumbColor]
+          ? ((_patchMap[InAppWebViewSettings$.verticalScrollbarThumbColor]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .verticalScrollbarThumbColor](
+                        this.verticalScrollbarThumbColor,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .verticalScrollbarThumbColor]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .verticalScrollbarThumbColor]
+                          .applyTo(this.verticalScrollbarThumbColor)
+                    : _patchMap[InAppWebViewSettings$
+                          .verticalScrollbarThumbColor])
+                as Color?
           : this.verticalScrollbarThumbColor,
       verticalScrollbarTrackColor:
           _patchMap.containsKey(
             InAppWebViewSettings$.verticalScrollbarTrackColor,
           )
-          ? (_patchMap[InAppWebViewSettings$.verticalScrollbarTrackColor]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.verticalScrollbarTrackColor](
-                    this.verticalScrollbarTrackColor,
-                  )
-                : (_patchMap[InAppWebViewSettings$.verticalScrollbarTrackColor]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.verticalScrollbarTrackColor]
-                      .applyTo(this.verticalScrollbarTrackColor)
-                : _patchMap[InAppWebViewSettings$.verticalScrollbarTrackColor]
+          ? ((_patchMap[InAppWebViewSettings$.verticalScrollbarTrackColor]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .verticalScrollbarTrackColor](
+                        this.verticalScrollbarTrackColor,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .verticalScrollbarTrackColor]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .verticalScrollbarTrackColor]
+                          .applyTo(this.verticalScrollbarTrackColor)
+                    : _patchMap[InAppWebViewSettings$
+                          .verticalScrollbarTrackColor])
+                as Color?
           : this.verticalScrollbarTrackColor,
       horizontalScrollbarThumbColor:
           _patchMap.containsKey(
             InAppWebViewSettings$.horizontalScrollbarThumbColor,
           )
-          ? (_patchMap[InAppWebViewSettings$.horizontalScrollbarThumbColor]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$
-                      .horizontalScrollbarThumbColor](
-                    this.horizontalScrollbarThumbColor,
-                  )
-                : (_patchMap[InAppWebViewSettings$
-                          .horizontalScrollbarThumbColor]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.horizontalScrollbarThumbColor]
-                      .applyTo(this.horizontalScrollbarThumbColor)
-                : _patchMap[InAppWebViewSettings$.horizontalScrollbarThumbColor]
+          ? ((_patchMap[InAppWebViewSettings$.horizontalScrollbarThumbColor]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .horizontalScrollbarThumbColor](
+                        this.horizontalScrollbarThumbColor,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .horizontalScrollbarThumbColor]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .horizontalScrollbarThumbColor]
+                          .applyTo(this.horizontalScrollbarThumbColor)
+                    : _patchMap[InAppWebViewSettings$
+                          .horizontalScrollbarThumbColor])
+                as Color?
           : this.horizontalScrollbarThumbColor,
       horizontalScrollbarTrackColor:
           _patchMap.containsKey(
             InAppWebViewSettings$.horizontalScrollbarTrackColor,
           )
-          ? (_patchMap[InAppWebViewSettings$.horizontalScrollbarTrackColor]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$
-                      .horizontalScrollbarTrackColor](
-                    this.horizontalScrollbarTrackColor,
-                  )
-                : (_patchMap[InAppWebViewSettings$
-                          .horizontalScrollbarTrackColor]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.horizontalScrollbarTrackColor]
-                      .applyTo(this.horizontalScrollbarTrackColor)
-                : _patchMap[InAppWebViewSettings$.horizontalScrollbarTrackColor]
+          ? ((_patchMap[InAppWebViewSettings$.horizontalScrollbarTrackColor]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .horizontalScrollbarTrackColor](
+                        this.horizontalScrollbarTrackColor,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .horizontalScrollbarTrackColor]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .horizontalScrollbarTrackColor]
+                          .applyTo(this.horizontalScrollbarTrackColor)
+                    : _patchMap[InAppWebViewSettings$
+                          .horizontalScrollbarTrackColor])
+                as Color?
           : this.horizontalScrollbarTrackColor,
       algorithmicDarkeningAllowed:
           _patchMap.containsKey(
             InAppWebViewSettings$.algorithmicDarkeningAllowed,
           )
-          ? (_patchMap[InAppWebViewSettings$.algorithmicDarkeningAllowed]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.algorithmicDarkeningAllowed](
-                    this.algorithmicDarkeningAllowed,
-                  )
-                : (_patchMap[InAppWebViewSettings$.algorithmicDarkeningAllowed]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.algorithmicDarkeningAllowed]
-                      .applyTo(this.algorithmicDarkeningAllowed)
-                : _patchMap[InAppWebViewSettings$.algorithmicDarkeningAllowed]
+          ? ((_patchMap[InAppWebViewSettings$.algorithmicDarkeningAllowed]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .algorithmicDarkeningAllowed](
+                        this.algorithmicDarkeningAllowed,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .algorithmicDarkeningAllowed]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .algorithmicDarkeningAllowed]
+                          .applyTo(this.algorithmicDarkeningAllowed)
+                    : _patchMap[InAppWebViewSettings$
+                          .algorithmicDarkeningAllowed])
+                as bool?
           : this.algorithmicDarkeningAllowed,
       paymentRequestEnabled:
           _patchMap.containsKey(InAppWebViewSettings$.paymentRequestEnabled)
-          ? (_patchMap[InAppWebViewSettings$.paymentRequestEnabled] is Function)
-                ? _patchMap[InAppWebViewSettings$.paymentRequestEnabled](
-                    this.paymentRequestEnabled,
-                  )
-                : (_patchMap[InAppWebViewSettings$.paymentRequestEnabled]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.paymentRequestEnabled]
-                      .applyTo(this.paymentRequestEnabled)
-                : _patchMap[InAppWebViewSettings$.paymentRequestEnabled]
+          ? ((_patchMap[InAppWebViewSettings$.paymentRequestEnabled]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$.paymentRequestEnabled](
+                        this.paymentRequestEnabled,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.paymentRequestEnabled]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.paymentRequestEnabled]
+                          .applyTo(this.paymentRequestEnabled)
+                    : _patchMap[InAppWebViewSettings$.paymentRequestEnabled])
+                as bool?
           : this.paymentRequestEnabled,
       webAuthenticationSupport:
           _patchMap.containsKey(InAppWebViewSettings$.webAuthenticationSupport)
-          ? (_patchMap[InAppWebViewSettings$.webAuthenticationSupport]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.webAuthenticationSupport](
-                    this.webAuthenticationSupport,
-                  )
-                : (_patchMap[InAppWebViewSettings$.webAuthenticationSupport]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.webAuthenticationSupport]
-                      .applyTo(this.webAuthenticationSupport)
-                : _patchMap[InAppWebViewSettings$.webAuthenticationSupport]
+          ? ((_patchMap[InAppWebViewSettings$.webAuthenticationSupport]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$.webAuthenticationSupport](
+                        this.webAuthenticationSupport,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.webAuthenticationSupport]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.webAuthenticationSupport]
+                          .applyTo(this.webAuthenticationSupport)
+                    : _patchMap[InAppWebViewSettings$.webAuthenticationSupport])
+                as WebAuthenticationSupport?
           : this.webAuthenticationSupport,
       enterpriseAuthenticationAppLinkPolicyEnabled:
           _patchMap.containsKey(
             InAppWebViewSettings$.enterpriseAuthenticationAppLinkPolicyEnabled,
           )
-          ? (_patchMap[InAppWebViewSettings$
-                        .enterpriseAuthenticationAppLinkPolicyEnabled]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$
-                      .enterpriseAuthenticationAppLinkPolicyEnabled](
-                    this.enterpriseAuthenticationAppLinkPolicyEnabled,
-                  )
-                : (_patchMap[InAppWebViewSettings$
-                          .enterpriseAuthenticationAppLinkPolicyEnabled]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$
-                          .enterpriseAuthenticationAppLinkPolicyEnabled]
-                      .applyTo(
+          ? ((_patchMap[InAppWebViewSettings$
+                            .enterpriseAuthenticationAppLinkPolicyEnabled]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .enterpriseAuthenticationAppLinkPolicyEnabled](
                         this.enterpriseAuthenticationAppLinkPolicyEnabled,
                       )
-                : _patchMap[InAppWebViewSettings$
-                      .enterpriseAuthenticationAppLinkPolicyEnabled]
+                    : (_patchMap[InAppWebViewSettings$
+                              .enterpriseAuthenticationAppLinkPolicyEnabled]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .enterpriseAuthenticationAppLinkPolicyEnabled]
+                          .applyTo(
+                            this.enterpriseAuthenticationAppLinkPolicyEnabled,
+                          )
+                    : _patchMap[InAppWebViewSettings$
+                          .enterpriseAuthenticationAppLinkPolicyEnabled])
+                as bool?
           : this.enterpriseAuthenticationAppLinkPolicyEnabled,
       defaultVideoPoster:
           _patchMap.containsKey(InAppWebViewSettings$.defaultVideoPoster)
-          ? (_patchMap[InAppWebViewSettings$.defaultVideoPoster] is Function)
-                ? _patchMap[InAppWebViewSettings$.defaultVideoPoster](
-                    this.defaultVideoPoster,
-                  )
-                : (_patchMap[InAppWebViewSettings$.defaultVideoPoster] is Patch)
-                ? _patchMap[InAppWebViewSettings$.defaultVideoPoster].applyTo(
-                    this.defaultVideoPoster,
-                  )
-                : _patchMap[InAppWebViewSettings$.defaultVideoPoster]
+          ? ((_patchMap[InAppWebViewSettings$.defaultVideoPoster] is Function)
+                    ? _patchMap[InAppWebViewSettings$.defaultVideoPoster](
+                        this.defaultVideoPoster,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.defaultVideoPoster]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.defaultVideoPoster]
+                          .applyTo(this.defaultVideoPoster)
+                    : _patchMap[InAppWebViewSettings$.defaultVideoPoster])
+                as Uint8List?
           : this.defaultVideoPoster,
       requestedWithHeaderOriginAllowList:
           _patchMap.containsKey(
             InAppWebViewSettings$.requestedWithHeaderOriginAllowList,
           )
-          ? (_patchMap[InAppWebViewSettings$.requestedWithHeaderOriginAllowList]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$
-                      .requestedWithHeaderOriginAllowList](
-                    this.requestedWithHeaderOriginAllowList,
-                  )
-                : (_patchMap[InAppWebViewSettings$
-                          .requestedWithHeaderOriginAllowList]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$
-                          .requestedWithHeaderOriginAllowList]
-                      .applyTo(this.requestedWithHeaderOriginAllowList)
-                : _patchMap[InAppWebViewSettings$
-                      .requestedWithHeaderOriginAllowList]
+          ? ((_patchMap[InAppWebViewSettings$
+                            .requestedWithHeaderOriginAllowList]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .requestedWithHeaderOriginAllowList](
+                        this.requestedWithHeaderOriginAllowList,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .requestedWithHeaderOriginAllowList]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .requestedWithHeaderOriginAllowList]
+                          .applyTo(this.requestedWithHeaderOriginAllowList)
+                    : _patchMap[InAppWebViewSettings$
+                          .requestedWithHeaderOriginAllowList])
+                as Set<String>?
           : this.requestedWithHeaderOriginAllowList,
       disallowOverScroll:
           _patchMap.containsKey(InAppWebViewSettings$.disallowOverScroll)
-          ? (_patchMap[InAppWebViewSettings$.disallowOverScroll] is Function)
-                ? _patchMap[InAppWebViewSettings$.disallowOverScroll](
-                    this.disallowOverScroll,
-                  )
-                : (_patchMap[InAppWebViewSettings$.disallowOverScroll] is Patch)
-                ? _patchMap[InAppWebViewSettings$.disallowOverScroll].applyTo(
-                    this.disallowOverScroll,
-                  )
-                : _patchMap[InAppWebViewSettings$.disallowOverScroll]
+          ? ((_patchMap[InAppWebViewSettings$.disallowOverScroll] is Function)
+                    ? _patchMap[InAppWebViewSettings$.disallowOverScroll](
+                        this.disallowOverScroll,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.disallowOverScroll]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.disallowOverScroll]
+                          .applyTo(this.disallowOverScroll)
+                    : _patchMap[InAppWebViewSettings$.disallowOverScroll])
+                as bool?
           : this.disallowOverScroll,
       enableViewportScale:
           _patchMap.containsKey(InAppWebViewSettings$.enableViewportScale)
-          ? (_patchMap[InAppWebViewSettings$.enableViewportScale] is Function)
-                ? _patchMap[InAppWebViewSettings$.enableViewportScale](
-                    this.enableViewportScale,
-                  )
-                : (_patchMap[InAppWebViewSettings$.enableViewportScale]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.enableViewportScale].applyTo(
-                    this.enableViewportScale,
-                  )
-                : _patchMap[InAppWebViewSettings$.enableViewportScale]
+          ? ((_patchMap[InAppWebViewSettings$.enableViewportScale] is Function)
+                    ? _patchMap[InAppWebViewSettings$.enableViewportScale](
+                        this.enableViewportScale,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.enableViewportScale]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.enableViewportScale]
+                          .applyTo(this.enableViewportScale)
+                    : _patchMap[InAppWebViewSettings$.enableViewportScale])
+                as bool?
           : this.enableViewportScale,
       suppressesIncrementalRendering:
           _patchMap.containsKey(
             InAppWebViewSettings$.suppressesIncrementalRendering,
           )
-          ? (_patchMap[InAppWebViewSettings$.suppressesIncrementalRendering]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$
-                      .suppressesIncrementalRendering](
-                    this.suppressesIncrementalRendering,
-                  )
-                : (_patchMap[InAppWebViewSettings$
-                          .suppressesIncrementalRendering]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$
-                          .suppressesIncrementalRendering]
-                      .applyTo(this.suppressesIncrementalRendering)
-                : _patchMap[InAppWebViewSettings$
-                      .suppressesIncrementalRendering]
+          ? ((_patchMap[InAppWebViewSettings$.suppressesIncrementalRendering]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .suppressesIncrementalRendering](
+                        this.suppressesIncrementalRendering,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .suppressesIncrementalRendering]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .suppressesIncrementalRendering]
+                          .applyTo(this.suppressesIncrementalRendering)
+                    : _patchMap[InAppWebViewSettings$
+                          .suppressesIncrementalRendering])
+                as bool?
           : this.suppressesIncrementalRendering,
       allowsAirPlayForMediaPlayback:
           _patchMap.containsKey(
             InAppWebViewSettings$.allowsAirPlayForMediaPlayback,
           )
-          ? (_patchMap[InAppWebViewSettings$.allowsAirPlayForMediaPlayback]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$
-                      .allowsAirPlayForMediaPlayback](
-                    this.allowsAirPlayForMediaPlayback,
-                  )
-                : (_patchMap[InAppWebViewSettings$
-                          .allowsAirPlayForMediaPlayback]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.allowsAirPlayForMediaPlayback]
-                      .applyTo(this.allowsAirPlayForMediaPlayback)
-                : _patchMap[InAppWebViewSettings$.allowsAirPlayForMediaPlayback]
+          ? ((_patchMap[InAppWebViewSettings$.allowsAirPlayForMediaPlayback]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .allowsAirPlayForMediaPlayback](
+                        this.allowsAirPlayForMediaPlayback,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .allowsAirPlayForMediaPlayback]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .allowsAirPlayForMediaPlayback]
+                          .applyTo(this.allowsAirPlayForMediaPlayback)
+                    : _patchMap[InAppWebViewSettings$
+                          .allowsAirPlayForMediaPlayback])
+                as bool?
           : this.allowsAirPlayForMediaPlayback,
       allowsBackForwardNavigationGestures:
           _patchMap.containsKey(
             InAppWebViewSettings$.allowsBackForwardNavigationGestures,
           )
-          ? (_patchMap[InAppWebViewSettings$
-                        .allowsBackForwardNavigationGestures]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$
-                      .allowsBackForwardNavigationGestures](
-                    this.allowsBackForwardNavigationGestures,
-                  )
-                : (_patchMap[InAppWebViewSettings$
-                          .allowsBackForwardNavigationGestures]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$
-                          .allowsBackForwardNavigationGestures]
-                      .applyTo(this.allowsBackForwardNavigationGestures)
-                : _patchMap[InAppWebViewSettings$
-                      .allowsBackForwardNavigationGestures]
+          ? ((_patchMap[InAppWebViewSettings$
+                            .allowsBackForwardNavigationGestures]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .allowsBackForwardNavigationGestures](
+                        this.allowsBackForwardNavigationGestures,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .allowsBackForwardNavigationGestures]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .allowsBackForwardNavigationGestures]
+                          .applyTo(this.allowsBackForwardNavigationGestures)
+                    : _patchMap[InAppWebViewSettings$
+                          .allowsBackForwardNavigationGestures])
+                as bool?
           : this.allowsBackForwardNavigationGestures,
       allowsLinkPreview:
           _patchMap.containsKey(InAppWebViewSettings$.allowsLinkPreview)
-          ? (_patchMap[InAppWebViewSettings$.allowsLinkPreview] is Function)
-                ? _patchMap[InAppWebViewSettings$.allowsLinkPreview](
-                    this.allowsLinkPreview,
-                  )
-                : (_patchMap[InAppWebViewSettings$.allowsLinkPreview] is Patch)
-                ? _patchMap[InAppWebViewSettings$.allowsLinkPreview].applyTo(
-                    this.allowsLinkPreview,
-                  )
-                : _patchMap[InAppWebViewSettings$.allowsLinkPreview]
+          ? ((_patchMap[InAppWebViewSettings$.allowsLinkPreview] is Function)
+                    ? _patchMap[InAppWebViewSettings$.allowsLinkPreview](
+                        this.allowsLinkPreview,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.allowsLinkPreview]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.allowsLinkPreview]
+                          .applyTo(this.allowsLinkPreview)
+                    : _patchMap[InAppWebViewSettings$.allowsLinkPreview])
+                as bool?
           : this.allowsLinkPreview,
       ignoresViewportScaleLimits:
           _patchMap.containsKey(
             InAppWebViewSettings$.ignoresViewportScaleLimits,
           )
-          ? (_patchMap[InAppWebViewSettings$.ignoresViewportScaleLimits]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.ignoresViewportScaleLimits](
-                    this.ignoresViewportScaleLimits,
-                  )
-                : (_patchMap[InAppWebViewSettings$.ignoresViewportScaleLimits]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.ignoresViewportScaleLimits]
-                      .applyTo(this.ignoresViewportScaleLimits)
-                : _patchMap[InAppWebViewSettings$.ignoresViewportScaleLimits]
+          ? ((_patchMap[InAppWebViewSettings$.ignoresViewportScaleLimits]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .ignoresViewportScaleLimits](
+                        this.ignoresViewportScaleLimits,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .ignoresViewportScaleLimits]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .ignoresViewportScaleLimits]
+                          .applyTo(this.ignoresViewportScaleLimits)
+                    : _patchMap[InAppWebViewSettings$
+                          .ignoresViewportScaleLimits])
+                as bool?
           : this.ignoresViewportScaleLimits,
       allowsInlineMediaPlayback:
           _patchMap.containsKey(InAppWebViewSettings$.allowsInlineMediaPlayback)
-          ? (_patchMap[InAppWebViewSettings$.allowsInlineMediaPlayback]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.allowsInlineMediaPlayback](
-                    this.allowsInlineMediaPlayback,
-                  )
-                : (_patchMap[InAppWebViewSettings$.allowsInlineMediaPlayback]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.allowsInlineMediaPlayback]
-                      .applyTo(this.allowsInlineMediaPlayback)
-                : _patchMap[InAppWebViewSettings$.allowsInlineMediaPlayback]
+          ? ((_patchMap[InAppWebViewSettings$.allowsInlineMediaPlayback]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .allowsInlineMediaPlayback](
+                        this.allowsInlineMediaPlayback,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .allowsInlineMediaPlayback]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.allowsInlineMediaPlayback]
+                          .applyTo(this.allowsInlineMediaPlayback)
+                    : _patchMap[InAppWebViewSettings$
+                          .allowsInlineMediaPlayback])
+                as bool?
           : this.allowsInlineMediaPlayback,
       allowsPictureInPictureMediaPlayback:
           _patchMap.containsKey(
             InAppWebViewSettings$.allowsPictureInPictureMediaPlayback,
           )
-          ? (_patchMap[InAppWebViewSettings$
-                        .allowsPictureInPictureMediaPlayback]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$
-                      .allowsPictureInPictureMediaPlayback](
-                    this.allowsPictureInPictureMediaPlayback,
-                  )
-                : (_patchMap[InAppWebViewSettings$
-                          .allowsPictureInPictureMediaPlayback]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$
-                          .allowsPictureInPictureMediaPlayback]
-                      .applyTo(this.allowsPictureInPictureMediaPlayback)
-                : _patchMap[InAppWebViewSettings$
-                      .allowsPictureInPictureMediaPlayback]
+          ? ((_patchMap[InAppWebViewSettings$
+                            .allowsPictureInPictureMediaPlayback]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .allowsPictureInPictureMediaPlayback](
+                        this.allowsPictureInPictureMediaPlayback,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .allowsPictureInPictureMediaPlayback]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .allowsPictureInPictureMediaPlayback]
+                          .applyTo(this.allowsPictureInPictureMediaPlayback)
+                    : _patchMap[InAppWebViewSettings$
+                          .allowsPictureInPictureMediaPlayback])
+                as bool?
           : this.allowsPictureInPictureMediaPlayback,
       isFraudulentWebsiteWarningEnabled:
           _patchMap.containsKey(
             InAppWebViewSettings$.isFraudulentWebsiteWarningEnabled,
           )
-          ? (_patchMap[InAppWebViewSettings$.isFraudulentWebsiteWarningEnabled]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$
-                      .isFraudulentWebsiteWarningEnabled](
-                    this.isFraudulentWebsiteWarningEnabled,
-                  )
-                : (_patchMap[InAppWebViewSettings$
-                          .isFraudulentWebsiteWarningEnabled]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$
-                          .isFraudulentWebsiteWarningEnabled]
-                      .applyTo(this.isFraudulentWebsiteWarningEnabled)
-                : _patchMap[InAppWebViewSettings$
-                      .isFraudulentWebsiteWarningEnabled]
+          ? ((_patchMap[InAppWebViewSettings$.isFraudulentWebsiteWarningEnabled]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .isFraudulentWebsiteWarningEnabled](
+                        this.isFraudulentWebsiteWarningEnabled,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .isFraudulentWebsiteWarningEnabled]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .isFraudulentWebsiteWarningEnabled]
+                          .applyTo(this.isFraudulentWebsiteWarningEnabled)
+                    : _patchMap[InAppWebViewSettings$
+                          .isFraudulentWebsiteWarningEnabled])
+                as bool?
           : this.isFraudulentWebsiteWarningEnabled,
       selectionGranularity:
           _patchMap.containsKey(InAppWebViewSettings$.selectionGranularity)
-          ? (_patchMap[InAppWebViewSettings$.selectionGranularity] is Function)
-                ? _patchMap[InAppWebViewSettings$.selectionGranularity](
-                    this.selectionGranularity,
-                  )
-                : (_patchMap[InAppWebViewSettings$.selectionGranularity]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.selectionGranularity].applyTo(
-                    this.selectionGranularity,
-                  )
-                : _patchMap[InAppWebViewSettings$.selectionGranularity]
+          ? ((_patchMap[InAppWebViewSettings$.selectionGranularity] is Function)
+                    ? _patchMap[InAppWebViewSettings$.selectionGranularity](
+                        this.selectionGranularity,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.selectionGranularity]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.selectionGranularity]
+                          .applyTo(this.selectionGranularity)
+                    : _patchMap[InAppWebViewSettings$.selectionGranularity])
+                as SelectionGranularity?
           : this.selectionGranularity,
       dataDetectorTypes:
           _patchMap.containsKey(InAppWebViewSettings$.dataDetectorTypes)
-          ? (_patchMap[InAppWebViewSettings$.dataDetectorTypes] is Function)
-                ? _patchMap[InAppWebViewSettings$.dataDetectorTypes](
-                    this.dataDetectorTypes,
-                  )
-                : (_patchMap[InAppWebViewSettings$.dataDetectorTypes] is Patch)
-                ? _patchMap[InAppWebViewSettings$.dataDetectorTypes].applyTo(
-                    this.dataDetectorTypes,
-                  )
-                : _patchMap[InAppWebViewSettings$.dataDetectorTypes]
+          ? ((_patchMap[InAppWebViewSettings$.dataDetectorTypes] is Function)
+                    ? _patchMap[InAppWebViewSettings$.dataDetectorTypes](
+                        this.dataDetectorTypes,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.dataDetectorTypes]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.dataDetectorTypes]
+                          .applyTo(this.dataDetectorTypes)
+                    : _patchMap[InAppWebViewSettings$.dataDetectorTypes])
+                as List<DataDetectorTypes>?
           : this.dataDetectorTypes,
       sharedCookiesEnabled:
           _patchMap.containsKey(InAppWebViewSettings$.sharedCookiesEnabled)
-          ? (_patchMap[InAppWebViewSettings$.sharedCookiesEnabled] is Function)
-                ? _patchMap[InAppWebViewSettings$.sharedCookiesEnabled](
-                    this.sharedCookiesEnabled,
-                  )
-                : (_patchMap[InAppWebViewSettings$.sharedCookiesEnabled]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.sharedCookiesEnabled].applyTo(
-                    this.sharedCookiesEnabled,
-                  )
-                : _patchMap[InAppWebViewSettings$.sharedCookiesEnabled]
+          ? ((_patchMap[InAppWebViewSettings$.sharedCookiesEnabled] is Function)
+                    ? _patchMap[InAppWebViewSettings$.sharedCookiesEnabled](
+                        this.sharedCookiesEnabled,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.sharedCookiesEnabled]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.sharedCookiesEnabled]
+                          .applyTo(this.sharedCookiesEnabled)
+                    : _patchMap[InAppWebViewSettings$.sharedCookiesEnabled])
+                as bool?
           : this.sharedCookiesEnabled,
       automaticallyAdjustsScrollIndicatorInsets:
           _patchMap.containsKey(
             InAppWebViewSettings$.automaticallyAdjustsScrollIndicatorInsets,
           )
-          ? (_patchMap[InAppWebViewSettings$
-                        .automaticallyAdjustsScrollIndicatorInsets]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$
-                      .automaticallyAdjustsScrollIndicatorInsets](
-                    this.automaticallyAdjustsScrollIndicatorInsets,
-                  )
-                : (_patchMap[InAppWebViewSettings$
-                          .automaticallyAdjustsScrollIndicatorInsets]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$
-                          .automaticallyAdjustsScrollIndicatorInsets]
-                      .applyTo(this.automaticallyAdjustsScrollIndicatorInsets)
-                : _patchMap[InAppWebViewSettings$
-                      .automaticallyAdjustsScrollIndicatorInsets]
+          ? ((_patchMap[InAppWebViewSettings$
+                            .automaticallyAdjustsScrollIndicatorInsets]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .automaticallyAdjustsScrollIndicatorInsets](
+                        this.automaticallyAdjustsScrollIndicatorInsets,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .automaticallyAdjustsScrollIndicatorInsets]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .automaticallyAdjustsScrollIndicatorInsets]
+                          .applyTo(
+                            this.automaticallyAdjustsScrollIndicatorInsets,
+                          )
+                    : _patchMap[InAppWebViewSettings$
+                          .automaticallyAdjustsScrollIndicatorInsets])
+                as bool?
           : this.automaticallyAdjustsScrollIndicatorInsets,
       accessibilityIgnoresInvertColors:
           _patchMap.containsKey(
             InAppWebViewSettings$.accessibilityIgnoresInvertColors,
           )
-          ? (_patchMap[InAppWebViewSettings$.accessibilityIgnoresInvertColors]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$
-                      .accessibilityIgnoresInvertColors](
-                    this.accessibilityIgnoresInvertColors,
-                  )
-                : (_patchMap[InAppWebViewSettings$
-                          .accessibilityIgnoresInvertColors]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$
-                          .accessibilityIgnoresInvertColors]
-                      .applyTo(this.accessibilityIgnoresInvertColors)
-                : _patchMap[InAppWebViewSettings$
-                      .accessibilityIgnoresInvertColors]
+          ? ((_patchMap[InAppWebViewSettings$.accessibilityIgnoresInvertColors]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .accessibilityIgnoresInvertColors](
+                        this.accessibilityIgnoresInvertColors,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .accessibilityIgnoresInvertColors]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .accessibilityIgnoresInvertColors]
+                          .applyTo(this.accessibilityIgnoresInvertColors)
+                    : _patchMap[InAppWebViewSettings$
+                          .accessibilityIgnoresInvertColors])
+                as bool?
           : this.accessibilityIgnoresInvertColors,
       decelerationRate:
           _patchMap.containsKey(InAppWebViewSettings$.decelerationRate)
-          ? (_patchMap[InAppWebViewSettings$.decelerationRate] is Function)
-                ? _patchMap[InAppWebViewSettings$.decelerationRate](
-                    this.decelerationRate,
-                  )
-                : (_patchMap[InAppWebViewSettings$.decelerationRate] is Patch)
-                ? _patchMap[InAppWebViewSettings$.decelerationRate].applyTo(
-                    this.decelerationRate,
-                  )
-                : _patchMap[InAppWebViewSettings$.decelerationRate]
+          ? ((_patchMap[InAppWebViewSettings$.decelerationRate] is Function)
+                    ? _patchMap[InAppWebViewSettings$.decelerationRate](
+                        this.decelerationRate,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.decelerationRate]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.decelerationRate].applyTo(
+                        this.decelerationRate,
+                      )
+                    : _patchMap[InAppWebViewSettings$.decelerationRate])
+                as ScrollViewDecelerationRate?
           : this.decelerationRate,
       alwaysBounceVertical:
           _patchMap.containsKey(InAppWebViewSettings$.alwaysBounceVertical)
-          ? (_patchMap[InAppWebViewSettings$.alwaysBounceVertical] is Function)
-                ? _patchMap[InAppWebViewSettings$.alwaysBounceVertical](
-                    this.alwaysBounceVertical,
-                  )
-                : (_patchMap[InAppWebViewSettings$.alwaysBounceVertical]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.alwaysBounceVertical].applyTo(
-                    this.alwaysBounceVertical,
-                  )
-                : _patchMap[InAppWebViewSettings$.alwaysBounceVertical]
+          ? ((_patchMap[InAppWebViewSettings$.alwaysBounceVertical] is Function)
+                    ? _patchMap[InAppWebViewSettings$.alwaysBounceVertical](
+                        this.alwaysBounceVertical,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.alwaysBounceVertical]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.alwaysBounceVertical]
+                          .applyTo(this.alwaysBounceVertical)
+                    : _patchMap[InAppWebViewSettings$.alwaysBounceVertical])
+                as bool?
           : this.alwaysBounceVertical,
       alwaysBounceHorizontal:
           _patchMap.containsKey(InAppWebViewSettings$.alwaysBounceHorizontal)
-          ? (_patchMap[InAppWebViewSettings$.alwaysBounceHorizontal]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.alwaysBounceHorizontal](
-                    this.alwaysBounceHorizontal,
-                  )
-                : (_patchMap[InAppWebViewSettings$.alwaysBounceHorizontal]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.alwaysBounceHorizontal]
-                      .applyTo(this.alwaysBounceHorizontal)
-                : _patchMap[InAppWebViewSettings$.alwaysBounceHorizontal]
+          ? ((_patchMap[InAppWebViewSettings$.alwaysBounceHorizontal]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$.alwaysBounceHorizontal](
+                        this.alwaysBounceHorizontal,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.alwaysBounceHorizontal]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.alwaysBounceHorizontal]
+                          .applyTo(this.alwaysBounceHorizontal)
+                    : _patchMap[InAppWebViewSettings$.alwaysBounceHorizontal])
+                as bool?
           : this.alwaysBounceHorizontal,
       bouncesHorizontally:
           _patchMap.containsKey(InAppWebViewSettings$.bouncesHorizontally)
-          ? (_patchMap[InAppWebViewSettings$.bouncesHorizontally] is Function)
-                ? _patchMap[InAppWebViewSettings$.bouncesHorizontally](
-                    this.bouncesHorizontally,
-                  )
-                : (_patchMap[InAppWebViewSettings$.bouncesHorizontally]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.bouncesHorizontally].applyTo(
-                    this.bouncesHorizontally,
-                  )
-                : _patchMap[InAppWebViewSettings$.bouncesHorizontally]
+          ? ((_patchMap[InAppWebViewSettings$.bouncesHorizontally] is Function)
+                    ? _patchMap[InAppWebViewSettings$.bouncesHorizontally](
+                        this.bouncesHorizontally,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.bouncesHorizontally]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.bouncesHorizontally]
+                          .applyTo(this.bouncesHorizontally)
+                    : _patchMap[InAppWebViewSettings$.bouncesHorizontally])
+                as bool?
           : this.bouncesHorizontally,
       bouncesVertically:
           _patchMap.containsKey(InAppWebViewSettings$.bouncesVertically)
-          ? (_patchMap[InAppWebViewSettings$.bouncesVertically] is Function)
-                ? _patchMap[InAppWebViewSettings$.bouncesVertically](
-                    this.bouncesVertically,
-                  )
-                : (_patchMap[InAppWebViewSettings$.bouncesVertically] is Patch)
-                ? _patchMap[InAppWebViewSettings$.bouncesVertically].applyTo(
-                    this.bouncesVertically,
-                  )
-                : _patchMap[InAppWebViewSettings$.bouncesVertically]
+          ? ((_patchMap[InAppWebViewSettings$.bouncesVertically] is Function)
+                    ? _patchMap[InAppWebViewSettings$.bouncesVertically](
+                        this.bouncesVertically,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.bouncesVertically]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.bouncesVertically]
+                          .applyTo(this.bouncesVertically)
+                    : _patchMap[InAppWebViewSettings$.bouncesVertically])
+                as bool?
           : this.bouncesVertically,
       scrollsToTop: _patchMap.containsKey(InAppWebViewSettings$.scrollsToTop)
-          ? (_patchMap[InAppWebViewSettings$.scrollsToTop] is Function)
-                ? _patchMap[InAppWebViewSettings$.scrollsToTop](
-                    this.scrollsToTop,
-                  )
-                : (_patchMap[InAppWebViewSettings$.scrollsToTop] is Patch)
-                ? _patchMap[InAppWebViewSettings$.scrollsToTop].applyTo(
-                    this.scrollsToTop,
-                  )
-                : _patchMap[InAppWebViewSettings$.scrollsToTop]
+          ? ((_patchMap[InAppWebViewSettings$.scrollsToTop] is Function)
+                    ? _patchMap[InAppWebViewSettings$.scrollsToTop](
+                        this.scrollsToTop,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.scrollsToTop] is Patch)
+                    ? _patchMap[InAppWebViewSettings$.scrollsToTop].applyTo(
+                        this.scrollsToTop,
+                      )
+                    : _patchMap[InAppWebViewSettings$.scrollsToTop])
+                as bool?
           : this.scrollsToTop,
       isPagingEnabled:
           _patchMap.containsKey(InAppWebViewSettings$.isPagingEnabled)
-          ? (_patchMap[InAppWebViewSettings$.isPagingEnabled] is Function)
-                ? _patchMap[InAppWebViewSettings$.isPagingEnabled](
-                    this.isPagingEnabled,
-                  )
-                : (_patchMap[InAppWebViewSettings$.isPagingEnabled] is Patch)
-                ? _patchMap[InAppWebViewSettings$.isPagingEnabled].applyTo(
-                    this.isPagingEnabled,
-                  )
-                : _patchMap[InAppWebViewSettings$.isPagingEnabled]
+          ? ((_patchMap[InAppWebViewSettings$.isPagingEnabled] is Function)
+                    ? _patchMap[InAppWebViewSettings$.isPagingEnabled](
+                        this.isPagingEnabled,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.isPagingEnabled]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.isPagingEnabled].applyTo(
+                        this.isPagingEnabled,
+                      )
+                    : _patchMap[InAppWebViewSettings$.isPagingEnabled])
+                as bool?
           : this.isPagingEnabled,
       maximumZoomScale:
           _patchMap.containsKey(InAppWebViewSettings$.maximumZoomScale)
-          ? (_patchMap[InAppWebViewSettings$.maximumZoomScale] is Function)
-                ? _patchMap[InAppWebViewSettings$.maximumZoomScale](
-                    this.maximumZoomScale,
-                  )
-                : (_patchMap[InAppWebViewSettings$.maximumZoomScale] is Patch)
-                ? _patchMap[InAppWebViewSettings$.maximumZoomScale].applyTo(
-                    this.maximumZoomScale,
-                  )
-                : _patchMap[InAppWebViewSettings$.maximumZoomScale]
+          ? ((_patchMap[InAppWebViewSettings$.maximumZoomScale] is Function)
+                    ? _patchMap[InAppWebViewSettings$.maximumZoomScale](
+                        this.maximumZoomScale,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.maximumZoomScale]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.maximumZoomScale].applyTo(
+                        this.maximumZoomScale,
+                      )
+                    : _patchMap[InAppWebViewSettings$.maximumZoomScale])
+                as double?
           : this.maximumZoomScale,
       minimumZoomScale:
           _patchMap.containsKey(InAppWebViewSettings$.minimumZoomScale)
-          ? (_patchMap[InAppWebViewSettings$.minimumZoomScale] is Function)
-                ? _patchMap[InAppWebViewSettings$.minimumZoomScale](
-                    this.minimumZoomScale,
-                  )
-                : (_patchMap[InAppWebViewSettings$.minimumZoomScale] is Patch)
-                ? _patchMap[InAppWebViewSettings$.minimumZoomScale].applyTo(
-                    this.minimumZoomScale,
-                  )
-                : _patchMap[InAppWebViewSettings$.minimumZoomScale]
+          ? ((_patchMap[InAppWebViewSettings$.minimumZoomScale] is Function)
+                    ? _patchMap[InAppWebViewSettings$.minimumZoomScale](
+                        this.minimumZoomScale,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.minimumZoomScale]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.minimumZoomScale].applyTo(
+                        this.minimumZoomScale,
+                      )
+                    : _patchMap[InAppWebViewSettings$.minimumZoomScale])
+                as double?
           : this.minimumZoomScale,
       contentInsetAdjustmentBehavior:
           _patchMap.containsKey(
             InAppWebViewSettings$.contentInsetAdjustmentBehavior,
           )
-          ? (_patchMap[InAppWebViewSettings$.contentInsetAdjustmentBehavior]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$
-                      .contentInsetAdjustmentBehavior](
-                    this.contentInsetAdjustmentBehavior,
-                  )
-                : (_patchMap[InAppWebViewSettings$
-                          .contentInsetAdjustmentBehavior]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$
-                          .contentInsetAdjustmentBehavior]
-                      .applyTo(this.contentInsetAdjustmentBehavior)
-                : _patchMap[InAppWebViewSettings$
-                      .contentInsetAdjustmentBehavior]
+          ? ((_patchMap[InAppWebViewSettings$.contentInsetAdjustmentBehavior]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .contentInsetAdjustmentBehavior](
+                        this.contentInsetAdjustmentBehavior,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .contentInsetAdjustmentBehavior]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .contentInsetAdjustmentBehavior]
+                          .applyTo(this.contentInsetAdjustmentBehavior)
+                    : _patchMap[InAppWebViewSettings$
+                          .contentInsetAdjustmentBehavior])
+                as ScrollViewContentInsetAdjustmentBehavior?
           : this.contentInsetAdjustmentBehavior,
       isDirectionalLockEnabled:
           _patchMap.containsKey(InAppWebViewSettings$.isDirectionalLockEnabled)
-          ? (_patchMap[InAppWebViewSettings$.isDirectionalLockEnabled]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.isDirectionalLockEnabled](
-                    this.isDirectionalLockEnabled,
-                  )
-                : (_patchMap[InAppWebViewSettings$.isDirectionalLockEnabled]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.isDirectionalLockEnabled]
-                      .applyTo(this.isDirectionalLockEnabled)
-                : _patchMap[InAppWebViewSettings$.isDirectionalLockEnabled]
+          ? ((_patchMap[InAppWebViewSettings$.isDirectionalLockEnabled]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$.isDirectionalLockEnabled](
+                        this.isDirectionalLockEnabled,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.isDirectionalLockEnabled]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.isDirectionalLockEnabled]
+                          .applyTo(this.isDirectionalLockEnabled)
+                    : _patchMap[InAppWebViewSettings$.isDirectionalLockEnabled])
+                as bool?
           : this.isDirectionalLockEnabled,
       mediaType: _patchMap.containsKey(InAppWebViewSettings$.mediaType)
-          ? (_patchMap[InAppWebViewSettings$.mediaType] is Function)
-                ? _patchMap[InAppWebViewSettings$.mediaType](this.mediaType)
-                : (_patchMap[InAppWebViewSettings$.mediaType] is Patch)
-                ? _patchMap[InAppWebViewSettings$.mediaType].applyTo(
-                    this.mediaType,
-                  )
-                : _patchMap[InAppWebViewSettings$.mediaType]
+          ? ((_patchMap[InAppWebViewSettings$.mediaType] is Function)
+                    ? _patchMap[InAppWebViewSettings$.mediaType](this.mediaType)
+                    : (_patchMap[InAppWebViewSettings$.mediaType] is Patch)
+                    ? _patchMap[InAppWebViewSettings$.mediaType].applyTo(
+                        this.mediaType,
+                      )
+                    : _patchMap[InAppWebViewSettings$.mediaType])
+                as String?
           : this.mediaType,
       pageZoom: _patchMap.containsKey(InAppWebViewSettings$.pageZoom)
-          ? (_patchMap[InAppWebViewSettings$.pageZoom] is Function)
-                ? _patchMap[InAppWebViewSettings$.pageZoom](this.pageZoom)
-                : (_patchMap[InAppWebViewSettings$.pageZoom] is Patch)
-                ? _patchMap[InAppWebViewSettings$.pageZoom].applyTo(
-                    this.pageZoom,
-                  )
-                : _patchMap[InAppWebViewSettings$.pageZoom]
+          ? ((_patchMap[InAppWebViewSettings$.pageZoom] is Function)
+                    ? _patchMap[InAppWebViewSettings$.pageZoom](this.pageZoom)
+                    : (_patchMap[InAppWebViewSettings$.pageZoom] is Patch)
+                    ? _patchMap[InAppWebViewSettings$.pageZoom].applyTo(
+                        this.pageZoom,
+                      )
+                    : _patchMap[InAppWebViewSettings$.pageZoom])
+                as double?
           : this.pageZoom,
       limitsNavigationsToAppBoundDomains:
           _patchMap.containsKey(
             InAppWebViewSettings$.limitsNavigationsToAppBoundDomains,
           )
-          ? (_patchMap[InAppWebViewSettings$.limitsNavigationsToAppBoundDomains]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$
-                      .limitsNavigationsToAppBoundDomains](
-                    this.limitsNavigationsToAppBoundDomains,
-                  )
-                : (_patchMap[InAppWebViewSettings$
-                          .limitsNavigationsToAppBoundDomains]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$
-                          .limitsNavigationsToAppBoundDomains]
-                      .applyTo(this.limitsNavigationsToAppBoundDomains)
-                : _patchMap[InAppWebViewSettings$
-                      .limitsNavigationsToAppBoundDomains]
+          ? ((_patchMap[InAppWebViewSettings$
+                            .limitsNavigationsToAppBoundDomains]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .limitsNavigationsToAppBoundDomains](
+                        this.limitsNavigationsToAppBoundDomains,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .limitsNavigationsToAppBoundDomains]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .limitsNavigationsToAppBoundDomains]
+                          .applyTo(this.limitsNavigationsToAppBoundDomains)
+                    : _patchMap[InAppWebViewSettings$
+                          .limitsNavigationsToAppBoundDomains])
+                as bool?
           : this.limitsNavigationsToAppBoundDomains,
       useOnNavigationResponse:
           _patchMap.containsKey(InAppWebViewSettings$.useOnNavigationResponse)
-          ? (_patchMap[InAppWebViewSettings$.useOnNavigationResponse]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.useOnNavigationResponse](
-                    this.useOnNavigationResponse,
-                  )
-                : (_patchMap[InAppWebViewSettings$.useOnNavigationResponse]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.useOnNavigationResponse]
-                      .applyTo(this.useOnNavigationResponse)
-                : _patchMap[InAppWebViewSettings$.useOnNavigationResponse]
+          ? ((_patchMap[InAppWebViewSettings$.useOnNavigationResponse]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$.useOnNavigationResponse](
+                        this.useOnNavigationResponse,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.useOnNavigationResponse]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.useOnNavigationResponse]
+                          .applyTo(this.useOnNavigationResponse)
+                    : _patchMap[InAppWebViewSettings$.useOnNavigationResponse])
+                as bool?
           : this.useOnNavigationResponse,
       applePayAPIEnabled:
           _patchMap.containsKey(InAppWebViewSettings$.applePayAPIEnabled)
-          ? (_patchMap[InAppWebViewSettings$.applePayAPIEnabled] is Function)
-                ? _patchMap[InAppWebViewSettings$.applePayAPIEnabled](
-                    this.applePayAPIEnabled,
-                  )
-                : (_patchMap[InAppWebViewSettings$.applePayAPIEnabled] is Patch)
-                ? _patchMap[InAppWebViewSettings$.applePayAPIEnabled].applyTo(
-                    this.applePayAPIEnabled,
-                  )
-                : _patchMap[InAppWebViewSettings$.applePayAPIEnabled]
+          ? ((_patchMap[InAppWebViewSettings$.applePayAPIEnabled] is Function)
+                    ? _patchMap[InAppWebViewSettings$.applePayAPIEnabled](
+                        this.applePayAPIEnabled,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.applePayAPIEnabled]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.applePayAPIEnabled]
+                          .applyTo(this.applePayAPIEnabled)
+                    : _patchMap[InAppWebViewSettings$.applePayAPIEnabled])
+                as bool?
           : this.applePayAPIEnabled,
       allowingReadAccessTo:
           _patchMap.containsKey(InAppWebViewSettings$.allowingReadAccessTo)
-          ? (_patchMap[InAppWebViewSettings$.allowingReadAccessTo] is Function)
-                ? _patchMap[InAppWebViewSettings$.allowingReadAccessTo](
-                    this.allowingReadAccessTo,
-                  )
-                : (_patchMap[InAppWebViewSettings$.allowingReadAccessTo]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.allowingReadAccessTo].applyTo(
-                    this.allowingReadAccessTo,
-                  )
-                : _patchMap[InAppWebViewSettings$.allowingReadAccessTo]
+          ? ((_patchMap[InAppWebViewSettings$.allowingReadAccessTo] is Function)
+                    ? _patchMap[InAppWebViewSettings$.allowingReadAccessTo](
+                        this.allowingReadAccessTo,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.allowingReadAccessTo]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.allowingReadAccessTo]
+                          .applyTo(this.allowingReadAccessTo)
+                    : _patchMap[InAppWebViewSettings$.allowingReadAccessTo])
+                as WebUri?
           : this.allowingReadAccessTo,
       disableLongPressContextMenuOnLinks:
           _patchMap.containsKey(
             InAppWebViewSettings$.disableLongPressContextMenuOnLinks,
           )
-          ? (_patchMap[InAppWebViewSettings$.disableLongPressContextMenuOnLinks]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$
-                      .disableLongPressContextMenuOnLinks](
-                    this.disableLongPressContextMenuOnLinks,
-                  )
-                : (_patchMap[InAppWebViewSettings$
-                          .disableLongPressContextMenuOnLinks]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$
-                          .disableLongPressContextMenuOnLinks]
-                      .applyTo(this.disableLongPressContextMenuOnLinks)
-                : _patchMap[InAppWebViewSettings$
-                      .disableLongPressContextMenuOnLinks]
+          ? ((_patchMap[InAppWebViewSettings$
+                            .disableLongPressContextMenuOnLinks]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .disableLongPressContextMenuOnLinks](
+                        this.disableLongPressContextMenuOnLinks,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .disableLongPressContextMenuOnLinks]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .disableLongPressContextMenuOnLinks]
+                          .applyTo(this.disableLongPressContextMenuOnLinks)
+                    : _patchMap[InAppWebViewSettings$
+                          .disableLongPressContextMenuOnLinks])
+                as bool?
           : this.disableLongPressContextMenuOnLinks,
       disableInputAccessoryView:
           _patchMap.containsKey(InAppWebViewSettings$.disableInputAccessoryView)
-          ? (_patchMap[InAppWebViewSettings$.disableInputAccessoryView]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.disableInputAccessoryView](
-                    this.disableInputAccessoryView,
-                  )
-                : (_patchMap[InAppWebViewSettings$.disableInputAccessoryView]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.disableInputAccessoryView]
-                      .applyTo(this.disableInputAccessoryView)
-                : _patchMap[InAppWebViewSettings$.disableInputAccessoryView]
+          ? ((_patchMap[InAppWebViewSettings$.disableInputAccessoryView]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .disableInputAccessoryView](
+                        this.disableInputAccessoryView,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .disableInputAccessoryView]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.disableInputAccessoryView]
+                          .applyTo(this.disableInputAccessoryView)
+                    : _patchMap[InAppWebViewSettings$
+                          .disableInputAccessoryView])
+                as bool?
           : this.disableInputAccessoryView,
       underPageBackgroundColor:
           _patchMap.containsKey(InAppWebViewSettings$.underPageBackgroundColor)
-          ? (_patchMap[InAppWebViewSettings$.underPageBackgroundColor]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.underPageBackgroundColor](
-                    this.underPageBackgroundColor,
-                  )
-                : (_patchMap[InAppWebViewSettings$.underPageBackgroundColor]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.underPageBackgroundColor]
-                      .applyTo(this.underPageBackgroundColor)
-                : _patchMap[InAppWebViewSettings$.underPageBackgroundColor]
+          ? ((_patchMap[InAppWebViewSettings$.underPageBackgroundColor]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$.underPageBackgroundColor](
+                        this.underPageBackgroundColor,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.underPageBackgroundColor]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.underPageBackgroundColor]
+                          .applyTo(this.underPageBackgroundColor)
+                    : _patchMap[InAppWebViewSettings$.underPageBackgroundColor])
+                as Color?
           : this.underPageBackgroundColor,
       isTextInteractionEnabled:
           _patchMap.containsKey(InAppWebViewSettings$.isTextInteractionEnabled)
-          ? (_patchMap[InAppWebViewSettings$.isTextInteractionEnabled]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.isTextInteractionEnabled](
-                    this.isTextInteractionEnabled,
-                  )
-                : (_patchMap[InAppWebViewSettings$.isTextInteractionEnabled]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.isTextInteractionEnabled]
-                      .applyTo(this.isTextInteractionEnabled)
-                : _patchMap[InAppWebViewSettings$.isTextInteractionEnabled]
+          ? ((_patchMap[InAppWebViewSettings$.isTextInteractionEnabled]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$.isTextInteractionEnabled](
+                        this.isTextInteractionEnabled,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.isTextInteractionEnabled]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.isTextInteractionEnabled]
+                          .applyTo(this.isTextInteractionEnabled)
+                    : _patchMap[InAppWebViewSettings$.isTextInteractionEnabled])
+                as bool?
           : this.isTextInteractionEnabled,
       isSiteSpecificQuirksModeEnabled:
           _patchMap.containsKey(
             InAppWebViewSettings$.isSiteSpecificQuirksModeEnabled,
           )
-          ? (_patchMap[InAppWebViewSettings$.isSiteSpecificQuirksModeEnabled]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$
-                      .isSiteSpecificQuirksModeEnabled](
-                    this.isSiteSpecificQuirksModeEnabled,
-                  )
-                : (_patchMap[InAppWebViewSettings$
-                          .isSiteSpecificQuirksModeEnabled]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$
-                          .isSiteSpecificQuirksModeEnabled]
-                      .applyTo(this.isSiteSpecificQuirksModeEnabled)
-                : _patchMap[InAppWebViewSettings$
-                      .isSiteSpecificQuirksModeEnabled]
+          ? ((_patchMap[InAppWebViewSettings$.isSiteSpecificQuirksModeEnabled]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .isSiteSpecificQuirksModeEnabled](
+                        this.isSiteSpecificQuirksModeEnabled,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .isSiteSpecificQuirksModeEnabled]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .isSiteSpecificQuirksModeEnabled]
+                          .applyTo(this.isSiteSpecificQuirksModeEnabled)
+                    : _patchMap[InAppWebViewSettings$
+                          .isSiteSpecificQuirksModeEnabled])
+                as bool?
           : this.isSiteSpecificQuirksModeEnabled,
       upgradeKnownHostsToHTTPS:
           _patchMap.containsKey(InAppWebViewSettings$.upgradeKnownHostsToHTTPS)
-          ? (_patchMap[InAppWebViewSettings$.upgradeKnownHostsToHTTPS]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.upgradeKnownHostsToHTTPS](
-                    this.upgradeKnownHostsToHTTPS,
-                  )
-                : (_patchMap[InAppWebViewSettings$.upgradeKnownHostsToHTTPS]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.upgradeKnownHostsToHTTPS]
-                      .applyTo(this.upgradeKnownHostsToHTTPS)
-                : _patchMap[InAppWebViewSettings$.upgradeKnownHostsToHTTPS]
+          ? ((_patchMap[InAppWebViewSettings$.upgradeKnownHostsToHTTPS]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$.upgradeKnownHostsToHTTPS](
+                        this.upgradeKnownHostsToHTTPS,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.upgradeKnownHostsToHTTPS]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.upgradeKnownHostsToHTTPS]
+                          .applyTo(this.upgradeKnownHostsToHTTPS)
+                    : _patchMap[InAppWebViewSettings$.upgradeKnownHostsToHTTPS])
+                as bool?
           : this.upgradeKnownHostsToHTTPS,
       isElementFullscreenEnabled:
           _patchMap.containsKey(
             InAppWebViewSettings$.isElementFullscreenEnabled,
           )
-          ? (_patchMap[InAppWebViewSettings$.isElementFullscreenEnabled]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.isElementFullscreenEnabled](
-                    this.isElementFullscreenEnabled,
-                  )
-                : (_patchMap[InAppWebViewSettings$.isElementFullscreenEnabled]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.isElementFullscreenEnabled]
-                      .applyTo(this.isElementFullscreenEnabled)
-                : _patchMap[InAppWebViewSettings$.isElementFullscreenEnabled]
+          ? ((_patchMap[InAppWebViewSettings$.isElementFullscreenEnabled]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .isElementFullscreenEnabled](
+                        this.isElementFullscreenEnabled,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .isElementFullscreenEnabled]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .isElementFullscreenEnabled]
+                          .applyTo(this.isElementFullscreenEnabled)
+                    : _patchMap[InAppWebViewSettings$
+                          .isElementFullscreenEnabled])
+                as bool?
           : this.isElementFullscreenEnabled,
       isFindInteractionEnabled:
           _patchMap.containsKey(InAppWebViewSettings$.isFindInteractionEnabled)
-          ? (_patchMap[InAppWebViewSettings$.isFindInteractionEnabled]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.isFindInteractionEnabled](
-                    this.isFindInteractionEnabled,
-                  )
-                : (_patchMap[InAppWebViewSettings$.isFindInteractionEnabled]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.isFindInteractionEnabled]
-                      .applyTo(this.isFindInteractionEnabled)
-                : _patchMap[InAppWebViewSettings$.isFindInteractionEnabled]
+          ? ((_patchMap[InAppWebViewSettings$.isFindInteractionEnabled]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$.isFindInteractionEnabled](
+                        this.isFindInteractionEnabled,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.isFindInteractionEnabled]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.isFindInteractionEnabled]
+                          .applyTo(this.isFindInteractionEnabled)
+                    : _patchMap[InAppWebViewSettings$.isFindInteractionEnabled])
+                as bool?
           : this.isFindInteractionEnabled,
       minimumViewportInset:
           _patchMap.containsKey(InAppWebViewSettings$.minimumViewportInset)
-          ? (_patchMap[InAppWebViewSettings$.minimumViewportInset] is Function)
-                ? _patchMap[InAppWebViewSettings$.minimumViewportInset](
-                    this.minimumViewportInset,
-                  )
-                : (_patchMap[InAppWebViewSettings$.minimumViewportInset]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.minimumViewportInset].applyTo(
-                    this.minimumViewportInset,
-                  )
-                : _patchMap[InAppWebViewSettings$.minimumViewportInset]
+          ? ((_patchMap[InAppWebViewSettings$.minimumViewportInset] is Function)
+                    ? _patchMap[InAppWebViewSettings$.minimumViewportInset](
+                        this.minimumViewportInset,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.minimumViewportInset]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.minimumViewportInset]
+                          .applyTo(this.minimumViewportInset)
+                    : _patchMap[InAppWebViewSettings$.minimumViewportInset])
+                as EdgeInsets?
           : this.minimumViewportInset,
       maximumViewportInset:
           _patchMap.containsKey(InAppWebViewSettings$.maximumViewportInset)
-          ? (_patchMap[InAppWebViewSettings$.maximumViewportInset] is Function)
-                ? _patchMap[InAppWebViewSettings$.maximumViewportInset](
-                    this.maximumViewportInset,
-                  )
-                : (_patchMap[InAppWebViewSettings$.maximumViewportInset]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.maximumViewportInset].applyTo(
-                    this.maximumViewportInset,
-                  )
-                : _patchMap[InAppWebViewSettings$.maximumViewportInset]
+          ? ((_patchMap[InAppWebViewSettings$.maximumViewportInset] is Function)
+                    ? _patchMap[InAppWebViewSettings$.maximumViewportInset](
+                        this.maximumViewportInset,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.maximumViewportInset]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.maximumViewportInset]
+                          .applyTo(this.maximumViewportInset)
+                    : _patchMap[InAppWebViewSettings$.maximumViewportInset])
+                as EdgeInsets?
           : this.maximumViewportInset,
       isInspectable: _patchMap.containsKey(InAppWebViewSettings$.isInspectable)
-          ? (_patchMap[InAppWebViewSettings$.isInspectable] is Function)
-                ? _patchMap[InAppWebViewSettings$.isInspectable](
-                    this.isInspectable,
-                  )
-                : (_patchMap[InAppWebViewSettings$.isInspectable] is Patch)
-                ? _patchMap[InAppWebViewSettings$.isInspectable].applyTo(
-                    this.isInspectable,
-                  )
-                : _patchMap[InAppWebViewSettings$.isInspectable]
+          ? ((_patchMap[InAppWebViewSettings$.isInspectable] is Function)
+                    ? _patchMap[InAppWebViewSettings$.isInspectable](
+                        this.isInspectable,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.isInspectable] is Patch)
+                    ? _patchMap[InAppWebViewSettings$.isInspectable].applyTo(
+                        this.isInspectable,
+                      )
+                    : _patchMap[InAppWebViewSettings$.isInspectable])
+                as bool?
           : this.isInspectable,
       shouldPrintBackgrounds:
           _patchMap.containsKey(InAppWebViewSettings$.shouldPrintBackgrounds)
-          ? (_patchMap[InAppWebViewSettings$.shouldPrintBackgrounds]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.shouldPrintBackgrounds](
-                    this.shouldPrintBackgrounds,
-                  )
-                : (_patchMap[InAppWebViewSettings$.shouldPrintBackgrounds]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.shouldPrintBackgrounds]
-                      .applyTo(this.shouldPrintBackgrounds)
-                : _patchMap[InAppWebViewSettings$.shouldPrintBackgrounds]
+          ? ((_patchMap[InAppWebViewSettings$.shouldPrintBackgrounds]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$.shouldPrintBackgrounds](
+                        this.shouldPrintBackgrounds,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.shouldPrintBackgrounds]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.shouldPrintBackgrounds]
+                          .applyTo(this.shouldPrintBackgrounds)
+                    : _patchMap[InAppWebViewSettings$.shouldPrintBackgrounds])
+                as bool?
           : this.shouldPrintBackgrounds,
       allowBackgroundAudioPlaying:
           _patchMap.containsKey(
             InAppWebViewSettings$.allowBackgroundAudioPlaying,
           )
-          ? (_patchMap[InAppWebViewSettings$.allowBackgroundAudioPlaying]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.allowBackgroundAudioPlaying](
-                    this.allowBackgroundAudioPlaying,
-                  )
-                : (_patchMap[InAppWebViewSettings$.allowBackgroundAudioPlaying]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.allowBackgroundAudioPlaying]
-                      .applyTo(this.allowBackgroundAudioPlaying)
-                : _patchMap[InAppWebViewSettings$.allowBackgroundAudioPlaying]
+          ? ((_patchMap[InAppWebViewSettings$.allowBackgroundAudioPlaying]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .allowBackgroundAudioPlaying](
+                        this.allowBackgroundAudioPlaying,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .allowBackgroundAudioPlaying]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .allowBackgroundAudioPlaying]
+                          .applyTo(this.allowBackgroundAudioPlaying)
+                    : _patchMap[InAppWebViewSettings$
+                          .allowBackgroundAudioPlaying])
+                as bool?
           : this.allowBackgroundAudioPlaying,
       webViewAssetLoader:
           _patchMap.containsKey(InAppWebViewSettings$.webViewAssetLoader)
-          ? (_patchMap[InAppWebViewSettings$.webViewAssetLoader] is Function)
-                ? _patchMap[InAppWebViewSettings$.webViewAssetLoader](
-                    this.webViewAssetLoader,
-                  )
-                : (_patchMap[InAppWebViewSettings$.webViewAssetLoader] is Patch)
-                ? _patchMap[InAppWebViewSettings$.webViewAssetLoader].applyTo(
-                    this.webViewAssetLoader,
-                  )
-                : _patchMap[InAppWebViewSettings$.webViewAssetLoader]
+          ? ((_patchMap[InAppWebViewSettings$.webViewAssetLoader] is Function)
+                    ? _patchMap[InAppWebViewSettings$.webViewAssetLoader](
+                        this.webViewAssetLoader,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.webViewAssetLoader]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.webViewAssetLoader]
+                          .applyTo(this.webViewAssetLoader)
+                    : _patchMap[InAppWebViewSettings$.webViewAssetLoader])
+                as WebViewAssetLoader?
           : this.webViewAssetLoader,
       iframeAllow: _patchMap.containsKey(InAppWebViewSettings$.iframeAllow)
-          ? (_patchMap[InAppWebViewSettings$.iframeAllow] is Function)
-                ? _patchMap[InAppWebViewSettings$.iframeAllow](this.iframeAllow)
-                : (_patchMap[InAppWebViewSettings$.iframeAllow] is Patch)
-                ? _patchMap[InAppWebViewSettings$.iframeAllow].applyTo(
-                    this.iframeAllow,
-                  )
-                : _patchMap[InAppWebViewSettings$.iframeAllow]
+          ? ((_patchMap[InAppWebViewSettings$.iframeAllow] is Function)
+                    ? _patchMap[InAppWebViewSettings$.iframeAllow](
+                        this.iframeAllow,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.iframeAllow] is Patch)
+                    ? _patchMap[InAppWebViewSettings$.iframeAllow].applyTo(
+                        this.iframeAllow,
+                      )
+                    : _patchMap[InAppWebViewSettings$.iframeAllow])
+                as String?
           : this.iframeAllow,
       iframeAllowFullscreen:
           _patchMap.containsKey(InAppWebViewSettings$.iframeAllowFullscreen)
-          ? (_patchMap[InAppWebViewSettings$.iframeAllowFullscreen] is Function)
-                ? _patchMap[InAppWebViewSettings$.iframeAllowFullscreen](
-                    this.iframeAllowFullscreen,
-                  )
-                : (_patchMap[InAppWebViewSettings$.iframeAllowFullscreen]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.iframeAllowFullscreen]
-                      .applyTo(this.iframeAllowFullscreen)
-                : _patchMap[InAppWebViewSettings$.iframeAllowFullscreen]
+          ? ((_patchMap[InAppWebViewSettings$.iframeAllowFullscreen]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$.iframeAllowFullscreen](
+                        this.iframeAllowFullscreen,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.iframeAllowFullscreen]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.iframeAllowFullscreen]
+                          .applyTo(this.iframeAllowFullscreen)
+                    : _patchMap[InAppWebViewSettings$.iframeAllowFullscreen])
+                as bool?
           : this.iframeAllowFullscreen,
       iframeSandbox: _patchMap.containsKey(InAppWebViewSettings$.iframeSandbox)
-          ? (_patchMap[InAppWebViewSettings$.iframeSandbox] is Function)
-                ? _patchMap[InAppWebViewSettings$.iframeSandbox](
-                    this.iframeSandbox,
-                  )
-                : (_patchMap[InAppWebViewSettings$.iframeSandbox] is Patch)
-                ? _patchMap[InAppWebViewSettings$.iframeSandbox].applyTo(
-                    this.iframeSandbox,
-                  )
-                : _patchMap[InAppWebViewSettings$.iframeSandbox]
+          ? ((_patchMap[InAppWebViewSettings$.iframeSandbox] is Function)
+                    ? _patchMap[InAppWebViewSettings$.iframeSandbox](
+                        this.iframeSandbox,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.iframeSandbox] is Patch)
+                    ? _patchMap[InAppWebViewSettings$.iframeSandbox].applyTo(
+                        this.iframeSandbox,
+                      )
+                    : _patchMap[InAppWebViewSettings$.iframeSandbox])
+                as Set<Sandbox>?
           : this.iframeSandbox,
       iframeReferrerPolicy:
           _patchMap.containsKey(InAppWebViewSettings$.iframeReferrerPolicy)
-          ? (_patchMap[InAppWebViewSettings$.iframeReferrerPolicy] is Function)
-                ? _patchMap[InAppWebViewSettings$.iframeReferrerPolicy](
-                    this.iframeReferrerPolicy,
-                  )
-                : (_patchMap[InAppWebViewSettings$.iframeReferrerPolicy]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.iframeReferrerPolicy].applyTo(
-                    this.iframeReferrerPolicy,
-                  )
-                : _patchMap[InAppWebViewSettings$.iframeReferrerPolicy]
+          ? ((_patchMap[InAppWebViewSettings$.iframeReferrerPolicy] is Function)
+                    ? _patchMap[InAppWebViewSettings$.iframeReferrerPolicy](
+                        this.iframeReferrerPolicy,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.iframeReferrerPolicy]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.iframeReferrerPolicy]
+                          .applyTo(this.iframeReferrerPolicy)
+                    : _patchMap[InAppWebViewSettings$.iframeReferrerPolicy])
+                as ReferrerPolicy?
           : this.iframeReferrerPolicy,
       iframeName: _patchMap.containsKey(InAppWebViewSettings$.iframeName)
-          ? (_patchMap[InAppWebViewSettings$.iframeName] is Function)
-                ? _patchMap[InAppWebViewSettings$.iframeName](this.iframeName)
-                : (_patchMap[InAppWebViewSettings$.iframeName] is Patch)
-                ? _patchMap[InAppWebViewSettings$.iframeName].applyTo(
-                    this.iframeName,
-                  )
-                : _patchMap[InAppWebViewSettings$.iframeName]
+          ? ((_patchMap[InAppWebViewSettings$.iframeName] is Function)
+                    ? _patchMap[InAppWebViewSettings$.iframeName](
+                        this.iframeName,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.iframeName] is Patch)
+                    ? _patchMap[InAppWebViewSettings$.iframeName].applyTo(
+                        this.iframeName,
+                      )
+                    : _patchMap[InAppWebViewSettings$.iframeName])
+                as String?
           : this.iframeName,
       iframeCsp: _patchMap.containsKey(InAppWebViewSettings$.iframeCsp)
-          ? (_patchMap[InAppWebViewSettings$.iframeCsp] is Function)
-                ? _patchMap[InAppWebViewSettings$.iframeCsp](this.iframeCsp)
-                : (_patchMap[InAppWebViewSettings$.iframeCsp] is Patch)
-                ? _patchMap[InAppWebViewSettings$.iframeCsp].applyTo(
-                    this.iframeCsp,
-                  )
-                : _patchMap[InAppWebViewSettings$.iframeCsp]
+          ? ((_patchMap[InAppWebViewSettings$.iframeCsp] is Function)
+                    ? _patchMap[InAppWebViewSettings$.iframeCsp](this.iframeCsp)
+                    : (_patchMap[InAppWebViewSettings$.iframeCsp] is Patch)
+                    ? _patchMap[InAppWebViewSettings$.iframeCsp].applyTo(
+                        this.iframeCsp,
+                      )
+                    : _patchMap[InAppWebViewSettings$.iframeCsp])
+                as String?
           : this.iframeCsp,
       dismissDialogues:
           _patchMap.containsKey(InAppWebViewSettings$.dismissDialogues)
-          ? (_patchMap[InAppWebViewSettings$.dismissDialogues] is Function)
-                ? _patchMap[InAppWebViewSettings$.dismissDialogues](
-                    this.dismissDialogues,
-                  )
-                : (_patchMap[InAppWebViewSettings$.dismissDialogues] is Patch)
-                ? _patchMap[InAppWebViewSettings$.dismissDialogues].applyTo(
-                    this.dismissDialogues,
-                  )
-                : _patchMap[InAppWebViewSettings$.dismissDialogues]
+          ? ((_patchMap[InAppWebViewSettings$.dismissDialogues] is Function)
+                    ? _patchMap[InAppWebViewSettings$.dismissDialogues](
+                        this.dismissDialogues,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.dismissDialogues]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.dismissDialogues].applyTo(
+                        this.dismissDialogues,
+                      )
+                    : _patchMap[InAppWebViewSettings$.dismissDialogues])
+                as bool?
           : this.dismissDialogues,
       insetsForWebContentToIgnore:
           _patchMap.containsKey(
             InAppWebViewSettings$.insetsForWebContentToIgnore,
           )
-          ? (_patchMap[InAppWebViewSettings$.insetsForWebContentToIgnore]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.insetsForWebContentToIgnore](
-                    this.insetsForWebContentToIgnore,
-                  )
-                : (_patchMap[InAppWebViewSettings$.insetsForWebContentToIgnore]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.insetsForWebContentToIgnore]
-                      .applyTo(this.insetsForWebContentToIgnore)
-                : _patchMap[InAppWebViewSettings$.insetsForWebContentToIgnore]
+          ? ((_patchMap[InAppWebViewSettings$.insetsForWebContentToIgnore]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .insetsForWebContentToIgnore](
+                        this.insetsForWebContentToIgnore,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .insetsForWebContentToIgnore]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .insetsForWebContentToIgnore]
+                          .applyTo(this.insetsForWebContentToIgnore)
+                    : _patchMap[InAppWebViewSettings$
+                          .insetsForWebContentToIgnore])
+                as List<AndroidWebViewInsets>?
           : this.insetsForWebContentToIgnore,
       useNetworkCapture:
           _patchMap.containsKey(InAppWebViewSettings$.useNetworkCapture)
-          ? (_patchMap[InAppWebViewSettings$.useNetworkCapture] is Function)
-                ? _patchMap[InAppWebViewSettings$.useNetworkCapture](
-                    this.useNetworkCapture,
-                  )
-                : (_patchMap[InAppWebViewSettings$.useNetworkCapture] is Patch)
-                ? _patchMap[InAppWebViewSettings$.useNetworkCapture].applyTo(
-                    this.useNetworkCapture,
-                  )
-                : _patchMap[InAppWebViewSettings$.useNetworkCapture]
+          ? ((_patchMap[InAppWebViewSettings$.useNetworkCapture] is Function)
+                    ? _patchMap[InAppWebViewSettings$.useNetworkCapture](
+                        this.useNetworkCapture,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.useNetworkCapture]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.useNetworkCapture]
+                          .applyTo(this.useNetworkCapture)
+                    : _patchMap[InAppWebViewSettings$.useNetworkCapture])
+                as bool?
           : this.useNetworkCapture,
       networkCaptureMaxBodySize:
           _patchMap.containsKey(InAppWebViewSettings$.networkCaptureMaxBodySize)
-          ? (_patchMap[InAppWebViewSettings$.networkCaptureMaxBodySize]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.networkCaptureMaxBodySize](
-                    this.networkCaptureMaxBodySize,
-                  )
-                : (_patchMap[InAppWebViewSettings$.networkCaptureMaxBodySize]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.networkCaptureMaxBodySize]
-                      .applyTo(this.networkCaptureMaxBodySize)
-                : _patchMap[InAppWebViewSettings$.networkCaptureMaxBodySize]
+          ? ((_patchMap[InAppWebViewSettings$.networkCaptureMaxBodySize]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .networkCaptureMaxBodySize](
+                        this.networkCaptureMaxBodySize,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .networkCaptureMaxBodySize]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.networkCaptureMaxBodySize]
+                          .applyTo(this.networkCaptureMaxBodySize)
+                    : _patchMap[InAppWebViewSettings$
+                          .networkCaptureMaxBodySize])
+                as int?
           : this.networkCaptureMaxBodySize,
       networkCaptureBodies:
           _patchMap.containsKey(InAppWebViewSettings$.networkCaptureBodies)
-          ? (_patchMap[InAppWebViewSettings$.networkCaptureBodies] is Function)
-                ? _patchMap[InAppWebViewSettings$.networkCaptureBodies](
-                    this.networkCaptureBodies,
-                  )
-                : (_patchMap[InAppWebViewSettings$.networkCaptureBodies]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.networkCaptureBodies].applyTo(
-                    this.networkCaptureBodies,
-                  )
-                : _patchMap[InAppWebViewSettings$.networkCaptureBodies]
+          ? ((_patchMap[InAppWebViewSettings$.networkCaptureBodies] is Function)
+                    ? _patchMap[InAppWebViewSettings$.networkCaptureBodies](
+                        this.networkCaptureBodies,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.networkCaptureBodies]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.networkCaptureBodies]
+                          .applyTo(this.networkCaptureBodies)
+                    : _patchMap[InAppWebViewSettings$.networkCaptureBodies])
+                as bool?
           : this.networkCaptureBodies,
       networkCaptureBinaryBodies:
           _patchMap.containsKey(
             InAppWebViewSettings$.networkCaptureBinaryBodies,
           )
-          ? (_patchMap[InAppWebViewSettings$.networkCaptureBinaryBodies]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.networkCaptureBinaryBodies](
-                    this.networkCaptureBinaryBodies,
-                  )
-                : (_patchMap[InAppWebViewSettings$.networkCaptureBinaryBodies]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.networkCaptureBinaryBodies]
-                      .applyTo(this.networkCaptureBinaryBodies)
-                : _patchMap[InAppWebViewSettings$.networkCaptureBinaryBodies]
+          ? ((_patchMap[InAppWebViewSettings$.networkCaptureBinaryBodies]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .networkCaptureBinaryBodies](
+                        this.networkCaptureBinaryBodies,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .networkCaptureBinaryBodies]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .networkCaptureBinaryBodies]
+                          .applyTo(this.networkCaptureBinaryBodies)
+                    : _patchMap[InAppWebViewSettings$
+                          .networkCaptureBinaryBodies])
+                as bool?
           : this.networkCaptureBinaryBodies,
       networkCaptureUrlPatterns:
           _patchMap.containsKey(InAppWebViewSettings$.networkCaptureUrlPatterns)
-          ? (_patchMap[InAppWebViewSettings$.networkCaptureUrlPatterns]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.networkCaptureUrlPatterns](
-                    this.networkCaptureUrlPatterns,
-                  )
-                : (_patchMap[InAppWebViewSettings$.networkCaptureUrlPatterns]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.networkCaptureUrlPatterns]
-                      .applyTo(this.networkCaptureUrlPatterns)
-                : _patchMap[InAppWebViewSettings$.networkCaptureUrlPatterns]
+          ? ((_patchMap[InAppWebViewSettings$.networkCaptureUrlPatterns]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .networkCaptureUrlPatterns](
+                        this.networkCaptureUrlPatterns,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .networkCaptureUrlPatterns]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.networkCaptureUrlPatterns]
+                          .applyTo(this.networkCaptureUrlPatterns)
+                    : _patchMap[InAppWebViewSettings$
+                          .networkCaptureUrlPatterns])
+                as List<String>?
           : this.networkCaptureUrlPatterns,
       networkCaptureUrlPatternType:
           _patchMap.containsKey(
             InAppWebViewSettings$.networkCaptureUrlPatternType,
           )
-          ? (_patchMap[InAppWebViewSettings$.networkCaptureUrlPatternType]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.networkCaptureUrlPatternType](
-                    this.networkCaptureUrlPatternType,
-                  )
-                : (_patchMap[InAppWebViewSettings$.networkCaptureUrlPatternType]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.networkCaptureUrlPatternType]
-                      .applyTo(this.networkCaptureUrlPatternType)
-                : _patchMap[InAppWebViewSettings$.networkCaptureUrlPatternType]
+          ? ((_patchMap[InAppWebViewSettings$.networkCaptureUrlPatternType]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .networkCaptureUrlPatternType](
+                        this.networkCaptureUrlPatternType,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .networkCaptureUrlPatternType]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .networkCaptureUrlPatternType]
+                          .applyTo(this.networkCaptureUrlPatternType)
+                    : _patchMap[InAppWebViewSettings$
+                          .networkCaptureUrlPatternType])
+                as UrlPatternType?
           : this.networkCaptureUrlPatternType,
       networkCaptureResourceTypes:
           _patchMap.containsKey(
             InAppWebViewSettings$.networkCaptureResourceTypes,
           )
-          ? (_patchMap[InAppWebViewSettings$.networkCaptureResourceTypes]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.networkCaptureResourceTypes](
-                    this.networkCaptureResourceTypes,
-                  )
-                : (_patchMap[InAppWebViewSettings$.networkCaptureResourceTypes]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.networkCaptureResourceTypes]
-                      .applyTo(this.networkCaptureResourceTypes)
-                : _patchMap[InAppWebViewSettings$.networkCaptureResourceTypes]
+          ? ((_patchMap[InAppWebViewSettings$.networkCaptureResourceTypes]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .networkCaptureResourceTypes](
+                        this.networkCaptureResourceTypes,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .networkCaptureResourceTypes]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$
+                              .networkCaptureResourceTypes]
+                          .applyTo(this.networkCaptureResourceTypes)
+                    : _patchMap[InAppWebViewSettings$
+                          .networkCaptureResourceTypes])
+                as List<ResourceType>?
           : this.networkCaptureResourceTypes,
       networkCaptureMimeTypes:
           _patchMap.containsKey(InAppWebViewSettings$.networkCaptureMimeTypes)
-          ? (_patchMap[InAppWebViewSettings$.networkCaptureMimeTypes]
-                    is Function)
-                ? _patchMap[InAppWebViewSettings$.networkCaptureMimeTypes](
-                    this.networkCaptureMimeTypes,
-                  )
-                : (_patchMap[InAppWebViewSettings$.networkCaptureMimeTypes]
-                      is Patch)
-                ? _patchMap[InAppWebViewSettings$.networkCaptureMimeTypes]
-                      .applyTo(this.networkCaptureMimeTypes)
-                : _patchMap[InAppWebViewSettings$.networkCaptureMimeTypes]
+          ? ((_patchMap[InAppWebViewSettings$.networkCaptureMimeTypes]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$.networkCaptureMimeTypes](
+                        this.networkCaptureMimeTypes,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.networkCaptureMimeTypes]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.networkCaptureMimeTypes]
+                          .applyTo(this.networkCaptureMimeTypes)
+                    : _patchMap[InAppWebViewSettings$.networkCaptureMimeTypes])
+                as List<String>?
           : this.networkCaptureMimeTypes,
       networkCapture:
           _patchMap.containsKey(InAppWebViewSettings$.networkCapture)
-          ? (_patchMap[InAppWebViewSettings$.networkCapture] is Function)
-                ? _patchMap[InAppWebViewSettings$.networkCapture](
-                    this.networkCapture,
-                  )
-                : (_patchMap[InAppWebViewSettings$.networkCapture] is Patch)
-                ? _patchMap[InAppWebViewSettings$.networkCapture].applyTo(
-                    this.networkCapture,
-                  )
-                : _patchMap[InAppWebViewSettings$.networkCapture]
+          ? ((_patchMap[InAppWebViewSettings$.networkCapture] is Function)
+                    ? _patchMap[InAppWebViewSettings$.networkCapture](
+                        this.networkCapture,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.networkCapture] is Patch)
+                    ? _patchMap[InAppWebViewSettings$.networkCapture].applyTo(
+                        this.networkCapture,
+                      )
+                    : _patchMap[InAppWebViewSettings$.networkCapture])
+                as NetworkCaptureController?
           : this.networkCapture,
     );
   }
@@ -4114,7 +4402,8 @@ class InAppWebViewSettings {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$InAppWebViewSettingsToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {
