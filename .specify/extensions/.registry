@@ -59,6 +59,14 @@
           "speckit.bug.fix",
           "speckit.bug.pr",
           "speckit.bug.test"
+        ],
+        "zed": [
+          "speckit.bug.assess",
+          "speckit.bug.issue",
+          "speckit.bug.fetch",
+          "speckit.bug.fix",
+          "speckit.bug.pr",
+          "speckit.bug.test"
         ]
       },
       "registered_skills": [],
