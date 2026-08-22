@@ -2130,17 +2130,21 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                             }
                         """, completionHandler: nil)
                 } else {
-                    var json: String
-                    if let resultData = try? JSONSerialization.data(
-                        withJSONObject: result ?? NSNull(), options: []),
-                        let resultString = String(data: resultData, encoding: .utf8)
-                    {
-                        json = resultString
-                    } else if let simpleResult = result {
-                        json = "\"\(simpleResult)\""
-                    } else {
-                        json = "null"
-                    }
+                    // Dart's callHandler implementation already returns the callback value
+                    // encoded with jsonEncode. Re-encoding this String with
+                    // JSONSerialization crashes for top-level fragments (for example
+                    // null) and would also change the value's JavaScript semantics.
+                    let json = result as? String ?? "null"
+#if DEBUG
+                    let resultType = result.map {
+                        String(describing: type(of: $0))
+                    } ?? "nil"
+                    print(
+                        "[ZikzakInAppWebView][JSBridge] handler=\(handlerName) "
+                            + "resultType=\(resultType) jsonLength=\(json.utf8.count) "
+                            + "fallbackToNull=\(result != nil && !(result is String))"
+                    )
+#endif
                     self.evaluateJavaScript(
                         """
                             if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
