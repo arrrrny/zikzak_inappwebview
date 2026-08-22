@@ -1,3 +1,9 @@
+## 5.0.1 - 2026-08-22
+
+
+### Fixes
+
+- Fixed Android `ClassCastException` failures when enum settings were serialized as string names instead of their expected integer wire values. Added the missing enum wire converters and corrected affected platform-interface JSON mappings.
 ## [Unreleased]
 
 ## 5.0.1 - 2026-08-19
