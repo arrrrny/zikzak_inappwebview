@@ -564,7 +564,21 @@ class InAppWebViewController implements Disposable {
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getViewId}
   dynamic getViewId() => platform.getViewId();
 
+  bool _disposed = false;
+
+  /// Indicates if this controller has been disposed.
+  ///
+  /// Becomes `true` after the first call to [dispose]; subsequent calls are
+  /// no-ops, which prevents double-dispose crashes.
+  bool get disposed => _disposed;
+
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.dispose}
-  void dispose({bool isKeepAlive = false}) =>
-      platform.dispose(isKeepAlive: isKeepAlive);
+  @override
+  void dispose({bool isKeepAlive = false}) {
+    if (_disposed) {
+      return;
+    }
+    _disposed = true;
+    platform.dispose(isKeepAlive: isKeepAlive);
+  }
 }
