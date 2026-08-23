@@ -1,5 +1,7 @@
 installed:
 - agent-context
+- bug
+- worktrees
 settings:
   auto_execute_hooks: true
 hooks:
@@ -98,6 +100,14 @@ hooks:
     priority: 10
     prompt: Execute speckit.agent-context.update?
     description: Refresh agent context after specification
+    condition: null
+  - extension: worktrees
+    command: speckit.worktrees.create
+    enabled: true
+    optional: false
+    priority: 10
+    prompt: Execute speckit.worktrees.create?
+    description: Auto-spawn a worktree after a new feature is specified
     condition: null
   after_clarify:
   - extension: git

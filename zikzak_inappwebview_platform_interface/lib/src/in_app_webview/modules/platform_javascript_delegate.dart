@@ -4,8 +4,18 @@ import '../../web_uri.dart';
 import '../../types/main.dart';
 
 /// Delegate for JavaScript-related methods of [PlatformInAppWebViewController].
+///
+/// Part of the domain-controller split (issue #229, P3): JavaScript
+/// evaluation, handler management and asset injection are grouped behind
+/// this focused facade so the main [PlatformInAppWebViewController] stays
+/// easy to reason about.
+///
+/// Platform implementations override the [PlatformInAppWebViewController.javaScriptDelegate]
+/// getter to return a concrete instance. The default getter returns `null`,
+/// preserving backward compatibility for implementations that have not yet
+/// been migrated.
 abstract class PlatformJavaScriptDelegate extends PlatformInterface {
-  /// Creates a new [PlatformJavaScriptDelegate]
+  /// Creates a new [PlatformJavaScriptDelegate].
   PlatformJavaScriptDelegate({required Object token}) : super(token: token);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.evaluateJavascript}
@@ -16,7 +26,7 @@ abstract class PlatformJavaScriptDelegate extends PlatformInterface {
   }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.callAsyncJavaScript}
-  Future<String?> callAsyncJavaScript({
+  Future<CallAsyncJavaScriptResult?> callAsyncJavaScript({
     required String functionBody,
     Map<String, dynamic> arguments = const <String, dynamic>{},
     ContentWorld? contentWorld,
@@ -37,7 +47,9 @@ abstract class PlatformJavaScriptDelegate extends PlatformInterface {
   }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.injectJavascriptFileFromAsset}
-  Future<void> injectJavascriptFileFromAsset({required String assetFilePath}) {
+  Future<dynamic> injectJavascriptFileFromAsset({
+    required String assetFilePath,
+  }) {
     throw UnimplementedError(
       'injectJavascriptFileFromAsset is not implemented on the current platform',
     );
@@ -78,7 +90,7 @@ abstract class PlatformJavaScriptDelegate extends PlatformInterface {
   }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.removeJavaScriptHandler}
-  Future<JavaScriptHandlerCallback?> removeJavaScriptHandler({
+  JavaScriptHandlerCallback? removeJavaScriptHandler({
     required String handlerName,
   }) {
     throw UnimplementedError(
