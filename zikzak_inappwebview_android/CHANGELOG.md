@@ -1,3 +1,9 @@
+## 5.0.2 - TBD
+
+### Fixes
+
+- [Android] Remove deprecated `WebSettingsCompat.setRequestedWithHeaderOriginAllowList` / `getRequestedWithHeaderOriginAllowList` calls (marked for removal in `androidx.webkit`). The X-Requested-With header origin-trial API is now a no-op, so the `requestedWithHeaderOriginAllowList` setting is no longer applied natively; the Dart setting is retained for API compatibility. Eliminates the `[removal]` build warnings.
+
 ## 5.0.1 - 2026-08-19
 
 ### Fixes
