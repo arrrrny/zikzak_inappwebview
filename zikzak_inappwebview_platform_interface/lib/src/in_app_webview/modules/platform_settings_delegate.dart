@@ -1,6 +1,6 @@
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
-import '../in_app_webview_settings.dart';
+import '../../domain/entities/in_app_webview_settings/in_app_webview_settings.dart';
 import '../platform_inappwebview_controller.dart';
 
 /// Delegate for reading and updating the WebView settings of a single
