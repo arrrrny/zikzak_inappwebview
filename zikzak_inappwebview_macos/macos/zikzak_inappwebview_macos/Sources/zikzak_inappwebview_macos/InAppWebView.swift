@@ -1,31 +1,70 @@
 import Cocoa
+import CryptoKit
 import FlutterMacOS
 import WebKit
 
-/// Maps the 64-char SHA-256 hex string sent from Dart (derived from a
-/// profile dir's canonical path) into a stable `UUID` for
-/// `WKWebsiteDataStore(forIdentifier:)`. We take the first 32 hex chars
-/// (16 bytes) and treat them as the UUID's raw bytes, so the same profile
-/// directory always yields the same on-disk store identifier — which is
-/// what makes a per-account session survive app relaunch.
-private func persistentUUID(from hex: String) -> UUID? {
-    let trimmed = hex.trimmingCharacters(in: .whitespacesAndNewlines)
-    guard trimmed.count >= 32 else { return nil }
-    let prefix = trimmed.prefix(32)
-    var bytes: [UInt8] = []
-    bytes.reserveCapacity(16)
-    var index = prefix.startIndex
-    while index < prefix.endIndex {
-        let next = prefix.index(index, offsetBy: 2, limitedBy: prefix.endIndex) ?? prefix.endIndex
-        guard let byte = UInt8(String(prefix[index..<next]), radix: 16) else { return nil }
-        bytes.append(byte)
-        index = next
+/// Maps a stable identifier string into a stable `UUID` for
+/// `WKWebsiteDataStore(forIdentifier:)`. Accepts three input shapes so the
+/// same Dart field can be fed either a raw UUID string, a stable profile
+/// name, or the 64-char SHA-256 hex the forklift caller used to send
+/// (derived from a profile dir's canonical path). All three are
+/// deterministic — the same identifier always yields the same on-disk
+/// store, which is what makes a per-account session survive app relaunch.
+///
+/// Shape priority: (a) direct UUID string -> (b) 64-char hex legacy path
+/// -> (c) SHA-256 of the UTF-8 bytes (CryptoKit, iOS 13+/macOS 10.15+,
+/// well below the iOS 17+/macOS 14+ floor of the persistent-store API
+/// itself).
+private func persistentUUID(from identifier: String) -> UUID? {
+    let trimmed = identifier.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard !trimmed.isEmpty else { return nil }
+
+    // (a) Direct UUID string ("550e8400-e29b-41d4-a716-446655440000").
+    if let direct = UUID(uuidString: trimmed) {
+        return direct
     }
-    guard bytes.count == 16 else { return nil }
-    return UUID(uuid: (
-        bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7],
-        bytes[8], bytes[9], bytes[10], bytes[11], bytes[12], bytes[13], bytes[14], bytes[15]
-    ))
+
+    // (b) Legacy 64-char SHA-256 hex path: take the first 32 hex chars
+    // (16 bytes) and treat them as the UUID's raw bytes. Preserves the
+    // on-disk store identifier forklift's Cloaked Chrome profiles already
+    // use, so existing persistent stores keep reopening after the upgrade.
+    let hexSet = CharacterSet(charactersIn: "0123456789abcdefABCDEF")
+    let isHex = trimmed.unicodeScalars.allSatisfy { hexSet.contains($0) }
+    if isHex, trimmed.count >= 32 {
+        let prefix = trimmed.prefix(32)
+        var bytes: [UInt8] = []
+        bytes.reserveCapacity(16)
+        var index = prefix.startIndex
+        while index < prefix.endIndex {
+            let next = prefix.index(index, offsetBy: 2, limitedBy: prefix.endIndex) ?? prefix.endIndex
+            guard let byte = UInt8(String(prefix[index..<next]), radix: 16) else { return nil }
+            bytes.append(byte)
+            index = next
+        }
+        guard bytes.count == 16 else { return nil }
+        return UUID(uuid: (
+            bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7],
+            bytes[8], bytes[9], bytes[10], bytes[11], bytes[12], bytes[13], bytes[14], bytes[15]
+        ))
+    }
+
+    // (c) Any other stable string: SHA-256 the UTF-8 bytes and use the
+    // first 16 bytes as the UUID's raw bytes. Deterministic, isolated,
+    // and survives relaunch — distinct identifiers never collide.
+    // CryptoKit ships with the system on iOS 13+/macOS 10.15+, so this
+    // branch is always available when the iOS 17+/macOS 14+ persistent
+    // store path runs.
+    if #available(macOS 10.15, *) {
+        let digest = SHA256.hash(data: Data(trimmed.utf8))
+        let sha = Array(digest)
+        return UUID(uuid: (
+            sha[0],  sha[1],  sha[2],  sha[3],
+            sha[4],  sha[5],  sha[6],  sha[7],
+            sha[8],  sha[9],  sha[10], sha[11],
+            sha[12], sha[13], sha[14], sha[15]
+        ))
+    }
+    return nil
 }
 
 public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler, WKUIDelegate, NSMenuDelegate {
