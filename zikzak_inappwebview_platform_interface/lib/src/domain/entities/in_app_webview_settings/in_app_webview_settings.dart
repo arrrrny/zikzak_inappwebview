@@ -544,6 +544,17 @@ abstract class $InAppWebViewSettings {
   ///(Windows/WebView2: WebAuthn is handled by Windows Hello when available)
   ///or have no public WebAuthn API (Linux/WebKitGTK), so the setting is
   ///ignored there.
+  ///
+  ///Notes:
+  ///- On iOS and macOS this setting is applied when the WebView is created
+  ///  and cannot be changed afterwards (the underlying WKWebViewConfiguration
+  ///  is immutable after init); changing it later through setSettings is a
+  ///  no-op and logs a native warning.
+  ///- On Android, getSettings returns `null` for this setting when the
+  ///  installed WebView does not support `WebViewFeature.WEB_AUTHENTICATION`
+  ///  or the OEM WebView wrapper rejects the call.
+  ///- WebAuthn ceremonies require a user gesture (for example a sign-in
+  ///  button tap) inside the WebView.
   @JsonKey(
     toJson: webAuthenticationSupportToWire,
     fromJson: webAuthenticationSupportFromWire,

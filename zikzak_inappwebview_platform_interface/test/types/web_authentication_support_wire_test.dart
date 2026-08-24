@@ -85,5 +85,19 @@ void main() {
       final defaults = InAppWebViewSettings.fromJson(const {});
       expect(defaults.webAuthenticationSupport, isNull);
     });
+
+    test('enum has exactly the three values the native sides know about', () {
+      // iOS/macOS enable passkeys when the wire value == 1 (FOR_APP) and
+      // Android passes the raw value through to WebSettingsCompat. Adding,
+      // removing, or reordering enum values without updating every native
+      // implementation would silently break passkey sign-in — fail loudly
+      // here instead.
+      expect(WebAuthenticationSupport.values.length, 3);
+      expect(WebAuthenticationSupport.values, [
+        WebAuthenticationSupport.NONE,
+        WebAuthenticationSupport.FOR_APP,
+        WebAuthenticationSupport.FOR_BROWSER,
+      ]);
+    });
   });
 }

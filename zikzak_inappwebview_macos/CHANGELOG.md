@@ -3,6 +3,7 @@
 ### Fixes
 
 - Enable WebAuthn / passkey sign-in on macOS (#272): wire the `webAuthenticationSupport` setting into the native `WKWebViewConfiguration` (via KVC, `boundKeychainForPasskeys = true` when `WebAuthenticationSupport.FOR_APP`), matching the iOS wiring. The configuration is immutable after `WKWebView` init, so the setting is applied in the `init` config builder, guarded by `#available(macOS 13.3, *)`. Also adds the `getRealSettings` read-back so `PlatformInAppWebViewController.getSettings()` reports the effective value. Note: the host app still needs the `webcredentials:` Associated Domains entitlement and the site must serve a valid `apple-app-site-association`.
+- Harden the WebAuthn/passkey wiring (#272 follow-up): guard the KVC `boundKeychainForPasskeys` write/read with `responds(to:)` against unexpected SDK states and log a warning when `webAuthenticationSupport` is changed through `setSettings` (creation-time only, as documented).
 
 ## 5.1.2 - 2026-08-24
 

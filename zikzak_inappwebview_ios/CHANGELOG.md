@@ -1,3 +1,9 @@
+## Unreleased
+
+### Fixes
+
+- Harden the WebAuthn/passkey wiring (#272 follow-up): guard the KVC `boundKeychainForPasskeys` write/read with `responds(to:)` so an unexpected SDK state can never raise an uncatchable `NSUnknownKeyException`, and log a warning when `webAuthenticationSupport` is changed through `setSettings` (the `WKWebViewConfiguration` is immutable after init, so the change is a documented no-op instead of a silent one).
+
 ## 5.1.2 - 2026-08-24
 
 * chore: restore development path dependencies after 5.1.1 publish

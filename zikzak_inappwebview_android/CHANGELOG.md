@@ -1,3 +1,9 @@
+## Unreleased
+
+### Fixes
+
+- Harden the WebAuthn/passkey wiring (#272 follow-up): log a warning when `webAuthenticationSupport` is requested but `WebViewFeature.WEB_AUTHENTICATION` is not supported by the installed WebView (init and `setSettings` paths) instead of silently dropping the setting, broaden the compat-call catch to `RuntimeException` so OEM WebView wrappers can never crash the app, and guard the `getSettings()` read-back with the same protection (a missing key still parses as `null` on the Dart side).
+
 ## 5.1.2 - 2026-08-24
 
 * chore: restore development path dependencies after 5.1.1 publish
