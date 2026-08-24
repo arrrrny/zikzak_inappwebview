@@ -1398,9 +1398,7 @@ class ChromeSafariBrowserSettingsPatch
     return this;
   }
 
-  ChromeSafariBrowserSettingsPatch withNavigationBarDividerColor(
-    Color? value,
-  ) {
+  ChromeSafariBrowserSettingsPatch withNavigationBarDividerColor(Color? value) {
     patchMap[ChromeSafariBrowserSettings$.navigationBarDividerColor] = value;
     return this;
   }
@@ -1507,9 +1505,7 @@ class ChromeSafariBrowserSettingsPatch
     return this;
   }
 
-  ChromeSafariBrowserSettingsPatch withPreferredControlTintColor(
-    Color? value,
-  ) {
+  ChromeSafariBrowserSettingsPatch withPreferredControlTintColor(Color? value) {
     patchMap[ChromeSafariBrowserSettings$.preferredControlTintColor] = value;
     return this;
   }
