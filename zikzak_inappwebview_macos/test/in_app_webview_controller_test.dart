@@ -294,4 +294,124 @@ void main() {
       },
     );
   });
+
+  // Regression test for issue #197 / macOS scroll callbacks:
+  // the native side emits onScrollChanged / onContentSizeChanged /
+  // onOverScrolled, but the Dart dispatcher previously had no case arms and
+  // fell through to `default:` throwing UnimplementedError. These tests pin the
+  // Dart-side channel contract so a future refactor cannot silently re-break it.
+  group('scroll callbacks (issue #197)', () {
+    test('onScrollChanged invokes the callback with decoded x/y', () async {
+      int? receivedX;
+      int? receivedY;
+      final widgetParams = PlatformInAppWebViewWidgetCreationParams(
+        controllerFromPlatform: (c) => c,
+        onScrollChanged: (c, x, y) {
+          receivedX = x;
+          receivedY = y;
+        },
+      );
+      final controllerParams = PlatformInAppWebViewControllerCreationParams(
+        id: 11111,
+        webviewParams: widgetParams,
+      );
+      final ctl = MacOSInAppWebViewController(controllerParams);
+      addTearDown(ctl.dispose);
+
+      await ctl.handleMethod(
+        MethodCall('onScrollChanged', {'x': 12, 'y': 34}),
+      );
+
+      expect(receivedX, 12);
+      expect(receivedY, 34);
+    });
+
+    test('onContentSizeChanged invokes the callback with decoded sizes',
+        () async {
+      Size? oldSize;
+      Size? newSize;
+      final widgetParams = PlatformInAppWebViewWidgetCreationParams(
+        controllerFromPlatform: (c) => c,
+        onContentSizeChanged: (c, oldContentSize, newContentSize) {
+          oldSize = oldContentSize;
+          newSize = newContentSize;
+        },
+      );
+      final controllerParams = PlatformInAppWebViewControllerCreationParams(
+        id: 22222,
+        webviewParams: widgetParams,
+      );
+      final ctl = MacOSInAppWebViewController(controllerParams);
+      addTearDown(ctl.dispose);
+
+      await ctl.handleMethod(
+        MethodCall('onContentSizeChanged', {
+          'oldContentSize': {'width': 100.0, 'height': 200.0},
+          'newContentSize': {'width': 300.0, 'height': 400.0},
+        }),
+      );
+
+      expect(oldSize, const Size(100, 200));
+      expect(newSize, const Size(300, 400));
+    });
+
+    test('onOverScrolled invokes the callback with decoded flags', () async {
+      int? x;
+      int? y;
+      bool? clampedX;
+      bool? clampedY;
+      final widgetParams = PlatformInAppWebViewWidgetCreationParams(
+        controllerFromPlatform: (c) => c,
+        onOverScrolled: (c, xv, yv, cx, cy) {
+          x = xv;
+          y = yv;
+          clampedX = cx;
+          clampedY = cy;
+        },
+      );
+      final controllerParams = PlatformInAppWebViewControllerCreationParams(
+        id: 33333,
+        webviewParams: widgetParams,
+      );
+      final ctl = MacOSInAppWebViewController(controllerParams);
+      addTearDown(ctl.dispose);
+
+      await ctl.handleMethod(
+        MethodCall('onOverScrolled', {
+          'x': 5,
+          'y': 6,
+          'clampedX': true,
+          'clampedY': false,
+        }),
+      );
+
+      expect(x, 5);
+      expect(y, 6);
+      expect(clampedX, isTrue);
+      expect(clampedY, isFalse);
+    });
+
+    test('does not throw when no callback is registered', () async {
+      // controller from setUp has no scroll callbacks wired up.
+      await controller.handleMethod(
+        MethodCall('onScrollChanged', {'x': 0, 'y': 0}),
+      );
+      await controller.handleMethod(
+        MethodCall('onContentSizeChanged', {
+          'oldContentSize': {'width': 0.0, 'height': 0.0},
+          'newContentSize': {'width': 0.0, 'height': 0.0},
+        }),
+      );
+      await controller.handleMethod(
+        MethodCall('onOverScrolled', {
+          'x': 0,
+          'y': 0,
+          'clampedX': false,
+          'clampedY': false,
+        }),
+      );
+      // reaching here without throwing is the assertion: the three case arms
+      // exist and the default throw is no longer hit for these method names.
+    });
+  });
 }

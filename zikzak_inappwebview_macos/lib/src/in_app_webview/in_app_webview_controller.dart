@@ -364,6 +364,43 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
           ))?.toJson();
         }
         break;
+      case 'onScrollChanged':
+        if (params.webviewParams?.onScrollChanged != null) {
+          params.webviewParams!.onScrollChanged!(
+            controller,
+            call.arguments['x'] as int? ?? 0,
+            call.arguments['y'] as int? ?? 0,
+          );
+        }
+        break;
+      case 'onContentSizeChanged':
+        if (params.webviewParams?.onContentSizeChanged != null) {
+          final old = call.arguments['oldContentSize'] as Map? ?? {};
+          final neu = call.arguments['newContentSize'] as Map? ?? {};
+          params.webviewParams!.onContentSizeChanged!(
+            controller,
+            Size(
+              (old['width'] as num? ?? 0).toDouble(),
+              (old['height'] as num? ?? 0).toDouble(),
+            ),
+            Size(
+              (neu['width'] as num? ?? 0).toDouble(),
+              (neu['height'] as num? ?? 0).toDouble(),
+            ),
+          );
+        }
+        break;
+      case 'onOverScrolled':
+        if (params.webviewParams?.onOverScrolled != null) {
+          params.webviewParams!.onOverScrolled!(
+            controller,
+            call.arguments['x'] as int? ?? 0,
+            call.arguments['y'] as int? ?? 0,
+            call.arguments['clampedX'] as bool? ?? false,
+            call.arguments['clampedY'] as bool? ?? false,
+          );
+        }
+        break;
       default:
         throw UnimplementedError("Unimplemented ${call.method} method");
     }
