@@ -141,10 +141,24 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             let settingsMap =
                 (args["initialSettings"] as? [String: Any?])
                 ?? (args["settings"] as? [String: Any?])
-            if let settingsMap = settingsMap,
-               let incognito = settingsMap["incognito"] as? Bool,
-               incognito {
-                configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+            if let settingsMap = settingsMap {
+                // Persistent, per-account data store keyed by a stable
+                // identifier (derived from `userDataDir` on the Dart side as a
+                // 64-char SHA-256 hex string, mapped to a UUID here). WebKit
+                // keys the on-disk store by that UUID, so cookies/storage stay
+                // isolated per account AND survive app relaunch — the behaviour
+                // forklift's Cloaked Chrome profiles relied on. Requires
+                // macOS 14.0+, hence the availability guard; older runtimes
+                // fall back to the shared store.
+                if #available(macOS 14.0, *),
+                   let id = settingsMap["persistentStoreIdentifier"] as? String,
+                   !id.isEmpty,
+                   let uuid = persistentUUID(from: id) {
+                    configuration.websiteDataStore = WKWebsiteDataStore(forIdentifier: uuid)
+                } else if let incognito = settingsMap["incognito"] as? Bool,
+                          incognito {
+                    configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+                }
             }
         }
 

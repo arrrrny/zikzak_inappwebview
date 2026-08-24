@@ -75,6 +75,10 @@ InAppWebViewSettings _$InAppWebViewSettingsFromJson(
       (v) => v as bool?,
     ),
     incognito: $checkedConvert('incognito', (v) => v as bool? ?? false),
+    persistentStoreIdentifier: $checkedConvert(
+      'persistentStoreIdentifier',
+      (v) => v as String?,
+    ),
     cacheEnabled: $checkedConvert('cacheEnabled', (v) => v as bool? ?? true),
     transparentBackground: $checkedConvert(
       'transparentBackground',
@@ -614,6 +618,7 @@ Map<String, dynamic> _$InAppWebViewSettingsToJson(
   'interceptOnlyAsyncAjaxRequests': instance.interceptOnlyAsyncAjaxRequests,
   'useShouldInterceptFetchRequest': instance.useShouldInterceptFetchRequest,
   'incognito': instance.incognito,
+  'persistentStoreIdentifier': ?instance.persistentStoreIdentifier,
   'cacheEnabled': instance.cacheEnabled,
   'transparentBackground': instance.transparentBackground,
   'disableVerticalScroll': instance.disableVerticalScroll,
