@@ -1,3 +1,13 @@
+## 5.1.2 - 2026-08-24
+
+### Fixes
+
+- Add the missing `pressKey` method on `PlatformInAppWebViewController`. The published 5.1.1 artifact omitted this method even though `zikzak_inappwebview` 5.1.1 and `zikzak_inappwebview_macos` 5.1.1 call `platform.pressKey(...)`, which broke consumer compilation. Re-releasing with the method present.
+## 5.1.1 - 2026-08-24
+
+* chore: regenerate zorphy entity files for zorphy 2.3.0
+* chore: restore dev path deps and bump zorphy/zorphy_annotation to ^2.3.0
+* Prepare for publishing version
 ## 5.1.0 - 2026-08-24
 
 

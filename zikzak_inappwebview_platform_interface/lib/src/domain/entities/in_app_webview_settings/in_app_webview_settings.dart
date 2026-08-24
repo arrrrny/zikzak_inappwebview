@@ -170,6 +170,15 @@ abstract class $InAppWebViewSettings {
   @JsonKey(defaultValue: false)
   bool? get incognito;
 
+  ///Stable identifier for a persistent, per-account `WKWebsiteDataStore` on
+  ///macOS. When non-null and non-empty, the WebView stores cookies,
+  ///localStorage, IndexedDB and other site data at a system location keyed by
+  ///this identifier, so an account's session survives a relaunch and stays
+  ///isolated from every other account. Derived from `userDataDir` by the
+  ///caller. Null/empty means an ephemeral (incognito) store.
+  @JsonKey(includeIfNull: false)
+  String? get persistentStoreIdentifier;
+
   ///Sets whether WebView should use browser caching. The default value is `true`.
   @JsonKey(defaultValue: true)
   bool? get cacheEnabled;
@@ -252,10 +261,7 @@ abstract class $InAppWebViewSettings {
   bool? get safeBrowsingEnabled;
 
   ///Configures the WebView's behavior when a secure origin attempts to load a resource from an insecure origin.
-  @JsonKey(
-    toJson: mixedContentModeToWire,
-    fromJson: mixedContentModeFromWire,
-  )
+  @JsonKey(toJson: mixedContentModeToWire, fromJson: mixedContentModeFromWire)
   MixedContentMode? get mixedContentMode;
 
   ///Enables or disables content URL access within WebView. Content URL access allows WebView to load content from a content provider installed in the system. The default value is `true`.

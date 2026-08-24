@@ -54,26 +54,31 @@ class RenderProcessGoneDetail {
     final _patchMap = _patcher.patchMap;
     return RenderProcessGoneDetail(
       didCrash: _patchMap.containsKey(RenderProcessGoneDetail$.didCrash)
-          ? (_patchMap[RenderProcessGoneDetail$.didCrash] is Function)
-                ? _patchMap[RenderProcessGoneDetail$.didCrash](this.didCrash)
-                : (_patchMap[RenderProcessGoneDetail$.didCrash] is Patch)
-                ? _patchMap[RenderProcessGoneDetail$.didCrash].applyTo(
-                    this.didCrash,
-                  )
-                : _patchMap[RenderProcessGoneDetail$.didCrash]
+          ? ((_patchMap[RenderProcessGoneDetail$.didCrash] is Function)
+                    ? _patchMap[RenderProcessGoneDetail$.didCrash](
+                        this.didCrash,
+                      )
+                    : (_patchMap[RenderProcessGoneDetail$.didCrash] is Patch)
+                    ? _patchMap[RenderProcessGoneDetail$.didCrash].applyTo(
+                        this.didCrash,
+                      )
+                    : _patchMap[RenderProcessGoneDetail$.didCrash])
+                as bool
           : this.didCrash,
       rendererPriorityAtExit:
           _patchMap.containsKey(RenderProcessGoneDetail$.rendererPriorityAtExit)
-          ? (_patchMap[RenderProcessGoneDetail$.rendererPriorityAtExit]
-                    is Function)
-                ? _patchMap[RenderProcessGoneDetail$.rendererPriorityAtExit](
-                    this.rendererPriorityAtExit,
-                  )
-                : (_patchMap[RenderProcessGoneDetail$.rendererPriorityAtExit]
-                      is Patch)
-                ? _patchMap[RenderProcessGoneDetail$.rendererPriorityAtExit]
-                      .applyTo(this.rendererPriorityAtExit)
-                : _patchMap[RenderProcessGoneDetail$.rendererPriorityAtExit]
+          ? ((_patchMap[RenderProcessGoneDetail$.rendererPriorityAtExit]
+                        is Function)
+                    ? _patchMap[RenderProcessGoneDetail$
+                          .rendererPriorityAtExit](this.rendererPriorityAtExit)
+                    : (_patchMap[RenderProcessGoneDetail$
+                              .rendererPriorityAtExit]
+                          is Patch)
+                    ? _patchMap[RenderProcessGoneDetail$.rendererPriorityAtExit]
+                          .applyTo(this.rendererPriorityAtExit)
+                    : _patchMap[RenderProcessGoneDetail$
+                          .rendererPriorityAtExit])
+                as RendererPriority?
           : this.rendererPriorityAtExit,
     );
   }
@@ -101,7 +106,8 @@ class RenderProcessGoneDetail {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$RenderProcessGoneDetailToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

@@ -80,54 +80,64 @@ class UserScript {
     final _patchMap = _patcher.patchMap;
     return UserScript(
       allowedOriginRules: _patchMap.containsKey(UserScript$.allowedOriginRules)
-          ? (_patchMap[UserScript$.allowedOriginRules] is Function)
-                ? _patchMap[UserScript$.allowedOriginRules](
-                    this.allowedOriginRules,
-                  )
-                : (_patchMap[UserScript$.allowedOriginRules] is Patch)
-                ? _patchMap[UserScript$.allowedOriginRules].applyTo(
-                    this.allowedOriginRules,
-                  )
-                : _patchMap[UserScript$.allowedOriginRules]
+          ? ((_patchMap[UserScript$.allowedOriginRules] is Function)
+                    ? _patchMap[UserScript$.allowedOriginRules](
+                        this.allowedOriginRules,
+                      )
+                    : (_patchMap[UserScript$.allowedOriginRules] is Patch)
+                    ? _patchMap[UserScript$.allowedOriginRules].applyTo(
+                        this.allowedOriginRules,
+                      )
+                    : _patchMap[UserScript$.allowedOriginRules])
+                as Set<String>
           : this.allowedOriginRules,
       contentWorld: _patchMap.containsKey(UserScript$.contentWorld)
-          ? (_patchMap[UserScript$.contentWorld] is Function)
-                ? _patchMap[UserScript$.contentWorld](this.contentWorld)
-                : (_patchMap[UserScript$.contentWorld] is Patch)
-                ? _patchMap[UserScript$.contentWorld].applyTo(this.contentWorld)
-                : _patchMap[UserScript$.contentWorld]
+          ? ((_patchMap[UserScript$.contentWorld] is Function)
+                    ? _patchMap[UserScript$.contentWorld](this.contentWorld)
+                    : (_patchMap[UserScript$.contentWorld] is Patch)
+                    ? _patchMap[UserScript$.contentWorld].applyTo(
+                        this.contentWorld,
+                      )
+                    : _patchMap[UserScript$.contentWorld])
+                as ContentWorld?
           : this.contentWorld,
       forMainFrameOnly: _patchMap.containsKey(UserScript$.forMainFrameOnly)
-          ? (_patchMap[UserScript$.forMainFrameOnly] is Function)
-                ? _patchMap[UserScript$.forMainFrameOnly](this.forMainFrameOnly)
-                : (_patchMap[UserScript$.forMainFrameOnly] is Patch)
-                ? _patchMap[UserScript$.forMainFrameOnly].applyTo(
-                    this.forMainFrameOnly,
-                  )
-                : _patchMap[UserScript$.forMainFrameOnly]
+          ? ((_patchMap[UserScript$.forMainFrameOnly] is Function)
+                    ? _patchMap[UserScript$.forMainFrameOnly](
+                        this.forMainFrameOnly,
+                      )
+                    : (_patchMap[UserScript$.forMainFrameOnly] is Patch)
+                    ? _patchMap[UserScript$.forMainFrameOnly].applyTo(
+                        this.forMainFrameOnly,
+                      )
+                    : _patchMap[UserScript$.forMainFrameOnly])
+                as bool
           : this.forMainFrameOnly,
       groupName: _patchMap.containsKey(UserScript$.groupName)
-          ? (_patchMap[UserScript$.groupName] is Function)
-                ? _patchMap[UserScript$.groupName](this.groupName)
-                : (_patchMap[UserScript$.groupName] is Patch)
-                ? _patchMap[UserScript$.groupName].applyTo(this.groupName)
-                : _patchMap[UserScript$.groupName]
+          ? ((_patchMap[UserScript$.groupName] is Function)
+                    ? _patchMap[UserScript$.groupName](this.groupName)
+                    : (_patchMap[UserScript$.groupName] is Patch)
+                    ? _patchMap[UserScript$.groupName].applyTo(this.groupName)
+                    : _patchMap[UserScript$.groupName])
+                as String?
           : this.groupName,
       injectionTime: _patchMap.containsKey(UserScript$.injectionTime)
-          ? (_patchMap[UserScript$.injectionTime] is Function)
-                ? _patchMap[UserScript$.injectionTime](this.injectionTime)
-                : (_patchMap[UserScript$.injectionTime] is Patch)
-                ? _patchMap[UserScript$.injectionTime].applyTo(
-                    this.injectionTime,
-                  )
-                : _patchMap[UserScript$.injectionTime]
+          ? ((_patchMap[UserScript$.injectionTime] is Function)
+                    ? _patchMap[UserScript$.injectionTime](this.injectionTime)
+                    : (_patchMap[UserScript$.injectionTime] is Patch)
+                    ? _patchMap[UserScript$.injectionTime].applyTo(
+                        this.injectionTime,
+                      )
+                    : _patchMap[UserScript$.injectionTime])
+                as UserScriptInjectionTime
           : this.injectionTime,
       source: _patchMap.containsKey(UserScript$.source)
-          ? (_patchMap[UserScript$.source] is Function)
-                ? _patchMap[UserScript$.source](this.source)
-                : (_patchMap[UserScript$.source] is Patch)
-                ? _patchMap[UserScript$.source].applyTo(this.source)
-                : _patchMap[UserScript$.source]
+          ? ((_patchMap[UserScript$.source] is Function)
+                    ? _patchMap[UserScript$.source](this.source)
+                    : (_patchMap[UserScript$.source] is Patch)
+                    ? _patchMap[UserScript$.source].applyTo(this.source)
+                    : _patchMap[UserScript$.source])
+                as String
           : this.source,
     );
   }
@@ -174,7 +184,8 @@ class UserScript {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$UserScriptToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

@@ -46,25 +46,28 @@ class LoginRequest {
     final _patchMap = _patcher.patchMap;
     return LoginRequest(
       realm: _patchMap.containsKey(LoginRequest$.realm)
-          ? (_patchMap[LoginRequest$.realm] is Function)
-                ? _patchMap[LoginRequest$.realm](this.realm)
-                : (_patchMap[LoginRequest$.realm] is Patch)
-                ? _patchMap[LoginRequest$.realm].applyTo(this.realm)
-                : _patchMap[LoginRequest$.realm]
+          ? ((_patchMap[LoginRequest$.realm] is Function)
+                    ? _patchMap[LoginRequest$.realm](this.realm)
+                    : (_patchMap[LoginRequest$.realm] is Patch)
+                    ? _patchMap[LoginRequest$.realm].applyTo(this.realm)
+                    : _patchMap[LoginRequest$.realm])
+                as String
           : this.realm,
       account: _patchMap.containsKey(LoginRequest$.account)
-          ? (_patchMap[LoginRequest$.account] is Function)
-                ? _patchMap[LoginRequest$.account](this.account)
-                : (_patchMap[LoginRequest$.account] is Patch)
-                ? _patchMap[LoginRequest$.account].applyTo(this.account)
-                : _patchMap[LoginRequest$.account]
+          ? ((_patchMap[LoginRequest$.account] is Function)
+                    ? _patchMap[LoginRequest$.account](this.account)
+                    : (_patchMap[LoginRequest$.account] is Patch)
+                    ? _patchMap[LoginRequest$.account].applyTo(this.account)
+                    : _patchMap[LoginRequest$.account])
+                as String?
           : this.account,
       args: _patchMap.containsKey(LoginRequest$.args)
-          ? (_patchMap[LoginRequest$.args] is Function)
-                ? _patchMap[LoginRequest$.args](this.args)
-                : (_patchMap[LoginRequest$.args] is Patch)
-                ? _patchMap[LoginRequest$.args].applyTo(this.args)
-                : _patchMap[LoginRequest$.args]
+          ? ((_patchMap[LoginRequest$.args] is Function)
+                    ? _patchMap[LoginRequest$.args](this.args)
+                    : (_patchMap[LoginRequest$.args] is Patch)
+                    ? _patchMap[LoginRequest$.args].applyTo(this.args)
+                    : _patchMap[LoginRequest$.args])
+                as String
           : this.args,
     );
   }
@@ -95,7 +98,8 @@ class LoginRequest {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$LoginRequestToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

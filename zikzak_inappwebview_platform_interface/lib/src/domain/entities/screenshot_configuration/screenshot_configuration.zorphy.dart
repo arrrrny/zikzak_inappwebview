@@ -75,56 +75,65 @@ class ScreenshotConfiguration {
     final _patchMap = _patcher.patchMap;
     return ScreenshotConfiguration(
       rect: _patchMap.containsKey(ScreenshotConfiguration$.rect)
-          ? (_patchMap[ScreenshotConfiguration$.rect] is Function)
-                ? _patchMap[ScreenshotConfiguration$.rect](this.rect)
-                : (_patchMap[ScreenshotConfiguration$.rect] is Patch)
-                ? _patchMap[ScreenshotConfiguration$.rect].applyTo(this.rect)
-                : _patchMap[ScreenshotConfiguration$.rect]
+          ? ((_patchMap[ScreenshotConfiguration$.rect] is Function)
+                    ? _patchMap[ScreenshotConfiguration$.rect](this.rect)
+                    : (_patchMap[ScreenshotConfiguration$.rect] is Patch)
+                    ? _patchMap[ScreenshotConfiguration$.rect].applyTo(
+                        this.rect,
+                      )
+                    : _patchMap[ScreenshotConfiguration$.rect])
+                as InAppWebViewRect?
           : this.rect,
       snapshotWidth:
           _patchMap.containsKey(ScreenshotConfiguration$.snapshotWidth)
-          ? (_patchMap[ScreenshotConfiguration$.snapshotWidth] is Function)
-                ? _patchMap[ScreenshotConfiguration$.snapshotWidth](
-                    this.snapshotWidth,
-                  )
-                : (_patchMap[ScreenshotConfiguration$.snapshotWidth] is Patch)
-                ? _patchMap[ScreenshotConfiguration$.snapshotWidth].applyTo(
-                    this.snapshotWidth,
-                  )
-                : _patchMap[ScreenshotConfiguration$.snapshotWidth]
+          ? ((_patchMap[ScreenshotConfiguration$.snapshotWidth] is Function)
+                    ? _patchMap[ScreenshotConfiguration$.snapshotWidth](
+                        this.snapshotWidth,
+                      )
+                    : (_patchMap[ScreenshotConfiguration$.snapshotWidth]
+                          is Patch)
+                    ? _patchMap[ScreenshotConfiguration$.snapshotWidth].applyTo(
+                        this.snapshotWidth,
+                      )
+                    : _patchMap[ScreenshotConfiguration$.snapshotWidth])
+                as double?
           : this.snapshotWidth,
       compressFormat:
           _patchMap.containsKey(ScreenshotConfiguration$.compressFormat)
-          ? (_patchMap[ScreenshotConfiguration$.compressFormat] is Function)
-                ? _patchMap[ScreenshotConfiguration$.compressFormat](
-                    this.compressFormat,
-                  )
-                : (_patchMap[ScreenshotConfiguration$.compressFormat] is Patch)
-                ? _patchMap[ScreenshotConfiguration$.compressFormat].applyTo(
-                    this.compressFormat,
-                  )
-                : _patchMap[ScreenshotConfiguration$.compressFormat]
+          ? ((_patchMap[ScreenshotConfiguration$.compressFormat] is Function)
+                    ? _patchMap[ScreenshotConfiguration$.compressFormat](
+                        this.compressFormat,
+                      )
+                    : (_patchMap[ScreenshotConfiguration$.compressFormat]
+                          is Patch)
+                    ? _patchMap[ScreenshotConfiguration$.compressFormat]
+                          .applyTo(this.compressFormat)
+                    : _patchMap[ScreenshotConfiguration$.compressFormat])
+                as CompressFormat
           : this.compressFormat,
       quality: _patchMap.containsKey(ScreenshotConfiguration$.quality)
-          ? (_patchMap[ScreenshotConfiguration$.quality] is Function)
-                ? _patchMap[ScreenshotConfiguration$.quality](this.quality)
-                : (_patchMap[ScreenshotConfiguration$.quality] is Patch)
-                ? _patchMap[ScreenshotConfiguration$.quality].applyTo(
-                    this.quality,
-                  )
-                : _patchMap[ScreenshotConfiguration$.quality]
+          ? ((_patchMap[ScreenshotConfiguration$.quality] is Function)
+                    ? _patchMap[ScreenshotConfiguration$.quality](this.quality)
+                    : (_patchMap[ScreenshotConfiguration$.quality] is Patch)
+                    ? _patchMap[ScreenshotConfiguration$.quality].applyTo(
+                        this.quality,
+                      )
+                    : _patchMap[ScreenshotConfiguration$.quality])
+                as int
           : this.quality,
       afterScreenUpdates:
           _patchMap.containsKey(ScreenshotConfiguration$.afterScreenUpdates)
-          ? (_patchMap[ScreenshotConfiguration$.afterScreenUpdates] is Function)
-                ? _patchMap[ScreenshotConfiguration$.afterScreenUpdates](
-                    this.afterScreenUpdates,
-                  )
-                : (_patchMap[ScreenshotConfiguration$.afterScreenUpdates]
-                      is Patch)
-                ? _patchMap[ScreenshotConfiguration$.afterScreenUpdates]
-                      .applyTo(this.afterScreenUpdates)
-                : _patchMap[ScreenshotConfiguration$.afterScreenUpdates]
+          ? ((_patchMap[ScreenshotConfiguration$.afterScreenUpdates]
+                        is Function)
+                    ? _patchMap[ScreenshotConfiguration$.afterScreenUpdates](
+                        this.afterScreenUpdates,
+                      )
+                    : (_patchMap[ScreenshotConfiguration$.afterScreenUpdates]
+                          is Patch)
+                    ? _patchMap[ScreenshotConfiguration$.afterScreenUpdates]
+                          .applyTo(this.afterScreenUpdates)
+                    : _patchMap[ScreenshotConfiguration$.afterScreenUpdates])
+                as bool
           : this.afterScreenUpdates,
     );
   }
@@ -167,7 +176,8 @@ class ScreenshotConfiguration {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$ScreenshotConfigurationToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

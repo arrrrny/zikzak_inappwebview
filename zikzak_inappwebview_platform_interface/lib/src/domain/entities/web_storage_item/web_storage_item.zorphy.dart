@@ -32,18 +32,20 @@ class WebStorageItem {
     final _patchMap = _patcher.patchMap;
     return WebStorageItem(
       key: _patchMap.containsKey(WebStorageItem$.key)
-          ? (_patchMap[WebStorageItem$.key] is Function)
-                ? _patchMap[WebStorageItem$.key](this.key)
-                : (_patchMap[WebStorageItem$.key] is Patch)
-                ? _patchMap[WebStorageItem$.key].applyTo(this.key)
-                : _patchMap[WebStorageItem$.key]
+          ? ((_patchMap[WebStorageItem$.key] is Function)
+                    ? _patchMap[WebStorageItem$.key](this.key)
+                    : (_patchMap[WebStorageItem$.key] is Patch)
+                    ? _patchMap[WebStorageItem$.key].applyTo(this.key)
+                    : _patchMap[WebStorageItem$.key])
+                as String?
           : this.key,
       value: _patchMap.containsKey(WebStorageItem$.value)
-          ? (_patchMap[WebStorageItem$.value] is Function)
-                ? _patchMap[WebStorageItem$.value](this.value)
-                : (_patchMap[WebStorageItem$.value] is Patch)
-                ? _patchMap[WebStorageItem$.value].applyTo(this.value)
-                : _patchMap[WebStorageItem$.value]
+          ? ((_patchMap[WebStorageItem$.value] is Function)
+                    ? _patchMap[WebStorageItem$.value](this.value)
+                    : (_patchMap[WebStorageItem$.value] is Patch)
+                    ? _patchMap[WebStorageItem$.value].applyTo(this.value)
+                    : _patchMap[WebStorageItem$.value])
+                as dynamic
           : this.value,
     );
   }
@@ -66,7 +68,8 @@ class WebStorageItem {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$WebStorageItemToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

@@ -152,148 +152,170 @@ class URLRequest {
     final _patchMap = _patcher.patchMap;
     return URLRequest(
       url: _patchMap.containsKey(URLRequest$.url)
-          ? (_patchMap[URLRequest$.url] is Function)
-                ? _patchMap[URLRequest$.url](this.url)
-                : (_patchMap[URLRequest$.url] is Patch)
-                ? _patchMap[URLRequest$.url].applyTo(this.url)
-                : _patchMap[URLRequest$.url]
+          ? ((_patchMap[URLRequest$.url] is Function)
+                    ? _patchMap[URLRequest$.url](this.url)
+                    : (_patchMap[URLRequest$.url] is Patch)
+                    ? _patchMap[URLRequest$.url].applyTo(this.url)
+                    : _patchMap[URLRequest$.url])
+                as WebUri?
           : this.url,
       method: _patchMap.containsKey(URLRequest$.method)
-          ? (_patchMap[URLRequest$.method] is Function)
-                ? _patchMap[URLRequest$.method](this.method)
-                : (_patchMap[URLRequest$.method] is Patch)
-                ? _patchMap[URLRequest$.method].applyTo(this.method)
-                : _patchMap[URLRequest$.method]
+          ? ((_patchMap[URLRequest$.method] is Function)
+                    ? _patchMap[URLRequest$.method](this.method)
+                    : (_patchMap[URLRequest$.method] is Patch)
+                    ? _patchMap[URLRequest$.method].applyTo(this.method)
+                    : _patchMap[URLRequest$.method])
+                as String?
           : this.method,
       headers: _patchMap.containsKey(URLRequest$.headers)
-          ? (_patchMap[URLRequest$.headers] is Function)
-                ? _patchMap[URLRequest$.headers](this.headers)
-                : (_patchMap[URLRequest$.headers] is Patch)
-                ? _patchMap[URLRequest$.headers].applyTo(this.headers)
-                : _patchMap[URLRequest$.headers]
+          ? ((_patchMap[URLRequest$.headers] is Function)
+                    ? _patchMap[URLRequest$.headers](this.headers)
+                    : (_patchMap[URLRequest$.headers] is Patch)
+                    ? _patchMap[URLRequest$.headers].applyTo(this.headers)
+                    : _patchMap[URLRequest$.headers])
+                as Map<String, String>?
           : this.headers,
       body: _patchMap.containsKey(URLRequest$.body)
-          ? (_patchMap[URLRequest$.body] is Function)
-                ? _patchMap[URLRequest$.body](this.body)
-                : (_patchMap[URLRequest$.body] is Patch)
-                ? _patchMap[URLRequest$.body].applyTo(this.body)
-                : _patchMap[URLRequest$.body]
+          ? ((_patchMap[URLRequest$.body] is Function)
+                    ? _patchMap[URLRequest$.body](this.body)
+                    : (_patchMap[URLRequest$.body] is Patch)
+                    ? _patchMap[URLRequest$.body].applyTo(this.body)
+                    : _patchMap[URLRequest$.body])
+                as Uint8List?
           : this.body,
       allowsCellularAccess:
           _patchMap.containsKey(URLRequest$.allowsCellularAccess)
-          ? (_patchMap[URLRequest$.allowsCellularAccess] is Function)
-                ? _patchMap[URLRequest$.allowsCellularAccess](
-                    this.allowsCellularAccess,
-                  )
-                : (_patchMap[URLRequest$.allowsCellularAccess] is Patch)
-                ? _patchMap[URLRequest$.allowsCellularAccess].applyTo(
-                    this.allowsCellularAccess,
-                  )
-                : _patchMap[URLRequest$.allowsCellularAccess]
+          ? ((_patchMap[URLRequest$.allowsCellularAccess] is Function)
+                    ? _patchMap[URLRequest$.allowsCellularAccess](
+                        this.allowsCellularAccess,
+                      )
+                    : (_patchMap[URLRequest$.allowsCellularAccess] is Patch)
+                    ? _patchMap[URLRequest$.allowsCellularAccess].applyTo(
+                        this.allowsCellularAccess,
+                      )
+                    : _patchMap[URLRequest$.allowsCellularAccess])
+                as bool?
           : this.allowsCellularAccess,
       allowsConstrainedNetworkAccess:
           _patchMap.containsKey(URLRequest$.allowsConstrainedNetworkAccess)
-          ? (_patchMap[URLRequest$.allowsConstrainedNetworkAccess] is Function)
-                ? _patchMap[URLRequest$.allowsConstrainedNetworkAccess](
-                    this.allowsConstrainedNetworkAccess,
-                  )
-                : (_patchMap[URLRequest$.allowsConstrainedNetworkAccess]
-                      is Patch)
-                ? _patchMap[URLRequest$.allowsConstrainedNetworkAccess].applyTo(
-                    this.allowsConstrainedNetworkAccess,
-                  )
-                : _patchMap[URLRequest$.allowsConstrainedNetworkAccess]
+          ? ((_patchMap[URLRequest$.allowsConstrainedNetworkAccess] is Function)
+                    ? _patchMap[URLRequest$.allowsConstrainedNetworkAccess](
+                        this.allowsConstrainedNetworkAccess,
+                      )
+                    : (_patchMap[URLRequest$.allowsConstrainedNetworkAccess]
+                          is Patch)
+                    ? _patchMap[URLRequest$.allowsConstrainedNetworkAccess]
+                          .applyTo(this.allowsConstrainedNetworkAccess)
+                    : _patchMap[URLRequest$.allowsConstrainedNetworkAccess])
+                as bool?
           : this.allowsConstrainedNetworkAccess,
       allowsExpensiveNetworkAccess:
           _patchMap.containsKey(URLRequest$.allowsExpensiveNetworkAccess)
-          ? (_patchMap[URLRequest$.allowsExpensiveNetworkAccess] is Function)
-                ? _patchMap[URLRequest$.allowsExpensiveNetworkAccess](
-                    this.allowsExpensiveNetworkAccess,
-                  )
-                : (_patchMap[URLRequest$.allowsExpensiveNetworkAccess] is Patch)
-                ? _patchMap[URLRequest$.allowsExpensiveNetworkAccess].applyTo(
-                    this.allowsExpensiveNetworkAccess,
-                  )
-                : _patchMap[URLRequest$.allowsExpensiveNetworkAccess]
+          ? ((_patchMap[URLRequest$.allowsExpensiveNetworkAccess] is Function)
+                    ? _patchMap[URLRequest$.allowsExpensiveNetworkAccess](
+                        this.allowsExpensiveNetworkAccess,
+                      )
+                    : (_patchMap[URLRequest$.allowsExpensiveNetworkAccess]
+                          is Patch)
+                    ? _patchMap[URLRequest$.allowsExpensiveNetworkAccess]
+                          .applyTo(this.allowsExpensiveNetworkAccess)
+                    : _patchMap[URLRequest$.allowsExpensiveNetworkAccess])
+                as bool?
           : this.allowsExpensiveNetworkAccess,
       cachePolicy: _patchMap.containsKey(URLRequest$.cachePolicy)
-          ? (_patchMap[URLRequest$.cachePolicy] is Function)
-                ? _patchMap[URLRequest$.cachePolicy](this.cachePolicy)
-                : (_patchMap[URLRequest$.cachePolicy] is Patch)
-                ? _patchMap[URLRequest$.cachePolicy].applyTo(this.cachePolicy)
-                : _patchMap[URLRequest$.cachePolicy]
+          ? ((_patchMap[URLRequest$.cachePolicy] is Function)
+                    ? _patchMap[URLRequest$.cachePolicy](this.cachePolicy)
+                    : (_patchMap[URLRequest$.cachePolicy] is Patch)
+                    ? _patchMap[URLRequest$.cachePolicy].applyTo(
+                        this.cachePolicy,
+                      )
+                    : _patchMap[URLRequest$.cachePolicy])
+                as URLRequestCachePolicy?
           : this.cachePolicy,
       httpShouldHandleCookies:
           _patchMap.containsKey(URLRequest$.httpShouldHandleCookies)
-          ? (_patchMap[URLRequest$.httpShouldHandleCookies] is Function)
-                ? _patchMap[URLRequest$.httpShouldHandleCookies](
-                    this.httpShouldHandleCookies,
-                  )
-                : (_patchMap[URLRequest$.httpShouldHandleCookies] is Patch)
-                ? _patchMap[URLRequest$.httpShouldHandleCookies].applyTo(
-                    this.httpShouldHandleCookies,
-                  )
-                : _patchMap[URLRequest$.httpShouldHandleCookies]
+          ? ((_patchMap[URLRequest$.httpShouldHandleCookies] is Function)
+                    ? _patchMap[URLRequest$.httpShouldHandleCookies](
+                        this.httpShouldHandleCookies,
+                      )
+                    : (_patchMap[URLRequest$.httpShouldHandleCookies] is Patch)
+                    ? _patchMap[URLRequest$.httpShouldHandleCookies].applyTo(
+                        this.httpShouldHandleCookies,
+                      )
+                    : _patchMap[URLRequest$.httpShouldHandleCookies])
+                as bool?
           : this.httpShouldHandleCookies,
       httpShouldUsePipelining:
           _patchMap.containsKey(URLRequest$.httpShouldUsePipelining)
-          ? (_patchMap[URLRequest$.httpShouldUsePipelining] is Function)
-                ? _patchMap[URLRequest$.httpShouldUsePipelining](
-                    this.httpShouldUsePipelining,
-                  )
-                : (_patchMap[URLRequest$.httpShouldUsePipelining] is Patch)
-                ? _patchMap[URLRequest$.httpShouldUsePipelining].applyTo(
-                    this.httpShouldUsePipelining,
-                  )
-                : _patchMap[URLRequest$.httpShouldUsePipelining]
+          ? ((_patchMap[URLRequest$.httpShouldUsePipelining] is Function)
+                    ? _patchMap[URLRequest$.httpShouldUsePipelining](
+                        this.httpShouldUsePipelining,
+                      )
+                    : (_patchMap[URLRequest$.httpShouldUsePipelining] is Patch)
+                    ? _patchMap[URLRequest$.httpShouldUsePipelining].applyTo(
+                        this.httpShouldUsePipelining,
+                      )
+                    : _patchMap[URLRequest$.httpShouldUsePipelining])
+                as bool?
           : this.httpShouldUsePipelining,
       networkServiceType: _patchMap.containsKey(URLRequest$.networkServiceType)
-          ? (_patchMap[URLRequest$.networkServiceType] is Function)
-                ? _patchMap[URLRequest$.networkServiceType](
-                    this.networkServiceType,
-                  )
-                : (_patchMap[URLRequest$.networkServiceType] is Patch)
-                ? _patchMap[URLRequest$.networkServiceType].applyTo(
-                    this.networkServiceType,
-                  )
-                : _patchMap[URLRequest$.networkServiceType]
+          ? ((_patchMap[URLRequest$.networkServiceType] is Function)
+                    ? _patchMap[URLRequest$.networkServiceType](
+                        this.networkServiceType,
+                      )
+                    : (_patchMap[URLRequest$.networkServiceType] is Patch)
+                    ? _patchMap[URLRequest$.networkServiceType].applyTo(
+                        this.networkServiceType,
+                      )
+                    : _patchMap[URLRequest$.networkServiceType])
+                as URLRequestNetworkServiceType?
           : this.networkServiceType,
       timeoutInterval: _patchMap.containsKey(URLRequest$.timeoutInterval)
-          ? (_patchMap[URLRequest$.timeoutInterval] is Function)
-                ? _patchMap[URLRequest$.timeoutInterval](this.timeoutInterval)
-                : (_patchMap[URLRequest$.timeoutInterval] is Patch)
-                ? _patchMap[URLRequest$.timeoutInterval].applyTo(
-                    this.timeoutInterval,
-                  )
-                : _patchMap[URLRequest$.timeoutInterval]
+          ? ((_patchMap[URLRequest$.timeoutInterval] is Function)
+                    ? _patchMap[URLRequest$.timeoutInterval](
+                        this.timeoutInterval,
+                      )
+                    : (_patchMap[URLRequest$.timeoutInterval] is Patch)
+                    ? _patchMap[URLRequest$.timeoutInterval].applyTo(
+                        this.timeoutInterval,
+                      )
+                    : _patchMap[URLRequest$.timeoutInterval])
+                as double?
           : this.timeoutInterval,
       mainDocumentURL: _patchMap.containsKey(URLRequest$.mainDocumentURL)
-          ? (_patchMap[URLRequest$.mainDocumentURL] is Function)
-                ? _patchMap[URLRequest$.mainDocumentURL](this.mainDocumentURL)
-                : (_patchMap[URLRequest$.mainDocumentURL] is Patch)
-                ? _patchMap[URLRequest$.mainDocumentURL].applyTo(
-                    this.mainDocumentURL,
-                  )
-                : _patchMap[URLRequest$.mainDocumentURL]
+          ? ((_patchMap[URLRequest$.mainDocumentURL] is Function)
+                    ? _patchMap[URLRequest$.mainDocumentURL](
+                        this.mainDocumentURL,
+                      )
+                    : (_patchMap[URLRequest$.mainDocumentURL] is Patch)
+                    ? _patchMap[URLRequest$.mainDocumentURL].applyTo(
+                        this.mainDocumentURL,
+                      )
+                    : _patchMap[URLRequest$.mainDocumentURL])
+                as WebUri?
           : this.mainDocumentURL,
       assumesHTTP3Capable:
           _patchMap.containsKey(URLRequest$.assumesHTTP3Capable)
-          ? (_patchMap[URLRequest$.assumesHTTP3Capable] is Function)
-                ? _patchMap[URLRequest$.assumesHTTP3Capable](
-                    this.assumesHTTP3Capable,
-                  )
-                : (_patchMap[URLRequest$.assumesHTTP3Capable] is Patch)
-                ? _patchMap[URLRequest$.assumesHTTP3Capable].applyTo(
-                    this.assumesHTTP3Capable,
-                  )
-                : _patchMap[URLRequest$.assumesHTTP3Capable]
+          ? ((_patchMap[URLRequest$.assumesHTTP3Capable] is Function)
+                    ? _patchMap[URLRequest$.assumesHTTP3Capable](
+                        this.assumesHTTP3Capable,
+                      )
+                    : (_patchMap[URLRequest$.assumesHTTP3Capable] is Patch)
+                    ? _patchMap[URLRequest$.assumesHTTP3Capable].applyTo(
+                        this.assumesHTTP3Capable,
+                      )
+                    : _patchMap[URLRequest$.assumesHTTP3Capable])
+                as bool?
           : this.assumesHTTP3Capable,
       attribution: _patchMap.containsKey(URLRequest$.attribution)
-          ? (_patchMap[URLRequest$.attribution] is Function)
-                ? _patchMap[URLRequest$.attribution](this.attribution)
-                : (_patchMap[URLRequest$.attribution] is Patch)
-                ? _patchMap[URLRequest$.attribution].applyTo(this.attribution)
-                : _patchMap[URLRequest$.attribution]
+          ? ((_patchMap[URLRequest$.attribution] is Function)
+                    ? _patchMap[URLRequest$.attribution](this.attribution)
+                    : (_patchMap[URLRequest$.attribution] is Patch)
+                    ? _patchMap[URLRequest$.attribution].applyTo(
+                        this.attribution,
+                      )
+                    : _patchMap[URLRequest$.attribution])
+                as URLRequestAttribution?
           : this.attribution,
     );
   }
@@ -377,7 +399,8 @@ class URLRequest {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$URLRequestToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

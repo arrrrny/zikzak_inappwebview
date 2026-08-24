@@ -303,359 +303,414 @@ class InAppBrowserSettings {
     final _patchMap = _patcher.patchMap;
     return InAppBrowserSettings(
       hidden: _patchMap.containsKey(InAppBrowserSettings$.hidden)
-          ? (_patchMap[InAppBrowserSettings$.hidden] is Function)
-                ? _patchMap[InAppBrowserSettings$.hidden](this.hidden)
-                : (_patchMap[InAppBrowserSettings$.hidden] is Patch)
-                ? _patchMap[InAppBrowserSettings$.hidden].applyTo(this.hidden)
-                : _patchMap[InAppBrowserSettings$.hidden]
+          ? ((_patchMap[InAppBrowserSettings$.hidden] is Function)
+                    ? _patchMap[InAppBrowserSettings$.hidden](this.hidden)
+                    : (_patchMap[InAppBrowserSettings$.hidden] is Patch)
+                    ? _patchMap[InAppBrowserSettings$.hidden].applyTo(
+                        this.hidden,
+                      )
+                    : _patchMap[InAppBrowserSettings$.hidden])
+                as bool?
           : this.hidden,
       hideToolbarTop:
           _patchMap.containsKey(InAppBrowserSettings$.hideToolbarTop)
-          ? (_patchMap[InAppBrowserSettings$.hideToolbarTop] is Function)
-                ? _patchMap[InAppBrowserSettings$.hideToolbarTop](
-                    this.hideToolbarTop,
-                  )
-                : (_patchMap[InAppBrowserSettings$.hideToolbarTop] is Patch)
-                ? _patchMap[InAppBrowserSettings$.hideToolbarTop].applyTo(
-                    this.hideToolbarTop,
-                  )
-                : _patchMap[InAppBrowserSettings$.hideToolbarTop]
+          ? ((_patchMap[InAppBrowserSettings$.hideToolbarTop] is Function)
+                    ? _patchMap[InAppBrowserSettings$.hideToolbarTop](
+                        this.hideToolbarTop,
+                      )
+                    : (_patchMap[InAppBrowserSettings$.hideToolbarTop] is Patch)
+                    ? _patchMap[InAppBrowserSettings$.hideToolbarTop].applyTo(
+                        this.hideToolbarTop,
+                      )
+                    : _patchMap[InAppBrowserSettings$.hideToolbarTop])
+                as bool?
           : this.hideToolbarTop,
       toolbarTopBackgroundColor:
           _patchMap.containsKey(InAppBrowserSettings$.toolbarTopBackgroundColor)
-          ? (_patchMap[InAppBrowserSettings$.toolbarTopBackgroundColor]
-                    is Function)
-                ? _patchMap[InAppBrowserSettings$.toolbarTopBackgroundColor](
-                    this.toolbarTopBackgroundColor,
-                  )
-                : (_patchMap[InAppBrowserSettings$.toolbarTopBackgroundColor]
-                      is Patch)
-                ? _patchMap[InAppBrowserSettings$.toolbarTopBackgroundColor]
-                      .applyTo(this.toolbarTopBackgroundColor)
-                : _patchMap[InAppBrowserSettings$.toolbarTopBackgroundColor]
+          ? ((_patchMap[InAppBrowserSettings$.toolbarTopBackgroundColor]
+                        is Function)
+                    ? _patchMap[InAppBrowserSettings$
+                          .toolbarTopBackgroundColor](
+                        this.toolbarTopBackgroundColor,
+                      )
+                    : (_patchMap[InAppBrowserSettings$
+                              .toolbarTopBackgroundColor]
+                          is Patch)
+                    ? _patchMap[InAppBrowserSettings$.toolbarTopBackgroundColor]
+                          .applyTo(this.toolbarTopBackgroundColor)
+                    : _patchMap[InAppBrowserSettings$
+                          .toolbarTopBackgroundColor])
+                as Color?
           : this.toolbarTopBackgroundColor,
       hideUrlBar: _patchMap.containsKey(InAppBrowserSettings$.hideUrlBar)
-          ? (_patchMap[InAppBrowserSettings$.hideUrlBar] is Function)
-                ? _patchMap[InAppBrowserSettings$.hideUrlBar](this.hideUrlBar)
-                : (_patchMap[InAppBrowserSettings$.hideUrlBar] is Patch)
-                ? _patchMap[InAppBrowserSettings$.hideUrlBar].applyTo(
-                    this.hideUrlBar,
-                  )
-                : _patchMap[InAppBrowserSettings$.hideUrlBar]
+          ? ((_patchMap[InAppBrowserSettings$.hideUrlBar] is Function)
+                    ? _patchMap[InAppBrowserSettings$.hideUrlBar](
+                        this.hideUrlBar,
+                      )
+                    : (_patchMap[InAppBrowserSettings$.hideUrlBar] is Patch)
+                    ? _patchMap[InAppBrowserSettings$.hideUrlBar].applyTo(
+                        this.hideUrlBar,
+                      )
+                    : _patchMap[InAppBrowserSettings$.hideUrlBar])
+                as bool?
           : this.hideUrlBar,
       hideProgressBar:
           _patchMap.containsKey(InAppBrowserSettings$.hideProgressBar)
-          ? (_patchMap[InAppBrowserSettings$.hideProgressBar] is Function)
-                ? _patchMap[InAppBrowserSettings$.hideProgressBar](
-                    this.hideProgressBar,
-                  )
-                : (_patchMap[InAppBrowserSettings$.hideProgressBar] is Patch)
-                ? _patchMap[InAppBrowserSettings$.hideProgressBar].applyTo(
-                    this.hideProgressBar,
-                  )
-                : _patchMap[InAppBrowserSettings$.hideProgressBar]
+          ? ((_patchMap[InAppBrowserSettings$.hideProgressBar] is Function)
+                    ? _patchMap[InAppBrowserSettings$.hideProgressBar](
+                        this.hideProgressBar,
+                      )
+                    : (_patchMap[InAppBrowserSettings$.hideProgressBar]
+                          is Patch)
+                    ? _patchMap[InAppBrowserSettings$.hideProgressBar].applyTo(
+                        this.hideProgressBar,
+                      )
+                    : _patchMap[InAppBrowserSettings$.hideProgressBar])
+                as bool?
           : this.hideProgressBar,
       hideDefaultMenuItems:
           _patchMap.containsKey(InAppBrowserSettings$.hideDefaultMenuItems)
-          ? (_patchMap[InAppBrowserSettings$.hideDefaultMenuItems] is Function)
-                ? _patchMap[InAppBrowserSettings$.hideDefaultMenuItems](
-                    this.hideDefaultMenuItems,
-                  )
-                : (_patchMap[InAppBrowserSettings$.hideDefaultMenuItems]
-                      is Patch)
-                ? _patchMap[InAppBrowserSettings$.hideDefaultMenuItems].applyTo(
-                    this.hideDefaultMenuItems,
-                  )
-                : _patchMap[InAppBrowserSettings$.hideDefaultMenuItems]
+          ? ((_patchMap[InAppBrowserSettings$.hideDefaultMenuItems] is Function)
+                    ? _patchMap[InAppBrowserSettings$.hideDefaultMenuItems](
+                        this.hideDefaultMenuItems,
+                      )
+                    : (_patchMap[InAppBrowserSettings$.hideDefaultMenuItems]
+                          is Patch)
+                    ? _patchMap[InAppBrowserSettings$.hideDefaultMenuItems]
+                          .applyTo(this.hideDefaultMenuItems)
+                    : _patchMap[InAppBrowserSettings$.hideDefaultMenuItems])
+                as bool?
           : this.hideDefaultMenuItems,
       toolbarTopTranslucent:
           _patchMap.containsKey(InAppBrowserSettings$.toolbarTopTranslucent)
-          ? (_patchMap[InAppBrowserSettings$.toolbarTopTranslucent] is Function)
-                ? _patchMap[InAppBrowserSettings$.toolbarTopTranslucent](
-                    this.toolbarTopTranslucent,
-                  )
-                : (_patchMap[InAppBrowserSettings$.toolbarTopTranslucent]
-                      is Patch)
-                ? _patchMap[InAppBrowserSettings$.toolbarTopTranslucent]
-                      .applyTo(this.toolbarTopTranslucent)
-                : _patchMap[InAppBrowserSettings$.toolbarTopTranslucent]
+          ? ((_patchMap[InAppBrowserSettings$.toolbarTopTranslucent]
+                        is Function)
+                    ? _patchMap[InAppBrowserSettings$.toolbarTopTranslucent](
+                        this.toolbarTopTranslucent,
+                      )
+                    : (_patchMap[InAppBrowserSettings$.toolbarTopTranslucent]
+                          is Patch)
+                    ? _patchMap[InAppBrowserSettings$.toolbarTopTranslucent]
+                          .applyTo(this.toolbarTopTranslucent)
+                    : _patchMap[InAppBrowserSettings$.toolbarTopTranslucent])
+                as bool?
           : this.toolbarTopTranslucent,
       toolbarTopBarTintColor:
           _patchMap.containsKey(InAppBrowserSettings$.toolbarTopBarTintColor)
-          ? (_patchMap[InAppBrowserSettings$.toolbarTopBarTintColor]
-                    is Function)
-                ? _patchMap[InAppBrowserSettings$.toolbarTopBarTintColor](
-                    this.toolbarTopBarTintColor,
-                  )
-                : (_patchMap[InAppBrowserSettings$.toolbarTopBarTintColor]
-                      is Patch)
-                ? _patchMap[InAppBrowserSettings$.toolbarTopBarTintColor]
-                      .applyTo(this.toolbarTopBarTintColor)
-                : _patchMap[InAppBrowserSettings$.toolbarTopBarTintColor]
+          ? ((_patchMap[InAppBrowserSettings$.toolbarTopBarTintColor]
+                        is Function)
+                    ? _patchMap[InAppBrowserSettings$.toolbarTopBarTintColor](
+                        this.toolbarTopBarTintColor,
+                      )
+                    : (_patchMap[InAppBrowserSettings$.toolbarTopBarTintColor]
+                          is Patch)
+                    ? _patchMap[InAppBrowserSettings$.toolbarTopBarTintColor]
+                          .applyTo(this.toolbarTopBarTintColor)
+                    : _patchMap[InAppBrowserSettings$.toolbarTopBarTintColor])
+                as Color?
           : this.toolbarTopBarTintColor,
       toolbarTopTintColor:
           _patchMap.containsKey(InAppBrowserSettings$.toolbarTopTintColor)
-          ? (_patchMap[InAppBrowserSettings$.toolbarTopTintColor] is Function)
-                ? _patchMap[InAppBrowserSettings$.toolbarTopTintColor](
-                    this.toolbarTopTintColor,
-                  )
-                : (_patchMap[InAppBrowserSettings$.toolbarTopTintColor]
-                      is Patch)
-                ? _patchMap[InAppBrowserSettings$.toolbarTopTintColor].applyTo(
-                    this.toolbarTopTintColor,
-                  )
-                : _patchMap[InAppBrowserSettings$.toolbarTopTintColor]
+          ? ((_patchMap[InAppBrowserSettings$.toolbarTopTintColor] is Function)
+                    ? _patchMap[InAppBrowserSettings$.toolbarTopTintColor](
+                        this.toolbarTopTintColor,
+                      )
+                    : (_patchMap[InAppBrowserSettings$.toolbarTopTintColor]
+                          is Patch)
+                    ? _patchMap[InAppBrowserSettings$.toolbarTopTintColor]
+                          .applyTo(this.toolbarTopTintColor)
+                    : _patchMap[InAppBrowserSettings$.toolbarTopTintColor])
+                as Color?
           : this.toolbarTopTintColor,
       hideToolbarBottom:
           _patchMap.containsKey(InAppBrowserSettings$.hideToolbarBottom)
-          ? (_patchMap[InAppBrowserSettings$.hideToolbarBottom] is Function)
-                ? _patchMap[InAppBrowserSettings$.hideToolbarBottom](
-                    this.hideToolbarBottom,
-                  )
-                : (_patchMap[InAppBrowserSettings$.hideToolbarBottom] is Patch)
-                ? _patchMap[InAppBrowserSettings$.hideToolbarBottom].applyTo(
-                    this.hideToolbarBottom,
-                  )
-                : _patchMap[InAppBrowserSettings$.hideToolbarBottom]
+          ? ((_patchMap[InAppBrowserSettings$.hideToolbarBottom] is Function)
+                    ? _patchMap[InAppBrowserSettings$.hideToolbarBottom](
+                        this.hideToolbarBottom,
+                      )
+                    : (_patchMap[InAppBrowserSettings$.hideToolbarBottom]
+                          is Patch)
+                    ? _patchMap[InAppBrowserSettings$.hideToolbarBottom]
+                          .applyTo(this.hideToolbarBottom)
+                    : _patchMap[InAppBrowserSettings$.hideToolbarBottom])
+                as bool?
           : this.hideToolbarBottom,
       toolbarBottomBackgroundColor:
           _patchMap.containsKey(
             InAppBrowserSettings$.toolbarBottomBackgroundColor,
           )
-          ? (_patchMap[InAppBrowserSettings$.toolbarBottomBackgroundColor]
-                    is Function)
-                ? _patchMap[InAppBrowserSettings$.toolbarBottomBackgroundColor](
-                    this.toolbarBottomBackgroundColor,
-                  )
-                : (_patchMap[InAppBrowserSettings$.toolbarBottomBackgroundColor]
-                      is Patch)
-                ? _patchMap[InAppBrowserSettings$.toolbarBottomBackgroundColor]
-                      .applyTo(this.toolbarBottomBackgroundColor)
-                : _patchMap[InAppBrowserSettings$.toolbarBottomBackgroundColor]
+          ? ((_patchMap[InAppBrowserSettings$.toolbarBottomBackgroundColor]
+                        is Function)
+                    ? _patchMap[InAppBrowserSettings$
+                          .toolbarBottomBackgroundColor](
+                        this.toolbarBottomBackgroundColor,
+                      )
+                    : (_patchMap[InAppBrowserSettings$
+                              .toolbarBottomBackgroundColor]
+                          is Patch)
+                    ? _patchMap[InAppBrowserSettings$
+                              .toolbarBottomBackgroundColor]
+                          .applyTo(this.toolbarBottomBackgroundColor)
+                    : _patchMap[InAppBrowserSettings$
+                          .toolbarBottomBackgroundColor])
+                as Color?
           : this.toolbarBottomBackgroundColor,
       toolbarBottomTintColor:
           _patchMap.containsKey(InAppBrowserSettings$.toolbarBottomTintColor)
-          ? (_patchMap[InAppBrowserSettings$.toolbarBottomTintColor]
-                    is Function)
-                ? _patchMap[InAppBrowserSettings$.toolbarBottomTintColor](
-                    this.toolbarBottomTintColor,
-                  )
-                : (_patchMap[InAppBrowserSettings$.toolbarBottomTintColor]
-                      is Patch)
-                ? _patchMap[InAppBrowserSettings$.toolbarBottomTintColor]
-                      .applyTo(this.toolbarBottomTintColor)
-                : _patchMap[InAppBrowserSettings$.toolbarBottomTintColor]
+          ? ((_patchMap[InAppBrowserSettings$.toolbarBottomTintColor]
+                        is Function)
+                    ? _patchMap[InAppBrowserSettings$.toolbarBottomTintColor](
+                        this.toolbarBottomTintColor,
+                      )
+                    : (_patchMap[InAppBrowserSettings$.toolbarBottomTintColor]
+                          is Patch)
+                    ? _patchMap[InAppBrowserSettings$.toolbarBottomTintColor]
+                          .applyTo(this.toolbarBottomTintColor)
+                    : _patchMap[InAppBrowserSettings$.toolbarBottomTintColor])
+                as Color?
           : this.toolbarBottomTintColor,
       toolbarBottomTranslucent:
           _patchMap.containsKey(InAppBrowserSettings$.toolbarBottomTranslucent)
-          ? (_patchMap[InAppBrowserSettings$.toolbarBottomTranslucent]
-                    is Function)
-                ? _patchMap[InAppBrowserSettings$.toolbarBottomTranslucent](
-                    this.toolbarBottomTranslucent,
-                  )
-                : (_patchMap[InAppBrowserSettings$.toolbarBottomTranslucent]
-                      is Patch)
-                ? _patchMap[InAppBrowserSettings$.toolbarBottomTranslucent]
-                      .applyTo(this.toolbarBottomTranslucent)
-                : _patchMap[InAppBrowserSettings$.toolbarBottomTranslucent]
+          ? ((_patchMap[InAppBrowserSettings$.toolbarBottomTranslucent]
+                        is Function)
+                    ? _patchMap[InAppBrowserSettings$.toolbarBottomTranslucent](
+                        this.toolbarBottomTranslucent,
+                      )
+                    : (_patchMap[InAppBrowserSettings$.toolbarBottomTranslucent]
+                          is Patch)
+                    ? _patchMap[InAppBrowserSettings$.toolbarBottomTranslucent]
+                          .applyTo(this.toolbarBottomTranslucent)
+                    : _patchMap[InAppBrowserSettings$.toolbarBottomTranslucent])
+                as bool?
           : this.toolbarBottomTranslucent,
       closeButtonCaption:
           _patchMap.containsKey(InAppBrowserSettings$.closeButtonCaption)
-          ? (_patchMap[InAppBrowserSettings$.closeButtonCaption] is Function)
-                ? _patchMap[InAppBrowserSettings$.closeButtonCaption](
-                    this.closeButtonCaption,
-                  )
-                : (_patchMap[InAppBrowserSettings$.closeButtonCaption] is Patch)
-                ? _patchMap[InAppBrowserSettings$.closeButtonCaption].applyTo(
-                    this.closeButtonCaption,
-                  )
-                : _patchMap[InAppBrowserSettings$.closeButtonCaption]
+          ? ((_patchMap[InAppBrowserSettings$.closeButtonCaption] is Function)
+                    ? _patchMap[InAppBrowserSettings$.closeButtonCaption](
+                        this.closeButtonCaption,
+                      )
+                    : (_patchMap[InAppBrowserSettings$.closeButtonCaption]
+                          is Patch)
+                    ? _patchMap[InAppBrowserSettings$.closeButtonCaption]
+                          .applyTo(this.closeButtonCaption)
+                    : _patchMap[InAppBrowserSettings$.closeButtonCaption])
+                as String?
           : this.closeButtonCaption,
       closeButtonColor:
           _patchMap.containsKey(InAppBrowserSettings$.closeButtonColor)
-          ? (_patchMap[InAppBrowserSettings$.closeButtonColor] is Function)
-                ? _patchMap[InAppBrowserSettings$.closeButtonColor](
-                    this.closeButtonColor,
-                  )
-                : (_patchMap[InAppBrowserSettings$.closeButtonColor] is Patch)
-                ? _patchMap[InAppBrowserSettings$.closeButtonColor].applyTo(
-                    this.closeButtonColor,
-                  )
-                : _patchMap[InAppBrowserSettings$.closeButtonColor]
+          ? ((_patchMap[InAppBrowserSettings$.closeButtonColor] is Function)
+                    ? _patchMap[InAppBrowserSettings$.closeButtonColor](
+                        this.closeButtonColor,
+                      )
+                    : (_patchMap[InAppBrowserSettings$.closeButtonColor]
+                          is Patch)
+                    ? _patchMap[InAppBrowserSettings$.closeButtonColor].applyTo(
+                        this.closeButtonColor,
+                      )
+                    : _patchMap[InAppBrowserSettings$.closeButtonColor])
+                as Color?
           : this.closeButtonColor,
       hideCloseButton:
           _patchMap.containsKey(InAppBrowserSettings$.hideCloseButton)
-          ? (_patchMap[InAppBrowserSettings$.hideCloseButton] is Function)
-                ? _patchMap[InAppBrowserSettings$.hideCloseButton](
-                    this.hideCloseButton,
-                  )
-                : (_patchMap[InAppBrowserSettings$.hideCloseButton] is Patch)
-                ? _patchMap[InAppBrowserSettings$.hideCloseButton].applyTo(
-                    this.hideCloseButton,
-                  )
-                : _patchMap[InAppBrowserSettings$.hideCloseButton]
+          ? ((_patchMap[InAppBrowserSettings$.hideCloseButton] is Function)
+                    ? _patchMap[InAppBrowserSettings$.hideCloseButton](
+                        this.hideCloseButton,
+                      )
+                    : (_patchMap[InAppBrowserSettings$.hideCloseButton]
+                          is Patch)
+                    ? _patchMap[InAppBrowserSettings$.hideCloseButton].applyTo(
+                        this.hideCloseButton,
+                      )
+                    : _patchMap[InAppBrowserSettings$.hideCloseButton])
+                as bool?
           : this.hideCloseButton,
       menuButtonColor:
           _patchMap.containsKey(InAppBrowserSettings$.menuButtonColor)
-          ? (_patchMap[InAppBrowserSettings$.menuButtonColor] is Function)
-                ? _patchMap[InAppBrowserSettings$.menuButtonColor](
-                    this.menuButtonColor,
-                  )
-                : (_patchMap[InAppBrowserSettings$.menuButtonColor] is Patch)
-                ? _patchMap[InAppBrowserSettings$.menuButtonColor].applyTo(
-                    this.menuButtonColor,
-                  )
-                : _patchMap[InAppBrowserSettings$.menuButtonColor]
+          ? ((_patchMap[InAppBrowserSettings$.menuButtonColor] is Function)
+                    ? _patchMap[InAppBrowserSettings$.menuButtonColor](
+                        this.menuButtonColor,
+                      )
+                    : (_patchMap[InAppBrowserSettings$.menuButtonColor]
+                          is Patch)
+                    ? _patchMap[InAppBrowserSettings$.menuButtonColor].applyTo(
+                        this.menuButtonColor,
+                      )
+                    : _patchMap[InAppBrowserSettings$.menuButtonColor])
+                as Color?
           : this.menuButtonColor,
       presentationStyle:
           _patchMap.containsKey(InAppBrowserSettings$.presentationStyle)
-          ? (_patchMap[InAppBrowserSettings$.presentationStyle] is Function)
-                ? _patchMap[InAppBrowserSettings$.presentationStyle](
-                    this.presentationStyle,
-                  )
-                : (_patchMap[InAppBrowserSettings$.presentationStyle] is Patch)
-                ? _patchMap[InAppBrowserSettings$.presentationStyle].applyTo(
-                    this.presentationStyle,
-                  )
-                : _patchMap[InAppBrowserSettings$.presentationStyle]
+          ? ((_patchMap[InAppBrowserSettings$.presentationStyle] is Function)
+                    ? _patchMap[InAppBrowserSettings$.presentationStyle](
+                        this.presentationStyle,
+                      )
+                    : (_patchMap[InAppBrowserSettings$.presentationStyle]
+                          is Patch)
+                    ? _patchMap[InAppBrowserSettings$.presentationStyle]
+                          .applyTo(this.presentationStyle)
+                    : _patchMap[InAppBrowserSettings$.presentationStyle])
+                as ModalPresentationStyle?
           : this.presentationStyle,
       transitionStyle:
           _patchMap.containsKey(InAppBrowserSettings$.transitionStyle)
-          ? (_patchMap[InAppBrowserSettings$.transitionStyle] is Function)
-                ? _patchMap[InAppBrowserSettings$.transitionStyle](
-                    this.transitionStyle,
-                  )
-                : (_patchMap[InAppBrowserSettings$.transitionStyle] is Patch)
-                ? _patchMap[InAppBrowserSettings$.transitionStyle].applyTo(
-                    this.transitionStyle,
-                  )
-                : _patchMap[InAppBrowserSettings$.transitionStyle]
+          ? ((_patchMap[InAppBrowserSettings$.transitionStyle] is Function)
+                    ? _patchMap[InAppBrowserSettings$.transitionStyle](
+                        this.transitionStyle,
+                      )
+                    : (_patchMap[InAppBrowserSettings$.transitionStyle]
+                          is Patch)
+                    ? _patchMap[InAppBrowserSettings$.transitionStyle].applyTo(
+                        this.transitionStyle,
+                      )
+                    : _patchMap[InAppBrowserSettings$.transitionStyle])
+                as ModalTransitionStyle?
           : this.transitionStyle,
       hideTitleBar: _patchMap.containsKey(InAppBrowserSettings$.hideTitleBar)
-          ? (_patchMap[InAppBrowserSettings$.hideTitleBar] is Function)
-                ? _patchMap[InAppBrowserSettings$.hideTitleBar](
-                    this.hideTitleBar,
-                  )
-                : (_patchMap[InAppBrowserSettings$.hideTitleBar] is Patch)
-                ? _patchMap[InAppBrowserSettings$.hideTitleBar].applyTo(
-                    this.hideTitleBar,
-                  )
-                : _patchMap[InAppBrowserSettings$.hideTitleBar]
+          ? ((_patchMap[InAppBrowserSettings$.hideTitleBar] is Function)
+                    ? _patchMap[InAppBrowserSettings$.hideTitleBar](
+                        this.hideTitleBar,
+                      )
+                    : (_patchMap[InAppBrowserSettings$.hideTitleBar] is Patch)
+                    ? _patchMap[InAppBrowserSettings$.hideTitleBar].applyTo(
+                        this.hideTitleBar,
+                      )
+                    : _patchMap[InAppBrowserSettings$.hideTitleBar])
+                as bool?
           : this.hideTitleBar,
       toolbarTopFixedTitle:
           _patchMap.containsKey(InAppBrowserSettings$.toolbarTopFixedTitle)
-          ? (_patchMap[InAppBrowserSettings$.toolbarTopFixedTitle] is Function)
-                ? _patchMap[InAppBrowserSettings$.toolbarTopFixedTitle](
-                    this.toolbarTopFixedTitle,
-                  )
-                : (_patchMap[InAppBrowserSettings$.toolbarTopFixedTitle]
-                      is Patch)
-                ? _patchMap[InAppBrowserSettings$.toolbarTopFixedTitle].applyTo(
-                    this.toolbarTopFixedTitle,
-                  )
-                : _patchMap[InAppBrowserSettings$.toolbarTopFixedTitle]
+          ? ((_patchMap[InAppBrowserSettings$.toolbarTopFixedTitle] is Function)
+                    ? _patchMap[InAppBrowserSettings$.toolbarTopFixedTitle](
+                        this.toolbarTopFixedTitle,
+                      )
+                    : (_patchMap[InAppBrowserSettings$.toolbarTopFixedTitle]
+                          is Patch)
+                    ? _patchMap[InAppBrowserSettings$.toolbarTopFixedTitle]
+                          .applyTo(this.toolbarTopFixedTitle)
+                    : _patchMap[InAppBrowserSettings$.toolbarTopFixedTitle])
+                as String?
           : this.toolbarTopFixedTitle,
       closeOnCannotGoBack:
           _patchMap.containsKey(InAppBrowserSettings$.closeOnCannotGoBack)
-          ? (_patchMap[InAppBrowserSettings$.closeOnCannotGoBack] is Function)
-                ? _patchMap[InAppBrowserSettings$.closeOnCannotGoBack](
-                    this.closeOnCannotGoBack,
-                  )
-                : (_patchMap[InAppBrowserSettings$.closeOnCannotGoBack]
-                      is Patch)
-                ? _patchMap[InAppBrowserSettings$.closeOnCannotGoBack].applyTo(
-                    this.closeOnCannotGoBack,
-                  )
-                : _patchMap[InAppBrowserSettings$.closeOnCannotGoBack]
+          ? ((_patchMap[InAppBrowserSettings$.closeOnCannotGoBack] is Function)
+                    ? _patchMap[InAppBrowserSettings$.closeOnCannotGoBack](
+                        this.closeOnCannotGoBack,
+                      )
+                    : (_patchMap[InAppBrowserSettings$.closeOnCannotGoBack]
+                          is Patch)
+                    ? _patchMap[InAppBrowserSettings$.closeOnCannotGoBack]
+                          .applyTo(this.closeOnCannotGoBack)
+                    : _patchMap[InAppBrowserSettings$.closeOnCannotGoBack])
+                as bool?
           : this.closeOnCannotGoBack,
       allowGoBackWithBackButton:
           _patchMap.containsKey(InAppBrowserSettings$.allowGoBackWithBackButton)
-          ? (_patchMap[InAppBrowserSettings$.allowGoBackWithBackButton]
-                    is Function)
-                ? _patchMap[InAppBrowserSettings$.allowGoBackWithBackButton](
-                    this.allowGoBackWithBackButton,
-                  )
-                : (_patchMap[InAppBrowserSettings$.allowGoBackWithBackButton]
-                      is Patch)
-                ? _patchMap[InAppBrowserSettings$.allowGoBackWithBackButton]
-                      .applyTo(this.allowGoBackWithBackButton)
-                : _patchMap[InAppBrowserSettings$.allowGoBackWithBackButton]
+          ? ((_patchMap[InAppBrowserSettings$.allowGoBackWithBackButton]
+                        is Function)
+                    ? _patchMap[InAppBrowserSettings$
+                          .allowGoBackWithBackButton](
+                        this.allowGoBackWithBackButton,
+                      )
+                    : (_patchMap[InAppBrowserSettings$
+                              .allowGoBackWithBackButton]
+                          is Patch)
+                    ? _patchMap[InAppBrowserSettings$.allowGoBackWithBackButton]
+                          .applyTo(this.allowGoBackWithBackButton)
+                    : _patchMap[InAppBrowserSettings$
+                          .allowGoBackWithBackButton])
+                as bool?
           : this.allowGoBackWithBackButton,
       shouldCloseOnBackButtonPressed:
           _patchMap.containsKey(
             InAppBrowserSettings$.shouldCloseOnBackButtonPressed,
           )
-          ? (_patchMap[InAppBrowserSettings$.shouldCloseOnBackButtonPressed]
-                    is Function)
-                ? _patchMap[InAppBrowserSettings$
-                      .shouldCloseOnBackButtonPressed](
-                    this.shouldCloseOnBackButtonPressed,
-                  )
-                : (_patchMap[InAppBrowserSettings$
-                          .shouldCloseOnBackButtonPressed]
-                      is Patch)
-                ? _patchMap[InAppBrowserSettings$
-                          .shouldCloseOnBackButtonPressed]
-                      .applyTo(this.shouldCloseOnBackButtonPressed)
-                : _patchMap[InAppBrowserSettings$
-                      .shouldCloseOnBackButtonPressed]
+          ? ((_patchMap[InAppBrowserSettings$.shouldCloseOnBackButtonPressed]
+                        is Function)
+                    ? _patchMap[InAppBrowserSettings$
+                          .shouldCloseOnBackButtonPressed](
+                        this.shouldCloseOnBackButtonPressed,
+                      )
+                    : (_patchMap[InAppBrowserSettings$
+                              .shouldCloseOnBackButtonPressed]
+                          is Patch)
+                    ? _patchMap[InAppBrowserSettings$
+                              .shouldCloseOnBackButtonPressed]
+                          .applyTo(this.shouldCloseOnBackButtonPressed)
+                    : _patchMap[InAppBrowserSettings$
+                          .shouldCloseOnBackButtonPressed])
+                as bool?
           : this.shouldCloseOnBackButtonPressed,
       windowType: _patchMap.containsKey(InAppBrowserSettings$.windowType)
-          ? (_patchMap[InAppBrowserSettings$.windowType] is Function)
-                ? _patchMap[InAppBrowserSettings$.windowType](this.windowType)
-                : (_patchMap[InAppBrowserSettings$.windowType] is Patch)
-                ? _patchMap[InAppBrowserSettings$.windowType].applyTo(
-                    this.windowType,
-                  )
-                : _patchMap[InAppBrowserSettings$.windowType]
+          ? ((_patchMap[InAppBrowserSettings$.windowType] is Function)
+                    ? _patchMap[InAppBrowserSettings$.windowType](
+                        this.windowType,
+                      )
+                    : (_patchMap[InAppBrowserSettings$.windowType] is Patch)
+                    ? _patchMap[InAppBrowserSettings$.windowType].applyTo(
+                        this.windowType,
+                      )
+                    : _patchMap[InAppBrowserSettings$.windowType])
+                as WindowType?
           : this.windowType,
       windowAlphaValue:
           _patchMap.containsKey(InAppBrowserSettings$.windowAlphaValue)
-          ? (_patchMap[InAppBrowserSettings$.windowAlphaValue] is Function)
-                ? _patchMap[InAppBrowserSettings$.windowAlphaValue](
-                    this.windowAlphaValue,
-                  )
-                : (_patchMap[InAppBrowserSettings$.windowAlphaValue] is Patch)
-                ? _patchMap[InAppBrowserSettings$.windowAlphaValue].applyTo(
-                    this.windowAlphaValue,
-                  )
-                : _patchMap[InAppBrowserSettings$.windowAlphaValue]
+          ? ((_patchMap[InAppBrowserSettings$.windowAlphaValue] is Function)
+                    ? _patchMap[InAppBrowserSettings$.windowAlphaValue](
+                        this.windowAlphaValue,
+                      )
+                    : (_patchMap[InAppBrowserSettings$.windowAlphaValue]
+                          is Patch)
+                    ? _patchMap[InAppBrowserSettings$.windowAlphaValue].applyTo(
+                        this.windowAlphaValue,
+                      )
+                    : _patchMap[InAppBrowserSettings$.windowAlphaValue])
+                as double?
           : this.windowAlphaValue,
       windowStyleMask:
           _patchMap.containsKey(InAppBrowserSettings$.windowStyleMask)
-          ? (_patchMap[InAppBrowserSettings$.windowStyleMask] is Function)
-                ? _patchMap[InAppBrowserSettings$.windowStyleMask](
-                    this.windowStyleMask,
-                  )
-                : (_patchMap[InAppBrowserSettings$.windowStyleMask] is Patch)
-                ? _patchMap[InAppBrowserSettings$.windowStyleMask].applyTo(
-                    this.windowStyleMask,
-                  )
-                : _patchMap[InAppBrowserSettings$.windowStyleMask]
+          ? ((_patchMap[InAppBrowserSettings$.windowStyleMask] is Function)
+                    ? _patchMap[InAppBrowserSettings$.windowStyleMask](
+                        this.windowStyleMask,
+                      )
+                    : (_patchMap[InAppBrowserSettings$.windowStyleMask]
+                          is Patch)
+                    ? _patchMap[InAppBrowserSettings$.windowStyleMask].applyTo(
+                        this.windowStyleMask,
+                      )
+                    : _patchMap[InAppBrowserSettings$.windowStyleMask])
+                as WindowStyleMask?
           : this.windowStyleMask,
       windowTitlebarSeparatorStyle:
           _patchMap.containsKey(
             InAppBrowserSettings$.windowTitlebarSeparatorStyle,
           )
-          ? (_patchMap[InAppBrowserSettings$.windowTitlebarSeparatorStyle]
-                    is Function)
-                ? _patchMap[InAppBrowserSettings$.windowTitlebarSeparatorStyle](
-                    this.windowTitlebarSeparatorStyle,
-                  )
-                : (_patchMap[InAppBrowserSettings$.windowTitlebarSeparatorStyle]
-                      is Patch)
-                ? _patchMap[InAppBrowserSettings$.windowTitlebarSeparatorStyle]
-                      .applyTo(this.windowTitlebarSeparatorStyle)
-                : _patchMap[InAppBrowserSettings$.windowTitlebarSeparatorStyle]
+          ? ((_patchMap[InAppBrowserSettings$.windowTitlebarSeparatorStyle]
+                        is Function)
+                    ? _patchMap[InAppBrowserSettings$
+                          .windowTitlebarSeparatorStyle](
+                        this.windowTitlebarSeparatorStyle,
+                      )
+                    : (_patchMap[InAppBrowserSettings$
+                              .windowTitlebarSeparatorStyle]
+                          is Patch)
+                    ? _patchMap[InAppBrowserSettings$
+                              .windowTitlebarSeparatorStyle]
+                          .applyTo(this.windowTitlebarSeparatorStyle)
+                    : _patchMap[InAppBrowserSettings$
+                          .windowTitlebarSeparatorStyle])
+                as WindowTitlebarSeparatorStyle?
           : this.windowTitlebarSeparatorStyle,
       windowFrame: _patchMap.containsKey(InAppBrowserSettings$.windowFrame)
-          ? (_patchMap[InAppBrowserSettings$.windowFrame] is Function)
-                ? _patchMap[InAppBrowserSettings$.windowFrame](this.windowFrame)
-                : (_patchMap[InAppBrowserSettings$.windowFrame] is Patch)
-                ? _patchMap[InAppBrowserSettings$.windowFrame].applyTo(
-                    this.windowFrame,
-                  )
-                : _patchMap[InAppBrowserSettings$.windowFrame]
+          ? ((_patchMap[InAppBrowserSettings$.windowFrame] is Function)
+                    ? _patchMap[InAppBrowserSettings$.windowFrame](
+                        this.windowFrame,
+                      )
+                    : (_patchMap[InAppBrowserSettings$.windowFrame] is Patch)
+                    ? _patchMap[InAppBrowserSettings$.windowFrame].applyTo(
+                        this.windowFrame,
+                      )
+                    : _patchMap[InAppBrowserSettings$.windowFrame])
+                as InAppWebViewRect?
           : this.windowFrame,
     );
   }
@@ -797,7 +852,8 @@ class InAppBrowserSettings {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$InAppBrowserSettingsToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

@@ -49,27 +49,30 @@ class JsConfirmRequest {
     final _patchMap = _patcher.patchMap;
     return JsConfirmRequest(
       url: _patchMap.containsKey(JsConfirmRequest$.url)
-          ? (_patchMap[JsConfirmRequest$.url] is Function)
-                ? _patchMap[JsConfirmRequest$.url](this.url)
-                : (_patchMap[JsConfirmRequest$.url] is Patch)
-                ? _patchMap[JsConfirmRequest$.url].applyTo(this.url)
-                : _patchMap[JsConfirmRequest$.url]
+          ? ((_patchMap[JsConfirmRequest$.url] is Function)
+                    ? _patchMap[JsConfirmRequest$.url](this.url)
+                    : (_patchMap[JsConfirmRequest$.url] is Patch)
+                    ? _patchMap[JsConfirmRequest$.url].applyTo(this.url)
+                    : _patchMap[JsConfirmRequest$.url])
+                as WebUri?
           : this.url,
       message: _patchMap.containsKey(JsConfirmRequest$.message)
-          ? (_patchMap[JsConfirmRequest$.message] is Function)
-                ? _patchMap[JsConfirmRequest$.message](this.message)
-                : (_patchMap[JsConfirmRequest$.message] is Patch)
-                ? _patchMap[JsConfirmRequest$.message].applyTo(this.message)
-                : _patchMap[JsConfirmRequest$.message]
+          ? ((_patchMap[JsConfirmRequest$.message] is Function)
+                    ? _patchMap[JsConfirmRequest$.message](this.message)
+                    : (_patchMap[JsConfirmRequest$.message] is Patch)
+                    ? _patchMap[JsConfirmRequest$.message].applyTo(this.message)
+                    : _patchMap[JsConfirmRequest$.message])
+                as String?
           : this.message,
       isMainFrame: _patchMap.containsKey(JsConfirmRequest$.isMainFrame)
-          ? (_patchMap[JsConfirmRequest$.isMainFrame] is Function)
-                ? _patchMap[JsConfirmRequest$.isMainFrame](this.isMainFrame)
-                : (_patchMap[JsConfirmRequest$.isMainFrame] is Patch)
-                ? _patchMap[JsConfirmRequest$.isMainFrame].applyTo(
-                    this.isMainFrame,
-                  )
-                : _patchMap[JsConfirmRequest$.isMainFrame]
+          ? ((_patchMap[JsConfirmRequest$.isMainFrame] is Function)
+                    ? _patchMap[JsConfirmRequest$.isMainFrame](this.isMainFrame)
+                    : (_patchMap[JsConfirmRequest$.isMainFrame] is Patch)
+                    ? _patchMap[JsConfirmRequest$.isMainFrame].applyTo(
+                        this.isMainFrame,
+                      )
+                    : _patchMap[JsConfirmRequest$.isMainFrame])
+                as bool?
           : this.isMainFrame,
     );
   }
@@ -100,7 +103,8 @@ class JsConfirmRequest {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$JsConfirmRequestToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

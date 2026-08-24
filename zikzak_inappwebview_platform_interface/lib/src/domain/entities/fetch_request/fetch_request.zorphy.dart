@@ -68,7 +68,7 @@ class FetchRequest {
     WebUri? url,
     String? method,
     Map<String, dynamic>? headers,
-    dynamic? body,
+    dynamic body,
     String? mode,
     FetchRequestCredential? credentials,
     String? cache,
@@ -100,7 +100,7 @@ class FetchRequest {
     WebUri? url,
     String? method,
     Map<String, dynamic>? headers,
-    dynamic? body,
+    dynamic body,
     String? mode,
     FetchRequestCredential? credentials,
     String? cache,
@@ -133,97 +133,114 @@ class FetchRequest {
     final _patchMap = _patcher.patchMap;
     return FetchRequest(
       url: _patchMap.containsKey(FetchRequest$.url)
-          ? (_patchMap[FetchRequest$.url] is Function)
-                ? _patchMap[FetchRequest$.url](this.url)
-                : (_patchMap[FetchRequest$.url] is Patch)
-                ? _patchMap[FetchRequest$.url].applyTo(this.url)
-                : _patchMap[FetchRequest$.url]
+          ? ((_patchMap[FetchRequest$.url] is Function)
+                    ? _patchMap[FetchRequest$.url](this.url)
+                    : (_patchMap[FetchRequest$.url] is Patch)
+                    ? _patchMap[FetchRequest$.url].applyTo(this.url)
+                    : _patchMap[FetchRequest$.url])
+                as WebUri?
           : this.url,
       method: _patchMap.containsKey(FetchRequest$.method)
-          ? (_patchMap[FetchRequest$.method] is Function)
-                ? _patchMap[FetchRequest$.method](this.method)
-                : (_patchMap[FetchRequest$.method] is Patch)
-                ? _patchMap[FetchRequest$.method].applyTo(this.method)
-                : _patchMap[FetchRequest$.method]
+          ? ((_patchMap[FetchRequest$.method] is Function)
+                    ? _patchMap[FetchRequest$.method](this.method)
+                    : (_patchMap[FetchRequest$.method] is Patch)
+                    ? _patchMap[FetchRequest$.method].applyTo(this.method)
+                    : _patchMap[FetchRequest$.method])
+                as String?
           : this.method,
       headers: _patchMap.containsKey(FetchRequest$.headers)
-          ? (_patchMap[FetchRequest$.headers] is Function)
-                ? _patchMap[FetchRequest$.headers](this.headers)
-                : (_patchMap[FetchRequest$.headers] is Patch)
-                ? _patchMap[FetchRequest$.headers].applyTo(this.headers)
-                : _patchMap[FetchRequest$.headers]
+          ? ((_patchMap[FetchRequest$.headers] is Function)
+                    ? _patchMap[FetchRequest$.headers](this.headers)
+                    : (_patchMap[FetchRequest$.headers] is Patch)
+                    ? _patchMap[FetchRequest$.headers].applyTo(this.headers)
+                    : _patchMap[FetchRequest$.headers])
+                as Map<String, dynamic>?
           : this.headers,
       body: _patchMap.containsKey(FetchRequest$.body)
-          ? (_patchMap[FetchRequest$.body] is Function)
-                ? _patchMap[FetchRequest$.body](this.body)
-                : (_patchMap[FetchRequest$.body] is Patch)
-                ? _patchMap[FetchRequest$.body].applyTo(this.body)
-                : _patchMap[FetchRequest$.body]
+          ? ((_patchMap[FetchRequest$.body] is Function)
+                    ? _patchMap[FetchRequest$.body](this.body)
+                    : (_patchMap[FetchRequest$.body] is Patch)
+                    ? _patchMap[FetchRequest$.body].applyTo(this.body)
+                    : _patchMap[FetchRequest$.body])
+                as dynamic
           : this.body,
       mode: _patchMap.containsKey(FetchRequest$.mode)
-          ? (_patchMap[FetchRequest$.mode] is Function)
-                ? _patchMap[FetchRequest$.mode](this.mode)
-                : (_patchMap[FetchRequest$.mode] is Patch)
-                ? _patchMap[FetchRequest$.mode].applyTo(this.mode)
-                : _patchMap[FetchRequest$.mode]
+          ? ((_patchMap[FetchRequest$.mode] is Function)
+                    ? _patchMap[FetchRequest$.mode](this.mode)
+                    : (_patchMap[FetchRequest$.mode] is Patch)
+                    ? _patchMap[FetchRequest$.mode].applyTo(this.mode)
+                    : _patchMap[FetchRequest$.mode])
+                as String?
           : this.mode,
       credentials: _patchMap.containsKey(FetchRequest$.credentials)
-          ? (_patchMap[FetchRequest$.credentials] is Function)
-                ? _patchMap[FetchRequest$.credentials](this.credentials)
-                : (_patchMap[FetchRequest$.credentials] is Patch)
-                ? _patchMap[FetchRequest$.credentials].applyTo(this.credentials)
-                : _patchMap[FetchRequest$.credentials]
+          ? ((_patchMap[FetchRequest$.credentials] is Function)
+                    ? _patchMap[FetchRequest$.credentials](this.credentials)
+                    : (_patchMap[FetchRequest$.credentials] is Patch)
+                    ? _patchMap[FetchRequest$.credentials].applyTo(
+                        this.credentials,
+                      )
+                    : _patchMap[FetchRequest$.credentials])
+                as FetchRequestCredential?
           : this.credentials,
       cache: _patchMap.containsKey(FetchRequest$.cache)
-          ? (_patchMap[FetchRequest$.cache] is Function)
-                ? _patchMap[FetchRequest$.cache](this.cache)
-                : (_patchMap[FetchRequest$.cache] is Patch)
-                ? _patchMap[FetchRequest$.cache].applyTo(this.cache)
-                : _patchMap[FetchRequest$.cache]
+          ? ((_patchMap[FetchRequest$.cache] is Function)
+                    ? _patchMap[FetchRequest$.cache](this.cache)
+                    : (_patchMap[FetchRequest$.cache] is Patch)
+                    ? _patchMap[FetchRequest$.cache].applyTo(this.cache)
+                    : _patchMap[FetchRequest$.cache])
+                as String?
           : this.cache,
       redirect: _patchMap.containsKey(FetchRequest$.redirect)
-          ? (_patchMap[FetchRequest$.redirect] is Function)
-                ? _patchMap[FetchRequest$.redirect](this.redirect)
-                : (_patchMap[FetchRequest$.redirect] is Patch)
-                ? _patchMap[FetchRequest$.redirect].applyTo(this.redirect)
-                : _patchMap[FetchRequest$.redirect]
+          ? ((_patchMap[FetchRequest$.redirect] is Function)
+                    ? _patchMap[FetchRequest$.redirect](this.redirect)
+                    : (_patchMap[FetchRequest$.redirect] is Patch)
+                    ? _patchMap[FetchRequest$.redirect].applyTo(this.redirect)
+                    : _patchMap[FetchRequest$.redirect])
+                as String?
           : this.redirect,
       referrer: _patchMap.containsKey(FetchRequest$.referrer)
-          ? (_patchMap[FetchRequest$.referrer] is Function)
-                ? _patchMap[FetchRequest$.referrer](this.referrer)
-                : (_patchMap[FetchRequest$.referrer] is Patch)
-                ? _patchMap[FetchRequest$.referrer].applyTo(this.referrer)
-                : _patchMap[FetchRequest$.referrer]
+          ? ((_patchMap[FetchRequest$.referrer] is Function)
+                    ? _patchMap[FetchRequest$.referrer](this.referrer)
+                    : (_patchMap[FetchRequest$.referrer] is Patch)
+                    ? _patchMap[FetchRequest$.referrer].applyTo(this.referrer)
+                    : _patchMap[FetchRequest$.referrer])
+                as String?
           : this.referrer,
       referrerPolicy: _patchMap.containsKey(FetchRequest$.referrerPolicy)
-          ? (_patchMap[FetchRequest$.referrerPolicy] is Function)
-                ? _patchMap[FetchRequest$.referrerPolicy](this.referrerPolicy)
-                : (_patchMap[FetchRequest$.referrerPolicy] is Patch)
-                ? _patchMap[FetchRequest$.referrerPolicy].applyTo(
-                    this.referrerPolicy,
-                  )
-                : _patchMap[FetchRequest$.referrerPolicy]
+          ? ((_patchMap[FetchRequest$.referrerPolicy] is Function)
+                    ? _patchMap[FetchRequest$.referrerPolicy](
+                        this.referrerPolicy,
+                      )
+                    : (_patchMap[FetchRequest$.referrerPolicy] is Patch)
+                    ? _patchMap[FetchRequest$.referrerPolicy].applyTo(
+                        this.referrerPolicy,
+                      )
+                    : _patchMap[FetchRequest$.referrerPolicy])
+                as ReferrerPolicy?
           : this.referrerPolicy,
       integrity: _patchMap.containsKey(FetchRequest$.integrity)
-          ? (_patchMap[FetchRequest$.integrity] is Function)
-                ? _patchMap[FetchRequest$.integrity](this.integrity)
-                : (_patchMap[FetchRequest$.integrity] is Patch)
-                ? _patchMap[FetchRequest$.integrity].applyTo(this.integrity)
-                : _patchMap[FetchRequest$.integrity]
+          ? ((_patchMap[FetchRequest$.integrity] is Function)
+                    ? _patchMap[FetchRequest$.integrity](this.integrity)
+                    : (_patchMap[FetchRequest$.integrity] is Patch)
+                    ? _patchMap[FetchRequest$.integrity].applyTo(this.integrity)
+                    : _patchMap[FetchRequest$.integrity])
+                as String?
           : this.integrity,
       keepalive: _patchMap.containsKey(FetchRequest$.keepalive)
-          ? (_patchMap[FetchRequest$.keepalive] is Function)
-                ? _patchMap[FetchRequest$.keepalive](this.keepalive)
-                : (_patchMap[FetchRequest$.keepalive] is Patch)
-                ? _patchMap[FetchRequest$.keepalive].applyTo(this.keepalive)
-                : _patchMap[FetchRequest$.keepalive]
+          ? ((_patchMap[FetchRequest$.keepalive] is Function)
+                    ? _patchMap[FetchRequest$.keepalive](this.keepalive)
+                    : (_patchMap[FetchRequest$.keepalive] is Patch)
+                    ? _patchMap[FetchRequest$.keepalive].applyTo(this.keepalive)
+                    : _patchMap[FetchRequest$.keepalive])
+                as bool?
           : this.keepalive,
       action: _patchMap.containsKey(FetchRequest$.action)
-          ? (_patchMap[FetchRequest$.action] is Function)
-                ? _patchMap[FetchRequest$.action](this.action)
-                : (_patchMap[FetchRequest$.action] is Patch)
-                ? _patchMap[FetchRequest$.action].applyTo(this.action)
-                : _patchMap[FetchRequest$.action]
+          ? ((_patchMap[FetchRequest$.action] is Function)
+                    ? _patchMap[FetchRequest$.action](this.action)
+                    : (_patchMap[FetchRequest$.action] is Patch)
+                    ? _patchMap[FetchRequest$.action].applyTo(this.action)
+                    : _patchMap[FetchRequest$.action])
+                as FetchRequestAction?
           : this.action,
     );
   }
@@ -298,7 +315,8 @@ class FetchRequest {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$FetchRequestToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {
@@ -415,6 +433,52 @@ extension FetchRequestPropertyHelpers on FetchRequest {
         (throw StateError('referrer is required but was null'));
   }
 
+  bool get hasReferrerPolicy {
+    return this.referrerPolicy != null;
+  }
+
+  bool get noReferrerPolicy {
+    return this.referrerPolicy == null;
+  }
+
+  ReferrerPolicy get referrerPolicyRequired {
+    return this.referrerPolicy ??
+        (throw StateError('referrerPolicy is required but was null'));
+  }
+
+  bool get isReferrerPolicyNO_REFERRER {
+    return this.referrerPolicy == ReferrerPolicy.NO_REFERRER;
+  }
+
+  bool get isReferrerPolicyNO_REFERRER_WHEN_DOWNGRADE {
+    return this.referrerPolicy == ReferrerPolicy.NO_REFERRER_WHEN_DOWNGRADE;
+  }
+
+  bool get isReferrerPolicyORIGIN {
+    return this.referrerPolicy == ReferrerPolicy.ORIGIN;
+  }
+
+  bool get isReferrerPolicyORIGIN_WHEN_CROSS_ORIGIN {
+    return this.referrerPolicy == ReferrerPolicy.ORIGIN_WHEN_CROSS_ORIGIN;
+  }
+
+  bool get isReferrerPolicySAME_ORIGIN {
+    return this.referrerPolicy == ReferrerPolicy.SAME_ORIGIN;
+  }
+
+  bool get isReferrerPolicySTRICT_ORIGIN {
+    return this.referrerPolicy == ReferrerPolicy.STRICT_ORIGIN;
+  }
+
+  bool get isReferrerPolicySTRICT_ORIGIN_WHEN_CROSS_ORIGIN {
+    return this.referrerPolicy ==
+        ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN;
+  }
+
+  bool get isReferrerPolicyUNSAFE_URL {
+    return this.referrerPolicy == ReferrerPolicy.UNSAFE_URL;
+  }
+
   bool get hasIntegrity {
     return this.integrity?.isNotEmpty == true;
   }
@@ -504,7 +568,7 @@ class FetchRequestPatch extends PatchBase<FetchRequest, FetchRequest$> {
     return this;
   }
 
-  FetchRequestPatch withBody(dynamic? value) {
+  FetchRequestPatch withBody(dynamic value) {
     patchMap[FetchRequest$.body] = value;
     return this;
   }

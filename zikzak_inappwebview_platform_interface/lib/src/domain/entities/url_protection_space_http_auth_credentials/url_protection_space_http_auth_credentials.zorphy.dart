@@ -54,33 +54,37 @@ class URLProtectionSpaceHttpAuthCredentials {
           _patchMap.containsKey(
             URLProtectionSpaceHttpAuthCredentials$.protectionSpace,
           )
-          ? (_patchMap[URLProtectionSpaceHttpAuthCredentials$.protectionSpace]
-                    is Function)
-                ? _patchMap[URLProtectionSpaceHttpAuthCredentials$
-                      .protectionSpace](this.protectionSpace)
-                : (_patchMap[URLProtectionSpaceHttpAuthCredentials$
-                          .protectionSpace]
-                      is Patch)
-                ? _patchMap[URLProtectionSpaceHttpAuthCredentials$
-                          .protectionSpace]
-                      .applyTo(this.protectionSpace)
-                : _patchMap[URLProtectionSpaceHttpAuthCredentials$
-                      .protectionSpace]
+          ? ((_patchMap[URLProtectionSpaceHttpAuthCredentials$.protectionSpace]
+                        is Function)
+                    ? _patchMap[URLProtectionSpaceHttpAuthCredentials$
+                          .protectionSpace](this.protectionSpace)
+                    : (_patchMap[URLProtectionSpaceHttpAuthCredentials$
+                              .protectionSpace]
+                          is Patch)
+                    ? _patchMap[URLProtectionSpaceHttpAuthCredentials$
+                              .protectionSpace]
+                          .applyTo(this.protectionSpace)
+                    : _patchMap[URLProtectionSpaceHttpAuthCredentials$
+                          .protectionSpace])
+                as URLProtectionSpace?
           : this.protectionSpace,
       credentials:
           _patchMap.containsKey(
             URLProtectionSpaceHttpAuthCredentials$.credentials,
           )
-          ? (_patchMap[URLProtectionSpaceHttpAuthCredentials$.credentials]
-                    is Function)
-                ? _patchMap[URLProtectionSpaceHttpAuthCredentials$.credentials](
-                    this.credentials,
-                  )
-                : (_patchMap[URLProtectionSpaceHttpAuthCredentials$.credentials]
-                      is Patch)
-                ? _patchMap[URLProtectionSpaceHttpAuthCredentials$.credentials]
-                      .applyTo(this.credentials)
-                : _patchMap[URLProtectionSpaceHttpAuthCredentials$.credentials]
+          ? ((_patchMap[URLProtectionSpaceHttpAuthCredentials$.credentials]
+                        is Function)
+                    ? _patchMap[URLProtectionSpaceHttpAuthCredentials$
+                          .credentials](this.credentials)
+                    : (_patchMap[URLProtectionSpaceHttpAuthCredentials$
+                              .credentials]
+                          is Patch)
+                    ? _patchMap[URLProtectionSpaceHttpAuthCredentials$
+                              .credentials]
+                          .applyTo(this.credentials)
+                    : _patchMap[URLProtectionSpaceHttpAuthCredentials$
+                          .credentials])
+                as List<URLCredential>?
           : this.credentials,
     );
   }
@@ -109,7 +113,8 @@ class URLProtectionSpaceHttpAuthCredentials {
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data =
         _$URLProtectionSpaceHttpAuthCredentialsToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

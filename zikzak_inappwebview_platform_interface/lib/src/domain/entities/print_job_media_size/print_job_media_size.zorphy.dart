@@ -63,36 +63,40 @@ class PrintJobMediaSize {
     final _patchMap = _patcher.patchMap;
     return PrintJobMediaSize(
       id: _patchMap.containsKey(PrintJobMediaSize$.id)
-          ? (_patchMap[PrintJobMediaSize$.id] is Function)
-                ? _patchMap[PrintJobMediaSize$.id](this.id)
-                : (_patchMap[PrintJobMediaSize$.id] is Patch)
-                ? _patchMap[PrintJobMediaSize$.id].applyTo(this.id)
-                : _patchMap[PrintJobMediaSize$.id]
+          ? ((_patchMap[PrintJobMediaSize$.id] is Function)
+                    ? _patchMap[PrintJobMediaSize$.id](this.id)
+                    : (_patchMap[PrintJobMediaSize$.id] is Patch)
+                    ? _patchMap[PrintJobMediaSize$.id].applyTo(this.id)
+                    : _patchMap[PrintJobMediaSize$.id])
+                as String
           : this.id,
       widthMils: _patchMap.containsKey(PrintJobMediaSize$.widthMils)
-          ? (_patchMap[PrintJobMediaSize$.widthMils] is Function)
-                ? _patchMap[PrintJobMediaSize$.widthMils](this.widthMils)
-                : (_patchMap[PrintJobMediaSize$.widthMils] is Patch)
-                ? _patchMap[PrintJobMediaSize$.widthMils].applyTo(
-                    this.widthMils,
-                  )
-                : _patchMap[PrintJobMediaSize$.widthMils]
+          ? ((_patchMap[PrintJobMediaSize$.widthMils] is Function)
+                    ? _patchMap[PrintJobMediaSize$.widthMils](this.widthMils)
+                    : (_patchMap[PrintJobMediaSize$.widthMils] is Patch)
+                    ? _patchMap[PrintJobMediaSize$.widthMils].applyTo(
+                        this.widthMils,
+                      )
+                    : _patchMap[PrintJobMediaSize$.widthMils])
+                as int
           : this.widthMils,
       heightMils: _patchMap.containsKey(PrintJobMediaSize$.heightMils)
-          ? (_patchMap[PrintJobMediaSize$.heightMils] is Function)
-                ? _patchMap[PrintJobMediaSize$.heightMils](this.heightMils)
-                : (_patchMap[PrintJobMediaSize$.heightMils] is Patch)
-                ? _patchMap[PrintJobMediaSize$.heightMils].applyTo(
-                    this.heightMils,
-                  )
-                : _patchMap[PrintJobMediaSize$.heightMils]
+          ? ((_patchMap[PrintJobMediaSize$.heightMils] is Function)
+                    ? _patchMap[PrintJobMediaSize$.heightMils](this.heightMils)
+                    : (_patchMap[PrintJobMediaSize$.heightMils] is Patch)
+                    ? _patchMap[PrintJobMediaSize$.heightMils].applyTo(
+                        this.heightMils,
+                      )
+                    : _patchMap[PrintJobMediaSize$.heightMils])
+                as int
           : this.heightMils,
       label: _patchMap.containsKey(PrintJobMediaSize$.label)
-          ? (_patchMap[PrintJobMediaSize$.label] is Function)
-                ? _patchMap[PrintJobMediaSize$.label](this.label)
-                : (_patchMap[PrintJobMediaSize$.label] is Patch)
-                ? _patchMap[PrintJobMediaSize$.label].applyTo(this.label)
-                : _patchMap[PrintJobMediaSize$.label]
+          ? ((_patchMap[PrintJobMediaSize$.label] is Function)
+                    ? _patchMap[PrintJobMediaSize$.label](this.label)
+                    : (_patchMap[PrintJobMediaSize$.label] is Patch)
+                    ? _patchMap[PrintJobMediaSize$.label].applyTo(this.label)
+                    : _patchMap[PrintJobMediaSize$.label])
+                as String?
           : this.label,
     );
   }
@@ -126,7 +130,8 @@ class PrintJobMediaSize {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$PrintJobMediaSizeToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

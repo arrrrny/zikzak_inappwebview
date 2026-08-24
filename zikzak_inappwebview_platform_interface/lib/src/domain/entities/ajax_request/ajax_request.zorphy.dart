@@ -177,145 +177,176 @@ class AjaxRequest {
     final _patchMap = _patcher.patchMap;
     return AjaxRequest(
       data: _patchMap.containsKey(AjaxRequest$.data)
-          ? (_patchMap[AjaxRequest$.data] is Function)
-                ? _patchMap[AjaxRequest$.data](this.data)
-                : (_patchMap[AjaxRequest$.data] is Patch)
-                ? _patchMap[AjaxRequest$.data].applyTo(this.data)
-                : _patchMap[AjaxRequest$.data]
+          ? ((_patchMap[AjaxRequest$.data] is Function)
+                    ? _patchMap[AjaxRequest$.data](this.data)
+                    : (_patchMap[AjaxRequest$.data] is Patch)
+                    ? _patchMap[AjaxRequest$.data].applyTo(this.data)
+                    : _patchMap[AjaxRequest$.data])
+                as dynamic
           : this.data,
       method: _patchMap.containsKey(AjaxRequest$.method)
-          ? (_patchMap[AjaxRequest$.method] is Function)
-                ? _patchMap[AjaxRequest$.method](this.method)
-                : (_patchMap[AjaxRequest$.method] is Patch)
-                ? _patchMap[AjaxRequest$.method].applyTo(this.method)
-                : _patchMap[AjaxRequest$.method]
+          ? ((_patchMap[AjaxRequest$.method] is Function)
+                    ? _patchMap[AjaxRequest$.method](this.method)
+                    : (_patchMap[AjaxRequest$.method] is Patch)
+                    ? _patchMap[AjaxRequest$.method].applyTo(this.method)
+                    : _patchMap[AjaxRequest$.method])
+                as String?
           : this.method,
       url: _patchMap.containsKey(AjaxRequest$.url)
-          ? (_patchMap[AjaxRequest$.url] is Function)
-                ? _patchMap[AjaxRequest$.url](this.url)
-                : (_patchMap[AjaxRequest$.url] is Patch)
-                ? _patchMap[AjaxRequest$.url].applyTo(this.url)
-                : _patchMap[AjaxRequest$.url]
+          ? ((_patchMap[AjaxRequest$.url] is Function)
+                    ? _patchMap[AjaxRequest$.url](this.url)
+                    : (_patchMap[AjaxRequest$.url] is Patch)
+                    ? _patchMap[AjaxRequest$.url].applyTo(this.url)
+                    : _patchMap[AjaxRequest$.url])
+                as WebUri?
           : this.url,
       isAsync: _patchMap.containsKey(AjaxRequest$.isAsync)
-          ? (_patchMap[AjaxRequest$.isAsync] is Function)
-                ? _patchMap[AjaxRequest$.isAsync](this.isAsync)
-                : (_patchMap[AjaxRequest$.isAsync] is Patch)
-                ? _patchMap[AjaxRequest$.isAsync].applyTo(this.isAsync)
-                : _patchMap[AjaxRequest$.isAsync]
+          ? ((_patchMap[AjaxRequest$.isAsync] is Function)
+                    ? _patchMap[AjaxRequest$.isAsync](this.isAsync)
+                    : (_patchMap[AjaxRequest$.isAsync] is Patch)
+                    ? _patchMap[AjaxRequest$.isAsync].applyTo(this.isAsync)
+                    : _patchMap[AjaxRequest$.isAsync])
+                as bool?
           : this.isAsync,
       user: _patchMap.containsKey(AjaxRequest$.user)
-          ? (_patchMap[AjaxRequest$.user] is Function)
-                ? _patchMap[AjaxRequest$.user](this.user)
-                : (_patchMap[AjaxRequest$.user] is Patch)
-                ? _patchMap[AjaxRequest$.user].applyTo(this.user)
-                : _patchMap[AjaxRequest$.user]
+          ? ((_patchMap[AjaxRequest$.user] is Function)
+                    ? _patchMap[AjaxRequest$.user](this.user)
+                    : (_patchMap[AjaxRequest$.user] is Patch)
+                    ? _patchMap[AjaxRequest$.user].applyTo(this.user)
+                    : _patchMap[AjaxRequest$.user])
+                as String?
           : this.user,
       password: _patchMap.containsKey(AjaxRequest$.password)
-          ? (_patchMap[AjaxRequest$.password] is Function)
-                ? _patchMap[AjaxRequest$.password](this.password)
-                : (_patchMap[AjaxRequest$.password] is Patch)
-                ? _patchMap[AjaxRequest$.password].applyTo(this.password)
-                : _patchMap[AjaxRequest$.password]
+          ? ((_patchMap[AjaxRequest$.password] is Function)
+                    ? _patchMap[AjaxRequest$.password](this.password)
+                    : (_patchMap[AjaxRequest$.password] is Patch)
+                    ? _patchMap[AjaxRequest$.password].applyTo(this.password)
+                    : _patchMap[AjaxRequest$.password])
+                as String?
           : this.password,
       withCredentials: _patchMap.containsKey(AjaxRequest$.withCredentials)
-          ? (_patchMap[AjaxRequest$.withCredentials] is Function)
-                ? _patchMap[AjaxRequest$.withCredentials](this.withCredentials)
-                : (_patchMap[AjaxRequest$.withCredentials] is Patch)
-                ? _patchMap[AjaxRequest$.withCredentials].applyTo(
-                    this.withCredentials,
-                  )
-                : _patchMap[AjaxRequest$.withCredentials]
+          ? ((_patchMap[AjaxRequest$.withCredentials] is Function)
+                    ? _patchMap[AjaxRequest$.withCredentials](
+                        this.withCredentials,
+                      )
+                    : (_patchMap[AjaxRequest$.withCredentials] is Patch)
+                    ? _patchMap[AjaxRequest$.withCredentials].applyTo(
+                        this.withCredentials,
+                      )
+                    : _patchMap[AjaxRequest$.withCredentials])
+                as bool?
           : this.withCredentials,
       headers: _patchMap.containsKey(AjaxRequest$.headers)
-          ? (_patchMap[AjaxRequest$.headers] is Function)
-                ? _patchMap[AjaxRequest$.headers](this.headers)
-                : (_patchMap[AjaxRequest$.headers] is Patch)
-                ? _patchMap[AjaxRequest$.headers].applyTo(this.headers)
-                : _patchMap[AjaxRequest$.headers]
+          ? ((_patchMap[AjaxRequest$.headers] is Function)
+                    ? _patchMap[AjaxRequest$.headers](this.headers)
+                    : (_patchMap[AjaxRequest$.headers] is Patch)
+                    ? _patchMap[AjaxRequest$.headers].applyTo(this.headers)
+                    : _patchMap[AjaxRequest$.headers])
+                as AjaxRequestHeaders?
           : this.headers,
       readyState: _patchMap.containsKey(AjaxRequest$.readyState)
-          ? (_patchMap[AjaxRequest$.readyState] is Function)
-                ? _patchMap[AjaxRequest$.readyState](this.readyState)
-                : (_patchMap[AjaxRequest$.readyState] is Patch)
-                ? _patchMap[AjaxRequest$.readyState].applyTo(this.readyState)
-                : _patchMap[AjaxRequest$.readyState]
+          ? ((_patchMap[AjaxRequest$.readyState] is Function)
+                    ? _patchMap[AjaxRequest$.readyState](this.readyState)
+                    : (_patchMap[AjaxRequest$.readyState] is Patch)
+                    ? _patchMap[AjaxRequest$.readyState].applyTo(
+                        this.readyState,
+                      )
+                    : _patchMap[AjaxRequest$.readyState])
+                as AjaxRequestReadyState?
           : this.readyState,
       status: _patchMap.containsKey(AjaxRequest$.status)
-          ? (_patchMap[AjaxRequest$.status] is Function)
-                ? _patchMap[AjaxRequest$.status](this.status)
-                : (_patchMap[AjaxRequest$.status] is Patch)
-                ? _patchMap[AjaxRequest$.status].applyTo(this.status)
-                : _patchMap[AjaxRequest$.status]
+          ? ((_patchMap[AjaxRequest$.status] is Function)
+                    ? _patchMap[AjaxRequest$.status](this.status)
+                    : (_patchMap[AjaxRequest$.status] is Patch)
+                    ? _patchMap[AjaxRequest$.status].applyTo(this.status)
+                    : _patchMap[AjaxRequest$.status])
+                as int?
           : this.status,
       responseURL: _patchMap.containsKey(AjaxRequest$.responseURL)
-          ? (_patchMap[AjaxRequest$.responseURL] is Function)
-                ? _patchMap[AjaxRequest$.responseURL](this.responseURL)
-                : (_patchMap[AjaxRequest$.responseURL] is Patch)
-                ? _patchMap[AjaxRequest$.responseURL].applyTo(this.responseURL)
-                : _patchMap[AjaxRequest$.responseURL]
+          ? ((_patchMap[AjaxRequest$.responseURL] is Function)
+                    ? _patchMap[AjaxRequest$.responseURL](this.responseURL)
+                    : (_patchMap[AjaxRequest$.responseURL] is Patch)
+                    ? _patchMap[AjaxRequest$.responseURL].applyTo(
+                        this.responseURL,
+                      )
+                    : _patchMap[AjaxRequest$.responseURL])
+                as WebUri?
           : this.responseURL,
       responseType: _patchMap.containsKey(AjaxRequest$.responseType)
-          ? (_patchMap[AjaxRequest$.responseType] is Function)
-                ? _patchMap[AjaxRequest$.responseType](this.responseType)
-                : (_patchMap[AjaxRequest$.responseType] is Patch)
-                ? _patchMap[AjaxRequest$.responseType].applyTo(
-                    this.responseType,
-                  )
-                : _patchMap[AjaxRequest$.responseType]
+          ? ((_patchMap[AjaxRequest$.responseType] is Function)
+                    ? _patchMap[AjaxRequest$.responseType](this.responseType)
+                    : (_patchMap[AjaxRequest$.responseType] is Patch)
+                    ? _patchMap[AjaxRequest$.responseType].applyTo(
+                        this.responseType,
+                      )
+                    : _patchMap[AjaxRequest$.responseType])
+                as String?
           : this.responseType,
       response: _patchMap.containsKey(AjaxRequest$.response)
-          ? (_patchMap[AjaxRequest$.response] is Function)
-                ? _patchMap[AjaxRequest$.response](this.response)
-                : (_patchMap[AjaxRequest$.response] is Patch)
-                ? _patchMap[AjaxRequest$.response].applyTo(this.response)
-                : _patchMap[AjaxRequest$.response]
+          ? ((_patchMap[AjaxRequest$.response] is Function)
+                    ? _patchMap[AjaxRequest$.response](this.response)
+                    : (_patchMap[AjaxRequest$.response] is Patch)
+                    ? _patchMap[AjaxRequest$.response].applyTo(this.response)
+                    : _patchMap[AjaxRequest$.response])
+                as dynamic
           : this.response,
       responseText: _patchMap.containsKey(AjaxRequest$.responseText)
-          ? (_patchMap[AjaxRequest$.responseText] is Function)
-                ? _patchMap[AjaxRequest$.responseText](this.responseText)
-                : (_patchMap[AjaxRequest$.responseText] is Patch)
-                ? _patchMap[AjaxRequest$.responseText].applyTo(
-                    this.responseText,
-                  )
-                : _patchMap[AjaxRequest$.responseText]
+          ? ((_patchMap[AjaxRequest$.responseText] is Function)
+                    ? _patchMap[AjaxRequest$.responseText](this.responseText)
+                    : (_patchMap[AjaxRequest$.responseText] is Patch)
+                    ? _patchMap[AjaxRequest$.responseText].applyTo(
+                        this.responseText,
+                      )
+                    : _patchMap[AjaxRequest$.responseText])
+                as String?
           : this.responseText,
       responseXML: _patchMap.containsKey(AjaxRequest$.responseXML)
-          ? (_patchMap[AjaxRequest$.responseXML] is Function)
-                ? _patchMap[AjaxRequest$.responseXML](this.responseXML)
-                : (_patchMap[AjaxRequest$.responseXML] is Patch)
-                ? _patchMap[AjaxRequest$.responseXML].applyTo(this.responseXML)
-                : _patchMap[AjaxRequest$.responseXML]
+          ? ((_patchMap[AjaxRequest$.responseXML] is Function)
+                    ? _patchMap[AjaxRequest$.responseXML](this.responseXML)
+                    : (_patchMap[AjaxRequest$.responseXML] is Patch)
+                    ? _patchMap[AjaxRequest$.responseXML].applyTo(
+                        this.responseXML,
+                      )
+                    : _patchMap[AjaxRequest$.responseXML])
+                as String?
           : this.responseXML,
       statusText: _patchMap.containsKey(AjaxRequest$.statusText)
-          ? (_patchMap[AjaxRequest$.statusText] is Function)
-                ? _patchMap[AjaxRequest$.statusText](this.statusText)
-                : (_patchMap[AjaxRequest$.statusText] is Patch)
-                ? _patchMap[AjaxRequest$.statusText].applyTo(this.statusText)
-                : _patchMap[AjaxRequest$.statusText]
+          ? ((_patchMap[AjaxRequest$.statusText] is Function)
+                    ? _patchMap[AjaxRequest$.statusText](this.statusText)
+                    : (_patchMap[AjaxRequest$.statusText] is Patch)
+                    ? _patchMap[AjaxRequest$.statusText].applyTo(
+                        this.statusText,
+                      )
+                    : _patchMap[AjaxRequest$.statusText])
+                as String?
           : this.statusText,
       responseHeaders: _patchMap.containsKey(AjaxRequest$.responseHeaders)
-          ? (_patchMap[AjaxRequest$.responseHeaders] is Function)
-                ? _patchMap[AjaxRequest$.responseHeaders](this.responseHeaders)
-                : (_patchMap[AjaxRequest$.responseHeaders] is Patch)
-                ? _patchMap[AjaxRequest$.responseHeaders].applyTo(
-                    this.responseHeaders,
-                  )
-                : _patchMap[AjaxRequest$.responseHeaders]
+          ? ((_patchMap[AjaxRequest$.responseHeaders] is Function)
+                    ? _patchMap[AjaxRequest$.responseHeaders](
+                        this.responseHeaders,
+                      )
+                    : (_patchMap[AjaxRequest$.responseHeaders] is Patch)
+                    ? _patchMap[AjaxRequest$.responseHeaders].applyTo(
+                        this.responseHeaders,
+                      )
+                    : _patchMap[AjaxRequest$.responseHeaders])
+                as Map<String, dynamic>?
           : this.responseHeaders,
       event: _patchMap.containsKey(AjaxRequest$.event)
-          ? (_patchMap[AjaxRequest$.event] is Function)
-                ? _patchMap[AjaxRequest$.event](this.event)
-                : (_patchMap[AjaxRequest$.event] is Patch)
-                ? _patchMap[AjaxRequest$.event].applyTo(this.event)
-                : _patchMap[AjaxRequest$.event]
+          ? ((_patchMap[AjaxRequest$.event] is Function)
+                    ? _patchMap[AjaxRequest$.event](this.event)
+                    : (_patchMap[AjaxRequest$.event] is Patch)
+                    ? _patchMap[AjaxRequest$.event].applyTo(this.event)
+                    : _patchMap[AjaxRequest$.event])
+                as AjaxRequestEvent?
           : this.event,
       action: _patchMap.containsKey(AjaxRequest$.action)
-          ? (_patchMap[AjaxRequest$.action] is Function)
-                ? _patchMap[AjaxRequest$.action](this.action)
-                : (_patchMap[AjaxRequest$.action] is Patch)
-                ? _patchMap[AjaxRequest$.action].applyTo(this.action)
-                : _patchMap[AjaxRequest$.action]
+          ? ((_patchMap[AjaxRequest$.action] is Function)
+                    ? _patchMap[AjaxRequest$.action](this.action)
+                    : (_patchMap[AjaxRequest$.action] is Patch)
+                    ? _patchMap[AjaxRequest$.action].applyTo(this.action)
+                    : _patchMap[AjaxRequest$.action])
+                as AjaxRequestAction?
           : this.action,
     );
   }
@@ -414,7 +445,8 @@ class AjaxRequest {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$AjaxRequestToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {
@@ -642,6 +674,18 @@ extension AjaxRequestPropertyHelpers on AjaxRequest {
     return this.responseHeaders?.isEmpty ?? true;
   }
 
+  bool get hasEvent {
+    return this.event != null;
+  }
+
+  bool get noEvent {
+    return this.event == null;
+  }
+
+  AjaxRequestEvent get eventRequired {
+    return this.event ?? (throw StateError('event is required but was null'));
+  }
+
   bool get hasAction {
     return this.action != null;
   }
@@ -696,7 +740,7 @@ class AjaxRequestPatch extends PatchBase<AjaxRequest, AjaxRequest$> {
     return entity.patchWithAjaxRequest(this);
   }
 
-  AjaxRequestPatch withData(dynamic? value) {
+  AjaxRequestPatch withData(dynamic value) {
     patchMap[AjaxRequest$.data] = value;
     return this;
   }
@@ -756,7 +800,7 @@ class AjaxRequestPatch extends PatchBase<AjaxRequest, AjaxRequest$> {
     return this;
   }
 
-  AjaxRequestPatch withResponse(dynamic? value) {
+  AjaxRequestPatch withResponse(dynamic value) {
     patchMap[AjaxRequest$.response] = value;
     return this;
   }
@@ -783,6 +827,21 @@ class AjaxRequestPatch extends PatchBase<AjaxRequest, AjaxRequest$> {
 
   AjaxRequestPatch withEvent(AjaxRequestEvent? value) {
     patchMap[AjaxRequest$.event] = value;
+    return this;
+  }
+
+  AjaxRequestPatch withEventPatch(AjaxRequestEventPatch patch) {
+    patchMap[AjaxRequest$.event] = patch;
+    return this;
+  }
+
+  AjaxRequestPatch withEventPatchFunc(
+    AjaxRequestEventPatch Function(AjaxRequestEventPatch) patch,
+  ) {
+    patchMap[AjaxRequest$.event] = (dynamic current) {
+      var currentPatch = AjaxRequestEventPatch();
+      return patch(currentPatch).applyTo(current as AjaxRequestEvent);
+    };
     return this;
   }
 

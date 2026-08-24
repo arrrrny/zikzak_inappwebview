@@ -65,47 +65,52 @@ class UIEventAttribution {
     return UIEventAttribution(
       sourceIdentifier:
           _patchMap.containsKey(UIEventAttribution$.sourceIdentifier)
-          ? (_patchMap[UIEventAttribution$.sourceIdentifier] is Function)
-                ? _patchMap[UIEventAttribution$.sourceIdentifier](
-                    this.sourceIdentifier,
-                  )
-                : (_patchMap[UIEventAttribution$.sourceIdentifier] is Patch)
-                ? _patchMap[UIEventAttribution$.sourceIdentifier].applyTo(
-                    this.sourceIdentifier,
-                  )
-                : _patchMap[UIEventAttribution$.sourceIdentifier]
+          ? ((_patchMap[UIEventAttribution$.sourceIdentifier] is Function)
+                    ? _patchMap[UIEventAttribution$.sourceIdentifier](
+                        this.sourceIdentifier,
+                      )
+                    : (_patchMap[UIEventAttribution$.sourceIdentifier] is Patch)
+                    ? _patchMap[UIEventAttribution$.sourceIdentifier].applyTo(
+                        this.sourceIdentifier,
+                      )
+                    : _patchMap[UIEventAttribution$.sourceIdentifier])
+                as int
           : this.sourceIdentifier,
       destinationURL: _patchMap.containsKey(UIEventAttribution$.destinationURL)
-          ? (_patchMap[UIEventAttribution$.destinationURL] is Function)
-                ? _patchMap[UIEventAttribution$.destinationURL](
-                    this.destinationURL,
-                  )
-                : (_patchMap[UIEventAttribution$.destinationURL] is Patch)
-                ? _patchMap[UIEventAttribution$.destinationURL].applyTo(
-                    this.destinationURL,
-                  )
-                : _patchMap[UIEventAttribution$.destinationURL]
+          ? ((_patchMap[UIEventAttribution$.destinationURL] is Function)
+                    ? _patchMap[UIEventAttribution$.destinationURL](
+                        this.destinationURL,
+                      )
+                    : (_patchMap[UIEventAttribution$.destinationURL] is Patch)
+                    ? _patchMap[UIEventAttribution$.destinationURL].applyTo(
+                        this.destinationURL,
+                      )
+                    : _patchMap[UIEventAttribution$.destinationURL])
+                as WebUri
           : this.destinationURL,
       sourceDescription:
           _patchMap.containsKey(UIEventAttribution$.sourceDescription)
-          ? (_patchMap[UIEventAttribution$.sourceDescription] is Function)
-                ? _patchMap[UIEventAttribution$.sourceDescription](
-                    this.sourceDescription,
-                  )
-                : (_patchMap[UIEventAttribution$.sourceDescription] is Patch)
-                ? _patchMap[UIEventAttribution$.sourceDescription].applyTo(
-                    this.sourceDescription,
-                  )
-                : _patchMap[UIEventAttribution$.sourceDescription]
+          ? ((_patchMap[UIEventAttribution$.sourceDescription] is Function)
+                    ? _patchMap[UIEventAttribution$.sourceDescription](
+                        this.sourceDescription,
+                      )
+                    : (_patchMap[UIEventAttribution$.sourceDescription]
+                          is Patch)
+                    ? _patchMap[UIEventAttribution$.sourceDescription].applyTo(
+                        this.sourceDescription,
+                      )
+                    : _patchMap[UIEventAttribution$.sourceDescription])
+                as String
           : this.sourceDescription,
       purchaser: _patchMap.containsKey(UIEventAttribution$.purchaser)
-          ? (_patchMap[UIEventAttribution$.purchaser] is Function)
-                ? _patchMap[UIEventAttribution$.purchaser](this.purchaser)
-                : (_patchMap[UIEventAttribution$.purchaser] is Patch)
-                ? _patchMap[UIEventAttribution$.purchaser].applyTo(
-                    this.purchaser,
-                  )
-                : _patchMap[UIEventAttribution$.purchaser]
+          ? ((_patchMap[UIEventAttribution$.purchaser] is Function)
+                    ? _patchMap[UIEventAttribution$.purchaser](this.purchaser)
+                    : (_patchMap[UIEventAttribution$.purchaser] is Patch)
+                    ? _patchMap[UIEventAttribution$.purchaser].applyTo(
+                        this.purchaser,
+                      )
+                    : _patchMap[UIEventAttribution$.purchaser])
+                as String
           : this.purchaser,
     );
   }
@@ -144,7 +149,8 @@ class UIEventAttribution {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$UIEventAttributionToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

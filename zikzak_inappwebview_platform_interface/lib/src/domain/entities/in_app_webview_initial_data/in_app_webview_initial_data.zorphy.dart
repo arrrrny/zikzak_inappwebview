@@ -75,49 +75,60 @@ class InAppWebViewInitialData {
     final _patchMap = _patcher.patchMap;
     return InAppWebViewInitialData(
       data: _patchMap.containsKey(InAppWebViewInitialData$.data)
-          ? (_patchMap[InAppWebViewInitialData$.data] is Function)
-                ? _patchMap[InAppWebViewInitialData$.data](this.data)
-                : (_patchMap[InAppWebViewInitialData$.data] is Patch)
-                ? _patchMap[InAppWebViewInitialData$.data].applyTo(this.data)
-                : _patchMap[InAppWebViewInitialData$.data]
+          ? ((_patchMap[InAppWebViewInitialData$.data] is Function)
+                    ? _patchMap[InAppWebViewInitialData$.data](this.data)
+                    : (_patchMap[InAppWebViewInitialData$.data] is Patch)
+                    ? _patchMap[InAppWebViewInitialData$.data].applyTo(
+                        this.data,
+                      )
+                    : _patchMap[InAppWebViewInitialData$.data])
+                as String
           : this.data,
       mimeType: _patchMap.containsKey(InAppWebViewInitialData$.mimeType)
-          ? (_patchMap[InAppWebViewInitialData$.mimeType] is Function)
-                ? _patchMap[InAppWebViewInitialData$.mimeType](this.mimeType)
-                : (_patchMap[InAppWebViewInitialData$.mimeType] is Patch)
-                ? _patchMap[InAppWebViewInitialData$.mimeType].applyTo(
-                    this.mimeType,
-                  )
-                : _patchMap[InAppWebViewInitialData$.mimeType]
+          ? ((_patchMap[InAppWebViewInitialData$.mimeType] is Function)
+                    ? _patchMap[InAppWebViewInitialData$.mimeType](
+                        this.mimeType,
+                      )
+                    : (_patchMap[InAppWebViewInitialData$.mimeType] is Patch)
+                    ? _patchMap[InAppWebViewInitialData$.mimeType].applyTo(
+                        this.mimeType,
+                      )
+                    : _patchMap[InAppWebViewInitialData$.mimeType])
+                as String
           : this.mimeType,
       encoding: _patchMap.containsKey(InAppWebViewInitialData$.encoding)
-          ? (_patchMap[InAppWebViewInitialData$.encoding] is Function)
-                ? _patchMap[InAppWebViewInitialData$.encoding](this.encoding)
-                : (_patchMap[InAppWebViewInitialData$.encoding] is Patch)
-                ? _patchMap[InAppWebViewInitialData$.encoding].applyTo(
-                    this.encoding,
-                  )
-                : _patchMap[InAppWebViewInitialData$.encoding]
+          ? ((_patchMap[InAppWebViewInitialData$.encoding] is Function)
+                    ? _patchMap[InAppWebViewInitialData$.encoding](
+                        this.encoding,
+                      )
+                    : (_patchMap[InAppWebViewInitialData$.encoding] is Patch)
+                    ? _patchMap[InAppWebViewInitialData$.encoding].applyTo(
+                        this.encoding,
+                      )
+                    : _patchMap[InAppWebViewInitialData$.encoding])
+                as String
           : this.encoding,
       baseUrl: _patchMap.containsKey(InAppWebViewInitialData$.baseUrl)
-          ? (_patchMap[InAppWebViewInitialData$.baseUrl] is Function)
-                ? _patchMap[InAppWebViewInitialData$.baseUrl](this.baseUrl)
-                : (_patchMap[InAppWebViewInitialData$.baseUrl] is Patch)
-                ? _patchMap[InAppWebViewInitialData$.baseUrl].applyTo(
-                    this.baseUrl,
-                  )
-                : _patchMap[InAppWebViewInitialData$.baseUrl]
+          ? ((_patchMap[InAppWebViewInitialData$.baseUrl] is Function)
+                    ? _patchMap[InAppWebViewInitialData$.baseUrl](this.baseUrl)
+                    : (_patchMap[InAppWebViewInitialData$.baseUrl] is Patch)
+                    ? _patchMap[InAppWebViewInitialData$.baseUrl].applyTo(
+                        this.baseUrl,
+                      )
+                    : _patchMap[InAppWebViewInitialData$.baseUrl])
+                as WebUri?
           : this.baseUrl,
       historyUrl: _patchMap.containsKey(InAppWebViewInitialData$.historyUrl)
-          ? (_patchMap[InAppWebViewInitialData$.historyUrl] is Function)
-                ? _patchMap[InAppWebViewInitialData$.historyUrl](
-                    this.historyUrl,
-                  )
-                : (_patchMap[InAppWebViewInitialData$.historyUrl] is Patch)
-                ? _patchMap[InAppWebViewInitialData$.historyUrl].applyTo(
-                    this.historyUrl,
-                  )
-                : _patchMap[InAppWebViewInitialData$.historyUrl]
+          ? ((_patchMap[InAppWebViewInitialData$.historyUrl] is Function)
+                    ? _patchMap[InAppWebViewInitialData$.historyUrl](
+                        this.historyUrl,
+                      )
+                    : (_patchMap[InAppWebViewInitialData$.historyUrl] is Patch)
+                    ? _patchMap[InAppWebViewInitialData$.historyUrl].applyTo(
+                        this.historyUrl,
+                      )
+                    : _patchMap[InAppWebViewInitialData$.historyUrl])
+                as WebUri?
           : this.historyUrl,
     );
   }
@@ -160,7 +171,8 @@ class InAppWebViewInitialData {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$InAppWebViewInitialDataToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

@@ -39,25 +39,28 @@ class UIImage {
     final _patchMap = _patcher.patchMap;
     return UIImage(
       name: _patchMap.containsKey(UIImage$.name_)
-          ? (_patchMap[UIImage$.name_] is Function)
-                ? _patchMap[UIImage$.name_](this.name)
-                : (_patchMap[UIImage$.name_] is Patch)
-                ? _patchMap[UIImage$.name_].applyTo(this.name)
-                : _patchMap[UIImage$.name_]
+          ? ((_patchMap[UIImage$.name_] is Function)
+                    ? _patchMap[UIImage$.name_](this.name)
+                    : (_patchMap[UIImage$.name_] is Patch)
+                    ? _patchMap[UIImage$.name_].applyTo(this.name)
+                    : _patchMap[UIImage$.name_])
+                as String?
           : this.name,
       systemName: _patchMap.containsKey(UIImage$.systemName)
-          ? (_patchMap[UIImage$.systemName] is Function)
-                ? _patchMap[UIImage$.systemName](this.systemName)
-                : (_patchMap[UIImage$.systemName] is Patch)
-                ? _patchMap[UIImage$.systemName].applyTo(this.systemName)
-                : _patchMap[UIImage$.systemName]
+          ? ((_patchMap[UIImage$.systemName] is Function)
+                    ? _patchMap[UIImage$.systemName](this.systemName)
+                    : (_patchMap[UIImage$.systemName] is Patch)
+                    ? _patchMap[UIImage$.systemName].applyTo(this.systemName)
+                    : _patchMap[UIImage$.systemName])
+                as String?
           : this.systemName,
       data: _patchMap.containsKey(UIImage$.data)
-          ? (_patchMap[UIImage$.data] is Function)
-                ? _patchMap[UIImage$.data](this.data)
-                : (_patchMap[UIImage$.data] is Patch)
-                ? _patchMap[UIImage$.data].applyTo(this.data)
-                : _patchMap[UIImage$.data]
+          ? ((_patchMap[UIImage$.data] is Function)
+                    ? _patchMap[UIImage$.data](this.data)
+                    : (_patchMap[UIImage$.data] is Patch)
+                    ? _patchMap[UIImage$.data].applyTo(this.data)
+                    : _patchMap[UIImage$.data])
+                as Uint8List?
           : this.data,
     );
   }
@@ -88,7 +91,8 @@ class UIImage {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$UIImageToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

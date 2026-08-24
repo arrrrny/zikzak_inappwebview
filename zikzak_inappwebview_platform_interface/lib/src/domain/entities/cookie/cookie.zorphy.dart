@@ -96,67 +96,78 @@ class Cookie {
     final _patchMap = _patcher.patchMap;
     return Cookie(
       name: _patchMap.containsKey(Cookie$.name_)
-          ? (_patchMap[Cookie$.name_] is Function)
-                ? _patchMap[Cookie$.name_](this.name)
-                : (_patchMap[Cookie$.name_] is Patch)
-                ? _patchMap[Cookie$.name_].applyTo(this.name)
-                : _patchMap[Cookie$.name_]
+          ? ((_patchMap[Cookie$.name_] is Function)
+                    ? _patchMap[Cookie$.name_](this.name)
+                    : (_patchMap[Cookie$.name_] is Patch)
+                    ? _patchMap[Cookie$.name_].applyTo(this.name)
+                    : _patchMap[Cookie$.name_])
+                as String
           : this.name,
       value: _patchMap.containsKey(Cookie$.value)
-          ? (_patchMap[Cookie$.value] is Function)
-                ? _patchMap[Cookie$.value](this.value)
-                : (_patchMap[Cookie$.value] is Patch)
-                ? _patchMap[Cookie$.value].applyTo(this.value)
-                : _patchMap[Cookie$.value]
+          ? ((_patchMap[Cookie$.value] is Function)
+                    ? _patchMap[Cookie$.value](this.value)
+                    : (_patchMap[Cookie$.value] is Patch)
+                    ? _patchMap[Cookie$.value].applyTo(this.value)
+                    : _patchMap[Cookie$.value])
+                as dynamic
           : this.value,
       expiresDate: _patchMap.containsKey(Cookie$.expiresDate)
-          ? (_patchMap[Cookie$.expiresDate] is Function)
-                ? _patchMap[Cookie$.expiresDate](this.expiresDate)
-                : (_patchMap[Cookie$.expiresDate] is Patch)
-                ? _patchMap[Cookie$.expiresDate].applyTo(this.expiresDate)
-                : _patchMap[Cookie$.expiresDate]
+          ? ((_patchMap[Cookie$.expiresDate] is Function)
+                    ? _patchMap[Cookie$.expiresDate](this.expiresDate)
+                    : (_patchMap[Cookie$.expiresDate] is Patch)
+                    ? _patchMap[Cookie$.expiresDate].applyTo(this.expiresDate)
+                    : _patchMap[Cookie$.expiresDate])
+                as int?
           : this.expiresDate,
       isSessionOnly: _patchMap.containsKey(Cookie$.isSessionOnly)
-          ? (_patchMap[Cookie$.isSessionOnly] is Function)
-                ? _patchMap[Cookie$.isSessionOnly](this.isSessionOnly)
-                : (_patchMap[Cookie$.isSessionOnly] is Patch)
-                ? _patchMap[Cookie$.isSessionOnly].applyTo(this.isSessionOnly)
-                : _patchMap[Cookie$.isSessionOnly]
+          ? ((_patchMap[Cookie$.isSessionOnly] is Function)
+                    ? _patchMap[Cookie$.isSessionOnly](this.isSessionOnly)
+                    : (_patchMap[Cookie$.isSessionOnly] is Patch)
+                    ? _patchMap[Cookie$.isSessionOnly].applyTo(
+                        this.isSessionOnly,
+                      )
+                    : _patchMap[Cookie$.isSessionOnly])
+                as bool?
           : this.isSessionOnly,
       domain: _patchMap.containsKey(Cookie$.domain)
-          ? (_patchMap[Cookie$.domain] is Function)
-                ? _patchMap[Cookie$.domain](this.domain)
-                : (_patchMap[Cookie$.domain] is Patch)
-                ? _patchMap[Cookie$.domain].applyTo(this.domain)
-                : _patchMap[Cookie$.domain]
+          ? ((_patchMap[Cookie$.domain] is Function)
+                    ? _patchMap[Cookie$.domain](this.domain)
+                    : (_patchMap[Cookie$.domain] is Patch)
+                    ? _patchMap[Cookie$.domain].applyTo(this.domain)
+                    : _patchMap[Cookie$.domain])
+                as String?
           : this.domain,
       sameSite: _patchMap.containsKey(Cookie$.sameSite)
-          ? (_patchMap[Cookie$.sameSite] is Function)
-                ? _patchMap[Cookie$.sameSite](this.sameSite)
-                : (_patchMap[Cookie$.sameSite] is Patch)
-                ? _patchMap[Cookie$.sameSite].applyTo(this.sameSite)
-                : _patchMap[Cookie$.sameSite]
+          ? ((_patchMap[Cookie$.sameSite] is Function)
+                    ? _patchMap[Cookie$.sameSite](this.sameSite)
+                    : (_patchMap[Cookie$.sameSite] is Patch)
+                    ? _patchMap[Cookie$.sameSite].applyTo(this.sameSite)
+                    : _patchMap[Cookie$.sameSite])
+                as HTTPCookieSameSitePolicy?
           : this.sameSite,
       isSecure: _patchMap.containsKey(Cookie$.isSecure)
-          ? (_patchMap[Cookie$.isSecure] is Function)
-                ? _patchMap[Cookie$.isSecure](this.isSecure)
-                : (_patchMap[Cookie$.isSecure] is Patch)
-                ? _patchMap[Cookie$.isSecure].applyTo(this.isSecure)
-                : _patchMap[Cookie$.isSecure]
+          ? ((_patchMap[Cookie$.isSecure] is Function)
+                    ? _patchMap[Cookie$.isSecure](this.isSecure)
+                    : (_patchMap[Cookie$.isSecure] is Patch)
+                    ? _patchMap[Cookie$.isSecure].applyTo(this.isSecure)
+                    : _patchMap[Cookie$.isSecure])
+                as bool?
           : this.isSecure,
       isHttpOnly: _patchMap.containsKey(Cookie$.isHttpOnly)
-          ? (_patchMap[Cookie$.isHttpOnly] is Function)
-                ? _patchMap[Cookie$.isHttpOnly](this.isHttpOnly)
-                : (_patchMap[Cookie$.isHttpOnly] is Patch)
-                ? _patchMap[Cookie$.isHttpOnly].applyTo(this.isHttpOnly)
-                : _patchMap[Cookie$.isHttpOnly]
+          ? ((_patchMap[Cookie$.isHttpOnly] is Function)
+                    ? _patchMap[Cookie$.isHttpOnly](this.isHttpOnly)
+                    : (_patchMap[Cookie$.isHttpOnly] is Patch)
+                    ? _patchMap[Cookie$.isHttpOnly].applyTo(this.isHttpOnly)
+                    : _patchMap[Cookie$.isHttpOnly])
+                as bool?
           : this.isHttpOnly,
       path: _patchMap.containsKey(Cookie$.path)
-          ? (_patchMap[Cookie$.path] is Function)
-                ? _patchMap[Cookie$.path](this.path)
-                : (_patchMap[Cookie$.path] is Patch)
-                ? _patchMap[Cookie$.path].applyTo(this.path)
-                : _patchMap[Cookie$.path]
+          ? ((_patchMap[Cookie$.path] is Function)
+                    ? _patchMap[Cookie$.path](this.path)
+                    : (_patchMap[Cookie$.path] is Patch)
+                    ? _patchMap[Cookie$.path].applyTo(this.path)
+                    : _patchMap[Cookie$.path])
+                as String?
           : this.path,
     );
   }
@@ -215,7 +226,8 @@ class Cookie {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$CookieToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

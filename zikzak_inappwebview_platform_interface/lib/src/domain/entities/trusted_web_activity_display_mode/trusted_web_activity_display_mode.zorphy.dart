@@ -43,7 +43,8 @@ class TrustedWebActivityDisplayMode {
     final Map<String, dynamic> data = _$TrustedWebActivityDisplayModeToJson(
       this,
     );
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {
