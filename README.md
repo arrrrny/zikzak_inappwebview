@@ -91,6 +91,11 @@ import 'package:zikzak_inappwebview/zikzak_inappwebview.dart';
 
 The API is nearly identical. Version 4.x.x corresponds to upstream 6.x.x. This fork has resolved all 156+ upstream issues and added critical fixes for SPM migration, Web platform support, Windows WebView2, and OEM device compatibility.
 
+> **Note — JavaScript bridge global.** The injected JavaScript bridge global is
+> **`window.zikzak_inappwebview`** (not `window.flutter_inappwebview`). After
+> migrating, call handlers via `window.zikzak_inappwebview.callHandler(...)`.
+> The `flutterInAppWebViewPlatformReady` event name is unchanged.
+
 ## 📊 Project Stats
 
 - **156+ upstream issues** triaged and tracked in [UPSTREAM_ISSUES_TRIAGE.md](./UPSTREAM_ISSUES_TRIAGE.md)
