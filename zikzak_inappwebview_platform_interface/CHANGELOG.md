@@ -1,3 +1,9 @@
+## Unreleased
+
+### Fixes
+
+- Export `webAuthenticationSupportFromWire` / `webAuthenticationSupportToWire` from the platform interface (they were generated but not exported, so custom platform implementations could not use them) and document the platform support matrix for `webAuthenticationSupport` (iOS 16.4+, macOS 13.3+, Android via `WebViewFeature.WEB_AUTHENTICATION`; ignored on Windows/Linux) (#272).
+
 ## 5.1.3 (unreleased)
 
 ### Docs

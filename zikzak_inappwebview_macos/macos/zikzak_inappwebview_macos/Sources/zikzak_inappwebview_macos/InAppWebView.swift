@@ -159,6 +159,22 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                           incognito {
                     configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
                 }
+                // WebAuthn / passkey support (issue #272).
+                // Mirrors the iOS KVC wiring (PR #131).
+                // Must be set before super.init because the configuration is
+                // immutable afterwards.
+                if #available(macOS 13.3, *) {
+                    if let webAuthnSupport = settingsMap["webAuthenticationSupport"] as? Int,
+                       webAuthnSupport == 1 {  // FOR_APP
+                        let selector = Selector(("webAuthenticationSupport"))
+                        if configuration.responds(to: selector),
+                           let webAuthSupport = configuration.perform(selector)?.takeUnretainedValue()
+                               as? NSObject
+                        {
+                            webAuthSupport.setValue(true, forKey: "boundKeychainForPasskeys")
+                        }
+                    }
+                }
             }
         }
 

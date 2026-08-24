@@ -530,6 +530,20 @@ abstract class $InAppWebViewSettings {
   bool? get paymentRequestEnabled;
 
   ///Sets the Web Authentication support level for the WebView. The default value is [WebAuthenticationSupport.NONE].
+  ///
+  ///Supported on:
+  ///- iOS 16.4+ (app-bound passkeys; requires the host app to add the
+  ///  webcredentials Associated Domains entitlement and the site to serve
+  ///  a valid apple-app-site-association file - see the Apple passkeys docs)
+  ///- macOS 13.3+ (app-bound passkeys; same host-app Associated Domains
+  ///  entitlement and apple-app-site-association requirements as iOS)
+  ///- Android (androidx.webkit WebViewFeature.WEB_AUTHENTICATION,
+  ///  feature-detected at runtime)
+  ///
+  ///Other platforms either do not expose a per-WebView WebAuthn toggle
+  ///(Windows/WebView2: WebAuthn is handled by Windows Hello when available)
+  ///or have no public WebAuthn API (Linux/WebKitGTK), so the setting is
+  ///ignored there.
   @JsonKey(
     toJson: webAuthenticationSupportToWire,
     fromJson: webAuthenticationSupportFromWire,
