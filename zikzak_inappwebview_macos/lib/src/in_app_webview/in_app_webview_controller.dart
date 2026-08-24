@@ -537,6 +537,19 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
   }
 
   @override
+  Future<void> pressKey({
+    required String key,
+    required int keyCode,
+    String characters = '',
+  }) async {
+    await _channel.invokeMethod('pressKey', <String, dynamic>{
+      'key': key,
+      'keyCode': keyCode,
+      'characters': characters,
+    });
+  }
+
+  @override
   Future<MacOSPrintJobController?> printCurrentPage({
     PrintJobSettings? settings,
   }) async {

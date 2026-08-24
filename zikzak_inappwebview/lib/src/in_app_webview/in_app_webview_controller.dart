@@ -155,6 +155,15 @@ class InAppWebViewController implements Disposable {
     ContentWorld? contentWorld,
   }) => platform.evaluateJavascript(source: source, contentWorld: contentWorld);
 
+  /// Dispatches a native key press (keyDown + keyUp) to the underlying WebView
+  /// so React / ProseMirror editors receive a trusted Enter / Backspace.
+  /// See [PlatformInAppWebViewController.pressKey].
+  Future<void> pressKey({
+    required String key,
+    required int keyCode,
+    String characters = '',
+  }) => platform.pressKey(key: key, keyCode: keyCode, characters: characters);
+
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.injectJavascriptFileFromUrl}
   Future<void> injectJavascriptFileFromUrl({
     required WebUri urlFile,

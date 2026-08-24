@@ -202,7 +202,7 @@ publish_package() {
 
     # Analyze the package
     echo -e "${BLUE}Analyzing package...${NC}"
-    flutter analyze --no-fatal-warnings --no-fatal-infos
+    flutter analyze
 
     # Publish with dry-run first
     echo -e "${BLUE}Running dry-run...${NC}"

@@ -907,6 +907,18 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 result(
                     FlutterError(code: "InAppWebView", message: "Invalid arguments", details: nil))
             }
+        case "pressKey":
+            if let args = call.arguments as? [String: Any],
+               let keyCode = args["keyCode"] as? Int {
+                let characters = (args["characters"] as? String) ?? ""
+                self.pressKey(keyCode: UInt16(keyCode), characters: characters)
+                result(nil)
+            } else {
+                result(FlutterError(
+                    code: "InAppWebView",
+                    message: "pressKey: expected keyCode: Int",
+                    details: nil))
+            }
         case "callAsyncJavaScript":
             if let args = call.arguments as? [String: Any],
                let functionBody = args["functionBody"] as? String,
@@ -2351,6 +2363,40 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         // if no Dart handler is registered the page loses right-click entirely,
         // so we forward to super to keep the native menu as a fallback.
         super.rightMouseDown(with: event)
+    }
+
+    /// Dispatches a trusted keyDown/keyUp pair to this WebView so React /
+    /// ProseMirror editors (which ignore untrusted, JS-synthesized key events)
+    /// receive a real Enter / Backspace. Called from the Dart side via the
+    /// `pressKey` channel method (Puppeteer `keyboard.press`). Delivering the
+    /// event through the responder's `keyDown:` (not `dispatchEvent`) makes
+    /// WebKit treat it as a trusted, user-initiated key event.
+    func pressKey(keyCode: UInt16, characters: String) {
+        guard let down = NSEvent.keyEvent(
+            with: .keyDown,
+            location: .zero,
+            modifierFlags: [],
+            timestamp: 0,
+            windowNumber: 0,
+            context: nil,
+            characters: characters,
+            charactersIgnoringModifiers: characters,
+            isARepeat: false,
+            keyCode: keyCode
+        ), let up = NSEvent.keyEvent(
+            with: .keyUp,
+            location: .zero,
+            modifierFlags: [],
+            timestamp: 0,
+            windowNumber: 0,
+            context: nil,
+            characters: characters,
+            charactersIgnoringModifiers: characters,
+            isARepeat: false,
+            keyCode: keyCode
+        ) else { return }
+        self.keyDown(down)
+        self.keyUp(up)
     }
 
     public func handleFindInteraction(_ call: FlutterMethodCall, result: @escaping FlutterResult) {

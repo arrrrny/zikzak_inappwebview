@@ -575,6 +575,20 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
     );
   }
 
+  /// Dispatches a native key press (keyDown + keyUp) to the underlying
+  /// WebView. Used by Puppeteer-style `keyboard.press` so React / ProseMirror
+  /// editors receive a trusted Enter / Backspace. [keyCode] is the macOS
+  /// virtual key code and [characters] the typed string (may be empty).
+  Future<void> pressKey({
+    required String key,
+    required int keyCode,
+    String characters = '',
+  }) {
+    throw UnimplementedError(
+      'pressKey is not implemented on the current platform',
+    );
+  }
+
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.injectJavascriptFileFromUrl}
   ///Injects an external JavaScript file into the WebView from a defined url.
   ///
