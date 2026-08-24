@@ -321,7 +321,10 @@ export '../domain/entities/enums/web_authentication_session_error.dart'
         webAuthenticationSessionErrorFromWire,
         webAuthenticationSessionErrorToWire;
 export '../domain/entities/enums/web_authentication_support.dart'
-    show WebAuthenticationSupport;
+    show
+        WebAuthenticationSupport,
+        webAuthenticationSupportFromWire,
+        webAuthenticationSupportToWire;
 export '../domain/entities/web_history/web_history.dart'
     show WebHistory, WebHistorySerialization;
 export '../domain/entities/web_history_item/web_history_item.dart'
