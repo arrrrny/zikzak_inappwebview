@@ -1,0 +1,30 @@
+name: zikzak_inappwebview_module
+description: >-
+  Value-add module for zikzak_inappwebview — pool, capture, VCR,
+  dialogue dismisser, recipes, navigation tracker, and agent tools.
+  Consumes only the plugin core's public API.
+version: 0.0.1-dev
+publish_to: none
+
+environment:
+  sdk: '>=3.6.0 <4.0.0'
+  flutter: '>=3.27.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  zikzak_inappwebview:
+    path: ../zikzak_inappwebview
+
+# zuraffa dependencies — uncomment when zuraffa#389 ships:
+#  zuraffa:
+#    path: ../../zuraffa
+
+#  dart_web_scraper:
+#    git:
+#      url: https://github.com/arrrrny/dart_web_scraper.git
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
