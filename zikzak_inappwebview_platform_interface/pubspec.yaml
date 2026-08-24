@@ -1,6 +1,6 @@
 name: zikzak_inappwebview_platform_interface
 description: A common platform interface for the zikzak_inappwebview plugin.
-version: 5.1.1
+version: 5.1.2
 homepage: https://inappwebview.dev/
 repository: https://github.com/arrrrny/zikzak_inappwebview/tree/master/zikzak_inappwebview_platform_interface
 issue_tracker: https://github.com/arrrrny/zikzak_inappwebview/issues
