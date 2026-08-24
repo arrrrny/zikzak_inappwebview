@@ -30,11 +30,12 @@ class PrewarmingToken {
     final _patchMap = _patcher.patchMap;
     return PrewarmingToken(
       id: _patchMap.containsKey(PrewarmingToken$.id)
-          ? (_patchMap[PrewarmingToken$.id] is Function)
-                ? _patchMap[PrewarmingToken$.id](this.id)
-                : (_patchMap[PrewarmingToken$.id] is Patch)
-                ? _patchMap[PrewarmingToken$.id].applyTo(this.id)
-                : _patchMap[PrewarmingToken$.id]
+          ? ((_patchMap[PrewarmingToken$.id] is Function)
+                    ? _patchMap[PrewarmingToken$.id](this.id)
+                    : (_patchMap[PrewarmingToken$.id] is Patch)
+                    ? _patchMap[PrewarmingToken$.id].applyTo(this.id)
+                    : _patchMap[PrewarmingToken$.id])
+                as String
           : this.id,
     );
   }
@@ -57,7 +58,8 @@ class PrewarmingToken {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$PrewarmingTokenToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

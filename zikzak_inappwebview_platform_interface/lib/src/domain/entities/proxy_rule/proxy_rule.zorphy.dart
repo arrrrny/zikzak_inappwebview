@@ -37,18 +37,22 @@ class ProxyRule {
     final _patchMap = _patcher.patchMap;
     return ProxyRule(
       url: _patchMap.containsKey(ProxyRule$.url)
-          ? (_patchMap[ProxyRule$.url] is Function)
-                ? _patchMap[ProxyRule$.url](this.url)
-                : (_patchMap[ProxyRule$.url] is Patch)
-                ? _patchMap[ProxyRule$.url].applyTo(this.url)
-                : _patchMap[ProxyRule$.url]
+          ? ((_patchMap[ProxyRule$.url] is Function)
+                    ? _patchMap[ProxyRule$.url](this.url)
+                    : (_patchMap[ProxyRule$.url] is Patch)
+                    ? _patchMap[ProxyRule$.url].applyTo(this.url)
+                    : _patchMap[ProxyRule$.url])
+                as WebUri
           : this.url,
       schemeFilter: _patchMap.containsKey(ProxyRule$.schemeFilter)
-          ? (_patchMap[ProxyRule$.schemeFilter] is Function)
-                ? _patchMap[ProxyRule$.schemeFilter](this.schemeFilter)
-                : (_patchMap[ProxyRule$.schemeFilter] is Patch)
-                ? _patchMap[ProxyRule$.schemeFilter].applyTo(this.schemeFilter)
-                : _patchMap[ProxyRule$.schemeFilter]
+          ? ((_patchMap[ProxyRule$.schemeFilter] is Function)
+                    ? _patchMap[ProxyRule$.schemeFilter](this.schemeFilter)
+                    : (_patchMap[ProxyRule$.schemeFilter] is Patch)
+                    ? _patchMap[ProxyRule$.schemeFilter].applyTo(
+                        this.schemeFilter,
+                      )
+                    : _patchMap[ProxyRule$.schemeFilter])
+                as ProxySchemeFilter?
           : this.schemeFilter,
     );
   }
@@ -76,7 +80,8 @@ class ProxyRule {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$ProxyRuleToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

@@ -79,54 +79,62 @@ class WebResourceRequest {
     final _patchMap = _patcher.patchMap;
     return WebResourceRequest(
       url: _patchMap.containsKey(WebResourceRequest$.url)
-          ? (_patchMap[WebResourceRequest$.url] is Function)
-                ? _patchMap[WebResourceRequest$.url](this.url)
-                : (_patchMap[WebResourceRequest$.url] is Patch)
-                ? _patchMap[WebResourceRequest$.url].applyTo(this.url)
-                : _patchMap[WebResourceRequest$.url]
+          ? ((_patchMap[WebResourceRequest$.url] is Function)
+                    ? _patchMap[WebResourceRequest$.url](this.url)
+                    : (_patchMap[WebResourceRequest$.url] is Patch)
+                    ? _patchMap[WebResourceRequest$.url].applyTo(this.url)
+                    : _patchMap[WebResourceRequest$.url])
+                as WebUri?
           : this.url,
       headers: _patchMap.containsKey(WebResourceRequest$.headers)
-          ? (_patchMap[WebResourceRequest$.headers] is Function)
-                ? _patchMap[WebResourceRequest$.headers](this.headers)
-                : (_patchMap[WebResourceRequest$.headers] is Patch)
-                ? _patchMap[WebResourceRequest$.headers].applyTo(this.headers)
-                : _patchMap[WebResourceRequest$.headers]
+          ? ((_patchMap[WebResourceRequest$.headers] is Function)
+                    ? _patchMap[WebResourceRequest$.headers](this.headers)
+                    : (_patchMap[WebResourceRequest$.headers] is Patch)
+                    ? _patchMap[WebResourceRequest$.headers].applyTo(
+                        this.headers,
+                      )
+                    : _patchMap[WebResourceRequest$.headers])
+                as Map<String, String>?
           : this.headers,
       method: _patchMap.containsKey(WebResourceRequest$.method)
-          ? (_patchMap[WebResourceRequest$.method] is Function)
-                ? _patchMap[WebResourceRequest$.method](this.method)
-                : (_patchMap[WebResourceRequest$.method] is Patch)
-                ? _patchMap[WebResourceRequest$.method].applyTo(this.method)
-                : _patchMap[WebResourceRequest$.method]
+          ? ((_patchMap[WebResourceRequest$.method] is Function)
+                    ? _patchMap[WebResourceRequest$.method](this.method)
+                    : (_patchMap[WebResourceRequest$.method] is Patch)
+                    ? _patchMap[WebResourceRequest$.method].applyTo(this.method)
+                    : _patchMap[WebResourceRequest$.method])
+                as String?
           : this.method,
       hasGesture: _patchMap.containsKey(WebResourceRequest$.hasGesture)
-          ? (_patchMap[WebResourceRequest$.hasGesture] is Function)
-                ? _patchMap[WebResourceRequest$.hasGesture](this.hasGesture)
-                : (_patchMap[WebResourceRequest$.hasGesture] is Patch)
-                ? _patchMap[WebResourceRequest$.hasGesture].applyTo(
-                    this.hasGesture,
-                  )
-                : _patchMap[WebResourceRequest$.hasGesture]
+          ? ((_patchMap[WebResourceRequest$.hasGesture] is Function)
+                    ? _patchMap[WebResourceRequest$.hasGesture](this.hasGesture)
+                    : (_patchMap[WebResourceRequest$.hasGesture] is Patch)
+                    ? _patchMap[WebResourceRequest$.hasGesture].applyTo(
+                        this.hasGesture,
+                      )
+                    : _patchMap[WebResourceRequest$.hasGesture])
+                as bool?
           : this.hasGesture,
       isForMainFrame: _patchMap.containsKey(WebResourceRequest$.isForMainFrame)
-          ? (_patchMap[WebResourceRequest$.isForMainFrame] is Function)
-                ? _patchMap[WebResourceRequest$.isForMainFrame](
-                    this.isForMainFrame,
-                  )
-                : (_patchMap[WebResourceRequest$.isForMainFrame] is Patch)
-                ? _patchMap[WebResourceRequest$.isForMainFrame].applyTo(
-                    this.isForMainFrame,
-                  )
-                : _patchMap[WebResourceRequest$.isForMainFrame]
+          ? ((_patchMap[WebResourceRequest$.isForMainFrame] is Function)
+                    ? _patchMap[WebResourceRequest$.isForMainFrame](
+                        this.isForMainFrame,
+                      )
+                    : (_patchMap[WebResourceRequest$.isForMainFrame] is Patch)
+                    ? _patchMap[WebResourceRequest$.isForMainFrame].applyTo(
+                        this.isForMainFrame,
+                      )
+                    : _patchMap[WebResourceRequest$.isForMainFrame])
+                as bool?
           : this.isForMainFrame,
       isRedirect: _patchMap.containsKey(WebResourceRequest$.isRedirect)
-          ? (_patchMap[WebResourceRequest$.isRedirect] is Function)
-                ? _patchMap[WebResourceRequest$.isRedirect](this.isRedirect)
-                : (_patchMap[WebResourceRequest$.isRedirect] is Patch)
-                ? _patchMap[WebResourceRequest$.isRedirect].applyTo(
-                    this.isRedirect,
-                  )
-                : _patchMap[WebResourceRequest$.isRedirect]
+          ? ((_patchMap[WebResourceRequest$.isRedirect] is Function)
+                    ? _patchMap[WebResourceRequest$.isRedirect](this.isRedirect)
+                    : (_patchMap[WebResourceRequest$.isRedirect] is Patch)
+                    ? _patchMap[WebResourceRequest$.isRedirect].applyTo(
+                        this.isRedirect,
+                      )
+                    : _patchMap[WebResourceRequest$.isRedirect])
+                as bool?
           : this.isRedirect,
     );
   }
@@ -173,7 +181,8 @@ class WebResourceRequest {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$WebResourceRequestToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

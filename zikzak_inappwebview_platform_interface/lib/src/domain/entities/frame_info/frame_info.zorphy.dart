@@ -56,27 +56,32 @@ class FrameInfo {
     final _patchMap = _patcher.patchMap;
     return FrameInfo(
       isMainFrame: _patchMap.containsKey(FrameInfo$.isMainFrame)
-          ? (_patchMap[FrameInfo$.isMainFrame] is Function)
-                ? _patchMap[FrameInfo$.isMainFrame](this.isMainFrame)
-                : (_patchMap[FrameInfo$.isMainFrame] is Patch)
-                ? _patchMap[FrameInfo$.isMainFrame].applyTo(this.isMainFrame)
-                : _patchMap[FrameInfo$.isMainFrame]
+          ? ((_patchMap[FrameInfo$.isMainFrame] is Function)
+                    ? _patchMap[FrameInfo$.isMainFrame](this.isMainFrame)
+                    : (_patchMap[FrameInfo$.isMainFrame] is Patch)
+                    ? _patchMap[FrameInfo$.isMainFrame].applyTo(
+                        this.isMainFrame,
+                      )
+                    : _patchMap[FrameInfo$.isMainFrame])
+                as bool
           : this.isMainFrame,
       request: _patchMap.containsKey(FrameInfo$.request)
-          ? (_patchMap[FrameInfo$.request] is Function)
-                ? _patchMap[FrameInfo$.request](this.request)
-                : (_patchMap[FrameInfo$.request] is Patch)
-                ? _patchMap[FrameInfo$.request].applyTo(this.request)
-                : _patchMap[FrameInfo$.request]
+          ? ((_patchMap[FrameInfo$.request] is Function)
+                    ? _patchMap[FrameInfo$.request](this.request)
+                    : (_patchMap[FrameInfo$.request] is Patch)
+                    ? _patchMap[FrameInfo$.request].applyTo(this.request)
+                    : _patchMap[FrameInfo$.request])
+                as URLRequest?
           : this.request,
       securityOrigin: _patchMap.containsKey(FrameInfo$.securityOrigin)
-          ? (_patchMap[FrameInfo$.securityOrigin] is Function)
-                ? _patchMap[FrameInfo$.securityOrigin](this.securityOrigin)
-                : (_patchMap[FrameInfo$.securityOrigin] is Patch)
-                ? _patchMap[FrameInfo$.securityOrigin].applyTo(
-                    this.securityOrigin,
-                  )
-                : _patchMap[FrameInfo$.securityOrigin]
+          ? ((_patchMap[FrameInfo$.securityOrigin] is Function)
+                    ? _patchMap[FrameInfo$.securityOrigin](this.securityOrigin)
+                    : (_patchMap[FrameInfo$.securityOrigin] is Patch)
+                    ? _patchMap[FrameInfo$.securityOrigin].applyTo(
+                        this.securityOrigin,
+                      )
+                    : _patchMap[FrameInfo$.securityOrigin])
+                as SecurityOrigin?
           : this.securityOrigin,
     );
   }
@@ -107,7 +112,8 @@ class FrameInfo {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$FrameInfoToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

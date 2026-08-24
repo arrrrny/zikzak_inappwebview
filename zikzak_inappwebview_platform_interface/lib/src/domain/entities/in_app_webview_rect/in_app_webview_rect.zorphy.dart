@@ -58,32 +58,36 @@ class InAppWebViewRect {
     final _patchMap = _patcher.patchMap;
     return InAppWebViewRect(
       x: _patchMap.containsKey(InAppWebViewRect$.x)
-          ? (_patchMap[InAppWebViewRect$.x] is Function)
-                ? _patchMap[InAppWebViewRect$.x](this.x)
-                : (_patchMap[InAppWebViewRect$.x] is Patch)
-                ? _patchMap[InAppWebViewRect$.x].applyTo(this.x)
-                : _patchMap[InAppWebViewRect$.x]
+          ? ((_patchMap[InAppWebViewRect$.x] is Function)
+                    ? _patchMap[InAppWebViewRect$.x](this.x)
+                    : (_patchMap[InAppWebViewRect$.x] is Patch)
+                    ? _patchMap[InAppWebViewRect$.x].applyTo(this.x)
+                    : _patchMap[InAppWebViewRect$.x])
+                as double
           : this.x,
       y: _patchMap.containsKey(InAppWebViewRect$.y)
-          ? (_patchMap[InAppWebViewRect$.y] is Function)
-                ? _patchMap[InAppWebViewRect$.y](this.y)
-                : (_patchMap[InAppWebViewRect$.y] is Patch)
-                ? _patchMap[InAppWebViewRect$.y].applyTo(this.y)
-                : _patchMap[InAppWebViewRect$.y]
+          ? ((_patchMap[InAppWebViewRect$.y] is Function)
+                    ? _patchMap[InAppWebViewRect$.y](this.y)
+                    : (_patchMap[InAppWebViewRect$.y] is Patch)
+                    ? _patchMap[InAppWebViewRect$.y].applyTo(this.y)
+                    : _patchMap[InAppWebViewRect$.y])
+                as double
           : this.y,
       width: _patchMap.containsKey(InAppWebViewRect$.width)
-          ? (_patchMap[InAppWebViewRect$.width] is Function)
-                ? _patchMap[InAppWebViewRect$.width](this.width)
-                : (_patchMap[InAppWebViewRect$.width] is Patch)
-                ? _patchMap[InAppWebViewRect$.width].applyTo(this.width)
-                : _patchMap[InAppWebViewRect$.width]
+          ? ((_patchMap[InAppWebViewRect$.width] is Function)
+                    ? _patchMap[InAppWebViewRect$.width](this.width)
+                    : (_patchMap[InAppWebViewRect$.width] is Patch)
+                    ? _patchMap[InAppWebViewRect$.width].applyTo(this.width)
+                    : _patchMap[InAppWebViewRect$.width])
+                as double
           : this.width,
       height: _patchMap.containsKey(InAppWebViewRect$.height)
-          ? (_patchMap[InAppWebViewRect$.height] is Function)
-                ? _patchMap[InAppWebViewRect$.height](this.height)
-                : (_patchMap[InAppWebViewRect$.height] is Patch)
-                ? _patchMap[InAppWebViewRect$.height].applyTo(this.height)
-                : _patchMap[InAppWebViewRect$.height]
+          ? ((_patchMap[InAppWebViewRect$.height] is Function)
+                    ? _patchMap[InAppWebViewRect$.height](this.height)
+                    : (_patchMap[InAppWebViewRect$.height] is Patch)
+                    ? _patchMap[InAppWebViewRect$.height].applyTo(this.height)
+                    : _patchMap[InAppWebViewRect$.height])
+                as double
           : this.height,
     );
   }
@@ -117,7 +121,8 @@ class InAppWebViewRect {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$InAppWebViewRectToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

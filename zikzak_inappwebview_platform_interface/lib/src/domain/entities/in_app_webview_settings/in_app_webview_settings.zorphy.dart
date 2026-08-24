@@ -29,6 +29,7 @@ class InAppWebViewSettings {
     bool? interceptOnlyAsyncAjaxRequests,
     bool? this.useShouldInterceptFetchRequest,
     bool? incognito,
+    String? this.persistentStoreIdentifier,
     bool? cacheEnabled,
     bool? transparentBackground,
     bool? disableVerticalScroll,
@@ -349,6 +350,9 @@ class InAppWebViewSettings {
 
   @JsonKey(defaultValue: false)
   final bool? incognito;
+
+  @JsonKey(includeIfNull: false)
+  final String? persistentStoreIdentifier;
 
   @JsonKey(defaultValue: true)
   final bool? cacheEnabled;
@@ -784,6 +788,7 @@ class InAppWebViewSettings {
     bool? interceptOnlyAsyncAjaxRequests,
     bool? useShouldInterceptFetchRequest,
     bool? incognito,
+    String? persistentStoreIdentifier,
     bool? cacheEnabled,
     bool? transparentBackground,
     bool? disableVerticalScroll,
@@ -948,6 +953,8 @@ class InAppWebViewSettings {
       useShouldInterceptFetchRequest:
           useShouldInterceptFetchRequest ?? this.useShouldInterceptFetchRequest,
       incognito: incognito ?? this.incognito,
+      persistentStoreIdentifier:
+          persistentStoreIdentifier ?? this.persistentStoreIdentifier,
       cacheEnabled: cacheEnabled ?? this.cacheEnabled,
       transparentBackground:
           transparentBackground ?? this.transparentBackground,
@@ -1178,6 +1185,7 @@ class InAppWebViewSettings {
     bool? interceptOnlyAsyncAjaxRequests,
     bool? useShouldInterceptFetchRequest,
     bool? incognito,
+    String? persistentStoreIdentifier,
     bool? cacheEnabled,
     bool? transparentBackground,
     bool? disableVerticalScroll,
@@ -1331,6 +1339,7 @@ class InAppWebViewSettings {
       interceptOnlyAsyncAjaxRequests: interceptOnlyAsyncAjaxRequests,
       useShouldInterceptFetchRequest: useShouldInterceptFetchRequest,
       incognito: incognito,
+      persistentStoreIdentifier: persistentStoreIdentifier,
       cacheEnabled: cacheEnabled,
       transparentBackground: transparentBackground,
       disableVerticalScroll: disableVerticalScroll,
@@ -1763,6 +1772,23 @@ class InAppWebViewSettings {
                     : _patchMap[InAppWebViewSettings$.incognito])
                 as bool?
           : this.incognito,
+      persistentStoreIdentifier:
+          _patchMap.containsKey(InAppWebViewSettings$.persistentStoreIdentifier)
+          ? ((_patchMap[InAppWebViewSettings$.persistentStoreIdentifier]
+                        is Function)
+                    ? _patchMap[InAppWebViewSettings$
+                          .persistentStoreIdentifier](
+                        this.persistentStoreIdentifier,
+                      )
+                    : (_patchMap[InAppWebViewSettings$
+                              .persistentStoreIdentifier]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.persistentStoreIdentifier]
+                          .applyTo(this.persistentStoreIdentifier)
+                    : _patchMap[InAppWebViewSettings$
+                          .persistentStoreIdentifier])
+                as String?
+          : this.persistentStoreIdentifier,
       cacheEnabled: _patchMap.containsKey(InAppWebViewSettings$.cacheEnabled)
           ? ((_patchMap[InAppWebViewSettings$.cacheEnabled] is Function)
                     ? _patchMap[InAppWebViewSettings$.cacheEnabled](
@@ -3777,6 +3803,7 @@ class InAppWebViewSettings {
         useShouldInterceptFetchRequest ==
             other.useShouldInterceptFetchRequest &&
         incognito == other.incognito &&
+        persistentStoreIdentifier == other.persistentStoreIdentifier &&
         cacheEnabled == other.cacheEnabled &&
         transparentBackground == other.transparentBackground &&
         disableVerticalScroll == other.disableVerticalScroll &&
@@ -3947,10 +3974,11 @@ class InAppWebViewSettings {
           this.interceptOnlyAsyncAjaxRequests,
           this.useShouldInterceptFetchRequest,
           this.incognito,
+          this.persistentStoreIdentifier,
           this.cacheEnabled,
-          this.transparentBackground,
         ) ^
         Object.hash(
+          this.transparentBackground,
           this.disableVerticalScroll,
           this.disableHorizontalScroll,
           this.disableContextMenu,
@@ -3970,9 +3998,9 @@ class InAppWebViewSettings {
           this.blockNetworkImage,
           this.blockNetworkLoads,
           this.cacheMode,
-          this.cursiveFontFamily,
         ) ^
         Object.hash(
+          this.cursiveFontFamily,
           this.defaultFixedFontSize,
           this.defaultFontSize,
           this.defaultTextEncodingName,
@@ -3992,9 +4020,9 @@ class InAppWebViewSettings {
           this.serifFontFamily,
           this.standardFontFamily,
           this.saveFormData,
-          this.thirdPartyCookiesEnabled,
         ) ^
         Object.hash(
+          this.thirdPartyCookiesEnabled,
           this.hardwareAcceleration,
           this.initialScale,
           this.supportMultipleWindows,
@@ -4014,9 +4042,9 @@ class InAppWebViewSettings {
           this.disableDefaultErrorPage,
           this.verticalScrollbarThumbColor,
           this.verticalScrollbarTrackColor,
-          this.horizontalScrollbarThumbColor,
         ) ^
         Object.hash(
+          this.horizontalScrollbarThumbColor,
           this.horizontalScrollbarTrackColor,
           this.algorithmicDarkeningAllowed,
           this.paymentRequestEnabled,
@@ -4036,9 +4064,9 @@ class InAppWebViewSettings {
           this.isFraudulentWebsiteWarningEnabled,
           this.selectionGranularity,
           this.dataDetectorTypes,
-          this.sharedCookiesEnabled,
         ) ^
         Object.hash(
+          this.sharedCookiesEnabled,
           this.automaticallyAdjustsScrollIndicatorInsets,
           this.accessibilityIgnoresInvertColors,
           this.decelerationRate,
@@ -4058,9 +4086,9 @@ class InAppWebViewSettings {
           this.useOnNavigationResponse,
           this.applePayAPIEnabled,
           this.allowingReadAccessTo,
-          this.disableLongPressContextMenuOnLinks,
         ) ^
         Object.hash(
+          this.disableLongPressContextMenuOnLinks,
           this.disableInputAccessoryView,
           this.underPageBackgroundColor,
           this.isTextInteractionEnabled,
@@ -4080,9 +4108,9 @@ class InAppWebViewSettings {
           this.iframeReferrerPolicy,
           this.iframeName,
           this.iframeCsp,
-          this.dismissDialogues,
         ) ^
         Object.hash(
+          this.dismissDialogues,
           this.insetsForWebContentToIgnore,
           this.useNetworkCapture,
           this.networkCaptureMaxBodySize,
@@ -4134,6 +4162,8 @@ class InAppWebViewSettings {
         'useShouldInterceptFetchRequest: ${useShouldInterceptFetchRequest}' +
         ', ' +
         'incognito: ${incognito}' +
+        ', ' +
+        'persistentStoreIdentifier: ${persistentStoreIdentifier}' +
         ', ' +
         'cacheEnabled: ${cacheEnabled}' +
         ', ' +
@@ -4680,6 +4710,21 @@ extension InAppWebViewSettingsPropertyHelpers on InAppWebViewSettings {
   bool get incognitoRequired {
     return this.incognito ??
         (throw StateError('incognito is required but was null'));
+  }
+
+  bool get hasPersistentStoreIdentifier {
+    return this.persistentStoreIdentifier?.isNotEmpty == true;
+  }
+
+  bool get noPersistentStoreIdentifier {
+    return this.persistentStoreIdentifier?.isEmpty ?? true;
+  }
+
+  String get persistentStoreIdentifierRequired {
+    return this.persistentStoreIdentifier ??
+        (throw StateError(
+          'persistentStoreIdentifier is required but was null',
+        ));
   }
 
   bool get hasCacheEnabled {
@@ -6712,6 +6757,7 @@ enum InAppWebViewSettings$ {
   interceptOnlyAsyncAjaxRequests,
   useShouldInterceptFetchRequest,
   incognito,
+  persistentStoreIdentifier,
   cacheEnabled,
   transparentBackground,
   disableVerticalScroll,
@@ -6944,6 +6990,11 @@ class InAppWebViewSettingsPatch
 
   InAppWebViewSettingsPatch withIncognito(bool? value) {
     patchMap[InAppWebViewSettings$.incognito] = value;
+    return this;
+  }
+
+  InAppWebViewSettingsPatch withPersistentStoreIdentifier(String? value) {
+    patchMap[InAppWebViewSettings$.persistentStoreIdentifier] = value;
     return this;
   }
 
@@ -7784,6 +7835,11 @@ abstract final class InAppWebViewSettingsFields {
     _$incognito,
   );
 
+  static const persistentStoreIdentifier = Field<InAppWebViewSettings, String?>(
+    'persistentStoreIdentifier',
+    _$persistentStoreIdentifier,
+  );
+
   static const cacheEnabled = Field<InAppWebViewSettings, bool?>(
     'cacheEnabled',
     _$cacheEnabled,
@@ -8556,6 +8612,10 @@ abstract final class InAppWebViewSettingsFields {
     return e.incognito;
   }
 
+  static String? _$persistentStoreIdentifier(InAppWebViewSettings e) {
+    return e.persistentStoreIdentifier;
+  }
+
   static bool? _$cacheEnabled(InAppWebViewSettings e) {
     return e.cacheEnabled;
   }
@@ -9196,6 +9256,10 @@ extension InAppWebViewSettingsCompareE on InAppWebViewSettings {
 
     if (incognito != other.incognito) {
       diff['incognito'] = () => other.incognito;
+    }
+
+    if (persistentStoreIdentifier != other.persistentStoreIdentifier) {
+      diff['persistentStoreIdentifier'] = () => other.persistentStoreIdentifier;
     }
 
     if (cacheEnabled != other.cacheEnabled) {

@@ -33,11 +33,12 @@ class PDFConfiguration {
     final _patchMap = _patcher.patchMap;
     return PDFConfiguration(
       rect: _patchMap.containsKey(PDFConfiguration$.rect)
-          ? (_patchMap[PDFConfiguration$.rect] is Function)
-                ? _patchMap[PDFConfiguration$.rect](this.rect)
-                : (_patchMap[PDFConfiguration$.rect] is Patch)
-                ? _patchMap[PDFConfiguration$.rect].applyTo(this.rect)
-                : _patchMap[PDFConfiguration$.rect]
+          ? ((_patchMap[PDFConfiguration$.rect] is Function)
+                    ? _patchMap[PDFConfiguration$.rect](this.rect)
+                    : (_patchMap[PDFConfiguration$.rect] is Patch)
+                    ? _patchMap[PDFConfiguration$.rect].applyTo(this.rect)
+                    : _patchMap[PDFConfiguration$.rect])
+                as InAppWebViewRect?
           : this.rect,
     );
   }
@@ -60,7 +61,8 @@ class PDFConfiguration {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$PDFConfigurationToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {
@@ -106,6 +108,21 @@ class PDFConfigurationPatch
 
   PDFConfigurationPatch withRect(InAppWebViewRect? value) {
     patchMap[PDFConfiguration$.rect] = value;
+    return this;
+  }
+
+  PDFConfigurationPatch withRectPatch(InAppWebViewRectPatch patch) {
+    patchMap[PDFConfiguration$.rect] = patch;
+    return this;
+  }
+
+  PDFConfigurationPatch withRectPatchFunc(
+    InAppWebViewRectPatch Function(InAppWebViewRectPatch) patch,
+  ) {
+    patchMap[PDFConfiguration$.rect] = (dynamic current) {
+      var currentPatch = InAppWebViewRectPatch();
+      return patch(currentPatch).applyTo(current as InAppWebViewRect);
+    };
     return this;
   }
 }

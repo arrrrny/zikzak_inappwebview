@@ -117,96 +117,111 @@ class URLProtectionSpace {
     final _patchMap = _patcher.patchMap;
     return URLProtectionSpace(
       host: _patchMap.containsKey(URLProtectionSpace$.host)
-          ? (_patchMap[URLProtectionSpace$.host] is Function)
-                ? _patchMap[URLProtectionSpace$.host](this.host)
-                : (_patchMap[URLProtectionSpace$.host] is Patch)
-                ? _patchMap[URLProtectionSpace$.host].applyTo(this.host)
-                : _patchMap[URLProtectionSpace$.host]
+          ? ((_patchMap[URLProtectionSpace$.host] is Function)
+                    ? _patchMap[URLProtectionSpace$.host](this.host)
+                    : (_patchMap[URLProtectionSpace$.host] is Patch)
+                    ? _patchMap[URLProtectionSpace$.host].applyTo(this.host)
+                    : _patchMap[URLProtectionSpace$.host])
+                as String
           : this.host,
       protocol: _patchMap.containsKey(URLProtectionSpace$.protocol)
-          ? (_patchMap[URLProtectionSpace$.protocol] is Function)
-                ? _patchMap[URLProtectionSpace$.protocol](this.protocol)
-                : (_patchMap[URLProtectionSpace$.protocol] is Patch)
-                ? _patchMap[URLProtectionSpace$.protocol].applyTo(this.protocol)
-                : _patchMap[URLProtectionSpace$.protocol]
+          ? ((_patchMap[URLProtectionSpace$.protocol] is Function)
+                    ? _patchMap[URLProtectionSpace$.protocol](this.protocol)
+                    : (_patchMap[URLProtectionSpace$.protocol] is Patch)
+                    ? _patchMap[URLProtectionSpace$.protocol].applyTo(
+                        this.protocol,
+                      )
+                    : _patchMap[URLProtectionSpace$.protocol])
+                as String?
           : this.protocol,
       realm: _patchMap.containsKey(URLProtectionSpace$.realm)
-          ? (_patchMap[URLProtectionSpace$.realm] is Function)
-                ? _patchMap[URLProtectionSpace$.realm](this.realm)
-                : (_patchMap[URLProtectionSpace$.realm] is Patch)
-                ? _patchMap[URLProtectionSpace$.realm].applyTo(this.realm)
-                : _patchMap[URLProtectionSpace$.realm]
+          ? ((_patchMap[URLProtectionSpace$.realm] is Function)
+                    ? _patchMap[URLProtectionSpace$.realm](this.realm)
+                    : (_patchMap[URLProtectionSpace$.realm] is Patch)
+                    ? _patchMap[URLProtectionSpace$.realm].applyTo(this.realm)
+                    : _patchMap[URLProtectionSpace$.realm])
+                as String?
           : this.realm,
       port: _patchMap.containsKey(URLProtectionSpace$.port)
-          ? (_patchMap[URLProtectionSpace$.port] is Function)
-                ? _patchMap[URLProtectionSpace$.port](this.port)
-                : (_patchMap[URLProtectionSpace$.port] is Patch)
-                ? _patchMap[URLProtectionSpace$.port].applyTo(this.port)
-                : _patchMap[URLProtectionSpace$.port]
+          ? ((_patchMap[URLProtectionSpace$.port] is Function)
+                    ? _patchMap[URLProtectionSpace$.port](this.port)
+                    : (_patchMap[URLProtectionSpace$.port] is Patch)
+                    ? _patchMap[URLProtectionSpace$.port].applyTo(this.port)
+                    : _patchMap[URLProtectionSpace$.port])
+                as int?
           : this.port,
       sslCertificate: _patchMap.containsKey(URLProtectionSpace$.sslCertificate)
-          ? (_patchMap[URLProtectionSpace$.sslCertificate] is Function)
-                ? _patchMap[URLProtectionSpace$.sslCertificate](
-                    this.sslCertificate,
-                  )
-                : (_patchMap[URLProtectionSpace$.sslCertificate] is Patch)
-                ? _patchMap[URLProtectionSpace$.sslCertificate].applyTo(
-                    this.sslCertificate,
-                  )
-                : _patchMap[URLProtectionSpace$.sslCertificate]
+          ? ((_patchMap[URLProtectionSpace$.sslCertificate] is Function)
+                    ? _patchMap[URLProtectionSpace$.sslCertificate](
+                        this.sslCertificate,
+                      )
+                    : (_patchMap[URLProtectionSpace$.sslCertificate] is Patch)
+                    ? _patchMap[URLProtectionSpace$.sslCertificate].applyTo(
+                        this.sslCertificate,
+                      )
+                    : _patchMap[URLProtectionSpace$.sslCertificate])
+                as SslCertificate?
           : this.sslCertificate,
       sslError: _patchMap.containsKey(URLProtectionSpace$.sslError)
-          ? (_patchMap[URLProtectionSpace$.sslError] is Function)
-                ? _patchMap[URLProtectionSpace$.sslError](this.sslError)
-                : (_patchMap[URLProtectionSpace$.sslError] is Patch)
-                ? _patchMap[URLProtectionSpace$.sslError].applyTo(this.sslError)
-                : _patchMap[URLProtectionSpace$.sslError]
+          ? ((_patchMap[URLProtectionSpace$.sslError] is Function)
+                    ? _patchMap[URLProtectionSpace$.sslError](this.sslError)
+                    : (_patchMap[URLProtectionSpace$.sslError] is Patch)
+                    ? _patchMap[URLProtectionSpace$.sslError].applyTo(
+                        this.sslError,
+                      )
+                    : _patchMap[URLProtectionSpace$.sslError])
+                as SslError?
           : this.sslError,
       authenticationMethod:
           _patchMap.containsKey(URLProtectionSpace$.authenticationMethod)
-          ? (_patchMap[URLProtectionSpace$.authenticationMethod] is Function)
-                ? _patchMap[URLProtectionSpace$.authenticationMethod](
-                    this.authenticationMethod,
-                  )
-                : (_patchMap[URLProtectionSpace$.authenticationMethod] is Patch)
-                ? _patchMap[URLProtectionSpace$.authenticationMethod].applyTo(
-                    this.authenticationMethod,
-                  )
-                : _patchMap[URLProtectionSpace$.authenticationMethod]
+          ? ((_patchMap[URLProtectionSpace$.authenticationMethod] is Function)
+                    ? _patchMap[URLProtectionSpace$.authenticationMethod](
+                        this.authenticationMethod,
+                      )
+                    : (_patchMap[URLProtectionSpace$.authenticationMethod]
+                          is Patch)
+                    ? _patchMap[URLProtectionSpace$.authenticationMethod]
+                          .applyTo(this.authenticationMethod)
+                    : _patchMap[URLProtectionSpace$.authenticationMethod])
+                as URLProtectionSpaceAuthenticationMethod?
           : this.authenticationMethod,
       distinguishedNames:
           _patchMap.containsKey(URLProtectionSpace$.distinguishedNames)
-          ? (_patchMap[URLProtectionSpace$.distinguishedNames] is Function)
-                ? _patchMap[URLProtectionSpace$.distinguishedNames](
-                    this.distinguishedNames,
-                  )
-                : (_patchMap[URLProtectionSpace$.distinguishedNames] is Patch)
-                ? _patchMap[URLProtectionSpace$.distinguishedNames].applyTo(
-                    this.distinguishedNames,
-                  )
-                : _patchMap[URLProtectionSpace$.distinguishedNames]
+          ? ((_patchMap[URLProtectionSpace$.distinguishedNames] is Function)
+                    ? _patchMap[URLProtectionSpace$.distinguishedNames](
+                        this.distinguishedNames,
+                      )
+                    : (_patchMap[URLProtectionSpace$.distinguishedNames]
+                          is Patch)
+                    ? _patchMap[URLProtectionSpace$.distinguishedNames].applyTo(
+                        this.distinguishedNames,
+                      )
+                    : _patchMap[URLProtectionSpace$.distinguishedNames])
+                as List<X509Certificate>?
           : this.distinguishedNames,
       proxyType: _patchMap.containsKey(URLProtectionSpace$.proxyType)
-          ? (_patchMap[URLProtectionSpace$.proxyType] is Function)
-                ? _patchMap[URLProtectionSpace$.proxyType](this.proxyType)
-                : (_patchMap[URLProtectionSpace$.proxyType] is Patch)
-                ? _patchMap[URLProtectionSpace$.proxyType].applyTo(
-                    this.proxyType,
-                  )
-                : _patchMap[URLProtectionSpace$.proxyType]
+          ? ((_patchMap[URLProtectionSpace$.proxyType] is Function)
+                    ? _patchMap[URLProtectionSpace$.proxyType](this.proxyType)
+                    : (_patchMap[URLProtectionSpace$.proxyType] is Patch)
+                    ? _patchMap[URLProtectionSpace$.proxyType].applyTo(
+                        this.proxyType,
+                      )
+                    : _patchMap[URLProtectionSpace$.proxyType])
+                as URLProtectionSpaceProxyType?
           : this.proxyType,
       receivesCredentialSecurely:
           _patchMap.containsKey(URLProtectionSpace$.receivesCredentialSecurely)
-          ? (_patchMap[URLProtectionSpace$.receivesCredentialSecurely]
-                    is Function)
-                ? _patchMap[URLProtectionSpace$.receivesCredentialSecurely](
-                    this.receivesCredentialSecurely,
-                  )
-                : (_patchMap[URLProtectionSpace$.receivesCredentialSecurely]
-                      is Patch)
-                ? _patchMap[URLProtectionSpace$.receivesCredentialSecurely]
-                      .applyTo(this.receivesCredentialSecurely)
-                : _patchMap[URLProtectionSpace$.receivesCredentialSecurely]
+          ? ((_patchMap[URLProtectionSpace$.receivesCredentialSecurely]
+                        is Function)
+                    ? _patchMap[URLProtectionSpace$.receivesCredentialSecurely](
+                        this.receivesCredentialSecurely,
+                      )
+                    : (_patchMap[URLProtectionSpace$.receivesCredentialSecurely]
+                          is Patch)
+                    ? _patchMap[URLProtectionSpace$.receivesCredentialSecurely]
+                          .applyTo(this.receivesCredentialSecurely)
+                    : _patchMap[URLProtectionSpace$.receivesCredentialSecurely])
+                as bool?
           : this.receivesCredentialSecurely,
     );
   }
@@ -269,7 +284,8 @@ class URLProtectionSpace {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$URLProtectionSpaceToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

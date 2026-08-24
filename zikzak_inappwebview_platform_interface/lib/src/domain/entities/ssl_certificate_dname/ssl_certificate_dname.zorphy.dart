@@ -65,32 +65,36 @@ class SslCertificateDName {
     final _patchMap = _patcher.patchMap;
     return SslCertificateDName(
       CName: _patchMap.containsKey(SslCertificateDName$.CName)
-          ? (_patchMap[SslCertificateDName$.CName] is Function)
-                ? _patchMap[SslCertificateDName$.CName](this.CName)
-                : (_patchMap[SslCertificateDName$.CName] is Patch)
-                ? _patchMap[SslCertificateDName$.CName].applyTo(this.CName)
-                : _patchMap[SslCertificateDName$.CName]
+          ? ((_patchMap[SslCertificateDName$.CName] is Function)
+                    ? _patchMap[SslCertificateDName$.CName](this.CName)
+                    : (_patchMap[SslCertificateDName$.CName] is Patch)
+                    ? _patchMap[SslCertificateDName$.CName].applyTo(this.CName)
+                    : _patchMap[SslCertificateDName$.CName])
+                as String?
           : this.CName,
       DName: _patchMap.containsKey(SslCertificateDName$.DName)
-          ? (_patchMap[SslCertificateDName$.DName] is Function)
-                ? _patchMap[SslCertificateDName$.DName](this.DName)
-                : (_patchMap[SslCertificateDName$.DName] is Patch)
-                ? _patchMap[SslCertificateDName$.DName].applyTo(this.DName)
-                : _patchMap[SslCertificateDName$.DName]
+          ? ((_patchMap[SslCertificateDName$.DName] is Function)
+                    ? _patchMap[SslCertificateDName$.DName](this.DName)
+                    : (_patchMap[SslCertificateDName$.DName] is Patch)
+                    ? _patchMap[SslCertificateDName$.DName].applyTo(this.DName)
+                    : _patchMap[SslCertificateDName$.DName])
+                as String?
           : this.DName,
       OName: _patchMap.containsKey(SslCertificateDName$.OName)
-          ? (_patchMap[SslCertificateDName$.OName] is Function)
-                ? _patchMap[SslCertificateDName$.OName](this.OName)
-                : (_patchMap[SslCertificateDName$.OName] is Patch)
-                ? _patchMap[SslCertificateDName$.OName].applyTo(this.OName)
-                : _patchMap[SslCertificateDName$.OName]
+          ? ((_patchMap[SslCertificateDName$.OName] is Function)
+                    ? _patchMap[SslCertificateDName$.OName](this.OName)
+                    : (_patchMap[SslCertificateDName$.OName] is Patch)
+                    ? _patchMap[SslCertificateDName$.OName].applyTo(this.OName)
+                    : _patchMap[SslCertificateDName$.OName])
+                as String?
           : this.OName,
       UName: _patchMap.containsKey(SslCertificateDName$.UName)
-          ? (_patchMap[SslCertificateDName$.UName] is Function)
-                ? _patchMap[SslCertificateDName$.UName](this.UName)
-                : (_patchMap[SslCertificateDName$.UName] is Patch)
-                ? _patchMap[SslCertificateDName$.UName].applyTo(this.UName)
-                : _patchMap[SslCertificateDName$.UName]
+          ? ((_patchMap[SslCertificateDName$.UName] is Function)
+                    ? _patchMap[SslCertificateDName$.UName](this.UName)
+                    : (_patchMap[SslCertificateDName$.UName] is Patch)
+                    ? _patchMap[SslCertificateDName$.UName].applyTo(this.UName)
+                    : _patchMap[SslCertificateDName$.UName])
+                as String?
           : this.UName,
     );
   }
@@ -124,7 +128,8 @@ class SslCertificateDName {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$SslCertificateDNameToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

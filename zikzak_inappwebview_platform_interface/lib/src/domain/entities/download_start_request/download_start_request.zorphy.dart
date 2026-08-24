@@ -85,76 +85,84 @@ class DownloadStartRequest {
     final _patchMap = _patcher.patchMap;
     return DownloadStartRequest(
       url: _patchMap.containsKey(DownloadStartRequest$.url)
-          ? (_patchMap[DownloadStartRequest$.url] is Function)
-                ? _patchMap[DownloadStartRequest$.url](this.url)
-                : (_patchMap[DownloadStartRequest$.url] is Patch)
-                ? _patchMap[DownloadStartRequest$.url].applyTo(this.url)
-                : _patchMap[DownloadStartRequest$.url]
+          ? ((_patchMap[DownloadStartRequest$.url] is Function)
+                    ? _patchMap[DownloadStartRequest$.url](this.url)
+                    : (_patchMap[DownloadStartRequest$.url] is Patch)
+                    ? _patchMap[DownloadStartRequest$.url].applyTo(this.url)
+                    : _patchMap[DownloadStartRequest$.url])
+                as WebUri
           : this.url,
       userAgent: _patchMap.containsKey(DownloadStartRequest$.userAgent)
-          ? (_patchMap[DownloadStartRequest$.userAgent] is Function)
-                ? _patchMap[DownloadStartRequest$.userAgent](this.userAgent)
-                : (_patchMap[DownloadStartRequest$.userAgent] is Patch)
-                ? _patchMap[DownloadStartRequest$.userAgent].applyTo(
-                    this.userAgent,
-                  )
-                : _patchMap[DownloadStartRequest$.userAgent]
+          ? ((_patchMap[DownloadStartRequest$.userAgent] is Function)
+                    ? _patchMap[DownloadStartRequest$.userAgent](this.userAgent)
+                    : (_patchMap[DownloadStartRequest$.userAgent] is Patch)
+                    ? _patchMap[DownloadStartRequest$.userAgent].applyTo(
+                        this.userAgent,
+                      )
+                    : _patchMap[DownloadStartRequest$.userAgent])
+                as String?
           : this.userAgent,
       contentDisposition:
           _patchMap.containsKey(DownloadStartRequest$.contentDisposition)
-          ? (_patchMap[DownloadStartRequest$.contentDisposition] is Function)
-                ? _patchMap[DownloadStartRequest$.contentDisposition](
-                    this.contentDisposition,
-                  )
-                : (_patchMap[DownloadStartRequest$.contentDisposition] is Patch)
-                ? _patchMap[DownloadStartRequest$.contentDisposition].applyTo(
-                    this.contentDisposition,
-                  )
-                : _patchMap[DownloadStartRequest$.contentDisposition]
+          ? ((_patchMap[DownloadStartRequest$.contentDisposition] is Function)
+                    ? _patchMap[DownloadStartRequest$.contentDisposition](
+                        this.contentDisposition,
+                      )
+                    : (_patchMap[DownloadStartRequest$.contentDisposition]
+                          is Patch)
+                    ? _patchMap[DownloadStartRequest$.contentDisposition]
+                          .applyTo(this.contentDisposition)
+                    : _patchMap[DownloadStartRequest$.contentDisposition])
+                as String?
           : this.contentDisposition,
       mimeType: _patchMap.containsKey(DownloadStartRequest$.mimeType)
-          ? (_patchMap[DownloadStartRequest$.mimeType] is Function)
-                ? _patchMap[DownloadStartRequest$.mimeType](this.mimeType)
-                : (_patchMap[DownloadStartRequest$.mimeType] is Patch)
-                ? _patchMap[DownloadStartRequest$.mimeType].applyTo(
-                    this.mimeType,
-                  )
-                : _patchMap[DownloadStartRequest$.mimeType]
+          ? ((_patchMap[DownloadStartRequest$.mimeType] is Function)
+                    ? _patchMap[DownloadStartRequest$.mimeType](this.mimeType)
+                    : (_patchMap[DownloadStartRequest$.mimeType] is Patch)
+                    ? _patchMap[DownloadStartRequest$.mimeType].applyTo(
+                        this.mimeType,
+                      )
+                    : _patchMap[DownloadStartRequest$.mimeType])
+                as String?
           : this.mimeType,
       contentLength: _patchMap.containsKey(DownloadStartRequest$.contentLength)
-          ? (_patchMap[DownloadStartRequest$.contentLength] is Function)
-                ? _patchMap[DownloadStartRequest$.contentLength](
-                    this.contentLength,
-                  )
-                : (_patchMap[DownloadStartRequest$.contentLength] is Patch)
-                ? _patchMap[DownloadStartRequest$.contentLength].applyTo(
-                    this.contentLength,
-                  )
-                : _patchMap[DownloadStartRequest$.contentLength]
+          ? ((_patchMap[DownloadStartRequest$.contentLength] is Function)
+                    ? _patchMap[DownloadStartRequest$.contentLength](
+                        this.contentLength,
+                      )
+                    : (_patchMap[DownloadStartRequest$.contentLength] is Patch)
+                    ? _patchMap[DownloadStartRequest$.contentLength].applyTo(
+                        this.contentLength,
+                      )
+                    : _patchMap[DownloadStartRequest$.contentLength])
+                as int
           : this.contentLength,
       suggestedFilename:
           _patchMap.containsKey(DownloadStartRequest$.suggestedFilename)
-          ? (_patchMap[DownloadStartRequest$.suggestedFilename] is Function)
-                ? _patchMap[DownloadStartRequest$.suggestedFilename](
-                    this.suggestedFilename,
-                  )
-                : (_patchMap[DownloadStartRequest$.suggestedFilename] is Patch)
-                ? _patchMap[DownloadStartRequest$.suggestedFilename].applyTo(
-                    this.suggestedFilename,
-                  )
-                : _patchMap[DownloadStartRequest$.suggestedFilename]
+          ? ((_patchMap[DownloadStartRequest$.suggestedFilename] is Function)
+                    ? _patchMap[DownloadStartRequest$.suggestedFilename](
+                        this.suggestedFilename,
+                      )
+                    : (_patchMap[DownloadStartRequest$.suggestedFilename]
+                          is Patch)
+                    ? _patchMap[DownloadStartRequest$.suggestedFilename]
+                          .applyTo(this.suggestedFilename)
+                    : _patchMap[DownloadStartRequest$.suggestedFilename])
+                as String?
           : this.suggestedFilename,
       textEncodingName:
           _patchMap.containsKey(DownloadStartRequest$.textEncodingName)
-          ? (_patchMap[DownloadStartRequest$.textEncodingName] is Function)
-                ? _patchMap[DownloadStartRequest$.textEncodingName](
-                    this.textEncodingName,
-                  )
-                : (_patchMap[DownloadStartRequest$.textEncodingName] is Patch)
-                ? _patchMap[DownloadStartRequest$.textEncodingName].applyTo(
-                    this.textEncodingName,
-                  )
-                : _patchMap[DownloadStartRequest$.textEncodingName]
+          ? ((_patchMap[DownloadStartRequest$.textEncodingName] is Function)
+                    ? _patchMap[DownloadStartRequest$.textEncodingName](
+                        this.textEncodingName,
+                      )
+                    : (_patchMap[DownloadStartRequest$.textEncodingName]
+                          is Patch)
+                    ? _patchMap[DownloadStartRequest$.textEncodingName].applyTo(
+                        this.textEncodingName,
+                      )
+                    : _patchMap[DownloadStartRequest$.textEncodingName])
+                as String?
           : this.textEncodingName,
     );
   }
@@ -205,7 +213,8 @@ class DownloadStartRequest {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$DownloadStartRequestToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

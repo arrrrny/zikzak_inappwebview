@@ -85,66 +85,75 @@ class URLResponse {
     final _patchMap = _patcher.patchMap;
     return URLResponse(
       url: _patchMap.containsKey(URLResponse$.url)
-          ? (_patchMap[URLResponse$.url] is Function)
-                ? _patchMap[URLResponse$.url](this.url)
-                : (_patchMap[URLResponse$.url] is Patch)
-                ? _patchMap[URLResponse$.url].applyTo(this.url)
-                : _patchMap[URLResponse$.url]
+          ? ((_patchMap[URLResponse$.url] is Function)
+                    ? _patchMap[URLResponse$.url](this.url)
+                    : (_patchMap[URLResponse$.url] is Patch)
+                    ? _patchMap[URLResponse$.url].applyTo(this.url)
+                    : _patchMap[URLResponse$.url])
+                as WebUri?
           : this.url,
       expectedContentLength:
           _patchMap.containsKey(URLResponse$.expectedContentLength)
-          ? (_patchMap[URLResponse$.expectedContentLength] is Function)
-                ? _patchMap[URLResponse$.expectedContentLength](
-                    this.expectedContentLength,
-                  )
-                : (_patchMap[URLResponse$.expectedContentLength] is Patch)
-                ? _patchMap[URLResponse$.expectedContentLength].applyTo(
-                    this.expectedContentLength,
-                  )
-                : _patchMap[URLResponse$.expectedContentLength]
+          ? ((_patchMap[URLResponse$.expectedContentLength] is Function)
+                    ? _patchMap[URLResponse$.expectedContentLength](
+                        this.expectedContentLength,
+                      )
+                    : (_patchMap[URLResponse$.expectedContentLength] is Patch)
+                    ? _patchMap[URLResponse$.expectedContentLength].applyTo(
+                        this.expectedContentLength,
+                      )
+                    : _patchMap[URLResponse$.expectedContentLength])
+                as int
           : this.expectedContentLength,
       mimeType: _patchMap.containsKey(URLResponse$.mimeType)
-          ? (_patchMap[URLResponse$.mimeType] is Function)
-                ? _patchMap[URLResponse$.mimeType](this.mimeType)
-                : (_patchMap[URLResponse$.mimeType] is Patch)
-                ? _patchMap[URLResponse$.mimeType].applyTo(this.mimeType)
-                : _patchMap[URLResponse$.mimeType]
+          ? ((_patchMap[URLResponse$.mimeType] is Function)
+                    ? _patchMap[URLResponse$.mimeType](this.mimeType)
+                    : (_patchMap[URLResponse$.mimeType] is Patch)
+                    ? _patchMap[URLResponse$.mimeType].applyTo(this.mimeType)
+                    : _patchMap[URLResponse$.mimeType])
+                as String?
           : this.mimeType,
       suggestedFilename: _patchMap.containsKey(URLResponse$.suggestedFilename)
-          ? (_patchMap[URLResponse$.suggestedFilename] is Function)
-                ? _patchMap[URLResponse$.suggestedFilename](
-                    this.suggestedFilename,
-                  )
-                : (_patchMap[URLResponse$.suggestedFilename] is Patch)
-                ? _patchMap[URLResponse$.suggestedFilename].applyTo(
-                    this.suggestedFilename,
-                  )
-                : _patchMap[URLResponse$.suggestedFilename]
+          ? ((_patchMap[URLResponse$.suggestedFilename] is Function)
+                    ? _patchMap[URLResponse$.suggestedFilename](
+                        this.suggestedFilename,
+                      )
+                    : (_patchMap[URLResponse$.suggestedFilename] is Patch)
+                    ? _patchMap[URLResponse$.suggestedFilename].applyTo(
+                        this.suggestedFilename,
+                      )
+                    : _patchMap[URLResponse$.suggestedFilename])
+                as String?
           : this.suggestedFilename,
       textEncodingName: _patchMap.containsKey(URLResponse$.textEncodingName)
-          ? (_patchMap[URLResponse$.textEncodingName] is Function)
-                ? _patchMap[URLResponse$.textEncodingName](
-                    this.textEncodingName,
-                  )
-                : (_patchMap[URLResponse$.textEncodingName] is Patch)
-                ? _patchMap[URLResponse$.textEncodingName].applyTo(
-                    this.textEncodingName,
-                  )
-                : _patchMap[URLResponse$.textEncodingName]
+          ? ((_patchMap[URLResponse$.textEncodingName] is Function)
+                    ? _patchMap[URLResponse$.textEncodingName](
+                        this.textEncodingName,
+                      )
+                    : (_patchMap[URLResponse$.textEncodingName] is Patch)
+                    ? _patchMap[URLResponse$.textEncodingName].applyTo(
+                        this.textEncodingName,
+                      )
+                    : _patchMap[URLResponse$.textEncodingName])
+                as String?
           : this.textEncodingName,
       headers: _patchMap.containsKey(URLResponse$.headers)
-          ? (_patchMap[URLResponse$.headers] is Function)
-                ? _patchMap[URLResponse$.headers](this.headers)
-                : (_patchMap[URLResponse$.headers] is Patch)
-                ? _patchMap[URLResponse$.headers].applyTo(this.headers)
-                : _patchMap[URLResponse$.headers]
+          ? ((_patchMap[URLResponse$.headers] is Function)
+                    ? _patchMap[URLResponse$.headers](this.headers)
+                    : (_patchMap[URLResponse$.headers] is Patch)
+                    ? _patchMap[URLResponse$.headers].applyTo(this.headers)
+                    : _patchMap[URLResponse$.headers])
+                as Map<String, String>?
           : this.headers,
       statusCode: _patchMap.containsKey(URLResponse$.statusCode)
-          ? (_patchMap[URLResponse$.statusCode] is Function)
-                ? _patchMap[URLResponse$.statusCode](this.statusCode)
-                : (_patchMap[URLResponse$.statusCode] is Patch)
-                ? _patchMap[URLResponse$.statusCode].applyTo(this.statusCode)
-                : _patchMap[URLResponse$.statusCode]
+          ? ((_patchMap[URLResponse$.statusCode] is Function)
+                    ? _patchMap[URLResponse$.statusCode](this.statusCode)
+                    : (_patchMap[URLResponse$.statusCode] is Patch)
+                    ? _patchMap[URLResponse$.statusCode].applyTo(
+                        this.statusCode,
+                      )
+                    : _patchMap[URLResponse$.statusCode])
+                as int?
           : this.statusCode,
     );
   }
@@ -195,7 +204,8 @@ class URLResponse {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$URLResponseToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

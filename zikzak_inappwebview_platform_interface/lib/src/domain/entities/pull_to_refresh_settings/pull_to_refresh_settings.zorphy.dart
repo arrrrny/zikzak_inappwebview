@@ -90,76 +90,87 @@ class PullToRefreshSettings {
     final _patchMap = _patcher.patchMap;
     return PullToRefreshSettings(
       enabled: _patchMap.containsKey(PullToRefreshSettings$.enabled)
-          ? (_patchMap[PullToRefreshSettings$.enabled] is Function)
-                ? _patchMap[PullToRefreshSettings$.enabled](this.enabled)
-                : (_patchMap[PullToRefreshSettings$.enabled] is Patch)
-                ? _patchMap[PullToRefreshSettings$.enabled].applyTo(
-                    this.enabled,
-                  )
-                : _patchMap[PullToRefreshSettings$.enabled]
+          ? ((_patchMap[PullToRefreshSettings$.enabled] is Function)
+                    ? _patchMap[PullToRefreshSettings$.enabled](this.enabled)
+                    : (_patchMap[PullToRefreshSettings$.enabled] is Patch)
+                    ? _patchMap[PullToRefreshSettings$.enabled].applyTo(
+                        this.enabled,
+                      )
+                    : _patchMap[PullToRefreshSettings$.enabled])
+                as bool?
           : this.enabled,
       color: _patchMap.containsKey(PullToRefreshSettings$.color)
-          ? (_patchMap[PullToRefreshSettings$.color] is Function)
-                ? _patchMap[PullToRefreshSettings$.color](this.color)
-                : (_patchMap[PullToRefreshSettings$.color] is Patch)
-                ? _patchMap[PullToRefreshSettings$.color].applyTo(this.color)
-                : _patchMap[PullToRefreshSettings$.color]
+          ? ((_patchMap[PullToRefreshSettings$.color] is Function)
+                    ? _patchMap[PullToRefreshSettings$.color](this.color)
+                    : (_patchMap[PullToRefreshSettings$.color] is Patch)
+                    ? _patchMap[PullToRefreshSettings$.color].applyTo(
+                        this.color,
+                      )
+                    : _patchMap[PullToRefreshSettings$.color])
+                as Color?
           : this.color,
       backgroundColor:
           _patchMap.containsKey(PullToRefreshSettings$.backgroundColor)
-          ? (_patchMap[PullToRefreshSettings$.backgroundColor] is Function)
-                ? _patchMap[PullToRefreshSettings$.backgroundColor](
-                    this.backgroundColor,
-                  )
-                : (_patchMap[PullToRefreshSettings$.backgroundColor] is Patch)
-                ? _patchMap[PullToRefreshSettings$.backgroundColor].applyTo(
-                    this.backgroundColor,
-                  )
-                : _patchMap[PullToRefreshSettings$.backgroundColor]
+          ? ((_patchMap[PullToRefreshSettings$.backgroundColor] is Function)
+                    ? _patchMap[PullToRefreshSettings$.backgroundColor](
+                        this.backgroundColor,
+                      )
+                    : (_patchMap[PullToRefreshSettings$.backgroundColor]
+                          is Patch)
+                    ? _patchMap[PullToRefreshSettings$.backgroundColor].applyTo(
+                        this.backgroundColor,
+                      )
+                    : _patchMap[PullToRefreshSettings$.backgroundColor])
+                as Color?
           : this.backgroundColor,
       distanceToTriggerSync:
           _patchMap.containsKey(PullToRefreshSettings$.distanceToTriggerSync)
-          ? (_patchMap[PullToRefreshSettings$.distanceToTriggerSync]
-                    is Function)
-                ? _patchMap[PullToRefreshSettings$.distanceToTriggerSync](
-                    this.distanceToTriggerSync,
-                  )
-                : (_patchMap[PullToRefreshSettings$.distanceToTriggerSync]
-                      is Patch)
-                ? _patchMap[PullToRefreshSettings$.distanceToTriggerSync]
-                      .applyTo(this.distanceToTriggerSync)
-                : _patchMap[PullToRefreshSettings$.distanceToTriggerSync]
+          ? ((_patchMap[PullToRefreshSettings$.distanceToTriggerSync]
+                        is Function)
+                    ? _patchMap[PullToRefreshSettings$.distanceToTriggerSync](
+                        this.distanceToTriggerSync,
+                      )
+                    : (_patchMap[PullToRefreshSettings$.distanceToTriggerSync]
+                          is Patch)
+                    ? _patchMap[PullToRefreshSettings$.distanceToTriggerSync]
+                          .applyTo(this.distanceToTriggerSync)
+                    : _patchMap[PullToRefreshSettings$.distanceToTriggerSync])
+                as int?
           : this.distanceToTriggerSync,
       slingshotDistance:
           _patchMap.containsKey(PullToRefreshSettings$.slingshotDistance)
-          ? (_patchMap[PullToRefreshSettings$.slingshotDistance] is Function)
-                ? _patchMap[PullToRefreshSettings$.slingshotDistance](
-                    this.slingshotDistance,
-                  )
-                : (_patchMap[PullToRefreshSettings$.slingshotDistance] is Patch)
-                ? _patchMap[PullToRefreshSettings$.slingshotDistance].applyTo(
-                    this.slingshotDistance,
-                  )
-                : _patchMap[PullToRefreshSettings$.slingshotDistance]
+          ? ((_patchMap[PullToRefreshSettings$.slingshotDistance] is Function)
+                    ? _patchMap[PullToRefreshSettings$.slingshotDistance](
+                        this.slingshotDistance,
+                      )
+                    : (_patchMap[PullToRefreshSettings$.slingshotDistance]
+                          is Patch)
+                    ? _patchMap[PullToRefreshSettings$.slingshotDistance]
+                          .applyTo(this.slingshotDistance)
+                    : _patchMap[PullToRefreshSettings$.slingshotDistance])
+                as int?
           : this.slingshotDistance,
       size: _patchMap.containsKey(PullToRefreshSettings$.size)
-          ? (_patchMap[PullToRefreshSettings$.size] is Function)
-                ? _patchMap[PullToRefreshSettings$.size](this.size)
-                : (_patchMap[PullToRefreshSettings$.size] is Patch)
-                ? _patchMap[PullToRefreshSettings$.size].applyTo(this.size)
-                : _patchMap[PullToRefreshSettings$.size]
+          ? ((_patchMap[PullToRefreshSettings$.size] is Function)
+                    ? _patchMap[PullToRefreshSettings$.size](this.size)
+                    : (_patchMap[PullToRefreshSettings$.size] is Patch)
+                    ? _patchMap[PullToRefreshSettings$.size].applyTo(this.size)
+                    : _patchMap[PullToRefreshSettings$.size])
+                as PullToRefreshSize?
           : this.size,
       attributedTitle:
           _patchMap.containsKey(PullToRefreshSettings$.attributedTitle)
-          ? (_patchMap[PullToRefreshSettings$.attributedTitle] is Function)
-                ? _patchMap[PullToRefreshSettings$.attributedTitle](
-                    this.attributedTitle,
-                  )
-                : (_patchMap[PullToRefreshSettings$.attributedTitle] is Patch)
-                ? _patchMap[PullToRefreshSettings$.attributedTitle].applyTo(
-                    this.attributedTitle,
-                  )
-                : _patchMap[PullToRefreshSettings$.attributedTitle]
+          ? ((_patchMap[PullToRefreshSettings$.attributedTitle] is Function)
+                    ? _patchMap[PullToRefreshSettings$.attributedTitle](
+                        this.attributedTitle,
+                      )
+                    : (_patchMap[PullToRefreshSettings$.attributedTitle]
+                          is Patch)
+                    ? _patchMap[PullToRefreshSettings$.attributedTitle].applyTo(
+                        this.attributedTitle,
+                      )
+                    : _patchMap[PullToRefreshSettings$.attributedTitle])
+                as AttributedString?
           : this.attributedTitle,
     );
   }
@@ -210,7 +221,8 @@ class PullToRefreshSettings {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$PullToRefreshSettingsToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

@@ -57,20 +57,22 @@ class PermissionResponse {
     final _patchMap = _patcher.patchMap;
     return PermissionResponse(
       resources: _patchMap.containsKey(PermissionResponse$.resources)
-          ? (_patchMap[PermissionResponse$.resources] is Function)
-                ? _patchMap[PermissionResponse$.resources](this.resources)
-                : (_patchMap[PermissionResponse$.resources] is Patch)
-                ? _patchMap[PermissionResponse$.resources].applyTo(
-                    this.resources,
-                  )
-                : _patchMap[PermissionResponse$.resources]
+          ? ((_patchMap[PermissionResponse$.resources] is Function)
+                    ? _patchMap[PermissionResponse$.resources](this.resources)
+                    : (_patchMap[PermissionResponse$.resources] is Patch)
+                    ? _patchMap[PermissionResponse$.resources].applyTo(
+                        this.resources,
+                      )
+                    : _patchMap[PermissionResponse$.resources])
+                as List<PermissionResourceType>?
           : this.resources,
       action: _patchMap.containsKey(PermissionResponse$.action)
-          ? (_patchMap[PermissionResponse$.action] is Function)
-                ? _patchMap[PermissionResponse$.action](this.action)
-                : (_patchMap[PermissionResponse$.action] is Patch)
-                ? _patchMap[PermissionResponse$.action].applyTo(this.action)
-                : _patchMap[PermissionResponse$.action]
+          ? ((_patchMap[PermissionResponse$.action] is Function)
+                    ? _patchMap[PermissionResponse$.action](this.action)
+                    : (_patchMap[PermissionResponse$.action] is Patch)
+                    ? _patchMap[PermissionResponse$.action].applyTo(this.action)
+                    : _patchMap[PermissionResponse$.action])
+                as PermissionResponseAction?
           : this.action,
     );
   }
@@ -98,7 +100,8 @@ class PermissionResponse {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$PermissionResponseToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

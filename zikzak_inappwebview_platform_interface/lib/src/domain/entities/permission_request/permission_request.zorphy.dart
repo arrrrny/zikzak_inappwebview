@@ -59,27 +59,30 @@ class PermissionRequest {
     final _patchMap = _patcher.patchMap;
     return PermissionRequest(
       origin: _patchMap.containsKey(PermissionRequest$.origin)
-          ? (_patchMap[PermissionRequest$.origin] is Function)
-                ? _patchMap[PermissionRequest$.origin](this.origin)
-                : (_patchMap[PermissionRequest$.origin] is Patch)
-                ? _patchMap[PermissionRequest$.origin].applyTo(this.origin)
-                : _patchMap[PermissionRequest$.origin]
+          ? ((_patchMap[PermissionRequest$.origin] is Function)
+                    ? _patchMap[PermissionRequest$.origin](this.origin)
+                    : (_patchMap[PermissionRequest$.origin] is Patch)
+                    ? _patchMap[PermissionRequest$.origin].applyTo(this.origin)
+                    : _patchMap[PermissionRequest$.origin])
+                as WebUri?
           : this.origin,
       resources: _patchMap.containsKey(PermissionRequest$.resources)
-          ? (_patchMap[PermissionRequest$.resources] is Function)
-                ? _patchMap[PermissionRequest$.resources](this.resources)
-                : (_patchMap[PermissionRequest$.resources] is Patch)
-                ? _patchMap[PermissionRequest$.resources].applyTo(
-                    this.resources,
-                  )
-                : _patchMap[PermissionRequest$.resources]
+          ? ((_patchMap[PermissionRequest$.resources] is Function)
+                    ? _patchMap[PermissionRequest$.resources](this.resources)
+                    : (_patchMap[PermissionRequest$.resources] is Patch)
+                    ? _patchMap[PermissionRequest$.resources].applyTo(
+                        this.resources,
+                      )
+                    : _patchMap[PermissionRequest$.resources])
+                as List<PermissionResourceType>?
           : this.resources,
       frame: _patchMap.containsKey(PermissionRequest$.frame)
-          ? (_patchMap[PermissionRequest$.frame] is Function)
-                ? _patchMap[PermissionRequest$.frame](this.frame)
-                : (_patchMap[PermissionRequest$.frame] is Patch)
-                ? _patchMap[PermissionRequest$.frame].applyTo(this.frame)
-                : _patchMap[PermissionRequest$.frame]
+          ? ((_patchMap[PermissionRequest$.frame] is Function)
+                    ? _patchMap[PermissionRequest$.frame](this.frame)
+                    : (_patchMap[PermissionRequest$.frame] is Patch)
+                    ? _patchMap[PermissionRequest$.frame].applyTo(this.frame)
+                    : _patchMap[PermissionRequest$.frame])
+                as FrameInfo?
           : this.frame,
     );
   }
@@ -110,7 +113,8 @@ class PermissionRequest {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$PermissionRequestToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {
@@ -151,6 +155,18 @@ extension PermissionRequestPropertyHelpers on PermissionRequest {
   bool get noResources {
     return this.resources?.isEmpty ?? true;
   }
+
+  bool get hasFrame {
+    return this.frame != null;
+  }
+
+  bool get noFrame {
+    return this.frame == null;
+  }
+
+  FrameInfo get frameRequired {
+    return this.frame ?? (throw StateError('frame is required but was null'));
+  }
 }
 
 extension PermissionRequestSerialization on PermissionRequest {
@@ -179,6 +195,21 @@ class PermissionRequestPatch
 
   PermissionRequestPatch withFrame(FrameInfo? value) {
     patchMap[PermissionRequest$.frame] = value;
+    return this;
+  }
+
+  PermissionRequestPatch withFramePatch(FrameInfoPatch patch) {
+    patchMap[PermissionRequest$.frame] = patch;
+    return this;
+  }
+
+  PermissionRequestPatch withFramePatchFunc(
+    FrameInfoPatch Function(FrameInfoPatch) patch,
+  ) {
+    patchMap[PermissionRequest$.frame] = (dynamic current) {
+      var currentPatch = FrameInfoPatch();
+      return patch(currentPatch).applyTo(current as FrameInfo);
+    };
     return this;
   }
 }

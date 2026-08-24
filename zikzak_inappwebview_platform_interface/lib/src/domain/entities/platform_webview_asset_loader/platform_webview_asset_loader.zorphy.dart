@@ -57,29 +57,36 @@ class WebViewAssetLoader {
     final _patchMap = _patcher.patchMap;
     return WebViewAssetLoader(
       domain: _patchMap.containsKey(WebViewAssetLoader$.domain)
-          ? (_patchMap[WebViewAssetLoader$.domain] is Function)
-                ? _patchMap[WebViewAssetLoader$.domain](this.domain)
-                : (_patchMap[WebViewAssetLoader$.domain] is Patch)
-                ? _patchMap[WebViewAssetLoader$.domain].applyTo(this.domain)
-                : _patchMap[WebViewAssetLoader$.domain]
+          ? ((_patchMap[WebViewAssetLoader$.domain] is Function)
+                    ? _patchMap[WebViewAssetLoader$.domain](this.domain)
+                    : (_patchMap[WebViewAssetLoader$.domain] is Patch)
+                    ? _patchMap[WebViewAssetLoader$.domain].applyTo(this.domain)
+                    : _patchMap[WebViewAssetLoader$.domain])
+                as String?
           : this.domain,
       httpAllowed: _patchMap.containsKey(WebViewAssetLoader$.httpAllowed)
-          ? (_patchMap[WebViewAssetLoader$.httpAllowed] is Function)
-                ? _patchMap[WebViewAssetLoader$.httpAllowed](this.httpAllowed)
-                : (_patchMap[WebViewAssetLoader$.httpAllowed] is Patch)
-                ? _patchMap[WebViewAssetLoader$.httpAllowed].applyTo(
-                    this.httpAllowed,
-                  )
-                : _patchMap[WebViewAssetLoader$.httpAllowed]
+          ? ((_patchMap[WebViewAssetLoader$.httpAllowed] is Function)
+                    ? _patchMap[WebViewAssetLoader$.httpAllowed](
+                        this.httpAllowed,
+                      )
+                    : (_patchMap[WebViewAssetLoader$.httpAllowed] is Patch)
+                    ? _patchMap[WebViewAssetLoader$.httpAllowed].applyTo(
+                        this.httpAllowed,
+                      )
+                    : _patchMap[WebViewAssetLoader$.httpAllowed])
+                as bool?
           : this.httpAllowed,
       pathHandlers: _patchMap.containsKey(WebViewAssetLoader$.pathHandlers)
-          ? (_patchMap[WebViewAssetLoader$.pathHandlers] is Function)
-                ? _patchMap[WebViewAssetLoader$.pathHandlers](this.pathHandlers)
-                : (_patchMap[WebViewAssetLoader$.pathHandlers] is Patch)
-                ? _patchMap[WebViewAssetLoader$.pathHandlers].applyTo(
-                    this.pathHandlers,
-                  )
-                : _patchMap[WebViewAssetLoader$.pathHandlers]
+          ? ((_patchMap[WebViewAssetLoader$.pathHandlers] is Function)
+                    ? _patchMap[WebViewAssetLoader$.pathHandlers](
+                        this.pathHandlers,
+                      )
+                    : (_patchMap[WebViewAssetLoader$.pathHandlers] is Patch)
+                    ? _patchMap[WebViewAssetLoader$.pathHandlers].applyTo(
+                        this.pathHandlers,
+                      )
+                    : _patchMap[WebViewAssetLoader$.pathHandlers])
+                as List<PlatformPathHandler>?
           : this.pathHandlers,
     );
   }
@@ -110,7 +117,8 @@ class WebViewAssetLoader {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$WebViewAssetLoaderToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

@@ -62,36 +62,42 @@ class JsPromptRequest {
     final _patchMap = _patcher.patchMap;
     return JsPromptRequest(
       url: _patchMap.containsKey(JsPromptRequest$.url)
-          ? (_patchMap[JsPromptRequest$.url] is Function)
-                ? _patchMap[JsPromptRequest$.url](this.url)
-                : (_patchMap[JsPromptRequest$.url] is Patch)
-                ? _patchMap[JsPromptRequest$.url].applyTo(this.url)
-                : _patchMap[JsPromptRequest$.url]
+          ? ((_patchMap[JsPromptRequest$.url] is Function)
+                    ? _patchMap[JsPromptRequest$.url](this.url)
+                    : (_patchMap[JsPromptRequest$.url] is Patch)
+                    ? _patchMap[JsPromptRequest$.url].applyTo(this.url)
+                    : _patchMap[JsPromptRequest$.url])
+                as WebUri?
           : this.url,
       message: _patchMap.containsKey(JsPromptRequest$.message)
-          ? (_patchMap[JsPromptRequest$.message] is Function)
-                ? _patchMap[JsPromptRequest$.message](this.message)
-                : (_patchMap[JsPromptRequest$.message] is Patch)
-                ? _patchMap[JsPromptRequest$.message].applyTo(this.message)
-                : _patchMap[JsPromptRequest$.message]
+          ? ((_patchMap[JsPromptRequest$.message] is Function)
+                    ? _patchMap[JsPromptRequest$.message](this.message)
+                    : (_patchMap[JsPromptRequest$.message] is Patch)
+                    ? _patchMap[JsPromptRequest$.message].applyTo(this.message)
+                    : _patchMap[JsPromptRequest$.message])
+                as String?
           : this.message,
       defaultValue: _patchMap.containsKey(JsPromptRequest$.defaultValue)
-          ? (_patchMap[JsPromptRequest$.defaultValue] is Function)
-                ? _patchMap[JsPromptRequest$.defaultValue](this.defaultValue)
-                : (_patchMap[JsPromptRequest$.defaultValue] is Patch)
-                ? _patchMap[JsPromptRequest$.defaultValue].applyTo(
-                    this.defaultValue,
-                  )
-                : _patchMap[JsPromptRequest$.defaultValue]
+          ? ((_patchMap[JsPromptRequest$.defaultValue] is Function)
+                    ? _patchMap[JsPromptRequest$.defaultValue](
+                        this.defaultValue,
+                      )
+                    : (_patchMap[JsPromptRequest$.defaultValue] is Patch)
+                    ? _patchMap[JsPromptRequest$.defaultValue].applyTo(
+                        this.defaultValue,
+                      )
+                    : _patchMap[JsPromptRequest$.defaultValue])
+                as String?
           : this.defaultValue,
       isMainFrame: _patchMap.containsKey(JsPromptRequest$.isMainFrame)
-          ? (_patchMap[JsPromptRequest$.isMainFrame] is Function)
-                ? _patchMap[JsPromptRequest$.isMainFrame](this.isMainFrame)
-                : (_patchMap[JsPromptRequest$.isMainFrame] is Patch)
-                ? _patchMap[JsPromptRequest$.isMainFrame].applyTo(
-                    this.isMainFrame,
-                  )
-                : _patchMap[JsPromptRequest$.isMainFrame]
+          ? ((_patchMap[JsPromptRequest$.isMainFrame] is Function)
+                    ? _patchMap[JsPromptRequest$.isMainFrame](this.isMainFrame)
+                    : (_patchMap[JsPromptRequest$.isMainFrame] is Patch)
+                    ? _patchMap[JsPromptRequest$.isMainFrame].applyTo(
+                        this.isMainFrame,
+                      )
+                    : _patchMap[JsPromptRequest$.isMainFrame])
+                as bool?
           : this.isMainFrame,
     );
   }
@@ -130,7 +136,8 @@ class JsPromptRequest {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$JsPromptRequestToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

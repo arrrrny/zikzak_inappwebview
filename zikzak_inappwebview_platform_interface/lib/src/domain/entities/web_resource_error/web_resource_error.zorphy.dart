@@ -41,20 +41,22 @@ class WebResourceError {
     final _patchMap = _patcher.patchMap;
     return WebResourceError(
       type: _patchMap.containsKey(WebResourceError$.type)
-          ? (_patchMap[WebResourceError$.type] is Function)
-                ? _patchMap[WebResourceError$.type](this.type)
-                : (_patchMap[WebResourceError$.type] is Patch)
-                ? _patchMap[WebResourceError$.type].applyTo(this.type)
-                : _patchMap[WebResourceError$.type]
+          ? ((_patchMap[WebResourceError$.type] is Function)
+                    ? _patchMap[WebResourceError$.type](this.type)
+                    : (_patchMap[WebResourceError$.type] is Patch)
+                    ? _patchMap[WebResourceError$.type].applyTo(this.type)
+                    : _patchMap[WebResourceError$.type])
+                as WebResourceErrorType?
           : this.type,
       description: _patchMap.containsKey(WebResourceError$.description)
-          ? (_patchMap[WebResourceError$.description] is Function)
-                ? _patchMap[WebResourceError$.description](this.description)
-                : (_patchMap[WebResourceError$.description] is Patch)
-                ? _patchMap[WebResourceError$.description].applyTo(
-                    this.description,
-                  )
-                : _patchMap[WebResourceError$.description]
+          ? ((_patchMap[WebResourceError$.description] is Function)
+                    ? _patchMap[WebResourceError$.description](this.description)
+                    : (_patchMap[WebResourceError$.description] is Patch)
+                    ? _patchMap[WebResourceError$.description].applyTo(
+                        this.description,
+                      )
+                    : _patchMap[WebResourceError$.description])
+                as String?
           : this.description,
     );
   }
@@ -82,7 +84,8 @@ class WebResourceError {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$WebResourceErrorToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

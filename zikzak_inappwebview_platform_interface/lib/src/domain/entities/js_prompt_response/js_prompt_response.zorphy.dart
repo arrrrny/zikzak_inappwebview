@@ -99,69 +99,78 @@ class JsPromptResponse {
     final _patchMap = _patcher.patchMap;
     return JsPromptResponse(
       message: _patchMap.containsKey(JsPromptResponse$.message)
-          ? (_patchMap[JsPromptResponse$.message] is Function)
-                ? _patchMap[JsPromptResponse$.message](this.message)
-                : (_patchMap[JsPromptResponse$.message] is Patch)
-                ? _patchMap[JsPromptResponse$.message].applyTo(this.message)
-                : _patchMap[JsPromptResponse$.message]
+          ? ((_patchMap[JsPromptResponse$.message] is Function)
+                    ? _patchMap[JsPromptResponse$.message](this.message)
+                    : (_patchMap[JsPromptResponse$.message] is Patch)
+                    ? _patchMap[JsPromptResponse$.message].applyTo(this.message)
+                    : _patchMap[JsPromptResponse$.message])
+                as String
           : this.message,
       defaultValue: _patchMap.containsKey(JsPromptResponse$.defaultValue)
-          ? (_patchMap[JsPromptResponse$.defaultValue] is Function)
-                ? _patchMap[JsPromptResponse$.defaultValue](this.defaultValue)
-                : (_patchMap[JsPromptResponse$.defaultValue] is Patch)
-                ? _patchMap[JsPromptResponse$.defaultValue].applyTo(
-                    this.defaultValue,
-                  )
-                : _patchMap[JsPromptResponse$.defaultValue]
+          ? ((_patchMap[JsPromptResponse$.defaultValue] is Function)
+                    ? _patchMap[JsPromptResponse$.defaultValue](
+                        this.defaultValue,
+                      )
+                    : (_patchMap[JsPromptResponse$.defaultValue] is Patch)
+                    ? _patchMap[JsPromptResponse$.defaultValue].applyTo(
+                        this.defaultValue,
+                      )
+                    : _patchMap[JsPromptResponse$.defaultValue])
+                as String
           : this.defaultValue,
       confirmButtonTitle:
           _patchMap.containsKey(JsPromptResponse$.confirmButtonTitle)
-          ? (_patchMap[JsPromptResponse$.confirmButtonTitle] is Function)
-                ? _patchMap[JsPromptResponse$.confirmButtonTitle](
-                    this.confirmButtonTitle,
-                  )
-                : (_patchMap[JsPromptResponse$.confirmButtonTitle] is Patch)
-                ? _patchMap[JsPromptResponse$.confirmButtonTitle].applyTo(
-                    this.confirmButtonTitle,
-                  )
-                : _patchMap[JsPromptResponse$.confirmButtonTitle]
+          ? ((_patchMap[JsPromptResponse$.confirmButtonTitle] is Function)
+                    ? _patchMap[JsPromptResponse$.confirmButtonTitle](
+                        this.confirmButtonTitle,
+                      )
+                    : (_patchMap[JsPromptResponse$.confirmButtonTitle] is Patch)
+                    ? _patchMap[JsPromptResponse$.confirmButtonTitle].applyTo(
+                        this.confirmButtonTitle,
+                      )
+                    : _patchMap[JsPromptResponse$.confirmButtonTitle])
+                as String
           : this.confirmButtonTitle,
       cancelButtonTitle:
           _patchMap.containsKey(JsPromptResponse$.cancelButtonTitle)
-          ? (_patchMap[JsPromptResponse$.cancelButtonTitle] is Function)
-                ? _patchMap[JsPromptResponse$.cancelButtonTitle](
-                    this.cancelButtonTitle,
-                  )
-                : (_patchMap[JsPromptResponse$.cancelButtonTitle] is Patch)
-                ? _patchMap[JsPromptResponse$.cancelButtonTitle].applyTo(
-                    this.cancelButtonTitle,
-                  )
-                : _patchMap[JsPromptResponse$.cancelButtonTitle]
+          ? ((_patchMap[JsPromptResponse$.cancelButtonTitle] is Function)
+                    ? _patchMap[JsPromptResponse$.cancelButtonTitle](
+                        this.cancelButtonTitle,
+                      )
+                    : (_patchMap[JsPromptResponse$.cancelButtonTitle] is Patch)
+                    ? _patchMap[JsPromptResponse$.cancelButtonTitle].applyTo(
+                        this.cancelButtonTitle,
+                      )
+                    : _patchMap[JsPromptResponse$.cancelButtonTitle])
+                as String
           : this.cancelButtonTitle,
       handledByClient: _patchMap.containsKey(JsPromptResponse$.handledByClient)
-          ? (_patchMap[JsPromptResponse$.handledByClient] is Function)
-                ? _patchMap[JsPromptResponse$.handledByClient](
-                    this.handledByClient,
-                  )
-                : (_patchMap[JsPromptResponse$.handledByClient] is Patch)
-                ? _patchMap[JsPromptResponse$.handledByClient].applyTo(
-                    this.handledByClient,
-                  )
-                : _patchMap[JsPromptResponse$.handledByClient]
+          ? ((_patchMap[JsPromptResponse$.handledByClient] is Function)
+                    ? _patchMap[JsPromptResponse$.handledByClient](
+                        this.handledByClient,
+                      )
+                    : (_patchMap[JsPromptResponse$.handledByClient] is Patch)
+                    ? _patchMap[JsPromptResponse$.handledByClient].applyTo(
+                        this.handledByClient,
+                      )
+                    : _patchMap[JsPromptResponse$.handledByClient])
+                as bool
           : this.handledByClient,
       value: _patchMap.containsKey(JsPromptResponse$.value)
-          ? (_patchMap[JsPromptResponse$.value] is Function)
-                ? _patchMap[JsPromptResponse$.value](this.value)
-                : (_patchMap[JsPromptResponse$.value] is Patch)
-                ? _patchMap[JsPromptResponse$.value].applyTo(this.value)
-                : _patchMap[JsPromptResponse$.value]
+          ? ((_patchMap[JsPromptResponse$.value] is Function)
+                    ? _patchMap[JsPromptResponse$.value](this.value)
+                    : (_patchMap[JsPromptResponse$.value] is Patch)
+                    ? _patchMap[JsPromptResponse$.value].applyTo(this.value)
+                    : _patchMap[JsPromptResponse$.value])
+                as String?
           : this.value,
       action: _patchMap.containsKey(JsPromptResponse$.action)
-          ? (_patchMap[JsPromptResponse$.action] is Function)
-                ? _patchMap[JsPromptResponse$.action](this.action)
-                : (_patchMap[JsPromptResponse$.action] is Patch)
-                ? _patchMap[JsPromptResponse$.action].applyTo(this.action)
-                : _patchMap[JsPromptResponse$.action]
+          ? ((_patchMap[JsPromptResponse$.action] is Function)
+                    ? _patchMap[JsPromptResponse$.action](this.action)
+                    : (_patchMap[JsPromptResponse$.action] is Patch)
+                    ? _patchMap[JsPromptResponse$.action].applyTo(this.action)
+                    : _patchMap[JsPromptResponse$.action])
+                as JsPromptResponseAction?
           : this.action,
     );
   }
@@ -212,7 +221,8 @@ class JsPromptResponse {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$JsPromptResponseToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

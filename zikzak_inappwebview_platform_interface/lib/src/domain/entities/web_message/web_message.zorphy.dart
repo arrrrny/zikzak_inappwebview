@@ -56,25 +56,28 @@ class WebMessage {
     final _patchMap = _patcher.patchMap;
     return WebMessage(
       data: _patchMap.containsKey(WebMessage$.data)
-          ? (_patchMap[WebMessage$.data] is Function)
-                ? _patchMap[WebMessage$.data](this.data)
-                : (_patchMap[WebMessage$.data] is Patch)
-                ? _patchMap[WebMessage$.data].applyTo(this.data)
-                : _patchMap[WebMessage$.data]
+          ? ((_patchMap[WebMessage$.data] is Function)
+                    ? _patchMap[WebMessage$.data](this.data)
+                    : (_patchMap[WebMessage$.data] is Patch)
+                    ? _patchMap[WebMessage$.data].applyTo(this.data)
+                    : _patchMap[WebMessage$.data])
+                as dynamic
           : this.data,
       type: _patchMap.containsKey(WebMessage$.type)
-          ? (_patchMap[WebMessage$.type] is Function)
-                ? _patchMap[WebMessage$.type](this.type)
-                : (_patchMap[WebMessage$.type] is Patch)
-                ? _patchMap[WebMessage$.type].applyTo(this.type)
-                : _patchMap[WebMessage$.type]
+          ? ((_patchMap[WebMessage$.type] is Function)
+                    ? _patchMap[WebMessage$.type](this.type)
+                    : (_patchMap[WebMessage$.type] is Patch)
+                    ? _patchMap[WebMessage$.type].applyTo(this.type)
+                    : _patchMap[WebMessage$.type])
+                as WebMessageType
           : this.type,
       ports: _patchMap.containsKey(WebMessage$.ports)
-          ? (_patchMap[WebMessage$.ports] is Function)
-                ? _patchMap[WebMessage$.ports](this.ports)
-                : (_patchMap[WebMessage$.ports] is Patch)
-                ? _patchMap[WebMessage$.ports].applyTo(this.ports)
-                : _patchMap[WebMessage$.ports]
+          ? ((_patchMap[WebMessage$.ports] is Function)
+                    ? _patchMap[WebMessage$.ports](this.ports)
+                    : (_patchMap[WebMessage$.ports] is Patch)
+                    ? _patchMap[WebMessage$.ports].applyTo(this.ports)
+                    : _patchMap[WebMessage$.ports])
+                as List<IWebMessagePort>?
           : this.ports,
     );
   }
@@ -105,7 +108,8 @@ class WebMessage {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$WebMessageToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {
