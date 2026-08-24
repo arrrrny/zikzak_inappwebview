@@ -770,8 +770,9 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///`flutter_inappwebview`, update your existing JavaScript from
   ///`window.flutter_inappwebview.callHandler(...)` to
   ///`window.zikzak_inappwebview.callHandler(...)`. Calls against the old name
-  ///fail silently with `TypeError: Cannot read properties of undefined
-  ///(reading 'callHandler')`. The `flutterInAppWebViewPlatformReady` event
+  ///fail because `window.flutter_inappwebview` is undefined, so calling
+  ///`window.flutter_inappwebview.callHandler(...)` throws a `TypeError`. The
+  ///`flutterInAppWebViewPlatformReady` event
   ///name is unchanged and still fires once the bridge is ready.
   ///
   ///**Officially Supported Platforms/Implementations**:
