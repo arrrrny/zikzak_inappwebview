@@ -1,3 +1,11 @@
+## 5.1.0 - 2026-08-24
+
+
+### Fixes
+
+- [Android] Remove deprecated `WebSettingsCompat.setRequestedWithHeaderOriginAllowList` / `getRequestedWithHeaderOriginAllowList` calls (marked for removal in `androidx.webkit`). Eliminates the `[removal]` build warnings introduced in 5.0.0. The Dart `requestedWithHeaderOriginAllowList` setting is retained for API compatibility (#235)
+- [platform_interface] Correct the stale `in_app_webview_settings.dart` import in `PlatformSettingsDelegate` — the published 5.0.1 artifact shipped a broken relative import that broke every consumer; the source on `master` is corrected (`in_app_webview_settings` moved to `lib/src/domain/entities/`) (#249, #255, #257)
+- [docs] Document the JavaScript bridge global rename to `window.zikzak_inappwebview` (was `window.flutter_inappwebview`) in the migration guide (#258)
 ## 5.0.1 - 2026-08-19
 
 ### Fixes

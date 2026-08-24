@@ -1,6 +1,6 @@
 name: zikzak_inappwebview
 description: A Flutter plugin that allows you to add an inline webview, to use an headless webview, and to open an in-app browser window.
-version: 5.0.0
+version: 5.1.0
 homepage: https://arrrrny.github.io/zikzak_inappwebview
 repository: https://github.com/arrrrny/zikzak_inappwebview
 issue_tracker: https://github.com/arrrrny/zikzak_inappwebview/issues
@@ -18,13 +18,13 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  zikzak_inappwebview_platform_interface: ^5.0.0
-  zikzak_inappwebview_android: ^5.0.0
-  zikzak_inappwebview_ios: ^5.0.0
-  zikzak_inappwebview_macos: ^5.0.0
-  zikzak_inappwebview_web: ^5.0.0
-  zikzak_inappwebview_windows: ^5.0.0
-  zikzak_inappwebview_linux: ^5.0.0
+  zikzak_inappwebview_platform_interface: ^5.1.0
+  zikzak_inappwebview_android: ^5.1.0
+  zikzak_inappwebview_ios: ^5.1.0
+  zikzak_inappwebview_macos: ^5.1.0
+  zikzak_inappwebview_web: ^5.1.0
+  zikzak_inappwebview_windows: ^5.1.0
+  zikzak_inappwebview_linux: ^5.1.0
   synchronized: ^3.4.1
   # Portable webview sessions (spec 014). Path dep while zikzak_session is
   # unpublished — flip to hosted on its first release.
@@ -99,6 +99,3 @@ false_secrets:
 
 # Unpublished-dev overrides: consume the local federated siblings while the
 # Zorphy-migrated layout is ahead of the published packages.
-dependency_overrides:
-  zikzak_inappwebview_platform_interface:
-    path: ../zikzak_inappwebview_platform_interface
