@@ -2,6 +2,32 @@ import Cocoa
 import FlutterMacOS
 import WebKit
 
+/// Maps the 64-char SHA-256 hex string sent from Dart (derived from a
+/// profile dir's canonical path) into a stable `UUID` for
+/// `WKWebsiteDataStore(forIdentifier:)`. We take the first 32 hex chars
+/// (16 bytes) and treat them as the UUID's raw bytes, so the same profile
+/// directory always yields the same on-disk store identifier — which is
+/// what makes a per-account session survive app relaunch.
+private func persistentUUID(from hex: String) -> UUID? {
+    let trimmed = hex.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard trimmed.count >= 32 else { return nil }
+    let prefix = trimmed.prefix(32)
+    var bytes: [UInt8] = []
+    bytes.reserveCapacity(16)
+    var index = prefix.startIndex
+    while index < prefix.endIndex {
+        let next = prefix.index(index, offsetBy: 2, limitedBy: prefix.endIndex) ?? prefix.endIndex
+        guard let byte = UInt8(String(prefix[index..<next]), radix: 16) else { return nil }
+        bytes.append(byte)
+        index = next
+    }
+    guard bytes.count == 16 else { return nil }
+    return UUID(uuid: (
+        bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7],
+        bytes[8], bytes[9], bytes[10], bytes[11], bytes[12], bytes[13], bytes[14], bytes[15]
+    ))
+}
+
 public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler, WKUIDelegate, NSMenuDelegate {
     var channel: FlutterMethodChannel!
     var registrar: FlutterPluginRegistrar? = nil
