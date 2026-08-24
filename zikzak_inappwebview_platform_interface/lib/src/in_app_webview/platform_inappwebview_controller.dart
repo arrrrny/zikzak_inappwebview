@@ -764,6 +764,16 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///before you know that your JavaScript code will call the `window.zikzak_inappwebview.callHandler` method,
   ///otherwise you won't be able to intercept the JavaScript message.
   ///
+  ///**Migration note — renamed bridge global.** This fork renamed the injected
+  ///JavaScript bridge global from `window.flutter_inappwebview` (upstream)
+  ///to `window.zikzak_inappwebview`. If you are migrating from
+  ///`flutter_inappwebview`, update your existing JavaScript from
+  ///`window.flutter_inappwebview.callHandler(...)` to
+  ///`window.zikzak_inappwebview.callHandler(...)`. Calls against the old name
+  ///fail silently with `TypeError: Cannot read properties of undefined
+  ///(reading 'callHandler')`. The `flutterInAppWebViewPlatformReady` event
+  ///name is unchanged and still fires once the bridge is ready.
+  ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS

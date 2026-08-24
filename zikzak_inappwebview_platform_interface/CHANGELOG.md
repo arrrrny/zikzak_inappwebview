@@ -1,3 +1,9 @@
+## 5.1.3 (unreleased)
+
+### Docs
+
+- [platform_interface] Add an explicit **Migration note** paragraph to the `addJavaScriptHandler` API docstring calling out the rename of the injected JavaScript bridge global from `window.flutter_inappwebview` (upstream) to `window.zikzak_inappwebview` (#258). The dart API docstring is the canonical JS communication guide rendered on pub.dev and embedded via `{@macro}` by every platform implementation, so the note reaches migrators reading any platform's API reference.
+
 ## 5.1.2 - 2026-08-24
 
 ### Fixes
