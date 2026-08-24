@@ -26,11 +26,9 @@ dependencies:
   zikzak_inappwebview_windows: ^5.0.0
   zikzak_inappwebview_linux: ^5.0.0
   synchronized: ^3.4.1
-  # Portable webview sessions (spec 014). Path dep while zikzak_session is
-  # unpublished — flip to hosted on its first release.
-  zikzak_session:
-    path: ../../zikzak_session
-
+  # Portable webview sessions (spec 014). Hosted since
+  # zikzak_session 0.1.0 shipped.
+  zikzak_session: ^0.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
