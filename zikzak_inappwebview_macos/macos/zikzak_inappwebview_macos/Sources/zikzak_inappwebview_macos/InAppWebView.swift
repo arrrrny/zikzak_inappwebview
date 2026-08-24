@@ -84,6 +84,13 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     ///into a Flutter platform view.
     public var popupWindow: NSWindow?
 
+    ///True when this WebView is hosted inside a `HeadlessInAppWebView`'s
+    ///off-screen window. Used to make that window visible to the window server
+    ///transiently during `takeSnapshot`, which otherwise returns `nil` for a
+    ///view that was never shown (no backing store). Never set for a normal
+    ///on-screen `InAppWebView`, so the real app window is never touched.
+    public var isHeadlessOffscreen: Bool = false
+
     ///The opener webview that created this popup (via [createWebViewWith]),
     ///`nil` for main (non-popup) webviews.
     public weak var opener: InAppWebView?
@@ -94,6 +101,26 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         let configuration = WKWebViewConfiguration()
         let userContentController = WKUserContentController()
         configuration.userContentController = userContentController
+
+        // Per-WebView data-store isolation MUST be configured on the
+        // WKWebViewConfiguration BEFORE the WKWebView is created — the
+        // configuration is immutable afterwards. `incognito` gives this
+        // WebView its own `nonPersistent()` store so concurrent accounts
+        // (e.g. multiple logged-in sessions) do not share one cookie jar.
+        // The later `setSettings` attempt to set `websiteDataStore` is a
+        // no-op post-init and must not be relied upon (see the
+        // macos-ios-per-instance-datastore / multi-account-cookies-bleed
+        // assessments).
+        if let args = arguments as? [String: Any] {
+            let settingsMap =
+                (args["initialSettings"] as? [String: Any?])
+                ?? (args["settings"] as? [String: Any?])
+            if let settingsMap = settingsMap,
+               let incognito = settingsMap["incognito"] as? Bool,
+               incognito {
+                configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+            }
+        }
 
         self.registrar = registrar
         super.init(frame: .zero, configuration: configuration)
@@ -740,7 +767,25 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                     }
                 }
 
+                // A headless WebView lives in an off-screen window that is
+                // never shown, so it has no backing store and
+                // `takeSnapshot` returns nil. Momentarily order the window to
+                // the front (still at off-screen coordinates → invisible to
+                // the user) so the window server composites it, and force a
+                // post-update capture. We order it back out in the completion
+                // handler once the snapshot is taken.
+                if self.isHeadlessOffscreen {
+                    self.window?.orderFront(nil)
+                    if snapshotConfiguration == nil {
+                        snapshotConfiguration = WKSnapshotConfiguration()
+                    }
+                    snapshotConfiguration?.afterScreenUpdates = true
+                }
+
                 self.takeSnapshot(with: snapshotConfiguration) { (image, error) -> Void in
+                    if self.isHeadlessOffscreen {
+                        self.window?.orderOut(nil)
+                    }
                     var imageData: Data? = nil
                     if let screenshot = image {
                         if let configMap = (call.arguments as? [String: Any])?[

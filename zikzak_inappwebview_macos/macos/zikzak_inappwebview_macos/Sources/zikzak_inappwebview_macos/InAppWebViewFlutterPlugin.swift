@@ -21,6 +21,10 @@ public class InAppWebViewFlutterPlugin: NSObject, FlutterPlugin {
         instance.headlessInAppWebViewManager = HeadlessInAppWebViewManager(registrar: registrar)
         instance.inAppBrowserManager = InAppBrowserManager(registrar: registrar)
         instance.myCookieManager = MyCookieManager(registrar: registrar)
+        // Let the cookie manager scope operations to a specific headless
+        // WebView's own data store (multi-account isolation) instead of the
+        // shared WKWebsiteDataStore.default().
+        MyCookieManager.headlessManager = instance.headlessInAppWebViewManager
         instance.credentialDatabase = CredentialDatabase(plugin: instance)
         instance.printJobManager = PrintJobManager(plugin: instance)
     }
