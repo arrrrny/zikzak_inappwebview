@@ -2395,8 +2395,8 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             isARepeat: false,
             keyCode: keyCode
         ) else { return }
-        self.keyDown(down)
-        self.keyUp(up)
+        self.keyDown(with: down)
+        self.keyUp(with: up)
     }
 
     public func handleFindInteraction(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
