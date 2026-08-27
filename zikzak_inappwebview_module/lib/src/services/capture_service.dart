@@ -22,7 +22,9 @@ class CaptureService implements CaptureSource {
       throw StateError('Capture already active for session $sessionId');
     }
     _active[sessionId] = true;
-    _budgets[sessionId] = config.maxEvents;
+    // Encode "unlimited" (maxEvents == 0) as -1 so a zero budget can be
+    // distinguished from an exhausted budget at injection time.
+    _budgets[sessionId] = config.maxEvents > 0 ? config.maxEvents : -1;
     final controller = StreamController<CaptureEvent>.broadcast();
     _controllers[sessionId] = controller;
     return controller.stream;
@@ -51,10 +53,14 @@ class CaptureService implements CaptureSource {
   bool injectEvent(String sessionId, CaptureEvent event) {
     if (_active[sessionId] != true) return false;
     final budget = _budgets[sessionId] ?? 0;
-    if (budget <= 0 && budget != 0) return false; // 0 means unlimited
-    if (budget > 0) {
-      _budgets[sessionId] = budget - 1;
+    // Negative budget means "unlimited" (maxEvents == 0): always emit.
+    if (budget < 0) {
+      _controllers[sessionId]?.add(event);
+      return true;
     }
+    // Bounded budget: stop emitting once exhausted so maxEvents is enforced.
+    if (budget <= 0) return false;
+    _budgets[sessionId] = budget - 1;
     _controllers[sessionId]?.add(event);
     return true;
   }

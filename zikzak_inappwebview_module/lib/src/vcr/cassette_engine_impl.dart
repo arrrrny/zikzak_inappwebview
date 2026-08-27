@@ -47,13 +47,16 @@ class CassetteEngineImpl implements CassetteEngine {
 
   @override
   Future<Cassette> saveCassette() async {
-    final cassette = Cassette(
+    // Snapshot the entries before clearing: List.unmodifiable() is a LIVE
+    // VIEW over _recordedEntries, so clearing the source afterwards would
+    // empty the returned cassette and silently lose every recording.
+    final entries = List<CassetteEntry>.from(_recordedEntries);
+    _recordedEntries.clear();
+    return Cassette(
       name: 'recording-${DateTime.now().millisecondsSinceEpoch}',
       recordedAt: DateTime.now(),
-      entries: List.unmodifiable(_recordedEntries),
+      entries: entries,
     );
-    _recordedEntries.clear();
-    return cassette;
   }
 
   /// Records a navigation entry.

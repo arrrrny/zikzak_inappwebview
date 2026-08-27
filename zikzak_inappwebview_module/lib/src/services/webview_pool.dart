@@ -78,7 +78,10 @@ class WebViewPool implements WebViewSessionFactory {
   // Generic idle sessions (no domain affinity)
   final List<PoolSession> _genericIdle = [];
 
-  // Mutex for thread-safe operations
+  // Serializes critical sections (acquire/release/disposeAll) so concurrent
+  // callers cannot observe an inconsistent pool state or exceed
+  // maxLiveInstances. Each caller waits on the previous one's completion.
+  Future<void> _lock = Future.value();
 
   // TTL eviction timer
   Timer? _evictionTimer;
@@ -124,6 +127,9 @@ class WebViewPool implements WebViewSessionFactory {
       session ??= await _createSession(sessionId, domainHint, etld, settings);
 
       // 5. Register as active
+      // Reused idle sessions retain a stale releasedAt (set on release),
+      // which would make isActive report false for a live, reused session.
+      session.releasedAt = null;
       _active[sessionId] = session;
       return session;
     });
@@ -204,9 +210,19 @@ class WebViewPool implements WebViewSessionFactory {
   // --- Private ---
 
   Future<T> _synchronized<T>(Future<T> Function() fn) async {
-    // Dart is single-threaded for sync code; async gaps are the concern.
-    // We use a simple lock object for logical synchronization.
-    return fn();
+    // Serialize critical sections via a future-chain mutex: each caller
+    // appends its work after the previous caller finishes, so only one
+    // critical section runs at a time. This prevents concurrent acquire()
+    // calls from exceeding maxLiveInstances.
+    final previous = _lock;
+    final completer = Completer<void>();
+    _lock = completer.future;
+    try {
+      await previous;
+      return await fn();
+    } finally {
+      completer.complete();
+    }
   }
 
   Future<PoolSession> _createSession(
@@ -266,7 +282,7 @@ class WebViewPool implements WebViewSessionFactory {
       entries.removeWhere((s) {
         final expired = s.releasedAt != null && s.releasedAt!.isBefore(cutoff);
         if (expired) {
-          s.webview.dispose();
+          unawaited(s.webview.dispose());
         }
         return expired;
       });
@@ -276,7 +292,7 @@ class WebViewPool implements WebViewSessionFactory {
     _genericIdle.removeWhere((s) {
       final expired = s.releasedAt != null && s.releasedAt!.isBefore(cutoff);
       if (expired) {
-        s.webview.dispose();
+        unawaited(s.webview.dispose());
       }
       return expired;
     });
@@ -297,13 +313,13 @@ class WebViewPool implements WebViewSessionFactory {
     // Active sessions remain intact.
     for (final entries in _idle.values) {
       for (final session in entries) {
-        session.webview.dispose();
+        unawaited(session.webview.dispose());
       }
     }
     _idle.clear();
 
     for (final session in _genericIdle) {
-      session.webview.dispose();
+      unawaited(session.webview.dispose());
     }
     _genericIdle.clear();
   }
