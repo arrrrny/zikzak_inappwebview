@@ -55,6 +55,12 @@ UrlPatternType/Sandbox/contentBlockers. **ALL @ExchangeableObject/
 @ExchangeableEnum MODELS ARE MIGRATED — migration complete.***
 
 - Phase 0 (mapping + toolchain) DONE.
+- **Phase 4 (pragmatic feature-coverage conformance tests) — DONE (this
+  commit)**: full wire-contract coverage of every Zorphy entity/enum in
+  platform_interface (138 → 268 tests), plus core pure-logic coverage
+  (keepNavigationInWebView, ProcessGlobalConfig; 95 → 101). See
+  "Phase 4 — conformance tests" worklog entry below for the bug fixes and
+  API deltas surfaced by this pass.
 - Note on the task premise: this repo does **NOT** use Freezed. Upstream
   flutter_inappwebview dropped Freezed before 4.x; both upstream 4.x and this
   fork generate models with the in-repo `@ExchangeableObject` /
@@ -901,3 +907,69 @@ dialogue_dismisser — hand-written toJson/fromJson today → Zorphy, core packa
   exchangeable dialect does not detect/emit sealed hierarchies — polymorphic
   families are flagged manual instead of converted to explicitSubTypes +
   implements. The families stay hand-written (skip/fork) until #103 lands.
+- 2026-08-16 — Phase 4 — conformance test suite (this commit). Goal context:
+  next up is rewriting the package as a zuraffa-only app via the zfa CLI with
+  an MCP plugin on top — so the test suite was built to be the WIRE-CONTRACT
+  conformance suite for that migration (pragmatic full-feature coverage,
+  public API only, no internals). Coverage: platform_interface 138 → 268
+  tests (13 new files); core 95 → 101 (webview_navigation_guards +
+  process_global_config); macos 34, windows 13 still green. EVERY exported
+  entity/enum now has a wire round-trip test (toJson shape, fromJson
+  null-tolerance, enum index/native-string wires, nested objects, fork
+  defaults, copyWith). The tests encode the CURRENT committed wire contract —
+  failures during the zfa rewrite = contract drift.
+  BUGS FOUND + FIXED by this pass:
+  - content_blocker_trigger_load_context: wire list was REVERSED
+    (['child-frame','top-frame']) vs upstream ('top-frame'/'child-frame') —
+    fixed; ContentBlocker (real) rules would have sent wrong load-contexts.
+  - website_data_type: wire list had 3 of 10 values (RangeError on the rest,
+    wrong enum mapping for the 3) — replaced with all 10 WKWebsiteDataType
+    strings in enum order (matches upstream).
+  - chrome_safari_browser_settings `_displayModeToJson`: the zorphy base
+    class puts toJson on an EXTENSION, so static dispatch always emitted `{}`
+    — the polymorphic displayMode wire (type key + fields) was lost on
+    toJson; now dispatches on the concrete subtype (matches upstream
+    virtual toMap dispatch). Verified: immersive displayMode round-trips.
+  API DELTAS surfaced (documented, not fixed — zfa rewrite will decide the
+  final API): AndroidResource static factories anim/layout/id/drawable were
+  dropped (only on the abstract $ class); ConsoleMessage.fromMap removed
+  (only fromJson); settings color fields became `Color_?` (`Color_` is HIDDEN
+  from the core barrel — consumers can't construct colors); InAppWebViewSettings
+  fields are final (no setter mutation, copyWith instead); print_job
+  duplex/disposition/paginationMode flattened to index wires (upstream was
+  platform-adaptive); ProxySchemeFilter wire map is internally inconsistent
+  (dead code, pinned as-is); ScrollViewContentInsetAdjustmentBehavior enum
+  order differs from upstream. The example app was updated to the current
+  API (AndroidResource(name:...), fromJson, `Color_`, copyWith).
+  DEV-MODE: master was in post-publish state (hosted ^4.10.0 deps) which
+  broke the macos/windows test compilation (.index on migrated enums) —
+  ran scripts/restore_dev_setup.sh so the whole monorepo tests the LOCAL
+  migrated platform_interface. All suites green; example builds + runs on
+  Linux. NOTE for publishing: prepare_for_publish.sh strips these overrides.
+- 2026-08-16 — Phase 4 continued — controller coverage. Added fake-platform
+  delegation tests for the remaining public feature wrappers: CookieManager
+  (all 8 ops, arg passthrough), ProxyController (+ AndroidProxySettings/
+  IOSProxySettings wire), TracingController, WebStorageManager,
+  FindInteractionController, PullToRefreshController, PrintJobController,
+  ServiceWorkerController — pinning the public method contract that the
+  zuraffa-only rewrite's MCP tools will expose. Also the first linux test
+  file: LinuxInAppWebViewController channel-args serialization (loadUrl
+  URLRequest map, evaluateJavascript source+contentWorld, navigation
+  queries) + handleMethod deserialization (onLoadStart/onLoadStop WebUri
+  delivery, onCallJsHandler routing) via an injected mock MethodChannel.
+  NOTE: mid-session the working tree carried an unrelated in-progress
+  dispose-pattern refactor (idempotent `disposed` guards on
+  InAppWebView/InAppWebViewController/HeadlessInAppWebView + web + test
+  files) that was uncompilable (`const` ctor + non-final `_disposed`);
+  dropped the `const` to unblock, left the WIP uncommitted for its owner.
+  Suites: platform_interface 268, core 127, macos 34, windows 13, linux 6.
+- 2026-08-16 — Phase 4 final — first test files for android + ios.
+  AndroidInAppWebViewController + IOSInAppWebViewController channel-args
+  serialization (loadUrl URLRequest map, postUrl url+postData,
+  evaluateJavascript source+contentWorld) + handleMethod deserialization
+  (onLoadStart/onLoadStop; android throws UnimplementedError on unknown
+  methods) via a same-named mock MethodChannel. Web package is browser-only
+  (dart:js_interop) — not VM-testable; its behavior is covered by the
+  example's browser tests. EVERY package in the monorepo now has automated
+  tests. Final suite: core 127, platform_interface 268, macos 34, windows 13,
+  linux 6, android 5, ios 4 = 457.

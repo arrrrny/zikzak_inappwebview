@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:zikzak_inappwebview/zikzak_inappwebview.dart';
+import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart'
+    show Color_;
 
 import 'main.dart';
 
@@ -91,7 +93,7 @@ class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
             ].contains(defaultTargetPlatform)
         ? null
         : PullToRefreshController(
-            settings: PullToRefreshSettings(color: Colors.black),
+            settings: PullToRefreshSettings(color: Color_(Colors.black.value)),
             onRefresh: () async {
               if (Platform.isAndroid) {
                 browser.webViewController?.reload();
@@ -123,7 +125,7 @@ class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
                   urlRequest: URLRequest(url: WebUri("https://flutter.dev")),
                   settings: InAppBrowserClassSettings(
                     browserSettings: InAppBrowserSettings(
-                      toolbarTopBackgroundColor: Colors.blue,
+                      toolbarTopBackgroundColor: Color_(Colors.blue.value),
                       presentationStyle: ModalPresentationStyle.POPOVER,
                     ),
                     webViewSettings: InAppWebViewSettings(
