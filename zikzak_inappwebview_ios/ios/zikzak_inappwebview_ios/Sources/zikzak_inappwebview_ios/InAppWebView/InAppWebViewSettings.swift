@@ -30,6 +30,12 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     var interceptOnlyAsyncAjaxRequests = true
     var useShouldInterceptFetchRequest = false
     var incognito = false
+    /// Stable identifier for a per-instance persistent WKWebsiteDataStore
+    /// (iOS 17+/macOS 14+). Mirrors the Dart-side field; populated from
+    /// the JSON dict by ISettings.parse via KVC. Mutually exclusive with
+    /// `incognito`; init-time-only — websiteDataStore is immutable after
+    /// the WKWebView is created.
+    var persistentStoreIdentifier: String? = nil
     var cacheEnabled = true
     var transparentBackground = false
     var disableVerticalScroll = false

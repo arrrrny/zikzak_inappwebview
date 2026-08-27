@@ -170,12 +170,31 @@ abstract class $InAppWebViewSettings {
   @JsonKey(defaultValue: false)
   bool? get incognito;
 
-  ///Stable identifier for a persistent, per-account `WKWebsiteDataStore` on
-  ///macOS. When non-null and non-empty, the WebView stores cookies,
-  ///localStorage, IndexedDB and other site data at a system location keyed by
-  ///this identifier, so an account's session survives a relaunch and stays
-  ///isolated from every other account. Derived from `userDataDir` by the
-  ///caller. Null/empty means an ephemeral (incognito) store.
+  ///Stable identifier for a per-instance, persistent, isolated
+  ///`WKWebsiteDataStore` on iOS 17+ and macOS 14+. When non-null and
+  ///non-empty, the WebView stores cookies, localStorage, IndexedDB and other
+  ///site data at a system location keyed by this identifier, so an account's
+  ///session survives an app relaunch and stays isolated from every other
+  ///account. Null/empty means the default shared store (existing behaviour).
+  ///
+  ///Accepts three input shapes (all deterministic; same identifier reopens
+  ///the same on-disk store):
+  /// * a raw UUID string ("550e8400-e29b-41d4-a716-446655440000"),
+  /// * a 64-char SHA-256 hex string (legacy caller contract; first 32 hex
+  ///   chars are used as the UUID's raw bytes),
+  /// * any other stable string (SHA-256 of its UTF-8 bytes -> first 16
+  ///   bytes used as the UUID's raw bytes).
+  ///
+  ///Mutually exclusive with [incognito]: when both are set, `incognito`
+  ///(non-persistent, wiped on tear-down) takes precedence.
+  ///
+  ///Must be set at construction time — `WKWebViewConfiguration.websiteDataStore`
+  ///is immutable after the `WKWebView` is initialised, so a `setSettings`
+  ///call changing this value has no effect.
+  ///
+  ///Below the iOS 17 / macOS 14 floor, the persistent path is unavailable
+  ///and the WebView falls back to the shared `.default()` store (existing
+  ///behaviour) — no error is surfaced.
   @JsonKey(includeIfNull: false)
   String? get persistentStoreIdentifier;
 
