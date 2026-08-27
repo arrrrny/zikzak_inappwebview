@@ -1,11 +1,9 @@
 package wtf.zikzak.zikzak_inappwebview_android.credential_database;
 
-import android.os.Build;
 import android.webkit.WebViewDatabase;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 
 import wtf.zikzak.zikzak_inappwebview_android.InAppWebViewFlutterPlugin;
 import wtf.zikzak.zikzak_inappwebview_android.types.ChannelDelegateImpl;
@@ -20,7 +18,6 @@ import java.util.Map;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
-@RequiresApi(api = Build.VERSION_CODES.O)
 public class CredentialDatabaseHandler extends ChannelDelegateImpl {
   protected static final String LOG_TAG = "CredentialDatabaseHandler";
   public static final String METHOD_CHANNEL_NAME = "wtf.zikzak/zikzak_inappwebview_credential_database";

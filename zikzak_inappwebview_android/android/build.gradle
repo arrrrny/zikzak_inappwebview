@@ -38,7 +38,7 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 26  // Android 8.0 (Oreo) - v4.0 minimum for modern WebView features
+        minSdkVersion 24  // Android 7.0 (Nougat)
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         vectorDrawables.useSupportLibrary = true

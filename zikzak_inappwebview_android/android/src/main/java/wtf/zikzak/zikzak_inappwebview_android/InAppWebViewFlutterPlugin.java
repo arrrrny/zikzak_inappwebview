@@ -104,9 +104,7 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
       serviceWorkerManager = new ServiceWorkerManager(this);
     }
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      credentialDatabaseHandler = new CredentialDatabaseHandler(this);
-    }
+    credentialDatabaseHandler = new CredentialDatabaseHandler(this);
     webViewFeatureManager = new WebViewFeatureManager(this);
     proxyManager = new ProxyManager(this);
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -146,7 +144,7 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
       myWebStorage.dispose();
       myWebStorage = null;
     }
-    if (credentialDatabaseHandler != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+    if (credentialDatabaseHandler != null) {
       credentialDatabaseHandler.dispose();
       credentialDatabaseHandler = null;
     }

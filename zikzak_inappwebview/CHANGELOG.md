@@ -1,5 +1,10 @@
 ## 5.1.3 (unreleased)
 
+### Compatibility
+
+- [Android] Align the implementation with the documented Android 7.0 (API 24) minimum and enable `HttpAuthCredentialDatabase` on API 24 and 25 by removing its obsolete API 26 registration guard.
+- [iOS] Lower the minimum deployment target from iOS 16.0 to iOS 15.6 across the Swift package, XCFramework build, and example application.
+
 ### Docs
 
 - [docs] Extend the #258 JS bridge rename documentation into the canonical JS communication guide (dart API docstring on `addJavaScriptHandler`, surfaced via `{@macro}` on every platform) and into the example HTML test assets. PR #259 only added a migration note to the README; this fills the remaining gap the issue called out ("ideally in the JS communication guide") so migrators reading the pub.dev API reference or copying the example HTML see the rename from `window.flutter_inappwebview` to `window.zikzak_inappwebview`. The old name `window.flutter_inappwebview` is undefined, so calling `window.flutter_inappwebview.callHandler(...)` throws a `TypeError` (#258).

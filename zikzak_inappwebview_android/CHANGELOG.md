@@ -1,3 +1,9 @@
+## 5.1.3 (unreleased)
+
+### Compatibility
+
+- Align the implementation with the documented Android 7.0 (API 24) minimum and enable `HttpAuthCredentialDatabase` on API 24 and 25 by removing its obsolete API 26 registration guard.
+
 ## 5.1.2 - 2026-08-24
 
 * chore: restore development path dependencies after 5.1.1 publish

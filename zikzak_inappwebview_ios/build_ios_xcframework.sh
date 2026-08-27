@@ -38,8 +38,8 @@ OUTPUT_XCFRAMEWORK="$OUTPUT_DIR/${SCHEME}.xcframework"
 IOS_SDK="iphoneos"
 SIMULATOR_SDK="iphonesimulator"
 
-# Minimum supported iOS version. Keep this in sync with the podspec.
-MIN_IOS_VERSION="16.0"
+# Minimum supported iOS version. Keep this in sync with Package.swift.
+MIN_IOS_VERSION="15.6"
 
 ###############################################################################
 # Helpers

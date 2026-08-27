@@ -75,7 +75,7 @@ dependencies:
 | ----------- | --------------- | ------------------------- |
 | **Flutter** | 3.10.0+         |                           |
 | **Android** | API 24+         | Android 7.0+              |
-| **iOS**     | 16.0+           |                           |
+| **iOS**     | 15.6+           |                           |
 | **macOS**   | 12.0+           |                           |
 | **Windows** | 10+             | Requires WebView2 Runtime |
 | **Linux**   |                 | Requires WebKitGTK 2.40+  |

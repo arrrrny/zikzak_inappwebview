@@ -1,3 +1,9 @@
+## 5.1.3 (unreleased)
+
+### Compatibility
+
+- Lower the minimum deployment target from iOS 16.0 to iOS 15.6 across the Swift package, XCFramework build, and example application.
+
 ## 5.1.2 - 2026-08-24
 
 * chore: restore development path dependencies after 5.1.1 publish
