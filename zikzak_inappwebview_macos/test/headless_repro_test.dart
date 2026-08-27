@@ -51,5 +51,28 @@ void main() {
     expect(params?['initialSettings'], isA<Map>());
     expect((params?['initialSettings'] as Map?)?.cast<String, dynamic>()?['isInspectable'], equals(true));
     expect(params?['initialSize'], isA<Map>());
+
+    // Phase 2 — headline feature: run() must be re-callable after dispose().
+    try {
+      await headless.dispose().timeout(const Duration(seconds: 5));
+      print('DISPOSE COMPLETED OK');
+    } catch (e, st) {
+      print('DISPOSE THREW: $e');
+      print(st);
+      fail('dispose() threw: $e');
+    }
+
+    try {
+      await headless.run().timeout(const Duration(seconds: 5));
+      print('RE-RUN COMPLETED OK');
+    } catch (e, st) {
+      print('RE-RUN THREW: $e');
+      print(st);
+      fail('run() after dispose() threw: $e');
+    }
+
+    print('CHANNEL CALLS: $calls');
+    expect(calls.where((c) => c == 'run').length, greaterThanOrEqualTo(2),
+        reason: 'run() must have been invoked again after dispose()');
   });
 }

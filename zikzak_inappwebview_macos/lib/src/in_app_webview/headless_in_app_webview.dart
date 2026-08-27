@@ -277,9 +277,7 @@ class MacOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
       var initialSettings = params.initialSettings ?? InAppWebViewSettings();
       initialSettings = _inferInitialSettings(initialSettings);
 
-      Map<String, dynamic> settingsMap =
-          (params.initialSettings != null ? initialSettings.toJson() : null) ??
-          initialSettings.toJson();
+      Map<String, dynamic> settingsMap = initialSettings.toJson();
 
       Map<String, dynamic> pullToRefreshSettings = PullToRefreshSettings(
         enabled: false,
