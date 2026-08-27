@@ -81,7 +81,7 @@ class _HeadlessInAppWebViewExampleScreenState
             Center(
               child: ElevatedButton(
                 onPressed: () async {
-                  await headlessWebView?.dispose();
+                  // Run (or re-run after a dispose — run() starts fresh).
                   await headlessWebView?.run();
                 },
                 child: const Text("Run HeadlessInAppWebView"),
