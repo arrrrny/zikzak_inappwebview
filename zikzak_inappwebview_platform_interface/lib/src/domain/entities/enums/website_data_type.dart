@@ -28,9 +28,10 @@ enum WebsiteDataType {
   WKWebsiteDataTypeServiceWorkerRegistrations,
 }
 
-
-///WebsiteDataType wire values are the WKWebsiteDataType strings — the enum
-///member names themselves, in enum order (matches upstream inappwebview).
+///WebsiteDataType wire values are strings — lookup by value.
+///
+///Wire values match the `WKWebsiteDataType*` constants the platform channels
+///emit (same strings as the pre-migration `@ExchangeableEnum` codegen).
 const _websiteDataType_wire = [
   'WKWebsiteDataTypeFetchCache',
   'WKWebsiteDataTypeDiskCache',

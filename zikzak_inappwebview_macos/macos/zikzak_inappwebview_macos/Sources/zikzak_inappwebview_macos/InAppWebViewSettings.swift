@@ -126,6 +126,18 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
                 realSettings["isElementFullscreenEnabled"] =
                     configuration.preferences.isElementFullscreenEnabled
             }
+            // WebAuthn / passkey read-back (issue #272)
+            if #available(macOS 13.3, *) {
+                let selector = Selector(("webAuthenticationSupport"))
+                if configuration.responds(to: selector),
+                   let webAuthSupport = configuration.perform(selector)?.takeUnretainedValue()
+                       as? NSObject
+                {
+                    let boundValue =
+                        webAuthSupport.value(forKey: "boundKeychainForPasskeys") as? Bool ?? false
+                    realSettings["webAuthenticationSupport"] = boundValue ? 1 : 0
+                }
+            }
             // isFindInteractionEnabled is not available on macOS
         }
         return realSettings

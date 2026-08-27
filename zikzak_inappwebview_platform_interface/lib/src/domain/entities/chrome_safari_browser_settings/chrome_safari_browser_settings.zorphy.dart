@@ -303,388 +303,439 @@ class ChromeSafariBrowserSettings {
     final _patchMap = _patcher.patchMap;
     return ChromeSafariBrowserSettings(
       shareState: _patchMap.containsKey(ChromeSafariBrowserSettings$.shareState)
-          ? (_patchMap[ChromeSafariBrowserSettings$.shareState] is Function)
-                ? _patchMap[ChromeSafariBrowserSettings$.shareState](
-                    this.shareState,
-                  )
-                : (_patchMap[ChromeSafariBrowserSettings$.shareState] is Patch)
-                ? _patchMap[ChromeSafariBrowserSettings$.shareState].applyTo(
-                    this.shareState,
-                  )
-                : _patchMap[ChromeSafariBrowserSettings$.shareState]
+          ? ((_patchMap[ChromeSafariBrowserSettings$.shareState] is Function)
+                    ? _patchMap[ChromeSafariBrowserSettings$.shareState](
+                        this.shareState,
+                      )
+                    : (_patchMap[ChromeSafariBrowserSettings$.shareState]
+                          is Patch)
+                    ? _patchMap[ChromeSafariBrowserSettings$.shareState]
+                          .applyTo(this.shareState)
+                    : _patchMap[ChromeSafariBrowserSettings$.shareState])
+                as CustomTabsShareState?
           : this.shareState,
       showTitle: _patchMap.containsKey(ChromeSafariBrowserSettings$.showTitle)
-          ? (_patchMap[ChromeSafariBrowserSettings$.showTitle] is Function)
-                ? _patchMap[ChromeSafariBrowserSettings$.showTitle](
-                    this.showTitle,
-                  )
-                : (_patchMap[ChromeSafariBrowserSettings$.showTitle] is Patch)
-                ? _patchMap[ChromeSafariBrowserSettings$.showTitle].applyTo(
-                    this.showTitle,
-                  )
-                : _patchMap[ChromeSafariBrowserSettings$.showTitle]
+          ? ((_patchMap[ChromeSafariBrowserSettings$.showTitle] is Function)
+                    ? _patchMap[ChromeSafariBrowserSettings$.showTitle](
+                        this.showTitle,
+                      )
+                    : (_patchMap[ChromeSafariBrowserSettings$.showTitle]
+                          is Patch)
+                    ? _patchMap[ChromeSafariBrowserSettings$.showTitle].applyTo(
+                        this.showTitle,
+                      )
+                    : _patchMap[ChromeSafariBrowserSettings$.showTitle])
+                as bool?
           : this.showTitle,
       toolbarBackgroundColor:
           _patchMap.containsKey(
             ChromeSafariBrowserSettings$.toolbarBackgroundColor,
           )
-          ? (_patchMap[ChromeSafariBrowserSettings$.toolbarBackgroundColor]
-                    is Function)
-                ? _patchMap[ChromeSafariBrowserSettings$
-                      .toolbarBackgroundColor](this.toolbarBackgroundColor)
-                : (_patchMap[ChromeSafariBrowserSettings$
-                          .toolbarBackgroundColor]
-                      is Patch)
-                ? _patchMap[ChromeSafariBrowserSettings$.toolbarBackgroundColor]
-                      .applyTo(this.toolbarBackgroundColor)
-                : _patchMap[ChromeSafariBrowserSettings$.toolbarBackgroundColor]
+          ? ((_patchMap[ChromeSafariBrowserSettings$.toolbarBackgroundColor]
+                        is Function)
+                    ? _patchMap[ChromeSafariBrowserSettings$
+                          .toolbarBackgroundColor](this.toolbarBackgroundColor)
+                    : (_patchMap[ChromeSafariBrowserSettings$
+                              .toolbarBackgroundColor]
+                          is Patch)
+                    ? _patchMap[ChromeSafariBrowserSettings$
+                              .toolbarBackgroundColor]
+                          .applyTo(this.toolbarBackgroundColor)
+                    : _patchMap[ChromeSafariBrowserSettings$
+                          .toolbarBackgroundColor])
+                as Color?
           : this.toolbarBackgroundColor,
       navigationBarColor:
           _patchMap.containsKey(ChromeSafariBrowserSettings$.navigationBarColor)
-          ? (_patchMap[ChromeSafariBrowserSettings$.navigationBarColor]
-                    is Function)
-                ? _patchMap[ChromeSafariBrowserSettings$.navigationBarColor](
-                    this.navigationBarColor,
-                  )
-                : (_patchMap[ChromeSafariBrowserSettings$.navigationBarColor]
-                      is Patch)
-                ? _patchMap[ChromeSafariBrowserSettings$.navigationBarColor]
-                      .applyTo(this.navigationBarColor)
-                : _patchMap[ChromeSafariBrowserSettings$.navigationBarColor]
+          ? ((_patchMap[ChromeSafariBrowserSettings$.navigationBarColor]
+                        is Function)
+                    ? _patchMap[ChromeSafariBrowserSettings$
+                          .navigationBarColor](this.navigationBarColor)
+                    : (_patchMap[ChromeSafariBrowserSettings$
+                              .navigationBarColor]
+                          is Patch)
+                    ? _patchMap[ChromeSafariBrowserSettings$.navigationBarColor]
+                          .applyTo(this.navigationBarColor)
+                    : _patchMap[ChromeSafariBrowserSettings$
+                          .navigationBarColor])
+                as Color?
           : this.navigationBarColor,
       navigationBarDividerColor:
           _patchMap.containsKey(
             ChromeSafariBrowserSettings$.navigationBarDividerColor,
           )
-          ? (_patchMap[ChromeSafariBrowserSettings$.navigationBarDividerColor]
-                    is Function)
-                ? _patchMap[ChromeSafariBrowserSettings$
-                      .navigationBarDividerColor](
-                    this.navigationBarDividerColor,
-                  )
-                : (_patchMap[ChromeSafariBrowserSettings$
-                          .navigationBarDividerColor]
-                      is Patch)
-                ? _patchMap[ChromeSafariBrowserSettings$
-                          .navigationBarDividerColor]
-                      .applyTo(this.navigationBarDividerColor)
-                : _patchMap[ChromeSafariBrowserSettings$
-                      .navigationBarDividerColor]
+          ? ((_patchMap[ChromeSafariBrowserSettings$.navigationBarDividerColor]
+                        is Function)
+                    ? _patchMap[ChromeSafariBrowserSettings$
+                          .navigationBarDividerColor](
+                        this.navigationBarDividerColor,
+                      )
+                    : (_patchMap[ChromeSafariBrowserSettings$
+                              .navigationBarDividerColor]
+                          is Patch)
+                    ? _patchMap[ChromeSafariBrowserSettings$
+                              .navigationBarDividerColor]
+                          .applyTo(this.navigationBarDividerColor)
+                    : _patchMap[ChromeSafariBrowserSettings$
+                          .navigationBarDividerColor])
+                as Color?
           : this.navigationBarDividerColor,
       secondaryToolbarColor:
           _patchMap.containsKey(
             ChromeSafariBrowserSettings$.secondaryToolbarColor,
           )
-          ? (_patchMap[ChromeSafariBrowserSettings$.secondaryToolbarColor]
-                    is Function)
-                ? _patchMap[ChromeSafariBrowserSettings$.secondaryToolbarColor](
-                    this.secondaryToolbarColor,
-                  )
-                : (_patchMap[ChromeSafariBrowserSettings$.secondaryToolbarColor]
-                      is Patch)
-                ? _patchMap[ChromeSafariBrowserSettings$.secondaryToolbarColor]
-                      .applyTo(this.secondaryToolbarColor)
-                : _patchMap[ChromeSafariBrowserSettings$.secondaryToolbarColor]
+          ? ((_patchMap[ChromeSafariBrowserSettings$.secondaryToolbarColor]
+                        is Function)
+                    ? _patchMap[ChromeSafariBrowserSettings$
+                          .secondaryToolbarColor](this.secondaryToolbarColor)
+                    : (_patchMap[ChromeSafariBrowserSettings$
+                              .secondaryToolbarColor]
+                          is Patch)
+                    ? _patchMap[ChromeSafariBrowserSettings$
+                              .secondaryToolbarColor]
+                          .applyTo(this.secondaryToolbarColor)
+                    : _patchMap[ChromeSafariBrowserSettings$
+                          .secondaryToolbarColor])
+                as Color?
           : this.secondaryToolbarColor,
       enableUrlBarHiding:
           _patchMap.containsKey(ChromeSafariBrowserSettings$.enableUrlBarHiding)
-          ? (_patchMap[ChromeSafariBrowserSettings$.enableUrlBarHiding]
-                    is Function)
-                ? _patchMap[ChromeSafariBrowserSettings$.enableUrlBarHiding](
-                    this.enableUrlBarHiding,
-                  )
-                : (_patchMap[ChromeSafariBrowserSettings$.enableUrlBarHiding]
-                      is Patch)
-                ? _patchMap[ChromeSafariBrowserSettings$.enableUrlBarHiding]
-                      .applyTo(this.enableUrlBarHiding)
-                : _patchMap[ChromeSafariBrowserSettings$.enableUrlBarHiding]
+          ? ((_patchMap[ChromeSafariBrowserSettings$.enableUrlBarHiding]
+                        is Function)
+                    ? _patchMap[ChromeSafariBrowserSettings$
+                          .enableUrlBarHiding](this.enableUrlBarHiding)
+                    : (_patchMap[ChromeSafariBrowserSettings$
+                              .enableUrlBarHiding]
+                          is Patch)
+                    ? _patchMap[ChromeSafariBrowserSettings$.enableUrlBarHiding]
+                          .applyTo(this.enableUrlBarHiding)
+                    : _patchMap[ChromeSafariBrowserSettings$
+                          .enableUrlBarHiding])
+                as bool?
           : this.enableUrlBarHiding,
       instantAppsEnabled:
           _patchMap.containsKey(ChromeSafariBrowserSettings$.instantAppsEnabled)
-          ? (_patchMap[ChromeSafariBrowserSettings$.instantAppsEnabled]
-                    is Function)
-                ? _patchMap[ChromeSafariBrowserSettings$.instantAppsEnabled](
-                    this.instantAppsEnabled,
-                  )
-                : (_patchMap[ChromeSafariBrowserSettings$.instantAppsEnabled]
-                      is Patch)
-                ? _patchMap[ChromeSafariBrowserSettings$.instantAppsEnabled]
-                      .applyTo(this.instantAppsEnabled)
-                : _patchMap[ChromeSafariBrowserSettings$.instantAppsEnabled]
+          ? ((_patchMap[ChromeSafariBrowserSettings$.instantAppsEnabled]
+                        is Function)
+                    ? _patchMap[ChromeSafariBrowserSettings$
+                          .instantAppsEnabled](this.instantAppsEnabled)
+                    : (_patchMap[ChromeSafariBrowserSettings$
+                              .instantAppsEnabled]
+                          is Patch)
+                    ? _patchMap[ChromeSafariBrowserSettings$.instantAppsEnabled]
+                          .applyTo(this.instantAppsEnabled)
+                    : _patchMap[ChromeSafariBrowserSettings$
+                          .instantAppsEnabled])
+                as bool?
           : this.instantAppsEnabled,
       packageName:
           _patchMap.containsKey(ChromeSafariBrowserSettings$.packageName)
-          ? (_patchMap[ChromeSafariBrowserSettings$.packageName] is Function)
-                ? _patchMap[ChromeSafariBrowserSettings$.packageName](
-                    this.packageName,
-                  )
-                : (_patchMap[ChromeSafariBrowserSettings$.packageName] is Patch)
-                ? _patchMap[ChromeSafariBrowserSettings$.packageName].applyTo(
-                    this.packageName,
-                  )
-                : _patchMap[ChromeSafariBrowserSettings$.packageName]
+          ? ((_patchMap[ChromeSafariBrowserSettings$.packageName] is Function)
+                    ? _patchMap[ChromeSafariBrowserSettings$.packageName](
+                        this.packageName,
+                      )
+                    : (_patchMap[ChromeSafariBrowserSettings$.packageName]
+                          is Patch)
+                    ? _patchMap[ChromeSafariBrowserSettings$.packageName]
+                          .applyTo(this.packageName)
+                    : _patchMap[ChromeSafariBrowserSettings$.packageName])
+                as String?
           : this.packageName,
       keepAliveEnabled:
           _patchMap.containsKey(ChromeSafariBrowserSettings$.keepAliveEnabled)
-          ? (_patchMap[ChromeSafariBrowserSettings$.keepAliveEnabled]
-                    is Function)
-                ? _patchMap[ChromeSafariBrowserSettings$.keepAliveEnabled](
-                    this.keepAliveEnabled,
-                  )
-                : (_patchMap[ChromeSafariBrowserSettings$.keepAliveEnabled]
-                      is Patch)
-                ? _patchMap[ChromeSafariBrowserSettings$.keepAliveEnabled]
-                      .applyTo(this.keepAliveEnabled)
-                : _patchMap[ChromeSafariBrowserSettings$.keepAliveEnabled]
+          ? ((_patchMap[ChromeSafariBrowserSettings$.keepAliveEnabled]
+                        is Function)
+                    ? _patchMap[ChromeSafariBrowserSettings$.keepAliveEnabled](
+                        this.keepAliveEnabled,
+                      )
+                    : (_patchMap[ChromeSafariBrowserSettings$.keepAliveEnabled]
+                          is Patch)
+                    ? _patchMap[ChromeSafariBrowserSettings$.keepAliveEnabled]
+                          .applyTo(this.keepAliveEnabled)
+                    : _patchMap[ChromeSafariBrowserSettings$.keepAliveEnabled])
+                as bool?
           : this.keepAliveEnabled,
       isSingleInstance:
           _patchMap.containsKey(ChromeSafariBrowserSettings$.isSingleInstance)
-          ? (_patchMap[ChromeSafariBrowserSettings$.isSingleInstance]
-                    is Function)
-                ? _patchMap[ChromeSafariBrowserSettings$.isSingleInstance](
-                    this.isSingleInstance,
-                  )
-                : (_patchMap[ChromeSafariBrowserSettings$.isSingleInstance]
-                      is Patch)
-                ? _patchMap[ChromeSafariBrowserSettings$.isSingleInstance]
-                      .applyTo(this.isSingleInstance)
-                : _patchMap[ChromeSafariBrowserSettings$.isSingleInstance]
+          ? ((_patchMap[ChromeSafariBrowserSettings$.isSingleInstance]
+                        is Function)
+                    ? _patchMap[ChromeSafariBrowserSettings$.isSingleInstance](
+                        this.isSingleInstance,
+                      )
+                    : (_patchMap[ChromeSafariBrowserSettings$.isSingleInstance]
+                          is Patch)
+                    ? _patchMap[ChromeSafariBrowserSettings$.isSingleInstance]
+                          .applyTo(this.isSingleInstance)
+                    : _patchMap[ChromeSafariBrowserSettings$.isSingleInstance])
+                as bool?
           : this.isSingleInstance,
       noHistory: _patchMap.containsKey(ChromeSafariBrowserSettings$.noHistory)
-          ? (_patchMap[ChromeSafariBrowserSettings$.noHistory] is Function)
-                ? _patchMap[ChromeSafariBrowserSettings$.noHistory](
-                    this.noHistory,
-                  )
-                : (_patchMap[ChromeSafariBrowserSettings$.noHistory] is Patch)
-                ? _patchMap[ChromeSafariBrowserSettings$.noHistory].applyTo(
-                    this.noHistory,
-                  )
-                : _patchMap[ChromeSafariBrowserSettings$.noHistory]
+          ? ((_patchMap[ChromeSafariBrowserSettings$.noHistory] is Function)
+                    ? _patchMap[ChromeSafariBrowserSettings$.noHistory](
+                        this.noHistory,
+                      )
+                    : (_patchMap[ChromeSafariBrowserSettings$.noHistory]
+                          is Patch)
+                    ? _patchMap[ChromeSafariBrowserSettings$.noHistory].applyTo(
+                        this.noHistory,
+                      )
+                    : _patchMap[ChromeSafariBrowserSettings$.noHistory])
+                as bool?
           : this.noHistory,
       isTrustedWebActivity:
           _patchMap.containsKey(
             ChromeSafariBrowserSettings$.isTrustedWebActivity,
           )
-          ? (_patchMap[ChromeSafariBrowserSettings$.isTrustedWebActivity]
-                    is Function)
-                ? _patchMap[ChromeSafariBrowserSettings$.isTrustedWebActivity](
-                    this.isTrustedWebActivity,
-                  )
-                : (_patchMap[ChromeSafariBrowserSettings$.isTrustedWebActivity]
-                      is Patch)
-                ? _patchMap[ChromeSafariBrowserSettings$.isTrustedWebActivity]
-                      .applyTo(this.isTrustedWebActivity)
-                : _patchMap[ChromeSafariBrowserSettings$.isTrustedWebActivity]
+          ? ((_patchMap[ChromeSafariBrowserSettings$.isTrustedWebActivity]
+                        is Function)
+                    ? _patchMap[ChromeSafariBrowserSettings$
+                          .isTrustedWebActivity](this.isTrustedWebActivity)
+                    : (_patchMap[ChromeSafariBrowserSettings$
+                              .isTrustedWebActivity]
+                          is Patch)
+                    ? _patchMap[ChromeSafariBrowserSettings$
+                              .isTrustedWebActivity]
+                          .applyTo(this.isTrustedWebActivity)
+                    : _patchMap[ChromeSafariBrowserSettings$
+                          .isTrustedWebActivity])
+                as bool?
           : this.isTrustedWebActivity,
       additionalTrustedOrigins:
           _patchMap.containsKey(
             ChromeSafariBrowserSettings$.additionalTrustedOrigins,
           )
-          ? (_patchMap[ChromeSafariBrowserSettings$.additionalTrustedOrigins]
-                    is Function)
-                ? _patchMap[ChromeSafariBrowserSettings$
-                      .additionalTrustedOrigins](this.additionalTrustedOrigins)
-                : (_patchMap[ChromeSafariBrowserSettings$
-                          .additionalTrustedOrigins]
-                      is Patch)
-                ? _patchMap[ChromeSafariBrowserSettings$
-                          .additionalTrustedOrigins]
-                      .applyTo(this.additionalTrustedOrigins)
-                : _patchMap[ChromeSafariBrowserSettings$
-                      .additionalTrustedOrigins]
+          ? ((_patchMap[ChromeSafariBrowserSettings$.additionalTrustedOrigins]
+                        is Function)
+                    ? _patchMap[ChromeSafariBrowserSettings$
+                          .additionalTrustedOrigins](
+                        this.additionalTrustedOrigins,
+                      )
+                    : (_patchMap[ChromeSafariBrowserSettings$
+                              .additionalTrustedOrigins]
+                          is Patch)
+                    ? _patchMap[ChromeSafariBrowserSettings$
+                              .additionalTrustedOrigins]
+                          .applyTo(this.additionalTrustedOrigins)
+                    : _patchMap[ChromeSafariBrowserSettings$
+                          .additionalTrustedOrigins])
+                as List<String>?
           : this.additionalTrustedOrigins,
       displayMode:
           _patchMap.containsKey(ChromeSafariBrowserSettings$.displayMode)
-          ? (_patchMap[ChromeSafariBrowserSettings$.displayMode] is Function)
-                ? _patchMap[ChromeSafariBrowserSettings$.displayMode](
-                    this.displayMode,
-                  )
-                : (_patchMap[ChromeSafariBrowserSettings$.displayMode] is Patch)
-                ? _patchMap[ChromeSafariBrowserSettings$.displayMode].applyTo(
-                    this.displayMode,
-                  )
-                : _patchMap[ChromeSafariBrowserSettings$.displayMode]
+          ? ((_patchMap[ChromeSafariBrowserSettings$.displayMode] is Function)
+                    ? _patchMap[ChromeSafariBrowserSettings$.displayMode](
+                        this.displayMode,
+                      )
+                    : (_patchMap[ChromeSafariBrowserSettings$.displayMode]
+                          is Patch)
+                    ? _patchMap[ChromeSafariBrowserSettings$.displayMode]
+                          .applyTo(this.displayMode)
+                    : _patchMap[ChromeSafariBrowserSettings$.displayMode])
+                as TrustedWebActivityDisplayMode?
           : this.displayMode,
       screenOrientation:
           _patchMap.containsKey(ChromeSafariBrowserSettings$.screenOrientation)
-          ? (_patchMap[ChromeSafariBrowserSettings$.screenOrientation]
-                    is Function)
-                ? _patchMap[ChromeSafariBrowserSettings$.screenOrientation](
-                    this.screenOrientation,
-                  )
-                : (_patchMap[ChromeSafariBrowserSettings$.screenOrientation]
-                      is Patch)
-                ? _patchMap[ChromeSafariBrowserSettings$.screenOrientation]
-                      .applyTo(this.screenOrientation)
-                : _patchMap[ChromeSafariBrowserSettings$.screenOrientation]
+          ? ((_patchMap[ChromeSafariBrowserSettings$.screenOrientation]
+                        is Function)
+                    ? _patchMap[ChromeSafariBrowserSettings$.screenOrientation](
+                        this.screenOrientation,
+                      )
+                    : (_patchMap[ChromeSafariBrowserSettings$.screenOrientation]
+                          is Patch)
+                    ? _patchMap[ChromeSafariBrowserSettings$.screenOrientation]
+                          .applyTo(this.screenOrientation)
+                    : _patchMap[ChromeSafariBrowserSettings$.screenOrientation])
+                as TrustedWebActivityScreenOrientation?
           : this.screenOrientation,
       startAnimations:
           _patchMap.containsKey(ChromeSafariBrowserSettings$.startAnimations)
-          ? (_patchMap[ChromeSafariBrowserSettings$.startAnimations]
-                    is Function)
-                ? _patchMap[ChromeSafariBrowserSettings$.startAnimations](
-                    this.startAnimations,
-                  )
-                : (_patchMap[ChromeSafariBrowserSettings$.startAnimations]
-                      is Patch)
-                ? _patchMap[ChromeSafariBrowserSettings$.startAnimations]
-                      .applyTo(this.startAnimations)
-                : _patchMap[ChromeSafariBrowserSettings$.startAnimations]
+          ? ((_patchMap[ChromeSafariBrowserSettings$.startAnimations]
+                        is Function)
+                    ? _patchMap[ChromeSafariBrowserSettings$.startAnimations](
+                        this.startAnimations,
+                      )
+                    : (_patchMap[ChromeSafariBrowserSettings$.startAnimations]
+                          is Patch)
+                    ? _patchMap[ChromeSafariBrowserSettings$.startAnimations]
+                          .applyTo(this.startAnimations)
+                    : _patchMap[ChromeSafariBrowserSettings$.startAnimations])
+                as List<AndroidResource>?
           : this.startAnimations,
       exitAnimations:
           _patchMap.containsKey(ChromeSafariBrowserSettings$.exitAnimations)
-          ? (_patchMap[ChromeSafariBrowserSettings$.exitAnimations] is Function)
-                ? _patchMap[ChromeSafariBrowserSettings$.exitAnimations](
-                    this.exitAnimations,
-                  )
-                : (_patchMap[ChromeSafariBrowserSettings$.exitAnimations]
-                      is Patch)
-                ? _patchMap[ChromeSafariBrowserSettings$.exitAnimations]
-                      .applyTo(this.exitAnimations)
-                : _patchMap[ChromeSafariBrowserSettings$.exitAnimations]
+          ? ((_patchMap[ChromeSafariBrowserSettings$.exitAnimations]
+                        is Function)
+                    ? _patchMap[ChromeSafariBrowserSettings$.exitAnimations](
+                        this.exitAnimations,
+                      )
+                    : (_patchMap[ChromeSafariBrowserSettings$.exitAnimations]
+                          is Patch)
+                    ? _patchMap[ChromeSafariBrowserSettings$.exitAnimations]
+                          .applyTo(this.exitAnimations)
+                    : _patchMap[ChromeSafariBrowserSettings$.exitAnimations])
+                as List<AndroidResource>?
           : this.exitAnimations,
       alwaysUseBrowserUI:
           _patchMap.containsKey(ChromeSafariBrowserSettings$.alwaysUseBrowserUI)
-          ? (_patchMap[ChromeSafariBrowserSettings$.alwaysUseBrowserUI]
-                    is Function)
-                ? _patchMap[ChromeSafariBrowserSettings$.alwaysUseBrowserUI](
-                    this.alwaysUseBrowserUI,
-                  )
-                : (_patchMap[ChromeSafariBrowserSettings$.alwaysUseBrowserUI]
-                      is Patch)
-                ? _patchMap[ChromeSafariBrowserSettings$.alwaysUseBrowserUI]
-                      .applyTo(this.alwaysUseBrowserUI)
-                : _patchMap[ChromeSafariBrowserSettings$.alwaysUseBrowserUI]
+          ? ((_patchMap[ChromeSafariBrowserSettings$.alwaysUseBrowserUI]
+                        is Function)
+                    ? _patchMap[ChromeSafariBrowserSettings$
+                          .alwaysUseBrowserUI](this.alwaysUseBrowserUI)
+                    : (_patchMap[ChromeSafariBrowserSettings$
+                              .alwaysUseBrowserUI]
+                          is Patch)
+                    ? _patchMap[ChromeSafariBrowserSettings$.alwaysUseBrowserUI]
+                          .applyTo(this.alwaysUseBrowserUI)
+                    : _patchMap[ChromeSafariBrowserSettings$
+                          .alwaysUseBrowserUI])
+                as bool?
           : this.alwaysUseBrowserUI,
       entersReaderIfAvailable:
           _patchMap.containsKey(
             ChromeSafariBrowserSettings$.entersReaderIfAvailable,
           )
-          ? (_patchMap[ChromeSafariBrowserSettings$.entersReaderIfAvailable]
-                    is Function)
-                ? _patchMap[ChromeSafariBrowserSettings$
-                      .entersReaderIfAvailable](this.entersReaderIfAvailable)
-                : (_patchMap[ChromeSafariBrowserSettings$
-                          .entersReaderIfAvailable]
-                      is Patch)
-                ? _patchMap[ChromeSafariBrowserSettings$
-                          .entersReaderIfAvailable]
-                      .applyTo(this.entersReaderIfAvailable)
-                : _patchMap[ChromeSafariBrowserSettings$
-                      .entersReaderIfAvailable]
+          ? ((_patchMap[ChromeSafariBrowserSettings$.entersReaderIfAvailable]
+                        is Function)
+                    ? _patchMap[ChromeSafariBrowserSettings$
+                          .entersReaderIfAvailable](
+                        this.entersReaderIfAvailable,
+                      )
+                    : (_patchMap[ChromeSafariBrowserSettings$
+                              .entersReaderIfAvailable]
+                          is Patch)
+                    ? _patchMap[ChromeSafariBrowserSettings$
+                              .entersReaderIfAvailable]
+                          .applyTo(this.entersReaderIfAvailable)
+                    : _patchMap[ChromeSafariBrowserSettings$
+                          .entersReaderIfAvailable])
+                as bool?
           : this.entersReaderIfAvailable,
       barCollapsingEnabled:
           _patchMap.containsKey(
             ChromeSafariBrowserSettings$.barCollapsingEnabled,
           )
-          ? (_patchMap[ChromeSafariBrowserSettings$.barCollapsingEnabled]
-                    is Function)
-                ? _patchMap[ChromeSafariBrowserSettings$.barCollapsingEnabled](
-                    this.barCollapsingEnabled,
-                  )
-                : (_patchMap[ChromeSafariBrowserSettings$.barCollapsingEnabled]
-                      is Patch)
-                ? _patchMap[ChromeSafariBrowserSettings$.barCollapsingEnabled]
-                      .applyTo(this.barCollapsingEnabled)
-                : _patchMap[ChromeSafariBrowserSettings$.barCollapsingEnabled]
+          ? ((_patchMap[ChromeSafariBrowserSettings$.barCollapsingEnabled]
+                        is Function)
+                    ? _patchMap[ChromeSafariBrowserSettings$
+                          .barCollapsingEnabled](this.barCollapsingEnabled)
+                    : (_patchMap[ChromeSafariBrowserSettings$
+                              .barCollapsingEnabled]
+                          is Patch)
+                    ? _patchMap[ChromeSafariBrowserSettings$
+                              .barCollapsingEnabled]
+                          .applyTo(this.barCollapsingEnabled)
+                    : _patchMap[ChromeSafariBrowserSettings$
+                          .barCollapsingEnabled])
+                as bool?
           : this.barCollapsingEnabled,
       dismissButtonStyle:
           _patchMap.containsKey(ChromeSafariBrowserSettings$.dismissButtonStyle)
-          ? (_patchMap[ChromeSafariBrowserSettings$.dismissButtonStyle]
-                    is Function)
-                ? _patchMap[ChromeSafariBrowserSettings$.dismissButtonStyle](
-                    this.dismissButtonStyle,
-                  )
-                : (_patchMap[ChromeSafariBrowserSettings$.dismissButtonStyle]
-                      is Patch)
-                ? _patchMap[ChromeSafariBrowserSettings$.dismissButtonStyle]
-                      .applyTo(this.dismissButtonStyle)
-                : _patchMap[ChromeSafariBrowserSettings$.dismissButtonStyle]
+          ? ((_patchMap[ChromeSafariBrowserSettings$.dismissButtonStyle]
+                        is Function)
+                    ? _patchMap[ChromeSafariBrowserSettings$
+                          .dismissButtonStyle](this.dismissButtonStyle)
+                    : (_patchMap[ChromeSafariBrowserSettings$
+                              .dismissButtonStyle]
+                          is Patch)
+                    ? _patchMap[ChromeSafariBrowserSettings$.dismissButtonStyle]
+                          .applyTo(this.dismissButtonStyle)
+                    : _patchMap[ChromeSafariBrowserSettings$
+                          .dismissButtonStyle])
+                as DismissButtonStyle?
           : this.dismissButtonStyle,
       preferredBarTintColor:
           _patchMap.containsKey(
             ChromeSafariBrowserSettings$.preferredBarTintColor,
           )
-          ? (_patchMap[ChromeSafariBrowserSettings$.preferredBarTintColor]
-                    is Function)
-                ? _patchMap[ChromeSafariBrowserSettings$.preferredBarTintColor](
-                    this.preferredBarTintColor,
-                  )
-                : (_patchMap[ChromeSafariBrowserSettings$.preferredBarTintColor]
-                      is Patch)
-                ? _patchMap[ChromeSafariBrowserSettings$.preferredBarTintColor]
-                      .applyTo(this.preferredBarTintColor)
-                : _patchMap[ChromeSafariBrowserSettings$.preferredBarTintColor]
+          ? ((_patchMap[ChromeSafariBrowserSettings$.preferredBarTintColor]
+                        is Function)
+                    ? _patchMap[ChromeSafariBrowserSettings$
+                          .preferredBarTintColor](this.preferredBarTintColor)
+                    : (_patchMap[ChromeSafariBrowserSettings$
+                              .preferredBarTintColor]
+                          is Patch)
+                    ? _patchMap[ChromeSafariBrowserSettings$
+                              .preferredBarTintColor]
+                          .applyTo(this.preferredBarTintColor)
+                    : _patchMap[ChromeSafariBrowserSettings$
+                          .preferredBarTintColor])
+                as Color?
           : this.preferredBarTintColor,
       preferredControlTintColor:
           _patchMap.containsKey(
             ChromeSafariBrowserSettings$.preferredControlTintColor,
           )
-          ? (_patchMap[ChromeSafariBrowserSettings$.preferredControlTintColor]
-                    is Function)
-                ? _patchMap[ChromeSafariBrowserSettings$
-                      .preferredControlTintColor](
-                    this.preferredControlTintColor,
-                  )
-                : (_patchMap[ChromeSafariBrowserSettings$
-                          .preferredControlTintColor]
-                      is Patch)
-                ? _patchMap[ChromeSafariBrowserSettings$
-                          .preferredControlTintColor]
-                      .applyTo(this.preferredControlTintColor)
-                : _patchMap[ChromeSafariBrowserSettings$
-                      .preferredControlTintColor]
+          ? ((_patchMap[ChromeSafariBrowserSettings$.preferredControlTintColor]
+                        is Function)
+                    ? _patchMap[ChromeSafariBrowserSettings$
+                          .preferredControlTintColor](
+                        this.preferredControlTintColor,
+                      )
+                    : (_patchMap[ChromeSafariBrowserSettings$
+                              .preferredControlTintColor]
+                          is Patch)
+                    ? _patchMap[ChromeSafariBrowserSettings$
+                              .preferredControlTintColor]
+                          .applyTo(this.preferredControlTintColor)
+                    : _patchMap[ChromeSafariBrowserSettings$
+                          .preferredControlTintColor])
+                as Color?
           : this.preferredControlTintColor,
       presentationStyle:
           _patchMap.containsKey(ChromeSafariBrowserSettings$.presentationStyle)
-          ? (_patchMap[ChromeSafariBrowserSettings$.presentationStyle]
-                    is Function)
-                ? _patchMap[ChromeSafariBrowserSettings$.presentationStyle](
-                    this.presentationStyle,
-                  )
-                : (_patchMap[ChromeSafariBrowserSettings$.presentationStyle]
-                      is Patch)
-                ? _patchMap[ChromeSafariBrowserSettings$.presentationStyle]
-                      .applyTo(this.presentationStyle)
-                : _patchMap[ChromeSafariBrowserSettings$.presentationStyle]
+          ? ((_patchMap[ChromeSafariBrowserSettings$.presentationStyle]
+                        is Function)
+                    ? _patchMap[ChromeSafariBrowserSettings$.presentationStyle](
+                        this.presentationStyle,
+                      )
+                    : (_patchMap[ChromeSafariBrowserSettings$.presentationStyle]
+                          is Patch)
+                    ? _patchMap[ChromeSafariBrowserSettings$.presentationStyle]
+                          .applyTo(this.presentationStyle)
+                    : _patchMap[ChromeSafariBrowserSettings$.presentationStyle])
+                as ModalPresentationStyle?
           : this.presentationStyle,
       transitionStyle:
           _patchMap.containsKey(ChromeSafariBrowserSettings$.transitionStyle)
-          ? (_patchMap[ChromeSafariBrowserSettings$.transitionStyle]
-                    is Function)
-                ? _patchMap[ChromeSafariBrowserSettings$.transitionStyle](
-                    this.transitionStyle,
-                  )
-                : (_patchMap[ChromeSafariBrowserSettings$.transitionStyle]
-                      is Patch)
-                ? _patchMap[ChromeSafariBrowserSettings$.transitionStyle]
-                      .applyTo(this.transitionStyle)
-                : _patchMap[ChromeSafariBrowserSettings$.transitionStyle]
+          ? ((_patchMap[ChromeSafariBrowserSettings$.transitionStyle]
+                        is Function)
+                    ? _patchMap[ChromeSafariBrowserSettings$.transitionStyle](
+                        this.transitionStyle,
+                      )
+                    : (_patchMap[ChromeSafariBrowserSettings$.transitionStyle]
+                          is Patch)
+                    ? _patchMap[ChromeSafariBrowserSettings$.transitionStyle]
+                          .applyTo(this.transitionStyle)
+                    : _patchMap[ChromeSafariBrowserSettings$.transitionStyle])
+                as ModalTransitionStyle?
           : this.transitionStyle,
       activityButton:
           _patchMap.containsKey(ChromeSafariBrowserSettings$.activityButton)
-          ? (_patchMap[ChromeSafariBrowserSettings$.activityButton] is Function)
-                ? _patchMap[ChromeSafariBrowserSettings$.activityButton](
-                    this.activityButton,
-                  )
-                : (_patchMap[ChromeSafariBrowserSettings$.activityButton]
-                      is Patch)
-                ? _patchMap[ChromeSafariBrowserSettings$.activityButton]
-                      .applyTo(this.activityButton)
-                : _patchMap[ChromeSafariBrowserSettings$.activityButton]
+          ? ((_patchMap[ChromeSafariBrowserSettings$.activityButton]
+                        is Function)
+                    ? _patchMap[ChromeSafariBrowserSettings$.activityButton](
+                        this.activityButton,
+                      )
+                    : (_patchMap[ChromeSafariBrowserSettings$.activityButton]
+                          is Patch)
+                    ? _patchMap[ChromeSafariBrowserSettings$.activityButton]
+                          .applyTo(this.activityButton)
+                    : _patchMap[ChromeSafariBrowserSettings$.activityButton])
+                as ActivityButton?
           : this.activityButton,
       eventAttribution:
           _patchMap.containsKey(ChromeSafariBrowserSettings$.eventAttribution)
-          ? (_patchMap[ChromeSafariBrowserSettings$.eventAttribution]
-                    is Function)
-                ? _patchMap[ChromeSafariBrowserSettings$.eventAttribution](
-                    this.eventAttribution,
-                  )
-                : (_patchMap[ChromeSafariBrowserSettings$.eventAttribution]
-                      is Patch)
-                ? _patchMap[ChromeSafariBrowserSettings$.eventAttribution]
-                      .applyTo(this.eventAttribution)
-                : _patchMap[ChromeSafariBrowserSettings$.eventAttribution]
+          ? ((_patchMap[ChromeSafariBrowserSettings$.eventAttribution]
+                        is Function)
+                    ? _patchMap[ChromeSafariBrowserSettings$.eventAttribution](
+                        this.eventAttribution,
+                      )
+                    : (_patchMap[ChromeSafariBrowserSettings$.eventAttribution]
+                          is Patch)
+                    ? _patchMap[ChromeSafariBrowserSettings$.eventAttribution]
+                          .applyTo(this.eventAttribution)
+                    : _patchMap[ChromeSafariBrowserSettings$.eventAttribution])
+                as UIEventAttribution?
           : this.eventAttribution,
     );
   }
@@ -821,7 +872,8 @@ class ChromeSafariBrowserSettings {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$ChromeSafariBrowserSettingsToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {
@@ -1398,9 +1450,7 @@ class ChromeSafariBrowserSettingsPatch
     return this;
   }
 
-  ChromeSafariBrowserSettingsPatch withNavigationBarDividerColor(
-    Color? value,
-  ) {
+  ChromeSafariBrowserSettingsPatch withNavigationBarDividerColor(Color? value) {
     patchMap[ChromeSafariBrowserSettings$.navigationBarDividerColor] = value;
     return this;
   }
@@ -1507,9 +1557,7 @@ class ChromeSafariBrowserSettingsPatch
     return this;
   }
 
-  ChromeSafariBrowserSettingsPatch withPreferredControlTintColor(
-    Color? value,
-  ) {
+  ChromeSafariBrowserSettingsPatch withPreferredControlTintColor(Color? value) {
     patchMap[ChromeSafariBrowserSettings$.preferredControlTintColor] = value;
     return this;
   }

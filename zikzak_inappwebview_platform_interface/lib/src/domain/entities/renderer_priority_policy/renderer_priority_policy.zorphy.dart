@@ -57,29 +57,35 @@ class RendererPriorityPolicy {
           _patchMap.containsKey(
             RendererPriorityPolicy$.rendererRequestedPriority,
           )
-          ? (_patchMap[RendererPriorityPolicy$.rendererRequestedPriority]
-                    is Function)
-                ? _patchMap[RendererPriorityPolicy$.rendererRequestedPriority](
-                    this.rendererRequestedPriority,
-                  )
-                : (_patchMap[RendererPriorityPolicy$.rendererRequestedPriority]
-                      is Patch)
-                ? _patchMap[RendererPriorityPolicy$.rendererRequestedPriority]
-                      .applyTo(this.rendererRequestedPriority)
-                : _patchMap[RendererPriorityPolicy$.rendererRequestedPriority]
+          ? ((_patchMap[RendererPriorityPolicy$.rendererRequestedPriority]
+                        is Function)
+                    ? _patchMap[RendererPriorityPolicy$
+                          .rendererRequestedPriority](
+                        this.rendererRequestedPriority,
+                      )
+                    : (_patchMap[RendererPriorityPolicy$
+                              .rendererRequestedPriority]
+                          is Patch)
+                    ? _patchMap[RendererPriorityPolicy$
+                              .rendererRequestedPriority]
+                          .applyTo(this.rendererRequestedPriority)
+                    : _patchMap[RendererPriorityPolicy$
+                          .rendererRequestedPriority])
+                as RendererPriority?
           : this.rendererRequestedPriority,
       waivedWhenNotVisible:
           _patchMap.containsKey(RendererPriorityPolicy$.waivedWhenNotVisible)
-          ? (_patchMap[RendererPriorityPolicy$.waivedWhenNotVisible]
-                    is Function)
-                ? _patchMap[RendererPriorityPolicy$.waivedWhenNotVisible](
-                    this.waivedWhenNotVisible,
-                  )
-                : (_patchMap[RendererPriorityPolicy$.waivedWhenNotVisible]
-                      is Patch)
-                ? _patchMap[RendererPriorityPolicy$.waivedWhenNotVisible]
-                      .applyTo(this.waivedWhenNotVisible)
-                : _patchMap[RendererPriorityPolicy$.waivedWhenNotVisible]
+          ? ((_patchMap[RendererPriorityPolicy$.waivedWhenNotVisible]
+                        is Function)
+                    ? _patchMap[RendererPriorityPolicy$.waivedWhenNotVisible](
+                        this.waivedWhenNotVisible,
+                      )
+                    : (_patchMap[RendererPriorityPolicy$.waivedWhenNotVisible]
+                          is Patch)
+                    ? _patchMap[RendererPriorityPolicy$.waivedWhenNotVisible]
+                          .applyTo(this.waivedWhenNotVisible)
+                    : _patchMap[RendererPriorityPolicy$.waivedWhenNotVisible])
+                as bool
           : this.waivedWhenNotVisible,
     );
   }
@@ -110,7 +116,8 @@ class RendererPriorityPolicy {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$RendererPriorityPolicyToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

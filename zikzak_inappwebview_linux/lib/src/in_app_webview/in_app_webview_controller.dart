@@ -77,7 +77,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
             WebResourceRequest(url: url != null ? WebUri(url) : WebUri('')),
             WebResourceError(
               type: WebResourceErrorType.values.firstWhere(
-                (t) => t.name == code,
+                (t) => t.index == code,
                 orElse: () => WebResourceErrorType.UNKNOWN,
               ),
               description: message,

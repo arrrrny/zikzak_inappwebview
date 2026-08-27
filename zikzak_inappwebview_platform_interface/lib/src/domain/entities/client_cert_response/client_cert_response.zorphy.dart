@@ -73,43 +73,49 @@ class ClientCertResponse {
     return ClientCertResponse(
       certificatePath:
           _patchMap.containsKey(ClientCertResponse$.certificatePath)
-          ? (_patchMap[ClientCertResponse$.certificatePath] is Function)
-                ? _patchMap[ClientCertResponse$.certificatePath](
-                    this.certificatePath,
-                  )
-                : (_patchMap[ClientCertResponse$.certificatePath] is Patch)
-                ? _patchMap[ClientCertResponse$.certificatePath].applyTo(
-                    this.certificatePath,
-                  )
-                : _patchMap[ClientCertResponse$.certificatePath]
+          ? ((_patchMap[ClientCertResponse$.certificatePath] is Function)
+                    ? _patchMap[ClientCertResponse$.certificatePath](
+                        this.certificatePath,
+                      )
+                    : (_patchMap[ClientCertResponse$.certificatePath] is Patch)
+                    ? _patchMap[ClientCertResponse$.certificatePath].applyTo(
+                        this.certificatePath,
+                      )
+                    : _patchMap[ClientCertResponse$.certificatePath])
+                as String
           : this.certificatePath,
       certificatePassword:
           _patchMap.containsKey(ClientCertResponse$.certificatePassword)
-          ? (_patchMap[ClientCertResponse$.certificatePassword] is Function)
-                ? _patchMap[ClientCertResponse$.certificatePassword](
-                    this.certificatePassword,
-                  )
-                : (_patchMap[ClientCertResponse$.certificatePassword] is Patch)
-                ? _patchMap[ClientCertResponse$.certificatePassword].applyTo(
-                    this.certificatePassword,
-                  )
-                : _patchMap[ClientCertResponse$.certificatePassword]
+          ? ((_patchMap[ClientCertResponse$.certificatePassword] is Function)
+                    ? _patchMap[ClientCertResponse$.certificatePassword](
+                        this.certificatePassword,
+                      )
+                    : (_patchMap[ClientCertResponse$.certificatePassword]
+                          is Patch)
+                    ? _patchMap[ClientCertResponse$.certificatePassword]
+                          .applyTo(this.certificatePassword)
+                    : _patchMap[ClientCertResponse$.certificatePassword])
+                as String?
           : this.certificatePassword,
       keyStoreType: _patchMap.containsKey(ClientCertResponse$.keyStoreType)
-          ? (_patchMap[ClientCertResponse$.keyStoreType] is Function)
-                ? _patchMap[ClientCertResponse$.keyStoreType](this.keyStoreType)
-                : (_patchMap[ClientCertResponse$.keyStoreType] is Patch)
-                ? _patchMap[ClientCertResponse$.keyStoreType].applyTo(
-                    this.keyStoreType,
-                  )
-                : _patchMap[ClientCertResponse$.keyStoreType]
+          ? ((_patchMap[ClientCertResponse$.keyStoreType] is Function)
+                    ? _patchMap[ClientCertResponse$.keyStoreType](
+                        this.keyStoreType,
+                      )
+                    : (_patchMap[ClientCertResponse$.keyStoreType] is Patch)
+                    ? _patchMap[ClientCertResponse$.keyStoreType].applyTo(
+                        this.keyStoreType,
+                      )
+                    : _patchMap[ClientCertResponse$.keyStoreType])
+                as String?
           : this.keyStoreType,
       action: _patchMap.containsKey(ClientCertResponse$.action)
-          ? (_patchMap[ClientCertResponse$.action] is Function)
-                ? _patchMap[ClientCertResponse$.action](this.action)
-                : (_patchMap[ClientCertResponse$.action] is Patch)
-                ? _patchMap[ClientCertResponse$.action].applyTo(this.action)
-                : _patchMap[ClientCertResponse$.action]
+          ? ((_patchMap[ClientCertResponse$.action] is Function)
+                    ? _patchMap[ClientCertResponse$.action](this.action)
+                    : (_patchMap[ClientCertResponse$.action] is Patch)
+                    ? _patchMap[ClientCertResponse$.action].applyTo(this.action)
+                    : _patchMap[ClientCertResponse$.action])
+                as ClientCertResponseAction?
           : this.action,
     );
   }
@@ -148,7 +154,8 @@ class ClientCertResponse {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$ClientCertResponseToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

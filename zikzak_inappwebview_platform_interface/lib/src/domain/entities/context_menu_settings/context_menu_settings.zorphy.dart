@@ -46,20 +46,21 @@ class ContextMenuSettings {
           _patchMap.containsKey(
             ContextMenuSettings$.hideDefaultSystemContextMenuItems,
           )
-          ? (_patchMap[ContextMenuSettings$.hideDefaultSystemContextMenuItems]
-                    is Function)
-                ? _patchMap[ContextMenuSettings$
-                      .hideDefaultSystemContextMenuItems](
-                    this.hideDefaultSystemContextMenuItems,
-                  )
-                : (_patchMap[ContextMenuSettings$
-                          .hideDefaultSystemContextMenuItems]
-                      is Patch)
-                ? _patchMap[ContextMenuSettings$
-                          .hideDefaultSystemContextMenuItems]
-                      .applyTo(this.hideDefaultSystemContextMenuItems)
-                : _patchMap[ContextMenuSettings$
-                      .hideDefaultSystemContextMenuItems]
+          ? ((_patchMap[ContextMenuSettings$.hideDefaultSystemContextMenuItems]
+                        is Function)
+                    ? _patchMap[ContextMenuSettings$
+                          .hideDefaultSystemContextMenuItems](
+                        this.hideDefaultSystemContextMenuItems,
+                      )
+                    : (_patchMap[ContextMenuSettings$
+                              .hideDefaultSystemContextMenuItems]
+                          is Patch)
+                    ? _patchMap[ContextMenuSettings$
+                              .hideDefaultSystemContextMenuItems]
+                          .applyTo(this.hideDefaultSystemContextMenuItems)
+                    : _patchMap[ContextMenuSettings$
+                          .hideDefaultSystemContextMenuItems])
+                as bool
           : this.hideDefaultSystemContextMenuItems,
     );
   }
@@ -85,7 +86,8 @@ class ContextMenuSettings {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$ContextMenuSettingsToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

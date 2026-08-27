@@ -967,20 +967,7 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
                     )
                 );
             }
-            if (
-                WebViewFeature.isFeatureSupported(
-                    WebViewFeature.REQUESTED_WITH_HEADER_ALLOW_LIST
-                )
-            ) {
-                realSettings.put(
-                    "requestedWithHeaderOriginAllowList",
-                    new ArrayList<>(
-                        WebSettingsCompat.getRequestedWithHeaderOriginAllowList(
-                            settings
-                        )
-                    )
-                );
-            }
+
         }
         return realSettings;
     }

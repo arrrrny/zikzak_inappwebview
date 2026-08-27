@@ -1,0 +1,64 @@
+schema_version: "1.0"
+
+extension:
+  id: worktrees
+  name: "Worktrees"
+  version: "1.3.2"
+  description: "Default-on worktree isolation for parallel agents — sibling or nested layout"
+  author: "dango85"
+  repository: "https://github.com/dango85/spec-kit-worktree-parallel"
+  license: "MIT"
+  install_notes: |
+    Cursor users: for agent isolation aligned with the editor, prefer /worktree + .cursor/worktrees.json
+    (see https://cursor.com/docs/configuration/worktrees and README "Cursor IDE").
+    If the Git extension is installed, consider disabling before_specify → speckit.git.feature in
+    .specify/extensions.yml — README "Parallel agents and the Git extension".
+
+requires:
+  speckit_version: ">=0.4.0"
+  tools:
+    - name: git
+      required: true
+
+provides:
+  commands:
+    - name: speckit.worktrees.create
+      file: commands/speckit.worktrees.create.md
+      description: "Spawn an isolated git worktree for a feature branch"
+    - name: speckit.worktrees.list
+      file: commands/speckit.worktrees.list.md
+      description: "Dashboard of all active worktrees with spec-artifact and task progress"
+    - name: speckit.worktrees.clean
+      file: commands/speckit.worktrees.clean.md
+      description: "Remove merged, orphaned, or stale worktrees and reclaim disk space"
+
+  config:
+    - name: "worktree-config.yml"
+      template: "worktree-config.yml"
+      description: "Worktree layout and behavior configuration"
+      required: false
+
+hooks:
+  after_specify:
+    command: speckit.worktrees.create
+    optional: false
+    description: "Auto-spawn a worktree after a new feature is specified"
+
+lifecycle:
+  post_install:
+    script: scripts/bash/post-install.sh
+    description: "Add .worktrees/ to .gitignore so worktree directories are never committed to the main repo"
+
+tags:
+  - "worktree"
+  - "git"
+  - "parallel"
+  - "isolation"
+  - "agents"
+
+config:
+  defaults:
+    layout: "nested"
+    auto_create: true
+    sibling_pattern: "{{repo}}--{{branch}}"
+    dotworktrees_dir: ".worktrees"

@@ -47,20 +47,24 @@ class InAppWebViewHitTestResult {
     final _patchMap = _patcher.patchMap;
     return InAppWebViewHitTestResult(
       type: _patchMap.containsKey(InAppWebViewHitTestResult$.type)
-          ? (_patchMap[InAppWebViewHitTestResult$.type] is Function)
-                ? _patchMap[InAppWebViewHitTestResult$.type](this.type)
-                : (_patchMap[InAppWebViewHitTestResult$.type] is Patch)
-                ? _patchMap[InAppWebViewHitTestResult$.type].applyTo(this.type)
-                : _patchMap[InAppWebViewHitTestResult$.type]
+          ? ((_patchMap[InAppWebViewHitTestResult$.type] is Function)
+                    ? _patchMap[InAppWebViewHitTestResult$.type](this.type)
+                    : (_patchMap[InAppWebViewHitTestResult$.type] is Patch)
+                    ? _patchMap[InAppWebViewHitTestResult$.type].applyTo(
+                        this.type,
+                      )
+                    : _patchMap[InAppWebViewHitTestResult$.type])
+                as InAppWebViewHitTestResultType?
           : this.type,
       extra: _patchMap.containsKey(InAppWebViewHitTestResult$.extra)
-          ? (_patchMap[InAppWebViewHitTestResult$.extra] is Function)
-                ? _patchMap[InAppWebViewHitTestResult$.extra](this.extra)
-                : (_patchMap[InAppWebViewHitTestResult$.extra] is Patch)
-                ? _patchMap[InAppWebViewHitTestResult$.extra].applyTo(
-                    this.extra,
-                  )
-                : _patchMap[InAppWebViewHitTestResult$.extra]
+          ? ((_patchMap[InAppWebViewHitTestResult$.extra] is Function)
+                    ? _patchMap[InAppWebViewHitTestResult$.extra](this.extra)
+                    : (_patchMap[InAppWebViewHitTestResult$.extra] is Patch)
+                    ? _patchMap[InAppWebViewHitTestResult$.extra].applyTo(
+                        this.extra,
+                      )
+                    : _patchMap[InAppWebViewHitTestResult$.extra])
+                as String?
           : this.extra,
     );
   }
@@ -88,7 +92,8 @@ class InAppWebViewHitTestResult {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$InAppWebViewHitTestResultToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

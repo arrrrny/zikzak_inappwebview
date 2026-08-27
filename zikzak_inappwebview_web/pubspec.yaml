@@ -1,6 +1,6 @@
 name: zikzak_inappwebview_web
 description: The web implementation of zikzak_inappwebview.
-version: 5.0.0
+version: 5.1.2
 homepage: https://github.com/arrrrny/zikzak_inappwebview
 
 environment:

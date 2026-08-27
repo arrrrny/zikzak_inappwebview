@@ -82,59 +82,71 @@ class WebResourceResponse {
     final _patchMap = _patcher.patchMap;
     return WebResourceResponse(
       contentType: _patchMap.containsKey(WebResourceResponse$.contentType)
-          ? (_patchMap[WebResourceResponse$.contentType] is Function)
-                ? _patchMap[WebResourceResponse$.contentType](this.contentType)
-                : (_patchMap[WebResourceResponse$.contentType] is Patch)
-                ? _patchMap[WebResourceResponse$.contentType].applyTo(
-                    this.contentType,
-                  )
-                : _patchMap[WebResourceResponse$.contentType]
+          ? ((_patchMap[WebResourceResponse$.contentType] is Function)
+                    ? _patchMap[WebResourceResponse$.contentType](
+                        this.contentType,
+                      )
+                    : (_patchMap[WebResourceResponse$.contentType] is Patch)
+                    ? _patchMap[WebResourceResponse$.contentType].applyTo(
+                        this.contentType,
+                      )
+                    : _patchMap[WebResourceResponse$.contentType])
+                as String?
           : this.contentType,
       contentEncoding:
           _patchMap.containsKey(WebResourceResponse$.contentEncoding)
-          ? (_patchMap[WebResourceResponse$.contentEncoding] is Function)
-                ? _patchMap[WebResourceResponse$.contentEncoding](
-                    this.contentEncoding,
-                  )
-                : (_patchMap[WebResourceResponse$.contentEncoding] is Patch)
-                ? _patchMap[WebResourceResponse$.contentEncoding].applyTo(
-                    this.contentEncoding,
-                  )
-                : _patchMap[WebResourceResponse$.contentEncoding]
+          ? ((_patchMap[WebResourceResponse$.contentEncoding] is Function)
+                    ? _patchMap[WebResourceResponse$.contentEncoding](
+                        this.contentEncoding,
+                      )
+                    : (_patchMap[WebResourceResponse$.contentEncoding] is Patch)
+                    ? _patchMap[WebResourceResponse$.contentEncoding].applyTo(
+                        this.contentEncoding,
+                      )
+                    : _patchMap[WebResourceResponse$.contentEncoding])
+                as String?
           : this.contentEncoding,
       data: _patchMap.containsKey(WebResourceResponse$.data)
-          ? (_patchMap[WebResourceResponse$.data] is Function)
-                ? _patchMap[WebResourceResponse$.data](this.data)
-                : (_patchMap[WebResourceResponse$.data] is Patch)
-                ? _patchMap[WebResourceResponse$.data].applyTo(this.data)
-                : _patchMap[WebResourceResponse$.data]
+          ? ((_patchMap[WebResourceResponse$.data] is Function)
+                    ? _patchMap[WebResourceResponse$.data](this.data)
+                    : (_patchMap[WebResourceResponse$.data] is Patch)
+                    ? _patchMap[WebResourceResponse$.data].applyTo(this.data)
+                    : _patchMap[WebResourceResponse$.data])
+                as Uint8List?
           : this.data,
       headers: _patchMap.containsKey(WebResourceResponse$.headers)
-          ? (_patchMap[WebResourceResponse$.headers] is Function)
-                ? _patchMap[WebResourceResponse$.headers](this.headers)
-                : (_patchMap[WebResourceResponse$.headers] is Patch)
-                ? _patchMap[WebResourceResponse$.headers].applyTo(this.headers)
-                : _patchMap[WebResourceResponse$.headers]
+          ? ((_patchMap[WebResourceResponse$.headers] is Function)
+                    ? _patchMap[WebResourceResponse$.headers](this.headers)
+                    : (_patchMap[WebResourceResponse$.headers] is Patch)
+                    ? _patchMap[WebResourceResponse$.headers].applyTo(
+                        this.headers,
+                      )
+                    : _patchMap[WebResourceResponse$.headers])
+                as Map<String, String>?
           : this.headers,
       statusCode: _patchMap.containsKey(WebResourceResponse$.statusCode)
-          ? (_patchMap[WebResourceResponse$.statusCode] is Function)
-                ? _patchMap[WebResourceResponse$.statusCode](this.statusCode)
-                : (_patchMap[WebResourceResponse$.statusCode] is Patch)
-                ? _patchMap[WebResourceResponse$.statusCode].applyTo(
-                    this.statusCode,
-                  )
-                : _patchMap[WebResourceResponse$.statusCode]
+          ? ((_patchMap[WebResourceResponse$.statusCode] is Function)
+                    ? _patchMap[WebResourceResponse$.statusCode](
+                        this.statusCode,
+                      )
+                    : (_patchMap[WebResourceResponse$.statusCode] is Patch)
+                    ? _patchMap[WebResourceResponse$.statusCode].applyTo(
+                        this.statusCode,
+                      )
+                    : _patchMap[WebResourceResponse$.statusCode])
+                as int?
           : this.statusCode,
       reasonPhrase: _patchMap.containsKey(WebResourceResponse$.reasonPhrase)
-          ? (_patchMap[WebResourceResponse$.reasonPhrase] is Function)
-                ? _patchMap[WebResourceResponse$.reasonPhrase](
-                    this.reasonPhrase,
-                  )
-                : (_patchMap[WebResourceResponse$.reasonPhrase] is Patch)
-                ? _patchMap[WebResourceResponse$.reasonPhrase].applyTo(
-                    this.reasonPhrase,
-                  )
-                : _patchMap[WebResourceResponse$.reasonPhrase]
+          ? ((_patchMap[WebResourceResponse$.reasonPhrase] is Function)
+                    ? _patchMap[WebResourceResponse$.reasonPhrase](
+                        this.reasonPhrase,
+                      )
+                    : (_patchMap[WebResourceResponse$.reasonPhrase] is Patch)
+                    ? _patchMap[WebResourceResponse$.reasonPhrase].applyTo(
+                        this.reasonPhrase,
+                      )
+                    : _patchMap[WebResourceResponse$.reasonPhrase])
+                as String?
           : this.reasonPhrase,
     );
   }
@@ -181,7 +193,8 @@ class WebResourceResponse {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$WebResourceResponseToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

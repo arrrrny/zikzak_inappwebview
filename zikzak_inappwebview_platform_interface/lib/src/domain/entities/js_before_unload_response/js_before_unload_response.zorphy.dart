@@ -83,58 +83,63 @@ class JsBeforeUnloadResponse {
     final _patchMap = _patcher.patchMap;
     return JsBeforeUnloadResponse(
       message: _patchMap.containsKey(JsBeforeUnloadResponse$.message)
-          ? (_patchMap[JsBeforeUnloadResponse$.message] is Function)
-                ? _patchMap[JsBeforeUnloadResponse$.message](this.message)
-                : (_patchMap[JsBeforeUnloadResponse$.message] is Patch)
-                ? _patchMap[JsBeforeUnloadResponse$.message].applyTo(
-                    this.message,
-                  )
-                : _patchMap[JsBeforeUnloadResponse$.message]
+          ? ((_patchMap[JsBeforeUnloadResponse$.message] is Function)
+                    ? _patchMap[JsBeforeUnloadResponse$.message](this.message)
+                    : (_patchMap[JsBeforeUnloadResponse$.message] is Patch)
+                    ? _patchMap[JsBeforeUnloadResponse$.message].applyTo(
+                        this.message,
+                      )
+                    : _patchMap[JsBeforeUnloadResponse$.message])
+                as String
           : this.message,
       confirmButtonTitle:
           _patchMap.containsKey(JsBeforeUnloadResponse$.confirmButtonTitle)
-          ? (_patchMap[JsBeforeUnloadResponse$.confirmButtonTitle] is Function)
-                ? _patchMap[JsBeforeUnloadResponse$.confirmButtonTitle](
-                    this.confirmButtonTitle,
-                  )
-                : (_patchMap[JsBeforeUnloadResponse$.confirmButtonTitle]
-                      is Patch)
-                ? _patchMap[JsBeforeUnloadResponse$.confirmButtonTitle].applyTo(
-                    this.confirmButtonTitle,
-                  )
-                : _patchMap[JsBeforeUnloadResponse$.confirmButtonTitle]
+          ? ((_patchMap[JsBeforeUnloadResponse$.confirmButtonTitle] is Function)
+                    ? _patchMap[JsBeforeUnloadResponse$.confirmButtonTitle](
+                        this.confirmButtonTitle,
+                      )
+                    : (_patchMap[JsBeforeUnloadResponse$.confirmButtonTitle]
+                          is Patch)
+                    ? _patchMap[JsBeforeUnloadResponse$.confirmButtonTitle]
+                          .applyTo(this.confirmButtonTitle)
+                    : _patchMap[JsBeforeUnloadResponse$.confirmButtonTitle])
+                as String
           : this.confirmButtonTitle,
       cancelButtonTitle:
           _patchMap.containsKey(JsBeforeUnloadResponse$.cancelButtonTitle)
-          ? (_patchMap[JsBeforeUnloadResponse$.cancelButtonTitle] is Function)
-                ? _patchMap[JsBeforeUnloadResponse$.cancelButtonTitle](
-                    this.cancelButtonTitle,
-                  )
-                : (_patchMap[JsBeforeUnloadResponse$.cancelButtonTitle]
-                      is Patch)
-                ? _patchMap[JsBeforeUnloadResponse$.cancelButtonTitle].applyTo(
-                    this.cancelButtonTitle,
-                  )
-                : _patchMap[JsBeforeUnloadResponse$.cancelButtonTitle]
+          ? ((_patchMap[JsBeforeUnloadResponse$.cancelButtonTitle] is Function)
+                    ? _patchMap[JsBeforeUnloadResponse$.cancelButtonTitle](
+                        this.cancelButtonTitle,
+                      )
+                    : (_patchMap[JsBeforeUnloadResponse$.cancelButtonTitle]
+                          is Patch)
+                    ? _patchMap[JsBeforeUnloadResponse$.cancelButtonTitle]
+                          .applyTo(this.cancelButtonTitle)
+                    : _patchMap[JsBeforeUnloadResponse$.cancelButtonTitle])
+                as String
           : this.cancelButtonTitle,
       handledByClient:
           _patchMap.containsKey(JsBeforeUnloadResponse$.handledByClient)
-          ? (_patchMap[JsBeforeUnloadResponse$.handledByClient] is Function)
-                ? _patchMap[JsBeforeUnloadResponse$.handledByClient](
-                    this.handledByClient,
-                  )
-                : (_patchMap[JsBeforeUnloadResponse$.handledByClient] is Patch)
-                ? _patchMap[JsBeforeUnloadResponse$.handledByClient].applyTo(
-                    this.handledByClient,
-                  )
-                : _patchMap[JsBeforeUnloadResponse$.handledByClient]
+          ? ((_patchMap[JsBeforeUnloadResponse$.handledByClient] is Function)
+                    ? _patchMap[JsBeforeUnloadResponse$.handledByClient](
+                        this.handledByClient,
+                      )
+                    : (_patchMap[JsBeforeUnloadResponse$.handledByClient]
+                          is Patch)
+                    ? _patchMap[JsBeforeUnloadResponse$.handledByClient]
+                          .applyTo(this.handledByClient)
+                    : _patchMap[JsBeforeUnloadResponse$.handledByClient])
+                as bool
           : this.handledByClient,
       action: _patchMap.containsKey(JsBeforeUnloadResponse$.action)
-          ? (_patchMap[JsBeforeUnloadResponse$.action] is Function)
-                ? _patchMap[JsBeforeUnloadResponse$.action](this.action)
-                : (_patchMap[JsBeforeUnloadResponse$.action] is Patch)
-                ? _patchMap[JsBeforeUnloadResponse$.action].applyTo(this.action)
-                : _patchMap[JsBeforeUnloadResponse$.action]
+          ? ((_patchMap[JsBeforeUnloadResponse$.action] is Function)
+                    ? _patchMap[JsBeforeUnloadResponse$.action](this.action)
+                    : (_patchMap[JsBeforeUnloadResponse$.action] is Patch)
+                    ? _patchMap[JsBeforeUnloadResponse$.action].applyTo(
+                        this.action,
+                      )
+                    : _patchMap[JsBeforeUnloadResponse$.action])
+                as JsBeforeUnloadResponseAction?
           : this.action,
     );
   }
@@ -177,7 +182,8 @@ class JsBeforeUnloadResponse {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$JsBeforeUnloadResponseToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

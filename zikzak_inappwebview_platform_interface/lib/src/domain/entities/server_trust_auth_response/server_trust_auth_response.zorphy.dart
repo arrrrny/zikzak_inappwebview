@@ -40,13 +40,14 @@ class ServerTrustAuthResponse {
     final _patchMap = _patcher.patchMap;
     return ServerTrustAuthResponse(
       action: _patchMap.containsKey(ServerTrustAuthResponse$.action)
-          ? (_patchMap[ServerTrustAuthResponse$.action] is Function)
-                ? _patchMap[ServerTrustAuthResponse$.action](this.action)
-                : (_patchMap[ServerTrustAuthResponse$.action] is Patch)
-                ? _patchMap[ServerTrustAuthResponse$.action].applyTo(
-                    this.action,
-                  )
-                : _patchMap[ServerTrustAuthResponse$.action]
+          ? ((_patchMap[ServerTrustAuthResponse$.action] is Function)
+                    ? _patchMap[ServerTrustAuthResponse$.action](this.action)
+                    : (_patchMap[ServerTrustAuthResponse$.action] is Patch)
+                    ? _patchMap[ServerTrustAuthResponse$.action].applyTo(
+                        this.action,
+                      )
+                    : _patchMap[ServerTrustAuthResponse$.action])
+                as ServerTrustAuthResponseAction?
           : this.action,
     );
   }
@@ -69,7 +70,8 @@ class ServerTrustAuthResponse {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$ServerTrustAuthResponseToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

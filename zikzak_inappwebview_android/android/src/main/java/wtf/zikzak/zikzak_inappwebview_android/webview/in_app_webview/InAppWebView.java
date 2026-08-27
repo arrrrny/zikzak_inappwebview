@@ -740,21 +740,6 @@ public final class InAppWebView
                 Log.w(LOG_TAG, "OEM WebView wrapper incompatible with setEnterpriseAuthenticationAppLinkPolicyEnabled", e);
             }
         }
-        if (
-            customSettings.requestedWithHeaderOriginAllowList != null &&
-            WebViewFeature.isFeatureSupported(
-                WebViewFeature.REQUESTED_WITH_HEADER_ALLOW_LIST
-            )
-        ) {
-            try {
-                WebSettingsCompat.setRequestedWithHeaderOriginAllowList(
-                    settings,
-                    customSettings.requestedWithHeaderOriginAllowList
-                );
-            } catch (ClassCastException e) {
-                Log.w(LOG_TAG, "OEM WebView wrapper incompatible with setRequestedWithHeaderOriginAllowList", e);
-            }
-        }
 
         if (customSettings.paymentRequestEnabled != null && WebViewFeature.isFeatureSupported(WebViewFeature.PAYMENT_REQUEST)) {
           try {
@@ -2214,25 +2199,6 @@ public final class InAppWebView
                 );
             } catch (ClassCastException e) {
                 Log.w(LOG_TAG, "OEM WebView wrapper incompatible with setEnterpriseAuthenticationAppLinkPolicyEnabled", e);
-            }
-        }
-        if (
-            newSettingsMap.get("requestedWithHeaderOriginAllowList") != null &&
-            !Util.objEquals(
-                customSettings.requestedWithHeaderOriginAllowList,
-                newCustomSettings.requestedWithHeaderOriginAllowList
-            ) &&
-            WebViewFeature.isFeatureSupported(
-                WebViewFeature.REQUESTED_WITH_HEADER_ALLOW_LIST
-            )
-        ) {
-            try {
-                WebSettingsCompat.setRequestedWithHeaderOriginAllowList(
-                    settings,
-                    newCustomSettings.requestedWithHeaderOriginAllowList
-                );
-            } catch (ClassCastException e) {
-                Log.w(LOG_TAG, "OEM WebView wrapper incompatible with setRequestedWithHeaderOriginAllowList", e);
             }
         }
 

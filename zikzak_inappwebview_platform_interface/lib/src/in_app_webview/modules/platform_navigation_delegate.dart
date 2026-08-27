@@ -1,14 +1,24 @@
 import 'dart:typed_data';
 
-import 'package:flutter/foundation.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import '../../web_uri.dart';
 import '../../types/main.dart';
+import '../platform_inappwebview_controller.dart';
 
 /// Delegate for navigation-related methods of [PlatformInAppWebViewController].
+///
+/// Part of the domain-controller split (issue #229, P3): page loading,
+/// history management and navigation are grouped behind this focused
+/// facade so the main [PlatformInAppWebViewController] stays easy to
+/// reason about.
+///
+/// Platform implementations override the [PlatformInAppWebViewController.navigationDelegate]
+/// getter to return a concrete instance. The default getter returns `null`,
+/// preserving backward compatibility for implementations that have not yet
+/// been migrated.
 abstract class PlatformNavigationDelegate extends PlatformInterface {
-  /// Creates a new [PlatformNavigationDelegate]
+  /// Creates a new [PlatformNavigationDelegate].
   PlatformNavigationDelegate({required Object token}) : super(token: token);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getUrl}

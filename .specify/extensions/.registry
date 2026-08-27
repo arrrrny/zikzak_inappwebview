@@ -44,6 +44,49 @@
       },
       "registered_skills": [],
       "installed_at": "2026-06-17T02:34:36.287280+00:00"
+    },
+    "bug": {
+      "version": "1.0.0",
+      "source": "local",
+      "manifest_hash": "sha256:7d168a3b0d409129022c600624d798ec2be4a72528ca8b5ba6e753e62fe5897a",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "kimi": [
+          "speckit.bug.assess",
+          "speckit.bug.issue",
+          "speckit.bug.fetch",
+          "speckit.bug.fix",
+          "speckit.bug.pr",
+          "speckit.bug.test"
+        ],
+        "zed": [
+          "speckit.bug.assess",
+          "speckit.bug.issue",
+          "speckit.bug.fetch",
+          "speckit.bug.fix",
+          "speckit.bug.pr",
+          "speckit.bug.test"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-08-22T21:00:04.216193+00:00"
+    },
+    "worktrees": {
+      "version": "1.3.2",
+      "source": "local",
+      "manifest_hash": "sha256:ec43973dd67ccd1c8aca2b2e711327bdaee55f0994fe2b2ed078899602533cd5",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "kimi": [
+          "speckit.worktrees.create",
+          "speckit.worktrees.list",
+          "speckit.worktrees.clean"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-08-22T21:07:20.715129+00:00"
     }
   }
 }

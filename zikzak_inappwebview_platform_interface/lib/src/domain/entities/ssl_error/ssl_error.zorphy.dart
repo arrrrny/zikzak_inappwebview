@@ -33,18 +33,20 @@ class SslError {
     final _patchMap = _patcher.patchMap;
     return SslError(
       code: _patchMap.containsKey(SslError$.code)
-          ? (_patchMap[SslError$.code] is Function)
-                ? _patchMap[SslError$.code](this.code)
-                : (_patchMap[SslError$.code] is Patch)
-                ? _patchMap[SslError$.code].applyTo(this.code)
-                : _patchMap[SslError$.code]
+          ? ((_patchMap[SslError$.code] is Function)
+                    ? _patchMap[SslError$.code](this.code)
+                    : (_patchMap[SslError$.code] is Patch)
+                    ? _patchMap[SslError$.code].applyTo(this.code)
+                    : _patchMap[SslError$.code])
+                as SslErrorType?
           : this.code,
       message: _patchMap.containsKey(SslError$.message)
-          ? (_patchMap[SslError$.message] is Function)
-                ? _patchMap[SslError$.message](this.message)
-                : (_patchMap[SslError$.message] is Patch)
-                ? _patchMap[SslError$.message].applyTo(this.message)
-                : _patchMap[SslError$.message]
+          ? ((_patchMap[SslError$.message] is Function)
+                    ? _patchMap[SslError$.message](this.message)
+                    : (_patchMap[SslError$.message] is Patch)
+                    ? _patchMap[SslError$.message].applyTo(this.message)
+                    : _patchMap[SslError$.message])
+                as String?
           : this.message,
     );
   }
@@ -67,7 +69,8 @@ class SslError {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$SslErrorToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {
