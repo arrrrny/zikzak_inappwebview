@@ -95,10 +95,6 @@ void main() {
   });
 
   group('ProxyRule', () {
-    // NOTE: ProxySchemeFilter is dead API surface (unused across the monorepo).
-    // Its wire map ['http','https','ws','wss'] has 4 entries for 3 enum values,
-    // so MATCH_HTTPS round-trips as 'ws' and fromWire('wss') throws a
-    // RangeError — an anomaly pinned as-is, to revisit during the zfa migration.
     test('wire: schemeFilter native strings (current mapping)', () {
       final r = ProxyRule(
         url: WebUri('https://proxy.dev:8080'),
@@ -106,17 +102,17 @@ void main() {
       );
       expect(r.toJson(), {
         'url': 'https://proxy.dev:8080',
-        'schemeFilter': 'https',
+        'schemeFilter': 'http',
       });
       final back = ProxyRule.fromJson(r.toJson());
       expect(back.url.toString(), 'https://proxy.dev:8080');
       expect(back.schemeFilter, ProxySchemeFilter.MATCH_HTTP);
       expect(ProxyRule.fromJson({'url': 'https://x.dev'}).schemeFilter, isNull);
-      // current (anomalous) mappings, pinned for the conformance suite:
-      expect(ProxyRule(url: WebUri('https://x.dev'), schemeFilter: ProxySchemeFilter.MATCH_ALL_SCHEMES).toJson()['schemeFilter'], 'http');
-      expect(ProxyRule(url: WebUri('https://x.dev'), schemeFilter: ProxySchemeFilter.MATCH_HTTPS).toJson()['schemeFilter'], 'ws');
-      // fromWire('wss') hits values[3] of a 3-value enum → wrapped RangeError.
-      expect(() => ProxyRule.fromJson({'url': 'https://x.dev', 'schemeFilter': 'wss'}), throwsA(anything));
+      // Wire map: ['*', 'http', 'https'] — MATCH_ALL_SCHEMES='*', MATCH_HTTP='http', MATCH_HTTPS='https'
+      expect(ProxyRule(url: WebUri('https://x.dev'), schemeFilter: ProxySchemeFilter.MATCH_ALL_SCHEMES).toJson()['schemeFilter'], '*');
+      expect(ProxyRule(url: WebUri('https://x.dev'), schemeFilter: ProxySchemeFilter.MATCH_HTTPS).toJson()['schemeFilter'], 'https');
+      // fromWire('wss') is not in the wire map → returns null.
+      expect(ProxyRule.fromJson({'url': 'https://x.dev', 'schemeFilter': 'wss'}).schemeFilter, isNull);
     });
   });
 
