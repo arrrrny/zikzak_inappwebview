@@ -46,5 +46,10 @@ void main() {
     print('initialSettings: ${params?['initialSettings']}');
     print('initialSize: ${params?['initialSize']}');
     expect(params, isNotNull);
+    expect(params?['initialUrlRequest'], isA<Map>());
+    expect((params?['initialUrlRequest'] as Map?)?.cast<String, dynamic>()?['url'], equals('https://flutter.dev'));
+    expect(params?['initialSettings'], isA<Map>());
+    expect((params?['initialSettings'] as Map?)?.cast<String, dynamic>()?['isInspectable'], equals(true));
+    expect(params?['initialSize'], isA<Map>());
   });
 }

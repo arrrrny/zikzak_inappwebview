@@ -257,53 +257,57 @@ class MacOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
       // Already running — no-op (matches the pre-existing guard).
       return;
     }
-    if (_disposed) {
-      // Re-run after dispose(): wait for any in-flight run to finish its
-      // deferred native teardown, then start fresh. dispose() is terminal
-      // for the PREVIOUS run, not for the webview itself.
-      await _runCompleter?.future;
-    }
-    _disposed = false;
-    _started = true;
-    _init();
-
-    var initialSettings = params.initialSettings ?? InAppWebViewSettings();
-    initialSettings = _inferInitialSettings(initialSettings);
-
-    Map<String, dynamic> settingsMap =
-        (params.initialSettings != null ? initialSettings.toJson() : null) ??
-        initialSettings.toJson();
-
-    Map<String, dynamic> pullToRefreshSettings = PullToRefreshSettings(
-      enabled: false,
-    ).toJson();
-
-    Map<String, dynamic> findInteractionSettings =
-        _macosParams.findInteractionController?.onFindResultReceived != null
-        ? {}
-        : {};
-
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('id', () => id);
-    args.putIfAbsent(
-      'params',
-      () => <String, dynamic>{
-        'initialUrlRequest': params.initialUrlRequest?.toJson(),
-        'initialFile': params.initialFile,
-        'initialData': params.initialData?.toJson(),
-        'initialSettings': settingsMap,
-        'contextMenu': params.contextMenu?.toJson() ?? {},
-        'windowId': params.windowId,
-        'initialUserScripts':
-            params.initialUserScripts?.map((e) => e.toJson()).toList() ?? [],
-        'pullToRefreshSettings': pullToRefreshSettings,
-        'findInteractionSettings': findInteractionSettings,
-        'initialSize': params.initialSize.toJson(),
-      },
-    );
+    // Capture any in-flight run's completer before claiming the restart slot.
+    final previousRunCompleter = _runCompleter;
+    // Claim the restart slot synchronously before any await to prevent
+    // concurrent run() calls from both entering _init().
     final runCompleter = Completer<void>();
     _runCompleter = runCompleter;
     try {
+      if (_disposed) {
+        // Re-run after dispose(): wait for any in-flight run to finish its
+        // deferred native teardown, then start fresh. dispose() is terminal
+        // for the PREVIOUS run, not for the webview itself.
+        await previousRunCompleter?.future;
+      }
+      _disposed = false;
+      _started = true;
+      _init();
+
+      var initialSettings = params.initialSettings ?? InAppWebViewSettings();
+      initialSettings = _inferInitialSettings(initialSettings);
+
+      Map<String, dynamic> settingsMap =
+          (params.initialSettings != null ? initialSettings.toJson() : null) ??
+          initialSettings.toJson();
+
+      Map<String, dynamic> pullToRefreshSettings = PullToRefreshSettings(
+        enabled: false,
+      ).toJson();
+
+      Map<String, dynamic> findInteractionSettings =
+          _macosParams.findInteractionController?.onFindResultReceived != null
+          ? {}
+          : {};
+
+      Map<String, dynamic> args = <String, dynamic>{};
+      args.putIfAbsent('id', () => id);
+      args.putIfAbsent(
+        'params',
+        () => <String, dynamic>{
+          'initialUrlRequest': params.initialUrlRequest?.toJson(),
+          'initialFile': params.initialFile,
+          'initialData': params.initialData?.toJson(),
+          'initialSettings': settingsMap,
+          'contextMenu': params.contextMenu?.toJson() ?? {},
+          'windowId': params.windowId,
+          'initialUserScripts':
+              params.initialUserScripts?.map((e) => e.toJson()).toList() ?? [],
+          'pullToRefreshSettings': pullToRefreshSettings,
+          'findInteractionSettings': findInteractionSettings,
+          'initialSize': params.initialSize.toJson(),
+        },
+      );
       await _sharedChannel.invokeMethod('run', args);
       _running = true;
       if (_disposed) {
@@ -399,7 +403,18 @@ class MacOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
       await _runCompleter?.future;
       return;
     }
-    await _disposeNative();
+    // Direct disposal path: create, assign, and complete _runCompleter so
+    // that a subsequent run() can await teardown and prevent channel corruption.
+    final disposeCompleter = Completer<void>();
+    _runCompleter = disposeCompleter;
+    try {
+      await _disposeNative();
+    } finally {
+      disposeCompleter.complete();
+      if (identical(_runCompleter, disposeCompleter)) {
+        _runCompleter = null;
+      }
+    }
   }
 
   Future<void> _disposeNative() async {
