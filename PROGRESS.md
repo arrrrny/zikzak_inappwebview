@@ -933,14 +933,14 @@ dialogue_dismisser — hand-written toJson/fromJson today → Zorphy, core packa
   API DELTAS surfaced (documented, not fixed — zfa rewrite will decide the
   final API): AndroidResource static factories anim/layout/id/drawable were
   dropped (only on the abstract $ class); ConsoleMessage.fromMap removed
-  (only fromJson); settings color fields became Color_? (Color_ is HIDDEN
+  (only fromJson); settings color fields became `Color_?` (`Color_` is HIDDEN
   from the core barrel — consumers can't construct colors); InAppWebViewSettings
   fields are final (no setter mutation, copyWith instead); print_job
   duplex/disposition/paginationMode flattened to index wires (upstream was
   platform-adaptive); ProxySchemeFilter wire map is internally inconsistent
   (dead code, pinned as-is); ScrollViewContentInsetAdjustmentBehavior enum
   order differs from upstream. The example app was updated to the current
-  API (AndroidResource(name:...), fromJson, Color_, copyWith).
+  API (AndroidResource(name:...), fromJson, `Color_`, copyWith).
   DEV-MODE: master was in post-publish state (hosted ^4.10.0 deps) which
   broke the macos/windows test compilation (.index on migrated enums) —
   ran scripts/restore_dev_setup.sh so the whole monorepo tests the LOCAL
