@@ -1704,7 +1704,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         // so a runtime change is a no-op. Surface it instead of silently
         // dropping it (issue #272).
         if newSettingsMap["webAuthenticationSupport"] != nil
-            && settings?.webAuthenticationSupport != newSettings.webAuthenticationSupport
+            && settings != nil && settings!.webAuthenticationSupport != newSettings.webAuthenticationSupport
         {
             print(
                 "webAuthenticationSupport cannot be changed after the WebView has been created (WKWebViewConfiguration is immutable); ignoring the new value"
