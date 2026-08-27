@@ -84,6 +84,15 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
             binding.getApplicationContext(), binding.getBinaryMessenger(), this.activity, binding.getPlatformViewRegistry(), null);
   }
 
+  /**
+   * Initializes the managers and platform services used by this plugin.
+   *
+   * @param applicationContext application context supplied by the Flutter engine
+   * @param messenger binary messenger used to register platform channels
+   * @param activity current activity, or {@code null} when no activity is attached
+   * @param platformViewRegistry registry used to install the WebView factory
+   * @param unused reserved parameter that is currently unused
+   */
   private void onAttachedToEngine(Context applicationContext, BinaryMessenger messenger, Activity activity, PlatformViewRegistry platformViewRegistry, Object unused) {
     this.applicationContext = applicationContext;
     this.activity = activity;
@@ -114,6 +123,11 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
     processGlobalConfigManager = new ProcessGlobalConfigManager(this);
   }
 
+  /**
+   * Releases the managers and platform services owned by this plugin.
+   *
+   * @param binding binding for the Flutter engine being detached
+   */
   @Override
   public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
     if (platformUtil != null) {
