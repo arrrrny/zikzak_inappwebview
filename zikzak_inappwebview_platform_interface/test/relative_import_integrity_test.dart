@@ -43,29 +43,40 @@ void main() {
 
       // Matches `import '...'`, `export '...'`, `part '...'` (also with
       // double quotes) at the start of a line, allowing leading whitespace.
+      // Also matches conditional imports/exports: `import '...' if (...) '...'`
+      // and collects all URI literals in the directive.
       // `part of '...'` is intentionally not matched: after `part ` the
       // regex requires a quote, and a `part of` directive targets the
       // owning library, which exists by construction.
       final directivePattern = RegExp(
-        r"""^\s*(?:import|export|part)\s+['"]([^'"]+)['"]""",
+        r"""^\s*(?:import|export|part)\s+['"]([^'"]+)['"](?:\s+if\s*\([^)]*\)\s+['"]([^'"]+)['"])*""",
         multiLine: true,
       );
+
+      // Pattern to extract all URI literals from a complete directive line
+      // (including conditional alternatives in if (...) '...' clauses).
+      final uriPattern = RegExp(r"""['"]([^'"]+)['"]""");
 
       for (final entity in libDir.listSync(recursive: true)) {
         if (entity is! File || !entity.path.endsWith('.dart')) continue;
         filesScanned++;
         final content = entity.readAsStringSync();
         for (final match in directivePattern.allMatches(content)) {
-          final uri = match.group(1)!;
-          // `dart:` and `package:` URIs are resolved by the SDK / pub, not
-          // by the filesystem layout checked here.
-          if (uri.startsWith('dart:') || uri.startsWith('package:')) continue;
-          directivesChecked++;
-          final targetPath = entity.uri.resolve(uri).toFilePath();
-          if (!File(targetPath).existsSync()) {
-            dangling.add(
-              '${entity.path}: $uri -> $targetPath (missing)',
-            );
+          // Extract the complete matched directive text
+          final directiveText = match.group(0)!;
+          // Extract all URI literals from the directive (including if alternatives)
+          for (final uriMatch in uriPattern.allMatches(directiveText)) {
+            final uri = uriMatch.group(1)!;
+            // `dart:` and `package:` URIs are resolved by the SDK / pub, not
+            // by the filesystem layout checked here.
+            if (uri.startsWith('dart:') || uri.startsWith('package:')) continue;
+            directivesChecked++;
+            final targetPath = entity.uri.resolve(uri).toFilePath();
+            if (!File(targetPath).existsSync()) {
+              dangling.add(
+                '${entity.path}: $uri -> $targetPath (missing)',
+              );
+            }
           }
         }
       }

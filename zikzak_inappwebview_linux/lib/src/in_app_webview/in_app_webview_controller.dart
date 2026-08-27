@@ -33,6 +33,9 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
 
   late MethodChannel _channel;
 
+  final Map<String, void Function(Map<String, dynamic>)>
+      _devToolsProtocolEventListeners = {};
+
   Future<dynamic> handleMethod(MethodCall call) async {
     final controller = params.webviewParams?.controllerFromPlatform != null
         ? params.webviewParams!.controllerFromPlatform!(this)
@@ -403,8 +406,20 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
         if (params.webviewParams?.onOverScrolled != null) {
           int scrollX = call.arguments['scrollX'] ?? 0;
           int scrollY = call.arguments['scrollY'] ?? 0;
-          bool clampedX = (call.arguments['clampedX'] as int?) != 0;
-          bool clampedY = (call.arguments['clampedY'] as int?) != 0;
+          bool clampedX = false;
+          bool clampedY = false;
+          final clampedXRaw = call.arguments['clampedX'];
+          final clampedYRaw = call.arguments['clampedY'];
+          if (clampedXRaw is bool) {
+            clampedX = clampedXRaw;
+          } else if (clampedXRaw is int) {
+            clampedX = clampedXRaw != 0;
+          }
+          if (clampedYRaw is bool) {
+            clampedY = clampedYRaw;
+          } else if (clampedYRaw is int) {
+            clampedY = clampedYRaw != 0;
+          }
           params.webviewParams!.onOverScrolled!(
             controller,
             scrollX,
@@ -463,10 +478,19 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
         break;
       case 'onContentSizeChanged':
         if (params.webviewParams?.onContentSizeChanged != null) {
-          var sizeMap = call.arguments['size'];
+          var oldSizeMap = call.arguments['oldSize'];
+          var newSizeMap = call.arguments['size'];
+          Size oldContentSize = Size.zero;
           Size newContentSize = Size.zero;
-          if (sizeMap is Map) {
-            final m = sizeMap.cast<String, dynamic>();
+          if (oldSizeMap is Map) {
+            final m = oldSizeMap.cast<String, dynamic>();
+            oldContentSize = Size(
+              (m['width'] as num?)?.toDouble() ?? 0.0,
+              (m['height'] as num?)?.toDouble() ?? 0.0,
+            );
+          }
+          if (newSizeMap is Map) {
+            final m = newSizeMap.cast<String, dynamic>();
             newContentSize = Size(
               (m['width'] as num?)?.toDouble() ?? 0.0,
               (m['height'] as num?)?.toDouble() ?? 0.0,
@@ -474,7 +498,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
           }
           params.webviewParams!.onContentSizeChanged!(
             controller,
-            Size.zero,
+            oldContentSize,
             newContentSize,
           );
         }
@@ -507,6 +531,16 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
         }
         break;
       default:
+        // Check if this is a DevTools protocol event
+        if (call.method.startsWith('onDevToolsProtocolEvent:')) {
+          final eventName = call.method.substring('onDevToolsProtocolEvent:'.length);
+          final callback = _devToolsProtocolEventListeners[eventName];
+          if (callback != null) {
+            final params = (call.arguments as Map?)?.cast<String, dynamic>() ?? {};
+            callback(params);
+          }
+          break;
+        }
         throw UnimplementedError("Unimplemented ${call.method} method");
     }
   }
@@ -562,7 +596,14 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
   }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('data', () => data);
+    args.putIfAbsent('mimeType', () => mimeType);
+    args.putIfAbsent('encoding', () => encoding);
     args.putIfAbsent('baseUrl', () => baseUrl?.toString());
+    args.putIfAbsent('historyUrl', () => historyUrl?.toString());
+    args.putIfAbsent(
+      'allowingReadAccessTo',
+      () => allowingReadAccessTo?.toString(),
+    );
     await _channel.invokeMethod('loadData', args);
   }
 
@@ -1205,6 +1246,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
     required String eventName,
     required void Function(Map<String, dynamic>) callback,
   }) async {
+    _devToolsProtocolEventListeners[eventName] = callback;
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('eventName', () => eventName);
     await _channel.invokeMethod('addDevToolsProtocolEventListener', args);
@@ -1214,6 +1256,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
   Future<void> removeDevToolsProtocolEventListener({
     required String eventName,
   }) async {
+    _devToolsProtocolEventListeners.remove(eventName);
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('eventName', () => eventName);
     await _channel.invokeMethod('removeDevToolsProtocolEventListener', args);

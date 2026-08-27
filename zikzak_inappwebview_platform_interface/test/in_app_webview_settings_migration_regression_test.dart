@@ -65,15 +65,18 @@ final File _preMigrationSettingsFile = _fileFromPackagePath(
   'lib/src/in_app_webview/in_app_webview_settings.dart',
 );
 
-// A regex that matches a Dart `import` directive and captures the path
-// string. Handles single OR double quotes; tolerates leading whitespace
-// and a `configurable-uri`-style `if (cond) '...'` clause (the captured
-// path is always the FIRST quoted string after `import`). Uses a
-// triple-quoted raw string so both `'` and `"` can appear inside.
+// A regex that matches a Dart `import` directive including conditional
+// imports with `if (...)` alternatives. Handles single OR double quotes;
+// tolerates leading whitespace. Uses a triple-quoted raw string so both
+// `'` and `"` can appear inside.
 final RegExp _importDirective = RegExp(
-  r"""^\s*import\s+['"]([^'"]+)['"]""",
+  r"""^\s*import\s+['"]([^'"]+)['"](?:\s+if\s*\([^)]*\)\s+['"]([^'"]+)['"])*""",
   multiLine: true,
 );
+
+// Pattern to extract all URI literals from a complete import directive
+// (including conditional alternatives in if (...) '...' clauses).
+final RegExp _uriPattern = RegExp(r"""['"]([^'"]+)['"]""");
 
 void main() {
   group('InAppWebViewSettings source layout (regression #249/#255/#257)', () {
@@ -169,21 +172,26 @@ void main() {
           final importerUri = entity.uri;
 
           for (final match in _importDirective.allMatches(src)) {
-            final rawPath = match.group(1)!;
-            // Package imports are absolute; only relative imports can
-            // accidentally resolve to a stale in-repo path.
-            if (rawPath.startsWith('package:')) continue;
-            if (rawPath.startsWith('dart:')) continue;
+            // Extract the complete matched directive text
+            final directiveText = match.group(0)!;
+            // Extract all URI literals from the directive (including if alternatives)
+            for (final uriMatch in _uriPattern.allMatches(directiveText)) {
+              final rawPath = uriMatch.group(1)!;
+              // Package imports are absolute; only relative imports can
+              // accidentally resolve to a stale in-repo path.
+              if (rawPath.startsWith('package:')) continue;
+              if (rawPath.startsWith('dart:')) continue;
 
-            // Only consider imports that touch the settings entity file.
-            if (!rawPath.endsWith('in_app_webview_settings.dart')) continue;
+              // Only consider imports that touch the settings entity file.
+              if (!rawPath.endsWith('in_app_webview_settings.dart')) continue;
 
-            final resolved = importerUri.resolve(rawPath);
-            if (resolved.toString() ==
-                _preMigrationSettingsFile.uri.toString()) {
-              staleImports.add(
-                '${entity.path}: import \'$rawPath\' -> $resolved',
-              );
+              final resolved = importerUri.resolve(rawPath);
+              if (resolved.toString() ==
+                  _preMigrationSettingsFile.uri.toString()) {
+                staleImports.add(
+                  '${entity.path}: import \'$rawPath\' -> $resolved',
+                );
+              }
             }
           }
         }

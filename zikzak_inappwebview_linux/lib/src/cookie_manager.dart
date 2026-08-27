@@ -48,11 +48,11 @@ class LinuxCookieManager extends PlatformCookieManager {
     args['value'] = value;
     args['path'] = path;
     args['domain'] = domain;
-    args['expiresDate'] = expiresDate?.toString();
+    args['expiresDate'] = expiresDate;
     args['maxAge'] = maxAge;
     args['isSecure'] = isSecure;
     args['isHttpOnly'] = isHttpOnly;
-    args['sameSite'] = sameSite?.index;
+    args['sameSite'] = httpCookieSameSitePolicyToWire(sameSite);
     return await _channel.invokeMethod<bool>('setCookie', args) ?? false;
   }
 
@@ -77,13 +77,7 @@ class LinuxCookieManager extends PlatformCookieManager {
           expiresDate: map['expiresDate'],
           isSessionOnly: map['isSessionOnly'],
           domain: map['domain'],
-          sameSite: map['sameSite'] is int
-              ? HTTPCookieSameSitePolicy
-                  .values[map['sameSite'] <
-                          HTTPCookieSameSitePolicy.values.length
-                      ? map['sameSite']
-                      : 0]
-              : null,
+          sameSite: httpCookieSameSitePolicyFromWire(map['sameSite']),
           isSecure: map['isSecure'],
           isHttpOnly: map['isHttpOnly'],
           path: map['path'],
@@ -159,13 +153,7 @@ class LinuxCookieManager extends PlatformCookieManager {
           expiresDate: map['expiresDate'],
           isSessionOnly: map['isSessionOnly'],
           domain: map['domain'],
-          sameSite: map['sameSite'] is int
-              ? HTTPCookieSameSitePolicy
-                  .values[map['sameSite'] <
-                          HTTPCookieSameSitePolicy.values.length
-                      ? map['sameSite']
-                      : 0]
-              : null,
+          sameSite: httpCookieSameSitePolicyFromWire(map['sameSite']),
           isSecure: map['isSecure'],
           isHttpOnly: map['isHttpOnly'],
           path: map['path'],

@@ -806,14 +806,18 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 // websiteDataStore is immutable post-init, so a later
                 // `setSettings` cannot change it (see issue #253
                 // acceptance criteria).
-                if #available(iOS 17.0, *),
+                var dataStoreWasSelected = false
+                if settings.incognito {
+                    configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+                    dataStoreWasSelected = true
+                } else if #available(iOS 17.0, *),
                    let id = settings.persistentStoreIdentifier, !id.isEmpty,
                    let uuid = persistentUUID(from: id) {
                     configuration.websiteDataStore = WKWebsiteDataStore(forIdentifier: uuid)
-                } else if settings.incognito {
-                    configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+                    dataStoreWasSelected = true
                 } else if settings.cacheEnabled {
                     configuration.websiteDataStore = WKWebsiteDataStore.default()
+                    dataStoreWasSelected = true
                 }
                 if !settings.applicationNameForUserAgent.isEmpty {
                     if let applicationNameForUserAgent = configuration.applicationNameForUserAgent {
@@ -852,8 +856,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                     // Set Cookies in iOS 11 and above, initialize websiteDataStore before setting cookies
                     // See also https://forums.developer.apple.com/thread/97194
                     // check if websiteDataStore has not been initialized before
-                    if !settings.incognito && !settings.cacheEnabled
-                        && settings.persistentStoreIdentifier == nil {
+                    let hasValidPersistentId = settings.persistentStoreIdentifier.map {
+                        persistentUUID(from: $0) != nil
+                    } ?? false
+                    if !dataStoreWasSelected && !hasValidPersistentId {
                         configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
                     }
                     for cookie in HTTPCookieStorage.shared.cookies ?? [] {
