@@ -253,9 +253,17 @@ class MacOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
   }
 
   Future<void> run() async {
-    if (_started || _disposed) {
+    if (_started && !_disposed) {
+      // Already running — no-op (matches the pre-existing guard).
       return;
     }
+    if (_disposed) {
+      // Re-run after dispose(): wait for any in-flight run to finish its
+      // deferred native teardown, then start fresh. dispose() is terminal
+      // for the PREVIOUS run, not for the webview itself.
+      await _runCompleter?.future;
+    }
+    _disposed = false;
     _started = true;
     _init();
 
