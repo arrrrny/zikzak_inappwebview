@@ -131,8 +131,12 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
                 let selector = Selector(("webAuthenticationSupport"))
                 if configuration.responds(to: selector),
                    let webAuthSupport = configuration.perform(selector)?.takeUnretainedValue()
-                       as? NSObject
+                       as? NSObject,
+                   webAuthSupport.responds(to: Selector(("boundKeychainForPasskeys")))
                 {
+                    // value(forKey:) throws an uncatchable NSUnknownKeyException
+                    // when the key is missing — the responds(to:) guard above keeps
+                    // getRealSettings() crash-proof on unexpected SDK states.
                     let boundValue =
                         webAuthSupport.value(forKey: "boundKeychainForPasskeys") as? Bool ?? false
                     realSettings["webAuthenticationSupport"] = boundValue ? 1 : 0

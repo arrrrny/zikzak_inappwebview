@@ -171,7 +171,13 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                            let webAuthSupport = configuration.perform(selector)?.takeUnretainedValue()
                                as? NSObject
                         {
-                            webAuthSupport.setValue(true, forKey: "boundKeychainForPasskeys")
+                            // Guard the inner key as well: setValue(_:forKey:) raises
+                            // an uncatchable NSUnknownKeyException when the key is
+                            // missing, which would crash the app on an unexpected
+                            // SDK state.
+                            if webAuthSupport.responds(to: Selector(("boundKeychainForPasskeys"))) {
+                                webAuthSupport.setValue(true, forKey: "boundKeychainForPasskeys")
+                            }
                         }
                     }
                 }
@@ -1654,6 +1660,18 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     }
 
     func setSettings(newSettings: InAppWebViewSettings, newSettingsMap: [String: Any]) {
+        // webAuthenticationSupport is creation-time only: the underlying
+        // WKWebViewConfiguration is immutable after the WKWebView is created,
+        // so a runtime change is a no-op. Surface it instead of silently
+        // dropping it (issue #272).
+        if newSettingsMap["webAuthenticationSupport"] != nil
+            && settings?.webAuthenticationSupport != newSettings.webAuthenticationSupport
+        {
+            print(
+                "webAuthenticationSupport cannot be changed after the WebView has been created (WKWebViewConfiguration is immutable); ignoring the new value"
+            )
+        }
+
         if newSettingsMap["userAgent"] != nil
             && settings?.userAgent != newSettings.userAgent
             && newSettings.userAgent != ""

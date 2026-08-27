@@ -5,6 +5,7 @@ import static android.webkit.WebSettings.LayoutAlgorithm.NORMAL;
 
 import android.annotation.SuppressLint;
 import android.os.Build;
+import android.util.Log;
 import android.view.View;
 import android.webkit.WebSettings;
 import androidx.annotation.NonNull;
@@ -950,10 +951,20 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
                     WebViewFeature.WEB_AUTHENTICATION
                 )
             ) {
-                realSettings.put(
-                    "webAuthenticationSupport",
-                    WebSettingsCompat.getWebAuthenticationSupport(settings)
-                );
+                try {
+                    realSettings.put(
+                        "webAuthenticationSupport",
+                        WebSettingsCompat.getWebAuthenticationSupport(settings)
+                    );
+                } catch (RuntimeException e) {
+                    // OEM WebView wrapper incompatibility. Omitting the key makes
+                    // the Dart side parse it as null, which signals "unsupported".
+                    Log.w(
+                        LOG_TAG,
+                        "OEM WebView wrapper incompatible with getWebAuthenticationSupport",
+                        e
+                    );
+                }
             }
             if (
                 WebViewFeature.isFeatureSupported(
