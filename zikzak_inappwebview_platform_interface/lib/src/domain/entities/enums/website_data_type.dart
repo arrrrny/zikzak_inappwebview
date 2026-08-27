@@ -1,5 +1,3 @@
-
-
 ///Class that represents a website data type.
 enum WebsiteDataType {
   ///On-disk Fetch caches.
