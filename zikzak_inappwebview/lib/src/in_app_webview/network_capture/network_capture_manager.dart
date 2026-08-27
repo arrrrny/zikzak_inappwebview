@@ -173,13 +173,10 @@ class NetworkCaptureManager {
   ///Should be called from WebView dispose paths.
   void detach(InAppWebViewController controller) {
     if (_registry[controller] != this) return;
-    controller.removeJavaScriptHandler(
-      handlerName: kNetworkCaptureHandlerName,
-    );
+    controller.removeJavaScriptHandler(handlerName: kNetworkCaptureHandlerName);
     _registry[controller] = null;
     _registry[controller.platform] = null;
   }
-
 
   Future<void> _flushPageQueue(InAppWebViewController controller) async {
     try {

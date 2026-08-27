@@ -162,6 +162,15 @@ public final class InAppWebView
     @Nullable
     public JavaScriptBridgeInterface javaScriptBridgeInterface;
 
+    /// One-shot callback fired on the FIRST terminal navigation event
+    /// (`onPageFinished` or a main-frame `onReceivedError`). Used by
+    /// `HeadlessInAppWebViewManager` to gate `run()` on webview readiness so
+    /// a consumer's first real `loadUrl` is never issued while the webview /
+    /// renderer is still starting up. `null` by default — no effect on
+    /// regular web views.
+    @Nullable
+    public Runnable firstNavigationCompleted;
+
     public InAppWebViewSettings customSettings = new InAppWebViewSettings();
     public boolean isLoading = false;
     private boolean inFullscreen = false;
@@ -2293,7 +2302,7 @@ public final class InAppWebView
      * to this WebView.
      *
      * <p>For each ignored inset type the matching {@link WindowInsetsCompat.Type}
-     * mask is zeroed out via a {@link ViewCompat.OnApplyWindowInsetsListener}
+     * mask is zeroed out via a {@link OnApplyWindowInsetsListener}
      * (using {@link WindowInsetsCompat.Builder#setInsets(int, Insets)}) so the
      * WebView no longer pads or shrinks its content for those insets. This is
      * the zikzak equivalent of {@code webview_flutter_android}'s
@@ -2349,7 +2358,7 @@ public final class InAppWebView
         final int finalTypeMask = typeMask;
         ViewCompat.setOnApplyWindowInsetsListener(
             this,
-            new ViewCompat.OnApplyWindowInsetsListener() {
+            new androidx.core.view.OnApplyWindowInsetsListener() {
                 @Override
                 public WindowInsetsCompat onApplyWindowInsets(
                     View v, WindowInsetsCompat insets

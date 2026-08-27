@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-import '../in_app_webview/platform_inappwebview_controller.dart';
-
 ///This type represents a callback, added with [PlatformInAppWebViewController.addJavaScriptHandler], that listens to post messages sent from JavaScript.
 ///
 ///The Android implementation uses [addJavascriptInterface](https://developer.android.com/reference/android/webkit/WebView#addJavascriptInterface(java.lang.Object,%20java.lang.String)).

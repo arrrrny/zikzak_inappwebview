@@ -11,36 +11,33 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 /// device and are covered by unit tests in the zikzak_inappwebview_macos
 /// package.
 void main() {
-  group('MacOS ConsoleMessage.fromMap null safety', () {
+  group('MacOS ConsoleMessage.fromJson null safety', () {
     test('handles null message without crashing', () {
-      final msg = ConsoleMessage.fromMap({'message': null, 'messageLevel': 1});
-      expect(msg, isNotNull);
-      expect(msg!.message, '');
+      final msg = ConsoleMessage.fromJson({'message': null, 'messageLevel': 1});
+      expect(msg.message, '');
     });
 
     test('handles null messageLevel without crashing', () {
-      final msg = ConsoleMessage.fromMap({
+      final msg = ConsoleMessage.fromJson({
         'message': 'test',
         'messageLevel': null,
       });
-      expect(msg, isNotNull);
-      expect(msg!.messageLevel, ConsoleMessageLevel.LOG);
+      expect(msg.message, 'test');
+      expect(msg.messageLevel, ConsoleMessageLevel.LOG);
     });
 
     test('handles both null without crashing', () {
-      final msg = ConsoleMessage.fromMap({
+      final msg = ConsoleMessage.fromJson({
         'message': null,
         'messageLevel': null,
       });
-      expect(msg, isNotNull);
-      expect(msg!.message, '');
+      expect(msg.message, '');
       expect(msg.messageLevel, ConsoleMessageLevel.LOG);
     });
 
     test('empty map returns safe defaults', () {
-      final msg = ConsoleMessage.fromMap(<String, dynamic>{});
-      expect(msg, isNotNull);
-      expect(msg!.message, '');
+      final msg = ConsoleMessage.fromJson(<String, dynamic>{});
+      expect(msg.message, '');
       expect(msg.messageLevel, ConsoleMessageLevel.LOG);
     });
   });

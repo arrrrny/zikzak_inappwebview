@@ -25,13 +25,13 @@ class MacOSPrintJobControllerCreationParams
 class MacOSPrintJobController extends PlatformPrintJobController
     with ChannelController {
   MacOSPrintJobController(PlatformPrintJobControllerCreationParams params)
-      : super.implementation(
-          params is MacOSPrintJobControllerCreationParams
-              ? params
-              : MacOSPrintJobControllerCreationParams.fromPlatformPrintJobControllerCreationParams(
-                  params,
-                ),
-        ) {
+    : super.implementation(
+        params is MacOSPrintJobControllerCreationParams
+            ? params
+            : MacOSPrintJobControllerCreationParams.fromPlatformPrintJobControllerCreationParams(
+                params,
+              ),
+      ) {
     onComplete = params.onComplete;
     channel = MethodChannel(
       "wtf.zikzak/zikzak_inappwebview_printjobcontroller_${params.id}",
@@ -68,7 +68,7 @@ class MacOSPrintJobController extends PlatformPrintJobController
       "getInfo",
       args,
     ))?.cast<String, dynamic>();
-    return PrintJobInfo.fromMap(infoMap);
+    return infoMap == null ? null : PrintJobInfo.fromJson(infoMap);
   }
 
   @override

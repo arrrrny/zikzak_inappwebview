@@ -3,3 +3,13 @@ targets:
     sources:
       exclude:
         - example/**.dart
+    builders:
+      # Zorphy entity generation — scoped to the zfa-managed entity dir.
+      zorphy:zorphy:
+        enabled: true
+        generate_for:
+          - lib/src/domain/entities/**
+      json_serializable:json_serializable:
+        enabled: true
+        generate_for:
+          - lib/src/domain/entities/**

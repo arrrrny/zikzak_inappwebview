@@ -4,7 +4,7 @@ import WebKit
 
 public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler, WKUIDelegate, NSMenuDelegate {
     var channel: FlutterMethodChannel!
-    var registrar: FlutterPluginRegistrar
+    var registrar: FlutterPluginRegistrar? = nil
     var plugin: InAppWebViewFlutterPlugin?
     private var findInteractionChannel: FlutterMethodChannel!
     private var searchText: String?
@@ -64,15 +64,39 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     private var lastScrollX: Int = 0
     private var lastScrollY: Int = 0
 
+    ///Auto-incrementing id counter for popup webviews created by
+    ///[createWebViewWith].
+    public static var windowIdCount: Int64 = 0
+
+    ///Registry of popup webviews waiting to be reparented into a Flutter
+    ///platform view (keyed by [windowId]).
+    public static var windowWebViews: [Int64: InAppWebView] = [:]
+
+    ///Registry of pending close events for popups that closed before their
+    ///channel was bound (keyed by [windowId]).
+    public static var pendingCloseEvents: Set<Int64> = []
+
+    ///The popup window id assigned by [createWebViewWith], `nil` for the
+    ///main (non-popup) webview.
+    public var windowId: Int64?
+
+    ///The off-screen window hosting a popup webview before it is reparented
+    ///into a Flutter platform view.
+    public var popupWindow: NSWindow?
+
+    ///The opener webview that created this popup (via [createWebViewWith]),
+    ///`nil` for main (non-popup) webviews.
+    public weak var opener: InAppWebView?
+
     init(
-        registrar: FlutterPluginRegistrar, viewId: Any, arguments: Any?, channelName: String? = nil, plugin: InAppWebViewFlutterPlugin? = nil
+        registrar: FlutterPluginRegistrar, viewId: Any, arguments: Any?, channelName: String? = nil, plugin: InAppWebViewFlutterPlugin? = nil, deferInitialLoad: Bool = false
     ) {
         let configuration = WKWebViewConfiguration()
         let userContentController = WKUserContentController()
         configuration.userContentController = userContentController
 
-        super.init(frame: .zero, configuration: configuration)
         self.registrar = registrar
+        super.init(frame: .zero, configuration: configuration)
         self.plugin = plugin
         self.autoresizingMask = [.width, .height]
         self.navigationDelegate = self
@@ -173,23 +197,26 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             injectionTime: .atDocumentStart, forMainFrameOnly: false)
         userContentController.addUserScript(webMessageInitScript)
 
-        let finalChannelName = channelName ?? "dev.zuzu/zikzak_inappwebview_\(viewId)"
-        channel = FlutterMethodChannel(name: finalChannelName, binaryMessenger: registrar.messenger)
-        channel.setMethodCallHandler(self.handle)
-        channelDelegate = WebViewChannelDelegate(channel: channel)
-
-        let findInteractionChannelName = "wtf.zikzak/zikzak_inappwebview_find_interaction_\(viewId)"
-        findInteractionChannel = FlutterMethodChannel(
-            name: findInteractionChannelName, binaryMessenger: registrar.messenger)
-        findInteractionChannel.setMethodCallHandler(self.handleFindInteraction)
+        bindChannels(registrar: registrar, viewId: viewId, channelName: channelName)
 
         if let args = arguments as? [String: Any] {
-            if let initialUrlRequest = args["initialUrlRequest"] as? [String: Any] {
-                let request = URLRequest(fromPluginMap: initialUrlRequest)
-                self.load(request)
+            // The initial load is normally fired here, synchronously during
+            // construction. Headless webviews pass deferInitialLoad: true so
+            // the HeadlessInAppWebViewManager can arm its readiness gate
+            // BEFORE the first navigation is issued (see makeInitialLoad).
+            if !deferInitialLoad {
+                if let initialUrlRequest = args["initialUrlRequest"] as? [String: Any] {
+                    let request = URLRequest(fromPluginMap: initialUrlRequest)
+                    self.load(request)
+                }
             }
 
-            if let settingsMap = args["settings"] as? [String: Any?] {
+            // The widget sends "initialSettings"; accept "settings" too for
+            // backward compatibility.
+            let settingsMap =
+                (args["initialSettings"] as? [String: Any?])
+                ?? (args["settings"] as? [String: Any?])
+            if let settingsMap = settingsMap {
                 let newSettings = InAppWebViewSettings()
                 let _ = newSettings.parse(settings: settingsMap)
                 self.setSettings(
@@ -217,6 +244,91 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         self.addObserver(self, forKeyPath: "pageZoom", options: .new, context: nil)
     }
 
+    ///Binds the Flutter method channels for the platform view [viewId] to
+    ///this webview. Used both by the main initializer and when a popup
+    ///webview created by [createWebViewWith] is reparented into a new
+    ///Flutter platform view.
+    func bindChannels(registrar: FlutterPluginRegistrar, viewId: Any, channelName: String? = nil) {
+        let finalChannelName = channelName ?? "dev.zuzu/zikzak_inappwebview_\(viewId)"
+        channel = FlutterMethodChannel(name: finalChannelName, binaryMessenger: registrar.messenger)
+        // Create the delegate BEFORE registering our own handler:
+        // ChannelDelegate.init registers its own (empty) handle on the
+        // channel, so InAppWebView.handle must be registered LAST to stay
+        // effective — otherwise every Dart->Swift controller call would be
+        // swallowed by the delegate's no-op handle and hang forever.
+        channelDelegate = WebViewChannelDelegate(channel: channel)
+        channel.setMethodCallHandler(self.handle)
+
+        let findInteractionChannelName = "wtf.zikzak/zikzak_inappwebview_find_interaction_\(viewId)"
+        findInteractionChannel = FlutterMethodChannel(
+            name: findInteractionChannelName, binaryMessenger: registrar.messenger)
+        findInteractionChannel.setMethodCallHandler(self.handleFindInteraction)
+
+        // Replay any pending close event that occurred before the channel was bound
+        if let windowId = windowId, InAppWebView.pendingCloseEvents.contains(windowId) {
+            InAppWebView.pendingCloseEvents.remove(windowId)
+            channel?.invokeMethod("onCloseWindow", arguments: nil)
+        }
+    }
+
+    ///Fires the initial load from the creation [params] (headless webviews).
+    ///
+    ///Deliberately separated from `init` so callers can arm a readiness gate
+    ///BEFORE the first navigation is issued. Handles `initialUrlRequest`,
+    ///`initialFile` and `initialData` (mirrors the iOS port). No-op when the
+    ///params carry no initial load.
+    func makeInitialLoad(params: [String: Any]) {
+        let initialUrlRequest = params["initialUrlRequest"] as? [String: Any]
+        let initialFile = params["initialFile"] as? String
+        let initialData = params["initialData"] as? [String: Any]
+
+        if let initialFile = initialFile {
+            // Resolve through the registrar like the channel "loadFile"
+            // handler does — initialFile may be a Flutter asset key, not an
+            // absolute native path.
+            guard let registrar = registrar,
+                let fileURL = try? Util.getUrlAsset(
+                    registrar: registrar, assetFilePath: initialFile)
+            else {
+                return
+            }
+            if fileURL.isFileURL {
+                self.loadFileURL(
+                    fileURL, allowingReadAccessTo: fileURL.deletingLastPathComponent())
+            } else {
+                self.load(URLRequest(url: fileURL))
+            }
+        } else if let initialData = initialData {
+            let data = initialData["data"] as? String ?? ""
+            let mimeType = initialData["mimeType"] as? String ?? "text/html"
+            let encoding = initialData["encoding"] as? String ?? "utf-8"
+            let baseURL = URL(string: initialData["baseUrl"] as? String ?? "about:blank")
+            if let dataData = data.data(using: .utf8) {
+                self.load(
+                    dataData, mimeType: mimeType,
+                    characterEncodingName: encoding, baseURL: baseURL ?? URL(string: "about:blank")!)
+            } else {
+                self.loadHTMLString(data, baseURL: baseURL)
+            }
+        } else if let initialUrlRequest = initialUrlRequest {
+            let request = URLRequest(fromPluginMap: initialUrlRequest)
+            self.load(request)
+        }
+    }
+
+    ///Initializes a popup webview created by [createWebViewWith].
+    ///
+    ///The popup shares the source webview's [WKWebViewConfiguration]
+    ///(including its userContentController, so the JS bridge and injected
+    ///scripts are already in place) and has its method channels bound later,
+    ///when the Flutter side creates a platform view for it.
+    public override init(frame frameRect: NSRect, configuration: WKWebViewConfiguration) {
+        super.init(frame: frameRect, configuration: configuration)
+        self.autoresizingMask = [.width, .height]
+        self.navigationDelegate = self
+        self.uiDelegate = self
+    }
+
 
     public func printCurrentPage(
         settings: PrintJobSettings? = nil
@@ -226,19 +338,14 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             printJobId = UUID().uuidString
         }
 
-        let printInfo = NSPrintInfo(dictionary: nil)
-        printInfo.jobName =
-            settings?.jobName ?? (title ?? url?.absoluteString ?? "") + " Document"
+        let printInfo = NSPrintInfo()
+        // NOTE: macOS NSPrintInfo has no jobName (iOS-only); the print job
+        // label comes from PrintJobController.settings.jobName instead.
         if let settings = settings {
             if let orientationValue = settings.orientation,
                let orientation = NSPrintInfo.PaperOrientation.init(rawValue: orientationValue)
             {
                 printInfo.orientation = orientation
-            }
-            if let duplexModeValue = settings.duplexMode,
-               let duplexMode = NSPrintInfo.DuplexMode.init(rawValue: duplexModeValue)
-            {
-                printInfo.duplex = duplexMode
             }
             if let margins = settings.margins {
                 printInfo.topMargin = margins.top
@@ -265,34 +372,44 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         return printJobId
     }
     deinit {
+        if let windowId = windowId {
+            InAppWebView.windowWebViews.removeValue(forKey: windowId)
+        }
+        popupWindow?.close()
         dispose()
     }
 
     public func dispose() {
         if !isDisposed {
-            self.configuration.userContentController.removeScriptMessageHandler(
-                forName: "consoleHandler")
-            self.configuration.userContentController.removeScriptMessageHandler(
-                forName: "onFindResultReceived")
-            self.configuration.userContentController.removeScriptMessageHandler(
-                forName: "callHandler")
-            self.configuration.userContentController.removeScriptMessageHandler(
-                forName: "onWebMessagePortMessageReceived")
-            self.configuration.userContentController.removeScriptMessageHandler(
-                forName: "onWebMessageListenerPostMessageReceived")
-            self.configuration.userContentController.removeScriptMessageHandler(
-                forName: "onScrollChangedReceived")
-            self.removeObserver(self, forKeyPath: "estimatedProgress")
-            self.removeObserver(self, forKeyPath: "url")
-            self.removeObserver(self, forKeyPath: "title")
-            self.removeObserver(self, forKeyPath: "pageZoom")
+            if windowId == nil {
+                // Only the main webview owns the userContentController
+                // registrations and KVO observers. Popup webviews share the
+                // source webview's configuration, so tearing those down here
+                // would break the opener.
+                self.configuration.userContentController.removeScriptMessageHandler(
+                    forName: "consoleHandler")
+                self.configuration.userContentController.removeScriptMessageHandler(
+                    forName: "onFindResultReceived")
+                self.configuration.userContentController.removeScriptMessageHandler(
+                    forName: "callHandler")
+                self.configuration.userContentController.removeScriptMessageHandler(
+                    forName: "onWebMessagePortMessageReceived")
+                self.configuration.userContentController.removeScriptMessageHandler(
+                    forName: "onWebMessageListenerPostMessageReceived")
+                self.configuration.userContentController.removeScriptMessageHandler(
+                    forName: "onScrollChangedReceived")
+                self.removeObserver(self, forKeyPath: "estimatedProgress")
+                self.removeObserver(self, forKeyPath: "url")
+                self.removeObserver(self, forKeyPath: "title")
+                self.removeObserver(self, forKeyPath: "pageZoom")
+            }
             // Dispose any active WebMessage channels / listeners (#197).
             for (_, wmc) in webMessageChannels { wmc.dispose() }
             webMessageChannels.removeAll()
             for (_, wml) in webMessageListeners { wml.dispose() }
             webMessageListeners.removeAll()
-            channel.setMethodCallHandler(nil)
-            findInteractionChannel.setMethodCallHandler(nil)
+            channel?.setMethodCallHandler(nil)
+            findInteractionChannel?.setMethodCallHandler(nil)
             isDisposed = true
         }
     }
@@ -403,9 +520,14 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             if let args = call.arguments as? [String: Any],
                let assetFilePath = args["assetFilePath"] as? String
             {
+                guard let registrar = self.registrar else {
+                    result(
+                        FlutterError(code: "InAppWebView", message: "Registrar not available", details: nil))
+                    return
+                }
                 do {
                     let assetURL = try Util.getUrlAsset(
-                        registrar: self.registrar, assetFilePath: assetFilePath)
+                        registrar: registrar, assetFilePath: assetFilePath)
                     if assetURL.isFileURL {
                         self.loadFileURL(
                             assetURL, allowingReadAccessTo: assetURL.deletingLastPathComponent())
@@ -670,14 +792,15 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                    let contentWorld = WKContentWorld.fromMap(map: contentWorldMap)
                 {
                     // macOS 11+ WKContentWorld — floor is macOS 12, no gating needed.
-                    self.evaluateJavaScript(source, in: nil, in: contentWorld) { (value, error) in
-                        if let error = error {
+                    self.evaluateJavaScript(source, in: nil, in: contentWorld) { outcome in
+                        switch outcome {
+                        case .success(let value):
+                            result(value ?? NSNull())
+                        case .failure(let error):
                             result(
                                 FlutterError(
                                     code: "InAppWebView", message: error.localizedDescription,
                                     details: nil))
-                        } else {
-                            result(value ?? NSNull())
                         }
                     }
                 } else {
@@ -793,7 +916,9 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             result(true)
         case "setSettings":
             if let args = call.arguments as? [String: Any],
-                let settingsMap = args["settings"] as? [String: Any?]
+                let settingsMap =
+                    (args["initialSettings"] as? [String: Any?])
+                    ?? (args["settings"] as? [String: Any?])
             {
                 let newSettings = InAppWebViewSettings()
                 let _ = newSettings.parse(settings: settingsMap)
@@ -1620,11 +1745,6 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             "onDidReceiveServerRedirectForProvisionalNavigation", arguments: [:])
     }
 
-    public func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
-        // onWebContentProcessDidTerminate (#197, see also #194).
-        channel?.invokeMethod("onWebContentProcessDidTerminate", arguments: [:])
-    }
-
     public func webView(
         _ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error
     ) {
@@ -2010,17 +2130,21 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                             }
                         """, completionHandler: nil)
                 } else {
-                    var json: String
-                    if let resultData = try? JSONSerialization.data(
-                        withJSONObject: result ?? NSNull(), options: []),
-                        let resultString = String(data: resultData, encoding: .utf8)
-                    {
-                        json = resultString
-                    } else if let simpleResult = result {
-                        json = "\"\(simpleResult)\""
-                    } else {
-                        json = "null"
-                    }
+                    // Dart's callHandler implementation already returns the callback value
+                    // encoded with jsonEncode. Re-encoding this String with
+                    // JSONSerialization crashes for top-level fragments (for example
+                    // null) and would also change the value's JavaScript semantics.
+                    let json = result as? String ?? "null"
+#if DEBUG
+                    let resultType = result.map {
+                        String(describing: type(of: $0))
+                    } ?? "nil"
+                    print(
+                        "[ZikzakInAppWebView][JSBridge] handler=\(handlerName) "
+                            + "resultType=\(resultType) jsonLength=\(json.utf8.count) "
+                            + "fallbackToNull=\(result != nil && !(result is String))"
+                    )
+#endif
                     self.evaluateJavaScript(
                         """
                             if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
@@ -2311,6 +2435,135 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     }
 
     public func webView(
+        _ webView: WKWebView,
+        createWebViewWith configuration: WKWebViewConfiguration,
+        for navigationAction: WKNavigationAction,
+        windowFeatures: WKWindowFeatures
+    ) -> WKWebView? {
+        guard let settings = settings, settings.javaScriptCanOpenWindowsAutomatically else {
+            return nil
+        }
+
+        let windowId = InAppWebView.windowIdCount
+        InAppWebView.windowIdCount += 1
+
+        let frame = NSRect(
+            x: 0,
+            y: 0,
+            width: CGFloat(windowFeatures.width?.doubleValue ?? 800),
+            height: CGFloat(windowFeatures.height?.doubleValue ?? 600)
+        )
+
+        let popupWebView = InAppWebView(frame: frame, configuration: configuration)
+        popupWebView.windowId = windowId
+        popupWebView.settings = settings
+        popupWebView.navigationDelegate = popupWebView
+        popupWebView.uiDelegate = popupWebView
+        popupWebView.opener = self
+
+        // CRITICAL: On macOS, a popup WKWebView MUST be hosted in an NSWindow
+        // before WebKit will start any navigation. An off-screen window is
+        // enough to satisfy this requirement; it is closed when the popup is
+        // reparented into a Flutter platform view.
+        let window = NSWindow(
+            contentRect: frame,
+            styleMask: [],
+            backing: .buffered,
+            defer: false
+        )
+        // CRITICAL: prevent the window from releasing its contentView (the
+        // popup webview) when closed during reparenting. The default
+        // isReleasedWhenClosed=true would over-release the webview that
+        // WebKit still owns, causing a SIGSEGV in objc_release.
+        window.isReleasedWhenClosed = false
+        window.contentView = popupWebView
+        popupWebView.popupWindow = window
+
+        InAppWebView.windowWebViews[windowId] = popupWebView
+
+        // Build the same CreateWindowAction map the iOS implementation sends
+        // (see CreateWindowAction.toMap() / WKNavigationAction.toMap()).
+        let sourceFrame: [String: Any]? = {
+            let frame = navigationAction.sourceFrame
+            return [
+                "isMainFrame": frame.isMainFrame,
+                "request": ["url": frame.request.url?.absoluteString ?? ""],
+                "securityOrigin": [
+                    "host": frame.securityOrigin.host,
+                    "port": frame.securityOrigin.port,
+                    "protocol": frame.securityOrigin.protocol,
+                ],
+            ]
+        }()
+        let targetFrame: [String: Any]? = {
+            guard let frame = navigationAction.targetFrame else { return nil }
+            return [
+                "isMainFrame": frame.isMainFrame,
+                "request": ["url": frame.request.url?.absoluteString ?? ""],
+                "securityOrigin": [
+                    "host": frame.securityOrigin.host,
+                    "port": frame.securityOrigin.port,
+                    "protocol": frame.securityOrigin.protocol,
+                ],
+            ]
+        }()
+
+        let createWindowAction: [String: Any?] = [
+            "request": navigationAction.request.toMap(),
+            "isForMainFrame": navigationAction.targetFrame?.isMainFrame ?? false,
+            "hasGesture": navigationAction.navigationType == .linkActivated
+                || navigationAction.navigationType == .formSubmitted,
+            "isRedirect": false,
+            "navigationType": navigationAction.navigationType.rawValue,
+            "sourceFrame": sourceFrame,
+            "targetFrame": targetFrame,
+            "windowId": windowId,
+            "windowFeatures": [
+                "allowsResizing": windowFeatures.allowsResizing,
+                "height": windowFeatures.height,
+                "menuBarVisibility": windowFeatures.menuBarVisibility,
+                "statusBarVisibility": windowFeatures.statusBarVisibility,
+                "toolbarsVisibility": windowFeatures.toolbarsVisibility,
+                "width": windowFeatures.width,
+                "x": windowFeatures.x,
+                "y": windowFeatures.y,
+            ],
+            "isDialog": nil,
+        ]
+        // NOTE: the popup webview has no Flutter channel yet (it is created
+        // with init(frame:configuration:) and only gets a channel when a
+        // platform view binds it). Fire the event on the opener webview's
+        // channel so Dart receives it and can render the popup.
+        self.channel?.invokeMethod("onCreateWindow", arguments: createWindowAction)
+
+        return popupWebView
+    }
+
+    public func webViewDidClose(_ webView: WKWebView) {
+        // Called when the page closes its popup (window.close()). Without this,
+        // an unhandled popup's off-screen NSWindow + webview form a retain
+        // cycle (window.contentView <-> popupWindow) that would leak.
+        guard let windowId = windowId else { return }
+        InAppWebView.windowWebViews.removeValue(forKey: windowId)
+        popupWindow?.close()
+        popupWindow = nil
+
+        // If the channel is bound, invoke immediately; otherwise route through
+        // the opener's channel or queue the event for replay after bindChannels.
+        if let channel = channel {
+            channel.invokeMethod("onCloseWindow", arguments: nil)
+        } else if let opener = opener, let openerChannel = opener.channel {
+            // Route the event through the opener's channel with the windowId
+            // so Dart can associate it with the correct popup webview.
+            openerChannel.invokeMethod(
+                "onCloseWindow", arguments: ["windowId": windowId])
+        } else {
+            // Queue the event for replay when bindChannels is called
+            InAppWebView.pendingCloseEvents.insert(windowId)
+        }
+    }
+
+    public func webView(
         _ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String,
         initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping () -> Void
     ) {
@@ -2534,142 +2787,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         }
     }
 
-    @available(macOS 12.0, *)
-    public func webView(
-        _ webView: WKWebView,
-        contextMenuForElement elementInfo: WKContextMenuElementInfo,
-        willDisplayWithHighlight highlight: Bool
-    ) -> NSMenu? {
-        // 1. Honor `disableContextMenu` — suppress the menu entirely but still
-        //    fire onCreateContextMenu so Dart parity with iOS/Android is kept.
-        //    We invoke the channel directly (bypassing `onCreateContextMenu(...)`
-        //    which would set `contextMenuIsShowing = true`): no NSMenu is shown,
-        //    so `menuDidClose(_:)` never fires and the flag would otherwise stay
-        //    true forever. iOS uses a separate debounce flag for the same reason.
-        if settings?.disableContextMenu == true {
-            let hit = hitTestResult(for: elementInfo)
-            channel?.invokeMethod("onCreateContextMenu", arguments: hit.toMap())
-            return nil
-        }
 
-        // 2. Honor `disableLongPressContextMenuOnLinks` — on macOS the right-click
-        //    menu on a link is the equivalent of the iOS long-press menu on links.
-        //    When the setting is true and the hit element is a link, suppress.
-        if settings?.disableLongPressContextMenuOnLinks == true,
-           elementInfo.linkURL != nil
-        {
-            return nil
-        }
-
-        let hitTestResult = self.hitTestResult(for: elementInfo)
-        onCreateContextMenu(hitTestResult: hitTestResult)
-
-        // 3. Build the menu. If no custom contextMenu was set via Dart, return nil
-        //    so WebKit shows its default menu. We already fired onCreateContextMenu
-        //    above (parity with iOS); since WebKit's default NSMenu is not ours,
-        //    `menuDidClose(_:)` will never fire on us — so balance the event here
-        //    by calling onHideContextMenu() immediately. (iOS observes close via
-        //    UIContextMenuInteraction; macOS WKUIDelegate cannot when returning nil.)
-        guard let menu = self.contextMenu else {
-            onHideContextMenu()
-            return nil
-        }
-
-        let contextMenuSettings = ContextMenuSettings()
-        if let contextMenuSettingsMap = menu["settings"] as? [String: Any?] {
-            let _ = contextMenuSettings.parse(settings: contextMenuSettingsMap)
-        }
-
-        let customMenu = NSMenu()
-        contextMenuItemTargets = []
-
-        if let menuItems = menu["menuItems"] as? [[String: Any]] {
-            for menuItem in menuItems {
-                guard let id = menuItem["id"] else {
-                    // Skip items without an id — Dart's `assert(id != null)`
-                    // is stripped in release builds, so we must guard here.
-                    continue
-                }
-                let title = menuItem["title"] as? String ?? ""
-                let target = ContextMenuItemTarget(id: id, title: title) { [weak self] itemId, itemTitle in
-                    self?.onContextMenuActionItemClicked(id: itemId, title: itemTitle)
-                }
-                contextMenuItemTargets.append(target)
-                let item = NSMenuItem(
-                    title: title,
-                    action: #selector(ContextMenuItemTarget.itemClicked),
-                    keyEquivalent: "")
-                item.target = target
-                customMenu.addItem(item)
-            }
-        }
-
-        // WKWebView does not expose its default NSMenu, so we cannot append
-        // custom items to the system items — when any custom items are present
-        // they *replace* the default menu. `hideDefaultSystemContextMenuItems`
-        // therefore only changes behavior when there are NO custom items:
-        //   true  + no custom items => suppress the menu entirely
-        //   false + no custom items => let WebKit show its default menu
-        //
-        // Returning nil from this delegate method lets WebKit show its default
-        // menu (per Apple's WKUIDelegate documentation). To actually suppress
-        // the menu when `hideDefaultSystemContextMenuItems == true`, we set the
-        // `suppressDefaultMenuNext` flag and cancel tracking in
-        // `willOpenMenu(_:with:)` — the supported macOS override path.
-        if customMenu.items.isEmpty {
-            if contextMenuSettings.hideDefaultSystemContextMenuItems {
-                // Suppress the default menu: set the flag so willOpenMenu cancels
-                // WebKit's default NSMenu before it's shown.
-                suppressDefaultMenuNext = true
-            }
-            // Same rationale as the `guard let menu` branch above: we already
-            // fired onCreateContextMenu, but we're returning nil so WebKit shows
-            // its default menu (or, when suppressed, no menu at all) — balance
-            // the event by firing onHideContextMenu.
-            onHideContextMenu()
-            return nil
-        }
-        customMenu.delegate = self
-        return customMenu
-    }
-
-    /// Builds a `HitTestResult` from the `WKContextMenuElementInfo` provided by
-    /// WebKit. Maps linkURL/imageURL to the same `HitTestResultType` values used
-    /// on iOS so Dart receives a consistent result across platforms.
-    private func hitTestResult(for elementInfo: WKContextMenuElementInfo) -> HitTestResult {
-        let linkURL = elementInfo.linkURL?.absoluteString
-        let imageURL = elementInfo.imageURL?.absoluteString
-
-        var type: HitTestResultType = .unknownType
-        var extra: String? = nil
-
-        if let link = linkURL, let image = imageURL, !link.isEmpty, !image.isEmpty {
-            type = .srcImageAnchorType
-            extra = link
-        } else if let image = imageURL, !image.isEmpty {
-            type = .imageType
-            extra = image
-        } else if let link = linkURL, !link.isEmpty {
-            // HTML allows case variations (MAILTO:, Mailto:, etc.) — match
-            // case-insensitively but strip the original-cased scheme length.
-            let lower = link.lowercased()
-            if lower.hasPrefix("mailto:") {
-                type = .emailType
-                extra = String(link.dropFirst("mailto:".count))
-            } else if lower.hasPrefix("tel:") {
-                type = .phoneType
-                extra = String(link.dropFirst("tel:".count))
-            } else if lower.hasPrefix("geo:") {
-                type = .geoType
-                extra = String(link.dropFirst("geo:".count))
-            } else {
-                type = .srcAnchorType
-                extra = link
-            }
-        }
-
-        return HitTestResult(type: type, extra: extra)
-    }
 
     // MARK: - Default-menu suppression (WKWebView default NSMenu)
 
@@ -2686,7 +2804,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     /// CodeRabbit's review of commit 62971480). It only fires when the
     /// delegate returned `nil`; when the delegate returned our custom
     /// `NSMenu`, the flag is false and we simply forward to `super`.
-    public override func willOpenMenu(_ menu: NSMenu, with event: NSEvent?) {
+    public override func willOpenMenu(_ menu: NSMenu, with event: NSEvent) {
         super.willOpenMenu(menu, with: event)
         if suppressDefaultMenuNext {
             suppressDefaultMenuNext = false
@@ -2700,49 +2818,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         }
     }
 
-    @available(macOS 12.0, *)
-    public func webView(
-        _ webView: WKWebView,
-        requestDeviceOrientationAndMotionPermissionFor origin: WKSecurityOrigin,
-        initiatedByFrame frame: WKFrameInfo,
-        decisionHandler: @escaping (WKPermissionDecision) -> Void
-    ) {
-        // If the WebView is already disposed, deny immediately to avoid
-        // invoking a torn-down FlutterMethodChannel.
-        guard !isDisposed else {
-            decisionHandler(.deny)
-            return
-        }
 
-        let originString =
-            "\(origin.protocol)://\(origin.host)"
-            + (origin.port != 0 ? ":" + String(origin.port) : "")
-        let permissionRequest = PermissionRequest(
-            origin: originString,
-            resources: ["deviceOrientationAndMotion"],
-            frame: frame)
-
-        var decisionHandlerCalled = false
-        channel.invokeMethod(
-            "onPermissionRequest",
-            arguments: permissionRequest.toMap()
-        ) { result in
-            if let map = result as? [String: Any] {
-                InAppWebView.resolvePermissionDecision(
-                    response: PermissionResponse.fromMap(map: map),
-                    decisionHandler: decisionHandler,
-                    decisionHandlerCalled: &decisionHandlerCalled)
-            } else {
-                if let error = result as? FlutterError {
-                    print("[InAppWebView] onPermissionRequest error: \(error.code) – \(error.message ?? "")")
-                }
-                InAppWebView.resolvePermissionDecision(
-                    response: nil,
-                    decisionHandler: decisionHandler,
-                    decisionHandlerCalled: &decisionHandlerCalled)
-            }
-        }
-    }
 
     // MARK: - NSMenuDelegate
 

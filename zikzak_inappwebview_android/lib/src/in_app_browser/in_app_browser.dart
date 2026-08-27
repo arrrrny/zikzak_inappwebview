@@ -157,27 +157,27 @@ class AndroidInAppBrowser extends PlatformInAppBrowser with ChannelController {
     _init();
 
     var initialSettings =
-        settings?.toMap() ??
+        settings?.toJson() ??
         options?.toMap() ??
         InAppBrowserClassSettings().toMap();
 
     Map<String, dynamic> pullToRefreshSettings =
-        pullToRefreshController?.settings?.toMap() ??
-        PullToRefreshSettings(enabled: false).toMap();
+        pullToRefreshController?.settings?.toJson() ??
+        PullToRefreshSettings(enabled: false).toJson();
 
     List<Map<String, dynamic>> menuItemList = [];
     _menuItems.forEach((key, value) {
-      menuItemList.add(value.toMap());
+      menuItemList.add(value.toJson());
     });
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('id', () => id);
     args.putIfAbsent('settings', () => initialSettings);
-    args.putIfAbsent('contextMenu', () => contextMenu?.toMap() ?? {});
+    args.putIfAbsent('contextMenu', () => contextMenu?.toJson() ?? {});
     args.putIfAbsent('windowId', () => windowId);
     args.putIfAbsent(
       'initialUserScripts',
-      () => initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
+      () => initialUserScripts?.map((e) => e.toJson()).toList() ?? [],
     );
     args.putIfAbsent('pullToRefreshSettings', () => pullToRefreshSettings);
     args.putIfAbsent('menuItems', () => menuItemList);
@@ -197,7 +197,7 @@ class AndroidInAppBrowser extends PlatformInAppBrowser with ChannelController {
       options: options,
       settings: settings,
     );
-    args.putIfAbsent('urlRequest', () => urlRequest.toMap());
+    args.putIfAbsent('urlRequest', () => urlRequest.toJson());
     await _staticChannel.invokeMethod('open', args);
   }
 

@@ -74,7 +74,7 @@ class AndroidPrintJobController extends PlatformPrintJobController
       'getInfo',
       args,
     ))?.cast<String, dynamic>();
-    return PrintJobInfo.fromMap(infoMap);
+    return infoMap == null ? null : PrintJobInfo.fromJson(infoMap);
   }
 
   @override

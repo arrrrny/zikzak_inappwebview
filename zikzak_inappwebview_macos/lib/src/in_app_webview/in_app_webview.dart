@@ -14,19 +14,19 @@ class MacOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
   @override
   Widget build(BuildContext context) {
     final Map<String, dynamic> creationParams = <String, dynamic>{
-      'initialUrlRequest': params.initialUrlRequest?.toMap(),
-      'initialSettings': params.initialSettings?.toMap(),
+      'initialUrlRequest': params.initialUrlRequest?.toJson(),
+      'initialSettings': params.initialSettings?.toJson(),
       'initialUserScripts': params.initialUserScripts
-          ?.map((e) => e.toMap())
+          ?.map((e) => e.toJson())
           .toList(),
-      'contextMenu': params.contextMenu?.toMap(),
+      'contextMenu': params.contextMenu?.toJson(),
       'windowId': params.windowId,
-      'initialData': params.initialData?.toMap(),
+      'initialData': params.initialData?.toJson(),
       'initialFile': params.initialFile,
     };
 
     return AppKitView(
-      viewType: 'dev.zuzu/flutter_inappwebview',
+      viewType: 'dev.zuzu/zikzak_inappwebview',
       onPlatformViewCreated: _onPlatformViewCreated,
       creationParams: creationParams,
       creationParamsCodec: const StandardMessageCodec(),

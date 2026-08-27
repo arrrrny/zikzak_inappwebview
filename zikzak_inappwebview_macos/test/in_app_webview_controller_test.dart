@@ -63,6 +63,33 @@ void main() {
     });
   });
 
+  group('callHandler channel contract', () {
+    Future<dynamic> invokeHandler(dynamic callbackResult) {
+      controller.addJavaScriptHandler(
+        handlerName: 'channelContract',
+        callback: (args) async => callbackResult,
+      );
+      return controller.handleMethod(
+        const MethodCall('callHandler', {
+          'handlerName': 'channelContract',
+          'args': '[]',
+        }),
+      );
+    }
+
+    test('returns null as JSON text for the native bridge', () async {
+      expect(await invokeHandler(null), 'null');
+    });
+
+    test('returns strings as JSON text for the native bridge', () async {
+      expect(await invokeHandler('ready'), '"ready"');
+    });
+
+    test('returns objects as JSON text for the native bridge', () async {
+      expect(await invokeHandler({'ready': true}), '{"ready":true}');
+    });
+  });
+
   group('removeJavaScriptHandler', () {
     test('returns null when handler does not exist', () {
       final result = controller.removeJavaScriptHandler(
@@ -193,7 +220,7 @@ void main() {
       final result = await controller.handleMethod(
         shouldOverrideUrlLoadingCall('https://example.com'),
       );
-      expect(result, NavigationActionPolicy.ALLOW.toNativeValue());
+      expect(result, NavigationActionPolicy.ALLOW.index);
     });
 
     test(
@@ -221,7 +248,7 @@ void main() {
         );
         expect(
           blockedResult,
-          NavigationActionPolicy.CANCEL.toNativeValue(),
+          NavigationActionPolicy.CANCEL.index,
           reason:
               'A blocked scheme must surface as CANCEL (0) so the macOS '
               'native side calls `decisionHandler(.cancel)` and stops the '
@@ -233,7 +260,7 @@ void main() {
         );
         expect(
           allowedResult,
-          NavigationActionPolicy.ALLOW.toNativeValue(),
+          NavigationActionPolicy.ALLOW.index,
           reason: 'Allowed schemes must surface as ALLOW (1).',
         );
       },
@@ -258,7 +285,7 @@ void main() {
         );
         expect(
           result,
-          NavigationActionPolicy.CANCEL.toNativeValue(),
+          NavigationActionPolicy.CANCEL.index,
           reason:
               'When the callback is registered but returns null, the Dart '
               'side must default to CANCEL so the native side never silently '

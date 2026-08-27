@@ -16,7 +16,7 @@ public class HeadlessInAppWebView: NSObject {
         self.registrar = registrar
         super.init()
 
-        self.webView = InAppWebView(registrar: registrar, viewId: id, arguments: params)
+        self.webView = InAppWebView(registrar: registrar, viewId: id, arguments: params, deferInitialLoad: true)
 
         let channel = FlutterMethodChannel(name: "wtf.zikzak/flutter_headless_inappwebview_" + id,
                                            binaryMessenger: registrar.messenger)
@@ -78,7 +78,11 @@ public class HeadlessInAppWebView: NSObject {
         webView?.removeFromSuperview()
         webView?.dispose()
         webView = nil
-        offscreenWindow?.close()
+        // The window was never ordered in, so close() is unsafe here (it can
+        // over-release a never-shown borderless window and crash with
+        // objc_release on the next autorelease pool pop). Detach the content
+        // view and drop the reference instead — ARC deallocates the window.
+        offscreenWindow?.contentView = nil
         offscreenWindow = nil
         manager?.dispose(id: id)
         manager = nil

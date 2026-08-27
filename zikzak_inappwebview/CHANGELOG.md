@@ -1,12 +1,125 @@
-## 4.6.3 - 2026-07-21
+## [Unreleased]
 
-## Unreleased
+## 5.0.1 - 2026-08-22
+
+### Fixes
+
+- Fixed Android `ClassCastException` failures when enum settings were serialized as string names instead of their expected integer wire values. Added the missing enum wire converters and corrected affected platform-interface JSON mappings.
+
+## 5.0.0 - 2026-08-16
+
+### Breaking Changes
+
+- Migrated the entire `platform_interface` model layer to **Zorphy entities** — every model class is now a Zorphy entity instead of a hand-written `@ExchangeableObject`-style class (Phases 1–3j). This changes the public API surface of the platform interface (class structure, `toJson`/`fromJson`, equality) and may require updates to custom platform implementations.
+
+### Features
+
+- [platform_interface] Migrated model families to Zorphy entities: JS dialogue, ajax request, fetch request, console message, web resource, permission/safe-browsing, navigation, auth/ssl, pull-to-refresh, web storage, web message, web authentication session, context menu, webview environment, chrome safari browser, print job, `InAppBrowserMenuItem`, tracing settings, user script, image/rect/screenshot config, in-app webview settings, and script HTML tag attributes
+
+### Chores
+
+- Removed the dead `@ExchangeableObject` codegen toolchain
+- Removed the Docusaurus website (to be replaced by a zread wiki)
+
+## 4.10.0 - 2026-08-16
+
+### Fixes
+
+- [iOS] Gate `HeadlessInAppWebView.run()` on web-process readiness — the first real `loadUrl` after `run()` could be silently dropped by WKWebView while its content process was still booting, surfacing as "Unable to fetch data" on the very first request. `run()` now completes only after the initial navigation reaches a terminal state (`didFinish`/`didFail`); signal-driven, no timeout constant
+- [iOS] Guard `run()` against a missing web view (no silent hang)
+- [Android] Same headless readiness gate — `run()` completes only after `onPageFinished` or a main-frame error (both `InAppWebViewClient` and `InAppWebViewClientCompat`)
+- [macOS] Same headless readiness gate — `run()` completes only after `didFinish`/`didFail`
+- [Linux] Same headless readiness gate — the headless "run" channel handler responds only after the first `WEBKIT_LOAD_FINISHED`
+
+### Features
+
+- [example] Add First-Load Race Stress screen — reproduces the first-load race for headless and visible webviews (fresh webview + immediate `loadUrl`, 10 sequential attempts)
+
+## 4.9.0 - 2026-08-14
+
+### Features
+
+- Session recipe — record and replay user sessions in the WebView: JS
+  tap-listener injection, selector-candidate extraction, scripted click replay,
+  and recipe models (#216)
+- Navigation tracker — JS-assisted URL-cycle tracking through the webview (#216)
+- Dialogue dismisser — inject JS to auto-dismiss modal dialogs (#216)
+- Navigation guards — `keepNavigationInWebView` helper that keeps user-tapped
+  links inside the WebView, avoiding iOS universal-link handoff (#216)
+- [Windows] Virtual host name to folder mapping — CORS-safe serving of local
+  folders (CORS bypass for local resources) (#185)
+- [macOS] Popup windows — `window.open` / `target=_blank` now load their URL
+  via `WKUIDelegate createWebViewWith` off-screen-window support, reparented
+  into a Flutter platform view when `onCreateWindow` is handled (#182, #183, #187)
+
+### Fixes
+
+- [macOS] Popup window crash, settings key, and event delivery fixes (#187)
+- [macOS] Network Capture API callbacks never fired — JS bridge name aligned
+  with iOS/Android so `onNetworkRequest` / `onNetworkResponse` /
+  `onNetworkLoadingFinished` reach Dart (#182)
+- [Linux] Blue screen instead of webview — offscreen rendering via
+  `GtkOffscreenWindow` + software rendering, plus `openDevTools` support (#184)
+- [Linux] Native plugin compile regression — broken `takeScreenshot` string
+  literal and missing include path (#179)
+- Chore: renamed remaining `flutter_inappwebview` residuals to
+  `zikzak_inappwebview` (JS bridge name, method channel, platform view type id) (#186)
+- Chore: dependency bumps (npm deps, brace-expansion) (#189, #210)
+
+## 4.8.0 - 2026-08-14
+
+### Features
+
+- [macOS] Add context-menu support — `disableContextMenu` / `disableLongPressContextMenuOnLinks` settings now honored, `onCreateContextMenu` event fired (#208, fixes #196)
+- [macOS] Implement WKNavigationDelegate authentication challenges — HTTP basic/digest/NTLM/Negotiate, TLS server-trust, and client-certificate requests (#207, fixes #193)
+- [macOS] Method-channel parity — ~50 controller methods implemented on iOS are now available on macOS (MissingPluginException resolved) (#205, fixes #197)
+- [macOS] Implement print page support reusing the iOS pattern (#190, fixes #188)
+- [Android] Add window-insets control for web content (`setInsetsForWebContentToIgnore` equivalent) (#206, fixes #198)
+- [iOS] Add `UIScrollView` bouncesHorizontally / bouncesVertically (iOS 17.4+) (#209, fixes #199)
+- [Android] Bump toolchain — androidx.webkit 1.15.0, AGP 8.13.1, JVM target 17 (#211, fixes #201)
+- Refactor: split `InAppWebViewController` into domain-specific controllers (#176)
+- Refactor: standardize dispose patterns across all wrapper classes (#175)
+
+### Fixes
+
+- [macOS] Implement media-capture permission prompts for `getUserMedia()` — no longer silently denied (#204, fixes #195)
+- [macOS] Implement `webViewWebContentProcessDidTerminate` — no more blank/unrecoverable WebView after content-process kill (#203, fixes #194)
+- [macOS] Await `shouldOverrideUrlLoading` response so cancellations are honored (#202, fixes #192)
+- [macOS] Use `WKWebpagePreferences.allowsContentJavaScript` instead of deprecated `WKPreferences.javaScriptEnabled` (#212, fixes #200)
+- [macOS] Replace deprecated `javaScriptEnabled` read in `getSelectedText` (#213)
+- [macOS] Repair SPM build — duplicate `Util.swift`, iOS-only APIs, init ordering (#215)
+- [macOS] Add missing `onPageCommitVisible` / `onDidReceiveServerRedirectForProvisionalNavigation` method-channel handlers (#217)
+- [Windows] Forward `additionalBrowserArguments` to WebView2 (#214, fixes #178)
+- [Windows] Implement `addJavaScriptHandler` + JS bridge (fixes #177)
+- [Android] Use `androidx.core.view.OnApplyWindowInsetsListener` type directly (#217)
+
+## 4.7.0 - 2026-07-29
+
+### Features
 
 - Added iOS proxy support (iOS 17.0+) — set process-wide proxy for WKWebView
+- Added Network Capture API — capture XHR/fetch requests and response bodies
+- Added Network Capture Scraper example screen
+
+### Fixes
 
 - Fixed: Web/WASM build failure — `HeadlessInAppWebViewWeb.dispose()` missing
   `isKeepAlive` parameter that was added to `PlatformHeadlessInAppWebView.dispose`
   interface, causing `dart2wasm` and `dart2js` compile errors
+- Fixed iOS: removed duplicate `else` clause in `ProxyManager` guard statement
+- Fixed iOS: added missing Flutter import and fixed Swift API usage in `ProxyManager`
+- Fixed Linux: removed unused `<iostream>` includes and call `load_initial` in
+  `createHeadless`
+- Fixed Linux: fixed pre-existing C++ issues in `in_app_webview.cc`
+- Fixed: restored `Disposable` interface on `PlatformProxyController`
+
+### Chores
+
+- Removed network capture example from public package
+- Added `.clangd` and `compile_flags.txt` for Linux Flutter header resolution
+- Bumped svgo dependency
+
+## 4.6.3 - 2026-07-21
 
 ## 4.6.2 - 2026-07-21
 

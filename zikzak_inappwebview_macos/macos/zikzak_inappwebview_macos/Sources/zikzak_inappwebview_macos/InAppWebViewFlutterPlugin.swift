@@ -10,13 +10,13 @@ public class InAppWebViewFlutterPlugin: NSObject, FlutterPlugin {
     var registrar: FlutterPluginRegistrar?
     
     public static func register(with registrar: FlutterPluginRegistrar) {
-        let channel = FlutterMethodChannel(name: "dev.zuzu/flutter_inappwebview", binaryMessenger: registrar.messenger)
+        let channel = FlutterMethodChannel(name: "dev.zuzu/zikzak_inappwebview", binaryMessenger: registrar.messenger)
         let instance = InAppWebViewFlutterPlugin()
         instance.registrar = registrar
         registrar.addMethodCallDelegate(instance, channel: channel)
         
         let factory = InAppWebViewFactory(registrar: registrar, plugin: instance)
-        registrar.register(factory, withId: "dev.zuzu/flutter_inappwebview")
+        registrar.register(factory, withId: "dev.zuzu/zikzak_inappwebview")
         
         instance.headlessInAppWebViewManager = HeadlessInAppWebViewManager(registrar: registrar)
         instance.inAppBrowserManager = InAppBrowserManager(registrar: registrar)

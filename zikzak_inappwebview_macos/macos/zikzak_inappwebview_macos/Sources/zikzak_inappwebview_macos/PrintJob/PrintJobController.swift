@@ -30,10 +30,10 @@ public class PrintJobController: NSObject, Disposable {
         self.settings = settings
         self.webView = webView
         self.printInfo = printOperation?.printInfo
-        self.jobName = self.printInfo?.jobName
+        self.jobName = settings?.jobName
         if let registrar = plugin.registrar {
             let channel = FlutterMethodChannel(name: PrintJobController.METHOD_CHANNEL_NAME_PREFIX + id,
-                                               binaryMessenger: registrar.messenger())
+                                               binaryMessenger: registrar.messenger)
             self.channelDelegate = PrintJobChannelDelegate(printJobController: self, channel: channel)
         }
     }

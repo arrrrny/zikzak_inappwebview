@@ -76,9 +76,10 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
             controller,
             WebResourceRequest(url: url != null ? WebUri(url) : WebUri('')),
             WebResourceError(
-              type:
-                  WebResourceErrorType.fromNativeValue(code) ??
-                  WebResourceErrorType.UNKNOWN,
+              type: WebResourceErrorType.values.firstWhere(
+                (t) => t.name == code,
+                orElse: () => WebResourceErrorType.UNKNOWN,
+              ),
               description: message,
             ),
           );
@@ -112,22 +113,21 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
         if (params.webviewParams?.shouldOverrideUrlLoading != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          var navigationAction = NavigationAction.fromMap(
+          var navigationAction = NavigationAction.fromJson(
             arguments['navigationAction'].cast<String, dynamic>(),
-          )!;
+          );
           var policy = await params.webviewParams!.shouldOverrideUrlLoading!(
             controller,
             navigationAction,
           );
-          return policy?.toNativeValue() ??
-              NavigationActionPolicy.CANCEL.toNativeValue();
+          return policy?.index ?? NavigationActionPolicy.CANCEL.index;
         }
-        return NavigationActionPolicy.ALLOW.toNativeValue();
+        return NavigationActionPolicy.ALLOW.index;
       case 'onConsoleMessage':
         if (params.webviewParams?.onConsoleMessage != null) {
-          var consoleMessage = ConsoleMessage.fromMap(
+          var consoleMessage = ConsoleMessage.fromJson(
             call.arguments.cast<String, dynamic>(),
-          )!;
+          );
           params.webviewParams!.onConsoleMessage!(controller, consoleMessage);
         }
         break;
@@ -158,7 +158,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
     WebUri? allowingReadAccessTo,
   }) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('urlRequest', () => urlRequest.toMap());
+    args.putIfAbsent('urlRequest', () => urlRequest.toJson());
     args.putIfAbsent(
       'allowingReadAccessTo',
       () => allowingReadAccessTo.toString(),
@@ -295,7 +295,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
     args.putIfAbsent('urlFile', () => urlFile.toString());
     args.putIfAbsent(
       'cssLinkHtmlTagAttributes',
-      () => cssLinkHtmlTagAttributes?.toMap(),
+      () => cssLinkHtmlTagAttributes?.toJson(),
     );
     await _channel.invokeMethod('injectCSSFileFromUrl', args);
   }
@@ -319,15 +319,20 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent(
       'screenshotConfiguration',
-      () => screenshotConfiguration?.toMap(),
+      () => screenshotConfiguration?.toJson(),
     );
     return await _channel.invokeMethod<Uint8List?>('takeScreenshot', args);
   }
 
   @override
+  Future<void> openDevTools() async {
+    await _channel.invokeMethod('openDevTools');
+  }
+
+  @override
   Future<Uint8List?> createPdf({PDFConfiguration? pdfConfiguration}) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('pdfConfiguration', () => pdfConfiguration?.toMap());
+    args.putIfAbsent('pdfConfiguration', () => pdfConfiguration?.toJson());
     return await _channel.invokeMethod<Uint8List?>('createPdf', args);
   }
 

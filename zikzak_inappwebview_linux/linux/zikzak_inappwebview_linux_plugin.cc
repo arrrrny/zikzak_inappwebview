@@ -1,6 +1,6 @@
 #include "include/zikzak_inappwebview_linux/zikzak_inappwebview_linux_plugin.h"
 
-#include <zikzak_inappwebview_linux/in_app_web_view_flutter_plugin.h>
+#include "include/zikzak_inappwebview_linux/in_app_web_view_flutter_plugin.h"
 
 #include <flutter_linux/flutter_linux.h>
 #include <gtk/gtk.h>
@@ -67,12 +67,23 @@ static void zikzak_inappwebview_linux_plugin_handle_method_call(
   fl_method_call_respond(method_call, response, nullptr);
 }
 
+static void headless_first_load_finished(InAppWebView *webview, gpointer user_data) {
+  FlMethodCall *method_call = FL_METHOD_CALL(user_data);
+  g_autoptr(FlMethodResponse) response = FL_METHOD_RESPONSE(
+      fl_method_success_response_new(fl_value_new_bool(true)));
+  fl_method_call_respond(method_call, response, nullptr);
+  g_object_unref(method_call);
+}
+
 static void headless_method_call_cb(FlMethodChannel *channel,
                                     FlMethodCall *method_call,
                                     gpointer user_data) {
   ZikzakInappwebviewLinuxPlugin *self =
       ZIKZAK_INAPPWEBVIEW_LINUX_PLUGIN(user_data);
   g_autoptr(FlMethodResponse) response = nullptr;
+  // When the readiness gate defers the response, the shared respond tail
+  // must be skipped — the callback owns the FlMethodCall response.
+  gboolean deferred = FALSE;
 
   const gchar *method = fl_method_call_get_name(method_call);
   FlValue *args = fl_method_call_get_args(method_call);
@@ -85,8 +96,31 @@ static void headless_method_call_cb(FlMethodChannel *channel,
         InAppWebView *webview =
             in_app_webview_new(self->messenger, self->texture_registrar, id);
         g_hash_table_insert(self->web_views, g_strdup(id), webview);
-        in_app_webview_load_initial(webview,
-                                    fl_value_lookup_string(args, "params"));
+        FlValue *params = fl_value_lookup_string(args, "params");
+        // Readiness gate: complete run() only after the initial load reaches
+        // a terminal state (WEBKIT_LOAD_FINISHED). WebKitGTK's web process
+        // spawns asynchronously; a navigation issued while it is still
+        // starting can be dropped. Signal-driven on purpose: no timeout
+        // constant — a missing terminal event is a wiring bug that must
+        // surface loudly, not be masked by a magic number.
+        gboolean has_initial_load = false;
+        if (params != nullptr && fl_value_get_type(params) == FL_VALUE_TYPE_MAP) {
+          has_initial_load =
+              fl_value_lookup_string(params, "initialUrlRequest") != nullptr ||
+              fl_value_lookup_string(params, "initialFile") != nullptr ||
+              fl_value_lookup_string(params, "initialData") != nullptr;
+        }
+        if (has_initial_load) {
+          g_object_ref(method_call);
+          in_app_webview_set_first_load_callback(webview,
+                                                 headless_first_load_finished,
+                                                 method_call);
+          deferred = TRUE;
+        } else {
+          response = FL_METHOD_RESPONSE(
+              fl_method_success_response_new(fl_value_new_bool(true)));
+        }
+        in_app_webview_load_initial(webview, params);
         g_autofree gchar *channel_name =
             g_strdup_printf("wtf.zikzak/flutter_headless_inappwebview_%s", id);
         g_autoptr(FlStandardMethodCodec) codec = fl_standard_method_codec_new();
@@ -94,8 +128,6 @@ static void headless_method_call_cb(FlMethodChannel *channel,
             self->messenger, channel_name, FL_METHOD_CODEC(codec));
         fl_method_channel_invoke_method(headless_channel, "onWebViewCreated",
                                         nullptr, nullptr, nullptr, nullptr);
-        response = FL_METHOD_RESPONSE(
-            fl_method_success_response_new(fl_value_new_bool(true)));
       }
     }
   } else if (strcmp(method, "createHeadless") == 0) {
@@ -116,6 +148,10 @@ static void headless_method_call_cb(FlMethodChannel *channel,
     }
   } else {
     response = FL_METHOD_RESPONSE(fl_method_not_implemented_response_new());
+  }
+
+  if (deferred) {
+    return;
   }
 
   if (!response) {
