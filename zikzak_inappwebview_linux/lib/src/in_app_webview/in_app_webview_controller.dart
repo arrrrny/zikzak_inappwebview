@@ -93,7 +93,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController {
       case 'onReceivedHttpError':
         if (params.webviewParams?.onReceivedHttpError != null) {
           String? url = call.arguments['url'];
-          int statusCode = call.arguments['statusCode'];
+          int statusCode = call.arguments['statusCode'] ?? 0;
           String? description = call.arguments['description'];
           params.webviewParams!.onReceivedHttpError!(
             controller,

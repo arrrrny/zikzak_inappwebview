@@ -859,7 +859,13 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                     let hasValidPersistentId = settings.persistentStoreIdentifier.map {
                         persistentUUID(from: $0) != nil
                     } ?? false
-                    if !dataStoreWasSelected && !hasValidPersistentId {
+                    // A persistent store can only be honored on iOS 17+ (the
+                    // `forIdentifier:` selector is unavailable below it). On
+                    // older iOS, `hasValidPersistentId` is meaningless for the
+                    // data store, so skip the short-circuit and fall through to
+                    // the master behavior (nonPersistent) when cacheEnabled is
+                    // false — otherwise per-account isolation is silently lost.
+                    if !dataStoreWasSelected && (!hasValidPersistentId || !#available(iOS 17.0, *)) {
                         configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
                     }
                     for cookie in HTTPCookieStorage.shared.cookies ?? [] {
