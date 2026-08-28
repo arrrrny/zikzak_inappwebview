@@ -88,4 +88,36 @@ void main() {
       expect(map['persistentStoreIdentifier'], 'alice-profile');
     });
   });
+
+  group('InAppWebViewSettings.dismissDialogues', () {
+    // U1 — FR-002: the option MUST default to disabled (false) so overlays are
+    // preserved unless the developer explicitly opts in.
+    test('default-constructed settings expose dismissDialogues == false', () {
+      final settings = InAppWebViewSettings();
+      expect(settings.dismissDialogues, isFalse,
+          reason: 'FR-002: dismissDialogues MUST default to false.');
+    });
+
+    // U2 — FR-001: the option MUST be settable to true.
+    test('dismissDialogues: true is exposed as true', () {
+      final settings = InAppWebViewSettings(dismissDialogues: true);
+      expect(settings.dismissDialogues, isTrue);
+    });
+
+    // U3 — FR-001 invariant: dismissDialogues MUST round-trip through
+    // toJson/fromJson unchanged at both boundaries (true and false).
+    test('dismissDialogues round-trips through toJson/fromJson (true and false)',
+        () {
+      for (final value in const [true, false]) {
+        final settings = InAppWebViewSettings(dismissDialogues: value);
+        final restored = InAppWebViewSettings.fromJson(settings.toJson());
+        expect(restored.dismissDialogues, value,
+            reason: 'dismissDialogues MUST survive a wire round-trip unchanged '
+                'at both boundaries (FR-001).');
+      }
+      // The implicit default also serializes to false and restores to false.
+      final def = InAppWebViewSettings();
+      expect(InAppWebViewSettings.fromJson(def.toJson()).dismissDialogues, isFalse);
+    });
+  });
 }

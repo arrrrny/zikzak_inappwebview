@@ -8,7 +8,7 @@ description: "Task list for dismiss-dialogues feature"
 
 **Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/
 
-**Tests**: Not explicitly requested in feature spec. No test tasks generated.
+**Tests**: Required by the project constitution (TDD is NON-NEGOTIABLE). Every behavior in `tdd/test-list.md` has a test task preceding its implementation task, tagged with its id (e.g. `[A1]`, `[U1]`). Per the constitution each test MUST be observed failing first (red) before its implementation starts; failure evidence goes in `tdd/cycle-log.md`.
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
@@ -49,6 +49,10 @@ description: "Task list for dismiss-dialogues feature"
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
+- [x] T034 [P] [U1] Test: a default-constructed `InAppWebViewSettings` exposes `dismissDialogues == false` — `zikzak_inappwebview_platform_interface/test/types/in_app_webview_settings_test.dart` (impl pre-existed; test green on first write, proven via deliberate-mutant check)
+- [x] T035 [P] [U2] Test: `InAppWebViewSettings(dismissDialogues: true)` exposes the property as `true`
+- [x] T036 [P] [U3] Test (invariant): `dismissDialogues` round-trips through `toJson`/`fromJson` unchanged for both `true` and `false`
+
 - [x] T006 Add `dismissDialogues` property with `@ExchangeableObjectProperty(defaultValue: "false")` annotation and `@SupportedPlatforms(platforms: [PlatformOS.iOS, PlatformOS.android, PlatformOS.macOS, PlatformOS.windows, PlatformOS.linux, PlatformOS.web])` in `zikzak_inappwebview_platform_interface/lib/src/in_app_webview/in_app_webview_settings.dart`
 - [x] T007 Regenerate `.g.dart` by running `dart run build_runner build` in `zikzak_inappwebview_platform_interface/`
 
@@ -64,6 +68,14 @@ description: "Task list for dismiss-dialogues feature"
 
 ### Implementation for User Story 1
 
+- [ ] T027 [P] [US1] [A1] Test (red first): with `dismissDialogues` enabled, a page whose DOM has `position: fixed` popups has every fixed element removed after load — `zikzak_inappwebview/test/...` (umbrella; suite blocked until `flutter pub cache repair`)
+- [ ] T028 [P] [US1] [A2] Test (red first): with `dismissDialogues` enabled, a page with sticky nav bars has every `position: sticky` element removed after load
+- [ ] T029 [P] [US1] [A3] Test (red first): with `dismissDialogues` enabled, `overflow` and `margin` on `document.documentElement` and `document.body` are reset after load
+- [ ] T030 [P] [US2] [A4] Test (red first): with `dismissDialogues` false, fixed/sticky overlays remain present and functional after load
+- [ ] T031 [P] [US2] [A5] Test (red first): with `dismissDialogues` false, fixed/sticky overlays remain in the DOM and therefore appear in screenshot/PDF capture output
+- [ ] T032 [P] [US3] [A6] Test (red first): with `dismissDialogues` enabled, a fixed overlay injected after initial load is removed within the retry window
+- [ ] T033 [P] [US3] [A7] Test (red first): with `dismissDialogues` enabled and no fixed/sticky elements, the removal routine completes with no error and no side effect
+
 - [x] T008 [P] [US1] Add `dismissDialogues` boolean property to iOS native settings in `zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/InAppWebViewSettings.swift`
 - [x] T009 [P] [US1] Add `dismissDialogues` boolean property to Android native settings in `zikzak_inappwebview_android/android/src/main/java/wtf/zikzak/zikzak_inappwebview_android/webview/in_app_webview/InAppWebViewSettings.java`
 - [x] T010 [P] [US1] Add `dismissDialogues` property pass-through in iOS Dart controller at `zikzak_inappwebview_ios/lib/src/in_app_webview/in_app_webview_controller.dart` (handled by .g.dart serialization)
@@ -72,6 +84,16 @@ description: "Task list for dismiss-dialogues feature"
 - [x] T013 [P] [US1] Add `dismissDialogues` property pass-through in Windows Dart controller at `zikzak_inappwebview_windows/lib/src/in_app_webview_windows_controller.dart` (handled by .g.dart serialization)
 - [x] T014 [P] [US1] Add `dismissDialogues` property pass-through in Linux Dart controller at `zikzak_inappwebview_linux/lib/src/in_app_webview/in_app_webview_controller.dart` (handled by .g.dart serialization)
 - [x] T015 [P] [US1] Add `dismissDialogues` property pass-through in Web Dart controller at `zikzak_inappwebview_web/lib/src/in_app_webview_web_controller.dart` (handled by .g.dart serialization)
+- [ ] T037 [P] [US1] [U4] Test (red first): when `dismissDialogues` is true and load stops, the controller evaluates JS that removes every `position: fixed`/`sticky` element
+- [ ] T038 [P] [US1] [U6] Test (red first): the injected JS resets `overflow` and `margin` on `document.documentElement` and `document.body`
+- [ ] T039 [P] [US1] [U7] Test (red first): the removal selector matches BOTH `position: fixed` and `position: sticky` elements
+- [ ] T040 [P] [US1] [U11] Test (red first): removal targets only the top-level document; elements inside `iframe`/`frame` are not removed
+- [ ] T041 [P] [US3] [U8] Test (red first): removal retries with a delay between attempts so an overlay present at load is removed on the first pass
+- [ ] T042 [P] [US1] [U10] Test (red first): a JavaScript error during removal is caught and does not propagate out of the load handler
+- [ ] T043 [P] [US2] [U5] Test (red first): when `dismissDialogues` is false, no dismissal JS is evaluated on page load
+- [ ] T044 [P] [US2] [U12] Test (red first): running removal on an already-clean page is a no-op with zero errors and zero side effects
+- [ ] T045 [P] [US3] [U9] Test (red first, boundary): an overlay injected after the retry window has closed is NOT removed
+
 - [x] T016 [US1] Implement overlay dismissal JavaScript injection in main web view at `zikzak_inappwebview/lib/src/in_app_webview/in_app_webview.dart`: when `dismissDialogues` is enabled and page load completes via onLoadStop, inject JS to find and remove all `fixed`/`sticky` elements, reset `overflow`/`margin` styles
 - [x] T017 [US1] Add retry loop (3 attempts with 800ms delay) around the overlay dismissal JS execution in `zikzak_inappwebview/lib/src/in_app_webview/in_app_webview.dart` to catch dynamically loaded overlays
 - [x] T018 [US1] Wrap overlay dismissal in try-catch with silent error handling to ensure JavaScript errors never propagate to the web view in `zikzak_inappwebview/lib/src/in_app_webview/in_app_webview.dart`
