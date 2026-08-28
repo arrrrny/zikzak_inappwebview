@@ -44,6 +44,16 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   build_runner: ^2.4.13
 
+# Force the working hosted zuraffa 6.x. The configured mirror (pub.flutter-io.cn)
+# only serves a corrupted zuraffa 6.0.0 that exports a missing
+# `src/extensions/future_extensions.dart` and breaks `flutter test` (see
+# specs/002-dismiss-dialogues/tdd/test-list.md). pub.zuzu.dev is the only hosted
+# mirror carrying a complete 6.x (6.0.1), which satisfies `^6.0.0`.
+dependency_overrides:
+  zuraffa:
+    hosted: https://pub.zuzu.dev
+    version: ^6.0.0
+
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec
 
