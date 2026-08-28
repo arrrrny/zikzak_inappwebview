@@ -105,6 +105,27 @@ The extension reads `.specify/extensions/bug/bug-config.yml` (copied from `confi
 - `auto_create_issue` (`false`) — when `true`, `speckit.bug.assess` files the GitHub issue automatically after writing the assessment. The `--issue` flag overrides this per run.
 - `branch_prefix` (`"fix"`) — prefix for the fix branch created by `speckit.bug.fix --branch` / `--worktree` (branch is `<prefix>/<slug>`, e.g. `fix/login-timeout`).
 - `default_host` (`"github"`) — Git host used when creating issues/PRs.
+- `tdd_enabled` (`true`) — when `true` (default), `bug.fix` and `bug.test` run through the TDD extension's red-green-refactor loop (`tdd.setup` → `tdd.plan` → `tdd.run` → `implement` → `tdd.verify`) instead of ad-hoc testing, mirroring `spec-whole`. Requires the `tdd` extension to be installed. Set to `false` for the classic fix → test → PR flow.
+
+### TDD integration
+
+When `tdd_enabled` is `true`, `bug.fix` treats the bug directory as a TDD feature: it
+synthesizes `spec.md` from the assessment, pins `.specify/feature.json` to the bug
+directory, and drives the red-green loop (`tdd.run all`) so the fix is written test-first.
+`bug.test` then runs `tdd.verify` against the same directory. The `bug-whole` skill chains
+these automatically, so a single `bug-whole` run delivers the whole bug lifecycle with TDD.
+
+```
+.specify/bugs/<slug>/
+├── assessment.md    # written by speckit.bug.assess
+├── spec.md          # synthesized from assessment.md when running in TDD mode
+├── fix.md           # written by speckit.bug.fix
+├── test.md          # written by speckit.bug.test
+└── tdd/             # TDD artifacts (present only in TDD mode)
+    ├── test-list.md
+    ├── cycle-log.md
+    └── verification.md
+```
 
 ## Branch Isolation
 

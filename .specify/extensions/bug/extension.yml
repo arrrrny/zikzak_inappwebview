@@ -3,10 +3,10 @@ schema_version: "1.0"
 extension:
   id: bug
   name: "Bug Triage Workflow"
-  version: "1.0.0"
-  description: "Assess, load or report (GitHub issue), fix, and validate bug reports against the codebase, with optional branch isolation and PR creation; per-bug reports stored under .specify/bugs/<slug>/"
-  author: spec-kit-core
-  repository: https://github.com/github/spec-kit
+  version: "1.1.0"
+  description: "Assess, load or report (GitHub issue), fix, and validate bug reports against the codebase, with optional branch isolation and PR creation; per-bug reports stored under .specify/bugs/<slug>/. Optional TDD integration (tdd_enabled, default true) drives fix/verify through the TDD extension's red-green-refactor loop."
+  author: arrrrny
+  repository: https://github.com/arrrrny/speckit-extensions
   license: MIT
 
 requires:
@@ -14,6 +14,13 @@ requires:
   tools:
     - name: gh
       required: false
+  # TDD integration (used only when tdd_enabled is true in bug-config.yml). The
+  # tdd extension must be installed for the TDD-driven fix/verify flow to run.
+  commands:
+    - speckit.tdd.setup
+    - speckit.tdd.plan
+    - speckit.tdd.run
+    - speckit.tdd.verify
 
 provides:
   commands:

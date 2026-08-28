@@ -43,6 +43,32 @@ Once resolved, set `BUG_SLUG` and `BUG_DIR = .specify/bugs/<BUG_SLUG>`, and brie
 - If `BUG_DIR/fix.md` already exists, ask the user whether to overwrite it before continuing (interactive mode) or refuse (automated mode).
 - Read `BUG_DIR/assessment.md` in full. Treat its **Proposed Remediation**, **Files likely to change**, **Tests to add or update**, and **Risks & Considerations** sections as the contract for this command.
 
+## TDD mode (when `tdd_enabled: true` in bug-config.yml)
+
+When the bug extension's `tdd_enabled` config is `true` (the default), fix the bug
+through the TDD extension's red-green-refactor loop instead of editing code directly.
+This mirrors how `spec-whole` drives a feature — the "feature" here is the bug:
+
+1. **Ensure the TDD stack profile exists** — if `.specify/memory/tdd-profile.md` is
+   missing, run `/speckit.tdd.setup` first (every other TDD command requires it).
+2. **Synthesize the bug spec** — write `BUG_DIR/spec.md` from `assessment.md`: the
+   required (fixed) behavior becomes the acceptance criteria, and the assessment's
+   reproduction steps become the failing-test scenario. This is the TDD spec source.
+3. **Pin the bug as the TDD feature** — set `.specify/feature.json` so
+   `feature_directory` points at `BUG_DIR` (e.g. `.specify/bugs/<slug>`). Everything
+   downstream (`tdd.plan`, `tdd.run`, `tdd.verify`) then operates on this directory.
+4. **Plan the tests** — run `/speckit.tdd.plan` to derive `BUG_DIR/tdd/test-list.md`.
+   If no `plan.md` exists in `BUG_DIR`, use `tdd.plan outer-only`.
+5. **Drive the loop** — run `/speckit.tdd.run all`. It writes the failing
+   reproduction test, proves it RED, applies the minimal fix, proves it GREEN,
+   refactors while green, and logs evidence in `BUG_DIR/tdd/cycle-log.md`.
+6. **Implement non-behavior work** — run `/speckit.implement` for any scaffolding,
+   config, or wiring tasks the loop left for it.
+7. **Write the fix report** (Execution step 4), referencing the `tdd/` artifacts.
+
+In TDD mode the "Apply the remediation" step below is performed *by* `tdd.run`, not by
+hand — do not pre-write the implementation before the test is red.
+
 ## Execution
 
 1. **Confirm the plan**
@@ -62,6 +88,9 @@ By default the fix is applied to the current branch. To match how `/skill:specki
 - State which mode was used in your reply; all subsequent edits happen on that branch/worktree.
 
 2. **Apply the remediation**
+   - **TDD mode:** if `tdd_enabled` is `true`, you already drove the fix via `tdd.run`
+     in the TDD-mode section above. Skip to step 3 and step 4, and reference the
+     `tdd/` artifacts (test-list, cycle-log, verification) in the report.
    - Make the code changes described by the preferred remediation. Stay within the files listed by the assessment unless newly discovered evidence requires expanding scope (in which case, log the expansion explicitly in the report).
    - Add or update the tests called out in the assessment so the bug cannot regress silently.
    - Keep the change minimal — do not refactor unrelated code, do not introduce dependencies that the assessment did not call for.
@@ -82,6 +111,7 @@ By default the fix is applied to the current branch. To match how `/skill:specki
    - **Fixed**: <ISO 8601 date>
    - **Assessment**: ./assessment.md
    - **Status**: applied | partial | not-applied
+   - **TDD artifacts**: ./tdd/test-list.md, ./tdd/cycle-log.md, ./tdd/verification.md (present only when the fix ran in TDD mode)
 
    ## Summary
 
@@ -122,7 +152,8 @@ By default the fix is applied to the current branch. To match how `/skill:specki
    - Which branch/worktree the fix was applied to (or "current branch" if isolation was not used).
    - The next suggested step(s), in order:
      - `/skill:speckit-bug-pr slug=<BUG_SLUG>` (open a PR from the fix branch, linking the issue).
-     - Then: `/skill:speckit-bug-test slug=<BUG_SLUG>` (validate the fix).
+     - Then: `/skill:speckit-bug-test slug=<BUG_SLUG>` (validate the fix). In TDD mode this runs
+       `tdd.verify` against the bug directory and reports its verdict.
 
 ## Guardrails
 

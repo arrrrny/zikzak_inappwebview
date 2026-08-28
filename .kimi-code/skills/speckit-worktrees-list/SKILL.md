@@ -4,8 +4,10 @@ description: Dashboard of all active worktrees with spec-artifact and task progr
 compatibility: Requires spec-kit project structure with .specify/ directory
 metadata:
   author: github-spec-kit
-  source: worktrees:commands/speckit.worktrees.list.md
+  source: extension:worktrees
 ---
+
+# Worktrees List Skill
 
 # List Worktrees
 

@@ -4,8 +4,10 @@ description: Remove merged, orphaned, or stale worktrees and reclaim disk space
 compatibility: Requires spec-kit project structure with .specify/ directory
 metadata:
   author: github-spec-kit
-  source: worktrees:commands/speckit.worktrees.clean.md
+  source: extension:worktrees
 ---
+
+# Worktrees Clean Skill
 
 # Clean Worktrees
 

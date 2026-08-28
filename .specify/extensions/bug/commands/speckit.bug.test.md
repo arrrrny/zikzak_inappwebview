@@ -40,6 +40,24 @@ Once resolved, set `BUG_SLUG` and `BUG_DIR = .specify/bugs/<BUG_SLUG>`, and brie
   - The original symptom and reproduction steps (from `assessment.md`).
   - The actual code changes and tests added (from `fix.md`).
 
+## TDD mode (when `tdd_enabled: true` in bug-config.yml)
+
+When `tdd_enabled` is `true` (the default), validation is driven by the TDD
+extension's auditor rather than the manual check table:
+
+1. **Pin the bug as the TDD feature** — set `.specify/feature.json` so
+   `feature_directory` points at `BUG_DIR` (e.g. `.specify/bugs/<slug>`). This is where
+   `bug.fix` (TDD mode) wrote `tdd/test-list.md`, `tdd/cycle-log.md`, and the fix itself.
+2. **Audit** — run `/speckit.tdd.verify` against `BUG_DIR`. It reads the TDD artifacts
+   from cold context (test-first evidence, red-phase evidence, test smells, mutation
+   results, acceptance-criteria coverage) and writes `BUG_DIR/tdd/verification.md` with a
+   verdict (`PASS` / `PASS_WITH_GAPS` / `FAIL` / `BLOCKED`).
+3. **Fold the verdict into this report** — in step 4, record the `tdd/verification.md`
+   path and map its verdict to this command's result:
+   `PASS` / `PASS_WITH_GAPS` → `verified`, `FAIL` → `failed`, `BLOCKED` → report and stop.
+   The manual check table (step 2) may still be run for extra confidence but is not the
+   source of truth in TDD mode.
+
 ## Execution
 
 1. **Plan the validation**
@@ -75,6 +93,7 @@ Once resolved, set `BUG_SLUG` and `BUG_DIR = .specify/bugs/<BUG_SLUG>`, and brie
    - **Assessment**: ./assessment.md
    - **Fix**: ./fix.md
    - **Result**: verified | partial | failed
+   - **TDD verification**: ./tdd/verification.md (present only when validation ran in TDD mode)
 
    ## Summary
 
