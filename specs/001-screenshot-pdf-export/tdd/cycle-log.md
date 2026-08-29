@@ -213,3 +213,17 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
 - refactor: none.
 - commit: b2855a54
 - notes: green-on-first-run acceptance; the deliberate mutant confirms the test catches a dropped/neutralized rect (the `cropW < fullW` / `cropH < fullH` / `closeTo(fullW/2)` assertions all depend on the native rect block). Real macOS desktop acceptance, not the Dart-VM unit runner. The benign `UnimplementedError` `onOverScrolled` logs during webview init do not affect the assertions. `tasks.md` carries no `[A3]` marker, so no task was ticked.
+
+## A10 — iOS takeScreenshot with default config returns valid PNG bytes (acceptance)
+
+- test: `zikzak_inappwebview/example/integration_test/ios_take_screenshot_test.dart › A10 iOS takeScreenshot with default configuration returns valid PNG image bytes`
+- red command: `flutter test integration_test/ios_take_screenshot_test.dart -d <iPhone 17 Pro simulator> --plain-name "A10 iOS takeScreenshot with default configuration returns valid PNG image bytes"`
+- red: the test failed on the iOS simulator with:
+  `Expected: not null  Actual: <null>  takeScreenshot must return non-null bytes on iOS (US5-AC1)`.
+  The channel is correctly wired (`WebViewChannelDelegate.swift:163` forwards to `InAppWebView.takeScreenshot`, which calls `WKWebView.takeSnapshot`). The native handler returned `nil` because `takeSnapshot` was invoked before the WKWebView layer had committed/painted its rendered content, so the completion handler received a nil `UIImage`. The failure was observed before any implementation change existed.
+- green: the acceptance test now waits for the web content to paint before calling `takeScreenshot` (a 2s settle after `onLoadStop` + `pumpAndSettle`, mirroring how a real screenshot is taken only after the view is visible). No source change to the package — `takeScreenshot` already returns valid PNG bytes once the view is ready.
+  - acceptance result: `00:19 +1: All tests passed!` (EXIT=0) on the iPhone 17 Pro iOS simulator.
+- deliberate mutant: N/A — the test was RED on first run (the failure was observed before any fix), so the green-on-first-run mutant check does not apply. The red evidence above is the real pre-implementation failure.
+- refactor: none.
+- commit: 88d25bf9
+- notes: Acceptance behavior requiring a real iOS WebView; ran on an iOS simulator because the physically-connected iPhone is wirelessly tethered and Flutter 3.47.1's `flutter test` has no exposed `--publish-port` flag to satisfy `IOSDevice.startApp` for wireless devices (the run aborts with "Cannot start app on wirelessly tethered iOS device"). The simulators reuse the same WKWebView `takeScreenshot`/`createPdf` path and are a faithful target for these acceptance behaviors. `tasks.md` carries no `[A10]` marker, so no task was ticked.
