@@ -181,3 +181,14 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
 - refactor: none.
 - commit: fabdfe74
 - notes: green-on-first-run acceptance; the deliberate mutant confirms the test catches a dropped/neutralized crop (the assertions `cropW < fullW` / `cropH < fullH` / `closeTo(fullW/2, 2.0)` all depend on the native rect block). Real-device (emulator) acceptance, not the Dart-VM unit runner. `tasks.md` carries no `[A14]` marker, so no task was ticked.
+
+## A1 — macOS takeScreenshot returns non-null valid PNG image bytes (acceptance)
+
+- test: `zikzak_inappwebview/example/integration_test/macos_take_screenshot_test.dart › A1 macOS takeScreenshot returns non-null valid PNG image bytes`
+- red: none — the native `takeScreenshot` handler already existed in `InAppWebView.swift` (case "takeScreenshot", line 805) returning the PNG `Data` via `result(imageData)`, so the test passed on first run on the macOS desktop target.
+- deliberate mutant: changed the handler's final `result(imageData)` to `result(nil)`; ran `flutter test integration_test/macos_take_screenshot_test.dart -d macos --plain-name "A1 macOS takeScreenshot returns non-null valid PNG image bytes"`. It failed with:
+  `Expected: not null  Actual: <null>  takeScreenshot must return non-null bytes on macOS (US1-AC1)`. Restored the native code exactly (`git checkout`); test green again.
+- green: no source change; behavior already satisfied by the existing macOS `takeScreenshot` handler (WKSnapshotConfiguration + PNG `NSBitmapImageRep`).
+- refactor: none.
+- commit: 94c745ab
+- notes: green-on-first-run acceptance; the deliberate mutant confirms the test catches a handler that returns null. Real macOS desktop acceptance, not the Dart-VM unit runner. (Note: the macOS run emits benign `UnimplementedError` logs for `onScrollChanged`/`onContentSizeChanged`/`onOverScrolled` channel methods during webview init — these do not affect the assertion.) `tasks.md` carries no `[A1]` marker, so no task was ticked.
