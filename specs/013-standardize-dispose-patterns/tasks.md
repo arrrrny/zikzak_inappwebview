@@ -21,7 +21,7 @@
 
 - [ ] T012 **[U7]** Verify `InAppWebViewController` implements `Disposable` with canonical signature
 - [X] T013 **[U8]** Verify `InAppWebViewController.dispose()` forwards to platform with `isKeepAlive`
-- [ ] T014 **[U9]** Verify `InAppWebViewController` keepAlive semantics: true retains native, false releases
+- [X] T014 **[U9]** Verify `InAppWebViewController` keepAlive semantics: true retains native, false releases
 - [ ] T015 **[U10]** Verify `InAppWebView` implements `Disposable` with canonical signature
 - [ ] T016 **[U11]** Verify `InAppWebView.dispose()` forwards to platform with `isKeepAlive`
 - [ ] T017 **[U12]** Verify `InAppWebView` keepAlive semantics consistent with controller

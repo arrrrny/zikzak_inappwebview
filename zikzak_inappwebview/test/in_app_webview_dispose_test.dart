@@ -36,5 +36,21 @@ void main() {
         expect(platform.lastKeepAlive, isTrue);
       },
     );
+
+    test(
+      'U9: a later dispose(isKeepAlive: false) after dispose(isKeepAlive: true) forwards false and fully releases',
+      () {
+        final platform = _FakePlatformController();
+        final controller =
+            InAppWebViewController.fromPlatform(platform: platform);
+
+        controller.dispose(isKeepAlive: true);
+        controller.dispose(isKeepAlive: false);
+
+        expect(platform.disposeCount, 2);
+        expect(platform.lastKeepAlive, isFalse,
+            reason: 'the second (non-keepAlive) call must forward false');
+      },
+    );
   });
 }

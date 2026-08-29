@@ -47,7 +47,7 @@ Grouped by the component from plan.md that owns them. Since plan.md is absent, w
 | --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
 | U7 | InAppWebViewController implements Disposable with canonical signature | FR-001, FR-002, FR-005 | example | DONE | test/disposable_pattern_test.dart |
 | U8 | InAppWebViewController.dispose({bool isKeepAlive = false}) forwards to platform.dispose(isKeepAlive: ...) | FR-006 | example | DONE | test/in_app_webview_dispose_test.dart: U8: InAppWebViewController.dispose(isKeepAlive: true) forwards to platform.dispose(isKeepAlive: true) |
-| U9 | isKeepAlive semantics: true retains native view, subsequent false releases it | FR-007 | example | PENDING | |
+| U9 | isKeepAlive semantics: true retains native view, subsequent false releases it | FR-007 | example | DONE | test/in_app_webview_dispose_test.dart: U9: a later dispose(isKeepAlive: false) after dispose(isKeepAlive: true) forwards false and fully releases |
 
 ### `zikzak_inappwebview/lib/src/in_app_webview/in_app_webview.dart`
 
