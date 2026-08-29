@@ -97,8 +97,97 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
         super.init()
     }
 
+    // MARK: - Enum wire-name helpers
+    // The Dart surface serializes InAppWebViewSettings enums as String names
+    // (see the generated EnumMaps). Native WebKit exposes them as Int rawValues,
+    // so we translate in both directions.
+
+    private func preferredContentModeName(_ rawValue: Int) -> String {
+        switch rawValue {
+        case 1: return "MOBILE"
+        case 2: return "DESKTOP"
+        default: return "RECOMMENDED"
+        }
+    }
+
+    private func selectionGranularityName(_ rawValue: Int) -> String {
+        switch rawValue {
+        case 1: return "CHARACTER"
+        default: return "DYNAMIC"
+        }
+    }
+
+    private func contentInsetAdjustmentBehaviorName(_ rawValue: Int) -> String {
+        switch rawValue {
+        case 1: return "SCROLLABLE_AXES"
+        case 2: return "NEVER"
+        case 3: return "ALWAYS"
+        default: return "AUTOMATIC"
+        }
+    }
+
+    private func webAuthenticationSupportName(_ rawValue: Int) -> String {
+        switch rawValue {
+        case 1: return "FOR_APP"
+        case 2: return "FOR_BROWSER"
+        default: return "NONE"
+        }
+    }
+
+    private func preferredContentModeRawValue(_ name: String?) -> Int {
+        switch name {
+        case "MOBILE": return 1
+        case "DESKTOP": return 2
+        default: return 0
+        }
+    }
+
+    private func selectionGranularityRawValue(_ name: String?) -> Int {
+        switch name {
+        case "CHARACTER": return 1
+        default: return 0
+        }
+    }
+
+    private func contentInsetAdjustmentBehaviorRawValue(_ name: String?) -> Int {
+        switch name {
+        case "SCROLLABLE_AXES": return 1
+        case "NEVER": return 2
+        case "ALWAYS": return 3
+        default: return 0
+        }
+    }
+
+    private func webAuthenticationSupportRawValue(_ name: String?) -> Int {
+        switch name {
+        case "FOR_BROWSER": return 2
+        case "FOR_APP": return 1
+        default: return 0
+        }
+    }
+
     override func parse(settings: [String: Any?]) -> InAppWebViewSettings {
         var settings = settings  // re-assing to be able to use removeValue
+        // Translate enum String wire names coming from the Dart surface back to
+        // the Int rawValues the WebKit properties expect. Legacy Int values are
+        // passed through unchanged.
+        let enumHandlers: [(String, (String?) -> Int)] = [
+            ("preferredContentMode", preferredContentModeRawValue),
+            ("selectionGranularity", selectionGranularityRawValue),
+            ("contentInsetAdjustmentBehavior", contentInsetAdjustmentBehaviorRawValue),
+            ("webAuthenticationSupport", webAuthenticationSupportRawValue),
+        ]
+        for (key, converter) in enumHandlers {
+            if let value = settings[key] {
+                if let name = value as? String {
+                    settings[key] = converter(name)
+                } else if !(value is NSNull), value != nil {
+                    // keep non-String, non-null values (e.g. legacy Int) as-is
+                } else {
+                    settings.removeValue(forKey: key)
+                }
+            }
+        }
         if let minimumViewportInsetMap = settings["minimumViewportInset"] as? [String: Double] {
             minimumViewportInset = UIEdgeInsets.fromMap(map: minimumViewportInsetMap)
             settings.removeValue(forKey: "minimumViewportInset")
@@ -228,6 +317,20 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
                 }
             }
         }
+
+        // Translate the four enum fields from WebKit Int rawValues back to the
+        // String wire names the Dart surface expects (see the generated
+        // EnumMaps). The Dart `fromMap` rebuilds enums via the EnumMap, so a raw
+        // Int here would fail to round-trip.
+        realSettings["preferredContentMode"] = preferredContentModeName(
+            realSettings["preferredContentMode"] as? Int ?? 0)
+        realSettings["selectionGranularity"] = selectionGranularityName(
+            realSettings["selectionGranularity"] as? Int ?? 0)
+        realSettings["contentInsetAdjustmentBehavior"] = contentInsetAdjustmentBehaviorName(
+            realSettings["contentInsetAdjustmentBehavior"] as? Int ?? 0)
+        realSettings["webAuthenticationSupport"] = webAuthenticationSupportName(
+            realSettings["webAuthenticationSupport"] as? Int ?? 0)
+
         return realSettings
     }
 }

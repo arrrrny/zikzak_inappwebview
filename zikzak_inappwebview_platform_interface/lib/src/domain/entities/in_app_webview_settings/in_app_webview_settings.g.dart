@@ -304,7 +304,7 @@ InAppWebViewSettings _$InAppWebViewSettingsFromJson(
       'rendererPriorityPolicy',
       (v) => v == null
           ? null
-          : RendererPriorityPolicy.fromJson(v as Map<String, dynamic>),
+          : RendererPriorityPolicy.fromJson(Map<String, dynamic>.from(v as Map)),
     ),
     disableDefaultErrorPage: $checkedConvert(
       'disableDefaultErrorPage',
@@ -533,7 +533,7 @@ InAppWebViewSettings _$InAppWebViewSettingsFromJson(
       'webViewAssetLoader',
       (v) => v == null
           ? null
-          : WebViewAssetLoader.fromJson(v as Map<String, dynamic>),
+          : WebViewAssetLoader.fromJson(Map<String, dynamic>.from(v as Map)),
     ),
     iframeAllow: $checkedConvert('iframeAllow', (v) => v as String?),
     iframeAllowFullscreen: $checkedConvert(

@@ -26,6 +26,7 @@ dependencies:
   zikzak_inappwebview_windows: ^5.0.0
   zikzak_inappwebview_linux: ^5.0.0
   synchronized: ^3.4.1
+  zikzak_session: ^0.2.0
 
 dev_dependencies:
   flutter_test:

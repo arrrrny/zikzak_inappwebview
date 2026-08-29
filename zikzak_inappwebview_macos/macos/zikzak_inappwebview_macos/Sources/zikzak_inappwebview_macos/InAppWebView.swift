@@ -46,6 +46,19 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     private var isPausedTimers = false
     private var isPausedTimersCompletionHandler: (() -> Void)?
 
+    // MARK: - WebContent readiness gate (first-load race, issue #197)
+    //
+    // A navigation issued while the WKWebView WebContent XPC process is still
+    // booting is silently dropped (no didStart/didFinish/didFail — the
+    // navigation simply never happens). HeadlessInAppWebViewManager arms an
+    // equivalent gate via evaluateJavaScript("true"), whose completion is the
+    // exact "process ready" signal (evaluateJavaScript is queued until the
+    // WebContent process is fully up). Mirror that here so a loadData/loadUrl/
+    // loadFile/postUrl issued from onWebViewCreated is queued and fired once
+    // the process can actually accept a navigation.
+    private var isWebContentReady = false
+    private var pendingFirstLoad: (() -> Void)?
+
     /// Last right-click location in view coordinates. macOS has no long-press
     /// gesture; right-click is the closest equivalent and is what we use to
     /// fire `onLongPressHitTestResult` and back `getHitTestResult`.
@@ -199,6 +212,12 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
 
         bindChannels(registrar: registrar, viewId: viewId, channelName: channelName)
 
+        // Arm the WebContent readiness gate: a load issued while the WebContent
+        // XPC process is still booting is silently dropped, so any load that
+        // arrives before the gate opens (here, or from onWebViewCreated) is
+        // queued and fired once evaluateJavaScript("true") completes.
+        armWebContentReadinessGate()
+
         if let args = arguments as? [String: Any] {
             // The initial load is normally fired here, synchronously during
             // construction. Headless webviews pass deferInitialLoad: true so
@@ -206,8 +225,11 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             // BEFORE the first navigation is issued (see makeInitialLoad).
             if !deferInitialLoad {
                 if let initialUrlRequest = args["initialUrlRequest"] as? [String: Any] {
+                    debugLog("INITIAL_LOAD")
                     let request = URLRequest(fromPluginMap: initialUrlRequest)
-                    self.load(request)
+                    self.performLoad { [weak self] in
+                        self?.load(request)
+                    }
                 }
             }
 
@@ -313,6 +335,55 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         } else if let initialUrlRequest = initialUrlRequest {
             let request = URLRequest(fromPluginMap: initialUrlRequest)
             self.load(request)
+        }
+    }
+
+    // MARK: - WebContent readiness gate (first-load race, issue #197)
+
+    // TEMP DEBUG: print to stderr (captured by flutter test --verbose).
+    private func debugLog(_ msg: String) {
+        print("ZIKZAK_DEBUG: \(msg)")
+    }
+
+    /// Runs a navigation, queuing it until the WebContent process is fully up.
+    ///
+    /// A `load` issued while the WKWebView WebContent XPC process is still
+    /// booting is silently dropped (no didStart / didFinish / didFail — the
+    /// navigation simply never happens). `evaluateJavaScript` is queued by
+    /// WebKit until the process and its default JS context exist, so the
+    /// readiness gate's completion is the exact "process ready" signal. Until
+    /// then we hold the latest load in `pendingFirstLoad`; only the most recent
+    /// is kept because a newer navigation supersedes an earlier one.
+    private func performLoad(_ load: @escaping () -> Void) {
+        debugLog("PERFORM ready=\(isWebContentReady)")
+        if isWebContentReady {
+            load()
+        } else {
+            pendingFirstLoad = load
+        }
+    }
+
+    /// Arms the WebContent readiness gate. Mirrors
+    /// `HeadlessInAppWebViewManager.run()`'s process-readiness ping:
+    /// `evaluateJavaScript("true")` is queued by WebKit until the WebContent
+    /// process is fully up, so its completion handler is the exact "process
+    /// ready" signal. Once ready we flush any load queued during `init` or
+    /// from `onWebViewCreated` — no timeout constant required.
+    private func armWebContentReadinessGate() {
+        debugLog("ARM gate")
+        self.evaluateJavaScript("true") { [weak self] (_, error) in
+            self?.debugLog("GATE_CB err=\(error?.localizedDescription ?? "nil")")
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.isWebContentReady = true
+                if let pending = self.pendingFirstLoad {
+                    self.pendingFirstLoad = nil
+                    debugLog("GATE_FLUSH")
+                    pending()
+                } else {
+                    debugLog("GATE_NO_PENDING")
+                }
+            }
         }
     }
 
@@ -473,7 +544,9 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 let urlRequest = args["urlRequest"] as? [String: Any]
             {
                 let request = URLRequest(fromPluginMap: urlRequest)
-                self.load(request)
+                self.performLoad { [weak self] in
+                    self?.load(request)
+                }
                 result(true)
             } else {
                 result(
@@ -490,7 +563,9 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                     "application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
                 request.httpMethod = "POST"
                 request.httpBody = postData
-                self.load(request)
+                self.performLoad { [weak self] in
+                    self?.load(request)
+                }
                 result(true)
             } else {
                 result(
@@ -503,14 +578,20 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             {
                 let mimeType = args["mimeType"] as? String ?? "text/html"
                 let encoding = args["encoding"] as? String ?? "utf-8"
+                debugLog("LOAD_DATA handle")
                 let baseURL = URL(string: baseUrl)
-                if let dataData = data.data(using: .utf8) {
-                    self.load(
-                        dataData, mimeType: mimeType,
-                        characterEncodingName: encoding, baseURL: baseURL ?? URL(string: "about:blank")!)
-                } else {
-                    self.loadHTMLString(data, baseURL: baseURL)
+                let load = { [weak self] in
+                    guard let self = self else { return }
+                    if let dataData = data.data(using: .utf8) {
+                        self.load(
+                            dataData, mimeType: mimeType,
+                            characterEncodingName: encoding,
+                            baseURL: baseURL ?? URL(string: "about:blank")!)
+                    } else {
+                        self.loadHTMLString(data, baseURL: baseURL)
+                    }
                 }
+                self.performLoad(load)
                 result(true)
             } else {
                 result(
@@ -528,11 +609,15 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 do {
                     let assetURL = try Util.getUrlAsset(
                         registrar: registrar, assetFilePath: assetFilePath)
-                    if assetURL.isFileURL {
-                        self.loadFileURL(
-                            assetURL, allowingReadAccessTo: assetURL.deletingLastPathComponent())
-                    } else {
-                        self.load(URLRequest(url: assetURL))
+                    self.performLoad { [weak self] in
+                        guard let self = self else { return }
+                        if assetURL.isFileURL {
+                            self.loadFileURL(
+                                assetURL,
+                                allowingReadAccessTo: assetURL.deletingLastPathComponent())
+                        } else {
+                            self.load(URLRequest(url: assetURL))
+                        }
                     }
                     result(true)
                 } catch let error as NSError {
@@ -1725,6 +1810,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     }
 
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        debugLog("ON_LOAD_STOP url=\(webView.url?.absoluteString ?? "nil")")
         InAppWebView.credentialsProposed = []
         channel?.invokeMethod("onLoadStop", arguments: ["url": webView.url?.absoluteString])
     }

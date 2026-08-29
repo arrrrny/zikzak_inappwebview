@@ -168,6 +168,219 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
     @Nullable
     public List<String> insetsForWebContentToIgnore = null;
 
+    // Maps from the String enum wire names produced by the Dart rewrite (and the
+    // legacy Integer wire values) to the native int constants the platform
+    // WebSettings expect. Keeping both shapes lets settings from either the
+    // published 5.x (Integer) or the rewritten (String) Dart surface parse.
+    private static final Map<String, Integer> PREFERRED_CONTENT_MODE_VALUES =
+        new HashMap<>();
+
+    static {
+        PREFERRED_CONTENT_MODE_VALUES.put(
+            "RECOMMENDED",
+            PreferredContentModeOptionType.RECOMMENDED.toValue()
+        );
+        PREFERRED_CONTENT_MODE_VALUES.put(
+            "MOBILE",
+            PreferredContentModeOptionType.MOBILE.toValue()
+        );
+        PREFERRED_CONTENT_MODE_VALUES.put(
+            "DESKTOP",
+            PreferredContentModeOptionType.DESKTOP.toValue()
+        );
+    }
+
+    private static final Map<String, Integer> MIXED_CONTENT_MODE_VALUES =
+        new HashMap<>();
+
+    static {
+        MIXED_CONTENT_MODE_VALUES.put(
+            "MIXED_CONTENT_ALWAYS_ALLOW",
+            WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+        );
+        MIXED_CONTENT_MODE_VALUES.put(
+            "MIXED_CONTENT_NEVER_ALLOW",
+            WebSettings.MIXED_CONTENT_NEVER_ALLOW
+        );
+        MIXED_CONTENT_MODE_VALUES.put(
+            "MIXED_CONTENT_COMPATIBILITY_MODE",
+            WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
+        );
+    }
+
+    private static final Map<String, Integer> CACHE_MODE_VALUES = new HashMap<>();
+
+    static {
+        CACHE_MODE_VALUES.put("LOAD_DEFAULT", WebSettings.LOAD_DEFAULT);
+        CACHE_MODE_VALUES.put(
+            "LOAD_CACHE_ELSE_NETWORK",
+            WebSettings.LOAD_CACHE_ELSE_NETWORK
+        );
+        CACHE_MODE_VALUES.put("LOAD_NO_CACHE", WebSettings.LOAD_NO_CACHE);
+        CACHE_MODE_VALUES.put("LOAD_CACHE_ONLY", WebSettings.LOAD_CACHE_ONLY);
+    }
+
+    private static final Map<String, Integer> DISABLED_ACTION_MODE_MENU_ITEMS_VALUES =
+        new HashMap<>();
+
+    static {
+        DISABLED_ACTION_MODE_MENU_ITEMS_VALUES.put(
+            "MENU_ITEM_NONE",
+            WebSettings.MENU_ITEM_NONE
+        );
+        DISABLED_ACTION_MODE_MENU_ITEMS_VALUES.put(
+            "MENU_ITEM_SHARE",
+            WebSettings.MENU_ITEM_SHARE
+        );
+        DISABLED_ACTION_MODE_MENU_ITEMS_VALUES.put(
+            "MENU_ITEM_WEB_SEARCH",
+            WebSettings.MENU_ITEM_WEB_SEARCH
+        );
+        DISABLED_ACTION_MODE_MENU_ITEMS_VALUES.put(
+            "MENU_ITEM_PROCESS_TEXT",
+            WebSettings.MENU_ITEM_PROCESS_TEXT
+        );
+    }
+
+    private static final Map<String, Integer> FORCE_DARK_VALUES = new HashMap<>();
+
+    static {
+        FORCE_DARK_VALUES.put("OFF", WebSettingsCompat.FORCE_DARK_OFF);
+        FORCE_DARK_VALUES.put("AUTO", WebSettingsCompat.FORCE_DARK_AUTO);
+        FORCE_DARK_VALUES.put("ON", WebSettingsCompat.FORCE_DARK_ON);
+    }
+
+    private static final Map<String, Integer> FORCE_DARK_STRATEGY_VALUES =
+        new HashMap<>();
+
+    static {
+        FORCE_DARK_STRATEGY_VALUES.put(
+            "USER_AGENT_DARKENING_ONLY",
+            WebSettingsCompat.DARK_STRATEGY_USER_AGENT_DARKENING_ONLY
+        );
+        FORCE_DARK_STRATEGY_VALUES.put(
+            "WEB_THEME_DARKENING_ONLY",
+            WebSettingsCompat.DARK_STRATEGY_WEB_THEME_DARKENING_ONLY
+        );
+        FORCE_DARK_STRATEGY_VALUES.put(
+            "PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING",
+            WebSettingsCompat.DARK_STRATEGY_PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING
+        );
+    }
+
+    private static final Map<String, Integer> OVER_SCROLL_MODE_VALUES =
+        new HashMap<>();
+
+    static {
+        OVER_SCROLL_MODE_VALUES.put("ALWAYS", View.OVER_SCROLL_ALWAYS);
+        OVER_SCROLL_MODE_VALUES.put(
+            "IF_CONTENT_SCROLLS",
+            View.OVER_SCROLL_IF_CONTENT_SCROLLS
+        );
+        OVER_SCROLL_MODE_VALUES.put("NEVER", View.OVER_SCROLL_NEVER);
+    }
+
+    private static final Map<String, Integer> SCROLL_BAR_STYLE_VALUES =
+        new HashMap<>();
+
+    static {
+        SCROLL_BAR_STYLE_VALUES.put(
+            "SCROLLBARS_INSIDE_OVERLAY",
+            View.SCROLLBARS_INSIDE_OVERLAY
+        );
+        SCROLL_BAR_STYLE_VALUES.put(
+            "SCROLLBARS_INSIDE_INSET",
+            View.SCROLLBARS_INSIDE_INSET
+        );
+        SCROLL_BAR_STYLE_VALUES.put(
+            "SCROLLBARS_OUTSIDE_OVERLAY",
+            View.SCROLLBARS_OUTSIDE_OVERLAY
+        );
+        SCROLL_BAR_STYLE_VALUES.put(
+            "SCROLLBARS_OUTSIDE_INSET",
+            View.SCROLLBARS_OUTSIDE_INSET
+        );
+    }
+
+    private static final Map<String, Integer> VERTICAL_SCROLLBAR_POSITION_VALUES =
+        new HashMap<>();
+
+    static {
+        VERTICAL_SCROLLBAR_POSITION_VALUES.put(
+            "SCROLLBAR_POSITION_DEFAULT",
+            View.SCROLLBAR_POSITION_DEFAULT
+        );
+        VERTICAL_SCROLLBAR_POSITION_VALUES.put(
+            "SCROLLBAR_POSITION_LEFT",
+            View.SCROLLBAR_POSITION_LEFT
+        );
+        VERTICAL_SCROLLBAR_POSITION_VALUES.put(
+            "SCROLLBAR_POSITION_RIGHT",
+            View.SCROLLBAR_POSITION_RIGHT
+        );
+    }
+
+    private static final Map<String, Integer> WEB_AUTHENTICATION_SUPPORT_VALUES =
+        new HashMap<>();
+
+    static {
+        WEB_AUTHENTICATION_SUPPORT_VALUES.put(
+            "NONE",
+            WebSettingsCompat.WEB_AUTHENTICATION_SUPPORT_NONE
+        );
+        WEB_AUTHENTICATION_SUPPORT_VALUES.put(
+            "FOR_APP",
+            WebSettingsCompat.WEB_AUTHENTICATION_SUPPORT_FOR_APP
+        );
+        WEB_AUTHENTICATION_SUPPORT_VALUES.put(
+            "FOR_BROWSER",
+            WebSettingsCompat.WEB_AUTHENTICATION_SUPPORT_FOR_BROWSER
+        );
+    }
+
+    /**
+     * Parse an enum settings value that may arrive either as a legacy
+     * {@code Integer} (index/wire value) or as the String enum name the
+     * rewritten Dart surface emits. Returns {@code null} when the value cannot
+     * be resolved, in which case the caller should keep the field's default.
+     */
+    @Nullable
+    private static Integer parseEnumValue(
+        @Nullable Object value,
+        @NonNull Map<String, Integer> nameToValue
+    ) {
+        if (value instanceof Integer) {
+            return (Integer) value;
+        }
+        if (value instanceof String) {
+            return nameToValue.get(value);
+        }
+        return null;
+    }
+
+    /**
+     * Reverse of {@link #parseEnumValue}: given a native int constant (or null),
+     * return the String enum wire name the rewritten Dart surface expects.
+     * Returns {@code null} when the value cannot be resolved, so callers can
+     * leave the field absent rather than emitting a stray int that
+     * {@code fromJson} (via {@code $enumDecodeNullable}) rejects.
+     */
+    @Nullable
+    private static String enumValueToName(
+        @Nullable Integer value,
+        @NonNull Map<String, Integer> nameToValue
+    ) {
+        if (value == null) {
+            return null;
+        }
+        for (Map.Entry<String, Integer> entry : nameToValue.entrySet()) {
+            if (value.equals(entry.getValue())) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
     @NonNull
     @Override
     public InAppWebViewSettings parse(@NonNull Map<String, Object> settings) {
@@ -223,9 +436,11 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
                             Map<String, Map<String, Object>>
                         >) value;
                     break;
-                case "preferredContentMode":
-                    preferredContentMode = (Integer) value;
+                case "preferredContentMode": {
+                    Integer v = parseEnumValue(value, PREFERRED_CONTENT_MODE_VALUES);
+                    if (v != null) preferredContentMode = v;
                     break;
+                }
                 case "useShouldInterceptAjaxRequest":
                     useShouldInterceptAjaxRequest = (Boolean) value;
                     break;
@@ -280,9 +495,11 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
                 case "safeBrowsingEnabled":
                     safeBrowsingEnabled = (Boolean) value;
                     break;
-                case "mixedContentMode":
-                    mixedContentMode = (Integer) value;
+                case "mixedContentMode": {
+                    Integer v = parseEnumValue(value, MIXED_CONTENT_MODE_VALUES);
+                    if (v != null) mixedContentMode = v;
                     break;
+                }
                 case "allowContentAccess":
                     allowContentAccess = (Boolean) value;
                     break;
@@ -304,9 +521,11 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
                 case "blockNetworkLoads":
                     blockNetworkLoads = (Boolean) value;
                     break;
-                case "cacheMode":
-                    cacheMode = (Integer) value;
+                case "cacheMode": {
+                    Integer v = parseEnumValue(value, CACHE_MODE_VALUES);
+                    if (v != null) cacheMode = v;
                     break;
+                }
                 case "cursiveFontFamily":
                     cursiveFontFamily = (String) value;
                     break;
@@ -319,21 +538,28 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
                 case "defaultTextEncodingName":
                     defaultTextEncodingName = (String) value;
                     break;
-                case "disabledActionModeMenuItems":
-                    disabledActionModeMenuItems = (Integer) value;
+                case "disabledActionModeMenuItems": {
+                    Integer v =
+                        parseEnumValue(value, DISABLED_ACTION_MODE_MENU_ITEMS_VALUES);
+                    if (v != null) disabledActionModeMenuItems = v;
                     break;
+                }
                 case "fantasyFontFamily":
                     fantasyFontFamily = (String) value;
                     break;
                 case "fixedFontFamily":
                     fixedFontFamily = (String) value;
                     break;
-                case "forceDark":
-                    forceDark = (Integer) value;
+                case "forceDark": {
+                    Integer v = parseEnumValue(value, FORCE_DARK_VALUES);
+                    if (v != null) forceDark = v;
                     break;
-                case "forceDarkStrategy":
-                    forceDarkStrategy = (Integer) value;
+                }
+                case "forceDarkStrategy": {
+                    Integer v = parseEnumValue(value, FORCE_DARK_STRATEGY_VALUES);
+                    if (v != null) forceDarkStrategy = v;
                     break;
+                }
                 case "geolocationEnabled":
                     geolocationEnabled = (Boolean) value;
                     break;
@@ -385,18 +611,25 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
                 case "regexToCancelOverrideUrlLoading":
                     regexToCancelOverrideUrlLoading = (String) value;
                     break;
-                case "overScrollMode":
-                    overScrollMode = (Integer) value;
+                case "overScrollMode": {
+                    Integer v = parseEnumValue(value, OVER_SCROLL_MODE_VALUES);
+                    if (v != null) overScrollMode = v;
                     break;
+                }
                 case "networkAvailable":
                     networkAvailable = (Boolean) value;
                     break;
-                case "scrollBarStyle":
-                    scrollBarStyle = (Integer) value;
+                case "scrollBarStyle": {
+                    Integer v = parseEnumValue(value, SCROLL_BAR_STYLE_VALUES);
+                    if (v != null) scrollBarStyle = v;
                     break;
-                case "verticalScrollbarPosition":
-                    verticalScrollbarPosition = (Integer) value;
+                }
+                case "verticalScrollbarPosition": {
+                    Integer v =
+                        parseEnumValue(value, VERTICAL_SCROLLBAR_POSITION_VALUES);
+                    if (v != null) verticalScrollbarPosition = v;
                     break;
+                }
                 case "scrollBarDefaultDelayBeforeFade":
                     scrollBarDefaultDelayBeforeFade = (Integer) value;
                     break;
@@ -439,9 +672,12 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
                 case "paymentRequestEnabled":
                     paymentRequestEnabled = (Boolean) value;
                     break;
-                case "webAuthenticationSupport":
-                    webAuthenticationSupport = (Integer) value;
+                case "webAuthenticationSupport": {
+                    Integer v =
+                        parseEnumValue(value, WEB_AUTHENTICATION_SUPPORT_VALUES);
+                    if (v != null) webAuthenticationSupport = v;
                     break;
+                }
                 case "enterpriseAuthenticationAppLinkPolicyEnabled":
                     enterpriseAuthenticationAppLinkPolicyEnabled =
                         (Boolean) value;
@@ -505,7 +741,10 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
         settings.put("horizontalScrollBarEnabled", horizontalScrollBarEnabled);
         settings.put("resourceCustomSchemes", resourceCustomSchemes);
         settings.put("contentBlockers", contentBlockers);
-        settings.put("preferredContentMode", preferredContentMode);
+        settings.put(
+            "preferredContentMode",
+            enumValueToName(preferredContentMode, PREFERRED_CONTENT_MODE_VALUES)
+        );
         settings.put(
             "useShouldInterceptAjaxRequest",
             useShouldInterceptAjaxRequest
@@ -533,7 +772,10 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
         settings.put("domStorageEnabled", domStorageEnabled);
         settings.put("useWideViewPort", useWideViewPort);
         settings.put("safeBrowsingEnabled", safeBrowsingEnabled);
-        settings.put("mixedContentMode", mixedContentMode);
+        settings.put(
+            "mixedContentMode",
+            enumValueToName(mixedContentMode, MIXED_CONTENT_MODE_VALUES)
+        );
         settings.put("allowContentAccess", allowContentAccess);
         settings.put("allowFileAccess", allowFileAccess);
         settings.put(
@@ -547,19 +789,31 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
         settings.put("appCachePath", appCachePath);
         settings.put("blockNetworkImage", blockNetworkImage);
         settings.put("blockNetworkLoads", blockNetworkLoads);
-        settings.put("cacheMode", cacheMode);
+        settings.put(
+            "cacheMode",
+            enumValueToName(cacheMode, CACHE_MODE_VALUES)
+        );
         settings.put("cursiveFontFamily", cursiveFontFamily);
         settings.put("defaultFixedFontSize", defaultFixedFontSize);
         settings.put("defaultFontSize", defaultFontSize);
         settings.put("defaultTextEncodingName", defaultTextEncodingName);
         settings.put(
             "disabledActionModeMenuItems",
-            disabledActionModeMenuItems
+            enumValueToName(
+                disabledActionModeMenuItems,
+                DISABLED_ACTION_MODE_MENU_ITEMS_VALUES
+            )
         );
         settings.put("fantasyFontFamily", fantasyFontFamily);
         settings.put("fixedFontFamily", fixedFontFamily);
-        settings.put("forceDark", forceDark);
-        settings.put("forceDarkStrategy", forceDarkStrategy);
+        settings.put(
+            "forceDark",
+            enumValueToName(forceDark, FORCE_DARK_VALUES)
+        );
+        settings.put(
+            "forceDarkStrategy",
+            enumValueToName(forceDarkStrategy, FORCE_DARK_STRATEGY_VALUES)
+        );
         settings.put("geolocationEnabled", geolocationEnabled);
         settings.put("layoutAlgorithm", getLayoutAlgorithm());
         settings.put("loadWithOverviewMode", loadWithOverviewMode);
@@ -583,10 +837,22 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
             "regexToCancelOverrideUrlLoading",
             regexToCancelOverrideUrlLoading
         );
-        settings.put("overScrollMode", overScrollMode);
+        settings.put(
+            "overScrollMode",
+            enumValueToName(overScrollMode, OVER_SCROLL_MODE_VALUES)
+        );
         settings.put("networkAvailable", networkAvailable);
-        settings.put("scrollBarStyle", scrollBarStyle);
-        settings.put("verticalScrollbarPosition", verticalScrollbarPosition);
+        settings.put(
+            "scrollBarStyle",
+            enumValueToName(scrollBarStyle, SCROLL_BAR_STYLE_VALUES)
+        );
+        settings.put(
+            "verticalScrollbarPosition",
+            enumValueToName(
+                verticalScrollbarPosition,
+                VERTICAL_SCROLLBAR_POSITION_VALUES
+            )
+        );
         settings.put(
             "scrollBarDefaultDelayBeforeFade",
             scrollBarDefaultDelayBeforeFade
@@ -624,7 +890,10 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
         );
         settings.put(
             "webAuthenticationSupport",
-            webAuthenticationSupport
+            enumValueToName(
+                webAuthenticationSupport,
+                WEB_AUTHENTICATION_SUPPORT_VALUES
+            )
         );
         settings.put(
             "enterpriseAuthenticationAppLinkPolicyEnabled",
@@ -713,7 +982,10 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 realSettings.put(
                     "mixedContentMode",
-                    settings.getMixedContentMode()
+                    enumValueToName(
+                        settings.getMixedContentMode(),
+                        MIXED_CONTENT_MODE_VALUES
+                    )
                 );
             }
             realSettings.put(
@@ -737,7 +1009,10 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
                 "blockNetworkLoads",
                 settings.getBlockNetworkLoads()
             );
-            realSettings.put("cacheMode", settings.getCacheMode());
+            realSettings.put(
+                "cacheMode",
+                enumValueToName(settings.getCacheMode(), CACHE_MODE_VALUES)
+            );
             realSettings.put(
                 "cursiveFontFamily",
                 settings.getCursiveFontFamily()
@@ -758,13 +1033,21 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
             ) {
                 realSettings.put(
                     "disabledActionModeMenuItems",
-                    WebSettingsCompat.getDisabledActionModeMenuItems(settings)
+                    enumValueToName(
+                        WebSettingsCompat.getDisabledActionModeMenuItems(
+                            settings
+                        ),
+                        DISABLED_ACTION_MODE_MENU_ITEMS_VALUES
+                    )
                 );
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 realSettings.put(
                     "disabledActionModeMenuItems",
-                    settings.getDisabledActionModeMenuItems()
+                    enumValueToName(
+                        settings.getDisabledActionModeMenuItems(),
+                        DISABLED_ACTION_MODE_MENU_ITEMS_VALUES
+                    )
                 );
             }
             realSettings.put(
@@ -775,10 +1058,19 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
             if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
                 realSettings.put(
                     "forceDark",
-                    WebSettingsCompat.getForceDark(settings)
+                    enumValueToName(
+                        WebSettingsCompat.getForceDark(settings),
+                        FORCE_DARK_VALUES
+                    )
                 );
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                realSettings.put("forceDark", settings.getForceDark());
+                realSettings.put(
+                    "forceDark",
+                    enumValueToName(
+                        settings.getForceDark(),
+                        FORCE_DARK_VALUES
+                    )
+                );
             }
             if (
                 WebViewFeature.isFeatureSupported(
@@ -787,7 +1079,10 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
             ) {
                 realSettings.put(
                     "forceDarkStrategy",
-                    WebSettingsCompat.getForceDarkStrategy(settings)
+                    enumValueToName(
+                        WebSettingsCompat.getForceDarkStrategy(settings),
+                        FORCE_DARK_STRATEGY_VALUES
+                    )
                 );
             }
             realSettings.put(
@@ -835,11 +1130,20 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
                 "supportMultipleWindows",
                 settings.supportMultipleWindows()
             );
-            realSettings.put("overScrollMode", webView.getOverScrollMode());
-            realSettings.put("scrollBarStyle", webView.getScrollBarStyle());
+            realSettings.put(
+                "overScrollMode",
+                enumValueToName(webView.getOverScrollMode(), OVER_SCROLL_MODE_VALUES)
+            );
+            realSettings.put(
+                "scrollBarStyle",
+                enumValueToName(webView.getScrollBarStyle(), SCROLL_BAR_STYLE_VALUES)
+            );
             realSettings.put(
                 "verticalScrollbarPosition",
-                webView.getVerticalScrollbarPosition()
+                enumValueToName(
+                    webView.getVerticalScrollbarPosition(),
+                    VERTICAL_SCROLLBAR_POSITION_VALUES
+                )
             );
             realSettings.put(
                 "scrollBarDefaultDelayBeforeFade",
@@ -952,7 +1256,10 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
             ) {
                 realSettings.put(
                     "webAuthenticationSupport",
-                    WebSettingsCompat.getWebAuthenticationSupport(settings)
+                    enumValueToName(
+                        WebSettingsCompat.getWebAuthenticationSupport(settings),
+                        WEB_AUTHENTICATION_SUPPORT_VALUES
+                    )
                 );
             }
             if (
