@@ -247,5 +247,5 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
   `Expected: throws <PlatformException> with `code`: 'UNSUPPORTED_IOS_VERSION' ... Actual: <Closure> ... emitted <null>  createPdf must surface the native clear error rather than swallowing it into a null return`. Restored exactly; test green again.
 - green: the production change is the native guard in `WebViewChannelDelegate.swift` `createPdf` `#available(iOS 14.0, *)` else-branch, changed from `result(nil)` (silent null) to `result(FlutterError(code: "UNSUPPORTED_IOS_VERSION", message: "createPdf requires iOS 14.0 or later", details: nil))`. This is the real US5-AC3 fix: on iOS 13.x the native call surfaces a clear error rather than a silent null; the Dart side needs no change because it propagates the resulting `PlatformException`.
 - refactor: none.
-- commit: e5d0a614
+- commit: 12ef63ce
 - notes: green-on-first-run; mutant confirms the test catches a swallowed/null-return regression. A12 (the iOS 13.x acceptance behavior) remains BLOCKED: this environment has only an iOS 26.3 simulator (no iOS 13.x runtime), so the real-device acceptance test cannot execute here. The native `FlutterError` guard + this Dart propagation test together cover the contract. `tasks.md` carries no `[U44]` marker, so no task was ticked. Full iOS package suite after: 5 passed (no regression).
