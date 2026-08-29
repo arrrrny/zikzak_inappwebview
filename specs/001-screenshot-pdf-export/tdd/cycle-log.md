@@ -227,3 +227,14 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
 - refactor: none.
 - commit: 88d25bf9
 - notes: Acceptance behavior requiring a real iOS WebView; ran on an iOS simulator because the physically-connected iPhone is wirelessly tethered and Flutter 3.47.1's `flutter test` has no exposed `--publish-port` flag to satisfy `IOSDevice.startApp` for wireless devices (the run aborts with "Cannot start app on wirelessly tethered iOS device"). The simulators reuse the same WKWebView `takeScreenshot`/`createPdf` path and are a faithful target for these acceptance behaviors. `tasks.md` carries no `[A10]` marker, so no task was ticked.
+
+## A11 — iOS createPdf on iOS 14.0+ returns valid PDF bytes (acceptance)
+
+- test: `zikzak_inappwebview/example/integration_test/ios_create_pdf_test.dart › A11 iOS createPdf on iOS 14.0+ returns valid PDF byte buffer`
+- red: none — the native `createPdf` already called `WKWebView.createPDF(configuration:)` and forwarded the resulting `Data` through `completionHandler` (InAppWebView.swift:1019-1039), so the test passed on first run on the iPhone 17 Pro iOS simulator (iOS 18).
+- deliberate mutant: changed the `.success` branch to `completionHandler(nil)` (so the PDF data is dropped); ran `flutter test integration_test/ios_create_pdf_test.dart -d <iPhone 17 Pro simulator> --plain-name "A11 iOS createPdf on iOS 14.0+ returns valid PDF byte buffer"`. It failed with:
+  `Expected: not null  Actual: <null>  createPdf must return non-null PDF bytes on iOS 14+ (US5-AC2)`. Restored the native code exactly (`git checkout`); test green again.
+- green: no source change; behavior already satisfied by the existing iOS `createPdf` (WKPDFConfiguration + `WKWebView.createPDF`). The acceptance test waits for the layer to paint (2s settle) before calling `createPdf`, mirroring A10.
+- refactor: none.
+- commit: 593286ce
+- notes: green-on-first-run acceptance; the deliberate mutant confirms the test catches a dropped PDF buffer. Real iOS acceptance (simulator, since the physical iPhone is wirelessly tethered and blocked by the missing `--publish-port` flag — see A10 notes). `tasks.md` carries no `[A11]` marker, so no task was ticked.
