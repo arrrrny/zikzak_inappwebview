@@ -47,3 +47,21 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
   `<redacted>`, which is what every consumer reads, so the test asserts on the decoded
   query-param value.
 - commit: 72d4896f
+
+## Cycle 3: A10 per-domain maxEntries budget (FR-006 / US4-AC1)
+
+- test: `zikzak_inappwebview_platform_interface/test/types/network_capture_controller_budget_test.dart::enforces per-domain maxEntries budget; other domains keep capturing (A10)` (new)
+- red: `cd zikzak_inappwebview_platform_interface && flutter test test/types/network_capture_controller_budget_test.dart`
+  -> `Expected: <15>  Actual: <55>` (1 failed) — no enforcement yet, so all 55 requests captured.
+- green: in `NetworkCaptureController.trackRequest`, extract `request.url.host`, look up
+  `domainBudgets[host]`, and when `maxEntries` is set drop further requests for that host
+  once `_domainEntryCount[host]` reaches the cap (increment only on a kept entry); other
+  domains keep capturing. `clear()` now also resets `_domainEntryCount`. Suite
+  `flutter test` (platform_interface) -> 149 ran, 148 passed, 1 pre-existing compile
+  failure in `test/in_app_webview_controller_delegates_test.dart` (unrelated:
+  `_ProbeJavaScript.callAsyncJavaScript` return-type mismatch vs `PlatformJavaScriptDelegate`).
+- refactor: none needed; budget lookup is a single self-contained guard.
+- note: the budget `DomainBudget` type + `domainBudgets`/`_domainEntryCount` fields were
+  added as a green seam before this cycle (kept minimal so the test compiles). The
+  pre-existing delegates-test failure is out of 010's scope and is not fixed here.
+- commit: TBD

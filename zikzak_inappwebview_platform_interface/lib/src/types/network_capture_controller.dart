@@ -6,6 +6,25 @@ import 'network_response.dart';
 import 'network_response_body.dart';
 import 'resource_type.dart';
 
+///Per-domain capture budget.
+///
+///When [NetworkCaptureController.domainBudgets] maps a host to a [DomainBudget],
+///captures for that host are capped accordingly. Once a cap is reached for a
+///domain, further captures for that domain are dropped while other domains keep
+///capturing normally (FR-006 / A10, A11, A12).
+class DomainBudget {
+  ///Maximum number of entries captured for the domain (A10). `null` = unlimited.
+  final int? maxEntries;
+
+  ///Maximum total response-body bytes captured for the domain (A11).
+  final int? maxBytes;
+
+  ///Maximum number of bytes retained per response body for the domain (A12).
+  final int? maxBodySize;
+
+  const DomainBudget({this.maxEntries, this.maxBytes, this.maxBodySize});
+}
+
 ///Controller that accumulates network capture data for bulk retrieval.
 ///
 ///Pass an instance to `InAppWebViewSettings.networkCapture` to automatically
@@ -43,6 +62,16 @@ class NetworkCaptureController {
   final Map<String, String> _pendingErrors = <String, String>{};
 
   DateTime _lastActivity = DateTime.now();
+
+  ///Per-domain capture budgets, keyed by exact host (e.g. `api.example.com`).
+  ///Empty by default, meaning no per-domain limits are applied.
+  ///
+  ///Set this before capture begins; changing it mid-capture takes effect on the
+  ///next tracked request. (FR-006)
+  Map<String, DomainBudget> domainBudgets = const {};
+
+  ///Number of entries currently captured per host, used for budget enforcement.
+  final Map<String, int> _domainEntryCount = <String, int>{};
 
   ///Number of captured entries.
   int get count => _entries.length;
@@ -145,6 +174,7 @@ class NetworkCaptureController {
     _pendingResponses.clear();
     _pendingBodies.clear();
     _pendingErrors.clear();
+    _domainEntryCount.clear();
     _lastActivity = DateTime.now();
   }
 
@@ -155,6 +185,20 @@ class NetworkCaptureController {
     if (existing != null) {
       return;
     }
+
+    // FR-006: enforce a per-domain entry budget. Once a domain hits its
+    // `maxEntries` cap, further captures for that domain are dropped while other
+    // domains keep capturing normally.
+    final host = request.url.host;
+    final budget = domainBudgets[host];
+    if (budget?.maxEntries != null) {
+      final captured = _domainEntryCount[host] ?? 0;
+      if (captured >= budget!.maxEntries!) {
+        return;
+      }
+      _domainEntryCount[host] = captured + 1;
+    }
+
     final entry = NetworkEntry(
       request: request,
       response: _pendingResponses.remove(request.requestId),

@@ -172,7 +172,7 @@ export '../domain/entities/enums/modal_transition_style.dart'
     show ModalTransitionStyle;
 export '../domain/entities/navigation_action/navigation_action.dart'
     show NavigationAction, NavigationActionSerialization;
-export 'network_capture_controller.dart' show NetworkCaptureController;
+export 'network_capture_controller.dart' show NetworkCaptureController, DomainBudget;
 export 'network_entry.dart' show NetworkEntry;
 export 'network_request.dart' show NetworkRequest;
 export 'network_response.dart' show NetworkResponse;
