@@ -202,3 +202,14 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
 - refactor: none.
 - commit: ee01ea44
 - notes: green-on-first-run acceptance; the deliberate mutant confirms the test catches a negotiated/forced PNG output when JPEG was requested. Real macOS desktop acceptance, not the Dart-VM unit runner. The benign `UnimplementedError` `onOverScrolled` logs during webview init do not affect the JPEG-magic assertion. `tasks.md` carries no `[A2]` marker, so no task was ticked.
+
+## A3 — macOS takeScreenshot with rect crops to the specified portion (acceptance)
+
+- test: `zikzak_inappwebview/example/integration_test/macos_take_screenshot_test.dart › A3 macOS takeScreenshot with rect captures only the specified portion of the view`
+- red: none — the native `takeScreenshot` handler already applied `WKSnapshotConfiguration.rect` from `rectMap` (InAppWebView.swift:812-819), so the test passed on first run on the macOS desktop target.
+- deliberate mutant: changed the rect block guard to `if false, let rectMap = ...` (so the crop rect is never applied and the full view is captured); ran `flutter test integration_test/macos_take_screenshot_test.dart -d macos --plain-name "A3 macOS takeScreenshot with rect captures only the specified portion of the view"`. It failed with:
+  `Expected: a value less than <800>  Actual: <800>  Which: is not a value less than <800>  rect must crop the width (US1-AC3)` (the macOS test display renders at 2x, so full width is 800 and the un-cropped capture equals it). Restored the native code exactly (`git checkout`); test green again.
+- green: no source change; behavior already satisfied by the existing macOS `takeScreenshot` rect branch (WKSnapshotConfiguration.rect set from ScreenshotConfiguration.rect).
+- refactor: none.
+- commit: b2855a54
+- notes: green-on-first-run acceptance; the deliberate mutant confirms the test catches a dropped/neutralized rect (the `cropW < fullW` / `cropH < fullH` / `closeTo(fullW/2)` assertions all depend on the native rect block). Real macOS desktop acceptance, not the Dart-VM unit runner. The benign `UnimplementedError` `onOverScrolled` logs during webview init do not affect the assertions. `tasks.md` carries no `[A3]` marker, so no task was ticked.
