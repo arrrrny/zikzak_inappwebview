@@ -11,9 +11,9 @@
 - [ ] **T007** [A7] Write acceptance test: Salvage flush emits buffered events on cancellation before disposal
 - [ ] **T008** [A8] Write acceptance test: Salvage flush emits buffered events on timeout before teardown
 - [ ] **T009** [A9] Write acceptance test: Zero-loss window (>1s) satisfied for events before cancellation
-- [ ] **T010** [A10] Write acceptance test: Per-domain maxEntries budget enforced
-- [ ] **T011** [A11] Write acceptance test: Per-domain maxBytes budget enforced
-- [ ] **T012** [A12] Write acceptance test: Per-domain maxBodySize budget enforced
+- [x] **T010** [A10] Write acceptance test: Per-domain maxEntries budget enforced
+- [x] **T011** [A11] Write acceptance test: Per-domain maxBytes budget enforced
+- [x] **T012** [A12] Write acceptance test: Per-domain maxBodySize budget enforced
 - [x] **T013** [A13] Write acceptance test: Auth header values redacted at source
 - [x] **T014** [A14] Write acceptance test: Session cookie values redacted at source
 - [x] **T015** [A15] Write acceptance test: URL/body auth params redacted at source
@@ -35,9 +35,9 @@
 - [ ] **T028** [A7] Implement salvage flush on cancellation in NetworkCaptureController
 - [ ] **T029** [A8] Implement salvage flush on timeout
 - [ ] **T030** [A9] Enforce documented zero-loss window (>1s) for salvage
-- [ ] **T031** [A10] Implement per-domain maxEntries budget enforcement
-- [ ] **T032** [A11] Implement per-domain maxBytes budget enforcement
-- [ ] **T033** [A12] Implement per-domain maxBodySize budget enforcement
+- [x] **T031** [A10] Implement per-domain maxEntries budget enforcement
+- [x] **T032** [A11] Implement per-domain maxBytes budget enforcement
+- [x] **T033** [A12] Implement per-domain maxBodySize budget enforcement
 - [x] **T034** [A13] Implement SecretRedactor for Authorization headers at source
 - [x] **T035** [A14] Implement SecretRedactor for session cookies at source
 - [x] **T036** [A15] Implement SecretRedactor for URL/body auth params (api_key, password) at source
@@ -105,3 +105,13 @@
 - [ ] **T089** [F5] Create feature branch `010-network-capture-intercept` and begin TDD cycle for A18 (auth tag on stream/flush)
 - [ ] **T090** [F6] Create feature branch `010-network-capture-intercept` and begin TDD cycle for A19 (overhead < 5%)
 - [ ] **T091** [F6] Create feature branch `010-network-capture-intercept` and begin TDD cycle for A20 (benchmark numbers documented)
+
+## Phase 7: TDD remediation (verification @ 90f2d9ce — verdict FAIL)
+
+The feature is NOT done until the untested criteria (SC-001/002/003/006/007) get tests;
+that work is already tracked as T001–T020 (planning), T021–T041 (implementation),
+T042–T071 (verify), and T072–T091 (cycle kickoffs). Two concrete findings fall outside
+that enumeration:
+
+- [ ] **T092** [F3] Wire `redactRequest`/`redactResponse`/`redactBody` through `NetworkCaptureManager._onJavaScriptEvent` and add an integration test proving redaction is applied before raw callbacks/collector. Also implement `redactBody` body-content redaction — it is currently a pass-through stub at `secret_redactor.dart:111`. Proof: `zikzak_inappwebview/test/` integration test asserts a planted token is absent from the manager's emitted events.
+- [ ] **T093** [F3] Add outer-loop acceptance verification for A10–A15 (Phase-3 tasks T051–T055 are unticked: no integration test exercises them through the live capture path). Proof: `cd zikzak_inappwebview/example && flutter test integration_test/...` against a headless capture session shows budgets/redaction hold end-to-end.
