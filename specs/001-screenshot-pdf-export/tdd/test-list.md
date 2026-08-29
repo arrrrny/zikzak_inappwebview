@@ -4,8 +4,8 @@ loop: outside-in
 profile: .specify/memory/tdd-profile.md
 spec_criteria: 12
 planned_at: abfa842e
-updated_at: abfa842e
-suite_baseline: red
+updated_at: cdde50d7
+suite_baseline: green
 ---
 
 # Test List: Screenshot and PDF Export
@@ -20,7 +20,7 @@ One per acceptance criterion in `spec.md`. Each stays red until the feature work
 | A2  | macOS takeScreenshot with JPEG format and quality 80 returns valid JPEG byte buffer | US1-AC2 | example | PENDING |                                             |
 | A3  | macOS takeScreenshot with rect captures only specified portion of the view | US1-AC3 | example | PENDING |                                             |
 | A4  | Android createPdf returns non-null Uint8List with valid PDF data | US2-AC1 | example | DONE    | zikzak_inappwebview/example/integration_test/android_create_pdf_test.dart › A4 Android createPdf returns non-null valid PDF bytes |
-| A5  | Android createPdf with A4 page size produces PDF with A4 dimensions and all content across pages | US2-AC2 | example | PENDING |                                             |
+| A5  | Android createPdf with A4 page size produces PDF with A4 dimensions and all content across pages | US2-AC2 | example | DONE    | zikzak_inappwebview/example/integration_test/android_create_pdf_test.dart › A5 Android createPdf with A4 page size produces A4 pages with all content |
 | A6  | Linux createPdf returns non-null Uint8List with valid PDF data | US3-AC1 | example | PENDING |                                             |
 | A7  | Linux createPdf with PDFConfiguration respects configuration options in generated PDF | US3-AC2 | example | PENDING |                                             |
 | A8  | Linux takeScreenshot returns non-null Uint8List with valid image data | US4-AC1 | example | PENDING |                                             |
@@ -28,6 +28,8 @@ One per acceptance criterion in `spec.md`. Each stays red until the feature work
 | A10 | iOS takeScreenshot with default configuration returns valid PNG image byte buffer | US5-AC1 | example | PENDING |                                             |
 | A11 | iOS createPdf on iOS 14.0+ returns valid PDF byte buffer | US5-AC2 | example | PENDING |                                             |
 | A12 | iOS createPdf on iOS 13.x (below minimum) fails gracefully with clear error message | US5-AC3 | example | PENDING |                                             |
+| A13 | Android takeScreenshot returns non-null Uint8List with valid PNG image data | FR-001, US1-parity | example | PENDING |                                             |
+| A14 | Android takeScreenshot with rect captures only the specified portion of the view | FR-002 | example | PENDING |                                             |
 
 ## Inner loop: unit behaviors
 
