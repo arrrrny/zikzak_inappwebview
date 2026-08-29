@@ -2,7 +2,7 @@
 feature: 012-lifecycle-integration-tests
 verdict: FAIL
 standard: .specify/extensions/tdd/templates/tdd-test-quality-rubric.md
-verified_at: 60b1e592
+verified_at: da35e188
 behaviors: 12
 proven: 0
 likely: 0
@@ -13,7 +13,7 @@ criteria_total: 10
 criteria_covered: 10
 mutation_score: unmeasured
 mutants_survived: unmeasured
-suite: integration test suite (example package, iOS Simulator 38AC6290) -> 6 passed, 1 skipped (Windows), exit 0; hot-restart test now GREEN
+suite: umbrella unit suite (zikzak_inappwebview) -> 184 passed, exit 0 (re-run 2026-08-29 at da35e188, ~10s); integration test suite (example package, lifecycle_test.dart) -> 6 passed, 1 skipped (Windows), exit 0 — re-run 2026-08-29 on Android emulator-5554 (API 37): assembleDebug 22s, install 843ms, `All tests passed!`; prior green on iOS Simulator 38AC6290 at 60b1e592
 ---
 
 # TDD Verification: WebView Lifecycle Integration Tests
@@ -104,3 +104,12 @@ Re-ran the audit at `HEAD = 60b1e592` (after the WebContent readiness-gate fix).
 ```
 
 So the readiness-gate fix is confirmed to resolve the hot-restart init/timeout regression. The remaining `FAIL` verdict is **discipline-only**: all 12 behaviors are still `TEST_AFTER` (no red-phase cycle-log evidence), which is a `FAIL` trigger independent of the green suite.
+
+## Re-verification note (2026-08-29, HEAD `da35e188`)
+
+Re-ran the audit at `HEAD = da35e188` (the 011 commit on branch `fix/webview-init-readiness-gate`). That commit does not touch 012's feature files, so the discipline verdict is unchanged (`FAIL`, test-after). Two things changed since `60b1e592`:
+
+1. **Umbrella unit baseline is now GREEN at 184 passed** (re-run this session, ~10s) — up from 95/112 at the prior audits. The 011 behavioral tests added to the same package are green and nothing regressed.
+2. **Fresh device evidence on Android emulator.** The integration suite `example/integration_test/lifecycle_test.dart` was re-run on `emulator-5554` (Android API 37) and passed: `assembleDebug` ~22s, `adb install` 843ms (the prior profile note about `cmd: Can't find service: package` is now resolved on this emulator), **6 passed, 1 skipped (Windows), exit 0**. So the integration suite is confirmed green on two platforms (iOS Simulator 38AC6290 at `60b1e592`, Android emulator-5554 at `da35e188`). The 011 A6 delegates test also exercises the same live Android emulator successfully.
+
+The `FAIL` remains discipline-only: no behavior has pre-implementation red evidence, which is a `FAIL` trigger regardless of the green suite.
