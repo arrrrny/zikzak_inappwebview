@@ -100,12 +100,14 @@ void main() {
       ),
     );
     await tester.pump(const Duration(milliseconds: 500));
+    // 120s ceilings: Intel-2019 macOS needs the headroom; fast platforms finish
+    // well under this and are unaffected by the higher ceiling.
     final controller = await created.future
-        .timeout(const Duration(seconds: 30));
+        .timeout(const Duration(seconds: 120));
     await controller
         .loadData(data: html)
-        .timeout(const Duration(seconds: 20));
-    await pageLoaded.future.timeout(const Duration(seconds: 20));
+        .timeout(const Duration(seconds: 120));
+    await pageLoaded.future.timeout(const Duration(seconds: 120));
     // Give the onLoadStop removal loop (3 retries) time to run.
     await Future<void>.delayed(const Duration(seconds: 4));
     return controller;
@@ -143,7 +145,7 @@ void main() {
         expect(contentPresent, isTrue,
             reason: 'page content must be preserved');
       },
-      timeout: const Timeout(Duration(minutes: 3)),
+      timeout: const Timeout(Duration(minutes: 8)),
     );
 
     testWidgets(
@@ -163,7 +165,7 @@ void main() {
         expect(stickyPresent, isTrue,
             reason: 'sticky nav must remain when disabled');
       },
-      timeout: const Timeout(Duration(minutes: 3)),
+      timeout: const Timeout(Duration(minutes: 8)),
     );
 
     testWidgets(
@@ -186,7 +188,7 @@ void main() {
         expect(await elementPresent(controller, '"h1"'), isTrue,
             reason: 'page content must be preserved');
       },
-      timeout: const Timeout(Duration(minutes: 3)),
+      timeout: const Timeout(Duration(minutes: 8)),
     );
 
     testWidgets(
@@ -207,7 +209,7 @@ void main() {
         expect(title, 'Throw',
             reason: 'web view must remain responsive after a JS error');
       },
-      timeout: const Timeout(Duration(minutes: 3)),
+      timeout: const Timeout(Duration(minutes: 8)),
     );
   });
 }

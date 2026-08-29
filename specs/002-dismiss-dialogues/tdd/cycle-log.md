@@ -103,3 +103,48 @@ existed and failed before the implementation.
 - refactor: none.
 - platform status: iOS Simulator ✓ verified. macOS desktop / Android emulator blocked
   by the same harness timeouts (T039/T040 open).
+
+## Cycle 4 — A2/A4 (+A3/A5) macOS desktop e2e (T039)
+
+- behavior: SC-002/SC-004 (and SC-003/SC-005 in the same file) on macOS desktop
+  (`-d macos`). This was the blocked T039: the headless macOS WebView used to hang
+  on `loadData`/`pumpAndSettle` under `flutter test`. The WebView **readiness gate**
+  (commit `60b1e592` and the `794024b7`/`17b29dd3` chain on this branch) resolves
+  the hang by gating `onWebViewCreated`/`run()` on web-process readiness.
+- kind: cross-platform characterization of the existing inline `dismissDialogues`
+  brute-force removal (the spec's contract). Tests assert pre-existing behavior.
+- test: `zikzak_inappwebview/example/integration_test/dismiss_dialogues_test.dart`
+  (all four: SC-002, SC-004, SC-003, SC-005).
+- red: N/A — characterization; no missing implementation.
+- green command: `cd zikzak_inappwebview/example && flutter test integration_test/dismiss_dialogues_test.dart -d macos`
+- green output: `00:19 +4: All tests passed!` (4/4, no assertion failures).
+- non-fatal noise: the run logs repeated `UnimplementedError: Unimplemented
+  onScrollChanged / onContentSizeChanged / onOverScrolled method` from
+  `zikzak_inappwebview_macos/.../in_app_webview_controller.dart:368`. These are
+  pre-existing macOS-platform method stubs the native side calls but Dart does not
+  implement; they do not affect any assertion. Reported as a platform finding, not
+  fixed here (out of 002 scope).
+- refactor: the test helper's readiness/load timeouts were raised to 120s ceilings
+  (per-test timeout 8 min) for the Intel-2019 macOS machine; fast platforms are
+  unaffected. `dismiss_dialogues_test.dart` only.
+- platform status: **macOS desktop ✓ verified** (was T039 blocked). Android emulator
+  still pending its own run (Cycle 5).
+
+## Cycle 5 — A2/A3/A4/A5 Android emulator e2e (T040)
+
+- behavior: SC-002..SC-005 on the Android emulator (`emulator-5554`, Android 8.0 /
+  API 26). This was the blocked T040: `onWebViewCreated` never fired under
+  `flutter test` on Android. The same readiness gate resolves it.
+- kind: cross-platform characterization of the existing inline removal.
+- test: `zikzak_inappwebview/example/integration_test/dismiss_dialogues_test.dart`
+  (all four).
+- red: N/A — characterization; no missing implementation.
+- green command: `cd zikzak_inappwebview/example && flutter test integration_test/dismiss_dialogues_test.dart -d emulator-5554`
+- green output: `00:21 +4: All tests passed!` (4/4, no assertion failures).
+- note: the first attempt failed fast with `No devices found ... emulator-5554`
+  because the emulator was still booting (offline). After the emulator finished
+  booting, the second run passed. No source change between attempts.
+- platform status: **Android emulator ✓ verified** (was T040 blocked).
+- summary: with Cycles 4+5, SC-002..SC-005 are now verified on **three** real
+  WebView entry points — iOS Simulator, macOS desktop, and Android emulator — the
+  full coverage the user requested.

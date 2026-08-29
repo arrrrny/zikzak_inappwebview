@@ -227,10 +227,10 @@ With multiple developers:
 
 ### HIGH findings (cross-platform coverage)
 
-- [ ] T039 [Cross-platform] Resolve macOS harness hang: investigate `pumpAndSettle` alternative or fixed-delay approach for macOS desktop WebView. Target: `integration_test/dismiss_dialogues_test.dart`. Verify: `flutter test integration_test/dismiss_dialogues_test.dart -d macos`
-- [ ] T040 [Cross-platform] Resolve Android `onWebViewCreated` timeout under `flutter test`. May require `flutter drive` or real device. Target: `integration_test/dismiss_dialogues_test.dart`. Verify: `flutter test integration_test/dismiss_dialogues_test.dart -d emulator-5554`
+- [x] T039 [Cross-platform] Resolve macOS harness hang: investigate `pumpAndSettle` alternative or fixed-delay approach for macOS desktop WebView. Target: `integration_test/dismiss_dialogues_test.dart`. Verify: `flutter test integration_test/dismiss_dialogues_test.dart -d macos` — **PASSED `00:19 +4: All tests passed!`** after the WebView readiness gate (T040/T039 hinged on the same headless-WebView fix on this branch).
+- [x] T040 [Cross-platform] Resolve Android `onWebViewCreated` timeout under `flutter test`. May require `flutter drive` or real device. Target: `integration_test/dismiss_dialogues_test.dart`. Verify: `flutter test integration_test/dismiss_dialogues_test.dart -d emulator-5554` — **PASSED `00:21 +4: All tests passed!`** on API-26 emulator after the readiness gate fixed `onWebViewCreated` firing under `flutter test`.
 
 ### MED findings (architecture & characterization)
 
-- [ ] T041 [Architecture] Decide: keep both `dismissDialogues` (brute-force) and `DialogueDismisser` (content-aware) as separate features, or wire `DialogueDismisser` behind the setting. Document decision in `spec.md` or new ADR. Target: `spec.md` or `docs/adr/`. Verify: manual review
+- [x] T041 [Architecture] Decide: keep both `dismissDialogues` (brute-force) and `DialogueDismisser` (content-aware) as separate features, or wire `DialogueDismisser` behind the setting. Document decision in `spec.md` or new ADR. Target: `spec.md` or `docs/adr/`. Verify: manual review — **Resolved via `specs/002-dismiss-dialogues/adr-001-dismiss-dialogues-vs-dialogue-dismisser.md`: keep `dismissDialogues` (brute-force, spec contract, A1–A5) as shipped; `DialogueDismisser` stays intentionally unwired (semantics differ — content-aware vs remove-all — so wiring it would violate SC-002).**
 - [x] T042 [U6] Add `mergeUserScripts` test for non-empty existing caller script list. Target: `test/dialogue_dismisser/dialogue_dismisser_test.dart`. Verify: `flutter test test/dialogue_dismisser/dialogue_dismisser_test.dart --plain-name "mergeUserScripts non-empty"`
