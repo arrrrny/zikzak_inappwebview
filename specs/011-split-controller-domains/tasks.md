@@ -44,26 +44,26 @@ Tasks are ordered by dependency. Test tasks must precede implementation tasks fo
 
 ## Phase 4: Platform Implementation Migration (Android)
 
-- [ ] T022: [U77] Write failing test for Android navigationDelegate override
-- [ ] T023: [U77] Implement Android PlatformNavigationDelegate and wire navigationDelegate getter
-- [ ] T024: [U78] Write failing test for Android javaScriptDelegate override
-- [ ] T025: [U78] Implement Android PlatformJavaScriptDelegate and wire javaScriptDelegate getter
-- [ ] T026: [U79] Write failing test for Android cookieDelegate override
-- [ ] T027: [U79] Implement Android PlatformCookieDelegate and wire cookieDelegate getter
-- [ ] T028: [U80] Write failing test for Android settingsDelegate override
-- [ ] T029: [U80] Implement Android PlatformSettingsDelegate and wire settingsDelegate getter
+- [X] {t}: [U77] Write failing test for Android navigationDelegate override
+- [X] {t}: [U77] Implement Android PlatformNavigationDelegate and wire navigationDelegate getter
+- [X] {t}: [U78] Write failing test for Android javaScriptDelegate override
+- [X] {t}: [U78] Implement Android PlatformJavaScriptDelegate and wire javaScriptDelegate getter
+- [X] {t}: [U79] Write failing test for Android cookieDelegate override
+- [X] {t}: [U79] Implement Android PlatformCookieDelegate and wire cookieDelegate getter
+- [X] {t}: [U80] Write failing test for Android settingsDelegate override
+- [X] {t}: [U80] Implement Android PlatformSettingsDelegate and wire settingsDelegate getter
 - [ ] T030: [A6-Android] Write acceptance test: Android delegates non-null and migrated methods produce identical results
 
 ## Phase 5: Platform Implementation Migration (iOS)
 
-- [ ] T031: [U81] Write failing test for iOS navigationDelegate override
-- [ ] T032: [U81] Implement iOS PlatformNavigationDelegate and wire navigationDelegate getter
-- [ ] T033: [U82] Write failing test for iOS javaScriptDelegate override
-- [ ] T034: [U82] Implement iOS PlatformJavaScriptDelegate and wire javaScriptDelegate getter
-- [ ] T035: [U83] Write failing test for iOS cookieDelegate override
-- [ ] T036: [U83] Implement iOS PlatformCookieDelegate and wire cookieDelegate getter
-- [ ] T037: [U84] Write failing test for iOS settingsDelegate override
-- [ ] T038: [U84] Implement iOS PlatformSettingsDelegate and wire settingsDelegate getter
+- [X] {t}: [U81] Write failing test for iOS navigationDelegate override
+- [X] {t}: [U81] Implement iOS PlatformNavigationDelegate and wire navigationDelegate getter
+- [X] {t}: [U82] Write failing test for iOS javaScriptDelegate override
+- [X] {t}: [U82] Implement iOS PlatformJavaScriptDelegate and wire javaScriptDelegate getter
+- [X] {t}: [U83] Write failing test for iOS cookieDelegate override
+- [X] {t}: [U83] Implement iOS PlatformCookieDelegate and wire cookieDelegate getter
+- [X] {t}: [U84] Write failing test for iOS settingsDelegate override
+- [X] {t}: [U84] Implement iOS PlatformSettingsDelegate and wire settingsDelegate getter
 - [ ] T039: [A6-iOS] Write acceptance test: iOS delegates non-null and migrated methods produce identical results
 
 ## Phase 6: Generated Code / DI Wiring (zorphy)

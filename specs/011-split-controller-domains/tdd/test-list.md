@@ -157,14 +157,14 @@ Grouped by the component from `plan.md` that owns them. Each line names one obse
 
 | id  | behavior                                              | traces | kind             | state    | test                                    |
 | --- | ----------------------------------------------------- | ------ | ---------------- | -------- | --------------------------------------- |
-| U77 | Android `PlatformInAppWebViewController` overrides `navigationDelegate` returning concrete instance | FR-004, SC-004 | example          | PENDING | |
-| U78 | Android `PlatformInAppWebViewController` overrides `javaScriptDelegate` returning concrete instance | FR-004, SC-004 | example          | PENDING | |
-| U79 | Android `PlatformInAppWebViewController` overrides `cookieDelegate` returning concrete instance | FR-004, SC-004 | example          | PENDING | |
-| U80 | Android `PlatformInAppWebViewController` overrides `settingsDelegate` returning concrete instance | FR-004, SC-004 | example          | PENDING | |
-| U81 | iOS `PlatformInAppWebViewController` overrides `navigationDelegate` returning concrete instance | FR-004, SC-004 | example          | PENDING | |
-| U82 | iOS `PlatformInAppWebViewController` overrides `javaScriptDelegate` returning concrete instance | FR-004, SC-004 | example          | PENDING | |
-| U83 | iOS `PlatformInAppWebViewController` overrides `cookieDelegate` returning concrete instance | FR-004, SC-004 | example          | PENDING | |
-| U84 | iOS `PlatformInAppWebViewController` overrides `settingsDelegate` returning concrete instance | FR-004, SC-004 | example          | PENDING | |
+| U77 | Android `PlatformInAppWebViewController` overrides `navigationDelegate` returning concrete instance | FR-004, SC-004 | example          | DONE | zikzak_inappwebview_android/test/in_app_webview/modules/android_delegates_test.dart |
+| U78 | Android `PlatformInAppWebViewController` overrides `javaScriptDelegate` returning concrete instance | FR-004, SC-004 | example          | DONE | zikzak_inappwebview_android/test/in_app_webview/modules/android_delegates_test.dart |
+| U79 | Android `PlatformInAppWebViewController` overrides `cookieDelegate` returning concrete instance | FR-004, SC-004 | example          | DONE | zikzak_inappwebview_android/test/in_app_webview/modules/android_delegates_test.dart |
+| U80 | Android `PlatformInAppWebViewController` overrides `settingsDelegate` returning concrete instance | FR-004, SC-004 | example          | DONE | zikzak_inappwebview_android/test/in_app_webview/modules/android_delegates_test.dart |
+| U81 | iOS `PlatformInAppWebViewController` overrides `navigationDelegate` returning concrete instance | FR-004, SC-004 | example          | DONE | zikzak_inappwebview_ios/test/in_app_webview/modules/ios_delegates_test.dart |
+| U82 | iOS `PlatformInAppWebViewController` overrides `javaScriptDelegate` returning concrete instance | FR-004, SC-004 | example          | DONE | zikzak_inappwebview_ios/test/in_app_webview/modules/ios_delegates_test.dart |
+| U83 | iOS `PlatformInAppWebViewController` overrides `cookieDelegate` returning concrete instance | FR-004, SC-004 | example          | DONE | zikzak_inappwebview_ios/test/in_app_webview/modules/ios_delegates_test.dart |
+| U84 | iOS `PlatformInAppWebViewController` overrides `settingsDelegate` returning concrete instance | FR-004, SC-004 | example          | DONE | zikzak_inappwebview_ios/test/in_app_webview/modules/ios_delegates_test.dart |
 
 ### Generated Code / DI Wiring (zorphy)
 

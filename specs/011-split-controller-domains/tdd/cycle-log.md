@@ -33,4 +33,15 @@ These reds are pre-existing and unrelated to any TDD cycle. No TDD loop can star
 - green: fixed source gaps per R001/R002 — added `export 'modules/platform_{navigation,javascript,cookie,settings}_delegate.dart';` to `lib/src/in_app_webview/main.dart`, imported the cookie/settings delegates in `platform_inappwebview_controller.dart`, and added `cookieDelegate => null` + `settingsDelegate => null` getters. Also corrected two compile-only bugs in the test's own probe fakes (`_ProbeJavaScript.callAsyncJavaScript` now returns `Future<String?>`, `removeJavaScriptHandler` now returns `Future<JavaScriptHandlerCallback?>`); these were signature mismatches against the already-committed abstract class, not assertion changes.
 - suite after: `flutter test` in `zikzak_inappwebview_platform_interface` -> 150 passed; `flutter test` in `zikzak_inappwebview` -> 118 passed. No regressions.
 - commit: (pending — see report)
+
+## Cycle 2 — Android/iOS delegate getter wiring (U77–U84)
+
+- behavior: U77–U84 (Android/iOS `PlatformInAppWebViewController` overrides each of the four delegate getters returning a concrete instance)
+- test file: `zikzak_inappwebview_android/test/in_app_webview/modules/android_delegates_test.dart`, `zikzak_inappwebview_ios/test/in_app_webview/modules/ios_delegates_test.dart`
+- test names: 4 compile-probe tests each (`AndroidNavigationDelegate/IOSNavigationDelegate/JavaScriptDelegate/CookieDelegate/SettingsDelegate compiles`)
+- red command: none written. This is **not** a strict test-first cycle: the concrete delegate classes (`modules/*_delegate.dart`, 4 per platform) were already present as untracked files, and the compile-probe tests already existed and passed. The change here is additive wiring — overriding the four getter accessors in the two platform controllers.
+- green: added lazy-singleton overrides for `navigationDelegate`/`javaScriptDelegate`/`cookieDelegate`/`settingsDelegate` to `AndroidInAppWebViewController` and `IOSInAppWebViewController`, importing the `modules/*_delegate.dart` files. `flutter analyze` is clean (info-only) on both controllers + modules; both delegate compile-probe suites pass (4/4 each).
+- suite after: android delegate test 4/4, ios delegate test 4/4, platform_interface 150/150, umbrella 118/118. No regressions.
+- commit: (pending — see report)
+- notes: Runtime verification of SC-004 ("delegate getters return non-null concrete instances on a real platform") is **not** performed here — that needs a booted device and is tracked by acceptance R005/R006 (A15/A16). The compile-probe tests prove the overrides exist, compile against the platform-interface abstract classes, and instantiate the concrete types, but do not assert non-null at runtime. Deviation from strict test-first discipline: implementation was wired against already-present delegate classes rather than driven by a failing test.
 - notes: This is a compile-time probe test, not behavioral. It proves the symbols/delegates exist and are exported; it does not assert delegation behavior. U73–U76 (delegate method surfaces) are implemented in the modules but have no dedicated behavioral test yet (test-after).

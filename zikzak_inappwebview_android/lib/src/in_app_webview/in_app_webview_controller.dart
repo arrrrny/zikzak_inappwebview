@@ -33,6 +33,11 @@ import '../web_storage/web_storage.dart';
 import 'headless_in_app_webview.dart';
 import '_static_channel.dart';
 
+import 'modules/android_navigation_delegate.dart';
+import 'modules/android_javascript_delegate.dart';
+import 'modules/android_cookie_delegate.dart';
+import 'modules/android_settings_delegate.dart';
+
 import '../print_job/main.dart';
 
 ///List of forbidden names for JavaScript handlers.
@@ -2712,6 +2717,26 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
       _webMessageListeners.clear();
     }
   }
+
+  PlatformNavigationDelegate? _navigationDelegate;
+  @override
+  PlatformNavigationDelegate? get navigationDelegate =>
+      _navigationDelegate ??= AndroidNavigationDelegate(this);
+
+  PlatformJavaScriptDelegate? _javaScriptDelegate;
+  @override
+  PlatformJavaScriptDelegate? get javaScriptDelegate =>
+      _javaScriptDelegate ??= AndroidJavaScriptDelegate(this);
+
+  PlatformCookieDelegate? _cookieDelegate;
+  @override
+  PlatformCookieDelegate? get cookieDelegate =>
+      _cookieDelegate ??= AndroidCookieDelegate(this);
+
+  PlatformSettingsDelegate? _settingsDelegate;
+  @override
+  PlatformSettingsDelegate? get settingsDelegate =>
+      _settingsDelegate ??= AndroidSettingsDelegate(this);
 }
 
 extension InternalInAppWebViewController on AndroidInAppWebViewController {
