@@ -124,3 +124,19 @@ Tasks are ordered by dependency. Test tasks must precede implementation tasks fo
 - [ ] R007: [MED] Replace compile-time probe tests in domain_controllers_test.dart with behavioral tests
   - File: zikzak_inappwebview/test/domain_controllers_test.dart
   - Command: flutter test test/domain_controllers_test.dart
+
+- [ ] R008: [HIGH] Write acceptance tests A2–A5 (facade behavior identical to monolith: navigation, javaScript, cookies, settings) and run red→green cycles
+  - File: zikzak_inappwebview/test/domain_split_backward_compat_test.dart (extend) or per-facade files (new)
+  - Command: flutter test test/domain_split_backward_compat_test.dart --plain-name "A2" (then A3/A4/A5)
+  - Closes Finding 2 (acceptance US-2–US-5 uncovered)
+
+- [ ] R009: [HIGH] Write behavioral tests for facade delegation U5–U67 (monolith delegates to facade, facade delegates to parent); requires a fake parent controller
+  - File: zikzak_inappwebview/test/domain_controllers_behavioral_test.dart (new)
+  - Command: flutter test test/domain_controllers_behavioral_test.dart
+  - Note: value/cost decision — at minimum cover U5–U9 (monolith→facade) and U66–U67 (settings); full U10–U65 is large. Closes Finding 3.
+
+- [ ] R010: [HIGH] Assert delegate getters return non-null concrete instances at runtime (A6 / SC-004), not just that the override compiles
+  - Aligns with R005/R006; fix the A15/A16 labeling and add a runtime non-null assertion on a real platform controller
+  - File: zikzak_inappwebview_android/test/android_delegates_test.dart, zikzak_inappwebview_ios/test/ios_delegates_test.dart
+  - Command: flutter test test/android_delegates_test.dart --plain-name "A6"
+  - Closes Finding 4.

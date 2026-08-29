@@ -1,109 +1,81 @@
 ---
 feature: 011-split-controller-domains
-verdict: BLOCKED
+verdict: FAIL
 standard: .specify/extensions/tdd/templates/tdd-test-quality-rubric.md
-verified_at: abfa842e
-behaviors: 86
-proven: 0
-likely: 0
+verified_at: 47cea2f8
+behaviors: 92
+proven: 5
+likely: 16
 test_after: 0
-no_test: 86
-high_smells: 1
+no_test: 69
+not_applicable: 2
+high_smells: 2
 criteria_total: 6
 criteria_covered: 0
-mutation_score: 0
-mutants_survived: 0
-suite: 95 passed, 2 compile-broken, 0 failed (in zikzak_inappwebview); 147 passed, 1 compile-broken (in platform_interface)
+mutation_score: N/A # no mutation tool in stack profile (mutation_test absent)
+mutants_survived: 1 # 1 deliberate mutant sampled; systemic, see Finding 1
+suite: umbrella 118 passed, 0 failed; platform_interface 150 passed, 0 failed; android 4/4; ios 4/4
 ---
 
 # TDD Verification: Split InAppWebViewController into Domain-Specific Controllers
 
-**Verdict: BLOCKED.** The audit cannot proceed because the feature has no TDD implementation evidence. The test list was created in this session but no test-first cycles have been run; the cycle log contains only the baseline. All 86 behaviors in the test list are `PENDING` with no tests written. The platform interface test `in_app_webview_controller_delegates_test.dart` fails to compile (missing `cookieDelegate`/`settingsDelegate` getters and unexported delegate types), which is a blocking defect for the test suite.
+**Verdict: FAIL.** The committed tests pass, but they are all compile-time probes that assert only that symbols exist — none exercise runtime behavior. A deliberate mutant (`AndroidInAppWebViewController.navigationDelegate => null`) left the Android delegate suite at 4/4, proving the tests cannot catch a behavioral break. Sixty-nine behaviors (the six acceptance criteria and the entire facade-delegation layer U5–U67) have no test at all, so acceptance criteria US-1–US-6 / SC-001–SC-006 are uncovered.
+
+Prior `verification.md` (verified_at `abfa842e`) reported `BLOCKED` because the delegate getters did not exist and the suite had compile errors. That blocker was resolved in commits `21d0d157`, `4e67a8f8`, `47cea2f8` (delegate exports, getters, and Android/iOS wiring). This re-audit reflects the code as it stands at `47cea2f8`: the blocker is gone, but the feature is **not** behaviorally tested.
 
 ## Test-first evidence
 
-| Behavior | Class    | Evidence |
-| -------- | -------- | -------- |
-| A1       | NO_TEST  | No test written; no cycle log entry |
-| A2       | NO_TEST  | No test written; no cycle log entry |
-| A3       | NO_TEST  | No test written; no cycle log entry |
-| A4       | NO_TEST  | No test written; no cycle log entry |
-| A5       | NO_TEST  | No test written; no cycle log entry |
-| A6       | NO_TEST  | No test written; no cycle log entry |
-| U1–U86   | NO_TEST  | No test written; no cycle log entry |
-
-The cycle log (`FEATURE_DIR/tdd/cycle-log.md`) contains only the baseline entry (commit `abfa842e`, 95 tests pass, 2 files fail to compile pre-existing). No cycle entries exist, meaning no red→green→refactor loops have been executed for any behavior. Per the rubric, missing evidence is `NO_TEST`, never assumed passing.
+| Behavior group | Class | Evidence |
+| -------------- | ----- | -------- |
+| U68–U72 (platform delegate getters + exports) | PROVEN | Cycle 1 records a red (compile error: missing `cookieDelegate`/`settingsDelegate` getters + unexported delegate types). Source fixed in `21d0d157`. |
+| U1–U4 (lazy facade getters) | LIKELY | `domain_controllers_test.dart` present and passing; no independent red recorded. Tests are compile-probes (see Finding 1). |
+| U73–U76 (delegate method surfaces) | LIKELY | Module classes present; assertions only that the types exist/compile. |
+| U77–U84 (Android/iOS delegate wiring) | LIKELY | Cycle 2 states "no red written"; concrete overrides added against already-present delegate classes. Compile-probe suites pass. |
+| A1–A6 (acceptance) | NO_TEST | `test-list.md` rows all `PENDING`; no test file exists. |
+| U5–U67 (facade delegation) | NO_TEST | `test-list.md` rows all `PENDING`; no behavioral test exists. |
+| U85, U86 (zorphy DI) | NOT_APPLICABLE | zorphy is entity codegen only; delegates wired manually via override getters. Confirmed by inspection. |
 
 ## Findings
 
-Ordered by severity, each with evidence and the fix.
-
 | # | Severity | Finding | Evidence |
-|---|----------|---------|----------|
-| 1 | HIGH | `in_app_webview_controller_delegates_test.dart` fails to compile: `PlatformCookieDelegate`, `PlatformSettingsDelegate` types not exported from platform interface main export; `cookieDelegate` and `settingsDelegate` getters missing on `PlatformInAppWebViewController` | `zikzak_inappwebview_platform_interface/test/in_app_webview_controller_delegates_test.dart:18-166` — compile errors for missing types and getters |
-| 2 | HIGH | No TDD cycle evidence: 86 behaviors planned, 0 with any test-first record | `FEATURE_DIR/tdd/cycle-log.md` has only baseline; `test-list.md` all `PENDING` |
-| 3 | HIGH | Six acceptance criteria in `spec.md` have no test coverage (outer loop entirely absent) | `spec.md` has US-1 through US-6; `test-list.md` A1–A6 all `PENDING` with no tests |
-| 4 | MED | Platform interface main export (`lib/src/in_app_webview/main.dart`) does not export the four delegate modules | `zikzak_inappwebview_platform_interface/lib/src/in_app_webview/main.dart` exports only 7 files, none are delegate modules |
-| 5 | MED | `PlatformInAppWebViewController` base class missing `cookieDelegate` and `settingsDelegate` getters (only `navigationDelegate` and `javaScriptDelegate` present) | `zikzak_inappwebview_platform_interface/lib/src/in_app_webview/platform_inappwebview_controller.dart:124-128` — only two delegate getters |
+| - | -------- | ------- | -------- |
+| 1 | HIGH | All 12 committed tests are compile-time probes. They assert only symbol/function-reference existence (`expect(FooClass, isNotNull)`); none instantiate a controller, call a method, or assert delegation or observable behavior. They pass even when runtime behavior is broken. Verified empirically: mutating `AndroidInAppWebViewController.navigationDelegate => null` left `android_delegates_test.dart` at 4/4 (mutant survived). Consequence: lazy-singleton instantiation (FR-011, SC-006), delegate wiring (FR-004, SC-004), and facade delegation (FR-002) are unverified at runtime. | `zikzak_inappwebview/test/domain_controllers_test.dart:28-42`; `zikzak_inappwebview_platform_interface/test/in_app_webview_controller_delegates_test.dart:170-188`; `zikzak_inappwebview_android/test/in_app_webview/modules/android_delegates_test.dart:14-28`; `zikzak_inappwebview_ios/test/in_app_webview/modules/ios_delegates_test.dart:14-28` |
+| 2 | HIGH | Six acceptance behaviors A1–A6 (US-1–US-6) are NO_TEST. No end-to-end or behavioral test exercises the real facades or delegates, so acceptance criteria SC-001–SC-006 are uncovered. This is the decisive FAIL condition. | `tdd/test-list.md` A1–A6 all `PENDING`; `spec.md` US-1–US-6 |
+| 3 | MED | Facade delegation behaviors U5–U67 (63 rows) are NO_TEST. The core of the feature — monolith delegates to facades, facades delegate to parent — has no behavioral test. Testing it requires a fake parent controller; the U1–U4 probes only prove the getters exist. | `tdd/test-list.md` U5–U67 all `PENDING` |
+| 4 | MED | Acceptance A6 / SC-004 (Android & iOS delegate getters return non-null concrete instances at runtime) is unproven. The committed tests only confirm the override symbols compile; non-null is never asserted at runtime (tracked by open remediation R005/R006). | `tdd/cycle-log.md` Cycle 2 notes: "Runtime verification of SC-004 … is not performed here" |
 
 ## Mutation results
 
-No mutation testing tool available in the stack profile (`mutation: null`). No implementation exists to mutate. Deliberate mutants not applicable — the feature has no implementation to test against. Test strength recorded as **unmeasured**.
+No mutation-testing tool in the stack profile (`mutation: null`). Deliberate-mutant spot check performed on the highest-risk committed behavior (delegate wiring):
+
+| Mutant | Behavior | Survived | Judgment |
+| ------ | -------- | -------- | -------- |
+| `zikzak_inappwebview_android/.../in_app_webview_controller.dart:2723` `navigationDelegate` body changed to `=> null` | U77 | **Yes** | Caught by nothing — the Android delegate test references the `AndroidNavigationDelegate` *class*, never calls the getter. Systemic: all 12 committed tests are compile-probes. Mutant restored exactly; `flutter test` re-run confirmed green. |
+
+One mutant sampled (of 92 behaviors); it survived. Because every committed test is a compile-probe, the unaffected set is effectively the same — test strength against bugs is **unmeasured and almost certainly low**. Coverage output (`flutter test --coverage`) is available but not a substitute; see "What was not audited".
 
 ## Traceability
 
 | Criterion | Tests | End to end |
 | --------- | ----- | ---------- |
-| US-1 / FR-002 / SC-001, SC-002 (Backward compatibility) | None | No |
-| US-2 / FR-005 / SC-003 (Navigation facade) | None | No |
-| US-3 / FR-006 / SC-003 (JavaScript facade) | None | No |
-| US-4 / FR-007 / SC-003, SC-005 (Cookie facade) | None | No |
-| US-5 / FR-008 / SC-003 (Settings facade) | None | No |
-| US-6 / FR-003, FR-004 / SC-004 (Platform delegate migration) | None | No |
+| US-1 / FR-002 / SC-001, SC-002 (backward compatibility) | none (A1 PENDING) | No |
+| US-2 / FR-005 / SC-003 (navigation facade) | none (A2, U5, U10–U28 PENDING) | No |
+| US-3 / FR-006 / SC-003 (JavaScript facade) | none (A3, U6, U29–U45 PENDING) | No |
+| US-4 / FR-007 / SC-003, SC-005 (cookie facade) | none (A4, U7, U46–U65 PENDING) | No |
+| US-5 / FR-008 / SC-003 (settings facade) | none (A5, U8, U66–U67 PENDING) | No |
+| US-6 / FR-003, FR-004 / SC-004 (platform delegate migration) | compile-probe only (A6, U68–U86); runtime non-null unasserted | No |
 
-**Untested criteria:** 6 of 6 acceptance criteria have no tests.
-**Tests tracing to nothing:** The `domain_controllers_test.dart` in `zikzak_inappwebview` is a compile-time probe only — it asserts facade getters exist and method signatures are non-null, but does not assert behavioral equivalence (no real controller instantiated, no method calls executed). It traces to no acceptance criterion in the test list.
+**Untested criteria:** 6 of 6 acceptance criteria have no behavioral test.
+**Tests tracing to nothing:** the 12 compile-probe tests verify symbol existence, not behavior, and trace to no acceptance criterion in the test list.
 
 ## What was not audited
 
-- **Platform implementations (Android/iOS):** The audit did not inspect `zikzak_inappwebview_android` or `zikzak_inappwebview_ios` because the feature's platform interface layer is already broken (missing delegate getters, unexported types). The Android/iOS delegate overrides (U77–U84) cannot be verified until the interface compiles.
-- **Generated code / DI wiring (zorphy):** FR-009 (U85, U86) not audited; no generated code changes visible in this branch.
-- **Edge cases:** Disposed controller, HeadlessInAppWebView, cross-domain state consistency, concurrent access — all listed in test-list.md "Invariants" but no tests exist.
-- **Mutation / property-based testing:** Stack profile has no mutation tool (`mutation_test` absent) and no property-based library (`glados` absent). Test strength unmeasured.
-- **Device/integration coverage:** The spec's SC-004 requires Android/iOS delegate getter verification. An iOS simulator (iPhone 16e) is available per the profile, but no integration tests exist for this feature. Android emulator is not available in this environment.
-- **Full umbrella suite blocked:** The `zikzak_inappwebview` umbrella suite has 2 pre-existing compile-broken test files (`headless_dispose_test.dart`, `webview_sessions_test.dart`) that are unrelated to this feature but prevent a clean suite run. Per profile, these must be fixed separately before any TDD loop can start on this feature.
+- **Facade delegation at runtime (U5–U67) and all acceptance scenarios (A1–A6):** no tests exist; nothing to audit beyond confirming absence.
+- **Device/integration coverage for SC-004:** Android emulator (`emulator-5554`) and macOS desktop are not drivable under `flutter test` in this environment (per profile); only the iOS Simulator runs integration tests. So even the runtime non-null check for Android/iOS delegates (A6) cannot be exercised here. iOS simulator is reachable.
+- **Mutation / property-based testing:** absent from the stack; test strength is unmeasured.
+- **Coverage scope:** `flutter test --coverage` produces `lcov.info` but was not used to gate this audit; the behavioral gaps above are structural (no tests), not merely branch gaps.
+- **Edge cases** (disposed controller, HeadlessInAppWebView, cross-domain state, concurrency, FR-011 dedupe): listed in `test-list.md` "Invariants" but untested.
 
-## Remediation tasks (appended to tasks.md)
+## Remediation
 
-```markdown
-## Phase N: TDD remediation
-
-- [ ] R001 [HIGH] Export PlatformCookieDelegate and PlatformSettingsDelegate from platform interface main export (fixes Finding 1, 4)
-  - File: zikzak_inappwebview_platform_interface/lib/src/in_app_webview/main.dart
-  - Command: flutter test test/in_app_webview_controller_delegates_test.dart
-
-- [ ] R002 [HIGH] Add cookieDelegate and settingsDelegate getters to PlatformInAppWebViewController base class (fixes Finding 1, 5)
-  - File: zikzak_inappwebview_platform_interface/lib/src/in_app_webview/platform_inappwebview_controller.dart
-  - Command: flutter test test/in_app_webview_controller_delegates_test.dart
-
-- [ ] R003 [HIGH] Fix pre-existing compile-broken tests in umbrella package (unblocks TDD loop per profile)
-  - File: zikzak_inappwebview/test/headless_dispose_test.dart (restore `disposed` getter on HeadlessInAppWebView)
-  - File: zikzak_inappwebview/test/webview_sessions_test.dart (add zikzak_session dependency or remove broken test)
-  - Command: flutter test (in zikzak_inappwebview)
-
-- [ ] R004 [HIGH] Write first acceptance test for A1 (backward compatibility) and run red→green cycle
-  - File: zikzak_inappwebview/test/domain_split_backward_compat_test.dart (new)
-  - Command: flutter test test/domain_split_backward_compat_test.dart --plain-name "A1"
-
-- [ ] R005 [HIGH] Write acceptance test for A15 (Android delegates non-null) and run red→green cycle
-  - File: zikzak_inappwebview_android/test/android_delegates_test.dart (new)
-  - Command: flutter test test/android_delegates_test.dart --plain-name "A15"
-
-- [ ] R006 [HIGH] Write acceptance test for A16 (iOS delegates non-null) and run red→green cycle
-  - File: zikzak_inappwebview_ios/test/ios_delegates_test.dart (new)
-  - Command: flutter test test/ios_delegates_test.dart --plain-name "A16"
-
-- [ ] R007 [MED] Replace compile-time probe tests in domain_controllers_test.dart with behavioral tests
-  - File: zikzak_inappwebview/test/domain_controllers_test.dart
-  - Command: flutter test test/domain_controllers_test.dart
-```
+The existing `## Phase N: TDD remediation` section in `tasks.md` already carries R001–R002 (done) and R003–R007 (open). R004 covers A1 only; R005/R006 cover Android/iOS delegate non-null (referencing A15/A16). The NEW gaps found in this audit — acceptance A2–A5 and the facade-delegation layer — are added as R008–R010, appended (not reworded) to that section. The feature is **not done** until the blocking findings (F1, F2) are cleared.
