@@ -164,6 +164,120 @@ class FakePlatformInAppWebViewController
   Future<void> setSettings({required InAppWebViewSettings settings}) async {
     _record('setSettings', {'settings': settings});
   }
+
+  // --- JavaScript facade recordings ---
+
+  JavaScriptHandlerCallback? nextHandler;
+
+  @override
+  Future<dynamic> evaluateJavascript({
+    required String source,
+    ContentWorld? contentWorld,
+  }) async {
+    _record('evaluateJavascript', {
+      'source': source,
+      'contentWorld': contentWorld,
+    });
+    return nextEvaluate;
+  }
+
+  @override
+  Future<CallAsyncJavaScriptResult?> callAsyncJavaScript({
+    required String functionBody,
+    Map<String, dynamic> arguments = const <String, dynamic>{},
+    ContentWorld? contentWorld,
+  }) async {
+    _record('callAsyncJavaScript', {
+      'functionBody': functionBody,
+      'arguments': arguments,
+      'contentWorld': contentWorld,
+    });
+    return nextAsyncResult;
+  }
+
+  @override
+  Future<void> injectJavascriptFileFromUrl({
+    required WebUri urlFile,
+    ScriptHtmlTagAttributes? scriptHtmlTagAttributes,
+  }) async {
+    _record('injectJavascriptFileFromUrl', {
+      'urlFile': urlFile,
+      'scriptHtmlTagAttributes': scriptHtmlTagAttributes,
+    });
+  }
+
+  @override
+  Future<dynamic> injectJavascriptFileFromAsset({
+    required String assetFilePath,
+  }) async {
+    _record('injectJavascriptFileFromAsset', {'assetFilePath': assetFilePath});
+    return nextInjectAsset;
+  }
+
+  @override
+  void addJavaScriptHandler({
+    required String handlerName,
+    required JavaScriptHandlerCallback callback,
+  }) {
+    _record('addJavaScriptHandler', {
+      'handlerName': handlerName,
+      'callback': callback,
+    });
+  }
+
+  @override
+  JavaScriptHandlerCallback? removeJavaScriptHandler({
+    required String handlerName,
+  }) {
+    _record('removeJavaScriptHandler', {'handlerName': handlerName});
+    return nextHandler;
+  }
+
+  @override
+  bool hasJavaScriptHandler({required String handlerName}) {
+    _record('hasJavaScriptHandler', {'handlerName': handlerName});
+    return nextBool;
+  }
+
+  @override
+  Future<void> addUserScript({required UserScript userScript}) async {
+    _record('addUserScript', {'userScript': userScript});
+  }
+
+  @override
+  Future<void> addUserScripts({required List<UserScript> userScripts}) async {
+    _record('addUserScripts', {'userScripts': userScripts});
+  }
+
+  @override
+  Future<bool> removeUserScript({required UserScript userScript}) async {
+    _record('removeUserScript', {'userScript': userScript});
+    return nextBool;
+  }
+
+  @override
+  Future<void> removeUserScripts({
+    required List<UserScript> userScripts,
+  }) async {
+    _record('removeUserScripts', {'userScripts': userScripts});
+  }
+
+  @override
+  Future<void> removeUserScriptsByGroupName({
+    required String groupName,
+  }) async {
+    _record('removeUserScriptsByGroupName', {'groupName': groupName});
+  }
+
+  @override
+  Future<void> removeAllUserScripts() async =>
+      _record('removeAllUserScripts');
+
+  @override
+  bool hasUserScript({required UserScript userScript}) {
+    _record('hasUserScript', {'userScript': userScript});
+    return nextBool;
+  }
 }
 
 /// A single recorded method invocation.

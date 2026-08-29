@@ -13,12 +13,12 @@ Tasks are ordered by dependency. Test tasks must precede implementation tasks fo
 - [X] T003: [U10-U28] Implement NavigationController delegation to parent controller
 
 ### JavaScriptController
-- [ ] T004: [U29-U45] Write failing tests for JavaScriptController method delegation
-- [ ] T005: [U29-U45] Implement JavaScriptController delegation to parent controller
+- [X] T004: [U29-U45] Write failing tests for JavaScriptController method delegation
+- [X] T005: [U29-U45] Implement JavaScriptController delegation to parent controller
 
 ### CookieController
-- [ ] T006: [U46-U65] Write failing tests for CookieController URL resolution and graceful degradation
-- [ ] T007: [U46-U65] Implement CookieController with default-to-current-URL semantics
+- [X] T006: [U46-U65] Write failing tests for CookieController URL resolution and graceful degradation
+- [X] T007: [U46-U65] Implement CookieController with default-to-current-URL semantics
 
 ### SettingsController
 - [X] T008: [U66-U67] Write failing tests for SettingsController method delegation

@@ -69,48 +69,48 @@ Grouped by the component from `plan.md` that owns them. Each line names one obse
 
 | id  | behavior                                              | traces | kind             | state    | test                                    |
 | --- | ----------------------------------------------------- | ------ | ---------------- | -------- | --------------------------------------- |
-| U29 | `evaluateJavascript` delegates to parent controller and returns same result | FR-006 | example          | PENDING | |
-| U30 | `callAsyncJavaScript` delegates to parent controller and returns same result | FR-006 | example          | PENDING | |
-| U31 | `injectJavascriptFileFromUrl` delegates to parent controller and produces same behavior | FR-006 | example          | PENDING | |
-| U32 | `injectJavascriptFileFromAsset` delegates to parent controller and produces same behavior | FR-006 | example          | PENDING | |
-| U33 | `addJavaScriptHandler` delegates to parent controller and registers handler identically | FR-006 | example          | PENDING | |
-| U34 | `removeJavaScriptHandler` delegates to parent controller and removes handler identically | FR-006 | example          | PENDING | |
-| U35 | `hasJavaScriptHandler` delegates to parent controller and returns same boolean | FR-006 | example          | PENDING | |
-| U36 | `addUserScript` delegates to parent controller and produces same behavior | FR-006 | example          | PENDING | |
-| U37 | `addUserScripts` delegates to parent controller and produces same behavior | FR-006 | example          | PENDING | |
-| U38 | `removeUserScript` delegates to parent controller and produces same behavior | FR-006 | example          | PENDING | |
-| U39 | `removeUserScripts` delegates to parent controller and produces same behavior | FR-006 | example          | PENDING | |
-| U40 | `removeUserScriptsByGroupName` delegates to parent controller and produces same behavior | FR-006 | example          | PENDING | |
-| U41 | `removeAllUserScripts` delegates to parent controller and produces same behavior | FR-006 | example          | PENDING | |
-| U42 | `hasUserScript` delegates to parent controller and returns same boolean | FR-006 | example          | PENDING | |
-| U43 | `injectCSSCode` delegates to parent controller and produces same behavior | FR-006 | example          | PENDING | |
-| U44 | `injectCSSFileFromUrl` delegates to parent controller and produces same behavior | FR-006 | example          | PENDING | |
-| U45 | `injectCSSFileFromAsset` delegates to parent controller and produces same behavior | FR-006 | example          | PENDING | |
+| U29 | `evaluateJavascript` delegates to parent controller and returns same result | FR-006 | example          | DONE | zikzak_inappwebview/test/domain_controllers_js_behavioral_test.dart |
+| U30 | `callAsyncJavaScript` delegates to parent controller and returns same result | FR-006 | example          | DONE | zikzak_inappwebview/test/domain_controllers_js_behavioral_test.dart |
+| U31 | `injectJavascriptFileFromUrl` delegates to parent controller and produces same behavior | FR-006 | example          | DONE | zikzak_inappwebview/test/domain_controllers_js_behavioral_test.dart |
+| U32 | `injectJavascriptFileFromAsset` delegates to parent controller and produces same behavior | FR-006 | example          | DONE | zikzak_inappwebview/test/domain_controllers_js_behavioral_test.dart |
+| U33 | `addJavaScriptHandler` delegates to parent controller and registers handler identically | FR-006 | example          | DONE | zikzak_inappwebview/test/domain_controllers_js_behavioral_test.dart |
+| U34 | `removeJavaScriptHandler` delegates to parent controller and removes handler identically | FR-006 | example          | DONE | zikzak_inappwebview/test/domain_controllers_js_behavioral_test.dart |
+| U35 | `hasJavaScriptHandler` delegates to parent controller and returns same boolean | FR-006 | example          | DONE | zikzak_inappwebview/test/domain_controllers_js_behavioral_test.dart |
+| U36 | `addUserScript` delegates to parent controller and produces same behavior | FR-006 | example          | DONE | zikzak_inappwebview/test/domain_controllers_js_behavioral_test.dart |
+| U37 | `addUserScripts` delegates to parent controller and produces same behavior | FR-006 | example          | DONE | zikzak_inappwebview/test/domain_controllers_js_behavioral_test.dart |
+| U38 | `removeUserScript` delegates to parent controller and produces same behavior | FR-006 | example          | DONE | zikzak_inappwebview/test/domain_controllers_js_behavioral_test.dart |
+| U39 | `removeUserScripts` delegates to parent controller and produces same behavior | FR-006 | example          | DONE | zikzak_inappwebview/test/domain_controllers_js_behavioral_test.dart |
+| U40 | `removeUserScriptsByGroupName` delegates to parent controller and produces same behavior | FR-006 | example          | DONE | zikzak_inappwebview/test/domain_controllers_js_behavioral_test.dart |
+| U41 | `removeAllUserScripts` delegates to parent controller and produces same behavior | FR-006 | example          | DONE | zikzak_inappwebview/test/domain_controllers_js_behavioral_test.dart |
+| U42 | `hasUserScript` delegates to parent controller and returns same boolean | FR-006 | example          | DONE | zikzak_inappwebview/test/domain_controllers_js_behavioral_test.dart |
+| U43 | `injectCSSCode` delegates to parent controller and produces same behavior | FR-006 | example          | NOT_APPLICABLE | NOT_APPLICABLE — CSS injection methods remain on monolithic InAppWebViewController, not on JavaScriptController facade; facade-delegation behavior N/A |
+| U44 | `injectCSSFileFromUrl` delegates to parent controller and produces same behavior | FR-006 | example          | NOT_APPLICABLE | NOT_APPLICABLE — CSS injection methods remain on monolithic InAppWebViewController, not on JavaScriptController facade; facade-delegation behavior N/A |
+| U45 | `injectCSSFileFromAsset` delegates to parent controller and produces same behavior | FR-006 | example          | NOT_APPLICABLE | NOT_APPLICABLE — CSS injection methods remain on monolithic InAppWebViewController, not on JavaScriptController facade; facade-delegation behavior N/A |
 
 ### `zikzak_inappwebview/lib/src/in_app_webview/controllers/cookie_controller.dart` — CookieController
 
 | id  | behavior                                              | traces | kind             | state    | test                                    |
 | --- | ----------------------------------------------------- | ------ | ---------------- | -------- | --------------------------------------- |
-| U46 | `getCookies` without URL defaults to current WebView URL via `getUrl()` | FR-007 | example          | PENDING | |
-| U47 | `getCookies` with explicit URL uses that URL instead of current | FR-007 | example          | PENDING | |
-| U48 | `getCookies` with no current URL and no explicit URL returns empty list (graceful degradation) | FR-007, SC-005 | example          | PENDING | |
-| U49 | `getCookie` without URL defaults to current WebView URL via `getUrl()` | FR-007 | example          | PENDING | |
-| U50 | `getCookie` with explicit URL uses that URL instead of current | FR-007 | example          | PENDING | |
-| U51 | `getCookie` with no current URL and no explicit URL returns null (graceful degradation) | FR-007, SC-005 | example          | PENDING | |
-| U52 | `setCookie` without URL defaults to current WebView URL via `getUrl()` | FR-007 | example          | PENDING | |
-| U53 | `setCookie` with explicit URL uses that URL instead of current | FR-007 | example          | PENDING | |
-| U54 | `setCookie` with no current URL and no explicit URL returns false (graceful degradation) | FR-007, SC-005 | example          | PENDING | |
-| U55 | `deleteCookie` without URL defaults to current WebView URL via `getUrl()` | FR-007 | example          | PENDING | |
-| U56 | `deleteCookie` with explicit URL uses that URL instead of current | FR-007 | example          | PENDING | |
-| U57 | `deleteCookie` with no current URL and no explicit URL returns false (graceful degradation) | FR-007, SC-005 | example          | PENDING | |
-| U58 | `deleteCookies` without URL defaults to current WebView URL via `getUrl()` | FR-007 | example          | PENDING | |
-| U59 | `deleteCookies` with explicit URL uses that URL instead of current | FR-007 | example          | PENDING | |
-| U60 | `deleteCookies` with no current URL and no explicit URL returns false (graceful degradation) | FR-007, SC-005 | example          | PENDING | |
-| U61 | `getAllCookies` returns all cookies from shared CookieManager (global, not scoped) | FR-007 | example          | PENDING | |
-| U62 | `deleteAllCookies` deletes all cookies from shared CookieManager (global) | FR-007 | example          | PENDING | |
-| U63 | `removeSessionCookies` removes session cookies from shared CookieManager (global) | FR-007 | example          | PENDING | |
-| U64 | CookieController uses injected CookieManager override when provided | FR-007 | example          | PENDING | |
-| U65 | CookieController lazily initializes CookieManager singleton | FR-011 | example          | PENDING | |
+| U46 | `getCookies` without URL defaults to current WebView URL via `getUrl()` | FR-007 | example          | DONE | zikzak_inappwebview/test/domain_controllers_cookie_behavioral_test.dart |
+| U47 | `getCookies` with explicit URL uses that URL instead of current | FR-007 | example          | DONE | zikzak_inappwebview/test/domain_controllers_cookie_behavioral_test.dart |
+| U48 | `getCookies` with no current URL and no explicit URL returns empty list (graceful degradation) | FR-007, SC-005 | example          | DONE | zikzak_inappwebview/test/domain_controllers_cookie_behavioral_test.dart |
+| U49 | `getCookie` without URL defaults to current WebView URL via `getUrl()` | FR-007 | example          | DONE | zikzak_inappwebview/test/domain_controllers_cookie_behavioral_test.dart |
+| U50 | `getCookie` with explicit URL uses that URL instead of current | FR-007 | example          | DONE | zikzak_inappwebview/test/domain_controllers_cookie_behavioral_test.dart |
+| U51 | `getCookie` with no current URL and no explicit URL returns null (graceful degradation) | FR-007, SC-005 | example          | DONE | zikzak_inappwebview/test/domain_controllers_cookie_behavioral_test.dart |
+| U52 | `setCookie` without URL defaults to current WebView URL via `getUrl()` | FR-007 | example          | DONE | zikzak_inappwebview/test/domain_controllers_cookie_behavioral_test.dart |
+| U53 | `setCookie` with explicit URL uses that URL instead of current | FR-007 | example          | DONE | zikzak_inappwebview/test/domain_controllers_cookie_behavioral_test.dart |
+| U54 | `setCookie` with no current URL and no explicit URL returns false (graceful degradation) | FR-007, SC-005 | example          | DONE | zikzak_inappwebview/test/domain_controllers_cookie_behavioral_test.dart |
+| U55 | `deleteCookie` without URL defaults to current WebView URL via `getUrl()` | FR-007 | example          | DONE | zikzak_inappwebview/test/domain_controllers_cookie_behavioral_test.dart |
+| U56 | `deleteCookie` with explicit URL uses that URL instead of current | FR-007 | example          | DONE | zikzak_inappwebview/test/domain_controllers_cookie_behavioral_test.dart |
+| U57 | `deleteCookie` with no current URL and no explicit URL returns false (graceful degradation) | FR-007, SC-005 | example          | DONE | zikzak_inappwebview/test/domain_controllers_cookie_behavioral_test.dart |
+| U58 | `deleteCookies` without URL defaults to current WebView URL via `getUrl()` | FR-007 | example          | DONE | zikzak_inappwebview/test/domain_controllers_cookie_behavioral_test.dart |
+| U59 | `deleteCookies` with explicit URL uses that URL instead of current | FR-007 | example          | DONE | zikzak_inappwebview/test/domain_controllers_cookie_behavioral_test.dart |
+| U60 | `deleteCookies` with no current URL and no explicit URL returns false (graceful degradation) | FR-007, SC-005 | example          | DONE | zikzak_inappwebview/test/domain_controllers_cookie_behavioral_test.dart |
+| U61 | `getAllCookies` returns all cookies from shared CookieManager (global, not scoped) | FR-007 | example          | DONE | zikzak_inappwebview/test/domain_controllers_cookie_behavioral_test.dart |
+| U62 | `deleteAllCookies` deletes all cookies from shared CookieManager (global) | FR-007 | example          | DONE | zikzak_inappwebview/test/domain_controllers_cookie_behavioral_test.dart |
+| U63 | `removeSessionCookies` removes session cookies from shared CookieManager (global) | FR-007 | example          | DONE | zikzak_inappwebview/test/domain_controllers_cookie_behavioral_test.dart |
+| U64 | CookieController uses injected CookieManager override when provided | FR-007 | example          | DONE | zikzak_inappwebview/test/domain_controllers_cookie_behavioral_test.dart |
+| U65 | CookieController lazily initializes CookieManager singleton | FR-011 | example          | DONE | zikzak_inappwebview/test/domain_controllers_cookie_behavioral_test.dart |
 
 ### `zikzak_inappwebview/lib/src/in_app_webview/controllers/settings_controller.dart` — SettingsController
 

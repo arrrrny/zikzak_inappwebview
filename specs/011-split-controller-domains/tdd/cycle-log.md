@@ -92,3 +92,81 @@ These reds are pre-existing and unrelated to any TDD cycle. No TDD loop can star
   remain for a separate careful pass; the backward-compat intent (A1/A2) is instead
   covered by the monolith-reaches-platform equivalence assertions here.
 - commit: (pending — see report)
+
+## Cycle 4 — JavaScriptController facade delegation behavioral tests (U29–U42; U43–U45 N/A)
+
+- behaviors: U29–U42 (JavaScriptController delegates each JS method to the parent
+  `InAppWebViewController`, reaching the platform with identical arguments and
+  return values). U43–U45 (`injectCSSCode`/`injectCSSFileFromUrl`/`injectCSSFileFromAsset`)
+  marked `NOT_APPLICABLE`: those CSS methods remain on the monolithic
+  `InAppWebViewController`, not on the `JavaScriptController` facade (verified in
+  `lib/src/in_app_webview/in_app_webview_controller.dart:172-187`), so facade-delegation
+  does not apply.
+- test file (new): `zikzak_inappwebview/test/domain_controllers_js_behavioral_test.dart`
+  (14 tests), plus JS-recorded methods appended to the existing
+  `zikzak_inappwebview/test/src/fake_platform_controller.dart`.
+- test names: `U29 evaluateJavascript delegates with identical args and result` …
+  `U42 hasUserScript delegates and returns same boolean`.
+- red command: `flutter test test/domain_controllers_js_behavioral_test.dart`
+- red output (decisive — two test-infrastructure compile errors, not assertion
+  failures):
+  ```
+  test/src/fake_platform_controller.dart:170:30: Error: 'nextAsyncResult' is already declared in this scope.
+  test/src/fake_platform_controller.dart:171:11: Error: 'nextInjectAsset' is already declared in this scope.
+  test/domain_controllers_js_behavioral_test.dart:14:1: Error: Functions marked 'async' must have a return type assignable to 'Future'.
+    JavaScriptHandlerCallback _echo(args) async => args;
+  ```
+  These were defects introduced when the JS recording section was appended to the
+  fake and when the `_echo` helper was declared as an `async` function instead of a
+  `JavaScriptHandlerCallback` (typedef `dynamic Function(List<dynamic>)`). Fixed by
+  removing the duplicate field declarations and rewriting `_echo` as a function-literal
+  variable: `JavaScriptHandlerCallback _echo = (args) => args;`. No source code changed.
+- green: after the compile fixes the file ran GREEN immediately — the JS facade
+  already delegates to the parent (verified in
+  `lib/src/in_app_webview/controllers/javascript_controller.dart`). 14/14 passed.
+- deliberate-mutant check: mutated `JavaScriptController.evaluateJavascript` to
+  `=> Future.value(null)` (dropping delegation). Ran `flutter test
+  test/domain_controllers_js_behavioral_test.dart --plain-name "U29 ..."` ->
+  FAILED (`Expected: <7>  Actual: <null>`). Mutant restored exactly; re-ran the file
+  -> 14 passed. Proves the delegation assertions are meaningful, not vacuous.
+- suite after: `flutter test` in `zikzak_inappwebview` -> 155 passed, 0 failed
+  (~9s wall). No regressions against the prior 141-passing baseline (+14).
+- notes: Behavioral tests over already-implemented delegation (test-after style),
+  validated by the deliberate-mutant check above. U43–U45 dropped to NOT_APPLICABLE
+  with the reason recorded in test-list.md; tasks T004/T005 ticked.
+- commit: (pending — see report)
+
+## Cycle 5 — CookieController facade delegation behavioral tests (U46–U65)
+
+- behaviors: U46–U65 (CookieController delegates each cookie method to the shared
+  `CookieManager`, reaching the platform cookie manager with identical arguments and
+  the parent controller as context; default-to-current-URL resolution via `getUrl()`;
+  graceful degradation to `[]`/`null`/`false` when no URL is available; global
+  operations `getAllCookies`/`deleteAllCookies`/`removeSessionCookies`; injected
+  `CookieManager` override use; lazy `CookieManager.instance()` when no override).
+- test file (new): `zikzak_inappwebview/test/domain_controllers_cookie_behavioral_test.dart`
+  (20 tests) plus `zikzak_inappwebview/test/src/fake_cookie_manager.dart` (new
+  recording `FakePlatformCookieManager` mirroring the existing
+  `FakePlatformInAppWebViewController`).
+- test names: `U46 getCookies without URL defers to getUrl() and passes controller ctx`
+  … `U65 without override, CookieController lazily uses CookieManager.instance()`.
+- red command: `flutter test test/domain_controllers_cookie_behavioral_test.dart`.
+- red output (decisive): the file ran GREEN on first run — the CookieController
+  implementation already delegates correctly (`lib/src/in_app_webview/controllers/cookie_controller.dart`).
+  Because the test passed immediately (characterization-style coverage of shipped code),
+  the playbook's deliberate-mutant check was applied instead of a fabricated red:
+  mutated `getCookies` to `final resolved = url;` (dropped `_resolveUrl`), ran
+  `--plain-name "U46 ..."` -> FAILED (`Expected: an object with length of <1>  Actual: []
+   Which: has length of <0>`). Mutant restored exactly; re-ran the file -> 20 passed.
+  This is the recorded red evidence for the cycle (mutant-induced, then restored),
+  not a pre-implementation failure.
+- green: no source change required — CookieController already delegates. 20/20 passed
+  on first run (after the mutant restore).
+- deliberate-mutant check: see red output above — `getCookies` default-to-current-URL
+  branch proven meaningful (U46 fails without `_resolveUrl`); mutant restored exactly.
+- suite after: `flutter test` in `zikzak_inappwebview` -> 175 passed, 0 failed
+  (~9s wall). No regressions against the prior 155-passing baseline (+20).
+- notes: Behavioral tests over already-implemented delegation (test-after style),
+  validated by the deliberate-mutant check above. U46–U65 marked DONE in test-list.md;
+  tasks T006/T007 ticked.
+- commit: (pending — see report)
