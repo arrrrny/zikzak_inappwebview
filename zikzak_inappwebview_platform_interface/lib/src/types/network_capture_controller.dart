@@ -73,6 +73,10 @@ class NetworkCaptureController {
   ///Number of entries currently captured per host, used for budget enforcement.
   final Map<String, int> _domainEntryCount = <String, int>{};
 
+  ///Total retained response-body bytes captured per host, used for budget
+  ///enforcement (A11).
+  final Map<String, int> _domainByteCount = <String, int>{};
+
   ///Number of captured entries.
   int get count => _entries.length;
 
@@ -175,6 +179,7 @@ class NetworkCaptureController {
     _pendingBodies.clear();
     _pendingErrors.clear();
     _domainEntryCount.clear();
+    _domainByteCount.clear();
     _lastActivity = DateTime.now();
   }
 
@@ -225,6 +230,18 @@ class NetworkCaptureController {
     _lastActivity = DateTime.now();
     final entry = _byId[body.requestId];
     if (entry != null) {
+      // FR-006: enforce a per-domain response-body byte budget. Once a domain
+      // crosses its `maxBytes` cap, further response bodies for that domain are
+      // dropped while other domains keep their bodies.
+      final host = body.url.host;
+      final budget = domainBudgets[host];
+      if (budget?.maxBytes != null) {
+        final retained = _domainByteCount[host] ?? 0;
+        if (retained + body.body.length > budget!.maxBytes!) {
+          return;
+        }
+        _domainByteCount[host] = retained + body.body.length;
+      }
       entry.responseBody = body;
     } else {
       _pendingBodies[body.requestId] = body;

@@ -64,4 +64,21 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
 - note: the budget `DomainBudget` type + `domainBudgets`/`_domainEntryCount` fields were
   added as a green seam before this cycle (kept minimal so the test compiles). The
   pre-existing delegates-test failure is out of 010's scope and is not fixed here.
+- commit: ecb9807b
+
+## Cycle 4: A11 per-domain maxBytes budget on response bodies (FR-006 / US4-AC2)
+
+- test: `zikzak_inappwebview_platform_interface/test/types/network_capture_controller_budget_test.dart::enforces per-domain maxBytes budget on response bodies; others kept (A11)` (new)
+- red: `cd zikzak_inappwebview_platform_interface && flutter test test/types/network_capture_controller_budget_test.dart --plain-name "enforces per-domain maxBytes budget on response bodies; others kept (A11)"`
+  -> `Expected: <3>  Actual: <4>` (1 failed) — no body budget yet, so all 4 bodies retained.
+- green: added `_domainByteCount` and enforced it in `attachBody`: for the body's host,
+  when `maxBytes` is set, drop the body once `retained + body.body.length > maxBytes`
+  (entry still tracked); reset the counter in `clear()`. Suite `flutter test`
+  (platform_interface) -> 150 ran, 149 passed, 1 pre-existing delegates-test compile
+  failure (unrelated, same as Cycle 3).
+- refactor: none needed; the byte guard mirrors the entry guard from Cycle 3.
+- note: A11 drops only the response body when the byte budget is exceeded (entries are
+  still retained); this matches the `DomainBudget.maxBytes` doc ("total response-body
+  bytes captured for the domain"). The pre-existing delegates-test failure is out of
+  scope and not fixed here.
 - commit: TBD
