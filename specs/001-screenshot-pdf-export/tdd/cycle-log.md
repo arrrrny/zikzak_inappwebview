@@ -192,3 +192,13 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
 - refactor: none.
 - commit: 94c745ab
 - notes: green-on-first-run acceptance; the deliberate mutant confirms the test catches a handler that returns null. Real macOS desktop acceptance, not the Dart-VM unit runner. (Note: the macOS run emits benign `UnimplementedError` logs for `onScrollChanged`/`onContentSizeChanged`/`onOverScrolled` channel methods during webview init — these do not affect the assertion.) `tasks.md` carries no `[A1]` marker, so no task was ticked.
+
+## A2 — macOS takeScreenshot JPEG q80 returns valid JPEG bytes (acceptance)
+
+- test: `zikzak_inappwebview/example/integration_test/macos_take_screenshot_test.dart › A2 macOS takeScreenshot with JPEG format and quality 80 returns valid JPEG bytes`
+- red: none — the native `takeScreenshot` handler already encoded JPEG when `compressFormat == "JPEG"` (InAppWebView.swift:836-847, `bitmapRep.representation(using: .jpeg, properties:)`), so the test passed on first run on the macOS desktop target.
+- deliberate mutant: changed `using: .jpeg` to `using: .png` at line 845 (InAppWebView.swift); ran `flutter test integration_test/macos_take_screenshot_test.dart -d macos --plain-name "A2 macOS takeScreenshot with JPEG format and quality 80 returns valid JPEG bytes"`. It failed (the PNG-encoded bytes no longer begin with the JPEG SOI marker `FF D8 FF`). Restored the native code exactly (`git checkout`); test green again.
+- green: no source change; behavior already satisfied by the existing macOS `takeScreenshot` JPEG branch (WKSnapshotConfiguration + `NSBitmapImageRep` `.jpeg` with `compressionFactor = quality/100`).
+- refactor: none.
+- commit: ee01ea44
+- notes: green-on-first-run acceptance; the deliberate mutant confirms the test catches a negotiated/forced PNG output when JPEG was requested. Real macOS desktop acceptance, not the Dart-VM unit runner. The benign `UnimplementedError` `onOverScrolled` logs during webview init do not affect the JPEG-magic assertion. `tasks.md` carries no `[A2]` marker, so no task was ticked.

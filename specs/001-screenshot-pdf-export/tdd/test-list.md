@@ -4,7 +4,7 @@ loop: outside-in
 profile: .specify/memory/tdd-profile.md
 spec_criteria: 12
 planned_at: abfa842e
-updated_at: 94c745ab
+updated_at: 651c4533
 suite_baseline: green
 ---
 
@@ -17,7 +17,7 @@ One per acceptance criterion in `spec.md`. Each stays red until the feature work
 | id  | behavior                                                    | traces | kind    | state   | test                                        |
 | --- | ----------------------------------------------------------- | ------ | ------- | ------- | ------------------------------------------- |
 | A1  | macOS takeScreenshot returns non-null Uint8List with valid PNG image data | US1-AC1 | example | DONE    | zikzak_inappwebview/example/integration_test/macos_take_screenshot_test.dart › A1 macOS takeScreenshot returns non-null valid PNG image bytes |
-| A2  | macOS takeScreenshot with JPEG format and quality 80 returns valid JPEG byte buffer | US1-AC2 | example | PENDING |                                             |
+| A2  | macOS takeScreenshot with JPEG format and quality 80 returns valid JPEG byte buffer | US1-AC2 | example | DONE    | zikzak_inappwebview/example/integration_test/macos_take_screenshot_test.dart › A2 macOS takeScreenshot with JPEG format and quality 80 returns valid JPEG bytes |
 | A3  | macOS takeScreenshot with rect captures only specified portion of the view | US1-AC3 | example | PENDING |                                             |
 | A4  | Android createPdf returns non-null Uint8List with valid PDF data | US2-AC1 | example | DONE    | zikzak_inappwebview/example/integration_test/android_create_pdf_test.dart › A4 Android createPdf returns non-null valid PDF bytes |
 | A5  | Android createPdf with A4 page size produces PDF with A4 dimensions and all content across pages | US2-AC2 | example | DONE    | zikzak_inappwebview/example/integration_test/android_create_pdf_test.dart › A5 Android createPdf with A4 page size produces A4 pages with all content |
