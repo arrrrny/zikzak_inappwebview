@@ -1,0 +1,9 @@
+# GYM scripts follow the issue-#397 `<id>-<name>.dart` rep format
+# (e.g. 01-deps.dart) and the `<id>_<name>_test.dart` exercise format —
+# they are standalone scripts/tests graded by the miki GYM runner, not
+# part of the plugin's compiled surface, so they live outside the
+# package's flutter_lints regime (mirrors how zuraffa excludes .gym/**
+# in its analysis_options.yaml).
+analyzer:
+  exclude:
+    - '**'
