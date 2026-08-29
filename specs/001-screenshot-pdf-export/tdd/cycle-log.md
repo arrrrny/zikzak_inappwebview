@@ -44,3 +44,14 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
 - refactor: none.
 - commit: pending (WIP, not yet committed)
 - notes: green-on-first-run characterization; mutant confirms the forwarded config is asserted. Full suite after: 201 passed (no regression). Required importing the deprecated class via its `src/` path (not exported from the barrel).
+
+## U16 — Android Dart createPdf delegates pdfConfiguration to the method channel
+
+- test: `zikzak_inappwebview_android/test/in_app_webview/android_screenshot_pdf_delegation_test.dart › U16 createPdf delegates to channel with pdfConfiguration.toJson()`
+- red: none — the delegation already existed in `AndroidInAppWebViewController.createPdf` (in_app_webview_controller.dart:2524), so the test passed on first run.
+- deliberate mutant: changed the channel method literal from `'createPdf'` to `'createPdfX'`; ran the test; it failed with:
+  `Expected: 'createPdf'  Actual: 'createPdfX'  Which: is different. Both strings start the same, but the actual value also has the following trailing characters: X`. Restored the source exactly; test green again.
+- green: no source change; behavior already satisfied by the existing delegation (`args['pdfConfiguration'] = pdfConfiguration?.toJson(); channel?.invokeMethod<Uint8List?>('createPdf', args)`).
+- refactor: none. The shared `_FakeChannel extends MethodChannel` and `_newController` helper already factor the construction/seam injection.
+- commit: pending (WIP, not yet committed)
+- notes: Android package's first behavioral delegation test. The controller is constructed normally (so its constructor-side `initMethodCallHandler` registration works under `TestWidgetsFlutterBinding.ensureInitialized()`), then its `channel` is replaced with the recording fake before the method call. Full Android suite after: 5 passed (no regression). `tasks.md` carries no `[U16]` marker, so no task was ticked.

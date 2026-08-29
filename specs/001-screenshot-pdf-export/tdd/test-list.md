@@ -82,7 +82,7 @@ Grouped by the component from `plan.md` that owns them. Each line names one obse
 
 | id  | behavior                                                  | traces     | kind     | state   | test                                   |
 | --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
-| U16 | Dart createPdf override invokes method channel 'createPdf' with pdfConfiguration.toMap() | US2, FR-005 | example  | PENDING |                                        |
+| U16 | Dart createPdf override invokes method channel 'createPdf' with pdfConfiguration.toMap() | US2, FR-005 | example  | DONE    | zikzak_inappwebview_android/test/in_app_webview/android_screenshot_pdf_delegation_test.dart › U16 createPdf delegates to channel with pdfConfiguration.toJson() |
 | U17 | Dart override returns the Uint8List from channel or null on failure | US2, FR-010 | example  | PENDING |                                        |
 
 ### `zikzak_inappwebview_linux/linux/in_app_webview.cc`
