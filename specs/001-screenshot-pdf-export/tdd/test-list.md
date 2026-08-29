@@ -162,7 +162,7 @@ Grouped by the component from `plan.md` that owns them. Each line names one obse
 
 | id  | behavior                                                  | traces     | kind     | state   | test                                   |
 | --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
-| U41 | Android takeScreenshot implementation intact: Dart override and Java handler exist and work | T022 | characterization | BASELINE |                                        |
+| U41 | Android takeScreenshot implementation intact: Dart override and Java handler exist and work | T022 | characterization | DONE    | zikzak_inappwebview_android/test/in_app_webview/android_screenshot_pdf_delegation_test.dart › U41 Android takeScreenshot delegates screenshotConfiguration and returns the channel bytes or null |
 
 ## Invariants and edge cases still to place
 

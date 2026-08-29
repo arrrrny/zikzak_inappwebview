@@ -66,3 +66,14 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
 - refactor: none. Shares the `_FakeChannel` / `_newController` helpers with U16.
 - commit: pending (WIP, not yet committed)
 - notes: green-on-first-run characterization; mutant confirms the test catches a dropped/empty return. Full Android suite after: 6 passed (no regression). `tasks.md` carries no `[U17]` marker, so no task was ticked.
+
+## U41 — Android takeScreenshot Dart delegation + return (characterization promoted to behavioral)
+
+- test: `zikzak_inappwebview_android/test/in_app_webview/android_screenshot_pdf_delegation_test.dart › U41 Android takeScreenshot delegates screenshotConfiguration and returns the channel bytes or null`
+- red: none — the `takeScreenshot` Dart override already delegated and returned (in_app_webview_controller.dart:1937), so the test passed on first run.
+- deliberate mutant: changed the channel method literal from `'takeScreenshot'` to `'takeScreenshotX'`; ran the test; it failed with:
+  `Expected: 'takeScreenshot'  Actual: 'takeScreenshotX'  Which: is different. Both strings start the same, but the actual value also has the following trailing characters: X`. Restored the source exactly; test green again.
+- green: no source change; behavior already satisfied by the existing delegation (`args['screenshotConfiguration'] = screenshotConfiguration?.toJson(); channel?.invokeMethod<Uint8List?>('takeScreenshot', args)`).
+- refactor: none. Reuses the `_FakeChannel` / `_newController` helpers and the U16/U17 style.
+- commit: pending (WIP, not yet committed)
+- notes: Promotes the previously-BASELINE characterization row U41 to a real behavioral test covering both the `screenshotConfiguration.toJson()` forward and the bytes/null return. The Java handler half of U41 (native `InAppWebView.java` takeScreenshot) is out of Dart-unit scope and still needs native/integration coverage. Full Android suite after: 7 passed (no regression). `tasks.md` carries no `[U41]` marker, so no task was ticked.

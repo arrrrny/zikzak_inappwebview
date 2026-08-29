@@ -86,5 +86,38 @@ void main() {
       expect(nullResult, isNull,
           reason: 'a null channel result must pass through as null');
     });
+
+    test(
+        'U41 Android takeScreenshot delegates screenshotConfiguration and returns the channel bytes or null',
+        () async {
+      final fake = _FakeChannel();
+      final controller = _newController(fake);
+      final config = ScreenshotConfiguration();
+
+      await controller.takeScreenshot(screenshotConfiguration: config);
+
+      expect(fake.calls, hasLength(1),
+          reason: 'takeScreenshot must reach the method channel exactly once');
+      expect(fake.calls.single.method, equals('takeScreenshot'),
+          reason: 'the channel method must be the literal "takeScreenshot"');
+      expect(
+        fake.calls.single.arguments['screenshotConfiguration'],
+        equals(config.toJson()),
+        reason: 'screenshotConfiguration must be forwarded as its JSON map',
+      );
+
+      final bytes = Uint8List.fromList([7, 8, 9]);
+      fake.nextResult = bytes;
+      final result =
+          await controller.takeScreenshot(screenshotConfiguration: ScreenshotConfiguration());
+      expect(result, equals(bytes),
+          reason: 'the Uint8List the channel returns must be propagated as-is');
+
+      fake.nextResult = null;
+      final nullResult = await controller
+          .takeScreenshot(screenshotConfiguration: ScreenshotConfiguration());
+      expect(nullResult, isNull,
+          reason: 'a null channel result must pass through as null');
+    });
   });
 }
