@@ -72,4 +72,31 @@ void main() {
           reason: 'returned bytes must be a valid PNG image (magic 89 50 4E 47)');
     },
   );
+
+  testWidgets(
+    'A2 macOS takeScreenshot with JPEG format and quality 80 returns valid JPEG bytes',
+    (WidgetTester tester) async {
+      // takeScreenshot JPEG is a macOS acceptance behavior (US1-AC2); skip elsewhere.
+      if (!Platform.isMacOS) return;
+
+      final controller = await pumpWebView(tester, pageLoaded: Completer());
+
+      final Uint8List? bytes = await controller
+          .takeScreenshot(
+            screenshotConfiguration: ScreenshotConfiguration(
+              compressFormat: CompressFormat.JPEG,
+              quality: 80,
+            ),
+          )
+          .timeout(const Duration(seconds: 120));
+
+      expect(bytes, isNotNull,
+          reason: 'takeScreenshot must return non-null bytes on macOS (US1-AC2)');
+      expect(bytes!.length, greaterThan(100),
+          reason: 'the screenshot byte buffer must be non-trivial');
+      // JPEG SOI marker is FF D8 FF (the 4th byte may vary, so check the first 3).
+      expect(bytes.sublist(0, 3), [0xFF, 0xD8, 0xFF],
+          reason: 'returned bytes must be a valid JPEG image (magic FF D8 FF)');
+    },
+  );
 }
