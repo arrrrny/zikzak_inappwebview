@@ -30,6 +30,7 @@ class FakePlatformInAppWebViewController
   dynamic nextEvaluate;
   CallAsyncJavaScriptResult? nextAsyncResult;
   dynamic nextInjectAsset;
+  Uint8List? nextBytes;
 
   List<_Call> recorded(String name) =>
       calls.where((c) => c.method == name).toList();
@@ -163,6 +164,24 @@ class FakePlatformInAppWebViewController
   @override
   Future<void> setSettings({required InAppWebViewSettings settings}) async {
     _record('setSettings', {'settings': settings});
+  }
+
+  // --- Screenshot / PDF delegation recordings (spec 001) ---
+
+  @override
+  Future<Uint8List?> takeScreenshot({
+    ScreenshotConfiguration? screenshotConfiguration,
+  }) async {
+    _record('takeScreenshot', {
+      'screenshotConfiguration': screenshotConfiguration,
+    });
+    return nextBytes;
+  }
+
+  @override
+  Future<Uint8List?> createPdf({PDFConfiguration? pdfConfiguration}) async {
+    _record('createPdf', {'pdfConfiguration': pdfConfiguration});
+    return nextBytes;
   }
 
   // --- JavaScript facade recordings ---
