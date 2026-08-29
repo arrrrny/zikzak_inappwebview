@@ -68,7 +68,7 @@ class InAppWebViewController implements Disposable {
       _settingsController ??= SettingsController(this);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getUrl}
-  Future<WebUri?> getUrl() => platform.getUrl();
+  Future<WebUri?> getUrl() => navigation.getUrl();
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getTitle}
   Future<String?> getTitle() => platform.getTitle();
@@ -86,14 +86,14 @@ class InAppWebViewController implements Disposable {
   Future<void> loadUrl({
     required URLRequest urlRequest,
     WebUri? allowingReadAccessTo,
-  }) => platform.loadUrl(
+  }) => navigation.loadUrl(
     urlRequest: urlRequest,
     allowingReadAccessTo: allowingReadAccessTo,
   );
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.postUrl}
   Future<void> postUrl({required WebUri url, required Uint8List postData}) =>
-      platform.postUrl(url: url, postData: postData);
+      navigation.postUrl(url: url, postData: postData);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.loadData}
   Future<void> loadData({
@@ -103,7 +103,7 @@ class InAppWebViewController implements Disposable {
     WebUri? baseUrl,
     WebUri? historyUrl,
     WebUri? allowingReadAccessTo,
-  }) => platform.loadData(
+  }) => navigation.loadData(
     data: data,
     mimeType: mimeType,
     encoding: encoding,
@@ -114,52 +114,52 @@ class InAppWebViewController implements Disposable {
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.loadFile}
   Future<void> loadFile({required String assetFilePath}) =>
-      platform.loadFile(assetFilePath: assetFilePath);
+      navigation.loadFile(assetFilePath: assetFilePath);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.reload}
-  Future<void> reload() => platform.reload();
+  Future<void> reload() => navigation.reload();
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.goBack}
-  Future<void> goBack() => platform.goBack();
+  Future<void> goBack() => navigation.goBack();
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.canGoBack}
-  Future<bool> canGoBack() => platform.canGoBack();
+  Future<bool> canGoBack() => navigation.canGoBack();
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.goForward}
-  Future<void> goForward() => platform.goForward();
+  Future<void> goForward() => navigation.goForward();
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.canGoForward}
-  Future<bool> canGoForward() => platform.canGoForward();
+  Future<bool> canGoForward() => navigation.canGoForward();
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.goBackOrForward}
   Future<void> goBackOrForward({required int steps}) =>
-      platform.goBackOrForward(steps: steps);
+      navigation.goBackOrForward(steps: steps);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.canGoBackOrForward}
   Future<bool> canGoBackOrForward({required int steps}) =>
-      platform.canGoBackOrForward(steps: steps);
+      navigation.canGoBackOrForward(steps: steps);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.goTo}
   Future<void> goTo({required WebHistoryItem historyItem}) =>
-      platform.goTo(historyItem: historyItem);
+      navigation.goTo(historyItem: historyItem);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.isLoading}
-  Future<bool> isLoading() => platform.isLoading();
+  Future<bool> isLoading() => navigation.isLoading();
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.stopLoading}
-  Future<void> stopLoading() => platform.stopLoading();
+  Future<void> stopLoading() => navigation.stopLoading();
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.evaluateJavascript}
   Future<dynamic> evaluateJavascript({
     required String source,
     ContentWorld? contentWorld,
-  }) => platform.evaluateJavascript(source: source, contentWorld: contentWorld);
+  }) => javaScript.evaluateJavascript(source: source, contentWorld: contentWorld);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.injectJavascriptFileFromUrl}
   Future<void> injectJavascriptFileFromUrl({
     required WebUri urlFile,
     ScriptHtmlTagAttributes? scriptHtmlTagAttributes,
-  }) => platform.injectJavascriptFileFromUrl(
+  }) => javaScript.injectJavascriptFileFromUrl(
     urlFile: urlFile,
     scriptHtmlTagAttributes: scriptHtmlTagAttributes,
   );
@@ -167,7 +167,7 @@ class InAppWebViewController implements Disposable {
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.injectJavascriptFileFromAsset}
   Future<dynamic> injectJavascriptFileFromAsset({
     required String assetFilePath,
-  }) => platform.injectJavascriptFileFromAsset(assetFilePath: assetFilePath);
+  }) => javaScript.injectJavascriptFileFromAsset(assetFilePath: assetFilePath);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.injectCSSCode}
   Future<void> injectCSSCode({required String source}) =>
@@ -190,7 +190,7 @@ class InAppWebViewController implements Disposable {
   void addJavaScriptHandler({
     required String handlerName,
     required JavaScriptHandlerCallback callback,
-  }) => platform.addJavaScriptHandler(
+  }) => javaScript.addJavaScriptHandler(
     handlerName: handlerName,
     callback: callback,
   );
@@ -198,11 +198,11 @@ class InAppWebViewController implements Disposable {
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.removeJavaScriptHandler}
   JavaScriptHandlerCallback? removeJavaScriptHandler({
     required String handlerName,
-  }) => platform.removeJavaScriptHandler(handlerName: handlerName);
+  }) => javaScript.removeJavaScriptHandler(handlerName: handlerName);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.hasJavaScriptHandler}
   bool hasJavaScriptHandler({required String handlerName}) =>
-      platform.hasJavaScriptHandler(handlerName: handlerName);
+      javaScript.hasJavaScriptHandler(handlerName: handlerName);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.takeScreenshot}
   Future<Uint8List?> takeScreenshot({
@@ -212,14 +212,14 @@ class InAppWebViewController implements Disposable {
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.setSettings}
   Future<void> setSettings({required InAppWebViewSettings settings}) =>
-      platform.setSettings(settings: settings);
+      this.settings.setSettings(settings: settings);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getSettings}
-  Future<InAppWebViewSettings?> getSettings() => platform.getSettings();
+  Future<InAppWebViewSettings?> getSettings() => this.settings.getSettings();
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getCopyBackForwardList}
   Future<WebHistory?> getCopyBackForwardList() =>
-      platform.getCopyBackForwardList();
+      navigation.getCopyBackForwardList();
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.scrollTo}
   Future<void> scrollTo({
@@ -311,37 +311,37 @@ class InAppWebViewController implements Disposable {
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.addUserScript}
   Future<void> addUserScript({required UserScript userScript}) =>
-      platform.addUserScript(userScript: userScript);
+      javaScript.addUserScript(userScript: userScript);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.addUserScripts}
   Future<void> addUserScripts({required List<UserScript> userScripts}) =>
-      platform.addUserScripts(userScripts: userScripts);
+      javaScript.addUserScripts(userScripts: userScripts);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.removeUserScript}
   Future<bool> removeUserScript({required UserScript userScript}) =>
-      platform.removeUserScript(userScript: userScript);
+      javaScript.removeUserScript(userScript: userScript);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.removeUserScriptsByGroupName}
   Future<void> removeUserScriptsByGroupName({required String groupName}) =>
-      platform.removeUserScriptsByGroupName(groupName: groupName);
+      javaScript.removeUserScriptsByGroupName(groupName: groupName);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.removeUserScripts}
   Future<void> removeUserScripts({required List<UserScript> userScripts}) =>
-      platform.removeUserScripts(userScripts: userScripts);
+      javaScript.removeUserScripts(userScripts: userScripts);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.removeAllUserScripts}
-  Future<void> removeAllUserScripts() => platform.removeAllUserScripts();
+  Future<void> removeAllUserScripts() => javaScript.removeAllUserScripts();
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.hasUserScript}
   bool hasUserScript({required UserScript userScript}) =>
-      platform.hasUserScript(userScript: userScript);
+      javaScript.hasUserScript(userScript: userScript);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.callAsyncJavaScript}
   Future<CallAsyncJavaScriptResult?> callAsyncJavaScript({
     required String functionBody,
     Map<String, dynamic> arguments = const <String, dynamic>{},
     ContentWorld? contentWorld,
-  }) => platform.callAsyncJavaScript(
+  }) => javaScript.callAsyncJavaScript(
     functionBody: functionBody,
     arguments: arguments,
     contentWorld: contentWorld,
@@ -411,10 +411,10 @@ class InAppWebViewController implements Disposable {
   Future<bool> zoomOut() => platform.zoomOut();
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.clearHistory}
-  Future<void> clearHistory() => platform.clearHistory();
+  Future<void> clearHistory() => navigation.clearHistory();
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.reloadFromOrigin}
-  Future<void> reloadFromOrigin() => platform.reloadFromOrigin();
+  Future<void> reloadFromOrigin() => navigation.reloadFromOrigin();
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.createPdf}
   Future<Uint8List?> createPdf({PDFConfiguration? pdfConfiguration}) =>
@@ -468,7 +468,7 @@ class InAppWebViewController implements Disposable {
     required URLRequest urlRequest,
     required Uint8List data,
     URLResponse? urlResponse,
-  }) => platform.loadSimulatedRequest(urlRequest: urlRequest, data: data);
+  }) => navigation.loadSimulatedRequest(urlRequest: urlRequest, data: data);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.openDevTools}
   Future<void> openDevTools() => platform.openDevTools();

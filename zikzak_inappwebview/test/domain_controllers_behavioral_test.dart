@@ -17,6 +17,86 @@ import 'src/fake_platform_controller.dart';
 InAppWebViewController _controller(FakePlatformInAppWebViewController fake) =>
     InAppWebViewController.fromPlatform(platform: fake);
 
+/// Spy facades that count how many times the monolith routed a call *through*
+/// the domain facade. Used by the U5–U9 monolith-delegation tests: if a monolith
+/// method calls `platform.xxx()` directly it bypasses the facade and the counter
+/// stays at 0, proving (when the assertion expects 1) that delegation happens.
+class _SpyNavigationController extends NavigationController {
+  _SpyNavigationController(super.controller);
+  int loadUrlCount = 0;
+  int getUrlCount = 0;
+  int reloadCount = 0;
+
+  @override
+  Future<void> loadUrl({
+    required URLRequest urlRequest,
+    WebUri? allowingReadAccessTo,
+  }) {
+    loadUrlCount++;
+    return super.loadUrl(
+      urlRequest: urlRequest,
+      allowingReadAccessTo: allowingReadAccessTo,
+    );
+  }
+
+  @override
+  Future<WebUri?> getUrl() {
+    getUrlCount++;
+    return super.getUrl();
+  }
+
+  @override
+  Future<void> reload() {
+    reloadCount++;
+    return super.reload();
+  }
+}
+
+class _SpyJavaScriptController extends JavaScriptController {
+  _SpyJavaScriptController(super.controller);
+  int evaluateCount = 0;
+
+  @override
+  Future<dynamic> evaluateJavascript({
+    required String source,
+    ContentWorld? contentWorld,
+  }) {
+    evaluateCount++;
+    return super.evaluateJavascript(source: source, contentWorld: contentWorld);
+  }
+}
+
+class _SpySettingsController extends SettingsController {
+  _SpySettingsController(super.controller);
+  int getSettingsCount = 0;
+
+  @override
+  Future<InAppWebViewSettings?> getSettings() {
+    getSettingsCount++;
+    return super.getSettings();
+  }
+}
+
+class _SpyMonolith extends InAppWebViewController {
+  late final _SpyNavigationController _nav;
+  late final _SpyJavaScriptController _js;
+  late final _SpySettingsController _settings;
+
+  _SpyMonolith(FakePlatformInAppWebViewController platform)
+      : super.fromPlatform(platform: platform) {
+    _nav = _SpyNavigationController(this);
+    _js = _SpyJavaScriptController(this);
+    _settings = _SpySettingsController(this);
+  }
+
+  @override
+  NavigationController get navigation => _nav;
+  @override
+  JavaScriptController get javaScript => _js;
+  @override
+  SettingsController get settings => _settings;
+}
+
 void main() {
   group('NavigationController delegates to parent (U10-U28)', () {
     test('U10 loadUrl delegates to parent with identical arguments', () async {
@@ -269,24 +349,77 @@ void main() {
     });
   });
 
-  group('Monolith navigation surface unchanged (U5, U9)', () {
-    test('U5 monolithic loadUrl reaches the platform identically', () async {
+  group('Monolith delegates to domain facades (U5-U9)', () {
+    test('U5 navigation methods hop through the navigation facade', () async {
       final fake = FakePlatformInAppWebViewController();
-      final controller = _controller(fake);
+      final controller = _SpyMonolith(fake);
       final urlRequest = URLRequest(url: WebUri('https://example.com'));
 
       await controller.loadUrl(urlRequest: urlRequest);
+      await controller.getUrl();
+      await controller.reload();
 
-      final calls = fake.recorded('loadUrl');
-      expect(calls, hasLength(1));
-      expect(calls.single.args['urlRequest'], urlRequest);
+      expect(controller._nav.loadUrlCount, 1,
+          reason: 'monolith.loadUrl must route through navigation facade');
+      expect(controller._nav.getUrlCount, 1,
+          reason: 'monolith.getUrl must route through navigation facade');
+      expect(controller._nav.reloadCount, 1,
+          reason: 'monolith.reload must route through navigation facade');
+      // Each still reaches the platform exactly once with identical args.
+      expect(fake.recorded('loadUrl'), hasLength(1));
+      expect(fake.recorded('loadUrl').single.args['urlRequest'], urlRequest);
+      expect(fake.recorded('getUrl'), hasLength(1));
+      expect(fake.recorded('reload'), hasLength(1));
     });
 
-    test('U9 monolithic getUrl reaches the platform identically', () async {
+    test('U6 JavaScript methods hop through the javaScript facade', () async {
+      final fake = FakePlatformInAppWebViewController();
+      final controller = _SpyMonolith(fake);
+
+      await controller.evaluateJavascript(source: '1+1');
+
+      expect(controller._js.evaluateCount, 1,
+          reason: 'monolith.evaluateJavascript must route through javaScript facade');
+      expect(fake.recorded('evaluateJavascript'), hasLength(1));
+      expect(fake.recorded('evaluateJavascript').single.args['source'], '1+1');
+    });
+
+    test('U8 settings methods hop through the settings facade', () async {
+      final fake = FakePlatformInAppWebViewController();
+      final controller = _SpyMonolith(fake);
+
+      await controller.getSettings();
+
+      expect(controller._settings.getSettingsCount, 1,
+          reason: 'monolith.getSettings must route through settings facade');
+      expect(fake.recorded('getSettings'), hasLength(1));
+    });
+
+    test('U7 cookie operations are exposed only via the cookies facade, '
+        'not as monolith methods', () async {
+      // The monolith does not (and should not) carry cookie methods directly;
+      // they live on the `cookies` facade. The facade call below compiles only
+      // because `cookies` exists; a `controller.getCookies(...)` would not.
+      final fake = FakePlatformInAppWebViewController();
+      final controller = _SpyMonolith(fake);
+
+      final cookies = await controller.cookies.getCookies();
+      expect(cookies, isEmpty);
+    });
+
+    test('U9 public method surface is unchanged: monolith still exposes the '
+        'full cross-domain surface and behaves identically', () async {
       final fake = FakePlatformInAppWebViewController()
         ..nextUrl = WebUri('https://example.com/u9');
       final controller = _controller(fake);
 
+      // Navigation, JS and settings entry points all present on the monolith.
+      expect(controller.loadUrl, isA<Function>());
+      expect(controller.evaluateJavascript, isA<Function>());
+      expect(controller.getSettings, isA<Function>());
+      expect(controller.getUrl, isA<Function>());
+
+      // And each still produces identical platform results.
       expect(await controller.getUrl(), WebUri('https://example.com/u9'));
       expect(fake.recorded('getUrl'), hasLength(1));
     });

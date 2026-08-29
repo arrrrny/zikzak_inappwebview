@@ -16,12 +16,21 @@ One per acceptance criterion in `spec.md`. Each stays red until the feature work
 
 | id  | behavior                                                    | traces | kind    | state   | test                                        |
 | --- | ----------------------------------------------------------- | ------ | ------- | ------- | ------------------------------------------- |
-| A1  | Existing consumer code calling monolithic `InAppWebViewController` methods compiles and behaves identically after the split (full backward compatibility) | US-1, FR-002, SC-001, SC-002 | example | PENDING | |
-| A2  | Navigation operations work through `controller.navigation.*` facade with identical behavior to monolithic methods | US-2, FR-005, SC-003 | example | PENDING | |
-| A3  | JavaScript evaluation, handlers, and injection work through `controller.javaScript.*` facade with identical behavior | US-3, FR-006, SC-003 | example | PENDING | |
-| A4  | Cookie operations work through `controller.cookies.*` facade with default-to-current-URL semantics and graceful degradation | US-4, FR-007, SC-003, SC-005 | example | PENDING | |
-| A5  | Settings read/write works through `controller.settings.*` facade with identical behavior | US-5, FR-008, SC-003 | example | PENDING | |
-| A6  | Android and iOS platform implementations expose non-null delegate instances for all four domains and migrated methods produce identical results | US-6, FR-003, FR-004, SC-004 | example | PENDING | |
+| A1  | Existing consumer code calling monolithic `InAppWebViewController` methods compiles and behaves identically after the split (full backward compatibility) | US-1, FR-002, SC-001, SC-002 | example | DONE | zikzak_inappwebview/test/acceptance/domain_controllers_acceptance_test.dart |
+| A2  | Navigation operations work through `controller.navigation.*` facade with identical behavior to monolithic methods | US-2, FR-005, SC-003 | example | DONE | zikzak_inappwebview/test/acceptance/domain_controllers_acceptance_test.dart |
+| A3  | JavaScript evaluation, handlers, and injection work through `controller.javaScript.*` facade with identical behavior | US-3, FR-006, SC-003 | example | DONE | zikzak_inappwebview/test/acceptance/domain_controllers_acceptance_test.dart |
+| A4  | Cookie operations work through `controller.cookies.*` facade with default-to-current-URL semantics and graceful degradation | US-4, FR-007, SC-003, SC-005 | example | DONE | zikzak_inappwebview/test/acceptance/domain_controllers_acceptance_test.dart |
+| A5  | Settings read/write works through `controller.settings.*` facade with identical behavior | US-5, FR-008, SC-003 | example | DONE | zikzak_inappwebview/test/acceptance/domain_controllers_acceptance_test.dart |
+| A6  | Android and iOS platform implementations expose non-null delegate instances for all four domains and migrated methods produce identical results | US-6, FR-003, FR-004, SC-004 | example | DONE | zikzak_inappwebview/example/integration_test/delegates_test.dart |
+
+> **A6 note (resolved 2026-08-29):** runtime non-null assertion exercised on a real
+> Android emulator (`emulator-5554`, API 37). The first run surfaced a genuine build
+> break — `PlatformJavaScriptDelegate` base signatures (`callAsyncJavaScript`,
+> `removeJavaScriptHandler`) did not match `PlatformInAppWebViewController` or the
+> Android/iOS impls. Fixed the base to `Future<CallAsyncJavaScriptResult?>` /
+> synchronous `JavaScriptHandlerCallback?` (matching the controller + both impls);
+> the integration test now builds and passes, proving all four delegates are non-null
+> at runtime (FR-004 / SC-004).
 
 ## Inner loop: unit behaviors
 
@@ -35,11 +44,11 @@ Grouped by the component from `plan.md` that owns them. Each line names one obse
 | U2  | `javaScript` getter returns a lazily-created `JavaScriptController` instance (singleton per controller) | FR-011, SC-006 | example  | DONE | zikzak_inappwebview/test/domain_controllers_test.dart |
 | U3  | `cookies` getter returns a lazily-created `CookieController` instance (singleton per controller) | FR-011, SC-006 | example  | DONE | zikzak_inappwebview/test/domain_controllers_test.dart |
 | U4  | `settings` getter returns a lazily-created `SettingsController` instance (singleton per controller) | FR-011, SC-006 | example  | DONE | zikzak_inappwebview/test/domain_controllers_test.dart |
-| U5  | All navigation methods on `InAppWebViewController` delegate to `navigation` facade and produce identical results | FR-002, FR-005 | example  | PENDING | |
-| U6  | All JavaScript methods on `InAppWebViewController` delegate to `javaScript` facade and produce identical results | FR-002, FR-006 | example  | PENDING | |
-| U7  | All cookie methods on `InAppWebViewController` delegate to `cookies` facade and produce identical results | FR-002, FR-007 | example  | PENDING | |
-| U8  | All settings methods on `InAppWebViewController` delegate to `settings` facade and produce identical results | FR-002, FR-008 | example  | PENDING | |
-| U9  | Public method surface of `InAppWebViewController` is unchanged (no methods removed, signatures identical) | FR-002, SC-002 | example  | PENDING | |
+| U5  | All navigation methods on `InAppWebViewController` delegate to `navigation` facade and produce identical results | FR-002, FR-005 | example  | DONE | zikzak_inappwebview/test/domain_controllers_behavioral_test.dart |
+| U6  | All JavaScript methods on `InAppWebViewController` delegate to `javaScript` facade and produce identical results | FR-002, FR-006 | example  | DONE | zikzak_inappwebview/test/domain_controllers_behavioral_test.dart |
+| U7  | All cookie methods on `InAppWebViewController` delegate to `cookies` facade and produce identical results | FR-002, FR-007 | example  | DONE | zikzak_inappwebview/test/domain_controllers_behavioral_test.dart |
+| U8  | All settings methods on `InAppWebViewController` delegate to `settings` facade and produce identical results | FR-002, FR-008 | example  | DONE | zikzak_inappwebview/test/domain_controllers_behavioral_test.dart |
+| U9  | Public method surface of `InAppWebViewController` is unchanged (no methods removed, signatures identical) | FR-002, SC-002 | example  | DONE | zikzak_inappwebview/test/domain_controllers_behavioral_test.dart |
 
 ### `zikzak_inappwebview/lib/src/in_app_webview/controllers/navigation_controller.dart` — NavigationController
 
@@ -133,25 +142,25 @@ Grouped by the component from `plan.md` that owns them. Each line names one obse
 
 | id  | behavior                                              | traces | kind             | state    | test                                    |
 | --- | ----------------------------------------------------- | ------ | ---------------- | -------- | --------------------------------------- |
-| U73 | Declares all navigation methods matching `PlatformInAppWebViewController` surface | FR-004 | example          | DONE | lib/src/in_app_webview/modules/platform_navigation_delegate.dart |
+| U73 | Declares all navigation methods matching `PlatformInAppWebViewController` surface | FR-004 | example          | DONE | zikzak_inappwebview_platform_interface/test/in_app_webview_controller_delegates_test.dart (compile-probe `_ProbeNavigation`) |
 
 ### `zikzak_inappwebview_platform_interface/lib/src/in_app_webview/modules/platform_javascript_delegate.dart` — PlatformJavaScriptDelegate
 
 | id  | behavior                                              | traces | kind             | state    | test                                    |
 | --- | ----------------------------------------------------- | ------ | ---------------- | -------- | --------------------------------------- |
-| U74 | Declares all JavaScript methods matching `PlatformInAppWebViewController` surface | FR-004 | example          | DONE | lib/src/in_app_webview/modules/platform_javascript_delegate.dart |
+| U74 | Declares all JavaScript methods matching `PlatformInAppWebViewController` surface | FR-004 | example          | DONE | zikzak_inappwebview_platform_interface/test/in_app_webview_controller_delegates_test.dart (compile-probe `_ProbeJavaScript`) |
 
 ### `zikzak_inappwebview_platform_interface/lib/src/in_app_webview/modules/platform_cookie_delegate.dart` — PlatformCookieDelegate
 
 | id  | behavior                                              | traces | kind             | state    | test                                    |
 | --- | ----------------------------------------------------- | ------ | ---------------- | -------- | --------------------------------------- |
-| U75 | Declares all cookie methods matching `PlatformInAppWebViewController` / `PlatformCookieManager` surface | FR-004 | example          | DONE | lib/src/in_app_webview/modules/platform_cookie_delegate.dart |
+| U75 | Declares all cookie methods matching `PlatformInAppWebViewController` / `PlatformCookieManager` surface | FR-004 | example          | DONE | zikzak_inappwebview_platform_interface/test/in_app_webview_controller_delegates_test.dart (compile-probe `_ProbeCookie`) |
 
 ### `zikzak_inappwebview_platform_interface/lib/src/in_app_webview/modules/platform_settings_delegate.dart` — PlatformSettingsDelegate
 
 | id  | behavior                                              | traces | kind             | state    | test                                    |
 | --- | ----------------------------------------------------- | ------ | ---------------- | -------- | --------------------------------------- |
-| U76 | Declares `setSettings` and `getSettings` matching `PlatformInAppWebViewController` surface | FR-004 | example          | DONE | lib/src/in_app_webview/modules/platform_settings_delegate.dart |
+| U76 | Declares `setSettings` and `getSettings` matching `PlatformInAppWebViewController` surface | FR-004 | example          | DONE | zikzak_inappwebview_platform_interface/test/in_app_webview_controller_delegates_test.dart (compile-probe `_ProbeSettings`) |
 
 ### Platform Implementation Migration (Android/iOS) — `zikzak_inappwebview_android` and `zikzak_inappwebview_ios`
 

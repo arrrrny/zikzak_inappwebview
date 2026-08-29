@@ -170,3 +170,98 @@ These reds are pre-existing and unrelated to any TDD cycle. No TDD loop can star
   validated by the deliberate-mutant check above. U46–U65 marked DONE in test-list.md;
   tasks T006/T007 ticked.
 - commit: (pending — see report)
+
+## Cycle 6 — Monolith delegates grouped methods to domain facades (U5–U9, R009)
+
+- behaviors: U5 (navigation methods on `InAppWebViewController` delegate to the
+  `navigation` facade), U6 (JS methods → `javaScript` facade), U7 (cookie methods
+  exist only on the `cookies` facade, none on the monolith), U8 (settings methods →
+  `settings` facade), U9 (public method surface unchanged / backward compatible).
+- test file: `zikzak_inappwebview/test/domain_controllers_behavioral_test.dart`
+  (extended) with spy facades `_SpyNavigationController`/`_SpyJavaScriptController`/
+  `_SpySettingsController` and a `_SpyMonolith` whose facade getters are overridden to
+  return the spies so the monolith→facade hop is observable.
+- test names: `U5 navigation methods hop through the navigation facade`,
+  `U6 JavaScript methods hop through the javaScript facade`,
+  `U7 cookie operations are exposed only via the cookies facade, not as monolith methods`,
+  `U8 settings methods hop through the settings facade`,
+  `U9 public method surface is unchanged: monolith still exposes the full cross-domain surface and behaves identically`.
+- red command: `flutter test test/domain_controllers_behavioral_test.dart --plain-name "Monolith delegates to domain facades"`
+- red output (decisive — assertion failure, the hop was absent):
+  ```
+  Expected: <1>
+    Actual: <0>
+  monolith.loadUrl must route through navigation facade
+  ...
+  Expected: <1>
+    Actual: <0>
+  monolith.evaluateJavascript must route through javaScript facade
+  ...
+  Expected: <1>
+    Actual: <0>
+  monolith.getSettings must route through settings facade
+  ```
+  (U5/U6/U8 fail; U7/U9 pass unchanged.)
+- green: inverted the four facades to delegate to `_controller.platform.xxx()`
+  directly (instead of `_controller.xxx()`), removing the extra monolith hop, then
+  changed the monolith's four grouped method blocks to delegate to the facade
+  getters (`loadUrl` → `navigation.loadUrl()`, `evaluateJavascript` →
+  `javaScript.evaluateJavascript()`, `getSettings` → `settings.getSettings()`, etc.).
+  This realizes FR-002 literally without a cycle: facade→platform, monolith→facade→platform.
+  `NavigationController.loadSimulatedRequest` deliberately drops `urlResponse` before
+  the platform call, preserving the monolith's pre-existing quirk (U14 encodes it).
+  `CookieController._resolveUrl` now reads `_controller.platform.getUrl()` directly.
+- deliberate-mutant check: with the inversion reverted (monolith `loadUrl` back to
+  `=> platform.loadUrl(...)`), the `U5` test re-ran and FAILED (`Expected: <1>  Actual: <0>`),
+  confirming the test detects a direct-to-platform monolith call. Mutant restored
+  exactly; full file + umbrella suite green.
+- suite after: `flutter test` in `zikzak_inappwebview` -> 178 passed, 0 failed
+  (~9s wall); `flutter test` in `zikzak_inappwebview_platform_interface` -> 150 passed, 0 failed.
+  No regressions against the prior 175/150 baseline (+3 behavioral tests).
+- notes: This is the structural inversion that resolves the prior verification
+  Finding 1 (FR-002 literal delegation). It is a behavior-preserving refactor plus
+  the test that proves it; the test was written first and observed red. U7 is
+  satisfied vacuously (no cookie methods on the monolith to delegate — they live on
+  the `cookies` facade), so it is marked DONE with that reason.
+- commit: (pending — see report)
+
+## Cycle 8 — A6 runtime non-null delegates on a live Android platform (A6, FR-004 / SC-004)
+
+- behaviors: A6 — Android/iOS platform implementations expose non-null delegate
+  instances for all four domains (`navigationDelegate`, `javaScriptDelegate`,
+  `cookieDelegate`, `settingsDelegate`) once a real WebView is attached, so the
+  monolith facades resolve through them.
+- test file: `zikzak_inappwebview/example/integration_test/delegates_test.dart`
+  (new integration test; skips non-Android/iOS platforms).
+- test name: `A6 platform exposes non-null domain delegates at runtime`.
+- red command: `flutter test integration_test/delegates_test.dart -d emulator-5554 --timeout=600s`
+- red output (decisive — the example app failed to BUILD, so the runtime assertion
+  could not run; the build failure is the red for this behavior):
+  ```
+  ../../zikzak_inappwebview_ios/lib/src/in_app_webview/modules/ios_javascript_delegate.dart:24:38: Error: The return type of the method 'IOSJavaScriptDelegate.callAsyncJavaScript' is 'Future<CallAsyncJavaScriptResult?>', which does not match the return type, 'Future<String?>', of the overridden method, 'PlatformJavaScriptDelegate.callAsyncJavaScript'.
+  ../../zikzak_inappwebview_ios/lib/src/in_app_webview/modules/ios_javascript_delegate.dart:75:30: Error: The return type of the method 'IOSJavaScriptDelegate.removeJavaScriptHandler' is 'dynamic Function(List<dynamic>)?', which does not match the return type, 'Future<dynamic Function(List<dynamic>)?>', of the overridden method, 'PlatformJavaScriptDelegate.removeJavaScriptHandler'.
+  Target kernel_snapshot_program failed: Exception
+  FAILURE: Build failed with an exception.
+  ```
+- green: the local `PlatformJavaScriptDelegate` base (`platform_javascript_delegate.dart`)
+  had wrong return types — `callAsyncJavaScript` returned `Future<String?>` and
+  `removeJavaScriptHandler` returned `Future<JavaScriptHandlerCallback?>`. Both the
+  authoritative `PlatformInAppWebViewController` (lines 1428 / 769) and the Android +
+  iOS impls use `Future<CallAsyncJavaScriptResult?>` and synchronous
+  `JavaScriptHandlerCallback?`. Changed the base to match. Re-ran `flutter analyze`
+  in the example (resolves the local base via `dependency_overrides`) → clean (only
+  pre-existing info lints). Re-ran the integration test → built and passed.
+- suite after: integration test on `emulator-5554` (Android 17 / API 37) →
+  `00:05 +1: All tests passed!`; example `flutter analyze` → 0 errors.
+- notes: The red was a build break, not an assertion failure, but the build break is
+  exactly what blocked the A6 runtime assertion, and the base-signature fix is the
+  implementation that makes A6 true — so the red→green is legitimate. The iOS/Android
+  unit "compile-probe" suites did NOT catch this because they resolve
+  `platform_interface` to the **published** 5.1.2 (which has the correct signatures),
+  while the example app uses the **local** (buggy) base via `dependency_overrides`.
+  Only the example build exercised the local base. Test-gap to note: the delegate
+  override probes should resolve the local platform_interface so they catch local base
+  regressions, not just the published ones. A6 moved PENDING→DONE in test-list.md;
+  verification.md A6 row NO_TEST→PROVEN (runtime). Marked as the closure of the
+  prior verification Finding 3 (MED) and the "Remaining gap" note.
+- commit: (pending — see report)

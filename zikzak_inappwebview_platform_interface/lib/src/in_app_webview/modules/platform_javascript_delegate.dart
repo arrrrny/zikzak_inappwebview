@@ -16,7 +16,7 @@ abstract class PlatformJavaScriptDelegate extends PlatformInterface {
   }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.callAsyncJavaScript}
-  Future<String?> callAsyncJavaScript({
+  Future<CallAsyncJavaScriptResult?> callAsyncJavaScript({
     required String functionBody,
     Map<String, dynamic> arguments = const <String, dynamic>{},
     ContentWorld? contentWorld,
@@ -78,7 +78,7 @@ abstract class PlatformJavaScriptDelegate extends PlatformInterface {
   }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.removeJavaScriptHandler}
-  Future<JavaScriptHandlerCallback?> removeJavaScriptHandler({
+  JavaScriptHandlerCallback? removeJavaScriptHandler({
     required String handlerName,
   }) {
     throw UnimplementedError(
