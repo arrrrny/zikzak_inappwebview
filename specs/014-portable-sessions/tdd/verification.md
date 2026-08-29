@@ -2,7 +2,7 @@
 feature: 014-portable-sessions
 verdict: FAIL
 standard: .specify/extensions/tdd/templates/tdd-test-quality-rubric.md
-verified_at: d31a9909
+verified_at: da35e188
 behaviors: 28
 proven: 0
 likely: 0
@@ -14,7 +14,7 @@ criteria_total: 11
 criteria_covered: 11
 mutation_score: 11 # 11/11 deliberate mutants killed, scope: lib/src/webview_sessions/webview_sessions.dart
 mutants_survived: 0
-suite: 118 passed, 0 failed, ~36s
+suite: umbrella unit suite (zikzak_inappwebview) -> 184 passed, 0 failed (re-run 2026-08-29 at da35e188, ~10s)
 ---
 
 # TDD Verification: Portable Sessions (via zikzak_session)
@@ -101,9 +101,9 @@ Untested criteria: none. Tests tracing to nothing: none.
   not run. The umbrella `flutter test` suite exercises the public API with injected
   fakes, which the traceability table reports as "end to end" at the Dart boundary.
 - **Performance/load**: no criterion, not assessed.
-- The `webview_sessions` files are currently **uncommitted** on branch
-  `fix/webview-init-readiness-gate`; `verified_at` is the current `HEAD` (d31a9909)
-  and the audit reflects the working-tree files as they stand.
+- The `webview_sessions` files are now **committed** on branch
+  `fix/webview-init-readiness-gate` (verified_at `da35e188`); the audit reflects the
+  tree as committed, not a dirty working copy.
 
 ## Note on remediation
 
