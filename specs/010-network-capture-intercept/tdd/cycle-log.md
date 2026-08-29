@@ -97,4 +97,4 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
 - note: per-domain `maxBodySize` is a further cap below the global
   `networkCaptureMaxBodySize` (applied in JS before the body reaches Dart). The
   pre-existing delegates-test failure is out of 010's scope and is not fixed here.
-- commit: TBD
+- commit: 8d7a0a1d
