@@ -1148,7 +1148,10 @@ public final class InAppWebView
     ) {
         final float pixelDensity = Util.getPixelDensity(getContext());
 
-        mainLooperHandler.post(
+        // Defer one frame so the WebView has finished layout; reading its size
+        // before then yields 0 and makes Bitmap.createBitmap throw, which is
+        // swallowed into a null return (FR-001). Mirror createPdf's warm-up.
+        mainLooperHandler.postDelayed(
             new Runnable() {
                 @Override
                 public void run() {
@@ -1157,8 +1160,16 @@ public final class InAppWebView
                         boolean wasVerticalScrollBarEnabled = isVerticalScrollBarEnabled();
                         setHorizontalScrollBarEnabled(false);
                         setVerticalScrollBarEnabled(false);
-                        int bitmapWidth = getMeasuredWidth();
-                        int bitmapHeight = getMeasuredHeight();
+                        // Prefer the laid-out size; measurement may still be 0
+                        // before layout settles. Guard against 0-size capture.
+                        int bitmapWidth =
+                            getWidth() > 0 ? getWidth() : getMeasuredWidth();
+                        int bitmapHeight =
+                            getHeight() > 0 ? getHeight() : getMeasuredHeight();
+                        if (bitmapWidth <= 0 || bitmapHeight <= 0) {
+                            result.success(null);
+                            return;
+                        }
                         int bitmapScrollX = getScrollX();
                         int bitmapScrollY = getScrollY();
                         Bitmap screenshotBitmap = Bitmap.createBitmap(
@@ -1266,7 +1277,8 @@ public final class InAppWebView
                         result.success(null);
                     }
                 }
-            }
+            },
+            1000
         );
     }
 
