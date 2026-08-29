@@ -142,5 +142,5 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
   - acceptance result: `00:02 +1: All tests passed!` (EXIT=0) on emulator-5554 (API 26)
 - deliberate mutant: N/A — the test was RED on first run (the failure was observed before implementation), so the green-on-first-run mutant check does not apply. The red evidence above is the real pre-implementation failure.
 - refactor: none needed. The fix is the minimal production change that makes the behavior hold.
-- commit: pending (this cycle)
+- commit: e9642e34
 - notes: Acceptance behavior requiring a real Android WebView; ran on a device/emulator, not the Dart-VM unit runner. This is a genuine production bug fix (zero-size PDF capture), not only a new test. `tasks.md` carries no `[A4]` marker, so no task was ticked.
