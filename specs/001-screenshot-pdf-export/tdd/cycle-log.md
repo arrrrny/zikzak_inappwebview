@@ -77,3 +77,57 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
 - refactor: none. Reuses the `_FakeChannel` / `_newController` helpers and the U16/U17 style.
 - commit: pending (WIP, not yet committed)
 - notes: Promotes the previously-BASELINE characterization row U41 to a real behavioral test covering both the `screenshotConfiguration.toJson()` forward and the bytes/null return. The Java handler half of U41 (native `InAppWebView.java` takeScreenshot) is out of Dart-unit scope and still needs native/integration coverage. Full Android suite after: 7 passed (no regression). `tasks.md` carries no `[U41]` marker, so no task was ticked.
+## U25 — Linux Dart createPdf delegates pdfConfiguration to the method channel
+
+- test: `zikzak_inappwebview_linux/test/in_app_webview/screenshot_pdf_delegation_test.dart › U25 createPdf delegates to channel with pdfConfiguration.toJson()`
+- red: none — the delegation already existed in `LinuxInAppWebViewController.createPdf` (in_app_webview_controller.dart:336), so the test passed on first run.
+- deliberate mutant: changed the channel method literal from `'createPdf'` to `'createPdfX'`; ran the test; it failed with:
+  `Expected: 'createPdf'  Actual: 'createPdfX'  Which: is different. Both strings start the same, but the actual value also has the following trailing characters: X`. Restored the source exactly; test green again.
+- green: no source change; behavior already satisfied by the existing delegation (`args.putIfAbsent('pdfConfiguration', () => pdfConfiguration?.toJson()); _channel.invokeMethod<Uint8List?>('createPdf', args)`).
+- refactor: none. New Linux test file created (`test/in_app_webview/screenshot_pdf_delegation_test.dart`); reuses the binary-messenger mock pattern from the macOS exemplar (`context_menu_test.dart`) and the channel-name convention `dev.zuzu/zikzak_inappwebview_${id}`.
+- commit: pending (WIP; batched with U26/U27/U38/U39 per session commit plan)
+- notes: green-on-first-run characterization; mutant confirms the test catches a renamed/dropped channel method. Full Linux suite after: 1 passed (no regression). `tasks.md` carries no `[U25]` marker, so no task was ticked.
+
+## U26 — Linux Dart takeScreenshot delegates screenshotConfiguration to the method channel
+
+- test: `zikzak_inappwebview_linux/test/in_app_webview/screenshot_pdf_delegation_test.dart › U26 takeScreenshot delegates to channel with screenshotConfiguration.toJson()`
+- red: none — the delegation already existed in `LinuxInAppWebViewController.takeScreenshot` (in_app_webview_controller.dart:324), so the test passed on first run.
+- deliberate mutant: changed the channel method literal from `'takeScreenshot'` to `'takeScreenshotX'`; ran the test; it failed with:
+  `Expected: 'takeScreenshot'  Actual: 'takeScreenshotX'  Which: is different. Both strings start the same, but the actual value also has the following trailing characters: X`. Restored the source exactly; test green again.
+- green: no source change; behavior already satisfied by the existing delegation (`args.putIfAbsent('screenshotConfiguration', () => screenshotConfiguration?.toJson()); _channel.invokeMethod<Uint8List?>('takeScreenshot', args)`).
+- refactor: none. Shares the group, `_newController` helper, and mock setup with U25.
+- commit: pending (WIP; batched with U25/U27/U38/U39 per session commit plan)
+- notes: green-on-first-run characterization; mutant confirms the test catches a renamed/dropped channel method. Full Linux suite after: 2 passed (no regression). `tasks.md` carries no `[U26]` marker, so no task was ticked.
+
+## U27 — Linux Dart overrides propagate the channel Uint8List or null
+
+- test: `zikzak_inappwebview_linux/test/in_app_webview/screenshot_pdf_delegation_test.dart › U27 overrides return the channel Uint8List or null`
+- red: none — both overrides already propagated the channel result (in_app_webview_controller.dart:324 and :336), so the test passed on first run.
+- deliberate mutant: changed `createPdf` to `return null;`; ran the test; it failed with:
+  `Expected: [10, 20, 30]  Actual: <null>  Which: is not Iterable  the Uint8List the channel returns must be propagated as-is`. Restored the override exactly; test green again.
+- green: no source change; behavior already satisfied by the existing forward-and-return.
+- refactor: none. Shares the group, `_newController` helper, and mock setup with U25/U26.
+- commit: pending (WIP; batched with U25/U26/U38/U39 per session commit plan)
+- notes: green-on-first-run characterization; mutant confirms the test catches a dropped/empty return. Full Linux suite after: 3 passed (no regression). `tasks.md` carries no `[U27]` marker, so no task was ticked.
+
+## U38 — Windows Dart takeScreenshot returns null without throwing
+
+- test: `zikzak_inappwebview_windows/test/screenshot_pdf_delegation_test.dart › U38 takeScreenshot returns null without throwing`
+- red: none — the override already returned `null` (in_app_webview_windows_controller.dart:308), so the test passed on first run.
+- deliberate mutant: changed the override body to `throw UnimplementedError();`; ran the test; it failed with:
+  `UnimplementedError  package:zikzak_inappwebview_windows/src/in_app_webview_windows_controller.dart 308:5  InAppWebViewWindowsController.takeScreenshot`. Restored the override exactly; test green again.
+- green: no source change; behavior already satisfied by the existing `return null;` stub (Windows screenshot/pdf is out of scope per spec.md).
+- refactor: none. New Windows test file created; reuses the `WebviewController()` construction seam from the existing `in_app_webview_windows_controller_test.dart` exemplar.
+- commit: pending (WIP; batched with U25/U26/U27/U39 per session commit plan)
+- notes: green-on-first-run characterization; mutant confirms the test catches a reintroduced throw. Full Windows suite after: 14 passed (no regression). `tasks.md` carries no `[U38]` marker, so no task was ticked.
+
+## U39 — Web Dart takeScreenshot returns null without throwing
+
+- test: `zikzak_inappwebview_web/test/screenshot_pdf_delegation_test.dart › U39 takeScreenshot returns null without throwing`
+- red command: `flutter test test/screenshot_pdf_delegation_test.dart --platform=chrome --plain-name "U39 takeScreenshot returns null without throwing"` (the web package cannot compile on the Dart VM because `package:web` requires the JS backend, so the Chrome browser backend is used).
+- red: none — the override already returned `null` (in_app_webview_web_controller.dart:209), so the test passed on first run under Chrome.
+- deliberate mutant: changed the override body to `throw UnimplementedError();`; ran the test under Chrome; it failed with the thrown `UnimplementedError`. Restored the override exactly; test green again.
+- green: no source change; behavior already satisfied by the existing `return null;` stub (Web screenshot/pdf is out of scope per spec.md).
+- refactor: none. New Web test file created; the Web controller is constructed with a real `web.HTMLIFrameElement()` only available under the Chrome backend.
+- commit: pending (WIP; batched with U25/U26/U27/U38 per session commit plan)
+- notes: green-on-first-run characterization run under Chrome (the only backend on which the `web` package compiles). Mutant confirms the test catches a reintroduced throw. `tasks.md` carries no `[U39]` marker, so no task was ticked. NOTE: this test must be run with `--platform=chrome`; it will not compile under the default Dart VM runner.

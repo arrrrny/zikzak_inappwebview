@@ -101,9 +101,9 @@ Grouped by the component from `plan.md` that owns them. Each line names one obse
 
 | id  | behavior                                                  | traces     | kind     | state   | test                                   |
 | --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
-| U25 | Dart createPdf override invokes method channel 'createPdf' with pdfConfiguration.toMap() | US3 | example  | PENDING |                                        |
-| U26 | Dart takeScreenshot override invokes method channel 'takeScreenshot' with screenshotConfiguration.toMap() | US4 | example  | PENDING |                                        |
-| U27 | Dart overrides return Uint8List from channel or null on failure | US3, US4, FR-010 | example  | PENDING |                                        |
+| U25 | Dart createPdf override invokes method channel 'createPdf' with pdfConfiguration.toMap() | US3 | example  | DONE    | zikzak_inappwebview_linux/test/in_app_webview/screenshot_pdf_delegation_test.dart › U25 createPdf delegates to channel with pdfConfiguration.toJson() |
+| U26 | Dart takeScreenshot override invokes method channel 'takeScreenshot' with screenshotConfiguration.toMap() | US4 | example  | DONE    | zikzak_inappwebview_linux/test/in_app_webview/screenshot_pdf_delegation_test.dart › U26 takeScreenshot delegates to channel with screenshotConfiguration.toJson() |
+| U27 | Dart overrides return Uint8List from channel or null on failure | US3, US4, FR-010 | example  | DONE    | zikzak_inappwebview_linux/test/in_app_webview/screenshot_pdf_delegation_test.dart › U27 overrides return the channel Uint8List or null |
 
 ### `zikzak_inappwebview_ios/ios/Classes/InAppWebView/InAppWebView.swift`
 
@@ -144,13 +144,13 @@ Grouped by the component from `plan.md` that owns them. Each line names one obse
 
 | id  | behavior                                                  | traces     | kind     | state   | test                                   |
 | --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
-| U38 | Windows takeScreenshot override returns null without throwing | FR-009 | example  | PENDING |                                        |
+| U38 | Windows takeScreenshot override returns null without throwing | FR-009 | example  | DONE    | zikzak_inappwebview_windows/test/screenshot_pdf_delegation_test.dart › U38 takeScreenshot returns null without throwing |
 
 ### `zikzak_inappwebview_web/lib/src/in_app_webview_web_controller.dart`
 
 | id  | behavior                                                  | traces     | kind     | state   | test                                   |
 | --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
-| U39 | Web takeScreenshot override returns null without throwing | FR-009 | example  | PENDING |                                        |
+| U39 | Web takeScreenshot override returns null without throwing | FR-009 | example  | DONE    | zikzak_inappwebview_web/test/screenshot_pdf_delegation_test.dart › U39 takeScreenshot returns null without throwing |
 
 ### `zikzak_inappwebview_macos/macos/Classes/InAppWebView.swift` (createPdf verification)
 
