@@ -4,7 +4,7 @@ loop: outside-in
 profile: .specify/memory/tdd-profile.md
 spec_criteria: 12
 planned_at: abfa842e
-updated_at: cdde50d7
+updated_at: fabdfe74
 suite_baseline: green
 ---
 
@@ -29,7 +29,7 @@ One per acceptance criterion in `spec.md`. Each stays red until the feature work
 | A11 | iOS createPdf on iOS 14.0+ returns valid PDF byte buffer | US5-AC2 | example | PENDING |                                             |
 | A12 | iOS createPdf on iOS 13.x (below minimum) fails gracefully with clear error message | US5-AC3 | example | PENDING |                                             |
 | A13 | Android takeScreenshot returns non-null Uint8List with valid PNG image data | FR-001, US1-parity | example | DONE    | zikzak_inappwebview/example/integration_test/android_take_screenshot_test.dart › A13 Android takeScreenshot returns non-null valid PNG image bytes |
-| A14 | Android takeScreenshot with rect captures only the specified portion of the view | FR-002 | example | PENDING |                                             |
+| A14 | Android takeScreenshot with rect captures only the specified portion of the view | FR-002 | example | DONE    | zikzak_inappwebview/example/integration_test/android_take_screenshot_test.dart › A14 Android takeScreenshot with rect captures only the specified portion of the view |
 
 ## Inner loop: unit behaviors
 

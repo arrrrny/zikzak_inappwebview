@@ -170,3 +170,14 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
 - refactor: none needed. The fix only aligns `takeScreenshot` with the existing `capturePdf` dimension-reading pattern; no new duplication introduced.
 - commit: 7e5f9041
 - notes: Acceptance behavior requiring a real Android WebView; ran on a device/emulator, not the Dart-VM unit runner. This is a genuine production bug fix (zero-size screenshot capture), not only a new test. `tasks.md` carries no `[A13]` marker, so no task was ticked.
+
+## A14 — Android takeScreenshot with rect crops to the specified portion (acceptance)
+
+- test: `zikzak_inappwebview/example/integration_test/android_take_screenshot_test.dart › A14 Android takeScreenshot with rect captures only the specified portion of the view`
+- red: none — the native rect-crop already existed in `InAppWebView.takeScreenshot` (InAppWebView.java:1198), so the test passed on first run on emulator-5554 (API 26).
+- deliberate mutant: forced `rectWidth = screenshotBitmap.getWidth()` and `rectHeight = screenshotBitmap.getHeight()` (neutralizing the crop so the cropped bitmap equals the full bitmap); ran `flutter test integration_test/android_take_screenshot_test.dart -d emulator-5554 --plain-name "A14 Android takeScreenshot with rect captures only the specified portion of the view"`. It failed with:
+  `Expected: a value less than <1050>  Actual: <1050>  Which: is not a value less than <1050>  rect must crop the width (FR-002)`. Restored the native code exactly (`git checkout`); test green again.
+- green: no source change; behavior already satisfied by the existing rect crop in `InAppWebView.takeScreenshot`.
+- refactor: none.
+- commit: fabdfe74
+- notes: green-on-first-run acceptance; the deliberate mutant confirms the test catches a dropped/neutralized crop (the assertions `cropW < fullW` / `cropH < fullH` / `closeTo(fullW/2, 2.0)` all depend on the native rect block). Real-device (emulator) acceptance, not the Dart-VM unit runner. `tasks.md` carries no `[A14]` marker, so no task was ticked.
