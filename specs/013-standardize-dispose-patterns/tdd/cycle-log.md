@@ -151,3 +151,20 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
 - refactor: none needed — reused the `_FakePlatformLocalhostServer` fake from the U15/U14 tests in the same file.
 - class: TEST_FIRST (test written before confirming the implementation; red proven via mutant because the guard already held).
 - commit: not committed (working tree left dirty per `--no-commit` default).
+
+## Cycle 9 — U17 (test-first with deliberate-mutant proof)
+
+- test: `test/in_app_localhost_server_dispose_test.dart` — `U17: dispose(isKeepAlive: true) is accepted but has no effect on server behavior`
+- red command: `flutter test test/in_app_localhost_server_dispose_test.dart --plain-name "U17: dispose(isKeepAlive: true) is accepted but has no effect on server behavior"`
+- red evidence (deliberate-mutant check): the test passed on first run because `InAppLocalhostServer.dispose()` ignores `isKeepAlive` (calls `close()` whenever `isRunning()`). To prove the test has teeth, the close condition was temporarily changed from `if (isRunning())` to `if (isRunning() && !isKeepAlive)` so `keepAlive: true` would suppress `close()`. The test then failed:
+  ```
+  00:00 +0 -1: ... U17: dispose(isKeepAlive: true) is accepted but has no effect on server behavior [E]
+    Expected: <1>
+      Actual: <0>
+    close() must still be called exactly once; keepAlive must not suppress it
+  ```
+  The implementation was restored exactly and the test passed again. This mutant failure is the recorded red.
+- green: no source change beyond the existing no-op treatment of `isKeepAlive`; full umbrella suite `flutter test` -> green at 193 (was 192; +1 new test), no regressions.
+- refactor: none needed — reused the `_FakePlatformLocalhostServer` fake from the U15/U14/U16 tests in the same file.
+- class: TEST_FIRST (test written before confirming the implementation; red proven via mutant because the behavior already held).
+- commit: not committed (working tree left dirty per `--no-commit` default).

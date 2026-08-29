@@ -29,7 +29,7 @@
 - [X] T019 **[U14]** Implement `InAppLocalhostServer.dispose()` stops server if running (fire-and-forget, swallows errors)
 - [X] T020 **[U15]** Implement `InAppLocalhostServer.dispose()` on non-running server (safe, marks disposed)
 - [X] T021 **[U16]** Implement idempotent second `dispose()` call on `InAppLocalhostServer`
-- [ ] T022 **[U17]** Implement `dispose(isKeepAlive: ...)` signature on server (accepted, no behavioral effect)
+- [X] T022 **[U17]** Implement `dispose(isKeepAlive: ...)` signature on server (accepted, no behavioral effect)
 - [ ] T023 **[A4]** Write acceptance test: All four wrappers declare `implements Disposable`
 - [ ] T024 **[A5]** Write acceptance test: `dispose()` on any wrapper forwards to platform with same default parameter
 - [ ] T025 **[A6]** Write acceptance test: `InAppLocalhostServer.dispose()` stops server, idempotent

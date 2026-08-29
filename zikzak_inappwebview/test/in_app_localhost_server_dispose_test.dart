@@ -62,5 +62,18 @@ void main() {
       expect(fake.closeCallCount, 1,
           reason: 'close() must not be called again by a second dispose()');
     });
+
+    test('U17: dispose(isKeepAlive: true) is accepted but has no effect on server behavior', () {
+      final fake = _FakePlatformLocalhostServer();
+      fake.isRunningValue = true;
+      final server = InAppLocalhostServer.fromPlatform(fake);
+
+      server.dispose(isKeepAlive: true);
+
+      expect(server.disposed, isTrue,
+          reason: 'dispose() must still mark the server disposed with keepAlive set');
+      expect(fake.closeCallCount, 1,
+          reason: 'close() must still be called exactly once; keepAlive must not suppress it');
+    });
   });
 }
