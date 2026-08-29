@@ -68,9 +68,12 @@ Tasks are ordered by dependency. Test tasks must precede implementation tasks fo
 
 ## Phase 6: Generated Code / DI Wiring (zorphy)
 
-- [ ] T040: [U85] Write failing test for generated wiring resolves all four delegates
-- [ ] T041: [U85] Update zorphy/generated code to register delegates correctly
-- [ ] T042: [U86] Verify no orphaned or duplicated wiring in generated code
+- [X] T040: [U85] Write failing test for generated wiring resolves all four delegates
+      → N/A: zorphy is entity-serialization codegen only (all `.zorphy` under `lib/src/domain/entities/`); there is no generated controller DI. Delegates are wired manually via `override` getters (done in Phase 4/5, U77–U84).
+- [X] T041: [U85] Update zorphy/generated code to register delegates correctly
+      → N/A for the same reason as T040.
+- [X] T042: [U86] Verify no orphaned or duplicated wiring in generated code
+      → N/A: no generated delegate wiring exists; the single wiring path is the manual override getters, one per delegate, no orphans.
 
 ## Phase 7: Acceptance Criteria Verification
 

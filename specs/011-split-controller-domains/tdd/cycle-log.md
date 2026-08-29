@@ -45,3 +45,9 @@ These reds are pre-existing and unrelated to any TDD cycle. No TDD loop can star
 - commit: (pending — see report)
 - notes: Runtime verification of SC-004 ("delegate getters return non-null concrete instances on a real platform") is **not** performed here — that needs a booted device and is tracked by acceptance R005/R006 (A15/A16). The compile-probe tests prove the overrides exist, compile against the platform-interface abstract classes, and instantiate the concrete types, but do not assert non-null at runtime. Deviation from strict test-first discipline: implementation was wired against already-present delegate classes rather than driven by a failing test.
 - notes: This is a compile-time probe test, not behavioral. It proves the symbols/delegates exist and are exported; it does not assert delegation behavior. U73–U76 (delegate method surfaces) are implemented in the modules but have no dedicated behavioral test yet (test-after).
+
+## Investigation — Phase 6 "Generated Code / DI Wiring (zorphy)" is not applicable (U85–U86)
+
+- finding: The spec assumed zorphy generates dependency-injection wiring that must register the four domain delegates. Inspection shows zorphy is used **only for entity serialization** in this repo — every `.zorphy` file lives under `lib/src/domain/entities/`, and there is **no generated controller DI container** (no `GetIt`/`@Inject`/`Injectable` for controllers). The delegates are wired manually via `override` getters (Phase 4/5, this session), which are the single source of wiring and have no orphans.
+- disposition: U85/U86 marked `NOT_APPLICABLE` in test-list; tasks T040/T041/T042 ticked with an N/A note. No code change required — the spec's Phase 6 describes work the architecture does not need.
+- verification: `grep -rln "zorphy"` restricted to entity files; `find -name '*.zorphy*'` all under `domain/entities/`; no controller-DI generator present.

@@ -170,8 +170,8 @@ Grouped by the component from `plan.md` that owns them. Each line names one obse
 
 | id  | behavior                                              | traces | kind             | state    | test                                    |
 | --- | ----------------------------------------------------- | ------ | ---------------- | -------- | --------------------------------------- |
-| U85 | Generated platform controller wiring resolves and registers all four delegates correctly | FR-009 | example          | PENDING | |
-| U86 | No orphaned or duplicated wiring for delegate instances in generated code | FR-009 | example          | PENDING | |
+| U85 | Generated platform controller wiring resolves and registers all four delegates correctly | FR-009 | example          | NOT_APPLICABLE | NOT_APPLICABLE — delegates wired manually via override getters (this turn); zorphy is entity codegen only, no controller DI |
+| U86 | No orphaned or duplicated wiring for delegate instances in generated code | FR-009 | example          | NOT_APPLICABLE | NOT_APPLICABLE — no generated wiring exists for delegates (zorphy = entity serialization only); manual override getters are the single source of wiring |
 
 ## Invariants and edge cases still to place
 
