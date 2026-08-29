@@ -144,3 +144,13 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
 - refactor: none needed. The fix is the minimal production change that makes the behavior hold.
 - commit: e9642e34
 - notes: Acceptance behavior requiring a real Android WebView; ran on a device/emulator, not the Dart-VM unit runner. This is a genuine production bug fix (zero-size PDF capture), not only a new test. `tasks.md` carries no `[A4]` marker, so no task was ticked.
+
+## A5 — Android createPdf with A4 page size paginates content across A4 pages
+
+- test: `zikzak_inappwebview/example/integration_test/android_create_pdf_test.dart › A5 Android createPdf with A4 page size produces A4 pages with all content`
+- red: ran `flutter test -d emulator-5554 integration_test/android_create_pdf_test.dart --plain-name "A5 Android createPdf with A4 page size produces A4 pages with all content"`. Failed with:
+  `Expected: a value greater than or equal to <2>  Actual: <1>  Which: is not a value greater than or equal to <2>` (only 1 `/MediaBox` found; native `createPdf` ignored `pageSize` and emitted a single content-sized page).
+- green: threaded `pdfConfiguration` from `InAppWebView.createPdf` into `capturePdf`; `capturePdf` now reads `pageSize`/`margins`/`orientation` from the map (swapping w/h for LANDSCAPE) and slices the scaled WebView bitmap into `ceil(scaledContentHeight / contentHeight)` pages, each drawn at its own `/MediaBox`, with the surplus clipped by the page. Original content-sized single-page behavior is retained when `pageSize` is null. Added `toDouble` helper.
+- refactor: none (change is localized to the capture path; the single-page fallback is preserved, so A4 is unaffected).
+- commit: 189cb769
+- notes: Acceptance test on emulator-5554 (API 26). Regression: full `android_create_pdf_test.dart` (A4+A5) green, 2 passed. `tasks.md` carries no `[A5]` marker, so no task was ticked. PDFConfiguration pageSize/margins/orientation fields (zorphy) were added in this commit so the test could carry the A4 size across the channel.
