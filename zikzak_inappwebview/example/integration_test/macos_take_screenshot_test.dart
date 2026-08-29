@@ -13,6 +13,13 @@ import 'package:zikzak_inappwebview/zikzak_inappwebview.dart';
 /// Acceptance test: the native `takeScreenshot` handler only produces real
 /// bytes when a live macOS WebView is attached, so it must run on the macOS
 /// desktop target, not the Dart-VM host compile-probe suites.
+(int, int) _pngSize(Uint8List b) {
+  // PNG IHDR: width at bytes 16..19, height at bytes 20..23 (big-endian).
+  final w = (b[16] << 24) | (b[17] << 16) | (b[18] << 8) | b[19];
+  final h = (b[20] << 24) | (b[21] << 16) | (b[22] << 8) | b[23];
+  return (w, h);
+}
+
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -97,6 +104,49 @@ void main() {
       // JPEG SOI marker is FF D8 FF (the 4th byte may vary, so check the first 3).
       expect(bytes.sublist(0, 3), [0xFF, 0xD8, 0xFF],
           reason: 'returned bytes must be a valid JPEG image (magic FF D8 FF)');
+    },
+  );
+
+  testWidgets(
+    'A3 macOS takeScreenshot with rect captures only the specified portion of the view',
+    (WidgetTester tester) async {
+      // takeScreenshot rect crop is a macOS acceptance behavior (US1-AC3); skip elsewhere.
+      if (!Platform.isMacOS) return;
+
+      final controller = await pumpWebView(tester, pageLoaded: Completer());
+
+      final Uint8List? full = await controller
+          .takeScreenshot()
+          .timeout(const Duration(seconds: 120));
+      expect(full, isNotNull, reason: 'full screenshot must be non-null (US1-AC1)');
+      expect(full!.sublist(0, 4), [0x89, 0x50, 0x4E, 0x47],
+          reason: 'full screenshot must be a valid PNG');
+      final (fullW, fullH) = _pngSize(full);
+      expect(fullW, greaterThan(0));
+      expect(fullH, greaterThan(0));
+
+      // Crop the left-half / top-half of the 400x600 view: rect = 200x300 CSS px.
+      final Uint8List? cropped = await controller
+          .takeScreenshot(
+            screenshotConfiguration: ScreenshotConfiguration(
+              rect: InAppWebViewRect(x: 0, y: 0, width: 200, height: 300),
+            ),
+          )
+          .timeout(const Duration(seconds: 120));
+      expect(cropped, isNotNull, reason: 'cropped screenshot must be non-null (US1-AC3)');
+      expect(cropped!.sublist(0, 4), [0x89, 0x50, 0x4E, 0x47],
+          reason: 'cropped screenshot must be a valid PNG');
+      final (cropW, cropH) = _pngSize(cropped);
+
+      // The crop is exactly half the view in each axis (rect 200x300 of a 400x600
+      // view); the captured PNG must be smaller than the full one and ~half its
+      // size in each dimension (US1-AC3).
+      expect(cropW, lessThan(fullW), reason: 'rect must crop the width (US1-AC3)');
+      expect(cropH, lessThan(fullH), reason: 'rect must crop the height (US1-AC3)');
+      expect(cropW, closeTo(fullW / 2, 2.0),
+          reason: 'cropped width must be ~half the full width');
+      expect(cropH, closeTo(fullH / 2, 2.0),
+          reason: 'cropped height must be ~half the full height');
     },
   );
 }
