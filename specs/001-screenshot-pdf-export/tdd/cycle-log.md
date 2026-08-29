@@ -131,3 +131,16 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
 - refactor: none. New Web test file created; the Web controller is constructed with a real `web.HTMLIFrameElement()` only available under the Chrome backend.
 - commit: pending (WIP; batched with U25/U26/U27/U38 per session commit plan)
 - notes: green-on-first-run characterization run under Chrome (the only backend on which the `web` package compiles). Mutant confirms the test catches a reintroduced throw. `tasks.md` carries no `[U39]` marker, so no task was ticked. NOTE: this test must be run with `--platform=chrome`; it will not compile under the default Dart VM runner.
+
+## A4 — Android createPdf returns non-null valid PDF bytes (acceptance)
+
+- test: `zikzak_inappwebview/example/integration_test/android_create_pdf_test.dart › A4 Android createPdf returns non-null valid PDF bytes`
+- red command: `flutter test integration_test/android_create_pdf_test.dart -d emulator-5554`
+- red: the test failed. Initially `createPdf` returned `null` (the native catch block returned `result.success(null)`); a diagnostic re-run surfaced the real cause as a `PlatformException(CREATEPDF_INNER, java.lang.IllegalArgumentException: width and height must be > 0, null, null)`. The native `createPdf`/`capturePdf` read `viewWidth`/`viewHeight` in the outer runnable **before the WebView was laid out**, so both were `0`; `Bitmap.createBitmap(0, 1576)` then threw. Diagnostic dimensions at capture time: `w=0 mw=1050 pw=1050 ph=1575 sr=1576` — the measured width is 1050 once laid out. The test genuinely failed (red) before any fix existed.
+- green: moved the dimension computation (`getWidth()>0?getWidth():getMeasuredWidth()`, `computeVerticalScrollRange()`, `MAX_HEIGHT` clamp) **inside** `doCapture`, which runs after the `postVisualStateCallback` visual-state completion, so the view is already laid out and `getMeasuredWidth()` returns 1050. Removed the temporary diagnostic `result.error` instrumentation and restored the original graceful `result.success(null)` on genuine capture failure.
+  - source: `zikzak_inappwebview_android/android/src/main/java/wtf/zikzak/zikzak_inappwebview_android/webview/in_app_webview/InAppWebView.java` (`createPdf` + `capturePdf`)
+  - acceptance result: `00:02 +1: All tests passed!` (EXIT=0) on emulator-5554 (API 26)
+- deliberate mutant: N/A — the test was RED on first run (the failure was observed before implementation), so the green-on-first-run mutant check does not apply. The red evidence above is the real pre-implementation failure.
+- refactor: none needed. The fix is the minimal production change that makes the behavior hold.
+- commit: pending (this cycle)
+- notes: Acceptance behavior requiring a real Android WebView; ran on a device/emulator, not the Dart-VM unit runner. This is a genuine production bug fix (zero-size PDF capture), not only a new test. `tasks.md` carries no `[A4]` marker, so no task was ticked.
