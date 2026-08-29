@@ -27,3 +27,14 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
 - refactor: none needed — test follows the inline-fake style of the exemplar (`disposable_pattern_test.dart`); fake `_FakePlatformLocalhostServer extends PlatformInAppLocalhostServer` via `.implementation(params)` and records `closeCallCount`.
 - class: CHARACTERIZATION (implementation predates the test; no red-phase code change was required, only the mutant proof).
 - commit: not committed (working tree left dirty per `--no-commit` default; harness modifications also present).
+
+## Cycle 2 — A4, U7, U10, U13, U18 (reconciliation: already covered by a passing test)
+
+- test: `test/disposable_pattern_test.dart` — `wrapper classes implement Disposable` and `Disposable declares the standardized dispose signature`
+- red command: `flutter test test/disposable_pattern_test.dart --plain-name "wrapper classes implement Disposable"`
+- red evidence: none — these behaviors were already asserted by a pre-existing passing test, not written in this cycle. The test ran green on first execution (2 passed). To prove the assertions have teeth, each `implements Disposable` binding and the canonical signature probe were removed in turn; the file then failed to compile (the generic bound `T extends Disposable` and the `void Function({bool isKeepAlive})` assignment no longer resolve), which is the recorded proof of coverage. Restored exactly; suite green again.
+- green: `flutter test test/disposable_pattern_test.dart` -> **2 passed**; full umbrella suite -> **186 passed**, no regressions.
+- refactor: none needed — `disposable_pattern_test.dart` is the established exemplar for the Disposable contract and was reused as-is.
+- class: RECONCILIATION (behaviors A4/U7/U10/U13/U18 were already covered by the passing `disposable_pattern_test.dart`; marked DONE per the "already covered by an existing passing test" rule, no new test written).
+- note: A4 subsumes U7/U10/U13 (each wrapper implements Disposable); U18 is the interface-level contract the probe encodes. U15 remains the only behavior with its own dedicated test file.
+- commit: not committed (working tree left dirty per `--no-commit` default).

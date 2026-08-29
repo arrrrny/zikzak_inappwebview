@@ -19,7 +19,7 @@ One per acceptance criterion in `spec.md`. Each stays red until the feature work
 | A1 | Calling dispose() on a HeadlessInAppWebView before run() releases platform resources exactly once with no leak | US1-AC1, FR-004 | example | PENDING | |
 | A2 | Calling dispose() twice on a started HeadlessInAppWebView invokes platform dispose only once (idempotent) | US1-AC2, FR-004, FR-008 | example | PENDING | |
 | A3 | Concurrent or repeated dispose() calls on HeadlessInAppWebView never throw and never leak | US1-AC3, FR-008 | example | PENDING | |
-| A4 | InAppWebViewController, InAppWebView, InAppLocalhostServer, and HeadlessInAppWebView all declare implements Disposable | US2-AC1, FR-002 | example | PENDING | |
+| A4 | InAppWebViewController, InAppWebView, InAppLocalhostServer, and HeadlessInAppWebView all declare implements Disposable | US2-AC1, FR-002 | example | DONE | test/disposable_pattern_test.dart |
 | A5 | dispose() on any wrapper forwards to platform dispose(isKeepAlive: ...) with the same default parameter | US2-AC2, FR-005, FR-006 | example | PENDING | |
 | A6 | InAppLocalhostServer.dispose() stops the server if running, releases resources, and is idempotent | US2-AC3, FR-003 | example | PENDING | |
 | A7 | dispose(isKeepAlive: true) on a keep-alive-backed controller releases Dart-side resources but retains native view | US3-AC1, FR-007 | example | PENDING | |
@@ -45,7 +45,7 @@ Grouped by the component from plan.md that owns them. Since plan.md is absent, w
 
 | id | behavior | traces | kind | state | test |
 | --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
-| U7 | InAppWebViewController implements Disposable with canonical signature | FR-001, FR-002, FR-005 | example | PENDING | |
+| U7 | InAppWebViewController implements Disposable with canonical signature | FR-001, FR-002, FR-005 | example | DONE | test/disposable_pattern_test.dart |
 | U8 | InAppWebViewController.dispose({bool isKeepAlive = false}) forwards to platform.dispose(isKeepAlive: ...) | FR-006 | example | PENDING | |
 | U9 | isKeepAlive semantics: true retains native view, subsequent false releases it | FR-007 | example | PENDING | |
 
@@ -53,7 +53,7 @@ Grouped by the component from plan.md that owns them. Since plan.md is absent, w
 
 | id | behavior | traces | kind | state | test |
 | --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
-| U10 | InAppWebView implements Disposable with canonical signature | FR-001, FR-002, FR-005 | example | PENDING | |
+| U10 | InAppWebView implements Disposable with canonical signature | FR-001, FR-002, FR-005 | example | DONE | test/disposable_pattern_test.dart |
 | U11 | InAppWebView.dispose({bool isKeepAlive = false}) forwards to platform.dispose(isKeepAlive: ...) | FR-006 | example | PENDING | |
 | U12 | isKeepAlive semantics consistent with InAppWebViewController | FR-007 | example | PENDING | |
 
@@ -61,7 +61,7 @@ Grouped by the component from plan.md that owns them. Since plan.md is absent, w
 
 | id | behavior | traces | kind | state | test |
 | --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
-| U13 | InAppLocalhostServer implements Disposable with canonical signature | FR-001, FR-002, FR-003, FR-005 | example | PENDING | |
+| U13 | InAppLocalhostServer implements Disposable with canonical signature | FR-001, FR-002, FR-003, FR-005 | example | DONE | test/disposable_pattern_test.dart |
 | U14 | dispose() on running server calls close() and marks disposed (fire-and-forget, swallows errors) | FR-003, FR-008 | example | PENDING | |
 | U15 | dispose() on non-running server marks disposed without error | FR-003, FR-008, FR-009 | example | DONE | test/in_app_localhost_server_dispose_test.dart: U15: dispose() on a non-running server marks it disposed and does not close it |
 | U16 | Second dispose() call is a no-op (idempotent) | FR-003, FR-008 | example | PENDING | |
@@ -71,7 +71,7 @@ Grouped by the component from plan.md that owns them. Since plan.md is absent, w
 
 | id | behavior | traces | kind | state | test |
 | --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
-| U18 | Disposable interface declares void dispose({bool isKeepAlive = false}) as the single canonical contract | FR-001, FR-005 | example | PENDING | |
+| U18 | Disposable interface declares void dispose({bool isKeepAlive = false}) as the single canonical contract | FR-001, FR-005 | example | DONE | test/disposable_pattern_test.dart |
 
 ## Invariants and edge cases still to place
 
