@@ -661,6 +661,7 @@ class HeadlessInAppWebView implements Disposable {
   Future<Size?> getSize() => platform.getSize();
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformHeadlessInAppWebView.dispose}
+  @override
   Future<void> dispose({bool isKeepAlive = false}) async {
     if (_disposed) {
       return;
