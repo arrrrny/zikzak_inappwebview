@@ -82,5 +82,53 @@ void main() {
         expect(withBodies.length, equals(3)); // 2 budgeted + 1 other
       },
     );
+
+    test(
+      'enforces per-domain maxBodySize truncation; others kept whole (A12)',
+      () async {
+        const budgetDomain = 'api.example.com';
+        final controller = NetworkCaptureController()
+          ..domainBudgets = {
+            budgetDomain: const DomainBudget(maxBodySize: 5),
+          };
+
+        controller.trackRequest(NetworkRequest(
+          requestId: 'b0',
+          url: WebUri('https://$budgetDomain/items/0'),
+          resourceType: ResourceType.fetch,
+        ));
+        controller.attachBody(NetworkResponseBody(
+          requestId: 'b0',
+          url: WebUri('https://$budgetDomain/items/0'),
+          body: 'a' * 20,
+          size: 20,
+        ));
+
+        // Unbudgeted domain's body must be kept whole.
+        controller.trackRequest(NetworkRequest(
+          requestId: 'o0',
+          url: WebUri('https://other.example.com/x/0'),
+          resourceType: ResourceType.fetch,
+        ));
+        controller.attachBody(NetworkResponseBody(
+          requestId: 'o0',
+          url: WebUri('https://other.example.com/x/0'),
+          body: 'b' * 20,
+          size: 20,
+        ));
+
+        final entries = await controller.getEntries();
+        final budgeted =
+            entries.firstWhere((e) => e.request.requestId == 'b0');
+        final other = entries.firstWhere((e) => e.request.requestId == 'o0');
+
+        // Per-domain cap truncates the body to 5 chars and flags it.
+        expect(budgeted.responseBody!.body.length, equals(5));
+        expect(budgeted.responseBody!.truncated, isTrue);
+        // Other domain is unaffected.
+        expect(other.responseBody!.body.length, equals(20));
+        expect(other.responseBody!.truncated, isFalse);
+      },
+    );
   });
 }

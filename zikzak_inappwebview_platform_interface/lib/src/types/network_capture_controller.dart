@@ -230,17 +230,25 @@ class NetworkCaptureController {
     _lastActivity = DateTime.now();
     final entry = _byId[body.requestId];
     if (entry != null) {
-      // FR-006: enforce a per-domain response-body byte budget. Once a domain
-      // crosses its `maxBytes` cap, further response bodies for that domain are
-      // dropped while other domains keep their bodies.
+      // FR-006: per-domain response-body budget.
       final host = body.url.host;
       final budget = domainBudgets[host];
-      if (budget?.maxBytes != null) {
-        final retained = _domainByteCount[host] ?? 0;
-        if (retained + body.body.length > budget!.maxBytes!) {
-          return;
+      if (budget != null) {
+        // A12: truncate the body to the per-domain cap (below the global cap).
+        if (budget.maxBodySize != null &&
+            body.body.length > budget.maxBodySize!) {
+          body.body = body.body.substring(0, budget.maxBodySize!);
+          body.truncated = true;
+          body.size = body.body.length;
         }
-        _domainByteCount[host] = retained + body.body.length;
+        // A11: drop the body once the domain's cumulative bytes exceed the cap.
+        if (budget.maxBytes != null) {
+          final retained = _domainByteCount[host] ?? 0;
+          if (retained + body.body.length > budget.maxBytes!) {
+            return;
+          }
+          _domainByteCount[host] = retained + body.body.length;
+        }
       }
       entry.responseBody = body;
     } else {

@@ -81,4 +81,20 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
   still retained); this matches the `DomainBudget.maxBytes` doc ("total response-body
   bytes captured for the domain"). The pre-existing delegates-test failure is out of
   scope and not fixed here.
+- commit: 31b72b72
+
+## Cycle 5: A12 per-domain maxBodySize truncation (FR-006 / US4-AC3)
+
+- test: `zikzak_inappwebview_platform_interface/test/types/network_capture_controller_budget_test.dart::enforces per-domain maxBodySize truncation; others kept whole (A12)` (new)
+- red: `cd zikzak_inappwebview_platform_interface && flutter test test/types/network_capture_controller_budget_test.dart --plain-name "enforces per-domain maxBodySize truncation; others kept whole (A12)"`
+  -> `Expected: <5>  Actual: <20>` (1 failed) — body not truncated yet.
+- green: in `attachBody`, when the domain's `maxBodySize` is set and the body is
+  longer, truncate `body.body` to that cap, set `truncated = true`, and recompute
+  `size`; the byte budget (A11) then counts the truncated length. Other domains are
+  unaffected. Suite `flutter test` (platform_interface) -> 151 ran, 150 passed, 1
+  pre-existing delegates-test compile failure (unrelated, same as Cycle 3/4).
+- refactor: none needed; the truncation guard sits alongside the byte guard.
+- note: per-domain `maxBodySize` is a further cap below the global
+  `networkCaptureMaxBodySize` (applied in JS before the body reaches Dart). The
+  pre-existing delegates-test failure is out of 010's scope and is not fixed here.
 - commit: TBD
