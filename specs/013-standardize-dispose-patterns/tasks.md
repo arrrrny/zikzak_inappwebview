@@ -9,7 +9,7 @@
 
 - [ ] T003 **[A1]** Write acceptance test: `HeadlessInAppWebView.dispose()` before `run()` releases platform resources exactly once with no leak
 - [X] T004 **[U1]** Implement double-dispose guard in `HeadlessInAppWebView.dispose()`: track disposed state, call platform.dispose() at most once
-- [ ] T005 **[U2]** Implement `dispose()` after `run()` completes correctly
+- [X] T005 **[U2]** Implement `dispose()` after `run()` completes correctly
 - [X] T006 **[U3]** Implement idempotent second `dispose()` call (no-op)
 - [X] T007 **[U4]** Implement `dispose(isKeepAlive: true)` forwards `true` to platform
 - [ ] T008 **[U5]** Implement `dispose(isKeepAlive: false)` after `dispose(isKeepAlive: true)` fully releases

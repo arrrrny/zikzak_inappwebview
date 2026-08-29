@@ -14,6 +14,15 @@ class _FakeHeadlessPlatform extends PlatformHeadlessInAppWebView {
 
   int disposeCount = 0;
   bool lastKeepAlive = true;
+  bool ran = false;
+
+  @override
+  Future<void> run() async {
+    ran = true;
+  }
+
+  @override
+  bool isRunning() => ran;
 
   @override
   Future<void> dispose({bool isKeepAlive = false}) async {
@@ -76,6 +85,22 @@ void main() {
 
         expect(platform.disposeCount, 1);
         expect(platform.lastKeepAlive, isTrue);
+      },
+    );
+
+    test(
+      'U2: dispose() after run() forwards to platform.dispose(isKeepAlive: false) exactly once',
+      () async {
+        final platform = _FakeHeadlessPlatform();
+        final headless = HeadlessInAppWebView.fromPlatform(platform: platform);
+
+        await headless.run();
+        await headless.dispose();
+
+        expect(platform.disposeCount, 1,
+            reason: 'a single dispose after run reaches the platform once');
+        expect(platform.lastKeepAlive, isFalse,
+            reason: 'default dispose forwards isKeepAlive: false');
       },
     );
   });

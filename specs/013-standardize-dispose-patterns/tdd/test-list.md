@@ -35,7 +35,7 @@ Grouped by the component from plan.md that owns them. Since plan.md is absent, w
 | id | behavior | traces | kind | state | test |
 | --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
 | U1 | HeadlessInAppWebView.dispose() before run() sets internal disposed flag and calls platform.dispose(isKeepAlive: false) once | FR-004, FR-008, FR-009 | example | DONE | test/headless_dispose_guard_test.dart |
-| U2 | HeadlessInAppWebView.dispose() after run() sets disposed flag and calls platform.dispose(isKeepAlive: false) once | FR-004, FR-008 | example | PENDING | |
+| U2 | HeadlessInAppWebView.dispose() after run() sets disposed flag and calls platform.dispose(isKeepAlive: false) once | FR-004, FR-008 | example | DONE | test/headless_dispose_guard_test.dart: U2: dispose() after run() forwards to platform.dispose(isKeepAlive: false) exactly once |
 | U3 | Second dispose() call on HeadlessInAppWebView is a no-op (does not call platform.dispose again) | FR-004, FR-008 | example | DONE | test/headless_dispose_guard_test.dart |
 | U4 | dispose(isKeepAlive: true) forwards true to platform.dispose(isKeepAlive: true) | FR-005, FR-006, FR-007 | example | DONE | test/headless_dispose_guard_test.dart |
 | U5 | dispose(isKeepAlive: false) after dispose(isKeepAlive: true) calls platform.dispose(isKeepAlive: false) and fully releases | FR-007, FR-008 | example | PENDING | |

@@ -234,3 +234,20 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
 - refactor: none needed — reused the `_FakePlatformWidget` fake from the U11 test in the same file.
 - class: TEST_FIRST (test written before confirming the implementation; red proven via mutant because the behavior already held).
 - commit: not committed (working tree left dirty per `--no-commit` default).
+
+## Cycle 14 — U2 (test-first with deliberate-mutant proof)
+
+- test: `test/headless_dispose_guard_test.dart` — `U2: dispose() after run() forwards to platform.dispose(isKeepAlive: false) exactly once`
+- red command: `flutter test test/headless_dispose_guard_test.dart --plain-name "U2: dispose() after run() forwards to platform.dispose(isKeepAlive: false) exactly once"`
+- red evidence (deliberate-mutant check): the test passed on first run because `HeadlessInAppWebView.dispose()` forwards `isKeepAlive` to `platform.dispose()` regardless of run state (the same guard as U1). To prove the test has teeth, the forwarding was temporarily changed from `platform.dispose(isKeepAlive: isKeepAlive)` to `platform.dispose(isKeepAlive: true)`. The test then failed:
+  ```
+  00:00 +0 -1: ... U2: dispose() after run() forwards to platform.dispose(isKeepAlive: false) exactly once [E]
+    Expected: false
+      Actual: <true>
+    default dispose forwards isKeepAlive: false
+  ```
+  The implementation was restored exactly and the test passed again. This mutant failure is the recorded red.
+- green: no source change beyond the existing forwarding; full umbrella suite `flutter test` -> green at 198 (was 197; +1 new test), no regressions. The `_FakeHeadlessPlatform` gained a `run()`/`isRunning()` stub so the test can drive a started headless view without invoking the base `UnimplementedError` default.
+- refactor: none needed.
+- class: TEST_FIRST (test written before confirming the implementation; red proven via mutant because the behavior already held).
+- commit: not committed (working tree left dirty per `--no-commit` default).
