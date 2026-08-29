@@ -30,7 +30,7 @@ One per acceptance criterion in `spec.md`. Each stays red until the feature work
 | A12 | Per-domain maxBodySize budget enforced: bodies truncated to per-domain cap | US4-AC3    | example   | PENDING  |                                           |
 | A13 | Auth-shaped Authorization header values redacted at source before any consumer sees them | US5-AC1    | example   | DONE    | `test/network_capture_redaction_test.dart::redacts Authorization and session Cookie headers before any consumer (A13/A14)` |
 | A14 | Session cookie values redacted at source before any consumer sees them | US5-AC2    | example   | DONE    | `test/network_capture_redaction_test.dart::redacts Authorization and session Cookie headers before any consumer (A13/A14)` |
-| A15 | URL/body auth-shaped params (api_key, password) redacted at source before any consumer sees them | US5-AC3    | example   | PENDING  |                                           |
+| A15 | URL/body auth-shaped params (api_key, password) redacted at source before any consumer sees them | US5-AC3    | example   | DONE    | `test/network_capture_redaction_test.dart::redacts auth-shaped URL query and body params before any consumer (A15)` |
 | A16 | SSO/auth-flow sequences detected and marked with auth classification | US6-AC1    | example   | PENDING  |                                           |
 | A17 | Auth-marked entries have response body dropped entirely (null in getEntries/getSightings) | US6-AC2    | example   | PENDING  |                                           |
 | A18 | Auth-marked entries carry auth tag and no body on stream and salvage flush | US6-AC3    | example   | PENDING  |                                           |

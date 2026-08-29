@@ -34,5 +34,45 @@ void main() {
       // Non-secret headers survive untouched.
       expect(redacted.headers['X-Other'], equals('keep-me'));
     });
+
+    test('redacts auth-shaped URL query and body params before any consumer '
+        '(A15)', () {
+      const apiKey = 'AKIA-SECRET-12345';
+      const password = 'hunter2-pass';
+
+      final request = NetworkRequest(
+        requestId: 'r2',
+        url: WebUri(
+          'https://api.example.com/login?api_key=$apiKey&password=$password&scope=read',
+        ),
+        method: 'POST',
+        headers: <String, String>{
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'api_key=$apiKey&password=$password&scope=read',
+        resourceType: ResourceType.fetch,
+      );
+
+      final redacted = redactRequest(request);
+
+      // Secret values must never appear in the URL string.
+      final redactedUrl = redacted.url.toString();
+      expect(redactedUrl, isNot(contains(apiKey)));
+      expect(redactedUrl, isNot(contains(password)));
+
+      // Decoded query param values are replaced by the marker; non-secret
+      // params survive. (The marker is URL-encoded in the raw string but
+      // decodes back to the marker, which is what every consumer reads.)
+      final decoded = Uri.parse(redactedUrl).queryParameters;
+      expect(decoded['api_key'], equals(kRedactionMarker));
+      expect(decoded['password'], equals(kRedactionMarker));
+      expect(decoded['scope'], equals('read'));
+
+      // Body param values are redacted; non-secret param survives.
+      expect(redacted.body, isNot(contains(apiKey)));
+      expect(redacted.body, isNot(contains(password)));
+      expect(redacted.body, contains(kRedactionMarker));
+      expect(redacted.body, contains('scope=read'));
+    });
   });
 }

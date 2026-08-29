@@ -12,6 +12,23 @@ const List<String> _redactedHeaderKeys = <String>[
   'set-cookie',
 ];
 
+///Query/body parameter names whose values are always redacted at the source
+///because they carry auth-shaped secrets (API keys, passwords, tokens).
+const List<String> _redactedParamKeys = <String>[
+  'api_key',
+  'apikey',
+  'password',
+  'passwd',
+  'secret',
+  'token',
+  'access_token',
+  'refresh_token',
+  'client_secret',
+];
+
+bool _isRedactableParam(String key) =>
+    _redactedParamKeys.contains(key.toLowerCase());
+
 Map<String, String> _redactHeaders(Map<String, String> headers) {
   if (headers.isEmpty) return headers;
   final out = <String, String>{};
@@ -23,6 +40,35 @@ Map<String, String> _redactHeaders(Map<String, String> headers) {
   return out;
 }
 
+///Redacts auth-shaped query parameters from a [WebUri], returning a new URI with
+///the same structure but redacted param values (A15, source-level).
+WebUri _redactUrl(WebUri url) {
+  final queryParams = url.queryParameters;
+  if (queryParams.isEmpty) return url;
+  final redacted = <String, String>{};
+  queryParams.forEach((key, value) {
+    redacted[key] = _isRedactableParam(key) ? kRedactionMarker : value;
+  });
+  return WebUri.uri(url.replace(queryParameters: redacted));
+}
+
+///Redacts auth-shaped values from a `application/x-www-form-urlencoded` body
+///string, leaving keys and non-secret params intact (A15, source-level).
+String _redactFormBody(String body) {
+  if (body.isEmpty) return body;
+  return body.replaceAllMapped(
+    RegExp(r'(^|&)([^=&]+)=([^&]*)'),
+    (m) {
+      final key = m.group(2)!;
+      final value = m.group(3)!;
+      if (_isRedactableParam(key)) {
+        return '${m.group(1)}${key}=${kRedactionMarker}';
+      }
+      return m.group(0)!;
+    },
+  );
+}
+
 ///Redacts auth-shaped secrets from a captured [NetworkRequest] before any
 ///consumer (raw callbacks, controller, stream, distiller) observes it.
 ///
@@ -31,10 +77,10 @@ Map<String, String> _redactHeaders(Map<String, String> headers) {
 NetworkRequest redactRequest(NetworkRequest request) {
   return NetworkRequest(
     requestId: request.requestId,
-    url: request.url,
+    url: _redactUrl(request.url),
     method: request.method,
     headers: _redactHeaders(request.headers),
-    body: request.body,
+    body: request.body == null ? null : _redactFormBody(request.body!),
     bodyIsBinary: request.bodyIsBinary,
     resourceType: request.resourceType,
     timestamp: request.timestamp,

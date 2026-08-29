@@ -29,3 +29,21 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
 - note: the Baseline red (2 compile failures) is resolved at this branch HEAD; the
   suite is green, so this cycle started on a green baseline. A15 (URL/body auth
   param redaction) is a separate, still-pending behavior covered by its own cycle.
+
+## Cycle 2: A15 URL/body auth param redaction (api_key / password)
+
+- test: `test/network_capture_redaction_test.dart::redacts auth-shaped URL query and body params before any consumer (A15)` (new)
+- red: `cd zikzak_inappwebview && flutter test test/network_capture_redaction_test.dart --plain-name "redacts auth-shaped URL query and body params before any consumer (A15)"`
+  -> `Expected: not contains 'AKIA-SECRET-12345'  Actual: 'https://api.example.com/login?api_key=AKIA-SECRET-12345&password=hunter2-pass&scope=read'`
+- green: added `_redactedParamKeys` + `_isRedactableParam`, plus `_redactUrl` (rebuilds
+  the `WebUri` with redacted query-param values via `Uri.replace`) and `_redactFormBody`
+  (redacts `key=value` pairs for auth-shaped keys in `application/x-www-form-urlencoded`
+  bodies); wired both into `redactRequest`. Suite `flutter test` -> 186 passed, 0 failed
+  (was 185).
+- refactor: none needed; `_isRedactableParam` shared by both helpers.
+- note: a JSON-encoded request/response body is not yet redacted by this cycle (only
+  URL query params + form-urlencoded bodies). The marker is percent-encoded in the raw
+  URL string (`%3Credacted%3E`) but `Uri.parse(...).queryParameters` decodes it back to
+  `<redacted>`, which is what every consumer reads, so the test asserts on the decoded
+  query-param value.
+- commit: 72d4896f

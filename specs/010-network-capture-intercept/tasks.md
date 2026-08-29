@@ -16,7 +16,7 @@
 - [ ] **T012** [A12] Write acceptance test: Per-domain maxBodySize budget enforced
 - [x] **T013** [A13] Write acceptance test: Auth header values redacted at source
 - [x] **T014** [A14] Write acceptance test: Session cookie values redacted at source
-- [ ] **T015** [A15] Write acceptance test: URL/body auth params redacted at source
+- [x] **T015** [A15] Write acceptance test: URL/body auth params redacted at source
 - [ ] **T016** [A16] Write acceptance test: SSO/auth-flow sequences detected and marked auth
 - [ ] **T017** [A17] Write acceptance test: Auth-marked entries have response body dropped entirely
 - [ ] **T018** [A18] Write acceptance test: Auth-marked entries carry auth tag and no body on stream/flush
@@ -40,7 +40,7 @@
 - [ ] **T033** [A12] Implement per-domain maxBodySize budget enforcement
 - [x] **T034** [A13] Implement SecretRedactor for Authorization headers at source
 - [x] **T035** [A14] Implement SecretRedactor for session cookies at source
-- [ ] **T036** [A15] Implement SecretRedactor for URL/body auth params (api_key, password) at source
+- [x] **T036** [A15] Implement SecretRedactor for URL/body auth params (api_key, password) at source
 - [ ] **T037** [A16] Implement SSO/auth-flow detection and auth classification
 - [ ] **T038** [A17] Implement response body dropping for auth-marked entries
 - [ ] **T039** [A18] Ensure auth tag and no body propagate to stream and salvage flush
@@ -63,7 +63,7 @@
 - [ ] **T053** [A12] Verify A12: Per-domain maxBodySize budget (outer loop green)
 - [ ] **T054** [A13] Verify A13: Auth header redaction at source (outer loop green)
 - [ ] **T055** [A14] Verify A14: Session cookie redaction at source (outer loop green)
-- [ ] **T056** [A15] Verify A15: URL/body param redaction at source (outer loop green)
+- [x] **T056** [A15] Verify A15: URL/body param redaction at source (outer loop green)
 - [ ] **T057** [A16] Verify A16: SSO/auth detection and auth classification (outer loop green)
 - [ ] **T058** [A17] Verify A17: Auth body dropped entirely (outer loop green)
 - [ ] **T059** [A18] Verify A18: Auth tag and no body on stream/flush (outer loop green)
