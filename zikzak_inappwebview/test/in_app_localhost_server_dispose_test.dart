@@ -48,5 +48,19 @@ void main() {
       expect(fake.closeCallCount, 1,
           reason: 'close() must be called exactly once when the server is running');
     });
+
+    test('U16: a second dispose() call on the server is a no-op (idempotent)', () {
+      final fake = _FakePlatformLocalhostServer();
+      fake.isRunningValue = true;
+      final server = InAppLocalhostServer.fromPlatform(fake);
+
+      server.dispose();
+      server.dispose();
+
+      expect(server.disposed, isTrue,
+          reason: 'dispose() must leave the server marked as disposed');
+      expect(fake.closeCallCount, 1,
+          reason: 'close() must not be called again by a second dispose()');
+    });
   });
 }

@@ -64,7 +64,7 @@ Grouped by the component from plan.md that owns them. Since plan.md is absent, w
 | U13 | InAppLocalhostServer implements Disposable with canonical signature | FR-001, FR-002, FR-003, FR-005 | example | DONE | test/disposable_pattern_test.dart |
 | U14 | dispose() on running server calls close() and marks disposed (fire-and-forget, swallows errors) | FR-003, FR-008 | example | DONE | test/in_app_localhost_server_dispose_test.dart |
 | U15 | dispose() on non-running server marks disposed without error | FR-003, FR-008, FR-009 | example | DONE | test/in_app_localhost_server_dispose_test.dart: U15: dispose() on a non-running server marks it disposed and does not close it |
-| U16 | Second dispose() call is a no-op (idempotent) | FR-003, FR-008 | example | PENDING | |
+| U16 | Second dispose() call is a no-op (idempotent) | FR-003, FR-008 | example | DONE | test/in_app_localhost_server_dispose_test.dart: U16: a second dispose() call on the server is a no-op (idempotent) |
 | U17 | dispose(isKeepAlive: ...) signature accepted but flag has no effect on server behavior | FR-005, FR-011 | example | PENDING | |
 
 ### `zikzak_inappwebview_platform_interface/lib/src/types/disposable.dart`

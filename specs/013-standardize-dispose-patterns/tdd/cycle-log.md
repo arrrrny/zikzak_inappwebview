@@ -134,3 +134,20 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
 - refactor: none needed — reused the `_FakePlatformLocalhostServer` fake from the U15 test in the same file.
 - class: TEST_FIRST (test written before confirming the implementation; red proven via mutant because the stop-on-running logic already held).
 - commit: not committed (working tree left dirty per `--no-commit` default).
+
+## Cycle 8 — U16 (test-first with deliberate-mutant proof)
+
+- test: `test/in_app_localhost_server_dispose_test.dart` — `U16: a second dispose() call on the server is a no-op (idempotent)`
+- red command: `flutter test test/in_app_localhost_server_dispose_test.dart --plain-name "U16: a second dispose() call on the server is a no-op (idempotent)"`
+- red evidence (deliberate-mutant check): the test passed on first run because `InAppLocalhostServer.dispose()` already has the `if (_disposed) return;` guard. To prove the test has teeth, the guard was temporarily removed so `dispose()` always reached `close()`. The test then failed:
+  ```
+  00:00 +0 -1: ... U16: a second dispose() call on the server is a no-op (idempotent) [E]
+    Expected: <1>
+      Actual: <2>
+    close() must not be called again by a second dispose()
+  ```
+  The implementation was restored exactly and the test passed again. This mutant failure is the recorded red.
+- green: no source change beyond the existing idempotency guard; full umbrella suite `flutter test` -> green at 192 (was 191; +1 new test), no regressions.
+- refactor: none needed — reused the `_FakePlatformLocalhostServer` fake from the U15/U14 tests in the same file.
+- class: TEST_FIRST (test written before confirming the implementation; red proven via mutant because the guard already held).
+- commit: not committed (working tree left dirty per `--no-commit` default).
