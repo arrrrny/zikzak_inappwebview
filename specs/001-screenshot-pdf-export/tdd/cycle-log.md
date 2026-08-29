@@ -238,3 +238,14 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
 - refactor: none.
 - commit: 593286ce
 - notes: green-on-first-run acceptance; the deliberate mutant confirms the test catches a dropped PDF buffer. Real iOS acceptance (simulator, since the physical iPhone is wirelessly tethered and blocked by the missing `--publish-port` flag — see A10 notes). `tasks.md` carries no `[A11]` marker, so no task was ticked.
+
+## U44 — iOS Dart createPdf propagates the clear UNSUPPORTED_IOS_VERSION error
+
+- test: `zikzak_inappwebview_ios/test/in_app_webview/ios_screenshot_pdf_delegation_test.dart › U44 createPdf propagates a clear UNSUPPORTED_IOS_VERSION error instead of silently returning null`
+- red: none — the Dart `IOSInAppWebViewController.createPdf` already propagates the channel's `PlatformException` (`return await channel?.invokeMethod<Uint8List?>('createPdf', args)`), so the test passed on first run.
+- deliberate mutant: changed the fake's `nextError` (which throws `PlatformException(code: 'UNSUPPORTED_IOS_VERSION', message: 'createPdf requires iOS 14.0 or later')`) to `nextResult = null`, so `createPdf` returns null instead of throwing. Ran the test; it failed with:
+  `Expected: throws <PlatformException> with `code`: 'UNSUPPORTED_IOS_VERSION' ... Actual: <Closure> ... emitted <null>  createPdf must surface the native clear error rather than swallowing it into a null return`. Restored exactly; test green again.
+- green: the production change is the native guard in `WebViewChannelDelegate.swift` `createPdf` `#available(iOS 14.0, *)` else-branch, changed from `result(nil)` (silent null) to `result(FlutterError(code: "UNSUPPORTED_IOS_VERSION", message: "createPdf requires iOS 14.0 or later", details: nil))`. This is the real US5-AC3 fix: on iOS 13.x the native call surfaces a clear error rather than a silent null; the Dart side needs no change because it propagates the resulting `PlatformException`.
+- refactor: none.
+- commit: e5d0a614
+- notes: green-on-first-run; mutant confirms the test catches a swallowed/null-return regression. A12 (the iOS 13.x acceptance behavior) remains BLOCKED: this environment has only an iOS 26.3 simulator (no iOS 13.x runtime), so the real-device acceptance test cannot execute here. The native `FlutterError` guard + this Dart propagation test together cover the contract. `tasks.md` carries no `[U44]` marker, so no task was ticked. Full iOS package suite after: 5 passed (no regression).

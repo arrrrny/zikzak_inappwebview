@@ -27,7 +27,7 @@ One per acceptance criterion in `spec.md`. Each stays red until the feature work
 | A9  | Linux takeScreenshot with ScreenshotConfiguration respects format, quality, and rect options | US4-AC2 | example | PENDING |                                             |
 | A10 | iOS takeScreenshot with default configuration returns valid PNG image byte buffer | US5-AC1 | example | DONE    | zikzak_inappwebview/example/integration_test/ios_take_screenshot_test.dart › A10 iOS takeScreenshot with default configuration returns valid PNG image bytes |
 | A11 | iOS createPdf on iOS 14.0+ returns valid PDF byte buffer | US5-AC2 | example | DONE    | zikzak_inappwebview/example/integration_test/ios_create_pdf_test.dart › A11 iOS createPdf on iOS 14.0+ returns valid PDF byte buffer |
-| A12 | iOS createPdf on iOS 13.x (below minimum) fails gracefully with clear error message | US5-AC3 | example | PENDING |                                             |
+| A12 | iOS createPdf on iOS 13.x (below minimum) fails gracefully with clear error message | US5-AC3 | example | BLOCKED | blocked: no iOS 13.x runtime in this environment (only iOS 26.3 simulator available); contract covered by the native `FlutterError` guard in `WebViewChannelDelegate.swift` + unit behavior U44 (Dart propagation) |
 | A13 | Android takeScreenshot returns non-null Uint8List with valid PNG image data | FR-001, US1-parity | example | DONE    | zikzak_inappwebview/example/integration_test/android_take_screenshot_test.dart › A13 Android takeScreenshot returns non-null valid PNG image bytes |
 | A14 | Android takeScreenshot with rect captures only the specified portion of the view | FR-002 | example | DONE    | zikzak_inappwebview/example/integration_test/android_take_screenshot_test.dart › A14 Android takeScreenshot with rect captures only the specified portion of the view |
 
@@ -121,6 +121,7 @@ Grouped by the component from `plan.md` that owns them. Each line names one obse
 | --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
 | U31 | iOS takeScreenshot Dart override invokes method channel correctly (line 1910) | US5-AC1 | characterization | BASELINE |                                        |
 | U32 | iOS createPdf Dart override invokes method channel correctly (line 2528) | US5-AC2 | characterization | BASELINE |                                        |
+| U44 | iOS Dart createPdf propagates the native clear `UNSUPPORTED_IOS_VERSION` PlatformException (instead of silently returning null) when the platform reports iOS < 14 | US5-AC3 | example | DONE    | zikzak_inappwebview_ios/test/in_app_webview/ios_screenshot_pdf_delegation_test.dart › U44 createPdf propagates a clear UNSUPPORTED_IOS_VERSION error instead of silently returning null |
 
 ### `zikzak_inappwebview_ios/ios/Classes/InAppWebView/WebViewChannelDelegate.swift`
 
