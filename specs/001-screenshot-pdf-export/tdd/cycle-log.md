@@ -55,3 +55,14 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
 - refactor: none. The shared `_FakeChannel extends MethodChannel` and `_newController` helper already factor the construction/seam injection.
 - commit: pending (WIP, not yet committed)
 - notes: Android package's first behavioral delegation test. The controller is constructed normally (so its constructor-side `initMethodCallHandler` registration works under `TestWidgetsFlutterBinding.ensureInitialized()`), then its `channel` is replaced with the recording fake before the method call. Full Android suite after: 5 passed (no regression). `tasks.md` carries no `[U16]` marker, so no task was ticked.
+
+## U17 — Android Dart createPdf returns the channel Uint8List or null
+
+- test: `zikzak_inappwebview_android/test/in_app_webview/android_screenshot_pdf_delegation_test.dart › U17 createPdf returns the channel Uint8List or null`
+- red: none — the override already returned `await channel?.invokeMethod<Uint8List?>('createPdf', args)` (in_app_webview_controller.dart:2524), so the test passed on first run.
+- deliberate mutant: changed the override body to `return null;`; ran the test; it failed with:
+  `Expected: [10, 20, 30]  Actual: <null>  Which: is not Iterable  the Uint8List the channel returns must be propagated as-is`. Restored the override exactly; test green again.
+- green: no source change; behavior already satisfied by the existing forward-and-return.
+- refactor: none. Shares the `_FakeChannel` / `_newController` helpers with U16.
+- commit: pending (WIP, not yet committed)
+- notes: green-on-first-run characterization; mutant confirms the test catches a dropped/empty return. Full Android suite after: 6 passed (no regression). `tasks.md` carries no `[U17]` marker, so no task was ticked.

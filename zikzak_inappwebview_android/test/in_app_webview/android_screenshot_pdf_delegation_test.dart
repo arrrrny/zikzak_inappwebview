@@ -69,5 +69,22 @@ void main() {
         reason: 'pdfConfiguration must be forwarded as its JSON map',
       );
     });
+
+    test('U17 createPdf returns the channel Uint8List or null', () async {
+      final fake = _FakeChannel();
+      final controller = _newController(fake);
+
+      final bytes = Uint8List.fromList([10, 20, 30]);
+      fake.nextResult = bytes;
+      final result = await controller.createPdf(pdfConfiguration: PDFConfiguration());
+      expect(result, equals(bytes),
+          reason: 'the Uint8List the channel returns must be propagated as-is');
+
+      fake.nextResult = null;
+      final nullResult =
+          await controller.createPdf(pdfConfiguration: PDFConfiguration());
+      expect(nullResult, isNull,
+          reason: 'a null channel result must pass through as null');
+    });
   });
 }
