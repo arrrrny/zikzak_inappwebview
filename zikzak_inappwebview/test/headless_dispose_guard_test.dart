@@ -65,5 +65,18 @@ void main() {
         expect(platform.disposeCount, 1);
       },
     );
+
+    test(
+      'U4: dispose(isKeepAlive: true) forwards true to platform.dispose',
+      () async {
+        final platform = _FakeHeadlessPlatform();
+        final headless = HeadlessInAppWebView.fromPlatform(platform: platform);
+
+        await headless.dispose(isKeepAlive: true);
+
+        expect(platform.disposeCount, 1);
+        expect(platform.lastKeepAlive, isTrue);
+      },
+    );
   });
 }

@@ -37,7 +37,7 @@ Grouped by the component from plan.md that owns them. Since plan.md is absent, w
 | U1 | HeadlessInAppWebView.dispose() before run() sets internal disposed flag and calls platform.dispose(isKeepAlive: false) once | FR-004, FR-008, FR-009 | example | DONE | test/headless_dispose_guard_test.dart |
 | U2 | HeadlessInAppWebView.dispose() after run() sets disposed flag and calls platform.dispose(isKeepAlive: false) once | FR-004, FR-008 | example | PENDING | |
 | U3 | Second dispose() call on HeadlessInAppWebView is a no-op (does not call platform.dispose again) | FR-004, FR-008 | example | DONE | test/headless_dispose_guard_test.dart |
-| U4 | dispose(isKeepAlive: true) forwards true to platform.dispose(isKeepAlive: true) | FR-005, FR-006, FR-007 | example | PENDING | |
+| U4 | dispose(isKeepAlive: true) forwards true to platform.dispose(isKeepAlive: true) | FR-005, FR-006, FR-007 | example | DONE | test/headless_dispose_guard_test.dart |
 | U5 | dispose(isKeepAlive: false) after dispose(isKeepAlive: true) calls platform.dispose(isKeepAlive: false) and fully releases | FR-007, FR-008 | example | PENDING | |
 | U6 | Concurrent dispose() calls are serialized and platform.dispose() invoked at most once | FR-008, FR-009 | example | DONE | test/headless_dispose_guard_test.dart |
 
@@ -62,7 +62,7 @@ Grouped by the component from plan.md that owns them. Since plan.md is absent, w
 | id | behavior | traces | kind | state | test |
 | --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
 | U13 | InAppLocalhostServer implements Disposable with canonical signature | FR-001, FR-002, FR-003, FR-005 | example | DONE | test/disposable_pattern_test.dart |
-| U14 | dispose() on running server calls close() and marks disposed (fire-and-forget, swallows errors) | FR-003, FR-008 | example | PENDING | |
+| U14 | dispose() on running server calls close() and marks disposed (fire-and-forget, swallows errors) | FR-003, FR-008 | example | DONE | test/in_app_localhost_server_dispose_test.dart |
 | U15 | dispose() on non-running server marks disposed without error | FR-003, FR-008, FR-009 | example | DONE | test/in_app_localhost_server_dispose_test.dart: U15: dispose() on a non-running server marks it disposed and does not close it |
 | U16 | Second dispose() call is a no-op (idempotent) | FR-003, FR-008 | example | PENDING | |
 | U17 | dispose(isKeepAlive: ...) signature accepted but flag has no effect on server behavior | FR-005, FR-011 | example | PENDING | |

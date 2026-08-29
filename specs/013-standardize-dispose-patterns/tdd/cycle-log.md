@@ -102,3 +102,35 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
 - class: TEST_FIRST (test written before confirming the implementation; red proven via mutant because the existing guard already satisfied the behavior).
 - note: the behavior is satisfied by the U3 guard's synchronous atomic check; U6's test locks that contract in for concurrent callers.
 - commit: not committed (working tree left dirty per `--no-commit` default).
+
+## Cycle 6 — U4 (test-first with deliberate-mutant proof)
+
+- test: `test/headless_dispose_guard_test.dart` — `U4: dispose(isKeepAlive: true) forwards true to platform.dispose`
+- red command: `flutter test test/headless_dispose_guard_test.dart --plain-name "U4: dispose(isKeepAlive: true) forwards true to platform.dispose"`
+- red evidence (deliberate-mutant check): the test passed on first run because `dispose()` already forwards the `isKeepAlive` argument to `platform.dispose(isKeepAlive: isKeepAlive)`. To prove the test has teeth, `platform.dispose(isKeepAlive: isKeepAlive)` was temporarily edited to `platform.dispose(isKeepAlive: false)`. The test then failed:
+  ```
+  00:00 +0 -1: ... U4: dispose(isKeepAlive: true) forwards true to platform.dispose [E]
+    Expected: true
+      Actual: <false>
+  ```
+  The implementation was restored exactly and the test passed again. This mutant failure is the recorded red.
+- green: no source change beyond the existing forwarding; full umbrella suite `flutter test` -> **190 passed** (was 189; +1 new test), no regressions.
+- refactor: none needed.
+- class: TEST_FIRST (test written before confirming the implementation; red proven via mutant because the forwarding already held).
+- commit: not committed (working tree left dirty per `--no-commit` default).
+
+## Cycle 7 — U14 (test-first with deliberate-mutant proof)
+
+- test: `test/in_app_localhost_server_dispose_test.dart` — `U14: dispose() on a running server closes it and marks it disposed`
+- red command: `flutter test test/in_app_localhost_server_dispose_test.dart --plain-name "U14: dispose() on a running server closes it and marks it disposed"`
+- red evidence (deliberate-mutant check): the test passed on first run because `InAppLocalhostServer.dispose()` already calls `close()` when `isRunning()`. To prove the test has teeth, the `if (isRunning())` guard around the fire-and-forget `close()` was temporarily changed to `if (false)`. The test then failed:
+  ```
+  00:00 +0 -1: ... U14: dispose() on a running server closes it and marks it disposed [E]
+    Expected: <1>
+      Actual: <0>
+  ```
+  The implementation was restored exactly and the test passed again. This mutant failure is the recorded red.
+- green: no source change beyond the existing stop-on-running logic; full umbrella suite `flutter test` -> green at 191 (was 190; +1 new test), no regressions.
+- refactor: none needed — reused the `_FakePlatformLocalhostServer` fake from the U15 test in the same file.
+- class: TEST_FIRST (test written before confirming the implementation; red proven via mutant because the stop-on-running logic already held).
+- commit: not committed (working tree left dirty per `--no-commit` default).

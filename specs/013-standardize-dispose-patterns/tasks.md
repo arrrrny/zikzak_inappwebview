@@ -11,7 +11,7 @@
 - [X] T004 **[U1]** Implement double-dispose guard in `HeadlessInAppWebView.dispose()`: track disposed state, call platform.dispose() at most once
 - [ ] T005 **[U2]** Implement `dispose()` after `run()` completes correctly
 - [X] T006 **[U3]** Implement idempotent second `dispose()` call (no-op)
-- [ ] T007 **[U4]** Implement `dispose(isKeepAlive: true)` forwards `true` to platform
+- [X] T007 **[U4]** Implement `dispose(isKeepAlive: true)` forwards `true` to platform
 - [ ] T008 **[U5]** Implement `dispose(isKeepAlive: false)` after `dispose(isKeepAlive: true)` fully releases
 - [X] T009 **[U6]** Implement thread-safe disposal (serialized concurrent calls, platform.dispose() at most once)
 - [ ] T010 **[A2]** Write acceptance test: Double dispose on started `HeadlessInAppWebView` invokes platform dispose only once
@@ -26,7 +26,7 @@
 - [ ] T016 **[U11]** Verify `InAppWebView.dispose()` forwards to platform with `isKeepAlive`
 - [ ] T017 **[U12]** Verify `InAppWebView` keepAlive semantics consistent with controller
 - [ ] T018 **[U13]** Verify `InAppLocalhostServer` implements `Disposable` with canonical signature
-- [ ] T019 **[U14]** Implement `InAppLocalhostServer.dispose()` stops server if running (fire-and-forget, swallows errors)
+- [X] T019 **[U14]** Implement `InAppLocalhostServer.dispose()` stops server if running (fire-and-forget, swallows errors)
 - [X] T020 **[U15]** Implement `InAppLocalhostServer.dispose()` on non-running server (safe, marks disposed)
 - [ ] T021 **[U16]** Implement idempotent second `dispose()` call on `InAppLocalhostServer`
 - [ ] T022 **[U17]** Implement `dispose(isKeepAlive: ...)` signature on server (accepted, no behavioral effect)

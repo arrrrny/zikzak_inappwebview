@@ -35,5 +35,18 @@ void main() {
       expect(fake.closeCallCount, 0,
           reason: 'close() must not be called when the server is not running');
     });
+
+    test('U14: dispose() on a running server closes it and marks it disposed', () {
+      final fake = _FakePlatformLocalhostServer();
+      fake.isRunningValue = true;
+      final server = InAppLocalhostServer.fromPlatform(fake);
+
+      server.dispose();
+
+      expect(server.disposed, isTrue,
+          reason: 'dispose() must mark the server as disposed');
+      expect(fake.closeCallCount, 1,
+          reason: 'close() must be called exactly once when the server is running');
+    });
   });
 }
