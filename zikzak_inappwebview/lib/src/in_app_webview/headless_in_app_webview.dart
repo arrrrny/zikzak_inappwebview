@@ -25,6 +25,13 @@ class HeadlessInAppWebView implements Disposable {
   /// Implementation of [PlatformHeadlessInAppWebView] for the current platform.
   final PlatformHeadlessInAppWebView platform;
 
+  /// Whether [dispose] has been invoked at least once.
+  ///
+  /// Set synchronously at the start of [dispose] so callers and the idempotency
+  /// guard (spec 013) can reason about lifecycle state without awaiting the
+  /// platform teardown.
+  bool _disposed = false;
+
   ///{@macro zikzak_inappwebview_platform_interface.PlatformHeadlessInAppWebView.id}
   String get id => platform.id;
 
@@ -655,6 +662,10 @@ class HeadlessInAppWebView implements Disposable {
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformHeadlessInAppWebView.dispose}
   Future<void> dispose({bool isKeepAlive = false}) async {
+    if (_disposed) {
+      return;
+    }
+    _disposed = true;
     await platform.dispose(isKeepAlive: isKeepAlive);
   }
 }

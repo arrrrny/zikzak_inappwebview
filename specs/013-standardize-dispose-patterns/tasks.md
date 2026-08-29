@@ -8,12 +8,12 @@
 ## Phase 1: HeadlessInAppWebView Double-Dispose Guard (P1 - Core Defect)
 
 - [ ] T003 **[A1]** Write acceptance test: `HeadlessInAppWebView.dispose()` before `run()` releases platform resources exactly once with no leak
-- [ ] T004 **[U1]** Implement double-dispose guard in `HeadlessInAppWebView.dispose()`: track disposed state, call platform.dispose() at most once
+- [X] T004 **[U1]** Implement double-dispose guard in `HeadlessInAppWebView.dispose()`: track disposed state, call platform.dispose() at most once
 - [ ] T005 **[U2]** Implement `dispose()` after `run()` completes correctly
-- [ ] T006 **[U3]** Implement idempotent second `dispose()` call (no-op)
+- [X] T006 **[U3]** Implement idempotent second `dispose()` call (no-op)
 - [ ] T007 **[U4]** Implement `dispose(isKeepAlive: true)` forwards `true` to platform
 - [ ] T008 **[U5]** Implement `dispose(isKeepAlive: false)` after `dispose(isKeepAlive: true)` fully releases
-- [ ] T009 **[U6]** Implement thread-safe disposal (serialized concurrent calls, platform.dispose() at most once)
+- [X] T009 **[U6]** Implement thread-safe disposal (serialized concurrent calls, platform.dispose() at most once)
 - [ ] T010 **[A2]** Write acceptance test: Double dispose on started `HeadlessInAppWebView` invokes platform dispose only once
 - [ ] T011 **[A3]** Write acceptance test: Concurrent/repeated `dispose()` never throws and never leaks
 

@@ -30,12 +30,10 @@ void main() {
       await headless.dispose();
       expect(platform.disposeCount, 1);
 
-      // Note: the standardize-dispose-patterns rewrite (spec 013) removed the
-      // umbrella-level `disposed` getter and the double-dispose guard. The
-      // umbrella now delegates straight to the platform, so a second dispose
-      // reaches the platform again rather than being a no-op.
+      // Spec 013 restored the umbrella-level double-dispose guard: a second
+      // dispose is a no-op and does not reach the platform again.
       await headless.dispose();
-      expect(platform.disposeCount, 2);
+      expect(platform.disposeCount, 1);
     },
   );
 }

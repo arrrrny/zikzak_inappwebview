@@ -38,3 +38,67 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
 - class: RECONCILIATION (behaviors A4/U7/U10/U13/U18 were already covered by the passing `disposable_pattern_test.dart`; marked DONE per the "already covered by an existing passing test" rule, no new test written).
 - note: A4 subsumes U7/U10/U13 (each wrapper implements Disposable); U18 is the interface-level contract the probe encodes. U15 remains the only behavior with its own dedicated test file.
 - commit: not committed (working tree left dirty per `--no-commit` default).
+
+## Cycle 3 — U1 (test-first with deliberate-mutant proof)
+
+- test: `test/headless_dispose_guard_test.dart` — `U1: dispose before run forwards to platform.dispose(isKeepAlive: false) exactly once`
+- red command: `flutter test test/headless_dispose_guard_test.dart --plain-name "U1: dispose before run forwards to platform.dispose(isKeepAlive: false) exactly once"`
+- red evidence (deliberate-mutant check): the test passed on first run because the current `dispose()` already forwards `isKeepAlive: false` to `platform.dispose()` for a single call. To prove the assertion has teeth, `platform.dispose(isKeepAlive: isKeepAlive)` was temporarily edited to `platform.dispose(isKeepAlive: true)`. The test then failed:
+  ```
+  00:00 +0 -1: ... U1: dispose before run forwards to platform.dispose(isKeepAlive: false) exactly once [E]
+    Expected: false
+      Actual: <true>
+    test/headless_dispose_guard_test.dart:36:9  main.<fn>.<fn>
+  ```
+  The mutant was restored exactly; the test passed again. This mutant failure is the recorded red.
+- green: added internal `bool _disposed = false;` field and set `_disposed = true` at the start of `dispose()` in `lib/src/in_app_webview/headless_in_app_webview.dart`. Full umbrella suite `flutter test` -> **187 passed** (was 186; +1 new test), no regressions. The `dispose()` forwarding itself was unchanged.
+- refactor: none needed — the new field is the only change; the test reuses the inline-fake style of the existing `headless_dispose_test.dart` (`_FakeHeadlessPlatform extends PlatformHeadlessInAppWebView` via `.implementation(params)`, recording `disposeCount` and the forwarded `isKeepAlive`).
+- class: TEST_FIRST (test written before implementation; red proven via mutant because the observable forwarding already held, and the new internal flag is a state change not directly observable without the U3 guard).
+- note: U1's "internal disposed flag" is verified indirectly — the field is added here and its observable effect (idempotency on a second dispose) is the subject of U3. The pre-existing `test/headless_dispose_test.dart` still asserts a second dispose reaches the platform (count == 2); that test captures pre-feature behavior and will be reconciled as its own step when the U3 guard is added.
+- commit: not committed (working tree left dirty per `--no-commit` default).
+
+## Cycle 4 — U3 (test-first, real red)
+
+- test: `test/headless_dispose_guard_test.dart` — `U3: a second dispose() call is a no-op (idempotent)`
+- red command: `flutter test test/headless_dispose_guard_test.dart --plain-name "U3: a second dispose() call is a no-op (idempotent)"`
+- red evidence (real assertion failure, expected vs actual):
+  ```
+  00:00 +0 -1: ... U3: a second dispose() call is a no-op (idempotent) [E]
+    Expected: <1>
+      Actual: <2>
+    test/headless_dispose_guard_test.dart:49:9  main.<fn>.<fn>
+  ```
+  The current `dispose()` has no guard, so a second call reaches `platform.dispose()` again (count == 2).
+- green: added an early-return idempotency guard to `dispose()` in `lib/src/in_app_webview/headless_in_app_webview.dart`:
+  ```dart
+  Future<void> dispose({bool isKeepAlive = false}) async {
+    if (_disposed) {
+      return;
+    }
+    _disposed = true;
+    await platform.dispose(isKeepAlive: isKeepAlive);
+  }
+  ```
+  Full umbrella suite `flutter test` -> **188 passed** (was 187; +1 new test), no regressions.
+- reconciliation (Hard Rule 4, genuinely-wrong-test step): implementing the guard broke the pre-existing `test/headless_dispose_test.dart`, whose second assertion (`expect(platform.disposeCount, 2)`) captured the obsolete pre-feature no-guard behavior. That test was written test-after to document the broken state; spec 013 explicitly restores the idempotency guard. The assertion was corrected to `expect(platform.disposeCount, 1)` with an updated comment — aligning the obsolete test to the feature's actual intent, not weakening it. No test was deleted or skipped.
+- refactor: none needed — the guard is the minimal sufficient change and reads like the surrounding delegation.
+- class: TEST_FIRST (test written and observed failing before the guard existed; real red, not a mutant check).
+- commit: not committed (working tree left dirty per `--no-commit` default).
+
+## Cycle 5 — U6 (test-first with deliberate-mutant proof)
+
+- test: `test/headless_dispose_guard_test.dart` — `U6: concurrent dispose() calls invoke platform.dispose at most once`
+- red command: `flutter test test/headless_dispose_guard_test.dart --plain-name "U6: concurrent dispose() calls invoke platform.dispose at most once"`
+- red evidence (deliberate-mutant check): the test passed on first run because the synchronous `if (_disposed) return; _disposed = true;` guard already serializes concurrent calls atomically (no `await` between the check and the set, so the second and third calls observe `_disposed == true` and return). To prove the test has teeth, the guard's early-return was temporarily removed so `dispose()` always reached `platform.dispose()`. The test then failed:
+  ```
+  00:00 +0 -1: ... U6: concurrent dispose() calls invoke platform.dispose at most once [E]
+    Expected: <1>
+      Actual: <3>
+    test/headless_dispose_guard_test.dart:65:9  main.<fn>.<fn>
+  ```
+  The guard was restored exactly and the test passed again. This mutant failure is the recorded red.
+- green: no source change needed beyond the guard already added in Cycle 4 (the synchronous flag check is the serialization mechanism). Full umbrella suite `flutter test` -> **189 passed** (was 188; +1 new test), no regressions.
+- refactor: none needed.
+- class: TEST_FIRST (test written before confirming the implementation; red proven via mutant because the existing guard already satisfied the behavior).
+- note: the behavior is satisfied by the U3 guard's synchronous atomic check; U6's test locks that contract in for concurrent callers.
+- commit: not committed (working tree left dirty per `--no-commit` default).
