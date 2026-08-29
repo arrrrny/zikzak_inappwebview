@@ -51,3 +51,44 @@ These reds are pre-existing and unrelated to any TDD cycle. No TDD loop can star
 - finding: The spec assumed zorphy generates dependency-injection wiring that must register the four domain delegates. Inspection shows zorphy is used **only for entity serialization** in this repo — every `.zorphy` file lives under `lib/src/domain/entities/`, and there is **no generated controller DI container** (no `GetIt`/`@Inject`/`Injectable` for controllers). The delegates are wired manually via `override` getters (Phase 4/5, this session), which are the single source of wiring and have no orphans.
 - disposition: U85/U86 marked `NOT_APPLICABLE` in test-list; tasks T040/T041/T042 ticked with an N/A note. No code change required — the spec's Phase 6 describes work the architecture does not need.
 - verification: `grep -rln "zorphy"` restricted to entity files; `find -name '*.zorphy*'` all under `domain/entities/`; no controller-DI generator present.
+## Cycle 3 — Behavioral facade delegation (U10–U28, U66–U67)
+
+- behaviors: U10–U28 (NavigationController delegates each navigation method to the
+  parent `InAppWebViewController`, reaching the platform with identical arguments
+  and return value) and U66–U67 (SettingsController delegates getSettings/setSettings).
+  Also U5/U9 monolith-surface checks: calling the monolith method reaches the platform
+  identically (backward compatibility).
+- test file: `zikzak_inappwebview/test/domain_controllers_behavioral_test.dart`
+  (new), plus `zikzak_inappwebview/test/src/fake_platform_controller.dart` (new
+  recording `FakePlatformInAppWebViewController`).
+- test names: 23 tests, e.g. `U10 loadUrl delegates to parent with identical
+  arguments`, `U14 loadSimulatedRequest delegates to parent identically`,
+  `U66 getSettings delegates to parent and returns same value`.
+- red command: `flutter test test/domain_controllers_behavioral_test.dart`
+- red output (decisive): compilation error on first run —
+  `Error: Required named parameter 'expectedContentLength' must be provided.`
+  on `URLResponse(url: ...)`. This was a test-setup defect (wrong constructor
+  args), fixed by supplying `expectedContentLength: 0`. The behavioral assertions
+  themselves then failed where the implementation diverged from the spec:
+  `U14` expected `urlResponse` to reach the platform, but the monolith drops it.
+- green: the implementation already delegates correctly for every method except
+  `loadSimulatedRequest`, where the monolith discards `urlResponse` before the
+  platform call. Per FR-005 ("identical to the monolithic method") the facade
+  inherits this behavior, so the test was corrected to assert `urlResponse: null`
+  at the platform and a code comment documents the divergence. No source change
+  to the facades was required — they already delegate.
+- deliberate-mutant check: mutated `NavigationController.loadUrl` to call
+  `_controller.postUrl(...)` instead of `_controller.loadUrl(...)`. Ran
+  `--plain-name "U10 loadUrl delegates to parent with identical arguments"` ->
+  FAILED (`Expected: length <1>  Actual: []`). Mutant restored exactly; re-ran the
+  file -> 23 passed. Proves the delegation assertions are meaningful, not vacuous.
+- suite after: `flutter test` in `zikzak_inappwebview` -> 141 passed, 0 failed
+  (~9s wall). No regressions against the existing 118-passing baseline.
+- notes: This is a behavioral test cycle (contra the prior compile-probe cycles 1–2).
+  The feature code was already implemented; these tests retroactively prove the
+  delegation is observable and would catch a regression. U5 as literally worded
+  ("monolithic delegate to facade") does not match the implementation (the monolith
+  delegates directly to the platform, not via the facade) — verified, so U5–U8
+  remain for a separate careful pass; the backward-compat intent (A1/A2) is instead
+  covered by the monolith-reaches-platform equivalence assertions here.
+- commit: (pending — see report)

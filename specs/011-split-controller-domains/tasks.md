@@ -9,8 +9,8 @@ Tasks are ordered by dependency. Test tasks must precede implementation tasks fo
 ## Phase 1: Domain Controller Facades (Consumer Layer)
 
 ### NavigationController
-- [ ] T002: [U10-U28] Write failing tests for NavigationController method delegation
-- [ ] T003: [U10-U28] Implement NavigationController delegation to parent controller
+- [X] T002: [U10-U28] Write failing tests for NavigationController method delegation
+- [X] T003: [U10-U28] Implement NavigationController delegation to parent controller
 
 ### JavaScriptController
 - [ ] T004: [U29-U45] Write failing tests for JavaScriptController method delegation
@@ -21,8 +21,8 @@ Tasks are ordered by dependency. Test tasks must precede implementation tasks fo
 - [ ] T007: [U46-U65] Implement CookieController with default-to-current-URL semantics
 
 ### SettingsController
-- [ ] T008: [U66-U67] Write failing tests for SettingsController method delegation
-- [ ] T009: [U66-U67] Implement SettingsController delegation to parent controller
+- [X] T008: [U66-U67] Write failing tests for SettingsController method delegation
+- [X] T009: [U66-U67] Implement SettingsController delegation to parent controller
 
 ## Phase 2: Monolithic Controller Integration
 

@@ -45,25 +45,25 @@ Grouped by the component from `plan.md` that owns them. Each line names one obse
 
 | id  | behavior                                              | traces | kind             | state    | test                                    |
 | --- | ----------------------------------------------------- | ------ | ---------------- | -------- | --------------------------------------- |
-| U10 | `loadUrl` delegates to parent controller and produces same navigation behavior | FR-005 | example          | PENDING | |
-| U11 | `postUrl` delegates to parent controller and produces same navigation behavior | FR-005 | example          | PENDING | |
-| U12 | `loadData` delegates to parent controller and produces same navigation behavior | FR-005 | example          | PENDING | |
-| U13 | `loadFile` delegates to parent controller and produces same navigation behavior | FR-005 | example          | PENDING | |
-| U14 | `loadSimulatedRequest` delegates to parent controller and produces same navigation behavior | FR-005 | example          | PENDING | |
-| U15 | `reload` delegates to parent controller and produces same navigation behavior | FR-005 | example          | PENDING | |
-| U16 | `reloadFromOrigin` delegates to parent controller and produces same navigation behavior | FR-005 | example          | PENDING | |
-| U17 | `stopLoading` delegates to parent controller and produces same navigation behavior | FR-005 | example          | PENDING | |
-| U18 | `isLoading` delegates to parent controller and returns same value | FR-005 | example          | PENDING | |
-| U19 | `goBack` delegates to parent controller and produces same navigation behavior | FR-005 | example          | PENDING | |
-| U20 | `goForward` delegates to parent controller and produces same navigation behavior | FR-005 | example          | PENDING | |
-| U21 | `goBackOrForward` delegates to parent controller with correct steps sign | FR-005 | example          | PENDING | |
-| U22 | `canGoBack` delegates to parent controller and returns same boolean | FR-005 | example          | PENDING | |
-| U23 | `canGoForward` delegates to parent controller and returns same boolean | FR-005 | example          | PENDING | |
-| U24 | `canGoBackOrForward` delegates to parent controller with correct steps sign and returns same boolean | FR-005 | example          | PENDING | |
-| U25 | `goTo` delegates to parent controller and produces same navigation behavior | FR-005 | example          | PENDING | |
-| U26 | `getCopyBackForwardList` delegates to parent controller and returns same history | FR-005 | example          | PENDING | |
-| U27 | `clearHistory` delegates to parent controller and produces same navigation behavior | FR-005 | example          | PENDING | |
-| U28 | `getUrl` delegates to parent controller and returns same URL | FR-005 | example          | PENDING | |
+| U10 | `loadUrl` delegates to parent controller and produces same navigation behavior | FR-005 | example          | DONE | zikzak_inappwebview/test/domain_controllers_behavioral_test.dart |
+| U11 | `postUrl` delegates to parent controller and produces same navigation behavior | FR-005 | example          | DONE | zikzak_inappwebview/test/domain_controllers_behavioral_test.dart |
+| U12 | `loadData` delegates to parent controller and produces same navigation behavior | FR-005 | example          | DONE | zikzak_inappwebview/test/domain_controllers_behavioral_test.dart |
+| U13 | `loadFile` delegates to parent controller and produces same navigation behavior | FR-005 | example          | DONE | zikzak_inappwebview/test/domain_controllers_behavioral_test.dart |
+| U14 | `loadSimulatedRequest` delegates to parent controller and produces same navigation behavior | FR-005 | example          | DONE | zikzak_inappwebview/test/domain_controllers_behavioral_test.dart |
+| U15 | `reload` delegates to parent controller and produces same navigation behavior | FR-005 | example          | DONE | zikzak_inappwebview/test/domain_controllers_behavioral_test.dart |
+| U16 | `reloadFromOrigin` delegates to parent controller and produces same navigation behavior | FR-005 | example          | DONE | zikzak_inappwebview/test/domain_controllers_behavioral_test.dart |
+| U17 | `stopLoading` delegates to parent controller and produces same navigation behavior | FR-005 | example          | DONE | zikzak_inappwebview/test/domain_controllers_behavioral_test.dart |
+| U18 | `isLoading` delegates to parent controller and returns same value | FR-005 | example          | DONE | zikzak_inappwebview/test/domain_controllers_behavioral_test.dart |
+| U19 | `goBack` delegates to parent controller and produces same navigation behavior | FR-005 | example          | DONE | zikzak_inappwebview/test/domain_controllers_behavioral_test.dart |
+| U20 | `goForward` delegates to parent controller and produces same navigation behavior | FR-005 | example          | DONE | zikzak_inappwebview/test/domain_controllers_behavioral_test.dart |
+| U21 | `goBackOrForward` delegates to parent controller with correct steps sign | FR-005 | example          | DONE | zikzak_inappwebview/test/domain_controllers_behavioral_test.dart |
+| U22 | `canGoBack` delegates to parent controller and returns same boolean | FR-005 | example          | DONE | zikzak_inappwebview/test/domain_controllers_behavioral_test.dart |
+| U23 | `canGoForward` delegates to parent controller and returns same boolean | FR-005 | example          | DONE | zikzak_inappwebview/test/domain_controllers_behavioral_test.dart |
+| U24 | `canGoBackOrForward` delegates to parent controller with correct steps sign and returns same boolean | FR-005 | example          | DONE | zikzak_inappwebview/test/domain_controllers_behavioral_test.dart |
+| U25 | `goTo` delegates to parent controller and produces same navigation behavior | FR-005 | example          | DONE | zikzak_inappwebview/test/domain_controllers_behavioral_test.dart |
+| U26 | `getCopyBackForwardList` delegates to parent controller and returns same history | FR-005 | example          | DONE | zikzak_inappwebview/test/domain_controllers_behavioral_test.dart |
+| U27 | `clearHistory` delegates to parent controller and produces same navigation behavior | FR-005 | example          | DONE | zikzak_inappwebview/test/domain_controllers_behavioral_test.dart |
+| U28 | `getUrl` delegates to parent controller and returns same URL | FR-005 | example          | DONE | zikzak_inappwebview/test/domain_controllers_behavioral_test.dart |
 
 ### `zikzak_inappwebview/lib/src/in_app_webview/controllers/javascript_controller.dart` — JavaScriptController
 
@@ -116,8 +116,8 @@ Grouped by the component from `plan.md` that owns them. Each line names one obse
 
 | id  | behavior                                              | traces | kind             | state    | test                                    |
 | --- | ----------------------------------------------------- | ------ | ---------------- | -------- | --------------------------------------- |
-| U66 | `getSettings` delegates to parent controller and returns same settings | FR-008 | example          | PENDING | |
-| U67 | `setSettings` delegates to parent controller and applies settings identically | FR-008 | example          | PENDING | |
+| U66 | `getSettings` delegates to parent controller and returns same settings | FR-008 | example          | DONE | zikzak_inappwebview/test/domain_controllers_behavioral_test.dart |
+| U67 | `setSettings` delegates to parent controller and applies settings identically | FR-008 | example          | DONE | zikzak_inappwebview/test/domain_controllers_behavioral_test.dart |
 
 ### `zikzak_inappwebview_platform_interface/lib/src/in_app_webview/platform_inappwebview_controller.dart` — Platform Interface Delegates
 
