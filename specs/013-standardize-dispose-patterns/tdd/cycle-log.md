@@ -168,3 +168,19 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
 - refactor: none needed — reused the `_FakePlatformLocalhostServer` fake from the U15/U14/U16 tests in the same file.
 - class: TEST_FIRST (test written before confirming the implementation; red proven via mutant because the behavior already held).
 - commit: not committed (working tree left dirty per `--no-commit` default).
+
+## Cycle 10 — U8 (test-first with deliberate-mutant proof)
+
+- test: `test/in_app_webview_dispose_test.dart` — `U8: InAppWebViewController.dispose(isKeepAlive: true) forwards to platform.dispose(isKeepAlive: true)`
+- red command: `flutter test test/in_app_webview_dispose_test.dart --plain-name "U8: InAppWebViewController.dispose(isKeepAlive: true) forwards to platform.dispose(isKeepAlive: true)"`
+- red evidence (deliberate-mutant check): the test passed on first run because `InAppWebViewController.dispose()` already forwards `isKeepAlive` to `platform.dispose()`. To prove the test has teeth, the forwarding was temporarily changed from `platform.dispose(isKeepAlive: isKeepAlive)` to `platform.dispose(isKeepAlive: false)`. The test then failed:
+  ```
+  00:00 +0 -1: ... U8: InAppWebViewController.dispose(isKeepAlive: true) forwards to platform.dispose(isKeepAlive: true) [E]
+    Expected: true
+      Actual: <false>
+  ```
+  The implementation was restored exactly and the test passed again. This mutant failure is the recorded red.
+- green: no source change beyond the existing forwarding; full umbrella suite `flutter test` -> green at 194 (was 193; +1 new test), no regressions.
+- refactor: none needed — new `_FakePlatformController` fake follows the inline-fake style of `_FakeHeadlessPlatform`.
+- class: TEST_FIRST (test written before confirming the implementation; red proven via mutant because the forwarding already held).
+- commit: not committed (working tree left dirty per `--no-commit` default).

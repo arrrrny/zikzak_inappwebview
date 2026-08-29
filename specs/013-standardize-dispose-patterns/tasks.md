@@ -20,7 +20,7 @@
 ## Phase 2: Consistent Disposable Contract on All Wrapper Classes (P2)
 
 - [ ] T012 **[U7]** Verify `InAppWebViewController` implements `Disposable` with canonical signature
-- [ ] T013 **[U8]** Verify `InAppWebViewController.dispose()` forwards to platform with `isKeepAlive`
+- [X] T013 **[U8]** Verify `InAppWebViewController.dispose()` forwards to platform with `isKeepAlive`
 - [ ] T014 **[U9]** Verify `InAppWebViewController` keepAlive semantics: true retains native, false releases
 - [ ] T015 **[U10]** Verify `InAppWebView` implements `Disposable` with canonical signature
 - [ ] T016 **[U11]** Verify `InAppWebView.dispose()` forwards to platform with `isKeepAlive`
