@@ -213,3 +213,24 @@ With multiple developers:
 - The JS overlay removal script is the core logic — all platform work is just property pass-through
 - Commit after each task or logical group (after setup, after each story)
 - Stop at any checkpoint to validate story independently
+
+---
+
+## Phase 7: TDD remediation (from verification 2026-08-29)
+
+**Purpose**: Address findings from `/speckit.tdd.verify` audit. The feature is **not done** until blocking findings are cleared.
+
+### HIGH findings (blocking)
+
+- [x] T037 [A3] Write integration test for dynamic late-loading overlays (SC-003). Inject a fixed overlay via `setTimeout` after page load, verify removal within retry window. Target: `integration_test/dismiss_dialogues_test.dart` add test case. Verify: `flutter test integration_test/dismiss_dialogues_test.dart --plain-name "dynamic" -d <device>`
+- [x] T038 [A5] Write integration test for JS error non-propagation (SC-005). Inject JS that throws during overlay removal, verify web view remains responsive. Target: `integration_test/dismiss_dialogues_test.dart` add test case. Verify: `flutter test integration_test/dismiss_dialogues_test.dart --plain-name "error" -d <device>`
+
+### HIGH findings (cross-platform coverage)
+
+- [ ] T039 [Cross-platform] Resolve macOS harness hang: investigate `pumpAndSettle` alternative or fixed-delay approach for macOS desktop WebView. Target: `integration_test/dismiss_dialogues_test.dart`. Verify: `flutter test integration_test/dismiss_dialogues_test.dart -d macos`
+- [ ] T040 [Cross-platform] Resolve Android `onWebViewCreated` timeout under `flutter test`. May require `flutter drive` or real device. Target: `integration_test/dismiss_dialogues_test.dart`. Verify: `flutter test integration_test/dismiss_dialogues_test.dart -d emulator-5554`
+
+### MED findings (architecture & characterization)
+
+- [ ] T041 [Architecture] Decide: keep both `dismissDialogues` (brute-force) and `DialogueDismisser` (content-aware) as separate features, or wire `DialogueDismisser` behind the setting. Document decision in `spec.md` or new ADR. Target: `spec.md` or `docs/adr/`. Verify: manual review
+- [x] T042 [U6] Add `mergeUserScripts` test for non-empty existing caller script list. Target: `test/dialogue_dismisser/dialogue_dismisser_test.dart`. Verify: `flutter test test/dialogue_dismisser/dialogue_dismisser_test.dart --plain-name "mergeUserScripts non-empty"`

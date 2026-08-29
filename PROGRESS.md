@@ -901,3 +901,20 @@ dialogue_dismisser — hand-written toJson/fromJson today → Zorphy, core packa
   exchangeable dialect does not detect/emit sealed hierarchies — polymorphic
   families are flagged manual instead of converted to explicitSubTypes +
   implements. The families stay hand-written (skip/fork) until #103 lands.
+
+- 2026-08-29 — Spec 014 (Portable Sessions) COMPLETE: `WebViewSessions`
+  controller added to the main package (`lib/src/webview_sessions/`), backed
+  entirely by `zikzak_session`'s `SessionPort` (FileSessionStore in tests;
+  injectable for apps) — no parallel session format introduced (FR-001/FR-002).
+  `save` harvests cookies via `CookieManager` + localStorage via JS evaluation;
+  `load` re-applies both and returns `false` on a missing session (FR-003/FR-004).
+  Static `toCookieEntry` maps the plugin `Cookie`↔zikzak_session `CookieEntry`
+  (dynamic value stringified, null optionals defaulted — FR-005); `harvest/
+  applyLocalStorage` carry key/value/origin with `area=localStorage` (FR-006).
+  Clock is injectable for deterministic timestamps (T024). Exported from
+  `lib/zikzak_inappwebview.dart`; `zikzak_session: ^0.2.0` is a runtime dep.
+  Verified: `test/webview_sessions_test.dart` 18/18 green (added T010 origin-via-
+  WebUri, T024 clock injection, T025 overwrite, T026 empty-load); full umbrella
+  suite green. Discipline note: feature was implemented test-after (Finding #1) —
+  cycle-log acknowledges it; strength gaps (T019/T020) recorded, e2e-through-real-
+  WebView (T023) and deliberate mutants (T027) remain as follow-ups.
