@@ -24,7 +24,7 @@
 - [X] T014 **[U9]** Verify `InAppWebViewController` keepAlive semantics: true retains native, false releases
 - [ ] T015 **[U10]** Verify `InAppWebView` implements `Disposable` with canonical signature
 - [X] T016 **[U11]** Verify `InAppWebView.dispose()` forwards to platform with `isKeepAlive`
-- [ ] T017 **[U12]** Verify `InAppWebView` keepAlive semantics consistent with controller
+- [X] T017 **[U12]** Verify `InAppWebView` keepAlive semantics consistent with controller
 - [ ] T018 **[U13]** Verify `InAppLocalhostServer` implements `Disposable` with canonical signature
 - [X] T019 **[U14]** Implement `InAppLocalhostServer.dispose()` stops server if running (fire-and-forget, swallows errors)
 - [X] T020 **[U15]** Implement `InAppLocalhostServer.dispose()` on non-running server (safe, marks disposed)

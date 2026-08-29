@@ -217,3 +217,20 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
 - refactor: none needed — new `_FakePlatformWidget` fake follows the inline-fake style; reuses the flutter widgets import for the required `build`/`controllerFromPlatform` stubs.
 - class: TEST_FIRST (test written before confirming the implementation; red proven via mutant because the forwarding already held).
 - commit: not committed (working tree left dirty per `--no-commit` default).
+
+## Cycle 13 — U12 (test-first with deliberate-mutant proof)
+
+- test: `test/in_app_webview_dispose_test.dart` — `U12: a later InAppWebView.dispose(isKeepAlive: false) after keepAlive forwards false and fully releases`
+- red command: `flutter test test/in_app_webview_dispose_test.dart --plain-name "U12: a later InAppWebView.dispose(isKeepAlive: false) after keepAlive forwards false and fully releases"`
+- red evidence (deliberate-mutant check): the test passed on first run because `InAppWebView.dispose()` forwards the actual `isKeepAlive` flag. To prove the test has teeth, the forwarding was temporarily changed from `platform.dispose(isKeepAlive: isKeepAlive)` to `platform.dispose(isKeepAlive: true)`. The test then failed:
+  ```
+  00:00 +0 -1: ... U12: a later InAppWebView.dispose(isKeepAlive: false) ... forwards false and fully releases [E]
+    Expected: false
+      Actual: <true>
+    the second (non-keepAlive) call must forward false
+  ```
+  The implementation was restored exactly and the test passed again. This mutant failure is the recorded red.
+- green: no source change beyond the existing forwarding; full umbrella suite `flutter test` -> green at 197, no regressions.
+- refactor: none needed — reused the `_FakePlatformWidget` fake from the U11 test in the same file.
+- class: TEST_FIRST (test written before confirming the implementation; red proven via mutant because the behavior already held).
+- commit: not committed (working tree left dirty per `--no-commit` default).
