@@ -251,3 +251,20 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
 - refactor: none needed.
 - class: TEST_FIRST (test written before confirming the implementation; red proven via mutant because the behavior already held).
 - commit: not committed (working tree left dirty per `--no-commit` default).
+## Cycle 15 — Acceptance reconciliation + U5/A8 conflict (no new tests)
+
+- scope: outside-in close-out. All inner-loop unit behaviors are now DONE/GREEN. The acceptance behaviors A1-A9 are driven through the same public wrapper entry points (`HeadlessInAppWebView.dispose`, `InAppWebViewController.dispose`, `InAppWebView.dispose`, `InAppLocalhostServer.dispose`) that the unit tests already exercise, because no `integration_test/` harness exists in this package (per test-list Out of scope). Each acceptance id was therefore reconciled to the unit test(s) that satisfy its criterion rather than a separate runner.
+- red command: n/a (reconciliation, not a new cycle).
+- green: no source or test change; full umbrella suite `flutter test` -> green at 198, no regressions.
+- reconciliation mapping (acceptance id -> covering unit test file):
+  - A1 -> U1 (`test/headless_dispose_guard_test.dart`)
+  - A2 -> U3 (`test/headless_dispose_guard_test.dart`)
+  - A3 -> U6 (`test/headless_dispose_guard_test.dart`)
+  - A4 -> `test/disposable_pattern_test.dart` (already DONE in Cycle 2)
+  - A5 -> U8 (controller), U11 (webview), U17 (server signature) in `test/in_app_webview_dispose_test.dart` / `test/in_app_localhost_server_dispose_test.dart`
+  - A6 -> U14/U15/U16 (`test/in_app_localhost_server_dispose_test.dart`)
+  - A9 -> U9 (controller) and U12 (webview) (`test/in_app_webview_dispose_test.dart`)
+- ESCAPE HATCH (genuine requirement conflict): U5 and A8 ask for `dispose(false)` AFTER `dispose(true)` to re-reach the platform and "fully release". This is directly contradicted by FR-008's idempotency guard (U3/U6), which makes any second `dispose()` return early without calling the platform. Satisfying U5/A8 would require removing the guard that U3/A2/A3 depend on. No test was written that would contradict the guard, and the guard was not weakened. U5 and A8 are left BLOCKED; the conflict is recorded in the test-list and reported to the user for a spec decision.
+- A7 (keepAlive retains native view) is device-only: native-view retention is platform behavior not observable at the wrapper level with a fake platform, and no `integration_test/` harness exists. Left PENDING (not a unit-testable behavior), reported as such.
+- class: RECONCILIATION (acceptance rows closed by mapping to existing DONE unit tests) + ESCAPE_HATCH (U5/A8 conflict).
+- commit: not committed (working tree left dirty per `--no-commit` default).
