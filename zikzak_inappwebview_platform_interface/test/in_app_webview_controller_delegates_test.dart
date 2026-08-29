@@ -67,7 +67,7 @@ class _ProbeJavaScript extends PlatformJavaScriptDelegate {
   @override
   Future<dynamic> evaluateJavascript({required String source}) async => null;
   @override
-  Future<String?> callAsyncJavaScript({
+  Future<CallAsyncJavaScriptResult?> callAsyncJavaScript({
     required String functionBody,
     Map<String, dynamic> arguments = const <String, dynamic>{},
     ContentWorld? contentWorld,
@@ -96,9 +96,9 @@ class _ProbeJavaScript extends PlatformJavaScriptDelegate {
     required JavaScriptHandlerCallback callback,
   }) {}
   @override
-  Future<JavaScriptHandlerCallback?> removeJavaScriptHandler({
+  JavaScriptHandlerCallback? removeJavaScriptHandler({
     required String handlerName,
-  }) async => null;
+  }) => null;
 }
 
 class _ProbeCookie extends PlatformCookieDelegate {
