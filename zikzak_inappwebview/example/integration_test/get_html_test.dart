@@ -45,9 +45,10 @@ void main() {
       ),
     );
 
-    // Wait for page to load
+    // Wait for page to load (bumped for the slow 2019 Intel Mac; see
+    // lifecycle_test.dart note on the first-load race).
     await pageLoaded.future.timeout(
-      const Duration(seconds: 10),
+      const Duration(seconds: 120),
       onTimeout: () {
         print('Timeout waiting for page load');
       },

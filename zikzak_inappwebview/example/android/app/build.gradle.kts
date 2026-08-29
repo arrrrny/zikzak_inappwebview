@@ -19,7 +19,9 @@ android {
         applicationId = "com.example.example"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        // Bumped from flutter.minSdkVersion so the example app can load
+        // zikzak_inappwebview_android (which requires a higher SDK) for integration tests.
+        minSdk = 26
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName

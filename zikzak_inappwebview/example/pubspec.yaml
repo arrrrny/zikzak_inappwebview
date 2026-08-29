@@ -41,6 +41,18 @@ dependencies:
   zikzak_inappwebview_platform_interface: ^5.0.0
   zikzak_inappwebview_web: ^5.0.0
 
+# DEV ONLY: point at the local plugin source so Swift/ObjC/Java changes are
+# compiled into the example app during development. Remove before publishing.
+dependency_overrides:
+  zikzak_inappwebview_macos:
+    path: ../../zikzak_inappwebview_macos
+  zikzak_inappwebview_ios:
+    path: ../../zikzak_inappwebview_ios
+  zikzak_inappwebview_android:
+    path: ../../zikzak_inappwebview_android
+  zikzak_inappwebview_platform_interface:
+    path: ../../zikzak_inappwebview_platform_interface
+
 dev_dependencies:
   integration_test:
     sdk: flutter

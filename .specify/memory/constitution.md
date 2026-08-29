@@ -13,10 +13,24 @@
 [PRINCIPLE_2_DESCRIPTION]
 <!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Test-Driven Development (NON-NEGOTIABLE)
+Every behavior change is driven by a test that failed first.
+
+- A test exists and has been observed failing, for the right reason, before the
+  code that makes it pass. The failure output is recorded in
+  `specs/<feature>/tdd/cycle-log.md`.
+- Test tasks are not optional. `tasks.md` places each behavior's test task before
+  its implementation task, and the implementation task is not started until the
+  test is red.
+- Tests are never weakened, skipped, deleted, or filtered out to reach green. When
+  a test and the code disagree, `spec.md` decides which is wrong.
+- Every acceptance criterion in `spec.md` has at least one acceptance test that
+  exercises the real entry point.
+- Refactoring happens only on a green suite, and never changes a test in the same
+  commit as a behavior change.
+- Test strength is verified, not assumed: mutation testing on the changed files
+  where a mutation tool exists, and a deliberate-mutant spot check where it does
+  not.
 
 ### [PRINCIPLE_4_NAME]
 <!-- Example: IV. Integration Testing -->
