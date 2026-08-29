@@ -154,3 +154,19 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
 - refactor: none (change is localized to the capture path; the single-page fallback is preserved, so A4 is unaffected).
 - commit: 189cb769
 - notes: Acceptance test on emulator-5554 (API 26). Regression: full `android_create_pdf_test.dart` (A4+A5) green, 2 passed. `tasks.md` carries no `[A5]` marker, so no task was ticked. PDFConfiguration pageSize/margins/orientation fields (zorphy) were added in this commit so the test could carry the A4 size across the channel.
+
+## A13 — Android takeScreenshot returns non-null valid PNG image bytes (acceptance)
+
+- test: `zikzak_inappwebview/example/integration_test/android_take_screenshot_test.dart › A13 Android takeScreenshot returns non-null valid PNG image bytes`
+- red command: `flutter test -d emulator-5554 integration_test/android_take_screenshot_test.dart --plain-name "A13 Android takeScreenshot returns non-null valid PNG image bytes"`
+- red: the test failed. The Dart assertion `expect(bytes, isNotNull)` failed with:
+  `Expected: not null  Actual: <null>  takeScreenshot must return non-null bytes on Android (FR-001)`.
+  The channel returned `null`. Root cause in the native handler: `takeScreenshot` read `getMeasuredWidth()`/`getMeasuredHeight()` directly and wrapped the body in a catch that returned `result.success(null)` on `IllegalArgumentException`. Before the WebView finished layout both dimensions were `0`, so `Bitmap.createBitmap(0, 0, ARGB_8888)` threw and the null was returned. The failure was observed before any fix existed.
+- green: applied the same pattern `createPdf`/`capturePdf` already use — prefer the laid-out size (`getWidth() > 0 ? getWidth() : getMeasuredWidth()`, same for height), guard against a 0-size capture (return `null` instead of throwing), and `postDelayed` the capture by 1000ms so the WebView has finished layout before its size is read.
+  - source: `zikzak_inappwebview_android/android/src/main/java/wtf/zikzak/zikzak_inappwebview_android/webview/in_app_webview/InAppWebView.java` (`takeScreenshot`)
+  - acceptance result: `00:02 +1: All tests passed!` (EXIT=0) on emulator-5554 (API 26)
+  - regression: Android package Dart suite after — `All tests passed!` (7 passed, U16/U17/U41 delegation intact)
+- deliberate mutant: N/A — the test was RED on first run (failure observed before implementation), so the green-on-first-run mutant check does not apply. The red evidence above is the real pre-implementation failure.
+- refactor: none needed. The fix only aligns `takeScreenshot` with the existing `capturePdf` dimension-reading pattern; no new duplication introduced.
+- commit: 7e5f9041
+- notes: Acceptance behavior requiring a real Android WebView; ran on a device/emulator, not the Dart-VM unit runner. This is a genuine production bug fix (zero-size screenshot capture), not only a new test. `tasks.md` carries no `[A13]` marker, so no task was ticked.
