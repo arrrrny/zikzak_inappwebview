@@ -12,10 +12,10 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 import '../webview_environment/webview_environment.dart';
 import 'headless_in_app_webview.dart';
 import 'in_app_webview_controller.dart';
-import 'dismiss_dialogues_legacy.dart';
 import '../find_interaction/find_interaction_controller.dart';
 import '../pull_to_refresh/main.dart';
 import '../pull_to_refresh/pull_to_refresh_controller.dart';
+import 'dismiss_dialogues_legacy.dart';
 import 'network_capture/network_capture_manager.dart';
 
 ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewWidget}
