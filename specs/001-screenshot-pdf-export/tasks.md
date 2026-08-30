@@ -242,3 +242,23 @@ With multiple developers after Foundational phase:
 - The macOS Swift handler should mirror the iOS `takeScreenshot` at lines 815-851 of the iOS `InAppWebView.swift` — same API, different availability guard
 - Commit after each task or logical group
 - Stop at any checkpoint to validate the story independently
+
+---
+
+## Phase 9: TDD remediation (audit 2026-08-30, verification.md verdict PASS_WITH_GAPS)
+
+Findings from `/speckit.tdd.verify` on spec 001 at `d99ad46b`. The feature's TDD
+evidence is strong on the three priority platforms; the items below close the gaps
+the audit surfaced. Android compatibility is the priority per project direction;
+Linux is secondary; Windows/Web stay as null-stub guards.
+
+- [ ] T026 [US5] [HIGH] Replace the fixed `await Future.delayed(const Duration(seconds: 2))` in `zikzak_inappwebview/example/integration_test/ios_take_screenshot_test.dart:56` and `ios_create_pdf_test.dart:55` with a condition-based wait (poll `takeScreenshot()`/`createPdf()` until non-null, bounded by timeout). Fixed sleeps are flaky across devices. Prove with `flutter test integration_test/ios_take_screenshot_test.dart -d <simulator>`.
+- [ ] T027 [US1] [MED] Add a macOS `createPdf` acceptance test (FR-003 partial gap — only native-intact BASELINE U40 exists today, no acceptance coverage). Mirror `ios_create_pdf_test.dart` against `zikzak_inappwebview/example/integration_test/macos_create_pdf_test.dart`. Prove on macOS desktop.
+- [ ] T028 [FR-010] [MED] Add an isolated test asserting `takeScreenshot`/`createPdf` return `null` (not throw) when called before web content is loaded, on at least one priority platform (Android preferred). Covers the untested edge criterion FR-010.
+- [ ] T029 [US3/US4] [MED, secondary] Linux acceptance A6–A9 (`zikzak_inappwebview/example/integration_test/linux_*.dart`) — add when a Linux host is available; today only Dart delegation (U25–U27) is green and native C handlers (U18–U24) have no test. Linux is explicitly secondary per project direction.
+- [ ] T030 [style] [LOW] Rename delegation tests from leading ticket ids (`U6 …`, `U16 …`) to behavior-first names per `.specify/memory/tdd-profile.md` conventions (6 files: umbrella, android, linux, windows, web, ios delegation tests). No behavior change; `flutter test` per package must stay green.
+- [ ] T031 [style] [LOW] Extract magic byte literals (`[10,20,30]`, etc.) and the iOS `UNSUPPORTED_IOS_VERSION` code/message literals into named test constants; drop redundant `greaterThan(100)` length checks where a PNG/PDF signature is already asserted; document the 120s integration timeouts (Intel-2019 Mac constraint). `flutter test` per package must stay green.
+
+NOTE: tasks.md carries no `[U#]`/`[A#]` behavior markers, so the TDD loop did not
+tick any task. Per the audit, the loop's work is DONE in `tdd/test-list.md` but
+`/speckit.implement` would not see it as closed from this file alone.
