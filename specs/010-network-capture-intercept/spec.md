@@ -22,7 +22,7 @@ An agent developer browsing an unknown retailer needs to call a single method on
 
 1. **Given** a WebView with network capture and a distiller post-processor configured, **When** a live session on a retailer yields XHR/fetch traffic, **Then** `getSightings()` returns a non-empty list of Sightings that pass the distiller's validity check and reflect the captured requests.
 2. **Given** the same session, **When** `getEntries()` is called, **Then** it returns the raw `NetworkEntry` objects unchanged (the distillation post-processor does not mutate raw storage).
-3. **Given** no distiller post-processor is configured, **When** `getSightings()` is called, **Then** it returns an empty list (or raw entries passed through) without throwing, and capture continues to operate normally.
+3. **Given** no distiller post-processor is configured, **When** `getSightings()` is called, **Then** it returns an empty `List<Sighting>` without throwing, and capture continues to operate normally.
 
 ---
 
@@ -175,7 +175,7 @@ The added interception work (streaming, redaction, budgeting, salvage buffering)
 
 ## Assumptions
 
-- The `SightingDistiller` post-processor contract (arrrrny/dart_web_scraper#79) is available and stable enough to wire into the capture pipeline as a pluggable slot; if absent, `getSightings()` degrades gracefully (empty/passthrough) without breaking raw capture.
+- The `SightingDistiller` post-processor contract (arrrrny/dart_web_scraper#79) is available and stable enough to wire into the capture pipeline as a pluggable slot; if absent, `getSightings()` returns an empty `List<Sighting>` without breaking raw capture.
 - Session lifecycle (creation/teardown of the WebView and headless pool) is provided by the pool work (arrrrny/zikzak_inappwebview#237), and the capture engine integrates with its dispose path to trigger the salvage flush.
 - The consumer that drives early-return (`intercept_browse`, arrrrny/zikzak_inappwebview#239) reads `getSightings()` and the streaming API; this spec defines the producer side and assumes that consumer contract.
 - The existing pure-Dart + JS-injection capture engine remains the implementation substrate, so platform parity (Android/iOS/macOS, headless) is preserved without native per-platform changes.

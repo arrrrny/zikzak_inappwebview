@@ -6,7 +6,9 @@ import '../in_app_webview_controller.dart';
 ///evaluation, JavaScript handlers and user script management.
 ///
 ///Part of the domain controller split (issue #161, P3). Every method
-///delegates to the parent [InAppWebViewController].
+///delegates straight to the underlying platform controller
+///([InAppWebViewController.platform]); the monolith routes grouped calls
+///back through this facade (see FR-002).
 class JavaScriptController {
   final InAppWebViewController _controller;
 
@@ -17,7 +19,7 @@ class JavaScriptController {
   Future<dynamic> evaluateJavascript({
     required String source,
     ContentWorld? contentWorld,
-  }) => _controller.evaluateJavascript(
+  }) => _controller.platform.evaluateJavascript(
     source: source,
     contentWorld: contentWorld,
   );
@@ -27,7 +29,7 @@ class JavaScriptController {
     required String functionBody,
     Map<String, dynamic> arguments = const <String, dynamic>{},
     ContentWorld? contentWorld,
-  }) => _controller.callAsyncJavaScript(
+  }) => _controller.platform.callAsyncJavaScript(
     functionBody: functionBody,
     arguments: arguments,
     contentWorld: contentWorld,
@@ -37,7 +39,7 @@ class JavaScriptController {
   Future<void> injectJavascriptFileFromUrl({
     required WebUri urlFile,
     ScriptHtmlTagAttributes? scriptHtmlTagAttributes,
-  }) => _controller.injectJavascriptFileFromUrl(
+  }) => _controller.platform.injectJavascriptFileFromUrl(
     urlFile: urlFile,
     scriptHtmlTagAttributes: scriptHtmlTagAttributes,
   );
@@ -45,13 +47,13 @@ class JavaScriptController {
   ///Injects a JavaScript file from the app assets into the page.
   Future<dynamic> injectJavascriptFileFromAsset({
     required String assetFilePath,
-  }) => _controller.injectJavascriptFileFromAsset(assetFilePath: assetFilePath);
+  }) => _controller.platform.injectJavascriptFileFromAsset(assetFilePath: assetFilePath);
 
   ///Registers a JavaScript handler with the given [handlerName].
   void addJavaScriptHandler({
     required String handlerName,
     required JavaScriptHandlerCallback callback,
-  }) => _controller.addJavaScriptHandler(
+  }) => _controller.platform.addJavaScriptHandler(
     handlerName: handlerName,
     callback: callback,
   );
@@ -59,36 +61,36 @@ class JavaScriptController {
   ///Removes the JavaScript handler with the given [handlerName].
   JavaScriptHandlerCallback? removeJavaScriptHandler({
     required String handlerName,
-  }) => _controller.removeJavaScriptHandler(handlerName: handlerName);
+  }) => _controller.platform.removeJavaScriptHandler(handlerName: handlerName);
 
   ///Whether a JavaScript handler with the given [handlerName] exists.
   bool hasJavaScriptHandler({required String handlerName}) =>
-      _controller.hasJavaScriptHandler(handlerName: handlerName);
+      _controller.platform.hasJavaScriptHandler(handlerName: handlerName);
 
   ///Adds the given [userScript].
   Future<void> addUserScript({required UserScript userScript}) =>
-      _controller.addUserScript(userScript: userScript);
+      _controller.platform.addUserScript(userScript: userScript);
 
   ///Adds the given [userScripts].
   Future<void> addUserScripts({required List<UserScript> userScripts}) =>
-      _controller.addUserScripts(userScripts: userScripts);
+      _controller.platform.addUserScripts(userScripts: userScripts);
 
   ///Removes the given [userScript].
   Future<bool> removeUserScript({required UserScript userScript}) =>
-      _controller.removeUserScript(userScript: userScript);
+      _controller.platform.removeUserScript(userScript: userScript);
 
   ///Removes the given [userScripts].
   Future<void> removeUserScripts({required List<UserScript> userScripts}) =>
-      _controller.removeUserScripts(userScripts: userScripts);
+      _controller.platform.removeUserScripts(userScripts: userScripts);
 
   ///Removes all user scripts of the given [groupName].
   Future<void> removeUserScriptsByGroupName({required String groupName}) =>
-      _controller.removeUserScriptsByGroupName(groupName: groupName);
+      _controller.platform.removeUserScriptsByGroupName(groupName: groupName);
 
   ///Removes all user scripts.
-  Future<void> removeAllUserScripts() => _controller.removeAllUserScripts();
+  Future<void> removeAllUserScripts() => _controller.platform.removeAllUserScripts();
 
   ///Whether the given [userScript] is currently injected.
   bool hasUserScript({required UserScript userScript}) =>
-      _controller.hasUserScript(userScript: userScript);
+      _controller.platform.hasUserScript(userScript: userScript);
 }

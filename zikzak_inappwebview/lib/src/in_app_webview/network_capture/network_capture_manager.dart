@@ -4,6 +4,7 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 
 import '../in_app_webview_controller.dart';
 import 'network_capture_interceptor_js.dart';
+import 'secret_redactor.dart';
 
 ///Name of the JavaScript handler the interceptor script reports through.
 const String kNetworkCaptureHandlerName = '__zikzakNetworkCapture__';
@@ -217,20 +218,23 @@ class NetworkCaptureManager {
       case 'request':
         final request = NetworkRequest.fromMap(payload);
         if (request == null) return;
-        collector.trackRequest(request);
-        _onNetworkRequest?.call(controller, request);
+        final redacted = redactRequest(request);
+        collector.trackRequest(redacted);
+        _onNetworkRequest?.call(controller, redacted);
         break;
       case 'response':
         final response = NetworkResponse.fromMap(payload);
         if (response == null) return;
-        collector.attachResponse(response);
-        _onNetworkResponse?.call(controller, response);
+        final redacted = redactResponse(response);
+        collector.attachResponse(redacted);
+        _onNetworkResponse?.call(controller, redacted);
         break;
       case 'body':
         final body = NetworkResponseBody.fromMap(payload);
         if (body == null) return;
-        collector.attachBody(body);
-        _onNetworkLoadingFinished?.call(controller, body);
+        final redacted = redactBody(body);
+        collector.attachBody(redacted);
+        _onNetworkLoadingFinished?.call(controller, redacted);
         break;
       case 'error':
         final requestId = payload['requestId']?.toString() ?? '';

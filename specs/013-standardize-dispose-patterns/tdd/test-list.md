@@ -1,88 +1,103 @@
 ---
-feature: 013-standardize-dispose-patterns # spec-kit feature directory name
-loop: outside-in # acceptance tests first, through the real wrapper entry points
-profile: .specify/memory/tdd-profile.md # stack profile the commands must read
-spec_criteria: 9 # acceptance scenarios across the 3 user stories in spec.md
-planned_at: f349d421 # short SHA the list was derived from
-updated_at: f349d421 # short SHA of the last change to this file
-suite_baseline: blocked # umbrella zikzak_inappwebview is blocked: zuraffa pub-cache corruption — run `flutter pub cache repair`
+feature: 013-standardize-dispose-patterns
+loop: outside-in
+profile: .specify/memory/tdd-profile.md
+spec_criteria: 9
+planned_at: abfa842e
+updated_at: abfa842e
+suite_baseline: red
 ---
 
 # Test List: Standardize Dispose Patterns Across Wrapper Classes + HeadlessInAppWebView Double-Dispose Guard
 
-> **Loop scope note:** `plan.md` is ABSENT for this feature, so the inner loop
-> (unit behaviors grouped by component) is **skipped** — this is an **outer-only**
-> plan. The 9 acceptance scenarios from `spec.md` become acceptance behaviors
-> `A1`–`A9`. Three distinct, user-observable edge cases from the spec's "Edge
-> Cases" section (not already subsumed by a scenario) are promoted to `A10`–`A12`
-> so the list is complete; all trace to real `FR-*` / `SC-*` ids in `spec.md`.
-> No `U*` rows are produced.
-
 ## Outer loop: acceptance behaviors
 
-One per acceptance criterion (scenario) in `spec.md`, observable through the real
-wrapper entry points (`HeadlessInAppWebView`, `InAppWebViewController`,
-`InAppWebView`, `InAppLocalhostServer`). Assertions run against hand-written
-platform fakes (per `tdd-profile.md`): call counts and state flags, not live
-rendering.
+One per acceptance criterion in `spec.md`. Each stays red until the feature works end to end through its real entry point.
 
-| id  | behavior | traces | kind | state | test |
-| --- | --- | --- | --- | --- | --- |
-| A1 | Given a `HeadlessInAppWebView` whose `run()` was never called, `dispose()` releases the underlying platform resources exactly once and leaves no web view running. | FR-004, SC-002 | example | DONE | `zikzak_inappwebview/test/headless_dispose_test.dart::HeadlessInAppWebView.dispose is idempotent (double-dispose guard)` |
-| A2 | Given a started `HeadlessInAppWebView`, `dispose()` followed by a second `dispose()` is a no-op and the platform `dispose()` is invoked only once. | FR-004, FR-008, SC-002 | example | DONE | `zikzak_inappwebview/test/headless_dispose_test.dart::HeadlessInAppWebView.dispose is idempotent (double-dispose guard)` |
-| A3 | Given a `HeadlessInAppWebView` in any lifecycle state, concurrent or repeated `dispose()` calls never throw and never leak a partially-disposed instance. | FR-008, SC-002, SC-006 | example | PENDING | |
-| A4 | The public wrappers `InAppWebViewController`, `InAppWebView`, `InAppLocalhostServer`, and `HeadlessInAppWebView` are each statically assignable to `Disposable` (`declares implements Disposable`). | FR-002, SC-001 | example | DONE | `zikzak_inappwebview/test/disposable_pattern_test.dart::wrapper classes implement Disposable` |
-| A5 | Given any disposable wrapper, invoking its `dispose()` forwards to the corresponding platform `dispose({bool isKeepAlive = false})`, preserving the caller's `isKeepAlive` value and the same default-parameter shape. | FR-006, SC-004 | example | PENDING | |
-| A6 | Given an `InAppLocalhostServer`, calling `dispose()` stops the server if running, releases its resources, and a second call is a safe idempotent no-op. | FR-003, SC-003 | example | PENDING | |
-| A7 | Given a controller created with an `InAppWebViewKeepAlive`, `dispose(isKeepAlive: true)` releases Dart-side references while the native web view remains usable. | FR-007, SC-005 | example | PENDING | |
-| A8 | Given the same keep-alive controller, a subsequent `dispose()` without keep-alive fully releases the native web view. | FR-007, SC-005 | example | PENDING | |
-| A9 | Given any disposable wrapper, the `isKeepAlive` default value (`false`) and its interpretation are identical across all implementations (uniform `dispose({bool isKeepAlive = false})` signature). | FR-005, FR-007, SC-004 | example | PENDING | |
-| A10 | Given an `InAppLocalhostServer` that was never `start()`ed, `dispose()` is safe and idempotent (no error, no server left running). | FR-003, SC-003 | example | PENDING | |
-| A11 | Given an `InAppLocalhostServer` whose `close()` is still in flight, `dispose()` does not surface the in-flight close Future as an unhandled error and still marks the instance disposed. | FR-003, FR-009 | example | PENDING | |
-| A12 | Given a wrapper forwarding `dispose()` to a platform object that is already disposed, the call is tolerated (no crash) and idempotent. | FR-009 | example | PENDING | |
+| id | behavior | traces | kind | state | test |
+| --- | ----------------------------------------------------------- | ------ | ------- | ------- | ------------------------------------------- |
+| A1 | Calling dispose() on a HeadlessInAppWebView before run() releases platform resources exactly once with no leak | US1-AC1, FR-004 | example | DONE | subsumed by U1: test/headless_dispose_guard_test.dart (dispose before run forwards isKeepAlive:false once) |
+| A2 | Calling dispose() twice on a started HeadlessInAppWebView invokes platform dispose only once (idempotent) | US1-AC2, FR-004, FR-008 | example | DONE | subsumed by U3: test/headless_dispose_guard_test.dart (second dispose a no-op) |
+| A3 | Concurrent or repeated dispose() calls on HeadlessInAppWebView never throw and never leak | US1-AC3, FR-008 | example | DONE | subsumed by U6: test/headless_dispose_guard_test.dart (concurrent calls invoke platform at most once) |
+| A4 | InAppWebViewController, InAppWebView, InAppLocalhostServer, and HeadlessInAppWebView all declare implements Disposable | US2-AC1, FR-002 | example | DONE | test/disposable_pattern_test.dart |
+| A5 | dispose() on any wrapper forwards to platform dispose(isKeepAlive: ...) with the same default parameter | US2-AC2, FR-005, FR-006 | example | DONE | subsumed by U8 (controller), U11 (webview), U17 (server accepts signature) in test/in_app_webview_dispose_test.dart and test/in_app_localhost_server_dispose_test.dart |
+| A6 | InAppLocalhostServer.dispose() stops the server if running, releases resources, and is idempotent | US2-AC3, FR-003 | example | DONE | subsumed by U14/U15/U16: test/in_app_localhost_server_dispose_test.dart |
+| A7 | dispose(isKeepAlive: true) on a keep-alive-backed controller releases Dart-side resources but retains native view | US3-AC1, FR-007 | example | PENDING | device-only: keepAlive native-view retention is platform behavior not observable at the wrapper level with a fake platform; no integration_test harness exists (see Out of scope) |
+| A8 | Subsequent dispose() without keep-alive on a keep-alive controller fully releases native view | US3-AC2, FR-007 | example | BLOCKED | conflicts with FR-008 idempotency guard (U3): a second dispose() is a no-op and never re-reaches the platform. Cannot be satisfied without removing the guard that U3/U6 require. See cycle-log note. Tracked as bug #295 (keepalive-dispose-release-gap); resolved there, not by weakening the guard. |
+| A9 | isKeepAlive default (false) and semantics are identical across all disposable wrappers | US3-AC3, FR-005, FR-007 | example | DONE | subsumed by U9 (controller) and U12 (webview) in test/in_app_webview_dispose_test.dart: both forward the actual flag, default false |
 
 ## Inner loop: unit behaviors
 
-**Skipped.** `plan.md` does not exist for this feature, so there is no component
-list to attach unit behaviors to. All behavior is expressed at the acceptance
-(outer) level above. When `plan.md` is added, re-run `/speckit.tdd.plan` to emit
-`U1…` rows grouped by component file path, including `kind: characterization`
-BASELINE rows for any changed component that currently lacks tests.
+Grouped by the component from plan.md that owns them. Since plan.md is absent, we derive component boundaries from spec.md wrapper classes.
+
+### `zikzak_inappwebview/lib/src/in_app_webview/headless_in_app_webview.dart`
+
+| id | behavior | traces | kind | state | test |
+| --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
+| U1 | HeadlessInAppWebView.dispose() before run() sets internal disposed flag and calls platform.dispose(isKeepAlive: false) once | FR-004, FR-008, FR-009 | example | DONE | test/headless_dispose_guard_test.dart |
+| U2 | HeadlessInAppWebView.dispose() after run() sets disposed flag and calls platform.dispose(isKeepAlive: false) once | FR-004, FR-008 | example | DONE | test/headless_dispose_guard_test.dart: U2: dispose() after run() forwards to platform.dispose(isKeepAlive: false) exactly once |
+| U3 | Second dispose() call on HeadlessInAppWebView is a no-op (does not call platform.dispose again) | FR-004, FR-008 | example | DONE | test/headless_dispose_guard_test.dart |
+| U4 | dispose(isKeepAlive: true) forwards true to platform.dispose(isKeepAlive: true) | FR-005, FR-006, FR-007 | example | DONE | test/headless_dispose_guard_test.dart |
+| U5 | dispose(isKeepAlive: false) after dispose(isKeepAlive: true) calls platform.dispose(isKeepAlive: false) and fully releases | FR-007, FR-008 | example | BLOCKED | conflicts with FR-008 idempotency guard (U3/U6): once disposed, a second dispose() returns early and never reaches the platform, so it cannot "fully release" via a second call. Resolving requires either dropping the idempotency guard (breaks U3/A2/A3) or a keepAlive-aware re-dispose path not present in the wrapper. Reported as a spec/impl conflict; no test written that would contradict the guard. Tracked as bug #295 (keepalive-dispose-release-gap); resolved there, not by weakening the guard. |
+| U6 | Concurrent dispose() calls are serialized and platform.dispose() invoked at most once | FR-008, FR-009 | example | DONE | test/headless_dispose_guard_test.dart |
+
+### `zikzak_inappwebview/lib/src/in_app_webview/in_app_webview_controller.dart`
+
+| id | behavior | traces | kind | state | test |
+| --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
+| U7 | InAppWebViewController implements Disposable with canonical signature | FR-001, FR-002, FR-005 | example | DONE | test/disposable_pattern_test.dart |
+| U8 | InAppWebViewController.dispose({bool isKeepAlive = false}) forwards to platform.dispose(isKeepAlive: ...) | FR-006 | example | DONE | test/in_app_webview_dispose_test.dart: U8: InAppWebViewController.dispose(isKeepAlive: true) forwards to platform.dispose(isKeepAlive: true) |
+| U9 | isKeepAlive semantics: true retains native view, subsequent false releases it | FR-007 | example | DONE | test/in_app_webview_dispose_test.dart: U9: a later dispose(isKeepAlive: false) after dispose(isKeepAlive: true) forwards false and fully releases |
+
+### `zikzak_inappwebview/lib/src/in_app_webview/in_app_webview.dart`
+
+| id | behavior | traces | kind | state | test |
+| --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
+| U10 | InAppWebView implements Disposable with canonical signature | FR-001, FR-002, FR-005 | example | DONE | test/disposable_pattern_test.dart |
+| U11 | InAppWebView.dispose({bool isKeepAlive = false}) forwards to platform.dispose(isKeepAlive: ...) | FR-006 | example | DONE | test/in_app_webview_dispose_test.dart: U11: InAppWebView.dispose(isKeepAlive: true) forwards to platform.dispose(isKeepAlive: true) |
+| U12 | isKeepAlive semantics consistent with InAppWebViewController | FR-007 | example | DONE | test/in_app_webview_dispose_test.dart: U12: a later InAppWebView.dispose(isKeepAlive: false) after keepAlive forwards false and fully releases |
+
+### `zikzak_inappwebview/lib/src/in_app_localhost_server.dart`
+
+| id | behavior | traces | kind | state | test |
+| --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
+| U13 | InAppLocalhostServer implements Disposable with canonical signature | FR-001, FR-002, FR-003, FR-005 | example | DONE | test/disposable_pattern_test.dart |
+| U14 | dispose() on running server calls close() and marks disposed (fire-and-forget, swallows errors) | FR-003, FR-008 | example | DONE | test/in_app_localhost_server_dispose_test.dart |
+| U15 | dispose() on non-running server marks disposed without error | FR-003, FR-008, FR-009 | example | DONE | test/in_app_localhost_server_dispose_test.dart: U15: dispose() on a non-running server marks it disposed and does not close it |
+| U16 | Second dispose() call is a no-op (idempotent) | FR-003, FR-008 | example | DONE | test/in_app_localhost_server_dispose_test.dart: U16: a second dispose() call on the server is a no-op (idempotent) |
+| U17 | dispose(isKeepAlive: ...) signature accepted but flag has no effect on server behavior | FR-005, FR-011 | example | DONE | test/in_app_localhost_server_dispose_test.dart: U17: dispose(isKeepAlive: true) is accepted but has no effect on server behavior |
+
+### `zikzak_inappwebview_platform_interface/lib/src/types/disposable.dart`
+
+| id | behavior | traces | kind | state | test |
+| --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
+| U18 | Disposable interface declares void dispose({bool isKeepAlive = false}) as the single canonical contract | FR-001, FR-005 | example | DONE | test/disposable_pattern_test.dart |
 
 ## Invariants and edge cases still to place
 
-All spec edge cases are already represented as `A*` rows above (dispose-before-run
-→ A1; double-dispose → A2; concurrent → A3; keepAlive+double-dispose → A7/A8;
-localhost-not-started → A10; localhost-async-shutdown → A11; already-disposed
-platform → A12). No unplaced items remain for the outer loop.
+Behaviors that belong to the feature but do not yet have a home component. Each must become a numbered line above before the feature is done, or be dropped with a reason.
+
+- Edge case: Dispose before run on HeadlessInAppWebView must not early-return leaving leak (covered by U1)
+- Edge case: Double dispose on any wrapper is safe no-op (covered by U3, U16)
+- Edge case: Concurrent dispose overlapping calls must not double-free or throw (covered by U6)
+- Edge case: InAppLocalhostServer not started - dispose safe and idempotent (covered by U15)
+- Edge case: InAppLocalhostServer async close - dispose does not surface unhandled error (covered by U14)
+- Edge case: keepAlive interaction with double dispose - keepAlive then plain dispose ends in full teardown (covered by U5)
+- Edge case: Wrapper forwarding to already-disposed platform must be tolerated (covered by U3, U9, U12, U16)
 
 ## Out of scope
 
-- Live native web-view rendering: cannot be exercised in the Dart test runner
-  (native views); tests assert call counts / state flags via platform fakes, per
-  spec §Assumptions.
-- Mutation / property-based testing: no `mutation_test` or `glados`/`fast_check`
-  in any `pubspec.lock` (see `tdd-profile.md`), so invariants are captured as
-  `kind: example` sampled at boundaries, not property tests.
-- The `Disposable` interface definition itself: assumed to already exist in the
-  platform-interface package (spec §Assumptions); this feature uses it, does not
-  redefine it.
-- `zikzak_inappwebview_module` / example `integration_test` acceptance paths: need
-  a device/emulator and are not part of this feature's unit surface.
+Things a reader may expect on this list and the one-line reason they are absent.
+
+- Platform-specific implementation changes (Android/iOS/Web native code): spec only covers wrapper Dart classes
+- Adding Disposable to classes not listed (PlatformCookieManager, etc.): those are platform interfaces, not public wrappers
+- Integration tests on real devices: no integration_test/ dir exists yet; unit tests use fakes per profile conventions
 
 ## Verification commands
 
-Copied verbatim from `.specify/memory/tdd-profile.md` (the `zikzak_inappwebview`
-umbrella stack) at planning time, so this file is readable on its own:
+Copied verbatim from `.specify/memory/tdd-profile.md` at planning time, so this file is readable on its own:
 
-- Single test: `flutter test --plain-name "{name}"`
+- Single test: `flutter test {file} --plain-name "{name}"`
 - Full suite: `flutter test`
 - Coverage: `flutter test --coverage`
-
-> **Baseline caveat:** the umbrella `zikzak_inappwebview` suite is **blocked** by
-> the corrupted `zuraffa` package in the pub cache (compile/load crash, not a red
-> suite). These commands will not run until `flutter pub cache repair` is executed.
-> `A1`, `A2`, `A4` are marked DONE because the existing tests
-> (`headless_dispose_test.dart`, `disposable_pattern_test.dart`) assert those
-> behaviors and the source already implements the contract — but this is based on
-> the test files' presence, not a live green run (the suite could not be executed).
+- Mutation: null (not available in this stack)

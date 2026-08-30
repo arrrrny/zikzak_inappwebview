@@ -25,14 +25,12 @@ class HeadlessInAppWebView implements Disposable {
   /// Implementation of [PlatformHeadlessInAppWebView] for the current platform.
   final PlatformHeadlessInAppWebView platform;
 
-  bool _disposed = false;
-
-  /// Indicates if this headless WebView has been disposed.
+  /// Whether [dispose] has been invoked at least once.
   ///
-  /// Becomes `true` after the first call to [dispose]; subsequent calls are
-  /// no-ops, which prevents double-dispose crashes (e.g. when a user disposes
-  /// manually and the widget tree also disposes).
-  bool get disposed => _disposed;
+  /// Set synchronously at the start of [dispose] so callers and the idempotency
+  /// guard (spec 013) can reason about lifecycle state without awaiting the
+  /// platform teardown.
+  bool _disposed = false;
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformHeadlessInAppWebView.id}
   String get id => platform.id;

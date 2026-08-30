@@ -3,229 +3,206 @@ feature: 001-screenshot-pdf-export
 loop: outside-in
 profile: .specify/memory/tdd-profile.md
 spec_criteria: 12
-planned_at: f349d421
-updated_at: f349d421
+planned_at: abfa842e
+updated_at: 651c4533
 suite_baseline: green
 ---
 
 # Test List: Screenshot and PDF Export
 
-Trace ids used below:
-
-- `US<n>-AS<m>` — acceptance scenario *m* of User Story *n* in `spec.md`
-  (spec.md numbers its scenarios per story rather than with global `AC-` ids).
-- `FR-0nn`, `SC-0nn` — functional requirement / success criterion ids in `spec.md`.
-
 ## Outer loop: acceptance behaviors
 
-One per acceptance criterion in `spec.md`. The real entry point reachable from
-`flutter_test` is the platform controller's public Dart API over a mocked
-`MethodChannel` (`MethodChannel(...).setMockMethodCallHandler`, per the profile's
-platform-package convention). Behaviors whose observable result is the *content*
-of natively rendered bytes (real PNG/JPEG pixels, real A4 page geometry) are
-`BLOCKED`: the profile records `acceptance: null` and the only e2e layer
-(`zikzak_inappwebview/example/integration_test`) needs a device/emulator.
+One per acceptance criterion in `spec.md`. Each stays red until the feature works end to end through its real entry point.
 
-| id  | behavior                                                                                              | traces           | kind    | state                                                       | test |
-| --- | ----------------------------------------------------------------------------------------------------- | ---------------- | ------- | ----------------------------------------------------------- | ---- |
-| A1  | Calling `takeScreenshot()` on a macOS controller yields the non-null `Uint8List` the platform returned | US1-AS1, FR-001  | example | PENDING                                                     |      |
-| A2  | A macOS `takeScreenshot(ScreenshotConfiguration(JPEG, quality 80))` reaches the platform with `compressFormat: jpeg` and `quality: 80` and yields its bytes | US1-AS2, FR-002 | example | PENDING |      |
-| A3  | A macOS `takeScreenshot` with a source rect reaches the platform with that rect and yields only the cropped bytes | US1-AS3, FR-002 | example | PENDING |      |
-| A4  | The rendered macOS screenshot pixels visually match the loaded page                                   | US1-AS1, SC-001  | example | BLOCKED — needs a real macOS host; profile `acceptance: null` |      |
-| A5  | Calling `createPdf()` on an Android controller yields the non-null `Uint8List` the platform returned   | US2-AS1, FR-003, FR-005 | example | PENDING                                            |      |
-| A6  | An Android `createPdf(PDFConfiguration(A4))` reaches the platform with the A4 page size and yields its bytes | US2-AS2, FR-004 | example | PENDING                                              |      |
-| A7  | The generated Android PDF has A4 page dimensions and contains all multi-page content                    | US2-AS2, SC-002  | example | BLOCKED — needs an Android device/emulator; profile `acceptance: null` |      |
-| A8  | Calling `createPdf()` on a Linux controller yields the non-null `Uint8List` the platform returned      | US3-AS1, FR-003, FR-007 | example | PENDING                                            |      |
-| A9  | A Linux `createPdf(PDFConfiguration(...))` reaches the platform with the serialized configuration and yields its bytes | US3-AS2, FR-004 | example | PENDING                              |      |
-| A10 | Calling `takeScreenshot()` on a Linux controller yields the non-null `Uint8List` the platform returned | US4-AS1, FR-008  | example | PENDING                                                     |      |
-| A11 | A Linux `takeScreenshot(ScreenshotConfiguration(...))` reaches the platform with format, quality and rect and yields its bytes | US4-AS2, FR-002 | example | PENDING                          |      |
-| A12 | Calling `takeScreenshot()` on an iOS controller with no configuration still yields the platform's bytes and sends a `null` configuration argument | US5-AS1, SC-004 | example | PENDING                     |      |
-| A13 | Calling `createPdf()` on an iOS controller yields the non-null `Uint8List` the platform returned       | US5-AS2, SC-004  | example | PENDING                                                     |      |
-| A14 | An iOS `createPdf()` rejected by the native side below the minimum OS version surfaces the platform's error message rather than a bare crash | US5-AS3 | example | PENDING                    |      |
-| A15 | `takeScreenshot()` and `createPdf()` each yield `null` on Windows and on Web instead of throwing `UnimplementedError` | FR-009, SC-005 | example | PENDING                                |      |
-| A16 | `takeScreenshot()` and `createPdf()` each yield `null` when the platform reports no loaded content, without throwing | FR-010 | example | PENDING                                    |      |
-| A17 | The deprecated `IOSInAppWebViewController` facade forwards both `createPdf` and `takeScreenshot` to the underlying controller and returns its bytes | FR-011 | example | BLOCKED — umbrella `zikzak_inappwebview` suite is blocked (zuraffa pub-cache corruption — run `flutter pub cache repair`) |      |
+| id  | behavior                                                    | traces | kind    | state   | test                                        |
+| --- | ----------------------------------------------------------- | ------ | ------- | ------- | ------------------------------------------- |
+| A1  | macOS takeScreenshot returns non-null Uint8List with valid PNG image data | US1-AC1 | example | DONE    | zikzak_inappwebview/example/integration_test/macos_take_screenshot_test.dart › A1 macOS takeScreenshot returns non-null valid PNG image bytes |
+| A2  | macOS takeScreenshot with JPEG format and quality 80 returns valid JPEG byte buffer | US1-AC2 | example | DONE    | zikzak_inappwebview/example/integration_test/macos_take_screenshot_test.dart › A2 macOS takeScreenshot with JPEG format and quality 80 returns valid JPEG bytes |
+| A3  | macOS takeScreenshot with rect captures only specified portion of the view | US1-AC3 | example | DONE    | zikzak_inappwebview/example/integration_test/macos_take_screenshot_test.dart › A3 macOS takeScreenshot with rect captures only the specified portion of the view |
+| A4  | Android createPdf returns non-null Uint8List with valid PDF data | US2-AC1 | example | DONE    | zikzak_inappwebview/example/integration_test/android_create_pdf_test.dart › A4 Android createPdf returns non-null valid PDF bytes |
+| A5  | Android createPdf with A4 page size produces PDF with A4 dimensions and all content across pages | US2-AC2 | example | DONE    | zikzak_inappwebview/example/integration_test/android_create_pdf_test.dart › A5 Android createPdf with A4 page size produces A4 pages with all content |
+| A6  | Linux createPdf returns non-null Uint8List with valid PDF data | US3-AC1 | example | PENDING |                                             |
+| A7  | Linux createPdf with PDFConfiguration respects configuration options in generated PDF | US3-AC2 | example | PENDING |                                             |
+| A8  | Linux takeScreenshot returns non-null Uint8List with valid image data | US4-AC1 | example | PENDING |                                             |
+| A9  | Linux takeScreenshot with ScreenshotConfiguration respects format, quality, and rect options | US4-AC2 | example | PENDING |                                             |
+| A10 | iOS takeScreenshot with default configuration returns valid PNG image byte buffer | US5-AC1 | example | DONE    | zikzak_inappwebview/example/integration_test/ios_take_screenshot_test.dart › A10 iOS takeScreenshot with default configuration returns valid PNG image bytes |
+| A11 | iOS createPdf on iOS 14.0+ returns valid PDF byte buffer | US5-AC2 | example | DONE    | zikzak_inappwebview/example/integration_test/ios_create_pdf_test.dart › A11 iOS createPdf on iOS 14.0+ returns valid PDF byte buffer |
+| A12 | iOS createPdf on iOS 13.x (below minimum) fails gracefully with clear error message | US5-AC3 | example | BLOCKED | blocked: no iOS 13.x runtime in this environment (only iOS 26.3 simulator available); contract covered by the native `FlutterError` guard in `WebViewChannelDelegate.swift` + unit behavior U44 (Dart propagation) |
+| A13 | Android takeScreenshot returns non-null Uint8List with valid PNG image data | FR-001, US1-parity | example | DONE    | zikzak_inappwebview/example/integration_test/android_take_screenshot_test.dart › A13 Android takeScreenshot returns non-null valid PNG image bytes |
+| A14 | Android takeScreenshot with rect captures only the specified portion of the view | FR-002 | example | DONE    | zikzak_inappwebview/example/integration_test/android_take_screenshot_test.dart › A14 Android takeScreenshot with rect captures only the specified portion of the view |
 
 ## Inner loop: unit behaviors
 
-Grouped by the component from `plan.md` that owns them. `plan.md` lists the
-configuration types under `lib/src/types/`; their real location in this tree is
-`lib/src/domain/entities/{screenshot,pdf}_configuration/` — paths below are the
-real ones.
+Grouped by the component from `plan.md` that owns them. Each line names one observable result.
 
-The profile records no property or mutation library, so every invariant
-(round-trip, idempotence, ordering) is `kind: example`, sampled at its boundaries.
+### `zikzak_inappwebview_macos/macos/Classes/InAppWebView.swift`
+
+| id  | behavior                                                  | traces     | kind     | state   | test                                   |
+| --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
+| U1  | Native Swift handler for takeScreenshot method channel call uses WKWebView.takeSnapshot with WKSnapshotConfiguration | US1, FR-006 | example  | PENDING |                                        |
+| U2  | Swift handler converts NSImage to PNG bytes when compressFormat is PNG | US1-AC1 | example  | PENDING |                                        |
+| U3  | Swift handler converts NSImage to JPEG bytes with specified quality when compressFormat is JPEG | US1-AC2 | example  | PENDING |                                        |
+| U4  | Swift handler applies rect cropping from ScreenshotConfiguration to WKSnapshotConfiguration | US1-AC3 | example  | PENDING |                                        |
+| U5  | Swift handler returns null gracefully when web content is not loaded | FR-010 | example  | PENDING |                                        |
 
 ### `zikzak_inappwebview_macos/lib/src/in_app_webview/in_app_webview_controller.dart`
 
-| id  | behavior                                                                                     | traces          | kind    | state   | test |
-| --- | -------------------------------------------------------------------------------------------- | --------------- | ------- | ------- | ---- |
-| U1  | Invokes the `takeScreenshot` channel method exactly once per call                            | US1-AS1, FR-001 | example | PENDING |      |
-| U2  | Sends `screenshotConfiguration` as `null` when no configuration is given                     | FR-002          | example | PENDING |      |
-| U3  | Sends the configuration's `toMap()` when a configuration is given                            | FR-002          | example | PENDING |      |
-| U4  | Returns `null` when the channel returns `null`                                               | FR-010          | example | PENDING |      |
-| U5  | Returns `null` rather than rethrowing when the channel raises a `PlatformException`           | FR-010          | example | PENDING |      |
-| U6  | Existing `createPdf` behavior on macOS is unchanged by the screenshot addition               | SC-004          | example | PENDING |      |
+| id  | behavior                                                  | traces     | kind     | state   | test                                   |
+| --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
+| U6  | Dart takeScreenshot override invokes method channel 'takeScreenshot' with screenshotConfiguration.toMap() | US1, FR-006 | example  | DONE    | test/screenshot_pdf_delegation_test.dart › U6 takeScreenshot delegates to platform with the screenshotConfiguration |                                        |
+| U7  | Dart override returns the Uint8List from channel or null on failure | US1, FR-010 | example  | DONE    | test/screenshot_pdf_delegation_test.dart › U7 takeScreenshot returns the platform Uint8List or null |                                        |
+
+### `zikzak_inappwebview_android/android/src/.../webview/in_app_webview/InAppWebView.java`
+
+| id  | behavior                                                  | traces     | kind     | state   | test                                   |
+| --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
+| U8  | Native Java createPdf uses WebView.createPrintDocumentAdapter and PdfDocument to generate PDF bytes | US2, FR-005 | example  | PENDING |                                        |
+| U9  | Java createPdf applies page size from PDFConfiguration via PrintAttributes.MediaSize | US2-AC2 | example  | PENDING |                                        |
+| U10 | Java createPdf applies orientation and margins from PDFConfiguration | US2-AC2 | example  | PENDING |                                        |
+| U11 | Java createPdf writes PDF to temp file in cache dir, reads bytes, returns via channel, cleans up file | US2, FR-010 | example  | PENDING |                                        |
+| U12 | Java createPdf returns null gracefully when web content is not loaded | FR-010 | example  | PENDING |                                        |
+
+### `zikzak_inappwebview_android/android/src/.../webview/WebViewChannelDelegateMethods.java`
+
+| id  | behavior                                                  | traces     | kind     | state   | test                                   |
+| --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
+| U13 | WebViewChannelDelegateMethods enum includes CREATE_PDF entry | US2 | example  | PENDING |                                        |
+
+### `zikzak_inappwebview_android/android/src/.../webview/InAppWebViewInterface.java`
+
+| id  | behavior                                                  | traces     | kind     | state   | test                                   |
+| --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
+| U14 | InAppWebViewInterface declares createPdf method signature | US2 | example  | PENDING |                                        |
+
+### `zikzak_inappwebview_android/android/src/.../webview/WebViewChannelDelegate.java`
+
+| id  | behavior                                                  | traces     | kind     | state   | test                                   |
+| --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
+| U15 | WebViewChannelDelegate switch handles CREATE_PDF case and dispatches to webView.createPdf() | US2 | example  | PENDING |                                        |
 
 ### `zikzak_inappwebview_android/lib/src/in_app_webview/in_app_webview_controller.dart`
 
-| id  | behavior                                                                                          | traces          | kind             | state    | test |
-| --- | ------------------------------------------------------------------------------------------------- | --------------- | ---------------- | -------- | ---- |
-| U7  | Current disabled `createPdf` returns `null` without touching the channel (pre-change behavior)     | FR-005          | characterization | BASELINE |      |
-| U8  | Invokes the `createPdf` channel method exactly once per call                                      | US2-AS1, FR-003 | example          | PENDING  |      |
-| U9  | Sends `pdfConfiguration` as `null` when no configuration is given                                  | FR-004          | example          | PENDING  |      |
-| U10 | Sends the configuration's `toMap()` when a configuration is given                                  | US2-AS2, FR-004 | example          | PENDING  |      |
-| U11 | Returns `null` when the channel returns `null`                                                     | FR-010          | example          | PENDING  |      |
-| U12 | Returns `null` rather than rethrowing when the channel raises a `PlatformException`                | FR-010          | example          | PENDING  |      |
-| U13 | Existing `takeScreenshot` behavior on Android is unchanged by the PDF change                       | SC-004          | example          | PENDING  |      |
+| id  | behavior                                                  | traces     | kind     | state   | test                                   |
+| --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
+| U16 | Dart createPdf override invokes method channel 'createPdf' with pdfConfiguration.toMap() | US2, FR-005 | example  | DONE    | zikzak_inappwebview_android/test/in_app_webview/android_screenshot_pdf_delegation_test.dart › U16 createPdf delegates to channel with pdfConfiguration.toJson() |
+| U17 | Dart override returns the Uint8List from channel or null on failure | US2, FR-010 | example  | DONE    | zikzak_inappwebview_android/test/in_app_webview/android_screenshot_pdf_delegation_test.dart › U17 createPdf returns the channel Uint8List or null |
+
+### `zikzak_inappwebview_linux/linux/in_app_webview.cc`
+
+| id  | behavior                                                  | traces     | kind     | state   | test                                   |
+| --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
+| U18 | Native C createPdf handler (existing) parses pdfConfiguration arguments and uses WebKitPrintOperation | US3 | characterization | BASELINE |                                        |
+| U19 | Native C createPdf applies pageSize, orientation, margins from PDFConfiguration via GtkPrintSettings | US3-AC2 | example  | PENDING |                                        |
+| U20 | Native C takeScreenshot handler uses webkit_web_view_get_snapshot() to obtain cairo_surface_t | US4, FR-008 | example  | PENDING |                                        |
+| U21 | Native C takeScreenshot converts cairo surface to PNG bytes when compressFormat is PNG | US4-AC1 | example  | PENDING |                                        |
+| U22 | Native C takeScreenshot converts cairo surface to JPEG bytes with quality when compressFormat is JPEG | US4-AC2 | example  | PENDING |                                        |
+| U23 | Native C takeScreenshot applies rect cropping from ScreenshotConfiguration | US4-AC2 | example  | PENDING |                                        |
+| U24 | Native C handlers return null gracefully when web content is not loaded | FR-010 | example  | PENDING |                                        |
 
 ### `zikzak_inappwebview_linux/lib/src/in_app_webview/in_app_webview_controller.dart`
 
-| id  | behavior                                                                                            | traces          | kind             | state    | test |
-| --- | --------------------------------------------------------------------------------------------------- | --------------- | ---------------- | -------- | ---- |
-| U14 | Current controller surface for `createPdf`/`takeScreenshot` before wiring (pre-change behavior)     | FR-007, FR-008  | characterization | BASELINE |      |
-| U15 | Invokes the `createPdf` channel method exactly once per call                                        | US3-AS1, FR-007 | example          | PENDING  |      |
-| U16 | Sends the PDF configuration's `toMap()`, or `null` when absent                                      | US3-AS2, FR-004 | example          | PENDING  |      |
-| U17 | Invokes the `takeScreenshot` channel method exactly once per call                                   | US4-AS1, FR-008 | example          | PENDING  |      |
-| U18 | Sends the screenshot configuration's `toMap()`, or `null` when absent                               | US4-AS2, FR-002 | example          | PENDING  |      |
-| U19 | Returns `null` when either channel call returns `null`                                              | FR-010          | example          | PENDING  |      |
-| U20 | Returns `null` rather than rethrowing when either channel call raises a `PlatformException`          | FR-010          | example          | PENDING  |      |
+| id  | behavior                                                  | traces     | kind     | state   | test                                   |
+| --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
+| U25 | Dart createPdf override invokes method channel 'createPdf' with pdfConfiguration.toMap() | US3 | example  | DONE    | zikzak_inappwebview_linux/test/in_app_webview/screenshot_pdf_delegation_test.dart › U25 createPdf delegates to channel with pdfConfiguration.toJson() |
+| U26 | Dart takeScreenshot override invokes method channel 'takeScreenshot' with screenshotConfiguration.toMap() | US4 | example  | DONE    | zikzak_inappwebview_linux/test/in_app_webview/screenshot_pdf_delegation_test.dart › U26 takeScreenshot delegates to channel with screenshotConfiguration.toJson() |
+| U27 | Dart overrides return Uint8List from channel or null on failure | US3, US4, FR-010 | example  | DONE    | zikzak_inappwebview_linux/test/in_app_webview/screenshot_pdf_delegation_test.dart › U27 overrides return the channel Uint8List or null |
+
+### `zikzak_inappwebview_ios/ios/Classes/InAppWebView/InAppWebView.swift`
+
+| id  | behavior                                                  | traces     | kind     | state   | test                                   |
+| --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
+| U28 | iOS takeScreenshot implementation intact: uses WKWebView.takeSnapshot with WKSnapshotConfiguration | US5-AC1 | characterization | BASELINE |                                        |
+| U29 | iOS createPdf implementation intact: uses WKWebView.createPDF with WKPDFConfiguration | US5-AC2 | characterization | BASELINE |                                        |
+| U30 | iOS createPdf returns null on iOS 13.x (below @available iOS 14.0) | US5-AC3 | characterization | BASELINE |                                        |
 
 ### `zikzak_inappwebview_ios/lib/src/in_app_webview/in_app_webview_controller.dart`
 
-| id  | behavior                                                                                     | traces          | kind    | state   | test |
-| --- | -------------------------------------------------------------------------------------------- | --------------- | ------- | ------- | ---- |
-| U21 | `takeScreenshot` invokes the channel and returns its bytes unmodified                        | US5-AS1, SC-004 | example | PENDING |      |
-| U22 | `createPdf` invokes the channel and returns its bytes unmodified                             | US5-AS2, SC-004 | example | PENDING |      |
-| U23 | A `PlatformException` from `createPdf` (unsupported OS version) surfaces its message to the caller | US5-AS3   | example | PENDING |      |
+| id  | behavior                                                  | traces     | kind     | state   | test                                   |
+| --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
+| U31 | iOS takeScreenshot Dart override invokes method channel correctly (line 1910) | US5-AC1 | characterization | BASELINE |                                        |
+| U32 | iOS createPdf Dart override invokes method channel correctly (line 2528) | US5-AC2 | characterization | BASELINE |                                        |
+| U44 | iOS Dart createPdf propagates the native clear `UNSUPPORTED_IOS_VERSION` PlatformException (instead of silently returning null) when the platform reports iOS < 14 | US5-AC3 | example | DONE    | zikzak_inappwebview_ios/test/in_app_webview/ios_screenshot_pdf_delegation_test.dart › U44 createPdf propagates a clear UNSUPPORTED_IOS_VERSION error instead of silently returning null |
 
-### `zikzak_inappwebview_windows/lib/src/in_app_webview_windows_controller.dart`
+### `zikzak_inappwebview_ios/ios/Classes/InAppWebView/WebViewChannelDelegate.swift`
 
-| id  | behavior                                                       | traces          | kind    | state   | test |
-| --- | -------------------------------------------------------------- | --------------- | ------- | ------- | ---- |
-| U24 | `takeScreenshot` returns `null` and never throws               | FR-009, SC-005  | example | PENDING |      |
-| U25 | `createPdf` returns `null` and never throws                    | FR-009, SC-005  | example | PENDING |      |
-
-### `zikzak_inappwebview_web/lib/src/in_app_webview_web_controller.dart`
-
-| id  | behavior                                                                              | traces         | kind             | state    | test |
-| --- | ------------------------------------------------------------------------------------- | -------------- | ---------------- | -------- | ---- |
-| U26 | Current web controller surface for `takeScreenshot`/`createPdf` (pre-change behavior)  | FR-009         | characterization | BASELINE |      |
-| U27 | `takeScreenshot` returns `null` and never throws                                      | FR-009, SC-005 | example          | PENDING  |      |
-| U28 | `createPdf` returns `null` and never throws                                           | FR-009, SC-005 | example          | PENDING  |      |
+| id  | behavior                                                  | traces     | kind     | state   | test                                   |
+| --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
+| U33 | WebViewChannelDelegate dispatches takeScreenshot and createPdf correctly | US5 | characterization | BASELINE |                                        |
 
 ### `zikzak_inappwebview/lib/src/in_app_webview/apple/in_app_webview_controller.dart`
 
-| id  | behavior                                                                       | traces | kind             | state    | test |
-| --- | ------------------------------------------------------------------------------ | ------ | ---------------- | -------- | ---- |
-| U29 | Current `createPdf` forwarding of the deprecated Apple facade (pre-change)      | FR-011 | characterization | BASELINE — umbrella suite blocked (zuraffa pub-cache corruption) |      |
-| U30 | `takeScreenshot` forwards to the wrapped controller and returns its bytes       | FR-011 | example          | BLOCKED — umbrella suite blocked (zuraffa pub-cache corruption)  |      |
-
-### `zikzak_inappwebview_platform_interface/lib/src/domain/entities/screenshot_configuration/screenshot_configuration.dart`
-
-| id  | behavior                                                                                        | traces | kind    | state   | test |
-| --- | ----------------------------------------------------------------------------------------------- | ------ | ------- | ------- | ---- |
-| U31 | `toMap()` emits every field the platforms read: `compressFormat`, `quality`, `rect`, `snapshotWidth`, `afterScreenUpdates` | FR-002 | example | PENDING |      |
-| U32 | A configuration survives a `toMap()` → `fromMap()` round trip unchanged, sampled at quality `0` and `100` | FR-002 | example | PENDING |      |
-| U33 | `quality: 0` is preserved rather than dropped as a falsy value (lower boundary)                  | FR-002 | example | PENDING |      |
-| U34 | `quality: 100` is preserved (upper boundary)                                                     | FR-002 | example | PENDING |      |
-| U35 | A `null` rect is emitted as an absent/`null` map entry, not as a zero rect                       | FR-002 | example | PENDING |      |
-
-### `zikzak_inappwebview_platform_interface/lib/src/domain/entities/pdf_configuration/pdf_configuration.dart`
-
-| id  | behavior                                                                     | traces | kind    | state   | test |
-| --- | ---------------------------------------------------------------------------- | ------ | ------- | ------- | ---- |
-| U36 | `toMap()` emits `rect`, `pageSize`, `orientation` and `margins`              | FR-004 | example | PENDING |      |
-| U37 | A configuration survives a `toMap()` → `fromMap()` round trip unchanged      | FR-004 | example | PENDING |      |
-| U38 | Zero margins are preserved rather than dropped (lower boundary)              | FR-004 | example | PENDING |      |
-| U39 | Landscape orientation serializes distinctly from portrait                     | FR-004 | example | PENDING |      |
+| id  | behavior                                                  | traces     | kind     | state   | test                                   |
+| --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
+| U34 | Deprecated IOSInAppWebViewController forwards takeScreenshot to platform controller | FR-011 | example  | DONE    | test/screenshot_pdf_delegation_test.dart › U34 deprecated IOSInAppWebViewController forwards takeScreenshot to its platform controller |                                        |
+| U35 | Deprecated facade forwards createPdf correctly (existing) | FR-011 | characterization | BASELINE |                                        |
 
 ### `zikzak_inappwebview_platform_interface/lib/src/in_app_webview/platform_inappwebview_controller.dart`
 
-| id  | behavior                                                                                                     | traces         | kind    | state   | test |
-| --- | ------------------------------------------------------------------------------------------------------------ | -------------- | ------- | ------- | ---- |
-| U40 | The default `takeScreenshot`/`createPdf` implementations of the abstract controller are overridable and their signatures accept an optional configuration and return `Future<Uint8List?>` | FR-001, FR-003 | example | PENDING |      |
+| id  | behavior                                                  | traces     | kind     | state   | test                                   |
+| --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
+| U36 | Platform interface declares takeScreenshot and createPdf abstract methods with correct signatures | FR-001, FR-003 | characterization | BASELINE |                                        |
+| U37 | Platform interface @endtemplate doc comments reflect macOS screenshot and Android/Linux PDF availability | T024 | example  | PENDING |                                        |
+
+### `zikzak_inappwebview_windows/lib/src/in_app_webview_windows_controller.dart`
+
+| id  | behavior                                                  | traces     | kind     | state   | test                                   |
+| --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
+| U38 | Windows takeScreenshot override returns null without throwing | FR-009 | example  | DONE    | zikzak_inappwebview_windows/test/screenshot_pdf_delegation_test.dart › U38 takeScreenshot returns null without throwing |
+
+### `zikzak_inappwebview_web/lib/src/in_app_webview_web_controller.dart`
+
+| id  | behavior                                                  | traces     | kind     | state   | test                                   |
+| --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
+| U39 | Web takeScreenshot override returns null without throwing | FR-009 | example  | DONE    | zikzak_inappwebview_web/test/screenshot_pdf_delegation_test.dart › U39 takeScreenshot returns null without throwing |
+
+### `zikzak_inappwebview_macos/macos/Classes/InAppWebView.swift` (createPdf verification)
+
+| id  | behavior                                                  | traces     | kind     | state   | test                                   |
+| --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
+| U40 | macOS createPdf implementation intact: uses WKWebView.createPDF with WKPDFConfiguration | T021 | characterization | BASELINE |                                        |
+
+### `zikzak_inappwebview_android/lib/src/in_app_webview/in_app_webview_controller.dart` (takeScreenshot verification)
+
+| id  | behavior                                                  | traces     | kind     | state   | test                                   |
+| --- | --------------------------------------------------------- | ---------- | -------- | ------- | -------------------------------------- |
+| U41 | Android takeScreenshot implementation intact: Dart override and Java handler exist and work | T022 | characterization | DONE    | zikzak_inappwebview_android/test/in_app_webview/android_screenshot_pdf_delegation_test.dart › U41 Android takeScreenshot delegates screenshotConfiguration and returns the channel bytes or null |
 
 ## Invariants and edge cases still to place
 
-Each must become a numbered line above before the feature is done, or be dropped
-with a reason. These come from `spec.md` "Edge Cases" and have no owning
-component in `plan.md` yet:
+Behaviors that belong to the feature but do not yet have a home component. Each must become a numbered line above before the feature is done, or be dropped with a reason.
 
-- A call made before the page finished loading must resolve (with bytes or `null`), never hang.
-- A view with zero width or height must yield `null` rather than an invalid buffer.
-- A `HeadlessInAppWebView` must serve both calls through the same controller contract.
-- A call still in flight when the webview is disposed must resolve or fail cleanly, not crash.
-- Repeated `takeScreenshot` calls with identical configuration must be idempotent in configuration sent (byte equality is not asserted — rendering may differ).
-- Content extending beyond the viewport: no requirement fixes the expected result; needs a spec decision before a test.
-- Very large Android content (OOM risk) — no measurable requirement in `spec.md`.
-- Transparent backgrounds in PNG output — no requirement in `spec.md`.
+- Both takeScreenshot and createPdf return null when called before web page has finished loading (Edge case 1)
+- Both return null when InAppWebView has zero width/height (not yet laid out) (Edge case 2)
+- takeScreenshot handles scrollable content beyond visible viewport (Edge case 3)
+- createPdf handles WebGL/canvas/dynamic content that hasn't fully rendered (Edge case 4)
+- Both methods behave correctly on HeadlessInAppWebView (Edge case 6)
+- createPdf handles very large web content on Android without OOM (Edge case 7)
+- takeScreenshot handles transparent backgrounds in web content for PNG (Edge case 8)
+- Both methods handle webview disposal while call is in flight (Edge case 9)
 
 ## Out of scope
 
-- Windows and Web implementations of screenshot/PDF: `spec.md` requires only a graceful `null` (FR-009); no capture behavior is specified.
-- Extending `ScreenshotConfiguration` / `PDFConfiguration` with new fields: excluded by the spec's Assumptions.
-- Native-side unit tests (Swift, Java, C): no native test harness exists in this repo; the profile records only `flutter_test`.
-- Performance thresholds SC-001 (<3s) and SC-002 (<5s): timing on real hardware, not reachable from `flutter_test`.
-- Golden/visual comparison of captured images: `flutter_test` goldens exist but no baseline images and no device rendering.
+Things a reader may expect on this list and the one-line reason they are absent.
+
+- Windows createPdf implementation: Windows is explicitly out of scope per spec.md assumptions
+- Web createPdf implementation: Web is explicitly out of scope per spec.md assumptions
+- Windows takeScreenshot implementation: Windows is explicitly out of scope per spec.md assumptions
+- Web takeScreenshot implementation: Web is explicitly out of scope per spec.md assumptions
+- Android screenshot on API < 21: min API is 21, no requirement below
+- Linux screenshot on non-WebKitGTK: only WebKitGTK backend supported
+- Performance benchmarking: measurable outcomes are success criteria, not test behaviors
+- PDF password protection/encryption: not in spec requirements
+- Screenshot video recording: not in spec requirements
 
 ## Verification commands
 
-Copied verbatim from `.specify/memory/tdd-profile.md` at planning time. Run each
-from that package's own directory (the stack's `cwd`).
+Copied verbatim from `.specify/memory/tdd-profile.md` at planning time, so this file is readable on its own:
 
-Default stack — `zikzak_inappwebview_platform_interface` (cwd `zikzak_inappwebview_platform_interface`):
-
-- Single test: `flutter test --plain-name "{name}"`
+- Single test: `flutter test {file} --plain-name "{name}"`
+- File tests: `flutter test {file}`
 - Full suite: `flutter test`
 - Coverage: `flutter test --coverage`
-
-`zikzak_inappwebview_macos` (cwd `zikzak_inappwebview_macos`):
-
-- Single test: `flutter test --plain-name "{name}"`
-- Full suite: `flutter test`
-- Coverage: `flutter test --coverage`
-
-`zikzak_inappwebview_android` (cwd `zikzak_inappwebview_android`):
-
-- Single test: `flutter test --plain-name "{name}"`
-- Full suite: `flutter test`
-- Coverage: `flutter test --coverage`
-
-`zikzak_inappwebview_ios` (cwd `zikzak_inappwebview_ios`):
-
-- Single test: `flutter test --plain-name "{name}"`
-- Full suite: `flutter test`
-- Coverage: `flutter test --coverage`
-
-`zikzak_inappwebview_linux` (cwd `zikzak_inappwebview_linux`):
-
-- Single test: `flutter test --plain-name "{name}"`
-- Full suite: `flutter test`
-- Coverage: `flutter test --coverage`
-
-`zikzak_inappwebview_windows` (cwd `zikzak_inappwebview_windows`):
-
-- Single test: `flutter test --plain-name "{name}"`
-- Full suite: `flutter test`
-- Coverage: `flutter test --coverage`
-
-`zikzak_inappwebview_web` (cwd `zikzak_inappwebview_web`):
-
-- Single test: `flutter test --plain-name "{name}"`
-- Full suite: `flutter test`
-- Coverage: `flutter test --coverage`
-
-Mutation: `null` in every stack — no mutation library in any `pubspec.lock`. Test
-strength is checked with a deliberate-mutant spot check instead, per the
-constitution.
-
-Notes:
-
-- `suite_baseline: green` refers to the default stack (300 passed, ~82s). The
-  macos/android/ios/linux/windows stacks are recorded green from smoke runs.
-- `zikzak_inappwebview` (umbrella) and `zikzak_inappwebview_module` are
-  **blocked**: zuraffa pub-cache corruption — run `flutter pub cache repair`.
-  A17, U29 and U30 live in the umbrella package and stay blocked until then.
-- `zikzak_inappwebview_web` has zero test files, so U26 is a characterization
-  baseline written before U27/U28 change anything.
+- Mutation: null (mutation_test package absent)
+- Acceptance: null (no integration_test/ dir in repo yet)
+- Property: null (glados absent)
+- Contract: null

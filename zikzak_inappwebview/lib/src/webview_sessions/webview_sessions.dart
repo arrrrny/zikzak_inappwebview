@@ -52,30 +52,52 @@ class WebViewSessions {
   CookieManager get _cookies =>
       _injectedCookieManager ?? (_cookieManager ??= CookieManager());
 
+  /// JS evaluator seam used by [save]/[load]. Injected for tests so the
+  /// controller can be omitted (no platform needed); in production it is
+  /// derived from the [InAppWebViewController] passed to those methods.
+  final Future<Object?> Function(String source)? _injectedEvaluator;
+
+  /// Clock used to stamp saved sessions. Injectable (defaults to
+  /// [DateTime.now]) so tests can assert the recorded timestamps deterministically.
+  final DateTime Function() _clock;
+
   /// Creates a sessions controller backed by [port].
-  WebViewSessions({required this.port, CookieManager? cookieManager})
-    : _injectedCookieManager = cookieManager;
+  ///
+  /// [cookieManager], [evaluateJavascript], and [clock] are injectable so the
+  /// controller-dependent paths can run without a live webview/platform and so
+  /// the recorded timestamps are deterministic under test (Finding #6 / T024).
+  WebViewSessions({
+    required this.port,
+    CookieManager? cookieManager,
+    Future<Object?> Function(String source)? evaluateJavascript,
+    DateTime Function()? clock,
+  }) : _injectedCookieManager = cookieManager,
+       _injectedEvaluator = evaluateJavascript,
+       _clock = clock ?? DateTime.now;
 
   // ── save ──────────────────────────────────────────────────────────────
 
   /// Saves the current session state of the webview behind [controller]
   /// under [sessionId] / [name] for [url].
   ///
-  /// Harvests cookies for [url] and the page's localStorage (key/value
-  /// pairs), maps them onto a [PortableSession] (origin = [url]'s origin),
-  /// and persists it through the [port]. Overwrites a previously saved
-  /// session with the same id.
+  /// Harvests cookies for [url] (FR-003) and the page's localStorage (FR-003,
+  /// FR-006) through [CookieManager] and JavaScript evaluation, maps them onto
+  /// a [PortableSession] (origin = [url]'s origin, FR-002/FR-003), and
+  /// persists it entirely through the [port] (FR-002 — no own storage format).
+  /// Overwrites a previously saved session with the same id (FR-001).
   Future<void> save(
-    InAppWebViewController controller, {
+    InAppWebViewController? controller, {
     required String sessionId,
     required String name,
     required WebUri url,
+    Future<Object?> Function(String source)? evaluateJavascript,
   }) async {
-    final now = DateTime.now().millisecondsSinceEpoch;
+    final evaluate =
+        evaluateJavascript ?? _injectedEvaluator ??
+        (source) => controller!.evaluateJavascript(source: source);
+    final now = _clock().millisecondsSinceEpoch;
     final cookies = await _cookies.getCookies(url: url);
-    final storage = await harvestLocalStorage(
-      (source) => controller.evaluateJavascript(source: source),
-    );
+    final storage = await harvestLocalStorage(evaluate);
 
     await port.save(
       PortableSession(
@@ -104,16 +126,30 @@ class WebViewSessions {
   /// Restores the session saved under [sessionId] into the webview behind
   /// [controller], for [url].
   ///
-  /// Re-applies cookies through the [CookieManager] and localStorage
-  /// entries through JavaScript. Returns `false` when no session is saved
-  /// under [sessionId] (never throws on missing sessions).
+  /// Re-applies cookies through the [CookieManager] (FR-004) and localStorage
+  /// entries through JavaScript (FR-004, FR-006). Returns `false` when no
+  /// session is saved under [sessionId] — never throws on a missing session
+  /// (FR-001, FR-004 / US1 scenario 3).
   Future<bool> load(
-    InAppWebViewController controller, {
+    InAppWebViewController? controller, {
     required String sessionId,
     required WebUri url,
+    Future<Object?> Function(String source)? evaluateJavascript,
   }) async {
+    final evaluate =
+        evaluateJavascript ?? _injectedEvaluator ??
+        (source) => controller!.evaluateJavascript(source: source);
     final session = await port.load(sessionId);
     if (session == null) return false;
+
+    // Reject sessions whose origin does not match the destination.
+    if (session.origin != _originOf(url)) return false;
+
+    // Clear destination-origin cookies and localStorage before restoring
+    // so that a previous session (B) does not retain entries from an
+    // earlier session (A) at the same origin.
+    await _cookies.deleteAllCookies();
+    await evaluate('window.localStorage.clear()');
 
     for (final entry in session.cookies) {
       await _cookies.setCookie(
@@ -132,10 +168,7 @@ class WebViewSessions {
         .where((entry) => entry.area == 'localStorage')
         .toList(growable: false);
     if (storage.isNotEmpty) {
-      await applyLocalStorage(
-        (source) => controller.evaluateJavascript(source: source),
-        storage,
-      );
+      await applyLocalStorage(evaluate, storage);
     }
     return true;
   }
@@ -150,10 +183,11 @@ class WebViewSessions {
 
   // ── cookie mapping ────────────────────────────────────────────────────
 
-  /// Maps a plugin [Cookie] into a portable [CookieEntry].
+  /// Maps a plugin [Cookie] into a portable [CookieEntry] (FR-005).
   ///
   /// The plugin's cookie value is `dynamic`; anything non-String is
-  /// stringified so the portable format stays plain JSON.
+  /// stringified so the portable format stays plain JSON. Null optionals fall
+  /// back to safe defaults (empty domain, `/` path, secure/httpOnly false).
   static CookieEntry toCookieEntry(Cookie cookie) => CookieEntry(
     name: cookie.name,
     value: cookie.value?.toString() ?? '',
@@ -167,20 +201,17 @@ class WebViewSessions {
   // ── localStorage via an evaluator closure ────────────────────────────
 
   /// Reads `window.localStorage` through [evaluate] (the webview's
-  /// `evaluateJavascript`) and returns its key/value pairs.
+  /// `evaluateJavascript`) and returns its key/value pairs (FR-003, FR-006).
   ///
-  /// A page with no localStorage yields an empty list; a failing
-  /// evaluation yields an empty list too (best-effort harvest, matching
-  /// zikzak_session's corrupt-session tolerance).
+  /// A page with no localStorage yields an empty list. An evaluation
+  /// failure propagates to the caller so that save operations can
+  /// report the error rather than silently persisting an incomplete
+  /// session.
   static Future<List<({String key, String value})>> harvestLocalStorage(
     Future<Object?> Function(String source) evaluate,
   ) async {
-    final dynamic raw;
-    try {
-      raw = await evaluate('JSON.stringify(window.localStorage)');
-    } catch (_) {
-      return const [];
-    }
+    final dynamic raw =
+        await evaluate('JSON.stringify(window.localStorage)');
     if (raw is! String || raw.isEmpty) return const [];
     final Object? decoded;
     try {
@@ -195,8 +226,8 @@ class WebViewSessions {
   }
 
   /// Re-applies [storage] entries through [evaluate] by setting each
-  /// localStorage key individually (avoids escaping pitfalls of one
-  /// concatenated script).
+  /// localStorage key individually (FR-004, FR-006 — avoids escaping pitfalls
+  /// of one concatenated script).
   static Future<void> applyLocalStorage(
     Future<Object?> Function(String source) evaluate,
     List<StorageEntry> storage,

@@ -109,6 +109,19 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     /// no effect on regular web views.
     var firstNavigationCompleted: (() -> Void)?
 
+    // MARK: - WebContent readiness gate (first-load race)
+    //
+    // A navigation issued while the WKWebView WebContent process is still
+    // booting is silently dropped (no didStart/didFinish/didFail — the
+    // navigation simply never happens). Mirror the macOS InAppWebView's gate:
+    // arm via evaluateJavaScript("true") (which WebKit queues until the
+    // WebContent process is fully up) and queue any early load until that
+    // completes, then flush. Without this, a loadData/loadUrl issued from
+    // onWebViewCreated (or the initial load) can be lost and the page never
+    // loads.
+    private var isWebContentReady = false
+    private var pendingFirstLoad: (() -> Void)?
+
 
     private static var sslCertificatesMap: [String: SslCertificate] = [:]  // [URL host name : SslCertificate]
     private static var credentialsProposed: [URLCredential] = []
@@ -178,6 +191,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         panGestureRecognizer = UIPanGestureRecognizer()
         panGestureRecognizer.delegate = self
         panGestureRecognizer.addTarget(self, action: #selector(endDraggingDetected))
+
+        // Arm the WebContent readiness gate so any load issued while the
+        // WebContent process is still booting is queued until it is ready.
+        armWebContentReadinessGate()
     }
 
     override public var frame: CGRect {
@@ -1179,42 +1196,51 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     }
 
     public func loadUrl(urlRequest: URLRequest, allowingReadAccessTo: URL?) {
-        isNavigatingWithCustomAction = true
-        let url = urlRequest.url!
+        performLoad { [weak self] in
+            guard let self = self else { return }
+            self.isNavigatingWithCustomAction = true
+            let url = urlRequest.url!
 
-        if #available(iOS 9.0, *), let allowingReadAccessTo = allowingReadAccessTo,
-            url.scheme == "file", allowingReadAccessTo.scheme == "file"
-        {
-            loadFileURL(url, allowingReadAccessTo: allowingReadAccessTo)
-        } else {
-            load(urlRequest)
+            if #available(iOS 9.0, *), let allowingReadAccessTo = allowingReadAccessTo,
+                url.scheme == "file", allowingReadAccessTo.scheme == "file"
+            {
+                self.loadFileURL(url, allowingReadAccessTo: allowingReadAccessTo)
+            } else {
+                self.load(urlRequest)
+            }
         }
     }
 
     public func postUrl(url: URL, postData: Data) {
-        var request = URLRequest(url: url)
+        performLoad { [weak self] in
+            guard let self = self else { return }
+            var request = URLRequest(url: url)
 
-        request.addValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-        request.httpMethod = "POST"
-        request.httpBody = postData
-        load(request)
+            request.addValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+            request.httpMethod = "POST"
+            request.httpBody = postData
+            self.load(request)
+        }
     }
 
     public func loadData(
         data: String, mimeType: String, encoding: String, baseUrl: URL, allowingReadAccessTo: URL?
     ) {
-        if #available(iOS 9.0, *), let allowingReadAccessTo = allowingReadAccessTo,
-            baseUrl.scheme == "file", allowingReadAccessTo.scheme == "file"
-        {
-            loadFileURL(baseUrl, allowingReadAccessTo: allowingReadAccessTo)
-        }
+        performLoad { [weak self] in
+            guard let self = self else { return }
+            if #available(iOS 9.0, *), let allowingReadAccessTo = allowingReadAccessTo,
+                baseUrl.scheme == "file", allowingReadAccessTo.scheme == "file"
+            {
+                self.loadFileURL(baseUrl, allowingReadAccessTo: allowingReadAccessTo)
+            }
 
-        if #available(iOS 9.0, *) {
-            load(
-                data.data(using: .utf8)!, mimeType: mimeType, characterEncodingName: encoding,
-                baseURL: baseUrl)
-        } else {
-            loadHTMLString(data, baseURL: baseUrl)
+            if #available(iOS 9.0, *) {
+                self.load(
+                    data.data(using: .utf8)!, mimeType: mimeType, characterEncodingName: encoding,
+                    baseURL: baseUrl)
+            } else {
+                self.loadHTMLString(data, baseURL: baseUrl)
+            }
         }
     }
 
@@ -1223,6 +1249,54 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             let assetURL = try Util.getUrlAsset(plugin: plugin, assetFilePath: assetFilePath)
             let urlRequest = URLRequest(url: assetURL)
             loadUrl(urlRequest: urlRequest, allowingReadAccessTo: nil)
+        }
+    }
+
+    // MARK: - WebContent readiness gate (first-load race)
+
+    private func debugLog(_ msg: String) {
+        print("ZIKZAK_DEBUG: \(msg)")
+    }
+
+    /// Runs a navigation, queuing it until the WebContent process is fully up.
+    ///
+    /// A `load` issued while the WKWebView WebContent process is still booting is
+    /// silently dropped (no didStart/didFinish/didFail — the navigation simply
+    /// never happens). `evaluateJavaScript` is queued by WebKit until the process
+    /// and its default JS context exist, so the readiness gate's completion is the
+    /// exact "process ready" signal. Until then we hold the latest load in
+    /// `pendingFirstLoad`; only the most recent is kept because a newer navigation
+    /// supersedes an earlier one.
+    private func performLoad(_ load: @escaping () -> Void) {
+        debugLog("PERFORM ready=\(isWebContentReady)")
+        if isWebContentReady {
+            load()
+        } else {
+            pendingFirstLoad = load
+        }
+    }
+
+    /// Arms the WebContent readiness gate. Mirrors the macOS InAppWebView and
+    /// `HeadlessInAppWebViewManager.run()`'s process-readiness ping:
+    /// `evaluateJavaScript("true")` is queued by WebKit until the WebContent
+    /// process is fully up, so its completion handler is the exact "process
+    /// ready" signal. Once ready we flush any load queued during init or from
+    /// onWebViewCreated — no timeout constant required.
+    private func armWebContentReadinessGate() {
+        debugLog("ARM gate")
+        self.evaluateJavaScript("true") { [weak self] (_, error) in
+            self?.debugLog("GATE_CB err=\(error?.localizedDescription ?? "nil")")
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.isWebContentReady = true
+                if let pending = self.pendingFirstLoad {
+                    self.pendingFirstLoad = nil
+                    debugLog("GATE_FLUSH")
+                    pending()
+                } else {
+                    debugLog("GATE_NO_PENDING")
+                }
+            }
         }
     }
 

@@ -72,7 +72,7 @@ A developer uses `dispose(isKeepAlive: true)` to release a controller's Dart-sid
 
 ### Functional Requirements
 
-- **FR-001**: The system MUST define a single `Disposable` interface with the signature `void dispose({bool isKeepAlive = false})` and use it as the canonical disposal contract.
+- **FR-001**: The system MUST define a single `Disposable` interface with the signature `void dispose({bool isKeepAlive = false})` and use it as the canonical disposal contract. The `void` return type means disposal is fire-and-forget when accessed through the `Disposable` interface; callers that need to observe completion (e.g. `HeadlessInAppWebView.dispose()` which returns `Future<void>`) must use the concrete type, not the interface.
 - **FR-002**: The system MUST ensure every public wrapper class that owns native or platform resources — at minimum `InAppWebViewController`, `InAppWebView`, `InAppLocalhostServer`, and `HeadlessInAppWebView` — declares `implements Disposable`.
 - **FR-003**: `InAppLocalhostServer` MUST expose a `dispose({bool isKeepAlive = false})` method that stops the server if running, releases its resources, and is idempotent.
 - **FR-004**: `HeadlessInAppWebView` MUST implement double-dispose protection such that `dispose()` is idempotent and safe whether it is called before `run()`, during `run()`, or after `run()` completes, with no resource leak in any of these states.

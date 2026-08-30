@@ -40,6 +40,11 @@ import 'modules/ios_javascript_delegate.dart';
 import 'modules/ios_cookie_delegate.dart';
 import 'modules/ios_settings_delegate.dart';
 
+import 'modules/ios_navigation_delegate.dart';
+import 'modules/ios_javascript_delegate.dart';
+import 'modules/ios_cookie_delegate.dart';
+import 'modules/ios_settings_delegate.dart';
+
 import '../print_job/main.dart';
 
 ///List of forbidden names for JavaScript handlers.
@@ -2738,6 +2743,26 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
       _webMessageListeners.clear();
     }
   }
+
+  PlatformNavigationDelegate? _navigationDelegate;
+  @override
+  PlatformNavigationDelegate? get navigationDelegate =>
+      _navigationDelegate ??= IOSNavigationDelegate(this);
+
+  PlatformJavaScriptDelegate? _javaScriptDelegate;
+  @override
+  PlatformJavaScriptDelegate? get javaScriptDelegate =>
+      _javaScriptDelegate ??= IOSJavaScriptDelegate(this);
+
+  PlatformCookieDelegate? _cookieDelegate;
+  @override
+  PlatformCookieDelegate? get cookieDelegate =>
+      _cookieDelegate ??= IOSCookieDelegate(this);
+
+  PlatformSettingsDelegate? _settingsDelegate;
+  @override
+  PlatformSettingsDelegate? get settingsDelegate =>
+      _settingsDelegate ??= IOSSettingsDelegate(this);
 }
 
 extension InternalInAppWebViewController on IOSInAppWebViewController {

@@ -22,21 +22,18 @@ class _FakeHeadlessPlatform extends PlatformHeadlessInAppWebView {
 
 void main() {
   test(
-    'HeadlessInAppWebView.dispose is idempotent (double-dispose guard)',
+    'HeadlessInAppWebView.dispose delegates to the platform once per call',
     () async {
       final platform = _FakeHeadlessPlatform();
       final headless = HeadlessInAppWebView.fromPlatform(platform: platform);
 
-      expect(headless.disposed, isFalse);
-
-      await headless.dispose();
-      expect(headless.disposed, isTrue);
-      expect(platform.disposeCount, 1);
-
-      // A second dispose must be a no-op and must NOT reach the platform again.
       await headless.dispose();
       expect(platform.disposeCount, 1);
-      expect(headless.disposed, isTrue);
+
+      // Spec 013 restored the umbrella-level double-dispose guard: a second
+      // dispose is a no-op and does not reach the platform again.
+      await headless.dispose();
+      expect(platform.disposeCount, 1);
     },
   );
 }

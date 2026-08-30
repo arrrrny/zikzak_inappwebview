@@ -1,9 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 import 'package:zikzak_session/zikzak_session.dart';
 
+import 'package:zikzak_inappwebview/src/cookie_manager.dart';
 import 'package:zikzak_inappwebview/src/webview_sessions/webview_sessions.dart';
 
 /// Spec `014-portable-sessions` — the sessions controller against the real
@@ -85,13 +87,16 @@ void main() {
       expect(harvested.first.value, 'token-1');
     });
 
-    test('a failing or empty evaluation yields an empty list', () async {
+    test('an evaluation failure propagates to the caller', () async {
       expect(
-        await WebViewSessions.harvestLocalStorage(
+        WebViewSessions.harvestLocalStorage(
           (_) async => throw StateError('no page'),
         ),
-        isEmpty,
+        throwsA(isA<StateError>()),
       );
+    });
+
+    test('an empty or non-Map evaluation yields an empty list', () async {
       expect(
         await WebViewSessions.harvestLocalStorage((_) async => ''),
         isEmpty,
@@ -249,12 +254,426 @@ void main() {
     );
   });
 
+  group('public save/load through the API (FR-002/FR-004/US1)', () {
+    test('save harvests cookies+storage and persists through the port', () async {
+      final fakeCookies = _FakeCookiePlatform()
+        ..cookies.add(
+          pluginCookie(
+            name: 'sid',
+            value: 'v1',
+            domain: '.example.com',
+            path: '/',
+            expiresDate: 1893456000000,
+          ),
+        );
+      final eval = _Eval({'auth': 'token-1'});
+      final s = WebViewSessions(
+        port: store,
+        cookieManager: CookieManager.fromPlatform(fakeCookies),
+        evaluateJavascript: eval.call,
+      );
+
+      await s.save(
+        null,
+        sessionId: 'browser-a',
+        name: 'Account A',
+        url: WebUri('https://app.example.com'),
+      );
+
+      final saved = await s.list();
+      expect(saved, hasLength(1));
+      expect(saved.first.id, 'browser-a');
+      expect(saved.first.cookies.single.name, 'sid');
+      expect(saved.first.cookies.single.value, 'v1');
+      expect(saved.first.storage.single.key, 'auth');
+      expect(saved.first.storage.single.value, 'token-1');
+    });
+
+    test('load re-applies cookies and localStorage onto the webview', () async {
+      final now = DateTime.now().millisecondsSinceEpoch;
+      final fakeCookies = _FakeCookiePlatform();
+      final eval = _Eval({});
+      final s = WebViewSessions(
+        port: store,
+        cookieManager: CookieManager.fromPlatform(fakeCookies),
+        evaluateJavascript: eval.call,
+      );
+
+      await store.save(
+        PortableSession(
+          id: 'browser-a',
+          name: 'Account A',
+          origin: 'https://app.example.com',
+          createdAt: now,
+          updatedAt: now,
+          cookies: [
+            CookieEntry(
+              name: 'sid',
+              value: 'v1',
+              domain: '.example.com',
+              path: '/',
+              secure: true,
+              httpOnly: false,
+            ),
+          ],
+          storage: [
+            StorageEntry(
+              key: 'auth',
+              value: 'token-1',
+              area: 'localStorage',
+              origin: 'https://app.example.com',
+            ),
+          ],
+        ),
+      );
+
+      final ok = await s.load(
+        null,
+        sessionId: 'browser-a',
+        url: WebUri('https://app.example.com'),
+      );
+
+      expect(ok, isTrue);
+      expect(fakeCookies.deleteAllCookiesCalls, equals(1),
+          reason: 'destination cookies cleared before restore');
+      expect(fakeCookies.setCalls, hasLength(1));
+      expect(fakeCookies.setCalls.single.name, 'sid');
+      expect(fakeCookies.setCalls.single.value, 'v1');
+      expect(
+        eval.scripts,
+        contains('window.localStorage.clear()'),
+        reason: 'localStorage cleared before restore',
+      );
+      expect(
+        eval.scripts,
+        contains('window.localStorage.setItem("auth", "token-1")'),
+      );
+    });
+
+    test('load reports not-found for an unknown session', () async {
+      final s = WebViewSessions(
+        port: store,
+        evaluateJavascript: (_) async => null,
+      );
+
+      expect(
+        await s.load(
+          null,
+          sessionId: 'nobody',
+          url: WebUri('https://app.example.com'),
+        ),
+        isFalse,
+      );
+    });
+  });
+
   group('port injection (FR-007)', () {
     test('any SessionPort implementation backs the controller', () {
       final custom = _InMemoryPort();
       final controller = WebViewSessions(port: custom);
 
       expect(controller.port, same(custom));
+    });
+  });
+
+  group('WebUri / Cookie types from platform_interface (FR-005 / T010)', () {
+    test('origin is taken from the WebUri passed to save, port included', () async {
+      final fakeCookies = _FakeCookiePlatform();
+      final eval = _Eval({});
+      final s = WebViewSessions(
+        port: store,
+        cookieManager: CookieManager.fromPlatform(fakeCookies),
+        evaluateJavascript: eval.call,
+      );
+      final url = WebUri('https://app.test:8443/login');
+
+      await s.save(null, sessionId: 'o1', name: 'O', url: url);
+
+      final saved = await store.load('o1');
+      expect(saved, isNotNull);
+      expect(saved!.origin, 'https://app.test:8443');
+    });
+
+    test('cookie mapping accepts a platform_interface Cookie with all fields', () {
+      final entry = WebViewSessions.toCookieEntry(
+        Cookie(
+          name: 'sid',
+          value: 'v2',
+          domain: 'app.test',
+          path: '/a',
+          expiresDate: 1893456000000,
+          isSecure: false,
+          isHttpOnly: true,
+        ),
+      );
+
+      expect(entry.name, 'sid');
+      expect(entry.value, 'v2');
+      expect(entry.domain, 'app.test');
+      expect(entry.path, '/a');
+      expect(entry.expiresAt, 1893456000000);
+      expect(entry.secure, isFalse);
+      expect(entry.httpOnly, isTrue);
+    });
+  });
+
+  group('save overwrite semantics (T025)', () {
+    test('saving the same id overwrites rather than duplicates', () async {
+      final now = DateTime.now().millisecondsSinceEpoch;
+      await store.save(
+        PortableSession(
+          id: 'dup',
+          name: 'First',
+          origin: 'https://d.test',
+          createdAt: now,
+          updatedAt: now,
+          cookies: [
+            CookieEntry(
+              name: 'a',
+              value: '1',
+              domain: 'd.test',
+              path: '/',
+              secure: false,
+              httpOnly: false,
+            ),
+          ],
+          storage: const [],
+        ),
+      );
+
+      final s = WebViewSessions(
+        port: store,
+        cookieManager: CookieManager.fromPlatform(
+          _FakeCookiePlatform()..cookies.add(pluginCookie(value: '2')),
+        ),
+        evaluateJavascript: _Eval({'k': 'v'}).call,
+      );
+      await s.save(
+        null,
+        sessionId: 'dup',
+        name: 'Second',
+        url: WebUri('https://d.test'),
+      );
+
+      final listed = await s.list();
+      expect(listed, hasLength(1), reason: 'same id overwrites, not duplicates');
+      expect(listed.first.name, 'Second');
+      expect(listed.first.cookies.single.value, '2');
+      expect(listed.first.storage.single.value, 'v');
+    });
+  });
+
+  group('load with empty cookies/storage (T026)', () {
+    test('returns true and applies nothing when the session has no data', () async {
+      final now = DateTime.now().millisecondsSinceEpoch;
+      await store.save(
+        PortableSession(
+          id: 'empty',
+          name: 'Empty',
+          origin: 'https://e.test',
+          createdAt: now,
+          updatedAt: now,
+          cookies: const [],
+          storage: const [],
+        ),
+      );
+
+      final fakeCookies = _FakeCookiePlatform();
+      final eval = _Eval({});
+      final s = WebViewSessions(
+        port: store,
+        cookieManager: CookieManager.fromPlatform(fakeCookies),
+        evaluateJavascript: eval.call,
+      );
+
+      final ok = await s.load(
+        null,
+        sessionId: 'empty',
+        url: WebUri('https://e.test'),
+      );
+
+      expect(ok, isTrue);
+      expect(fakeCookies.setCalls, isEmpty);
+      // Prior state is always cleared before restore, even for empty sessions.
+      expect(fakeCookies.deleteAllCookiesCalls, equals(1));
+      expect(eval.scripts, contains('window.localStorage.clear()'));
+    });
+  });
+
+  group('sequential A-then-B restore (data isolation)', () {
+    test('loading session B clears A-only cookies and localStorage', () async {
+      final now = DateTime.now().millisecondsSinceEpoch;
+
+      // Save session A with unique keys.
+      await store.save(
+        PortableSession(
+          id: 'profile-a',
+          name: 'Account A',
+          origin: 'https://app.example.com',
+          createdAt: now,
+          updatedAt: now,
+          cookies: [
+            CookieEntry(
+              name: 'a_cookie',
+              value: 'a-value',
+              domain: '.example.com',
+              path: '/',
+              secure: false,
+              httpOnly: false,
+            ),
+          ],
+          storage: [
+            StorageEntry(
+              key: 'a_key',
+              value: 'a-secret',
+              area: 'localStorage',
+              origin: 'https://app.example.com',
+            ),
+          ],
+        ),
+      );
+
+      // Save session B with different keys.
+      await store.save(
+        PortableSession(
+          id: 'profile-b',
+          name: 'Account B',
+          origin: 'https://app.example.com',
+          createdAt: now,
+          updatedAt: now,
+          cookies: [
+            CookieEntry(
+              name: 'b_cookie',
+              value: 'b-value',
+              domain: '.example.com',
+              path: '/',
+              secure: false,
+              httpOnly: false,
+            ),
+          ],
+          storage: [
+            StorageEntry(
+              key: 'b_key',
+              value: 'b-secret',
+              area: 'localStorage',
+              origin: 'https://app.example.com',
+            ),
+          ],
+        ),
+      );
+
+      final fakeCookies = _FakeCookiePlatform();
+      final eval = _Eval({});
+      final s = WebViewSessions(
+        port: store,
+        cookieManager: CookieManager.fromPlatform(fakeCookies),
+        evaluateJavascript: eval.call,
+      );
+
+      // Load session A first.
+      await s.load(null, sessionId: 'profile-a', url: WebUri('https://app.example.com'));
+      expect(fakeCookies.setCalls, hasLength(1));
+      expect(fakeCookies.setCalls.single.name, 'a_cookie');
+      expect(eval.scripts, contains('window.localStorage.setItem("a_key", "a-secret")'));
+
+      // Reset tracking.
+      fakeCookies.setCalls.clear();
+      eval.scripts.clear();
+
+      // Load session B — A's cookie and storage must not survive.
+      await s.load(null, sessionId: 'profile-b', url: WebUri('https://app.example.com'));
+
+      // Only B's cookie is set (not A's).
+      expect(fakeCookies.setCalls, hasLength(1));
+      expect(fakeCookies.setCalls.single.name, 'b_cookie');
+
+      // Only B's localStorage entry is set (not A's).
+      expect(eval.scripts, contains('window.localStorage.setItem("b_key", "b-secret")'));
+      expect(eval.scripts, isNot(contains('window.localStorage.setItem("a_key", "a-secret")')));
+    });
+  });
+
+  group('origin mismatch rejection', () {
+    test('rejects a session whose origin differs from the URL', () async {
+      final now = DateTime.now().millisecondsSinceEpoch;
+      await store.save(
+        PortableSession(
+          id: 'alpha-session',
+          name: 'Alpha',
+          origin: 'https://alpha.test',
+          createdAt: now,
+          updatedAt: now,
+          cookies: [
+            CookieEntry(
+              name: 'sid',
+              value: 'alpha-token',
+              domain: 'alpha.test',
+              path: '/',
+              secure: false,
+              httpOnly: false,
+            ),
+          ],
+          storage: [
+            StorageEntry(
+              key: 'user',
+              value: 'alpha-user',
+              area: 'localStorage',
+              origin: 'https://alpha.test',
+            ),
+          ],
+        ),
+      );
+
+      final fakeCookies = _FakeCookiePlatform();
+      final eval = _Eval({});
+      final s = WebViewSessions(
+        port: store,
+        cookieManager: CookieManager.fromPlatform(fakeCookies),
+        evaluateJavascript: eval.call,
+      );
+
+      // Attempt to load an alpha.test session for beta.test.
+      final ok = await s.load(
+        null,
+        sessionId: 'alpha-session',
+        url: WebUri('https://beta.test'),
+      );
+
+      expect(ok, isFalse);
+      expect(fakeCookies.setCalls, isEmpty,
+          reason: 'no cookies applied on origin mismatch');
+      expect(fakeCookies.deleteAllCookiesCalls, equals(0),
+          reason: 'no prior state cleared on origin mismatch');
+      expect(
+        eval.scripts,
+        isNot(contains(contains('setItem'))),
+        reason: 'no setItem script executed on origin mismatch',
+      );
+    });
+  });
+
+  group('clock injection (T024)', () {
+    test('saved timestamps reflect the injected clock, not wall time', () async {
+      const ticks = 1700000000000;
+      final clock = () => DateTime.fromMillisecondsSinceEpoch(ticks);
+      final s = WebViewSessions(
+        port: store,
+        cookieManager: CookieManager.fromPlatform(_FakeCookiePlatform()),
+        evaluateJavascript: _Eval({}).call,
+        clock: clock,
+      );
+
+      await s.save(
+        null,
+        sessionId: 'timed',
+        name: 'Timed',
+        url: WebUri('https://t.test'),
+      );
+
+      final saved = await store.load('timed');
+      expect(saved, isNotNull);
+      expect(saved!.createdAt, ticks);
+      expect(saved.updatedAt, ticks);
     });
   });
 }
@@ -277,4 +696,68 @@ class _InMemoryPort implements SessionPort {
 
   @override
   Future<bool> delete(String id) async => _sessions.remove(id) != null;
+}
+
+/// In-test [CookieManager] platform: returns scripted cookies on harvest and
+/// records every [setCookie] call so the load path can be asserted.
+class _FakeCookiePlatform extends PlatformCookieManager {
+  _FakeCookiePlatform()
+      : super.implementation(const PlatformCookieManagerCreationParams());
+
+  final List<Cookie> cookies = [];
+  final List<({String name, String value, String? domain, String path})>
+      setCalls = [];
+  int deleteAllCookiesCalls = 0;
+
+  @override
+  Future<List<Cookie>> getCookies({
+    required WebUri url,
+    PlatformInAppWebViewController? webViewController,
+  }) async => cookies;
+
+  @override
+  Future<bool> setCookie({
+    required WebUri url,
+    required String name,
+    required String value,
+    String path = '/',
+    String? domain,
+    int? expiresDate,
+    int? maxAge,
+    bool? isSecure,
+    bool? isHttpOnly,
+    HTTPCookieSameSitePolicy? sameSite,
+    PlatformInAppWebViewController? webViewController,
+  }) async {
+    setCalls.add((name: name, value: value, domain: domain, path: path));
+    return true;
+  }
+
+  @override
+  Future<bool> deleteAllCookies() async {
+    deleteAllCookiesCalls++;
+    cookies.clear();
+    return true;
+  }
+
+  @override
+  void dispose({bool isKeepAlive = false}) {}
+}
+
+/// Evaluator stand-in for the webview's `evaluateJavascript`. Returns the
+/// scripted localStorage JSON on a harvest call and records every script it
+/// is asked to run (so `setItem` application is observable).
+class _Eval {
+  _Eval(this.localStorage);
+
+  final Map<String, String> localStorage;
+  final List<String> scripts = [];
+
+  Future<Object?> call(String source) async {
+    scripts.add(source);
+    if (source.contains('JSON.stringify(window.localStorage)')) {
+      return jsonEncode(localStorage);
+    }
+    return null;
+  }
 }

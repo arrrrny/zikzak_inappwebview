@@ -281,6 +281,28 @@ void main() {
       expect(DialogueDismisser.mergeUserScripts(null, null), isNull);
     });
 
+    test('mergeUserScripts keeps non-empty caller scripts and appends dismisser last', () {
+      final dismisser = DialogueDismisser.maybeCreate(
+        presets: {DialogueDismissPreset.cookieConsent},
+      )!;
+      final caller = UserScript(
+        groupName: 'caller',
+        source: 'console.log("hi");',
+        injectionTime: UserScriptInjectionTime.AT_DOCUMENT_END,
+        forMainFrameOnly: true,
+      );
+
+      final merged = DialogueDismisser.mergeUserScripts([caller], dismisser)!;
+      expect(merged, hasLength(2), reason: 'caller script + dismisser script');
+      expect(merged[0], same(caller), reason: 'caller script is preserved');
+      expect(merged[1].groupName, 'zikzakDialogueDismisser');
+
+      // Null dismisser returns only the caller script, unchanged.
+      final passthrough = DialogueDismisser.mergeUserScripts([caller], null)!;
+      expect(passthrough, hasLength(1));
+      expect(passthrough.single, same(caller));
+    });
+
     test('handleJsPayload routes dismissals to the callback', () {
       final received = <DialogueDismissal>[];
       final dismisser = DialogueDismisser.maybeCreate(
