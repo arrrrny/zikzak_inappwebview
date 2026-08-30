@@ -152,147 +152,166 @@ class AttributedString {
     final _patchMap = _patcher.patchMap;
     return AttributedString(
       string: _patchMap.containsKey(AttributedString$.string)
-          ? (_patchMap[AttributedString$.string] is Function)
-                ? _patchMap[AttributedString$.string](this.string)
-                : (_patchMap[AttributedString$.string] is Patch)
-                ? _patchMap[AttributedString$.string].applyTo(this.string)
-                : _patchMap[AttributedString$.string]
+          ? ((_patchMap[AttributedString$.string] is Function)
+                    ? _patchMap[AttributedString$.string](this.string)
+                    : (_patchMap[AttributedString$.string] is Patch)
+                    ? _patchMap[AttributedString$.string].applyTo(this.string)
+                    : _patchMap[AttributedString$.string])
+                as String
           : this.string,
       backgroundColor: _patchMap.containsKey(AttributedString$.backgroundColor)
-          ? (_patchMap[AttributedString$.backgroundColor] is Function)
-                ? _patchMap[AttributedString$.backgroundColor](
-                    this.backgroundColor,
-                  )
-                : (_patchMap[AttributedString$.backgroundColor] is Patch)
-                ? _patchMap[AttributedString$.backgroundColor].applyTo(
-                    this.backgroundColor,
-                  )
-                : _patchMap[AttributedString$.backgroundColor]
+          ? ((_patchMap[AttributedString$.backgroundColor] is Function)
+                    ? _patchMap[AttributedString$.backgroundColor](
+                        this.backgroundColor,
+                      )
+                    : (_patchMap[AttributedString$.backgroundColor] is Patch)
+                    ? _patchMap[AttributedString$.backgroundColor].applyTo(
+                        this.backgroundColor,
+                      )
+                    : _patchMap[AttributedString$.backgroundColor])
+                as Color?
           : this.backgroundColor,
       baselineOffset: _patchMap.containsKey(AttributedString$.baselineOffset)
-          ? (_patchMap[AttributedString$.baselineOffset] is Function)
-                ? _patchMap[AttributedString$.baselineOffset](
-                    this.baselineOffset,
-                  )
-                : (_patchMap[AttributedString$.baselineOffset] is Patch)
-                ? _patchMap[AttributedString$.baselineOffset].applyTo(
-                    this.baselineOffset,
-                  )
-                : _patchMap[AttributedString$.baselineOffset]
+          ? ((_patchMap[AttributedString$.baselineOffset] is Function)
+                    ? _patchMap[AttributedString$.baselineOffset](
+                        this.baselineOffset,
+                      )
+                    : (_patchMap[AttributedString$.baselineOffset] is Patch)
+                    ? _patchMap[AttributedString$.baselineOffset].applyTo(
+                        this.baselineOffset,
+                      )
+                    : _patchMap[AttributedString$.baselineOffset])
+                as double?
           : this.baselineOffset,
       expansion: _patchMap.containsKey(AttributedString$.expansion)
-          ? (_patchMap[AttributedString$.expansion] is Function)
-                ? _patchMap[AttributedString$.expansion](this.expansion)
-                : (_patchMap[AttributedString$.expansion] is Patch)
-                ? _patchMap[AttributedString$.expansion].applyTo(this.expansion)
-                : _patchMap[AttributedString$.expansion]
+          ? ((_patchMap[AttributedString$.expansion] is Function)
+                    ? _patchMap[AttributedString$.expansion](this.expansion)
+                    : (_patchMap[AttributedString$.expansion] is Patch)
+                    ? _patchMap[AttributedString$.expansion].applyTo(
+                        this.expansion,
+                      )
+                    : _patchMap[AttributedString$.expansion])
+                as double?
           : this.expansion,
       foregroundColor: _patchMap.containsKey(AttributedString$.foregroundColor)
-          ? (_patchMap[AttributedString$.foregroundColor] is Function)
-                ? _patchMap[AttributedString$.foregroundColor](
-                    this.foregroundColor,
-                  )
-                : (_patchMap[AttributedString$.foregroundColor] is Patch)
-                ? _patchMap[AttributedString$.foregroundColor].applyTo(
-                    this.foregroundColor,
-                  )
-                : _patchMap[AttributedString$.foregroundColor]
+          ? ((_patchMap[AttributedString$.foregroundColor] is Function)
+                    ? _patchMap[AttributedString$.foregroundColor](
+                        this.foregroundColor,
+                      )
+                    : (_patchMap[AttributedString$.foregroundColor] is Patch)
+                    ? _patchMap[AttributedString$.foregroundColor].applyTo(
+                        this.foregroundColor,
+                      )
+                    : _patchMap[AttributedString$.foregroundColor])
+                as Color?
           : this.foregroundColor,
       kern: _patchMap.containsKey(AttributedString$.kern)
-          ? (_patchMap[AttributedString$.kern] is Function)
-                ? _patchMap[AttributedString$.kern](this.kern)
-                : (_patchMap[AttributedString$.kern] is Patch)
-                ? _patchMap[AttributedString$.kern].applyTo(this.kern)
-                : _patchMap[AttributedString$.kern]
+          ? ((_patchMap[AttributedString$.kern] is Function)
+                    ? _patchMap[AttributedString$.kern](this.kern)
+                    : (_patchMap[AttributedString$.kern] is Patch)
+                    ? _patchMap[AttributedString$.kern].applyTo(this.kern)
+                    : _patchMap[AttributedString$.kern])
+                as double?
           : this.kern,
       ligature: _patchMap.containsKey(AttributedString$.ligature)
-          ? (_patchMap[AttributedString$.ligature] is Function)
-                ? _patchMap[AttributedString$.ligature](this.ligature)
-                : (_patchMap[AttributedString$.ligature] is Patch)
-                ? _patchMap[AttributedString$.ligature].applyTo(this.ligature)
-                : _patchMap[AttributedString$.ligature]
+          ? ((_patchMap[AttributedString$.ligature] is Function)
+                    ? _patchMap[AttributedString$.ligature](this.ligature)
+                    : (_patchMap[AttributedString$.ligature] is Patch)
+                    ? _patchMap[AttributedString$.ligature].applyTo(
+                        this.ligature,
+                      )
+                    : _patchMap[AttributedString$.ligature])
+                as int?
           : this.ligature,
       obliqueness: _patchMap.containsKey(AttributedString$.obliqueness)
-          ? (_patchMap[AttributedString$.obliqueness] is Function)
-                ? _patchMap[AttributedString$.obliqueness](this.obliqueness)
-                : (_patchMap[AttributedString$.obliqueness] is Patch)
-                ? _patchMap[AttributedString$.obliqueness].applyTo(
-                    this.obliqueness,
-                  )
-                : _patchMap[AttributedString$.obliqueness]
+          ? ((_patchMap[AttributedString$.obliqueness] is Function)
+                    ? _patchMap[AttributedString$.obliqueness](this.obliqueness)
+                    : (_patchMap[AttributedString$.obliqueness] is Patch)
+                    ? _patchMap[AttributedString$.obliqueness].applyTo(
+                        this.obliqueness,
+                      )
+                    : _patchMap[AttributedString$.obliqueness])
+                as double?
           : this.obliqueness,
       strikethroughColor:
           _patchMap.containsKey(AttributedString$.strikethroughColor)
-          ? (_patchMap[AttributedString$.strikethroughColor] is Function)
-                ? _patchMap[AttributedString$.strikethroughColor](
-                    this.strikethroughColor,
-                  )
-                : (_patchMap[AttributedString$.strikethroughColor] is Patch)
-                ? _patchMap[AttributedString$.strikethroughColor].applyTo(
-                    this.strikethroughColor,
-                  )
-                : _patchMap[AttributedString$.strikethroughColor]
+          ? ((_patchMap[AttributedString$.strikethroughColor] is Function)
+                    ? _patchMap[AttributedString$.strikethroughColor](
+                        this.strikethroughColor,
+                      )
+                    : (_patchMap[AttributedString$.strikethroughColor] is Patch)
+                    ? _patchMap[AttributedString$.strikethroughColor].applyTo(
+                        this.strikethroughColor,
+                      )
+                    : _patchMap[AttributedString$.strikethroughColor])
+                as Color?
           : this.strikethroughColor,
       strikethroughStyle:
           _patchMap.containsKey(AttributedString$.strikethroughStyle)
-          ? (_patchMap[AttributedString$.strikethroughStyle] is Function)
-                ? _patchMap[AttributedString$.strikethroughStyle](
-                    this.strikethroughStyle,
-                  )
-                : (_patchMap[AttributedString$.strikethroughStyle] is Patch)
-                ? _patchMap[AttributedString$.strikethroughStyle].applyTo(
-                    this.strikethroughStyle,
-                  )
-                : _patchMap[AttributedString$.strikethroughStyle]
+          ? ((_patchMap[AttributedString$.strikethroughStyle] is Function)
+                    ? _patchMap[AttributedString$.strikethroughStyle](
+                        this.strikethroughStyle,
+                      )
+                    : (_patchMap[AttributedString$.strikethroughStyle] is Patch)
+                    ? _patchMap[AttributedString$.strikethroughStyle].applyTo(
+                        this.strikethroughStyle,
+                      )
+                    : _patchMap[AttributedString$.strikethroughStyle])
+                as UnderlineStyle?
           : this.strikethroughStyle,
       strokeColor: _patchMap.containsKey(AttributedString$.strokeColor)
-          ? (_patchMap[AttributedString$.strokeColor] is Function)
-                ? _patchMap[AttributedString$.strokeColor](this.strokeColor)
-                : (_patchMap[AttributedString$.strokeColor] is Patch)
-                ? _patchMap[AttributedString$.strokeColor].applyTo(
-                    this.strokeColor,
-                  )
-                : _patchMap[AttributedString$.strokeColor]
+          ? ((_patchMap[AttributedString$.strokeColor] is Function)
+                    ? _patchMap[AttributedString$.strokeColor](this.strokeColor)
+                    : (_patchMap[AttributedString$.strokeColor] is Patch)
+                    ? _patchMap[AttributedString$.strokeColor].applyTo(
+                        this.strokeColor,
+                      )
+                    : _patchMap[AttributedString$.strokeColor])
+                as Color?
           : this.strokeColor,
       strokeWidth: _patchMap.containsKey(AttributedString$.strokeWidth)
-          ? (_patchMap[AttributedString$.strokeWidth] is Function)
-                ? _patchMap[AttributedString$.strokeWidth](this.strokeWidth)
-                : (_patchMap[AttributedString$.strokeWidth] is Patch)
-                ? _patchMap[AttributedString$.strokeWidth].applyTo(
-                    this.strokeWidth,
-                  )
-                : _patchMap[AttributedString$.strokeWidth]
+          ? ((_patchMap[AttributedString$.strokeWidth] is Function)
+                    ? _patchMap[AttributedString$.strokeWidth](this.strokeWidth)
+                    : (_patchMap[AttributedString$.strokeWidth] is Patch)
+                    ? _patchMap[AttributedString$.strokeWidth].applyTo(
+                        this.strokeWidth,
+                      )
+                    : _patchMap[AttributedString$.strokeWidth])
+                as double?
           : this.strokeWidth,
       textEffect: _patchMap.containsKey(AttributedString$.textEffect)
-          ? (_patchMap[AttributedString$.textEffect] is Function)
-                ? _patchMap[AttributedString$.textEffect](this.textEffect)
-                : (_patchMap[AttributedString$.textEffect] is Patch)
-                ? _patchMap[AttributedString$.textEffect].applyTo(
-                    this.textEffect,
-                  )
-                : _patchMap[AttributedString$.textEffect]
+          ? ((_patchMap[AttributedString$.textEffect] is Function)
+                    ? _patchMap[AttributedString$.textEffect](this.textEffect)
+                    : (_patchMap[AttributedString$.textEffect] is Patch)
+                    ? _patchMap[AttributedString$.textEffect].applyTo(
+                        this.textEffect,
+                      )
+                    : _patchMap[AttributedString$.textEffect])
+                as AttributedStringTextEffectStyle?
           : this.textEffect,
       underlineColor: _patchMap.containsKey(AttributedString$.underlineColor)
-          ? (_patchMap[AttributedString$.underlineColor] is Function)
-                ? _patchMap[AttributedString$.underlineColor](
-                    this.underlineColor,
-                  )
-                : (_patchMap[AttributedString$.underlineColor] is Patch)
-                ? _patchMap[AttributedString$.underlineColor].applyTo(
-                    this.underlineColor,
-                  )
-                : _patchMap[AttributedString$.underlineColor]
+          ? ((_patchMap[AttributedString$.underlineColor] is Function)
+                    ? _patchMap[AttributedString$.underlineColor](
+                        this.underlineColor,
+                      )
+                    : (_patchMap[AttributedString$.underlineColor] is Patch)
+                    ? _patchMap[AttributedString$.underlineColor].applyTo(
+                        this.underlineColor,
+                      )
+                    : _patchMap[AttributedString$.underlineColor])
+                as Color?
           : this.underlineColor,
       underlineStyle: _patchMap.containsKey(AttributedString$.underlineStyle)
-          ? (_patchMap[AttributedString$.underlineStyle] is Function)
-                ? _patchMap[AttributedString$.underlineStyle](
-                    this.underlineStyle,
-                  )
-                : (_patchMap[AttributedString$.underlineStyle] is Patch)
-                ? _patchMap[AttributedString$.underlineStyle].applyTo(
-                    this.underlineStyle,
-                  )
-                : _patchMap[AttributedString$.underlineStyle]
+          ? ((_patchMap[AttributedString$.underlineStyle] is Function)
+                    ? _patchMap[AttributedString$.underlineStyle](
+                        this.underlineStyle,
+                      )
+                    : (_patchMap[AttributedString$.underlineStyle] is Patch)
+                    ? _patchMap[AttributedString$.underlineStyle].applyTo(
+                        this.underlineStyle,
+                      )
+                    : _patchMap[AttributedString$.underlineStyle])
+                as UnderlineStyle?
           : this.underlineStyle,
     );
   }
@@ -375,7 +394,8 @@ class AttributedString {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$AttributedStringToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

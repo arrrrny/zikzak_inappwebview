@@ -5,9 +5,76 @@
 //  Created by Lorenzo on 21/10/18.
 //
 
+import CryptoKit
 import Flutter
 import Foundation
 import WebKit
+
+/// Maps a stable identifier string into a stable `UUID` for
+/// `WKWebsiteDataStore(forIdentifier:)`. Accepts three input shapes so the
+/// same Dart field can be fed either a raw UUID string, a stable profile
+/// name, or the 64-char SHA-256 hex the forklift caller used to send
+/// (derived from a profile dir's canonical path). All three are
+/// deterministic — the same identifier always yields the same on-disk
+/// store, which is what makes a per-account session survive app relaunch.
+/// Mirrors the macOS helper 1:1 to keep the Dart-side contract identical
+/// across platforms.
+///
+/// Shape priority: (a) direct UUID string -> (b) 64-char hex legacy path
+/// -> (c) SHA-256 of the UTF-8 bytes (CryptoKit, iOS 13+/macOS 10.15+,
+/// well below the iOS 17+/macOS 14+ floor of the persistent-store API
+/// itself).
+private func persistentUUID(from identifier: String) -> UUID? {
+    let trimmed = identifier.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard !trimmed.isEmpty else { return nil }
+
+    // (a) Direct UUID string ("550e8400-e29b-41d4-a716-446655440000").
+    if let direct = UUID(uuidString: trimmed) {
+        return direct
+    }
+
+    // (b) Legacy 64-char SHA-256 hex path: take the first 32 hex chars
+    // (16 bytes) and treat them as the UUID's raw bytes. Preserves the
+    // on-disk store identifier forklift's Cloaked Chrome profiles already
+    // use, so existing persistent stores keep reopening after the upgrade.
+    let hexSet = CharacterSet(charactersIn: "0123456789abcdefABCDEF")
+    let isHex = trimmed.unicodeScalars.allSatisfy { hexSet.contains($0) }
+    if isHex, trimmed.count >= 32 {
+        let prefix = trimmed.prefix(32)
+        var bytes: [UInt8] = []
+        bytes.reserveCapacity(16)
+        var index = prefix.startIndex
+        while index < prefix.endIndex {
+            let next = prefix.index(index, offsetBy: 2, limitedBy: prefix.endIndex) ?? prefix.endIndex
+            guard let byte = UInt8(String(prefix[index..<next]), radix: 16) else { return nil }
+            bytes.append(byte)
+            index = next
+        }
+        guard bytes.count == 16 else { return nil }
+        return UUID(uuid: (
+            bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7],
+            bytes[8], bytes[9], bytes[10], bytes[11], bytes[12], bytes[13], bytes[14], bytes[15]
+        ))
+    }
+
+    // (c) Any other stable string: SHA-256 the UTF-8 bytes and use the
+    // first 16 bytes as the UUID's raw bytes. Deterministic, isolated,
+    // and survives relaunch — distinct identifiers never collide.
+    // CryptoKit ships with the system on iOS 13+/macOS 10.15+, so this
+    // branch is always available when the iOS 17+ persistent store path
+    // runs.
+    if #available(iOS 13.0, *) {
+        let digest = SHA256.hash(data: Data(trimmed.utf8))
+        let sha = Array(digest)
+        return UUID(uuid: (
+            sha[0],  sha[1],  sha[2],  sha[3],
+            sha[4],  sha[5],  sha[6],  sha[7],
+            sha[8],  sha[9],  sha[10], sha[11],
+            sha[12], sha[13], sha[14], sha[15]
+        ))
+    }
+    return nil
+}
 
 public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     WKNavigationDelegate, WKScriptMessageHandler, UIGestureRecognizerDelegate,
@@ -743,10 +810,31 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             }
 
             if #available(iOS 9.0, *) {
+                // Per-instance persistent, isolated WKWebsiteDataStore
+                // (iOS 17+/macOS 14+). Same persistentStoreIdentifier
+                // reopens the same on-disk store across launches; distinct
+                // identifiers yield fully isolated cookies/localStorage/
+                // cache. Mutually exclusive with `incognito` — incognito
+                // is non-persistent (wiped on tear-down) and takes
+                // precedence. Below iOS 17 the persistent path is
+                // unavailable, so we fall through to the shared `.default()`
+                // store (existing behavior). Must be applied here, on the
+                // configuration BEFORE the WKWebView is created —
+                // websiteDataStore is immutable post-init, so a later
+                // `setSettings` cannot change it (see issue #253
+                // acceptance criteria).
+                var dataStoreWasSelected = false
                 if settings.incognito {
                     configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+                    dataStoreWasSelected = true
+                } else if #available(iOS 17.0, *),
+                   let id = settings.persistentStoreIdentifier, !id.isEmpty,
+                   let uuid = persistentUUID(from: id) {
+                    configuration.websiteDataStore = WKWebsiteDataStore(forIdentifier: uuid)
+                    dataStoreWasSelected = true
                 } else if settings.cacheEnabled {
                     configuration.websiteDataStore = WKWebsiteDataStore.default()
+                    dataStoreWasSelected = true
                 }
                 if !settings.applicationNameForUserAgent.isEmpty {
                     if let applicationNameForUserAgent = configuration.applicationNameForUserAgent {
@@ -785,7 +873,16 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                     // Set Cookies in iOS 11 and above, initialize websiteDataStore before setting cookies
                     // See also https://forums.developer.apple.com/thread/97194
                     // check if websiteDataStore has not been initialized before
-                    if !settings.incognito && !settings.cacheEnabled {
+                    let hasValidPersistentId = settings.persistentStoreIdentifier.map {
+                        persistentUUID(from: $0) != nil
+                    } ?? false
+                    // A persistent store can only be honored on iOS 17+ (the
+                    // `forIdentifier:` selector is unavailable below it). On
+                    // older iOS, `hasValidPersistentId` is meaningless for the
+                    // data store, so skip the short-circuit and fall through to
+                    // the master behavior (nonPersistent) when cacheEnabled is
+                    // false — otherwise per-account isolation is silently lost.
+                    if !dataStoreWasSelected && (!hasValidPersistentId || !#available(iOS 17.0, *)) {
                         configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
                     }
                     for cookie in HTTPCookieStorage.shared.cookies ?? [] {
@@ -812,7 +909,12 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                         let webAuthSupport = configuration.perform(selector)?.takeUnretainedValue()
                             as? NSObject
                     {
-                        webAuthSupport.setValue(true, forKey: "boundKeychainForPasskeys")
+                        // Guard the inner key as well: setValue(_:forKey:) raises an
+                        // uncatchable NSUnknownKeyException when the key is missing,
+                        // which would crash the app on an unexpected SDK state.
+                        if webAuthSupport.responds(to: Selector(("boundKeychainForPasskeys"))) {
+                            webAuthSupport.setValue(true, forKey: "boundKeychainForPasskeys")
+                        }
                     }
                 }
             }
@@ -1215,6 +1317,18 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                     configuration.userContentController.removeAllUserScripts()
                 }
             }
+        }
+
+        // webAuthenticationSupport is creation-time only: the underlying
+        // WKWebViewConfiguration is immutable after the WKWebView is created,
+        // so a runtime change is a no-op. Surface it instead of silently
+        // dropping it (issue #272).
+        if newSettingsMap["webAuthenticationSupport"] != nil
+            && settings != nil && settings!.webAuthenticationSupport != newSettings.webAuthenticationSupport
+        {
+            print(
+                "webAuthenticationSupport cannot be changed after the WebView has been created (WKWebViewConfiguration is immutable); ignoring the new value"
+            )
         }
 
         if newSettingsMap["transparentBackground"] != nil

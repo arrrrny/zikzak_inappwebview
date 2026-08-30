@@ -1,6 +1,71 @@
 import Cocoa
+import CryptoKit
 import FlutterMacOS
 import WebKit
+
+/// Maps a stable identifier string into a stable `UUID` for
+/// `WKWebsiteDataStore(forIdentifier:)`. Accepts three input shapes so the
+/// same Dart field can be fed either a raw UUID string, a stable profile
+/// name, or the 64-char SHA-256 hex the forklift caller used to send
+/// (derived from a profile dir's canonical path). All three are
+/// deterministic — the same identifier always yields the same on-disk
+/// store, which is what makes a per-account session survive app relaunch.
+///
+/// Shape priority: (a) direct UUID string -> (b) 64-char hex legacy path
+/// -> (c) SHA-256 of the UTF-8 bytes (CryptoKit, iOS 13+/macOS 10.15+,
+/// well below the iOS 17+/macOS 14+ floor of the persistent-store API
+/// itself).
+private func persistentUUID(from identifier: String) -> UUID? {
+    let trimmed = identifier.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard !trimmed.isEmpty else { return nil }
+
+    // (a) Direct UUID string ("550e8400-e29b-41d4-a716-446655440000").
+    if let direct = UUID(uuidString: trimmed) {
+        return direct
+    }
+
+    // (b) Legacy 64-char SHA-256 hex path: take the first 32 hex chars
+    // (16 bytes) and treat them as the UUID's raw bytes. Preserves the
+    // on-disk store identifier forklift's Cloaked Chrome profiles already
+    // use, so existing persistent stores keep reopening after the upgrade.
+    let hexSet = CharacterSet(charactersIn: "0123456789abcdefABCDEF")
+    let isHex = trimmed.unicodeScalars.allSatisfy { hexSet.contains($0) }
+    if isHex, trimmed.count >= 32 {
+        let prefix = trimmed.prefix(32)
+        var bytes: [UInt8] = []
+        bytes.reserveCapacity(16)
+        var index = prefix.startIndex
+        while index < prefix.endIndex {
+            let next = prefix.index(index, offsetBy: 2, limitedBy: prefix.endIndex) ?? prefix.endIndex
+            guard let byte = UInt8(String(prefix[index..<next]), radix: 16) else { return nil }
+            bytes.append(byte)
+            index = next
+        }
+        guard bytes.count == 16 else { return nil }
+        return UUID(uuid: (
+            bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7],
+            bytes[8], bytes[9], bytes[10], bytes[11], bytes[12], bytes[13], bytes[14], bytes[15]
+        ))
+    }
+
+    // (c) Any other stable string: SHA-256 the UTF-8 bytes and use the
+    // first 16 bytes as the UUID's raw bytes. Deterministic, isolated,
+    // and survives relaunch — distinct identifiers never collide.
+    // CryptoKit ships with the system on iOS 13+/macOS 10.15+, so this
+    // branch is always available when the iOS 17+/macOS 14+ persistent
+    // store path runs.
+    if #available(macOS 10.15, *) {
+        let digest = SHA256.hash(data: Data(trimmed.utf8))
+        let sha = Array(digest)
+        return UUID(uuid: (
+            sha[0],  sha[1],  sha[2],  sha[3],
+            sha[4],  sha[5],  sha[6],  sha[7],
+            sha[8],  sha[9],  sha[10], sha[11],
+            sha[12], sha[13], sha[14], sha[15]
+        ))
+    }
+    return nil
+}
 
 public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler, WKUIDelegate, NSMenuDelegate {
     var channel: FlutterMethodChannel!
@@ -97,6 +162,13 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     ///into a Flutter platform view.
     public var popupWindow: NSWindow?
 
+    ///True when this WebView is hosted inside a `HeadlessInAppWebView`'s
+    ///off-screen window. Used to make that window visible to the window server
+    ///transiently during `takeSnapshot`, which otherwise returns `nil` for a
+    ///view that was never shown (no backing store). Never set for a normal
+    ///on-screen `InAppWebView`, so the real app window is never touched.
+    public var isHeadlessOffscreen: Bool = false
+
     ///The opener webview that created this popup (via [createWebViewWith]),
     ///`nil` for main (non-popup) webviews.
     public weak var opener: InAppWebView?
@@ -107,6 +179,62 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         let configuration = WKWebViewConfiguration()
         let userContentController = WKUserContentController()
         configuration.userContentController = userContentController
+
+        // Per-WebView data-store isolation MUST be configured on the
+        // WKWebViewConfiguration BEFORE the WKWebView is created — the
+        // configuration is immutable afterwards. `incognito` gives this
+        // WebView its own `nonPersistent()` store so concurrent accounts
+        // (e.g. multiple logged-in sessions) do not share one cookie jar.
+        // The later `setSettings` attempt to set `websiteDataStore` is a
+        // no-op post-init and must not be relied upon (see the
+        // macos-ios-per-instance-datastore / multi-account-cookies-bleed
+        // assessments).
+        if let args = arguments as? [String: Any] {
+            let settingsMap =
+                (args["initialSettings"] as? [String: Any?])
+                ?? (args["settings"] as? [String: Any?])
+            if let settingsMap = settingsMap {
+                // Persistent, per-account data store keyed by a stable
+                // identifier (derived from `userDataDir` on the Dart side as a
+                // 64-char SHA-256 hex string, mapped to a UUID here). WebKit
+                // keys the on-disk store by that UUID, so cookies/storage stay
+                // isolated per account AND survive app relaunch — the behaviour
+                // forklift's Cloaked Chrome profiles relied on. Requires
+                // macOS 14.0+, hence the availability guard; older runtimes
+                // fall back to the shared store.
+                if #available(macOS 14.0, *),
+                   let id = settingsMap["persistentStoreIdentifier"] as? String,
+                   !id.isEmpty,
+                   let uuid = persistentUUID(from: id) {
+                    configuration.websiteDataStore = WKWebsiteDataStore(forIdentifier: uuid)
+                } else if let incognito = settingsMap["incognito"] as? Bool,
+                          incognito {
+                    configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+                }
+                // WebAuthn / passkey support (issue #272).
+                // Mirrors the iOS KVC wiring (PR #131).
+                // Must be set before super.init because the configuration is
+                // immutable afterwards.
+                if #available(macOS 13.3, *) {
+                    if let webAuthnSupport = settingsMap["webAuthenticationSupport"] as? Int,
+                       webAuthnSupport == 1 {  // FOR_APP
+                        let selector = Selector(("webAuthenticationSupport"))
+                        if configuration.responds(to: selector),
+                           let webAuthSupport = configuration.perform(selector)?.takeUnretainedValue()
+                               as? NSObject
+                        {
+                            // Guard the inner key as well: setValue(_:forKey:) raises
+                            // an uncatchable NSUnknownKeyException when the key is
+                            // missing, which would crash the app on an unexpected
+                            // SDK state.
+                            if webAuthSupport.responds(to: Selector(("boundKeychainForPasskeys"))) {
+                                webAuthSupport.setValue(true, forKey: "boundKeychainForPasskeys")
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         self.registrar = registrar
         super.init(frame: .zero, configuration: configuration)
@@ -825,7 +953,25 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                     }
                 }
 
+                // A headless WebView lives in an off-screen window that is
+                // never shown, so it has no backing store and
+                // `takeSnapshot` returns nil. Momentarily order the window to
+                // the front (still at off-screen coordinates → invisible to
+                // the user) so the window server composites it, and force a
+                // post-update capture. We order it back out in the completion
+                // handler once the snapshot is taken.
+                if self.isHeadlessOffscreen {
+                    self.window?.orderFront(nil)
+                    if snapshotConfiguration == nil {
+                        snapshotConfiguration = WKSnapshotConfiguration()
+                    }
+                    snapshotConfiguration?.afterScreenUpdates = true
+                }
+
                 self.takeSnapshot(with: snapshotConfiguration) { (image, error) -> Void in
+                    if self.isHeadlessOffscreen {
+                        self.window?.orderOut(nil)
+                    }
                     var imageData: Data? = nil
                     if let screenshot = image {
                         if let configMap = (call.arguments as? [String: Any])?[
@@ -906,6 +1052,18 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             } else {
                 result(
                     FlutterError(code: "InAppWebView", message: "Invalid arguments", details: nil))
+            }
+        case "pressKey":
+            if let args = call.arguments as? [String: Any],
+               let keyCode = args["keyCode"] as? Int {
+                let characters = (args["characters"] as? String) ?? ""
+                self.pressKey(keyCode: UInt16(keyCode), characters: characters)
+                result(nil)
+            } else {
+                result(FlutterError(
+                    code: "InAppWebView",
+                    message: "pressKey: expected keyCode: Int",
+                    details: nil))
             }
         case "callAsyncJavaScript":
             if let args = call.arguments as? [String: Any],
@@ -1626,6 +1784,18 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     }
 
     func setSettings(newSettings: InAppWebViewSettings, newSettingsMap: [String: Any]) {
+        // webAuthenticationSupport is creation-time only: the underlying
+        // WKWebViewConfiguration is immutable after the WKWebView is created,
+        // so a runtime change is a no-op. Surface it instead of silently
+        // dropping it (issue #272).
+        if newSettingsMap["webAuthenticationSupport"] != nil
+            && settings != nil && settings!.webAuthenticationSupport != newSettings.webAuthenticationSupport
+        {
+            print(
+                "webAuthenticationSupport cannot be changed after the WebView has been created (WKWebViewConfiguration is immutable); ignoring the new value"
+            )
+        }
+
         if newSettingsMap["userAgent"] != nil
             && settings?.userAgent != newSettings.userAgent
             && newSettings.userAgent != ""
@@ -2216,17 +2386,21 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                             }
                         """, completionHandler: nil)
                 } else {
-                    var json: String
-                    if let resultData = try? JSONSerialization.data(
-                        withJSONObject: result ?? NSNull(), options: []),
-                        let resultString = String(data: resultData, encoding: .utf8)
-                    {
-                        json = resultString
-                    } else if let simpleResult = result {
-                        json = "\"\(simpleResult)\""
-                    } else {
-                        json = "null"
-                    }
+                    // Dart's callHandler implementation already returns the callback value
+                    // encoded with jsonEncode. Re-encoding this String with
+                    // JSONSerialization crashes for top-level fragments (for example
+                    // null) and would also change the value's JavaScript semantics.
+                    let json = result as? String ?? "null"
+#if DEBUG
+                    let resultType = result.map {
+                        String(describing: type(of: $0))
+                    } ?? "nil"
+                    print(
+                        "[ZikzakInAppWebView][JSBridge] handler=\(handlerName) "
+                            + "resultType=\(resultType) jsonLength=\(json.utf8.count) "
+                            + "fallbackToNull=\(result != nil && !(result is String))"
+                    )
+#endif
                     self.evaluateJavaScript(
                         """
                             if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
@@ -2348,6 +2522,40 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         // if no Dart handler is registered the page loses right-click entirely,
         // so we forward to super to keep the native menu as a fallback.
         super.rightMouseDown(with: event)
+    }
+
+    /// Dispatches a trusted keyDown/keyUp pair to this WebView so React /
+    /// ProseMirror editors (which ignore untrusted, JS-synthesized key events)
+    /// receive a real Enter / Backspace. Called from the Dart side via the
+    /// `pressKey` channel method (Puppeteer `keyboard.press`). Delivering the
+    /// event through the responder's `keyDown:` (not `dispatchEvent`) makes
+    /// WebKit treat it as a trusted, user-initiated key event.
+    func pressKey(keyCode: UInt16, characters: String) {
+        guard let down = NSEvent.keyEvent(
+            with: .keyDown,
+            location: .zero,
+            modifierFlags: [],
+            timestamp: 0,
+            windowNumber: 0,
+            context: nil,
+            characters: characters,
+            charactersIgnoringModifiers: characters,
+            isARepeat: false,
+            keyCode: keyCode
+        ), let up = NSEvent.keyEvent(
+            with: .keyUp,
+            location: .zero,
+            modifierFlags: [],
+            timestamp: 0,
+            windowNumber: 0,
+            context: nil,
+            characters: characters,
+            charactersIgnoringModifiers: characters,
+            isARepeat: false,
+            keyCode: keyCode
+        ) else { return }
+        self.keyDown(with: down)
+        self.keyUp(with: up)
     }
 
     public func handleFindInteraction(_ call: FlutterMethodCall, result: @escaping FlutterResult) {

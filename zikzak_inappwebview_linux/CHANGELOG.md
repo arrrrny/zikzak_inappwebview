@@ -1,5 +1,21 @@
-## 5.0.0 - 2026-08-16
+## 5.1.2 - 2026-08-24
 
+* chore: restore development path dependencies after 5.1.1 publish
+* Prepare for publishing version 5.1.1
+## 5.1.1 - 2026-08-24
+
+* chore: regenerate zorphy entity files for zorphy 2.3.0
+* chore: restore dev path deps and bump zorphy/zorphy_annotation to ^2.3.0
+* Prepare for publishing version
+## 5.1.0 - 2026-08-24
+
+
+### Fixes
+
+- [Android] Remove deprecated `WebSettingsCompat.setRequestedWithHeaderOriginAllowList` / `getRequestedWithHeaderOriginAllowList` calls (marked for removal in `androidx.webkit`). Eliminates the `[removal]` build warnings introduced in 5.0.0. The Dart `requestedWithHeaderOriginAllowList` setting is retained for API compatibility (#235)
+- [platform_interface] Correct the stale `in_app_webview_settings.dart` import in `PlatformSettingsDelegate` — the published 5.0.1 artifact shipped a broken relative import that broke every consumer; the source on `master` is corrected (`in_app_webview_settings` moved to `lib/src/domain/entities/`) (#249, #255, #257)
+- [docs] Document the JavaScript bridge global rename to `window.zikzak_inappwebview` (was `window.flutter_inappwebview`) in the migration guide (#258)
+## 5.0.0 - 2026-08-16
 
 ### Breaking Changes
 
@@ -13,8 +29,8 @@
 
 - Removed the dead `@ExchangeableObject` codegen toolchain
 - Removed the Docusaurus website (to be replaced by a zread wiki)
-## 4.10.0 - 2026-08-16
 
+## 4.10.0 - 2026-08-16
 
 ### Fixes
 
@@ -27,8 +43,8 @@
 ### Features
 
 - [example] Add First-Load Race Stress screen — reproduces the first-load race for headless and visible webviews (fresh webview + immediate `loadUrl`, 10 sequential attempts)
-## 4.9.0 - 2026-08-14
 
+## 4.9.0 - 2026-08-14
 
 ### Features
 
@@ -58,8 +74,8 @@
 - Chore: renamed remaining `flutter_inappwebview` residuals to
   `zikzak_inappwebview` (JS bridge name, method channel, platform view type id) (#186)
 - Chore: dependency bumps (npm deps, brace-expansion) (#189, #210)
-## 4.8.0 - 2026-08-14
 
+## 4.8.0 - 2026-08-14
 
 ### Features
 
@@ -87,7 +103,14 @@
 - [Android] Use `androidx.core.view.OnApplyWindowInsetsListener` type directly (#217)
 
 ## 4.7.0 - 2026-07-29
-## Unreleased
+
+## 5.0.1 - 2026-08-22
+
+### Fixes
+
+- Fixed Android enum settings serialization so platform-channel consumers receive the expected integer wire values.
+
+## [Unreleased]
 
 - Fixed Linux: the native plugin failed to compile (issue #179 regression)
   due to a broken `takeScreenshot` string literal (`'takeScreenshot"` instead
@@ -107,8 +130,6 @@
   so it works offscreen instead of returning null.
 - Added Linux: openDevTools support via WebKitWebInspector (developer extras
   enabled on demand).
-
-
 
 ### Features
 
@@ -134,27 +155,25 @@
 - Added `.clangd` and `compile_flags.txt` for Linux Flutter header resolution
 - Bumped svgo dependency
 
-
 ## 4.6.3 - 2026-07-21
-
 
 - Fixed: Web/WASM build failure — `HeadlessInAppWebViewWeb.dispose()` missing
   `isKeepAlive` parameter that was added to `PlatformHeadlessInAppWebView.dispose`
   interface, causing `dart2wasm` and `dart2js` compile errors
-## 4.6.2 - 2026-07-21
 
+## 4.6.2 - 2026-07-21
 
 - Fixed: Web/WASM compilation broken by unconditional `dart:io` import in platform
   interface — replaced with conditional export `if (dart.library.io)` to compile
   a stub on Web/WASM and the real `HttpServer`-based implementation on native
-## 4.6.1 - 2026-07-21
 
+## 4.6.1 - 2026-07-21
 
 - Fixed: iOS compile error in `URLValidationManager` integration — removed extraneous
   argument label `url:` from `validateURL` call that caused Swift compiler error
   when archiving for device
-## 4.6.0 - 2026-07-21
 
+## 4.6.0 - 2026-07-21
 
 - Fixed: iOS InAppBrowser crash after SPM migration — storyboard now loaded via
   `Bundle.module` instead of main bundle, resolving "Could not find a storyboard
@@ -181,13 +200,14 @@
 - Security: iOS native URL scheme validation via `URLValidationManager`
 - Perf: CookieManager — all 7 methods wrapped with `Lock.synchronized()` for
   thread-safe concurrent access
-## 4.5.3 - 2026-07-20
 
+## 4.5.3 - 2026-07-20
 
 - Fixed: iOS InAppBrowser crash after SPM migration — storyboard now loaded via
   `Bundle.module` instead of main bundle, resolving "Could not find a storyboard
   named 'WebView'" exception when opening the in-app browser
 - Cleaned up `any` version constraints from dev/example pubspec files
+
 ## 4.5.3 - 2026-07-20
 
 - Fixed: iOS InAppBrowser crash after SPM migration — storyboard now loaded via

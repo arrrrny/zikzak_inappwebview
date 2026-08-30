@@ -1,3 +1,27 @@
+## 5.1.3 (unreleased)
+
+### Docs
+
+- [docs] Extend the #258 JS bridge rename documentation into the canonical JS communication guide (dart API docstring on `addJavaScriptHandler`, surfaced via `{@macro}` on every platform) and into the example HTML test assets. PR #259 only added a migration note to the README; this fills the remaining gap the issue called out ("ideally in the JS communication guide") so migrators reading the pub.dev API reference or copying the example HTML see the rename from `window.flutter_inappwebview` to `window.zikzak_inappwebview`. The old name `window.flutter_inappwebview` is undefined, so calling `window.flutter_inappwebview.callHandler(...)` throws a `TypeError` (#258).
+
+## 5.1.2 - 2026-08-24
+
+### Fixes
+
+- [platform_interface] Add the missing `pressKey` method on `PlatformInAppWebViewController`. 5.1.1 shipped `zikzak_inappwebview` and `zikzak_inappwebview_macos` calling `platform.pressKey(...)`, but the published `platform_interface` 5.1.1 lacked the method, which broke compilation for consumers. This release adds `pressKey` to `platform_interface` (and its macOS implementation) so the 5.1.1 references now resolve.
+## 5.1.1 - 2026-08-24
+
+* chore: regenerate zorphy entity files for zorphy 2.3.0
+* chore: restore dev path deps and bump zorphy/zorphy_annotation to ^2.3.0
+* Prepare for publishing version
+## 5.1.0 - 2026-08-24
+
+### Fixes
+
+- [Android] Remove deprecated `WebSettingsCompat.setRequestedWithHeaderOriginAllowList` / `getRequestedWithHeaderOriginAllowList` calls (marked for removal in `androidx.webkit`). Eliminates the `[removal]` build warnings introduced in 5.0.0. The Dart `requestedWithHeaderOriginAllowList` setting is retained for API compatibility (#235)
+- [platform_interface] Correct the stale `in_app_webview_settings.dart` import in `PlatformSettingsDelegate` — the published 5.0.1 artifact shipped a broken relative import that broke every consumer; the source on `master` is corrected (`in_app_webview_settings` moved to `lib/src/domain/entities/`) (#249, #255, #257)
+- [docs] Document the JavaScript bridge global rename to `window.zikzak_inappwebview` (was `window.flutter_inappwebview`) in the migration guide (#258)
+
 ## 5.0.0 - 2026-08-16
 
 ### Breaking Changes

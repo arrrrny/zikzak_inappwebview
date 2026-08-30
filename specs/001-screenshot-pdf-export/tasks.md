@@ -4,7 +4,9 @@
 
 **Prerequisites**: plan.md (required), spec.md (required), research.md, data-model.md, contracts/
 
-**Tests**: Not included — the feature spec does not request automated tests. Verification is manual per platform.
+**Tests**: Mandatory. Per the project constitution (Test-Driven Development, NON-NEGOTIABLE), every behavior is driven by a test observed failing first. The behavior ids in brackets (`[A1]`, `[U1]`, …) refer to `tdd/test-list.md`; the red-phase evidence goes in `tdd/cycle-log.md`. Manual per-platform verification supplements, but does not replace, the automated tests.
+
+**⚠️ TDD debt**: Phases 1–8 below were completed before this test list existed, so their implementations were not test-driven. Phase 9 retrofits the tests. Characterization tasks come first and must be green against the code as it stands; the remaining test tasks must be observed failing first — if a test passes on the first run, revert the implementation for that behavior (or mutate it deliberately) to prove the test can fail, and record that evidence in `tdd/cycle-log.md`.
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
@@ -146,6 +148,90 @@ zikzak_inappwebview_web/lib/src/
 
 ---
 
+## Phase 9: TDD Retrofit — Tests for Every Behavior (MANDATORY)
+
+**Purpose**: Bind every behavior in `tdd/test-list.md` to a test. Tests are not optional. Each test must be observed failing for the right reason before the code it covers is (re)written; characterization tests are the exception — they are written green against untouched code and MUST land before any task that changes the code they cover.
+
+**Conventions** (from `.specify/memory/tdd-profile.md`): `package:flutter_test`, `test`/`group`/`expect`, hand-written fakes (no mocking library), `MethodChannel(...).setMockMethodCallHandler(...)` plus `TestWidgetsFlutterBinding.ensureInitialized()` for wire contracts. Run `flutter test` from each package's own directory.
+
+### Phase 9a: Characterization baselines (write FIRST, green against current code)
+
+- [ ] T026 [P] [US2] Characterization test [U7] for the pre-change Android `createPdf` (returns `null` without touching the channel) in `zikzak_inappwebview_android/test/in_app_webview_controller_test.dart` — must land before T013 is re-driven
+- [ ] T027 [P] [US3] [US4] Characterization test [U14] for the pre-wiring Linux controller surface of `createPdf`/`takeScreenshot` in `zikzak_inappwebview_linux/test/in_app_webview_controller_test.dart` — must land before T018/T020 are re-driven
+- [ ] T028 [P] Characterization test [U26] for the current web controller surface of `takeScreenshot`/`createPdf` in a new `zikzak_inappwebview_web/test/in_app_webview_web_controller_test.dart` (package currently has zero test files) — must land before T005 is re-driven
+- [ ] T029 Characterization test [U29] for the current deprecated Apple facade `createPdf` forwarding in `zikzak_inappwebview/test/apple_in_app_webview_controller_test.dart` — must land before T006 is re-driven. BLOCKED: umbrella suite blocked by zuraffa pub-cache corruption — run `flutter pub cache repair`
+
+### Phase 9b: Platform interface unit tests (no dependency on platform packages)
+
+- [ ] T030 [P] Unit tests [U31] [U32] [U33] [U34] [U35] for `ScreenshotConfiguration` serialization, round trip, and the quality `0`/`100` boundaries in `zikzak_inappwebview_platform_interface/test/types/screenshot_configuration_test.dart` (covers T001)
+- [ ] T031 [P] Unit tests [U36] [U37] [U38] [U39] for `PDFConfiguration` serialization, round trip, zero-margin boundary, and orientation in `zikzak_inappwebview_platform_interface/test/types/pdf_configuration_test.dart` (covers T002)
+- [ ] T032 [P] Unit test [U40] asserting the abstract `takeScreenshot`/`createPdf` signatures on `PlatformInAppWebViewController` are overridable and return `Future<Uint8List?>` in `zikzak_inappwebview_platform_interface/test/in_app_webview_controller_delegates_test.dart` (covers T003)
+
+### Phase 9c: Out-of-scope platform guards (FR-009)
+
+- [ ] T033 [P] Unit tests [U24] [U25] [A15-windows] asserting Windows `takeScreenshot`/`createPdf` return `null` and never throw, in `zikzak_inappwebview_windows/test/in_app_webview_windows_controller_test.dart` (covers T004)
+- [ ] T034 [P] Unit tests [U27] [U28] [A15-web] asserting Web `takeScreenshot`/`createPdf` return `null` and never throw, in `zikzak_inappwebview_web/test/in_app_webview_web_controller_test.dart` (covers T005) — depends on T028
+
+### Phase 9d: US1 — macOS takeScreenshot
+
+- [ ] T035 [US1] Wire-contract tests [U1] [U2] [U3] over a mocked `MethodChannel` asserting a single `takeScreenshot` invocation and the `screenshotConfiguration` argument (absent → `null`, present → `toMap()`), in `zikzak_inappwebview_macos/test/in_app_webview_controller_test.dart` (covers T008)
+- [ ] T036 [US1] Error/empty-path tests [U4] [U5] asserting `null` on a `null` channel result and on a `PlatformException`, same file (covers T008, T025)
+- [ ] T037 [US1] Acceptance tests [A1] [A2] [A3] through the macOS controller's public API: default call yields the platform bytes; JPEG/quality-80 configuration reaches the platform and yields its bytes; a source rect reaches the platform and yields the cropped bytes — `zikzak_inappwebview_macos/test/in_app_webview_controller_test.dart`
+- [ ] T038 [US1] Regression test [U6] that macOS `createPdf` still invokes its channel method unchanged, same file (covers T021)
+- [ ] T039 [US1] Record in `specs/001-screenshot-pdf-export/tdd/cycle-log.md` the manual device verification for [A4] (real macOS host required; not reachable from `flutter_test`)
+
+### Phase 9e: US2 — Android createPdf
+
+- [ ] T040 [US2] Wire-contract tests [U8] [U9] [U10] over a mocked `MethodChannel` asserting a single `createPdf` invocation and the `pdfConfiguration` argument (absent → `null`, present → `toMap()`), in `zikzak_inappwebview_android/test/in_app_webview_controller_test.dart` (covers T013) — depends on T026
+- [ ] T041 [US2] Error/empty-path tests [U11] [U12] asserting `null` on a `null` channel result and on a `PlatformException`, same file (covers T013, T025)
+- [ ] T042 [US2] Acceptance tests [A5] [A6] through the Android controller's public API: default call yields the platform bytes; an A4 `PDFConfiguration` reaches the platform and yields its bytes — same file
+- [ ] T043 [US2] Regression test [U13] that Android `takeScreenshot` still invokes its channel method unchanged, same file (covers T022)
+- [ ] T044 [US2] Record in `tdd/cycle-log.md` the emulator verification for [A7] (A4 page geometry and multi-page content; not reachable from `flutter_test`)
+
+### Phase 9f: US5 — iOS regression tests
+
+- [ ] T045 [P] [US5] Wire-contract tests [U21] [U22] [A12] [A13] asserting iOS `takeScreenshot` and `createPdf` each invoke their channel method once and return the bytes unmodified, with a `null` configuration argument when none is given, in `zikzak_inappwebview_ios/test/in_app_webview_controller_test.dart` (covers T014, T015, T016)
+- [ ] T046 [US5] Error-path test [U23] [A14] asserting a `PlatformException` from `createPdf` (unsupported OS version) surfaces its message to the caller rather than crashing, same file
+
+### Phase 9g: US3 / US4 — Linux createPdf and takeScreenshot
+
+- [ ] T047 [US3] Wire-contract tests [U15] [U16] [A8] [A9] asserting a single `createPdf` invocation with the serialized configuration (or `null`) and that the platform bytes are returned, in `zikzak_inappwebview_linux/test/in_app_webview_controller_test.dart` (covers T018) — depends on T027
+- [ ] T048 [US4] Wire-contract tests [U17] [U18] [A10] [A11] asserting a single `takeScreenshot` invocation with format/quality/rect (or `null`) and that the platform bytes are returned, same file (covers T020) — depends on T047 (same file)
+- [ ] T049 [US4] Error/empty-path tests [U19] [U20] asserting `null` on a `null` channel result and on a `PlatformException` for both Linux methods, same file (covers T025)
+
+### Phase 9h: Facade and cross-cutting
+
+- [ ] T050 Test [U30] [A17] asserting the deprecated `IOSInAppWebViewController` facade forwards `takeScreenshot` (and still forwards `createPdf`) to the wrapped controller via a hand-written fake, in `zikzak_inappwebview/test/apple_in_app_webview_controller_test.dart` (covers T006) — depends on T029. BLOCKED: umbrella suite blocked by zuraffa pub-cache corruption — run `flutter pub cache repair`
+- [ ] T051 Acceptance test [A16] asserting both methods yield `null` when the platform reports no loaded content, on macOS, Android, iOS and Linux controllers (covers T025)
+- [ ] T052 Place or drop, with a one-line reason each, the items under "Invariants and edge cases still to place" in `tdd/test-list.md` (pre-load call, zero-size view, headless controller, disposed-while-in-flight, configuration idempotence, beyond-viewport content, Android OOM, transparent PNG background)
+- [ ] T053 Deliberate-mutant spot check on the changed Dart files (no mutation library exists in any `pubspec.lock`): invert one guard per changed method, confirm a named test fails, revert, and record the result in `tdd/cycle-log.md`
+- [ ] T054 Update `tdd/test-list.md` states (PENDING → RED → GREEN → DONE) and append one `tdd/cycle-log.md` entry per behavior as the loop proceeds
+
+**Checkpoint**: Every behavior in `tdd/test-list.md` is DONE, BASELINE, BLOCKED with a reason, or DROPPED with a reason; every red phase has evidence in `tdd/cycle-log.md`.
+
+### Behavior coverage of the already-completed tasks
+
+Existing checked tasks are preserved verbatim; this table binds them to the behaviors that must cover them.
+
+| task            | behaviors                                    |
+| --------------- | -------------------------------------------- |
+| T001            | U31, U32, U33, U34, U35                      |
+| T002            | U36, U37, U38, U39                           |
+| T003            | U40                                          |
+| T004            | U24, U25, A15                                |
+| T005            | U26, U27, U28, A15                           |
+| T006            | U29, U30, A17                                |
+| T007, T008      | U1, U2, U3, U4, U5, A1, A2, A3, A4           |
+| T009–T013       | U7, U8, U9, U10, U11, U12, A5, A6, A7        |
+| T014–T016       | U21, U22, U23, A12, A13, A14                 |
+| T017, T018      | U14, U15, U16, A8, A9                        |
+| T019, T020      | U14, U17, U18, A10, A11                      |
+| T021            | U6                                           |
+| T022            | U13                                          |
+| T025            | U4, U5, U11, U12, U19, U20, A16              |
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies
@@ -158,6 +244,7 @@ zikzak_inappwebview_web/lib/src/
 - **User Story 3 (Phase 6)**: Depends on Foundational — Linux createPdf wiring
 - **User Story 4 (Phase 7)**: Depends on Foundational — Linux takeScreenshot
 - **Polish (Phase 8)**: Depends on all user stories being complete
+- **TDD Retrofit (Phase 9)**: Phase 9a (characterization) must land before any task that changes the code it covers; 9b/9c are independent and can start immediately; 9d–9h follow their user story's implementation files
 
 ### User Story Dependencies
 

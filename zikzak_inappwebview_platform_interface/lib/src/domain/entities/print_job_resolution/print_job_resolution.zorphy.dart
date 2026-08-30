@@ -63,38 +63,44 @@ class PrintJobResolution {
     final _patchMap = _patcher.patchMap;
     return PrintJobResolution(
       id: _patchMap.containsKey(PrintJobResolution$.id)
-          ? (_patchMap[PrintJobResolution$.id] is Function)
-                ? _patchMap[PrintJobResolution$.id](this.id)
-                : (_patchMap[PrintJobResolution$.id] is Patch)
-                ? _patchMap[PrintJobResolution$.id].applyTo(this.id)
-                : _patchMap[PrintJobResolution$.id]
+          ? ((_patchMap[PrintJobResolution$.id] is Function)
+                    ? _patchMap[PrintJobResolution$.id](this.id)
+                    : (_patchMap[PrintJobResolution$.id] is Patch)
+                    ? _patchMap[PrintJobResolution$.id].applyTo(this.id)
+                    : _patchMap[PrintJobResolution$.id])
+                as String
           : this.id,
       label: _patchMap.containsKey(PrintJobResolution$.label)
-          ? (_patchMap[PrintJobResolution$.label] is Function)
-                ? _patchMap[PrintJobResolution$.label](this.label)
-                : (_patchMap[PrintJobResolution$.label] is Patch)
-                ? _patchMap[PrintJobResolution$.label].applyTo(this.label)
-                : _patchMap[PrintJobResolution$.label]
+          ? ((_patchMap[PrintJobResolution$.label] is Function)
+                    ? _patchMap[PrintJobResolution$.label](this.label)
+                    : (_patchMap[PrintJobResolution$.label] is Patch)
+                    ? _patchMap[PrintJobResolution$.label].applyTo(this.label)
+                    : _patchMap[PrintJobResolution$.label])
+                as String
           : this.label,
       verticalDpi: _patchMap.containsKey(PrintJobResolution$.verticalDpi)
-          ? (_patchMap[PrintJobResolution$.verticalDpi] is Function)
-                ? _patchMap[PrintJobResolution$.verticalDpi](this.verticalDpi)
-                : (_patchMap[PrintJobResolution$.verticalDpi] is Patch)
-                ? _patchMap[PrintJobResolution$.verticalDpi].applyTo(
-                    this.verticalDpi,
-                  )
-                : _patchMap[PrintJobResolution$.verticalDpi]
+          ? ((_patchMap[PrintJobResolution$.verticalDpi] is Function)
+                    ? _patchMap[PrintJobResolution$.verticalDpi](
+                        this.verticalDpi,
+                      )
+                    : (_patchMap[PrintJobResolution$.verticalDpi] is Patch)
+                    ? _patchMap[PrintJobResolution$.verticalDpi].applyTo(
+                        this.verticalDpi,
+                      )
+                    : _patchMap[PrintJobResolution$.verticalDpi])
+                as int
           : this.verticalDpi,
       horizontalDpi: _patchMap.containsKey(PrintJobResolution$.horizontalDpi)
-          ? (_patchMap[PrintJobResolution$.horizontalDpi] is Function)
-                ? _patchMap[PrintJobResolution$.horizontalDpi](
-                    this.horizontalDpi,
-                  )
-                : (_patchMap[PrintJobResolution$.horizontalDpi] is Patch)
-                ? _patchMap[PrintJobResolution$.horizontalDpi].applyTo(
-                    this.horizontalDpi,
-                  )
-                : _patchMap[PrintJobResolution$.horizontalDpi]
+          ? ((_patchMap[PrintJobResolution$.horizontalDpi] is Function)
+                    ? _patchMap[PrintJobResolution$.horizontalDpi](
+                        this.horizontalDpi,
+                      )
+                    : (_patchMap[PrintJobResolution$.horizontalDpi] is Patch)
+                    ? _patchMap[PrintJobResolution$.horizontalDpi].applyTo(
+                        this.horizontalDpi,
+                      )
+                    : _patchMap[PrintJobResolution$.horizontalDpi])
+                as int
           : this.horizontalDpi,
     );
   }
@@ -133,7 +139,8 @@ class PrintJobResolution {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$PrintJobResolutionToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

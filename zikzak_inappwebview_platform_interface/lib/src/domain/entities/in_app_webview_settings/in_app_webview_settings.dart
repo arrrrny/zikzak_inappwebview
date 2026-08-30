@@ -131,7 +131,11 @@ abstract class $InAppWebViewSettings {
   List<ContentBlocker>? get contentBlockers;
 
   ///Sets the content mode that the WebView needs to use when loading and rendering a webpage. The default value is [UserPreferredContentMode.RECOMMENDED].
-  @JsonKey(defaultValue: UserPreferredContentMode.RECOMMENDED)
+  @JsonKey(
+    defaultValue: UserPreferredContentMode.RECOMMENDED,
+    toJson: userPreferredContentModeToWire,
+    fromJson: userPreferredContentModeFromWire,
+  )
   UserPreferredContentMode? get preferredContentMode;
 
   ///Set to `true` to be able to listen at the [PlatformWebViewCreationParams.shouldInterceptAjaxRequest] event.
@@ -165,6 +169,34 @@ abstract class $InAppWebViewSettings {
   ///Set to `true` to open a browser window with incognito mode. The default value is `false`.
   @JsonKey(defaultValue: false)
   bool? get incognito;
+
+  ///Stable identifier for a per-instance, persistent, isolated
+  ///`WKWebsiteDataStore` on iOS 17+ and macOS 14+. When non-null and
+  ///non-empty, the WebView stores cookies, localStorage, IndexedDB and other
+  ///site data at a system location keyed by this identifier, so an account's
+  ///session survives an app relaunch and stays isolated from every other
+  ///account. Null/empty means the default shared store (existing behaviour).
+  ///
+  ///Accepts three input shapes (all deterministic; same identifier reopens
+  ///the same on-disk store):
+  /// * a raw UUID string ("550e8400-e29b-41d4-a716-446655440000"),
+  /// * a 64-char SHA-256 hex string (legacy caller contract; first 32 hex
+  ///   chars are used as the UUID's raw bytes),
+  /// * any other stable string (SHA-256 of its UTF-8 bytes -> first 16
+  ///   bytes used as the UUID's raw bytes).
+  ///
+  ///Mutually exclusive with [incognito]: when both are set, `incognito`
+  ///(non-persistent, wiped on tear-down) takes precedence.
+  ///
+  ///Must be set at construction time — `WKWebViewConfiguration.websiteDataStore`
+  ///is immutable after the `WKWebView` is initialised, so a `setSettings`
+  ///call changing this value has no effect.
+  ///
+  ///Below the iOS 17 / macOS 14 floor, the persistent path is unavailable
+  ///and the WebView falls back to the shared `.default()` store (existing
+  ///behaviour) — no error is surfaced.
+  @JsonKey(includeIfNull: false)
+  String? get persistentStoreIdentifier;
 
   ///Sets whether WebView should use browser caching. The default value is `true`.
   @JsonKey(defaultValue: true)
@@ -248,6 +280,7 @@ abstract class $InAppWebViewSettings {
   bool? get safeBrowsingEnabled;
 
   ///Configures the WebView's behavior when a secure origin attempts to load a resource from an insecure origin.
+  @JsonKey(toJson: mixedContentModeToWire, fromJson: mixedContentModeFromWire)
   MixedContentMode? get mixedContentMode;
 
   ///Enables or disables content URL access within WebView. Content URL access allows WebView to load content from a content provider installed in the system. The default value is `true`.
@@ -269,7 +302,11 @@ abstract class $InAppWebViewSettings {
 
   ///Overrides the way the cache is used. The way the cache is used is based on the navigation type. For a normal page load, the cache is checked and content is re-validated as needed.
   ///When navigating back, content is not revalidated, instead the content is just retrieved from the cache. The default value is [CacheMode.LOAD_DEFAULT].
-  @JsonKey(defaultValue: CacheMode.LOAD_DEFAULT)
+  @JsonKey(
+    defaultValue: CacheMode.LOAD_DEFAULT,
+    toJson: cacheModeToWire,
+    fromJson: cacheModeFromWire,
+  )
   CacheMode? get cacheMode;
 
   ///Sets the cursive font family name. The default value is `"cursive"`.
@@ -289,6 +326,10 @@ abstract class $InAppWebViewSettings {
   String? get defaultTextEncodingName;
 
   ///Disables the action mode menu items according to menuItems flag.
+  @JsonKey(
+    toJson: actionModeMenuItemToWire,
+    fromJson: actionModeMenuItemFromWire,
+  )
   ActionModeMenuItem? get disabledActionModeMenuItems;
 
   ///Sets the fantasy font family name. The default value is `"fantasy"`.
@@ -300,13 +341,19 @@ abstract class $InAppWebViewSettings {
   String? get fixedFontFamily;
 
   ///Set the force dark mode for this WebView. The default value is [ForceDark.OFF].
-  @JsonKey(defaultValue: ForceDark.OFF)
+  @JsonKey(
+    defaultValue: ForceDark.OFF,
+    toJson: forceDarkToWire,
+    fromJson: forceDarkFromWire,
+  )
   ForceDark? get forceDark;
 
   ///Set how WebView content should be darkened.
   ///The default value is [ForceDarkStrategy.PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING].
   @JsonKey(
     defaultValue: ForceDarkStrategy.PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING,
+    toJson: forceDarkStrategyToWire,
+    fromJson: forceDarkStrategyFromWire,
   )
   ForceDarkStrategy? get forceDarkStrategy;
 
@@ -416,7 +463,11 @@ abstract class $InAppWebViewSettings {
   ///Sets the WebView's over-scroll mode.
   ///Setting the over-scroll mode of a WebView will have an effect only if the WebView is capable of scrolling.
   ///The default value is [OverScrollMode.IF_CONTENT_SCROLLS].
-  @JsonKey(defaultValue: OverScrollMode.IF_CONTENT_SCROLLS)
+  @JsonKey(
+    defaultValue: OverScrollMode.IF_CONTENT_SCROLLS,
+    toJson: overScrollModeToWire,
+    fromJson: overScrollModeFromWire,
+  )
   OverScrollMode? get overScrollMode;
 
   ///Informs WebView of the network state.
@@ -429,12 +480,20 @@ abstract class $InAppWebViewSettings {
   ///you can use SCROLLBARS_INSIDE_OVERLAY or SCROLLBARS_INSIDE_INSET. If you want them to appear at the edge of the view, ignoring the padding,
   ///then you can use SCROLLBARS_OUTSIDE_OVERLAY or SCROLLBARS_OUTSIDE_INSET.
   ///The default value is [ScrollBarStyle.SCROLLBARS_INSIDE_OVERLAY].
-  @JsonKey(defaultValue: ScrollBarStyle.SCROLLBARS_INSIDE_OVERLAY)
+  @JsonKey(
+    defaultValue: ScrollBarStyle.SCROLLBARS_INSIDE_OVERLAY,
+    toJson: scrollBarStyleToWire,
+    fromJson: scrollBarStyleFromWire,
+  )
   ScrollBarStyle? get scrollBarStyle;
 
   ///Sets the position of the vertical scroll bar.
   ///The default value is [VerticalScrollbarPosition.SCROLLBAR_POSITION_DEFAULT].
-  @JsonKey(defaultValue: VerticalScrollbarPosition.SCROLLBAR_POSITION_DEFAULT)
+  @JsonKey(
+    defaultValue: VerticalScrollbarPosition.SCROLLBAR_POSITION_DEFAULT,
+    toJson: verticalScrollbarPositionToWire,
+    fromJson: verticalScrollbarPositionFromWire,
+  )
   VerticalScrollbarPosition? get verticalScrollbarPosition;
 
   ///Defines the delay in milliseconds that a scrollbar waits before fade out.
@@ -490,6 +549,35 @@ abstract class $InAppWebViewSettings {
   bool? get paymentRequestEnabled;
 
   ///Sets the Web Authentication support level for the WebView. The default value is [WebAuthenticationSupport.NONE].
+  ///
+  ///Supported on:
+  ///- iOS 16.4+ (app-bound passkeys; requires the host app to add the
+  ///  webcredentials Associated Domains entitlement and the site to serve
+  ///  a valid apple-app-site-association file - see the Apple passkeys docs)
+  ///- macOS 13.3+ (app-bound passkeys; same host-app Associated Domains
+  ///  entitlement and apple-app-site-association requirements as iOS)
+  ///- Android (androidx.webkit WebViewFeature.WEB_AUTHENTICATION,
+  ///  feature-detected at runtime)
+  ///
+  ///Other platforms either do not expose a per-WebView WebAuthn toggle
+  ///(Windows/WebView2: WebAuthn is handled by Windows Hello when available)
+  ///or have no public WebAuthn API (Linux/WebKitGTK), so the setting is
+  ///ignored there.
+  ///
+  ///Notes:
+  ///- On iOS and macOS this setting is applied when the WebView is created
+  ///  and cannot be changed afterwards (the underlying WKWebViewConfiguration
+  ///  is immutable after init); changing it later through setSettings is a
+  ///  no-op and logs a native warning.
+  ///- On Android, getSettings returns `null` for this setting when the
+  ///  installed WebView does not support `WebViewFeature.WEB_AUTHENTICATION`
+  ///  or the OEM WebView wrapper rejects the call.
+  ///- WebAuthn ceremonies require a user gesture (for example a sign-in
+  ///  button tap) inside the WebView.
+  @JsonKey(
+    toJson: webAuthenticationSupportToWire,
+    fromJson: webAuthenticationSupportFromWire,
+  )
   WebAuthenticationSupport? get webAuthenticationSupport;
 
   ///Sets whether EnterpriseAuthenticationAppLinkPolicy if set by admin is allowed to have any

@@ -48,25 +48,29 @@ class ActivityButton {
     final _patchMap = _patcher.patchMap;
     return ActivityButton(
       templateImage: _patchMap.containsKey(ActivityButton$.templateImage)
-          ? (_patchMap[ActivityButton$.templateImage] is Function)
-                ? _patchMap[ActivityButton$.templateImage](this.templateImage)
-                : (_patchMap[ActivityButton$.templateImage] is Patch)
-                ? _patchMap[ActivityButton$.templateImage].applyTo(
-                    this.templateImage,
-                  )
-                : _patchMap[ActivityButton$.templateImage]
+          ? ((_patchMap[ActivityButton$.templateImage] is Function)
+                    ? _patchMap[ActivityButton$.templateImage](
+                        this.templateImage,
+                      )
+                    : (_patchMap[ActivityButton$.templateImage] is Patch)
+                    ? _patchMap[ActivityButton$.templateImage].applyTo(
+                        this.templateImage,
+                      )
+                    : _patchMap[ActivityButton$.templateImage])
+                as UIImage
           : this.templateImage,
       extensionIdentifier:
           _patchMap.containsKey(ActivityButton$.extensionIdentifier)
-          ? (_patchMap[ActivityButton$.extensionIdentifier] is Function)
-                ? _patchMap[ActivityButton$.extensionIdentifier](
-                    this.extensionIdentifier,
-                  )
-                : (_patchMap[ActivityButton$.extensionIdentifier] is Patch)
-                ? _patchMap[ActivityButton$.extensionIdentifier].applyTo(
-                    this.extensionIdentifier,
-                  )
-                : _patchMap[ActivityButton$.extensionIdentifier]
+          ? ((_patchMap[ActivityButton$.extensionIdentifier] is Function)
+                    ? _patchMap[ActivityButton$.extensionIdentifier](
+                        this.extensionIdentifier,
+                      )
+                    : (_patchMap[ActivityButton$.extensionIdentifier] is Patch)
+                    ? _patchMap[ActivityButton$.extensionIdentifier].applyTo(
+                        this.extensionIdentifier,
+                      )
+                    : _patchMap[ActivityButton$.extensionIdentifier])
+                as String
           : this.extensionIdentifier,
     );
   }
@@ -94,7 +98,8 @@ class ActivityButton {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$ActivityButtonToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

@@ -89,77 +89,87 @@ class WindowFeatures {
     final _patchMap = _patcher.patchMap;
     return WindowFeatures(
       allowsResizing: _patchMap.containsKey(WindowFeatures$.allowsResizing)
-          ? (_patchMap[WindowFeatures$.allowsResizing] is Function)
-                ? _patchMap[WindowFeatures$.allowsResizing](this.allowsResizing)
-                : (_patchMap[WindowFeatures$.allowsResizing] is Patch)
-                ? _patchMap[WindowFeatures$.allowsResizing].applyTo(
-                    this.allowsResizing,
-                  )
-                : _patchMap[WindowFeatures$.allowsResizing]
+          ? ((_patchMap[WindowFeatures$.allowsResizing] is Function)
+                    ? _patchMap[WindowFeatures$.allowsResizing](
+                        this.allowsResizing,
+                      )
+                    : (_patchMap[WindowFeatures$.allowsResizing] is Patch)
+                    ? _patchMap[WindowFeatures$.allowsResizing].applyTo(
+                        this.allowsResizing,
+                      )
+                    : _patchMap[WindowFeatures$.allowsResizing])
+                as bool?
           : this.allowsResizing,
       height: _patchMap.containsKey(WindowFeatures$.height)
-          ? (_patchMap[WindowFeatures$.height] is Function)
-                ? _patchMap[WindowFeatures$.height](this.height)
-                : (_patchMap[WindowFeatures$.height] is Patch)
-                ? _patchMap[WindowFeatures$.height].applyTo(this.height)
-                : _patchMap[WindowFeatures$.height]
+          ? ((_patchMap[WindowFeatures$.height] is Function)
+                    ? _patchMap[WindowFeatures$.height](this.height)
+                    : (_patchMap[WindowFeatures$.height] is Patch)
+                    ? _patchMap[WindowFeatures$.height].applyTo(this.height)
+                    : _patchMap[WindowFeatures$.height])
+                as double?
           : this.height,
       menuBarVisibility:
           _patchMap.containsKey(WindowFeatures$.menuBarVisibility)
-          ? (_patchMap[WindowFeatures$.menuBarVisibility] is Function)
-                ? _patchMap[WindowFeatures$.menuBarVisibility](
-                    this.menuBarVisibility,
-                  )
-                : (_patchMap[WindowFeatures$.menuBarVisibility] is Patch)
-                ? _patchMap[WindowFeatures$.menuBarVisibility].applyTo(
-                    this.menuBarVisibility,
-                  )
-                : _patchMap[WindowFeatures$.menuBarVisibility]
+          ? ((_patchMap[WindowFeatures$.menuBarVisibility] is Function)
+                    ? _patchMap[WindowFeatures$.menuBarVisibility](
+                        this.menuBarVisibility,
+                      )
+                    : (_patchMap[WindowFeatures$.menuBarVisibility] is Patch)
+                    ? _patchMap[WindowFeatures$.menuBarVisibility].applyTo(
+                        this.menuBarVisibility,
+                      )
+                    : _patchMap[WindowFeatures$.menuBarVisibility])
+                as bool?
           : this.menuBarVisibility,
       statusBarVisibility:
           _patchMap.containsKey(WindowFeatures$.statusBarVisibility)
-          ? (_patchMap[WindowFeatures$.statusBarVisibility] is Function)
-                ? _patchMap[WindowFeatures$.statusBarVisibility](
-                    this.statusBarVisibility,
-                  )
-                : (_patchMap[WindowFeatures$.statusBarVisibility] is Patch)
-                ? _patchMap[WindowFeatures$.statusBarVisibility].applyTo(
-                    this.statusBarVisibility,
-                  )
-                : _patchMap[WindowFeatures$.statusBarVisibility]
+          ? ((_patchMap[WindowFeatures$.statusBarVisibility] is Function)
+                    ? _patchMap[WindowFeatures$.statusBarVisibility](
+                        this.statusBarVisibility,
+                      )
+                    : (_patchMap[WindowFeatures$.statusBarVisibility] is Patch)
+                    ? _patchMap[WindowFeatures$.statusBarVisibility].applyTo(
+                        this.statusBarVisibility,
+                      )
+                    : _patchMap[WindowFeatures$.statusBarVisibility])
+                as bool?
           : this.statusBarVisibility,
       toolbarsVisibility:
           _patchMap.containsKey(WindowFeatures$.toolbarsVisibility)
-          ? (_patchMap[WindowFeatures$.toolbarsVisibility] is Function)
-                ? _patchMap[WindowFeatures$.toolbarsVisibility](
-                    this.toolbarsVisibility,
-                  )
-                : (_patchMap[WindowFeatures$.toolbarsVisibility] is Patch)
-                ? _patchMap[WindowFeatures$.toolbarsVisibility].applyTo(
-                    this.toolbarsVisibility,
-                  )
-                : _patchMap[WindowFeatures$.toolbarsVisibility]
+          ? ((_patchMap[WindowFeatures$.toolbarsVisibility] is Function)
+                    ? _patchMap[WindowFeatures$.toolbarsVisibility](
+                        this.toolbarsVisibility,
+                      )
+                    : (_patchMap[WindowFeatures$.toolbarsVisibility] is Patch)
+                    ? _patchMap[WindowFeatures$.toolbarsVisibility].applyTo(
+                        this.toolbarsVisibility,
+                      )
+                    : _patchMap[WindowFeatures$.toolbarsVisibility])
+                as bool?
           : this.toolbarsVisibility,
       width: _patchMap.containsKey(WindowFeatures$.width)
-          ? (_patchMap[WindowFeatures$.width] is Function)
-                ? _patchMap[WindowFeatures$.width](this.width)
-                : (_patchMap[WindowFeatures$.width] is Patch)
-                ? _patchMap[WindowFeatures$.width].applyTo(this.width)
-                : _patchMap[WindowFeatures$.width]
+          ? ((_patchMap[WindowFeatures$.width] is Function)
+                    ? _patchMap[WindowFeatures$.width](this.width)
+                    : (_patchMap[WindowFeatures$.width] is Patch)
+                    ? _patchMap[WindowFeatures$.width].applyTo(this.width)
+                    : _patchMap[WindowFeatures$.width])
+                as double?
           : this.width,
       x: _patchMap.containsKey(WindowFeatures$.x)
-          ? (_patchMap[WindowFeatures$.x] is Function)
-                ? _patchMap[WindowFeatures$.x](this.x)
-                : (_patchMap[WindowFeatures$.x] is Patch)
-                ? _patchMap[WindowFeatures$.x].applyTo(this.x)
-                : _patchMap[WindowFeatures$.x]
+          ? ((_patchMap[WindowFeatures$.x] is Function)
+                    ? _patchMap[WindowFeatures$.x](this.x)
+                    : (_patchMap[WindowFeatures$.x] is Patch)
+                    ? _patchMap[WindowFeatures$.x].applyTo(this.x)
+                    : _patchMap[WindowFeatures$.x])
+                as double?
           : this.x,
       y: _patchMap.containsKey(WindowFeatures$.y)
-          ? (_patchMap[WindowFeatures$.y] is Function)
-                ? _patchMap[WindowFeatures$.y](this.y)
-                : (_patchMap[WindowFeatures$.y] is Patch)
-                ? _patchMap[WindowFeatures$.y].applyTo(this.y)
-                : _patchMap[WindowFeatures$.y]
+          ? ((_patchMap[WindowFeatures$.y] is Function)
+                    ? _patchMap[WindowFeatures$.y](this.y)
+                    : (_patchMap[WindowFeatures$.y] is Patch)
+                    ? _patchMap[WindowFeatures$.y].applyTo(this.y)
+                    : _patchMap[WindowFeatures$.y])
+                as double?
           : this.y,
     );
   }
@@ -214,7 +224,8 @@ class WindowFeatures {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$WindowFeaturesToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

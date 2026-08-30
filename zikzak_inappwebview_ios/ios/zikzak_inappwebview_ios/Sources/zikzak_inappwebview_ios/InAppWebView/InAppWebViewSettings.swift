@@ -30,6 +30,12 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     var interceptOnlyAsyncAjaxRequests = true
     var useShouldInterceptFetchRequest = false
     var incognito = false
+    /// Stable identifier for a per-instance persistent WKWebsiteDataStore
+    /// (iOS 17+/macOS 14+). Mirrors the Dart-side field; populated from
+    /// the JSON dict by ISettings.parse via KVC. Mutually exclusive with
+    /// `incognito`; init-time-only — websiteDataStore is immutable after
+    /// the WKWebView is created.
+    var persistentStoreIdentifier: String? = nil
     var cacheEnabled = true
     var transparentBackground = false
     var disableVerticalScroll = false
@@ -309,8 +315,12 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
                 let selector = Selector(("webAuthenticationSupport"))
                 if configuration.responds(to: selector),
                     let webAuthSupport = configuration.perform(selector)?.takeUnretainedValue()
-                        as? NSObject
+                        as? NSObject,
+                    webAuthSupport.responds(to: Selector(("boundKeychainForPasskeys")))
                 {
+                    // value(forKey:) throws an uncatchable NSUnknownKeyException
+                    // when the key is missing — the responds(to:) guard above keeps
+                    // getRealSettings() crash-proof on unexpected SDK states.
                     let boundValue =
                         webAuthSupport.value(forKey: "boundKeychainForPasskeys") as? Bool ?? false
                     realSettings["webAuthenticationSupport"] = boundValue ? 1 : 0

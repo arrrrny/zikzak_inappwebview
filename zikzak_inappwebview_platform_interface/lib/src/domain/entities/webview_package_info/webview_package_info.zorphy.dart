@@ -40,22 +40,28 @@ class WebViewPackageInfo {
     final _patchMap = _patcher.patchMap;
     return WebViewPackageInfo(
       versionName: _patchMap.containsKey(WebViewPackageInfo$.versionName)
-          ? (_patchMap[WebViewPackageInfo$.versionName] is Function)
-                ? _patchMap[WebViewPackageInfo$.versionName](this.versionName)
-                : (_patchMap[WebViewPackageInfo$.versionName] is Patch)
-                ? _patchMap[WebViewPackageInfo$.versionName].applyTo(
-                    this.versionName,
-                  )
-                : _patchMap[WebViewPackageInfo$.versionName]
+          ? ((_patchMap[WebViewPackageInfo$.versionName] is Function)
+                    ? _patchMap[WebViewPackageInfo$.versionName](
+                        this.versionName,
+                      )
+                    : (_patchMap[WebViewPackageInfo$.versionName] is Patch)
+                    ? _patchMap[WebViewPackageInfo$.versionName].applyTo(
+                        this.versionName,
+                      )
+                    : _patchMap[WebViewPackageInfo$.versionName])
+                as String?
           : this.versionName,
       packageName: _patchMap.containsKey(WebViewPackageInfo$.packageName)
-          ? (_patchMap[WebViewPackageInfo$.packageName] is Function)
-                ? _patchMap[WebViewPackageInfo$.packageName](this.packageName)
-                : (_patchMap[WebViewPackageInfo$.packageName] is Patch)
-                ? _patchMap[WebViewPackageInfo$.packageName].applyTo(
-                    this.packageName,
-                  )
-                : _patchMap[WebViewPackageInfo$.packageName]
+          ? ((_patchMap[WebViewPackageInfo$.packageName] is Function)
+                    ? _patchMap[WebViewPackageInfo$.packageName](
+                        this.packageName,
+                      )
+                    : (_patchMap[WebViewPackageInfo$.packageName] is Patch)
+                    ? _patchMap[WebViewPackageInfo$.packageName].applyTo(
+                        this.packageName,
+                      )
+                    : _patchMap[WebViewPackageInfo$.packageName])
+                as String?
           : this.packageName,
     );
   }
@@ -83,7 +89,8 @@ class WebViewPackageInfo {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$WebViewPackageInfoToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

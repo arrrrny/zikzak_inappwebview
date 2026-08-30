@@ -394,466 +394,550 @@ class PrintJobSettings {
     final _patchMap = _patcher.patchMap;
     return PrintJobSettings(
       handledByClient: _patchMap.containsKey(PrintJobSettings$.handledByClient)
-          ? (_patchMap[PrintJobSettings$.handledByClient] is Function)
-                ? _patchMap[PrintJobSettings$.handledByClient](
-                    this.handledByClient,
-                  )
-                : (_patchMap[PrintJobSettings$.handledByClient] is Patch)
-                ? _patchMap[PrintJobSettings$.handledByClient].applyTo(
-                    this.handledByClient,
-                  )
-                : _patchMap[PrintJobSettings$.handledByClient]
+          ? ((_patchMap[PrintJobSettings$.handledByClient] is Function)
+                    ? _patchMap[PrintJobSettings$.handledByClient](
+                        this.handledByClient,
+                      )
+                    : (_patchMap[PrintJobSettings$.handledByClient] is Patch)
+                    ? _patchMap[PrintJobSettings$.handledByClient].applyTo(
+                        this.handledByClient,
+                      )
+                    : _patchMap[PrintJobSettings$.handledByClient])
+                as bool?
           : this.handledByClient,
       jobName: _patchMap.containsKey(PrintJobSettings$.jobName)
-          ? (_patchMap[PrintJobSettings$.jobName] is Function)
-                ? _patchMap[PrintJobSettings$.jobName](this.jobName)
-                : (_patchMap[PrintJobSettings$.jobName] is Patch)
-                ? _patchMap[PrintJobSettings$.jobName].applyTo(this.jobName)
-                : _patchMap[PrintJobSettings$.jobName]
+          ? ((_patchMap[PrintJobSettings$.jobName] is Function)
+                    ? _patchMap[PrintJobSettings$.jobName](this.jobName)
+                    : (_patchMap[PrintJobSettings$.jobName] is Patch)
+                    ? _patchMap[PrintJobSettings$.jobName].applyTo(this.jobName)
+                    : _patchMap[PrintJobSettings$.jobName])
+                as String?
           : this.jobName,
       detailedErrorReporting:
           _patchMap.containsKey(PrintJobSettings$.detailedErrorReporting)
-          ? (_patchMap[PrintJobSettings$.detailedErrorReporting] is Function)
-                ? _patchMap[PrintJobSettings$.detailedErrorReporting](
-                    this.detailedErrorReporting,
-                  )
-                : (_patchMap[PrintJobSettings$.detailedErrorReporting] is Patch)
-                ? _patchMap[PrintJobSettings$.detailedErrorReporting].applyTo(
-                    this.detailedErrorReporting,
-                  )
-                : _patchMap[PrintJobSettings$.detailedErrorReporting]
+          ? ((_patchMap[PrintJobSettings$.detailedErrorReporting] is Function)
+                    ? _patchMap[PrintJobSettings$.detailedErrorReporting](
+                        this.detailedErrorReporting,
+                      )
+                    : (_patchMap[PrintJobSettings$.detailedErrorReporting]
+                          is Patch)
+                    ? _patchMap[PrintJobSettings$.detailedErrorReporting]
+                          .applyTo(this.detailedErrorReporting)
+                    : _patchMap[PrintJobSettings$.detailedErrorReporting])
+                as bool?
           : this.detailedErrorReporting,
       showsPrintPanel: _patchMap.containsKey(PrintJobSettings$.showsPrintPanel)
-          ? (_patchMap[PrintJobSettings$.showsPrintPanel] is Function)
-                ? _patchMap[PrintJobSettings$.showsPrintPanel](
-                    this.showsPrintPanel,
-                  )
-                : (_patchMap[PrintJobSettings$.showsPrintPanel] is Patch)
-                ? _patchMap[PrintJobSettings$.showsPrintPanel].applyTo(
-                    this.showsPrintPanel,
-                  )
-                : _patchMap[PrintJobSettings$.showsPrintPanel]
+          ? ((_patchMap[PrintJobSettings$.showsPrintPanel] is Function)
+                    ? _patchMap[PrintJobSettings$.showsPrintPanel](
+                        this.showsPrintPanel,
+                      )
+                    : (_patchMap[PrintJobSettings$.showsPrintPanel] is Patch)
+                    ? _patchMap[PrintJobSettings$.showsPrintPanel].applyTo(
+                        this.showsPrintPanel,
+                      )
+                    : _patchMap[PrintJobSettings$.showsPrintPanel])
+                as bool?
           : this.showsPrintPanel,
       showsProgressPanel:
           _patchMap.containsKey(PrintJobSettings$.showsProgressPanel)
-          ? (_patchMap[PrintJobSettings$.showsProgressPanel] is Function)
-                ? _patchMap[PrintJobSettings$.showsProgressPanel](
-                    this.showsProgressPanel,
-                  )
-                : (_patchMap[PrintJobSettings$.showsProgressPanel] is Patch)
-                ? _patchMap[PrintJobSettings$.showsProgressPanel].applyTo(
-                    this.showsProgressPanel,
-                  )
-                : _patchMap[PrintJobSettings$.showsProgressPanel]
+          ? ((_patchMap[PrintJobSettings$.showsProgressPanel] is Function)
+                    ? _patchMap[PrintJobSettings$.showsProgressPanel](
+                        this.showsProgressPanel,
+                      )
+                    : (_patchMap[PrintJobSettings$.showsProgressPanel] is Patch)
+                    ? _patchMap[PrintJobSettings$.showsProgressPanel].applyTo(
+                        this.showsProgressPanel,
+                      )
+                    : _patchMap[PrintJobSettings$.showsProgressPanel])
+                as bool?
           : this.showsProgressPanel,
       jobSavingURL: _patchMap.containsKey(PrintJobSettings$.jobSavingURL)
-          ? (_patchMap[PrintJobSettings$.jobSavingURL] is Function)
-                ? _patchMap[PrintJobSettings$.jobSavingURL](this.jobSavingURL)
-                : (_patchMap[PrintJobSettings$.jobSavingURL] is Patch)
-                ? _patchMap[PrintJobSettings$.jobSavingURL].applyTo(
-                    this.jobSavingURL,
-                  )
-                : _patchMap[PrintJobSettings$.jobSavingURL]
+          ? ((_patchMap[PrintJobSettings$.jobSavingURL] is Function)
+                    ? _patchMap[PrintJobSettings$.jobSavingURL](
+                        this.jobSavingURL,
+                      )
+                    : (_patchMap[PrintJobSettings$.jobSavingURL] is Patch)
+                    ? _patchMap[PrintJobSettings$.jobSavingURL].applyTo(
+                        this.jobSavingURL,
+                      )
+                    : _patchMap[PrintJobSettings$.jobSavingURL])
+                as WebUri?
           : this.jobSavingURL,
       jobDisposition: _patchMap.containsKey(PrintJobSettings$.jobDisposition)
-          ? (_patchMap[PrintJobSettings$.jobDisposition] is Function)
-                ? _patchMap[PrintJobSettings$.jobDisposition](
-                    this.jobDisposition,
-                  )
-                : (_patchMap[PrintJobSettings$.jobDisposition] is Patch)
-                ? _patchMap[PrintJobSettings$.jobDisposition].applyTo(
-                    this.jobDisposition,
-                  )
-                : _patchMap[PrintJobSettings$.jobDisposition]
+          ? ((_patchMap[PrintJobSettings$.jobDisposition] is Function)
+                    ? _patchMap[PrintJobSettings$.jobDisposition](
+                        this.jobDisposition,
+                      )
+                    : (_patchMap[PrintJobSettings$.jobDisposition] is Patch)
+                    ? _patchMap[PrintJobSettings$.jobDisposition].applyTo(
+                        this.jobDisposition,
+                      )
+                    : _patchMap[PrintJobSettings$.jobDisposition])
+                as PrintJobDisposition?
           : this.jobDisposition,
       paperName: _patchMap.containsKey(PrintJobSettings$.paperName)
-          ? (_patchMap[PrintJobSettings$.paperName] is Function)
-                ? _patchMap[PrintJobSettings$.paperName](this.paperName)
-                : (_patchMap[PrintJobSettings$.paperName] is Patch)
-                ? _patchMap[PrintJobSettings$.paperName].applyTo(this.paperName)
-                : _patchMap[PrintJobSettings$.paperName]
+          ? ((_patchMap[PrintJobSettings$.paperName] is Function)
+                    ? _patchMap[PrintJobSettings$.paperName](this.paperName)
+                    : (_patchMap[PrintJobSettings$.paperName] is Patch)
+                    ? _patchMap[PrintJobSettings$.paperName].applyTo(
+                        this.paperName,
+                      )
+                    : _patchMap[PrintJobSettings$.paperName])
+                as String?
           : this.paperName,
       horizontalPagination:
           _patchMap.containsKey(PrintJobSettings$.horizontalPagination)
-          ? (_patchMap[PrintJobSettings$.horizontalPagination] is Function)
-                ? _patchMap[PrintJobSettings$.horizontalPagination](
-                    this.horizontalPagination,
-                  )
-                : (_patchMap[PrintJobSettings$.horizontalPagination] is Patch)
-                ? _patchMap[PrintJobSettings$.horizontalPagination].applyTo(
-                    this.horizontalPagination,
-                  )
-                : _patchMap[PrintJobSettings$.horizontalPagination]
+          ? ((_patchMap[PrintJobSettings$.horizontalPagination] is Function)
+                    ? _patchMap[PrintJobSettings$.horizontalPagination](
+                        this.horizontalPagination,
+                      )
+                    : (_patchMap[PrintJobSettings$.horizontalPagination]
+                          is Patch)
+                    ? _patchMap[PrintJobSettings$.horizontalPagination].applyTo(
+                        this.horizontalPagination,
+                      )
+                    : _patchMap[PrintJobSettings$.horizontalPagination])
+                as PrintJobPaginationMode?
           : this.horizontalPagination,
       verticalPagination:
           _patchMap.containsKey(PrintJobSettings$.verticalPagination)
-          ? (_patchMap[PrintJobSettings$.verticalPagination] is Function)
-                ? _patchMap[PrintJobSettings$.verticalPagination](
-                    this.verticalPagination,
-                  )
-                : (_patchMap[PrintJobSettings$.verticalPagination] is Patch)
-                ? _patchMap[PrintJobSettings$.verticalPagination].applyTo(
-                    this.verticalPagination,
-                  )
-                : _patchMap[PrintJobSettings$.verticalPagination]
+          ? ((_patchMap[PrintJobSettings$.verticalPagination] is Function)
+                    ? _patchMap[PrintJobSettings$.verticalPagination](
+                        this.verticalPagination,
+                      )
+                    : (_patchMap[PrintJobSettings$.verticalPagination] is Patch)
+                    ? _patchMap[PrintJobSettings$.verticalPagination].applyTo(
+                        this.verticalPagination,
+                      )
+                    : _patchMap[PrintJobSettings$.verticalPagination])
+                as PrintJobPaginationMode?
           : this.verticalPagination,
       isHorizontallyCentered:
           _patchMap.containsKey(PrintJobSettings$.isHorizontallyCentered)
-          ? (_patchMap[PrintJobSettings$.isHorizontallyCentered] is Function)
-                ? _patchMap[PrintJobSettings$.isHorizontallyCentered](
-                    this.isHorizontallyCentered,
-                  )
-                : (_patchMap[PrintJobSettings$.isHorizontallyCentered] is Patch)
-                ? _patchMap[PrintJobSettings$.isHorizontallyCentered].applyTo(
-                    this.isHorizontallyCentered,
-                  )
-                : _patchMap[PrintJobSettings$.isHorizontallyCentered]
+          ? ((_patchMap[PrintJobSettings$.isHorizontallyCentered] is Function)
+                    ? _patchMap[PrintJobSettings$.isHorizontallyCentered](
+                        this.isHorizontallyCentered,
+                      )
+                    : (_patchMap[PrintJobSettings$.isHorizontallyCentered]
+                          is Patch)
+                    ? _patchMap[PrintJobSettings$.isHorizontallyCentered]
+                          .applyTo(this.isHorizontallyCentered)
+                    : _patchMap[PrintJobSettings$.isHorizontallyCentered])
+                as bool?
           : this.isHorizontallyCentered,
       isVerticallyCentered:
           _patchMap.containsKey(PrintJobSettings$.isVerticallyCentered)
-          ? (_patchMap[PrintJobSettings$.isVerticallyCentered] is Function)
-                ? _patchMap[PrintJobSettings$.isVerticallyCentered](
-                    this.isVerticallyCentered,
-                  )
-                : (_patchMap[PrintJobSettings$.isVerticallyCentered] is Patch)
-                ? _patchMap[PrintJobSettings$.isVerticallyCentered].applyTo(
-                    this.isVerticallyCentered,
-                  )
-                : _patchMap[PrintJobSettings$.isVerticallyCentered]
+          ? ((_patchMap[PrintJobSettings$.isVerticallyCentered] is Function)
+                    ? _patchMap[PrintJobSettings$.isVerticallyCentered](
+                        this.isVerticallyCentered,
+                      )
+                    : (_patchMap[PrintJobSettings$.isVerticallyCentered]
+                          is Patch)
+                    ? _patchMap[PrintJobSettings$.isVerticallyCentered].applyTo(
+                        this.isVerticallyCentered,
+                      )
+                    : _patchMap[PrintJobSettings$.isVerticallyCentered])
+                as bool?
           : this.isVerticallyCentered,
       maximumContentHeight:
           _patchMap.containsKey(PrintJobSettings$.maximumContentHeight)
-          ? (_patchMap[PrintJobSettings$.maximumContentHeight] is Function)
-                ? _patchMap[PrintJobSettings$.maximumContentHeight](
-                    this.maximumContentHeight,
-                  )
-                : (_patchMap[PrintJobSettings$.maximumContentHeight] is Patch)
-                ? _patchMap[PrintJobSettings$.maximumContentHeight].applyTo(
-                    this.maximumContentHeight,
-                  )
-                : _patchMap[PrintJobSettings$.maximumContentHeight]
+          ? ((_patchMap[PrintJobSettings$.maximumContentHeight] is Function)
+                    ? _patchMap[PrintJobSettings$.maximumContentHeight](
+                        this.maximumContentHeight,
+                      )
+                    : (_patchMap[PrintJobSettings$.maximumContentHeight]
+                          is Patch)
+                    ? _patchMap[PrintJobSettings$.maximumContentHeight].applyTo(
+                        this.maximumContentHeight,
+                      )
+                    : _patchMap[PrintJobSettings$.maximumContentHeight])
+                as double?
           : this.maximumContentHeight,
       maximumContentWidth:
           _patchMap.containsKey(PrintJobSettings$.maximumContentWidth)
-          ? (_patchMap[PrintJobSettings$.maximumContentWidth] is Function)
-                ? _patchMap[PrintJobSettings$.maximumContentWidth](
-                    this.maximumContentWidth,
-                  )
-                : (_patchMap[PrintJobSettings$.maximumContentWidth] is Patch)
-                ? _patchMap[PrintJobSettings$.maximumContentWidth].applyTo(
-                    this.maximumContentWidth,
-                  )
-                : _patchMap[PrintJobSettings$.maximumContentWidth]
+          ? ((_patchMap[PrintJobSettings$.maximumContentWidth] is Function)
+                    ? _patchMap[PrintJobSettings$.maximumContentWidth](
+                        this.maximumContentWidth,
+                      )
+                    : (_patchMap[PrintJobSettings$.maximumContentWidth]
+                          is Patch)
+                    ? _patchMap[PrintJobSettings$.maximumContentWidth].applyTo(
+                        this.maximumContentWidth,
+                      )
+                    : _patchMap[PrintJobSettings$.maximumContentWidth])
+                as double?
           : this.maximumContentWidth,
       margins: _patchMap.containsKey(PrintJobSettings$.margins)
-          ? (_patchMap[PrintJobSettings$.margins] is Function)
-                ? _patchMap[PrintJobSettings$.margins](this.margins)
-                : (_patchMap[PrintJobSettings$.margins] is Patch)
-                ? _patchMap[PrintJobSettings$.margins].applyTo(this.margins)
-                : _patchMap[PrintJobSettings$.margins]
+          ? ((_patchMap[PrintJobSettings$.margins] is Function)
+                    ? _patchMap[PrintJobSettings$.margins](this.margins)
+                    : (_patchMap[PrintJobSettings$.margins] is Patch)
+                    ? _patchMap[PrintJobSettings$.margins].applyTo(this.margins)
+                    : _patchMap[PrintJobSettings$.margins])
+                as EdgeInsets?
           : this.margins,
       firstPage: _patchMap.containsKey(PrintJobSettings$.firstPage)
-          ? (_patchMap[PrintJobSettings$.firstPage] is Function)
-                ? _patchMap[PrintJobSettings$.firstPage](this.firstPage)
-                : (_patchMap[PrintJobSettings$.firstPage] is Patch)
-                ? _patchMap[PrintJobSettings$.firstPage].applyTo(this.firstPage)
-                : _patchMap[PrintJobSettings$.firstPage]
+          ? ((_patchMap[PrintJobSettings$.firstPage] is Function)
+                    ? _patchMap[PrintJobSettings$.firstPage](this.firstPage)
+                    : (_patchMap[PrintJobSettings$.firstPage] is Patch)
+                    ? _patchMap[PrintJobSettings$.firstPage].applyTo(
+                        this.firstPage,
+                      )
+                    : _patchMap[PrintJobSettings$.firstPage])
+                as int?
           : this.firstPage,
       lastPage: _patchMap.containsKey(PrintJobSettings$.lastPage)
-          ? (_patchMap[PrintJobSettings$.lastPage] is Function)
-                ? _patchMap[PrintJobSettings$.lastPage](this.lastPage)
-                : (_patchMap[PrintJobSettings$.lastPage] is Patch)
-                ? _patchMap[PrintJobSettings$.lastPage].applyTo(this.lastPage)
-                : _patchMap[PrintJobSettings$.lastPage]
+          ? ((_patchMap[PrintJobSettings$.lastPage] is Function)
+                    ? _patchMap[PrintJobSettings$.lastPage](this.lastPage)
+                    : (_patchMap[PrintJobSettings$.lastPage] is Patch)
+                    ? _patchMap[PrintJobSettings$.lastPage].applyTo(
+                        this.lastPage,
+                      )
+                    : _patchMap[PrintJobSettings$.lastPage])
+                as int?
           : this.lastPage,
       headerAndFooter: _patchMap.containsKey(PrintJobSettings$.headerAndFooter)
-          ? (_patchMap[PrintJobSettings$.headerAndFooter] is Function)
-                ? _patchMap[PrintJobSettings$.headerAndFooter](
-                    this.headerAndFooter,
-                  )
-                : (_patchMap[PrintJobSettings$.headerAndFooter] is Patch)
-                ? _patchMap[PrintJobSettings$.headerAndFooter].applyTo(
-                    this.headerAndFooter,
-                  )
-                : _patchMap[PrintJobSettings$.headerAndFooter]
+          ? ((_patchMap[PrintJobSettings$.headerAndFooter] is Function)
+                    ? _patchMap[PrintJobSettings$.headerAndFooter](
+                        this.headerAndFooter,
+                      )
+                    : (_patchMap[PrintJobSettings$.headerAndFooter] is Patch)
+                    ? _patchMap[PrintJobSettings$.headerAndFooter].applyTo(
+                        this.headerAndFooter,
+                      )
+                    : _patchMap[PrintJobSettings$.headerAndFooter])
+                as bool?
           : this.headerAndFooter,
       headerHeight: _patchMap.containsKey(PrintJobSettings$.headerHeight)
-          ? (_patchMap[PrintJobSettings$.headerHeight] is Function)
-                ? _patchMap[PrintJobSettings$.headerHeight](this.headerHeight)
-                : (_patchMap[PrintJobSettings$.headerHeight] is Patch)
-                ? _patchMap[PrintJobSettings$.headerHeight].applyTo(
-                    this.headerHeight,
-                  )
-                : _patchMap[PrintJobSettings$.headerHeight]
+          ? ((_patchMap[PrintJobSettings$.headerHeight] is Function)
+                    ? _patchMap[PrintJobSettings$.headerHeight](
+                        this.headerHeight,
+                      )
+                    : (_patchMap[PrintJobSettings$.headerHeight] is Patch)
+                    ? _patchMap[PrintJobSettings$.headerHeight].applyTo(
+                        this.headerHeight,
+                      )
+                    : _patchMap[PrintJobSettings$.headerHeight])
+                as double?
           : this.headerHeight,
       footerHeight: _patchMap.containsKey(PrintJobSettings$.footerHeight)
-          ? (_patchMap[PrintJobSettings$.footerHeight] is Function)
-                ? _patchMap[PrintJobSettings$.footerHeight](this.footerHeight)
-                : (_patchMap[PrintJobSettings$.footerHeight] is Patch)
-                ? _patchMap[PrintJobSettings$.footerHeight].applyTo(
-                    this.footerHeight,
-                  )
-                : _patchMap[PrintJobSettings$.footerHeight]
+          ? ((_patchMap[PrintJobSettings$.footerHeight] is Function)
+                    ? _patchMap[PrintJobSettings$.footerHeight](
+                        this.footerHeight,
+                      )
+                    : (_patchMap[PrintJobSettings$.footerHeight] is Patch)
+                    ? _patchMap[PrintJobSettings$.footerHeight].applyTo(
+                        this.footerHeight,
+                      )
+                    : _patchMap[PrintJobSettings$.footerHeight])
+                as double?
           : this.footerHeight,
       time: _patchMap.containsKey(PrintJobSettings$.time)
-          ? (_patchMap[PrintJobSettings$.time] is Function)
-                ? _patchMap[PrintJobSettings$.time](this.time)
-                : (_patchMap[PrintJobSettings$.time] is Patch)
-                ? _patchMap[PrintJobSettings$.time].applyTo(this.time)
-                : _patchMap[PrintJobSettings$.time]
+          ? ((_patchMap[PrintJobSettings$.time] is Function)
+                    ? _patchMap[PrintJobSettings$.time](this.time)
+                    : (_patchMap[PrintJobSettings$.time] is Patch)
+                    ? _patchMap[PrintJobSettings$.time].applyTo(this.time)
+                    : _patchMap[PrintJobSettings$.time])
+                as int?
           : this.time,
       orientation: _patchMap.containsKey(PrintJobSettings$.orientation)
-          ? (_patchMap[PrintJobSettings$.orientation] is Function)
-                ? _patchMap[PrintJobSettings$.orientation](this.orientation)
-                : (_patchMap[PrintJobSettings$.orientation] is Patch)
-                ? _patchMap[PrintJobSettings$.orientation].applyTo(
-                    this.orientation,
-                  )
-                : _patchMap[PrintJobSettings$.orientation]
+          ? ((_patchMap[PrintJobSettings$.orientation] is Function)
+                    ? _patchMap[PrintJobSettings$.orientation](this.orientation)
+                    : (_patchMap[PrintJobSettings$.orientation] is Patch)
+                    ? _patchMap[PrintJobSettings$.orientation].applyTo(
+                        this.orientation,
+                      )
+                    : _patchMap[PrintJobSettings$.orientation])
+                as PrintJobOrientation?
           : this.orientation,
       colorMode: _patchMap.containsKey(PrintJobSettings$.colorMode)
-          ? (_patchMap[PrintJobSettings$.colorMode] is Function)
-                ? _patchMap[PrintJobSettings$.colorMode](this.colorMode)
-                : (_patchMap[PrintJobSettings$.colorMode] is Patch)
-                ? _patchMap[PrintJobSettings$.colorMode].applyTo(this.colorMode)
-                : _patchMap[PrintJobSettings$.colorMode]
+          ? ((_patchMap[PrintJobSettings$.colorMode] is Function)
+                    ? _patchMap[PrintJobSettings$.colorMode](this.colorMode)
+                    : (_patchMap[PrintJobSettings$.colorMode] is Patch)
+                    ? _patchMap[PrintJobSettings$.colorMode].applyTo(
+                        this.colorMode,
+                      )
+                    : _patchMap[PrintJobSettings$.colorMode])
+                as PrintJobColorMode?
           : this.colorMode,
       duplexMode: _patchMap.containsKey(PrintJobSettings$.duplexMode)
-          ? (_patchMap[PrintJobSettings$.duplexMode] is Function)
-                ? _patchMap[PrintJobSettings$.duplexMode](this.duplexMode)
-                : (_patchMap[PrintJobSettings$.duplexMode] is Patch)
-                ? _patchMap[PrintJobSettings$.duplexMode].applyTo(
-                    this.duplexMode,
-                  )
-                : _patchMap[PrintJobSettings$.duplexMode]
+          ? ((_patchMap[PrintJobSettings$.duplexMode] is Function)
+                    ? _patchMap[PrintJobSettings$.duplexMode](this.duplexMode)
+                    : (_patchMap[PrintJobSettings$.duplexMode] is Patch)
+                    ? _patchMap[PrintJobSettings$.duplexMode].applyTo(
+                        this.duplexMode,
+                      )
+                    : _patchMap[PrintJobSettings$.duplexMode])
+                as PrintJobDuplexMode?
           : this.duplexMode,
       mediaSize: _patchMap.containsKey(PrintJobSettings$.mediaSize)
-          ? (_patchMap[PrintJobSettings$.mediaSize] is Function)
-                ? _patchMap[PrintJobSettings$.mediaSize](this.mediaSize)
-                : (_patchMap[PrintJobSettings$.mediaSize] is Patch)
-                ? _patchMap[PrintJobSettings$.mediaSize].applyTo(this.mediaSize)
-                : _patchMap[PrintJobSettings$.mediaSize]
+          ? ((_patchMap[PrintJobSettings$.mediaSize] is Function)
+                    ? _patchMap[PrintJobSettings$.mediaSize](this.mediaSize)
+                    : (_patchMap[PrintJobSettings$.mediaSize] is Patch)
+                    ? _patchMap[PrintJobSettings$.mediaSize].applyTo(
+                        this.mediaSize,
+                      )
+                    : _patchMap[PrintJobSettings$.mediaSize])
+                as PrintJobMediaSize?
           : this.mediaSize,
       resolution: _patchMap.containsKey(PrintJobSettings$.resolution)
-          ? (_patchMap[PrintJobSettings$.resolution] is Function)
-                ? _patchMap[PrintJobSettings$.resolution](this.resolution)
-                : (_patchMap[PrintJobSettings$.resolution] is Patch)
-                ? _patchMap[PrintJobSettings$.resolution].applyTo(
-                    this.resolution,
-                  )
-                : _patchMap[PrintJobSettings$.resolution]
+          ? ((_patchMap[PrintJobSettings$.resolution] is Function)
+                    ? _patchMap[PrintJobSettings$.resolution](this.resolution)
+                    : (_patchMap[PrintJobSettings$.resolution] is Patch)
+                    ? _patchMap[PrintJobSettings$.resolution].applyTo(
+                        this.resolution,
+                      )
+                    : _patchMap[PrintJobSettings$.resolution])
+                as PrintJobResolution?
           : this.resolution,
       faxNumber: _patchMap.containsKey(PrintJobSettings$.faxNumber)
-          ? (_patchMap[PrintJobSettings$.faxNumber] is Function)
-                ? _patchMap[PrintJobSettings$.faxNumber](this.faxNumber)
-                : (_patchMap[PrintJobSettings$.faxNumber] is Patch)
-                ? _patchMap[PrintJobSettings$.faxNumber].applyTo(this.faxNumber)
-                : _patchMap[PrintJobSettings$.faxNumber]
+          ? ((_patchMap[PrintJobSettings$.faxNumber] is Function)
+                    ? _patchMap[PrintJobSettings$.faxNumber](this.faxNumber)
+                    : (_patchMap[PrintJobSettings$.faxNumber] is Patch)
+                    ? _patchMap[PrintJobSettings$.faxNumber].applyTo(
+                        this.faxNumber,
+                      )
+                    : _patchMap[PrintJobSettings$.faxNumber])
+                as String?
           : this.faxNumber,
       copies: _patchMap.containsKey(PrintJobSettings$.copies)
-          ? (_patchMap[PrintJobSettings$.copies] is Function)
-                ? _patchMap[PrintJobSettings$.copies](this.copies)
-                : (_patchMap[PrintJobSettings$.copies] is Patch)
-                ? _patchMap[PrintJobSettings$.copies].applyTo(this.copies)
-                : _patchMap[PrintJobSettings$.copies]
+          ? ((_patchMap[PrintJobSettings$.copies] is Function)
+                    ? _patchMap[PrintJobSettings$.copies](this.copies)
+                    : (_patchMap[PrintJobSettings$.copies] is Patch)
+                    ? _patchMap[PrintJobSettings$.copies].applyTo(this.copies)
+                    : _patchMap[PrintJobSettings$.copies])
+                as int?
           : this.copies,
       numberOfPages: _patchMap.containsKey(PrintJobSettings$.numberOfPages)
-          ? (_patchMap[PrintJobSettings$.numberOfPages] is Function)
-                ? _patchMap[PrintJobSettings$.numberOfPages](this.numberOfPages)
-                : (_patchMap[PrintJobSettings$.numberOfPages] is Patch)
-                ? _patchMap[PrintJobSettings$.numberOfPages].applyTo(
-                    this.numberOfPages,
-                  )
-                : _patchMap[PrintJobSettings$.numberOfPages]
+          ? ((_patchMap[PrintJobSettings$.numberOfPages] is Function)
+                    ? _patchMap[PrintJobSettings$.numberOfPages](
+                        this.numberOfPages,
+                      )
+                    : (_patchMap[PrintJobSettings$.numberOfPages] is Patch)
+                    ? _patchMap[PrintJobSettings$.numberOfPages].applyTo(
+                        this.numberOfPages,
+                      )
+                    : _patchMap[PrintJobSettings$.numberOfPages])
+                as int?
           : this.numberOfPages,
       mustCollate: _patchMap.containsKey(PrintJobSettings$.mustCollate)
-          ? (_patchMap[PrintJobSettings$.mustCollate] is Function)
-                ? _patchMap[PrintJobSettings$.mustCollate](this.mustCollate)
-                : (_patchMap[PrintJobSettings$.mustCollate] is Patch)
-                ? _patchMap[PrintJobSettings$.mustCollate].applyTo(
-                    this.mustCollate,
-                  )
-                : _patchMap[PrintJobSettings$.mustCollate]
+          ? ((_patchMap[PrintJobSettings$.mustCollate] is Function)
+                    ? _patchMap[PrintJobSettings$.mustCollate](this.mustCollate)
+                    : (_patchMap[PrintJobSettings$.mustCollate] is Patch)
+                    ? _patchMap[PrintJobSettings$.mustCollate].applyTo(
+                        this.mustCollate,
+                      )
+                    : _patchMap[PrintJobSettings$.mustCollate])
+                as bool?
           : this.mustCollate,
       pagesAcross: _patchMap.containsKey(PrintJobSettings$.pagesAcross)
-          ? (_patchMap[PrintJobSettings$.pagesAcross] is Function)
-                ? _patchMap[PrintJobSettings$.pagesAcross](this.pagesAcross)
-                : (_patchMap[PrintJobSettings$.pagesAcross] is Patch)
-                ? _patchMap[PrintJobSettings$.pagesAcross].applyTo(
-                    this.pagesAcross,
-                  )
-                : _patchMap[PrintJobSettings$.pagesAcross]
+          ? ((_patchMap[PrintJobSettings$.pagesAcross] is Function)
+                    ? _patchMap[PrintJobSettings$.pagesAcross](this.pagesAcross)
+                    : (_patchMap[PrintJobSettings$.pagesAcross] is Patch)
+                    ? _patchMap[PrintJobSettings$.pagesAcross].applyTo(
+                        this.pagesAcross,
+                      )
+                    : _patchMap[PrintJobSettings$.pagesAcross])
+                as String?
           : this.pagesAcross,
       pagesDown: _patchMap.containsKey(PrintJobSettings$.pagesDown)
-          ? (_patchMap[PrintJobSettings$.pagesDown] is Function)
-                ? _patchMap[PrintJobSettings$.pagesDown](this.pagesDown)
-                : (_patchMap[PrintJobSettings$.pagesDown] is Patch)
-                ? _patchMap[PrintJobSettings$.pagesDown].applyTo(this.pagesDown)
-                : _patchMap[PrintJobSettings$.pagesDown]
+          ? ((_patchMap[PrintJobSettings$.pagesDown] is Function)
+                    ? _patchMap[PrintJobSettings$.pagesDown](this.pagesDown)
+                    : (_patchMap[PrintJobSettings$.pagesDown] is Patch)
+                    ? _patchMap[PrintJobSettings$.pagesDown].applyTo(
+                        this.pagesDown,
+                      )
+                    : _patchMap[PrintJobSettings$.pagesDown])
+                as String?
           : this.pagesDown,
       showsPreview: _patchMap.containsKey(PrintJobSettings$.showsPreview)
-          ? (_patchMap[PrintJobSettings$.showsPreview] is Function)
-                ? _patchMap[PrintJobSettings$.showsPreview](this.showsPreview)
-                : (_patchMap[PrintJobSettings$.showsPreview] is Patch)
-                ? _patchMap[PrintJobSettings$.showsPreview].applyTo(
-                    this.showsPreview,
-                  )
-                : _patchMap[PrintJobSettings$.showsPreview]
+          ? ((_patchMap[PrintJobSettings$.showsPreview] is Function)
+                    ? _patchMap[PrintJobSettings$.showsPreview](
+                        this.showsPreview,
+                      )
+                    : (_patchMap[PrintJobSettings$.showsPreview] is Patch)
+                    ? _patchMap[PrintJobSettings$.showsPreview].applyTo(
+                        this.showsPreview,
+                      )
+                    : _patchMap[PrintJobSettings$.showsPreview])
+                as bool?
           : this.showsPreview,
       showsPrintSelection:
           _patchMap.containsKey(PrintJobSettings$.showsPrintSelection)
-          ? (_patchMap[PrintJobSettings$.showsPrintSelection] is Function)
-                ? _patchMap[PrintJobSettings$.showsPrintSelection](
-                    this.showsPrintSelection,
-                  )
-                : (_patchMap[PrintJobSettings$.showsPrintSelection] is Patch)
-                ? _patchMap[PrintJobSettings$.showsPrintSelection].applyTo(
-                    this.showsPrintSelection,
-                  )
-                : _patchMap[PrintJobSettings$.showsPrintSelection]
+          ? ((_patchMap[PrintJobSettings$.showsPrintSelection] is Function)
+                    ? _patchMap[PrintJobSettings$.showsPrintSelection](
+                        this.showsPrintSelection,
+                      )
+                    : (_patchMap[PrintJobSettings$.showsPrintSelection]
+                          is Patch)
+                    ? _patchMap[PrintJobSettings$.showsPrintSelection].applyTo(
+                        this.showsPrintSelection,
+                      )
+                    : _patchMap[PrintJobSettings$.showsPrintSelection])
+                as bool?
           : this.showsPrintSelection,
       showsPageRange: _patchMap.containsKey(PrintJobSettings$.showsPageRange)
-          ? (_patchMap[PrintJobSettings$.showsPageRange] is Function)
-                ? _patchMap[PrintJobSettings$.showsPageRange](
-                    this.showsPageRange,
-                  )
-                : (_patchMap[PrintJobSettings$.showsPageRange] is Patch)
-                ? _patchMap[PrintJobSettings$.showsPageRange].applyTo(
-                    this.showsPageRange,
-                  )
-                : _patchMap[PrintJobSettings$.showsPageRange]
+          ? ((_patchMap[PrintJobSettings$.showsPageRange] is Function)
+                    ? _patchMap[PrintJobSettings$.showsPageRange](
+                        this.showsPageRange,
+                      )
+                    : (_patchMap[PrintJobSettings$.showsPageRange] is Patch)
+                    ? _patchMap[PrintJobSettings$.showsPageRange].applyTo(
+                        this.showsPageRange,
+                      )
+                    : _patchMap[PrintJobSettings$.showsPageRange])
+                as bool?
           : this.showsPageRange,
       showsNumberOfCopies:
           _patchMap.containsKey(PrintJobSettings$.showsNumberOfCopies)
-          ? (_patchMap[PrintJobSettings$.showsNumberOfCopies] is Function)
-                ? _patchMap[PrintJobSettings$.showsNumberOfCopies](
-                    this.showsNumberOfCopies,
-                  )
-                : (_patchMap[PrintJobSettings$.showsNumberOfCopies] is Patch)
-                ? _patchMap[PrintJobSettings$.showsNumberOfCopies].applyTo(
-                    this.showsNumberOfCopies,
-                  )
-                : _patchMap[PrintJobSettings$.showsNumberOfCopies]
+          ? ((_patchMap[PrintJobSettings$.showsNumberOfCopies] is Function)
+                    ? _patchMap[PrintJobSettings$.showsNumberOfCopies](
+                        this.showsNumberOfCopies,
+                      )
+                    : (_patchMap[PrintJobSettings$.showsNumberOfCopies]
+                          is Patch)
+                    ? _patchMap[PrintJobSettings$.showsNumberOfCopies].applyTo(
+                        this.showsNumberOfCopies,
+                      )
+                    : _patchMap[PrintJobSettings$.showsNumberOfCopies])
+                as bool?
           : this.showsNumberOfCopies,
       showsPaperOrientation:
           _patchMap.containsKey(PrintJobSettings$.showsPaperOrientation)
-          ? (_patchMap[PrintJobSettings$.showsPaperOrientation] is Function)
-                ? _patchMap[PrintJobSettings$.showsPaperOrientation](
-                    this.showsPaperOrientation,
-                  )
-                : (_patchMap[PrintJobSettings$.showsPaperOrientation] is Patch)
-                ? _patchMap[PrintJobSettings$.showsPaperOrientation].applyTo(
-                    this.showsPaperOrientation,
-                  )
-                : _patchMap[PrintJobSettings$.showsPaperOrientation]
+          ? ((_patchMap[PrintJobSettings$.showsPaperOrientation] is Function)
+                    ? _patchMap[PrintJobSettings$.showsPaperOrientation](
+                        this.showsPaperOrientation,
+                      )
+                    : (_patchMap[PrintJobSettings$.showsPaperOrientation]
+                          is Patch)
+                    ? _patchMap[PrintJobSettings$.showsPaperOrientation]
+                          .applyTo(this.showsPaperOrientation)
+                    : _patchMap[PrintJobSettings$.showsPaperOrientation])
+                as bool?
           : this.showsPaperOrientation,
       showsPaperSelectionForLoadedPapers:
           _patchMap.containsKey(
             PrintJobSettings$.showsPaperSelectionForLoadedPapers,
           )
-          ? (_patchMap[PrintJobSettings$.showsPaperSelectionForLoadedPapers]
-                    is Function)
-                ? _patchMap[PrintJobSettings$
-                      .showsPaperSelectionForLoadedPapers](
-                    this.showsPaperSelectionForLoadedPapers,
-                  )
-                : (_patchMap[PrintJobSettings$
-                          .showsPaperSelectionForLoadedPapers]
-                      is Patch)
-                ? _patchMap[PrintJobSettings$
-                          .showsPaperSelectionForLoadedPapers]
-                      .applyTo(this.showsPaperSelectionForLoadedPapers)
-                : _patchMap[PrintJobSettings$
-                      .showsPaperSelectionForLoadedPapers]
+          ? ((_patchMap[PrintJobSettings$.showsPaperSelectionForLoadedPapers]
+                        is Function)
+                    ? _patchMap[PrintJobSettings$
+                          .showsPaperSelectionForLoadedPapers](
+                        this.showsPaperSelectionForLoadedPapers,
+                      )
+                    : (_patchMap[PrintJobSettings$
+                              .showsPaperSelectionForLoadedPapers]
+                          is Patch)
+                    ? _patchMap[PrintJobSettings$
+                              .showsPaperSelectionForLoadedPapers]
+                          .applyTo(this.showsPaperSelectionForLoadedPapers)
+                    : _patchMap[PrintJobSettings$
+                          .showsPaperSelectionForLoadedPapers])
+                as bool?
           : this.showsPaperSelectionForLoadedPapers,
       showsPaperSize: _patchMap.containsKey(PrintJobSettings$.showsPaperSize)
-          ? (_patchMap[PrintJobSettings$.showsPaperSize] is Function)
-                ? _patchMap[PrintJobSettings$.showsPaperSize](
-                    this.showsPaperSize,
-                  )
-                : (_patchMap[PrintJobSettings$.showsPaperSize] is Patch)
-                ? _patchMap[PrintJobSettings$.showsPaperSize].applyTo(
-                    this.showsPaperSize,
-                  )
-                : _patchMap[PrintJobSettings$.showsPaperSize]
+          ? ((_patchMap[PrintJobSettings$.showsPaperSize] is Function)
+                    ? _patchMap[PrintJobSettings$.showsPaperSize](
+                        this.showsPaperSize,
+                      )
+                    : (_patchMap[PrintJobSettings$.showsPaperSize] is Patch)
+                    ? _patchMap[PrintJobSettings$.showsPaperSize].applyTo(
+                        this.showsPaperSize,
+                      )
+                    : _patchMap[PrintJobSettings$.showsPaperSize])
+                as bool?
           : this.showsPaperSize,
       showsScaling: _patchMap.containsKey(PrintJobSettings$.showsScaling)
-          ? (_patchMap[PrintJobSettings$.showsScaling] is Function)
-                ? _patchMap[PrintJobSettings$.showsScaling](this.showsScaling)
-                : (_patchMap[PrintJobSettings$.showsScaling] is Patch)
-                ? _patchMap[PrintJobSettings$.showsScaling].applyTo(
-                    this.showsScaling,
-                  )
-                : _patchMap[PrintJobSettings$.showsScaling]
+          ? ((_patchMap[PrintJobSettings$.showsScaling] is Function)
+                    ? _patchMap[PrintJobSettings$.showsScaling](
+                        this.showsScaling,
+                      )
+                    : (_patchMap[PrintJobSettings$.showsScaling] is Patch)
+                    ? _patchMap[PrintJobSettings$.showsScaling].applyTo(
+                        this.showsScaling,
+                      )
+                    : _patchMap[PrintJobSettings$.showsScaling])
+                as bool?
           : this.showsScaling,
       showsPageSetupAccessory:
           _patchMap.containsKey(PrintJobSettings$.showsPageSetupAccessory)
-          ? (_patchMap[PrintJobSettings$.showsPageSetupAccessory] is Function)
-                ? _patchMap[PrintJobSettings$.showsPageSetupAccessory](
-                    this.showsPageSetupAccessory,
-                  )
-                : (_patchMap[PrintJobSettings$.showsPageSetupAccessory]
-                      is Patch)
-                ? _patchMap[PrintJobSettings$.showsPageSetupAccessory].applyTo(
-                    this.showsPageSetupAccessory,
-                  )
-                : _patchMap[PrintJobSettings$.showsPageSetupAccessory]
+          ? ((_patchMap[PrintJobSettings$.showsPageSetupAccessory] is Function)
+                    ? _patchMap[PrintJobSettings$.showsPageSetupAccessory](
+                        this.showsPageSetupAccessory,
+                      )
+                    : (_patchMap[PrintJobSettings$.showsPageSetupAccessory]
+                          is Patch)
+                    ? _patchMap[PrintJobSettings$.showsPageSetupAccessory]
+                          .applyTo(this.showsPageSetupAccessory)
+                    : _patchMap[PrintJobSettings$.showsPageSetupAccessory])
+                as bool?
           : this.showsPageSetupAccessory,
       scalingFactor: _patchMap.containsKey(PrintJobSettings$.scalingFactor)
-          ? (_patchMap[PrintJobSettings$.scalingFactor] is Function)
-                ? _patchMap[PrintJobSettings$.scalingFactor](this.scalingFactor)
-                : (_patchMap[PrintJobSettings$.scalingFactor] is Patch)
-                ? _patchMap[PrintJobSettings$.scalingFactor].applyTo(
-                    this.scalingFactor,
-                  )
-                : _patchMap[PrintJobSettings$.scalingFactor]
+          ? ((_patchMap[PrintJobSettings$.scalingFactor] is Function)
+                    ? _patchMap[PrintJobSettings$.scalingFactor](
+                        this.scalingFactor,
+                      )
+                    : (_patchMap[PrintJobSettings$.scalingFactor] is Patch)
+                    ? _patchMap[PrintJobSettings$.scalingFactor].applyTo(
+                        this.scalingFactor,
+                      )
+                    : _patchMap[PrintJobSettings$.scalingFactor])
+                as double?
           : this.scalingFactor,
       forceRenderingQuality:
           _patchMap.containsKey(PrintJobSettings$.forceRenderingQuality)
-          ? (_patchMap[PrintJobSettings$.forceRenderingQuality] is Function)
-                ? _patchMap[PrintJobSettings$.forceRenderingQuality](
-                    this.forceRenderingQuality,
-                  )
-                : (_patchMap[PrintJobSettings$.forceRenderingQuality] is Patch)
-                ? _patchMap[PrintJobSettings$.forceRenderingQuality].applyTo(
-                    this.forceRenderingQuality,
-                  )
-                : _patchMap[PrintJobSettings$.forceRenderingQuality]
+          ? ((_patchMap[PrintJobSettings$.forceRenderingQuality] is Function)
+                    ? _patchMap[PrintJobSettings$.forceRenderingQuality](
+                        this.forceRenderingQuality,
+                      )
+                    : (_patchMap[PrintJobSettings$.forceRenderingQuality]
+                          is Patch)
+                    ? _patchMap[PrintJobSettings$.forceRenderingQuality]
+                          .applyTo(this.forceRenderingQuality)
+                    : _patchMap[PrintJobSettings$.forceRenderingQuality])
+                as PrintJobRenderingQuality?
           : this.forceRenderingQuality,
       animated: _patchMap.containsKey(PrintJobSettings$.animated)
-          ? (_patchMap[PrintJobSettings$.animated] is Function)
-                ? _patchMap[PrintJobSettings$.animated](this.animated)
-                : (_patchMap[PrintJobSettings$.animated] is Patch)
-                ? _patchMap[PrintJobSettings$.animated].applyTo(this.animated)
-                : _patchMap[PrintJobSettings$.animated]
+          ? ((_patchMap[PrintJobSettings$.animated] is Function)
+                    ? _patchMap[PrintJobSettings$.animated](this.animated)
+                    : (_patchMap[PrintJobSettings$.animated] is Patch)
+                    ? _patchMap[PrintJobSettings$.animated].applyTo(
+                        this.animated,
+                      )
+                    : _patchMap[PrintJobSettings$.animated])
+                as bool?
           : this.animated,
       canSpawnSeparateThread:
           _patchMap.containsKey(PrintJobSettings$.canSpawnSeparateThread)
-          ? (_patchMap[PrintJobSettings$.canSpawnSeparateThread] is Function)
-                ? _patchMap[PrintJobSettings$.canSpawnSeparateThread](
-                    this.canSpawnSeparateThread,
-                  )
-                : (_patchMap[PrintJobSettings$.canSpawnSeparateThread] is Patch)
-                ? _patchMap[PrintJobSettings$.canSpawnSeparateThread].applyTo(
-                    this.canSpawnSeparateThread,
-                  )
-                : _patchMap[PrintJobSettings$.canSpawnSeparateThread]
+          ? ((_patchMap[PrintJobSettings$.canSpawnSeparateThread] is Function)
+                    ? _patchMap[PrintJobSettings$.canSpawnSeparateThread](
+                        this.canSpawnSeparateThread,
+                      )
+                    : (_patchMap[PrintJobSettings$.canSpawnSeparateThread]
+                          is Patch)
+                    ? _patchMap[PrintJobSettings$.canSpawnSeparateThread]
+                          .applyTo(this.canSpawnSeparateThread)
+                    : _patchMap[PrintJobSettings$.canSpawnSeparateThread])
+                as bool?
           : this.canSpawnSeparateThread,
       outputType: _patchMap.containsKey(PrintJobSettings$.outputType)
-          ? (_patchMap[PrintJobSettings$.outputType] is Function)
-                ? _patchMap[PrintJobSettings$.outputType](this.outputType)
-                : (_patchMap[PrintJobSettings$.outputType] is Patch)
-                ? _patchMap[PrintJobSettings$.outputType].applyTo(
-                    this.outputType,
-                  )
-                : _patchMap[PrintJobSettings$.outputType]
+          ? ((_patchMap[PrintJobSettings$.outputType] is Function)
+                    ? _patchMap[PrintJobSettings$.outputType](this.outputType)
+                    : (_patchMap[PrintJobSettings$.outputType] is Patch)
+                    ? _patchMap[PrintJobSettings$.outputType].applyTo(
+                        this.outputType,
+                      )
+                    : _patchMap[PrintJobSettings$.outputType])
+                as PrintJobOutputType?
           : this.outputType,
       pageOrder: _patchMap.containsKey(PrintJobSettings$.pageOrder)
-          ? (_patchMap[PrintJobSettings$.pageOrder] is Function)
-                ? _patchMap[PrintJobSettings$.pageOrder](this.pageOrder)
-                : (_patchMap[PrintJobSettings$.pageOrder] is Patch)
-                ? _patchMap[PrintJobSettings$.pageOrder].applyTo(this.pageOrder)
-                : _patchMap[PrintJobSettings$.pageOrder]
+          ? ((_patchMap[PrintJobSettings$.pageOrder] is Function)
+                    ? _patchMap[PrintJobSettings$.pageOrder](this.pageOrder)
+                    : (_patchMap[PrintJobSettings$.pageOrder] is Patch)
+                    ? _patchMap[PrintJobSettings$.pageOrder].applyTo(
+                        this.pageOrder,
+                      )
+                    : _patchMap[PrintJobSettings$.pageOrder])
+                as PrintJobPageOrder?
           : this.pageOrder,
     );
   }
@@ -1069,7 +1153,8 @@ class PrintJobSettings {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$PrintJobSettingsToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

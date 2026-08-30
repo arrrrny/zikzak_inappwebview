@@ -38,18 +38,22 @@ class WebHistory {
     final _patchMap = _patcher.patchMap;
     return WebHistory(
       list: _patchMap.containsKey(WebHistory$.list)
-          ? (_patchMap[WebHistory$.list] is Function)
-                ? _patchMap[WebHistory$.list](this.list)
-                : (_patchMap[WebHistory$.list] is Patch)
-                ? _patchMap[WebHistory$.list].applyTo(this.list)
-                : _patchMap[WebHistory$.list]
+          ? ((_patchMap[WebHistory$.list] is Function)
+                    ? _patchMap[WebHistory$.list](this.list)
+                    : (_patchMap[WebHistory$.list] is Patch)
+                    ? _patchMap[WebHistory$.list].applyTo(this.list)
+                    : _patchMap[WebHistory$.list])
+                as List<WebHistoryItem>?
           : this.list,
       currentIndex: _patchMap.containsKey(WebHistory$.currentIndex)
-          ? (_patchMap[WebHistory$.currentIndex] is Function)
-                ? _patchMap[WebHistory$.currentIndex](this.currentIndex)
-                : (_patchMap[WebHistory$.currentIndex] is Patch)
-                ? _patchMap[WebHistory$.currentIndex].applyTo(this.currentIndex)
-                : _patchMap[WebHistory$.currentIndex]
+          ? ((_patchMap[WebHistory$.currentIndex] is Function)
+                    ? _patchMap[WebHistory$.currentIndex](this.currentIndex)
+                    : (_patchMap[WebHistory$.currentIndex] is Patch)
+                    ? _patchMap[WebHistory$.currentIndex].applyTo(
+                        this.currentIndex,
+                      )
+                    : _patchMap[WebHistory$.currentIndex])
+                as int?
           : this.currentIndex,
     );
   }
@@ -77,7 +81,8 @@ class WebHistory {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$WebHistoryToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

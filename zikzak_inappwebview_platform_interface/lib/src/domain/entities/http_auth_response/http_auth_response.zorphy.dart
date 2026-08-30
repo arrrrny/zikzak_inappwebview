@@ -74,37 +74,46 @@ class HttpAuthResponse {
     final _patchMap = _patcher.patchMap;
     return HttpAuthResponse(
       username: _patchMap.containsKey(HttpAuthResponse$.username)
-          ? (_patchMap[HttpAuthResponse$.username] is Function)
-                ? _patchMap[HttpAuthResponse$.username](this.username)
-                : (_patchMap[HttpAuthResponse$.username] is Patch)
-                ? _patchMap[HttpAuthResponse$.username].applyTo(this.username)
-                : _patchMap[HttpAuthResponse$.username]
+          ? ((_patchMap[HttpAuthResponse$.username] is Function)
+                    ? _patchMap[HttpAuthResponse$.username](this.username)
+                    : (_patchMap[HttpAuthResponse$.username] is Patch)
+                    ? _patchMap[HttpAuthResponse$.username].applyTo(
+                        this.username,
+                      )
+                    : _patchMap[HttpAuthResponse$.username])
+                as String
           : this.username,
       password: _patchMap.containsKey(HttpAuthResponse$.password)
-          ? (_patchMap[HttpAuthResponse$.password] is Function)
-                ? _patchMap[HttpAuthResponse$.password](this.password)
-                : (_patchMap[HttpAuthResponse$.password] is Patch)
-                ? _patchMap[HttpAuthResponse$.password].applyTo(this.password)
-                : _patchMap[HttpAuthResponse$.password]
+          ? ((_patchMap[HttpAuthResponse$.password] is Function)
+                    ? _patchMap[HttpAuthResponse$.password](this.password)
+                    : (_patchMap[HttpAuthResponse$.password] is Patch)
+                    ? _patchMap[HttpAuthResponse$.password].applyTo(
+                        this.password,
+                      )
+                    : _patchMap[HttpAuthResponse$.password])
+                as String
           : this.password,
       permanentPersistence:
           _patchMap.containsKey(HttpAuthResponse$.permanentPersistence)
-          ? (_patchMap[HttpAuthResponse$.permanentPersistence] is Function)
-                ? _patchMap[HttpAuthResponse$.permanentPersistence](
-                    this.permanentPersistence,
-                  )
-                : (_patchMap[HttpAuthResponse$.permanentPersistence] is Patch)
-                ? _patchMap[HttpAuthResponse$.permanentPersistence].applyTo(
-                    this.permanentPersistence,
-                  )
-                : _patchMap[HttpAuthResponse$.permanentPersistence]
+          ? ((_patchMap[HttpAuthResponse$.permanentPersistence] is Function)
+                    ? _patchMap[HttpAuthResponse$.permanentPersistence](
+                        this.permanentPersistence,
+                      )
+                    : (_patchMap[HttpAuthResponse$.permanentPersistence]
+                          is Patch)
+                    ? _patchMap[HttpAuthResponse$.permanentPersistence].applyTo(
+                        this.permanentPersistence,
+                      )
+                    : _patchMap[HttpAuthResponse$.permanentPersistence])
+                as bool
           : this.permanentPersistence,
       action: _patchMap.containsKey(HttpAuthResponse$.action)
-          ? (_patchMap[HttpAuthResponse$.action] is Function)
-                ? _patchMap[HttpAuthResponse$.action](this.action)
-                : (_patchMap[HttpAuthResponse$.action] is Patch)
-                ? _patchMap[HttpAuthResponse$.action].applyTo(this.action)
-                : _patchMap[HttpAuthResponse$.action]
+          ? ((_patchMap[HttpAuthResponse$.action] is Function)
+                    ? _patchMap[HttpAuthResponse$.action](this.action)
+                    : (_patchMap[HttpAuthResponse$.action] is Patch)
+                    ? _patchMap[HttpAuthResponse$.action].applyTo(this.action)
+                    : _patchMap[HttpAuthResponse$.action])
+                as HttpAuthResponseAction?
           : this.action,
     );
   }
@@ -143,7 +152,8 @@ class HttpAuthResponse {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$HttpAuthResponseToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

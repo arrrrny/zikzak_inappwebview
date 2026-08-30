@@ -740,21 +740,6 @@ public final class InAppWebView
                 Log.w(LOG_TAG, "OEM WebView wrapper incompatible with setEnterpriseAuthenticationAppLinkPolicyEnabled", e);
             }
         }
-        if (
-            customSettings.requestedWithHeaderOriginAllowList != null &&
-            WebViewFeature.isFeatureSupported(
-                WebViewFeature.REQUESTED_WITH_HEADER_ALLOW_LIST
-            )
-        ) {
-            try {
-                WebSettingsCompat.setRequestedWithHeaderOriginAllowList(
-                    settings,
-                    customSettings.requestedWithHeaderOriginAllowList
-                );
-            } catch (ClassCastException e) {
-                Log.w(LOG_TAG, "OEM WebView wrapper incompatible with setRequestedWithHeaderOriginAllowList", e);
-            }
-        }
 
         if (customSettings.paymentRequestEnabled != null && WebViewFeature.isFeatureSupported(WebViewFeature.PAYMENT_REQUEST)) {
           try {
@@ -764,12 +749,27 @@ public final class InAppWebView
           }
         }
 
-        if (customSettings.webAuthenticationSupport != null &&
-                WebViewFeature.isFeatureSupported(WebViewFeature.WEB_AUTHENTICATION)) {
-          try {
-            WebSettingsCompat.setWebAuthenticationSupport(settings, customSettings.webAuthenticationSupport);
-          } catch (ClassCastException e) {
-            Log.w(LOG_TAG, "OEM WebView wrapper incompatible with setWebAuthenticationSupport", e);
+        if (customSettings.webAuthenticationSupport != null) {
+          if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_AUTHENTICATION)) {
+            try {
+              WebSettingsCompat.setWebAuthenticationSupport(settings, customSettings.webAuthenticationSupport);
+            } catch (RuntimeException e) {
+              // ClassCastException: OEM WebView wrapper incompatibility; other
+              // RuntimeExceptions: provider glue failures. Applying a settings
+              // value must never crash the app.
+              Log.w(LOG_TAG, "Failed to apply webAuthenticationSupport", e);
+            }
+          } else if (customSettings.webAuthenticationSupport != 0) {
+            // The setting was explicitly requested but this WebView does not
+            // support WebAuthn — surface it instead of silently dropping it
+            // (the same class of silent no-op as issue #272 on macOS).
+            Log.w(
+                LOG_TAG,
+                "webAuthenticationSupport="
+                    + customSettings.webAuthenticationSupport
+                    + " requested but WebViewFeature.WEB_AUTHENTICATION is not supported"
+                    + " by this WebView; passkey sign-in will not work. Update the"
+                    + " Android System WebView component.");
           }
         }
 
@@ -2309,25 +2309,6 @@ public final class InAppWebView
                 Log.w(LOG_TAG, "OEM WebView wrapper incompatible with setEnterpriseAuthenticationAppLinkPolicyEnabled", e);
             }
         }
-        if (
-            newSettingsMap.get("requestedWithHeaderOriginAllowList") != null &&
-            !Util.objEquals(
-                customSettings.requestedWithHeaderOriginAllowList,
-                newCustomSettings.requestedWithHeaderOriginAllowList
-            ) &&
-            WebViewFeature.isFeatureSupported(
-                WebViewFeature.REQUESTED_WITH_HEADER_ALLOW_LIST
-            )
-        ) {
-            try {
-                WebSettingsCompat.setRequestedWithHeaderOriginAllowList(
-                    settings,
-                    newCustomSettings.requestedWithHeaderOriginAllowList
-                );
-            } catch (ClassCastException e) {
-                Log.w(LOG_TAG, "OEM WebView wrapper incompatible with setRequestedWithHeaderOriginAllowList", e);
-            }
-        }
 
         if (newSettingsMap.get("paymentRequestEnabled") != null &&
                 customSettings.paymentRequestEnabled != newCustomSettings.paymentRequestEnabled &&
@@ -2340,12 +2321,19 @@ public final class InAppWebView
         }
 
         if (newSettingsMap.get("webAuthenticationSupport") != null &&
-                !Util.objEquals(customSettings.webAuthenticationSupport, newCustomSettings.webAuthenticationSupport) &&
-                WebViewFeature.isFeatureSupported(WebViewFeature.WEB_AUTHENTICATION)) {
-            try {
-                WebSettingsCompat.setWebAuthenticationSupport(settings, newCustomSettings.webAuthenticationSupport);
-            } catch (ClassCastException e) {
-                Log.w(LOG_TAG, "OEM WebView wrapper incompatible with setWebAuthenticationSupport", e);
+                !Util.objEquals(customSettings.webAuthenticationSupport, newCustomSettings.webAuthenticationSupport)) {
+            if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_AUTHENTICATION)) {
+                try {
+                    WebSettingsCompat.setWebAuthenticationSupport(settings, newCustomSettings.webAuthenticationSupport);
+                } catch (RuntimeException e) {
+                    Log.w(LOG_TAG, "Failed to apply webAuthenticationSupport", e);
+                }
+            } else {
+                Log.w(
+                        LOG_TAG,
+                        "webAuthenticationSupport change requested but"
+                                + " WebViewFeature.WEB_AUTHENTICATION is not supported by this"
+                                + " WebView; ignoring");
             }
         }
 

@@ -44,25 +44,28 @@ class WebStorageOrigin {
     final _patchMap = _patcher.patchMap;
     return WebStorageOrigin(
       origin: _patchMap.containsKey(WebStorageOrigin$.origin)
-          ? (_patchMap[WebStorageOrigin$.origin] is Function)
-                ? _patchMap[WebStorageOrigin$.origin](this.origin)
-                : (_patchMap[WebStorageOrigin$.origin] is Patch)
-                ? _patchMap[WebStorageOrigin$.origin].applyTo(this.origin)
-                : _patchMap[WebStorageOrigin$.origin]
+          ? ((_patchMap[WebStorageOrigin$.origin] is Function)
+                    ? _patchMap[WebStorageOrigin$.origin](this.origin)
+                    : (_patchMap[WebStorageOrigin$.origin] is Patch)
+                    ? _patchMap[WebStorageOrigin$.origin].applyTo(this.origin)
+                    : _patchMap[WebStorageOrigin$.origin])
+                as String?
           : this.origin,
       quota: _patchMap.containsKey(WebStorageOrigin$.quota)
-          ? (_patchMap[WebStorageOrigin$.quota] is Function)
-                ? _patchMap[WebStorageOrigin$.quota](this.quota)
-                : (_patchMap[WebStorageOrigin$.quota] is Patch)
-                ? _patchMap[WebStorageOrigin$.quota].applyTo(this.quota)
-                : _patchMap[WebStorageOrigin$.quota]
+          ? ((_patchMap[WebStorageOrigin$.quota] is Function)
+                    ? _patchMap[WebStorageOrigin$.quota](this.quota)
+                    : (_patchMap[WebStorageOrigin$.quota] is Patch)
+                    ? _patchMap[WebStorageOrigin$.quota].applyTo(this.quota)
+                    : _patchMap[WebStorageOrigin$.quota])
+                as int?
           : this.quota,
       usage: _patchMap.containsKey(WebStorageOrigin$.usage)
-          ? (_patchMap[WebStorageOrigin$.usage] is Function)
-                ? _patchMap[WebStorageOrigin$.usage](this.usage)
-                : (_patchMap[WebStorageOrigin$.usage] is Patch)
-                ? _patchMap[WebStorageOrigin$.usage].applyTo(this.usage)
-                : _patchMap[WebStorageOrigin$.usage]
+          ? ((_patchMap[WebStorageOrigin$.usage] is Function)
+                    ? _patchMap[WebStorageOrigin$.usage](this.usage)
+                    : (_patchMap[WebStorageOrigin$.usage] is Patch)
+                    ? _patchMap[WebStorageOrigin$.usage].applyTo(this.usage)
+                    : _patchMap[WebStorageOrigin$.usage])
+                as int?
           : this.usage,
     );
   }
@@ -93,7 +96,8 @@ class WebStorageOrigin {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$WebStorageOriginToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

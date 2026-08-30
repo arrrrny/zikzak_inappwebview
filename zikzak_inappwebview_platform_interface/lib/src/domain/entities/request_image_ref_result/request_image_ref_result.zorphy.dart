@@ -33,11 +33,12 @@ class RequestImageRefResult {
     final _patchMap = _patcher.patchMap;
     return RequestImageRefResult(
       url: _patchMap.containsKey(RequestImageRefResult$.url)
-          ? (_patchMap[RequestImageRefResult$.url] is Function)
-                ? _patchMap[RequestImageRefResult$.url](this.url)
-                : (_patchMap[RequestImageRefResult$.url] is Patch)
-                ? _patchMap[RequestImageRefResult$.url].applyTo(this.url)
-                : _patchMap[RequestImageRefResult$.url]
+          ? ((_patchMap[RequestImageRefResult$.url] is Function)
+                    ? _patchMap[RequestImageRefResult$.url](this.url)
+                    : (_patchMap[RequestImageRefResult$.url] is Patch)
+                    ? _patchMap[RequestImageRefResult$.url].applyTo(this.url)
+                    : _patchMap[RequestImageRefResult$.url])
+                as WebUri?
           : this.url,
     );
   }
@@ -60,7 +61,8 @@ class RequestImageRefResult {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$RequestImageRefResultToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

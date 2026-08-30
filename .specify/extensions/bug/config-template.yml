@@ -1,0 +1,25 @@
+# Bug Triage Workflow Extension Configuration
+# Copied to .specify/extensions/bug/bug-config.yml on install
+
+# Auto-create a GitHub issue immediately after `speckit.bug.assess` writes the
+# assessment (the "report" phase). When false (default), assess only SUGGESTS
+# the issue step; pass `--issue` to assess to trigger it for a single run.
+auto_create_issue: true
+
+# Branch prefix used by `speckit.bug.fix --branch` / `--worktree`.
+# The fix branch is named `<branch_prefix>/<slug>` (e.g. `fix/login-timeout`).
+branch_prefix: "fix"
+
+# Default Git host used when creating issues/PRs. Only "github" is supported today.
+default_host: github
+
+# Drive the fix and verify steps through the TDD extension's red-green-refactor
+# loop instead of ad-hoc testing.
+#   true  -> bug.fix synthesizes a spec from the assessment, pins the bug directory
+#            as the TDD feature, and runs tdd.setup (if needed) -> tdd.plan ->
+#            tdd.run -> implement; bug.test runs tdd.verify. The whole bug-whole
+#            cycle then mirrors spec-whole (setup -> plan -> run -> implement -> verify).
+#   false -> classic flow: bug.fix applies the remediation and adds tests directly;
+#            bug.test validates with a manual check table. No TDD commands are run.
+# The tdd extension must be installed for this to take effect.
+tdd_enabled: true

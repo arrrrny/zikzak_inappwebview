@@ -129,10 +129,18 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   /// Delegate for JavaScript-related methods.
   PlatformJavaScriptDelegate? get javaScriptDelegate => null;
 
-  /// Delegate for cookie-management methods scoped to this controller.
+  /// Delegate for cookie-management methods scoped to this WebView.
+  ///
+  /// Returns `null` by default; platform implementations override
+  /// this to return a concrete [PlatformCookieDelegate] that wraps the
+  /// controller's cookie operations.
   PlatformCookieDelegate? get cookieDelegate => null;
 
-  /// Delegate for reading and updating this controller's WebView settings.
+  /// Delegate for reading and updating the WebView settings.
+  ///
+  /// Returns `null` by default; platform implementations override
+  /// this to return a concrete [PlatformSettingsDelegate] that wraps the
+  /// controller's settings operations.
   PlatformSettingsDelegate? get settingsDelegate => null;
 
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.webStorage}
@@ -567,6 +575,20 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
     );
   }
 
+  /// Dispatches a native key press (keyDown + keyUp) to the underlying
+  /// WebView. Used by Puppeteer-style `keyboard.press` so React / ProseMirror
+  /// editors receive a trusted Enter / Backspace. [keyCode] is the macOS
+  /// virtual key code and [characters] the typed string (may be empty).
+  Future<void> pressKey({
+    required String key,
+    required int keyCode,
+    String characters = '',
+  }) {
+    throw UnimplementedError(
+      'pressKey is not implemented on the current platform',
+    );
+  }
+
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.injectJavascriptFileFromUrl}
   ///Injects an external JavaScript file into the WebView from a defined url.
   ///
@@ -741,6 +763,17 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///**NOTE**: This method should be called, for example, in the [PlatformWebViewCreationParams.onWebViewCreated] or [PlatformWebViewCreationParams.onLoadStart] events or, at least,
   ///before you know that your JavaScript code will call the `window.zikzak_inappwebview.callHandler` method,
   ///otherwise you won't be able to intercept the JavaScript message.
+  ///
+  ///**Migration note — renamed bridge global.** This fork renamed the injected
+  ///JavaScript bridge global from `window.flutter_inappwebview` (upstream)
+  ///to `window.zikzak_inappwebview`. If you are migrating from
+  ///`flutter_inappwebview`, update your existing JavaScript from
+  ///`window.flutter_inappwebview.callHandler(...)` to
+  ///`window.zikzak_inappwebview.callHandler(...)`. Calls against the old name
+  ///fail because `window.flutter_inappwebview` is undefined, so calling
+  ///`window.flutter_inappwebview.callHandler(...)` throws a `TypeError`. The
+  ///`flutterInAppWebViewPlatformReady` event
+  ///name is unchanged and still fires once the bridge is ready.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView

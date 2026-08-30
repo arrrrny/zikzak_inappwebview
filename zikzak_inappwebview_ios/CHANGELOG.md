@@ -1,3 +1,26 @@
+## Unreleased
+
+### Fixes
+
+- Harden the WebAuthn/passkey wiring (#272 follow-up): guard the KVC `boundKeychainForPasskeys` write/read with `responds(to:)` so an unexpected SDK state can never raise an uncatchable `NSUnknownKeyException`, and log a warning when `webAuthenticationSupport` is changed through `setSettings` (the `WKWebViewConfiguration` is immutable after init, so the change is a documented no-op instead of a silent one).
+
+## 5.1.2 - 2026-08-24
+
+* chore: restore development path dependencies after 5.1.1 publish
+* Prepare for publishing version 5.1.1
+## 5.1.1 - 2026-08-24
+
+* chore: regenerate zorphy entity files for zorphy 2.3.0
+* chore: restore dev path deps and bump zorphy/zorphy_annotation to ^2.3.0
+* Prepare for publishing version
+## 5.1.0 - 2026-08-24
+
+
+### Fixes
+
+- [Android] Remove deprecated `WebSettingsCompat.setRequestedWithHeaderOriginAllowList` / `getRequestedWithHeaderOriginAllowList` calls (marked for removal in `androidx.webkit`). Eliminates the `[removal]` build warnings introduced in 5.0.0. The Dart `requestedWithHeaderOriginAllowList` setting is retained for API compatibility (#235)
+- [platform_interface] Correct the stale `in_app_webview_settings.dart` import in `PlatformSettingsDelegate` — the published 5.0.1 artifact shipped a broken relative import that broke every consumer; the source on `master` is corrected (`in_app_webview_settings` moved to `lib/src/domain/entities/`) (#249, #255, #257)
+- [docs] Document the JavaScript bridge global rename to `window.zikzak_inappwebview` (was `window.flutter_inappwebview`) in the migration guide (#258)
 ## 5.0.0 - 2026-08-16
 
 

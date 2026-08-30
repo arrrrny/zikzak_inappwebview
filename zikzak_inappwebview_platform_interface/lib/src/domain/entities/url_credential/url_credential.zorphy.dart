@@ -63,36 +63,40 @@ class URLCredential {
     final _patchMap = _patcher.patchMap;
     return URLCredential(
       username: _patchMap.containsKey(URLCredential$.username)
-          ? (_patchMap[URLCredential$.username] is Function)
-                ? _patchMap[URLCredential$.username](this.username)
-                : (_patchMap[URLCredential$.username] is Patch)
-                ? _patchMap[URLCredential$.username].applyTo(this.username)
-                : _patchMap[URLCredential$.username]
+          ? ((_patchMap[URLCredential$.username] is Function)
+                    ? _patchMap[URLCredential$.username](this.username)
+                    : (_patchMap[URLCredential$.username] is Patch)
+                    ? _patchMap[URLCredential$.username].applyTo(this.username)
+                    : _patchMap[URLCredential$.username])
+                as String?
           : this.username,
       password: _patchMap.containsKey(URLCredential$.password)
-          ? (_patchMap[URLCredential$.password] is Function)
-                ? _patchMap[URLCredential$.password](this.password)
-                : (_patchMap[URLCredential$.password] is Patch)
-                ? _patchMap[URLCredential$.password].applyTo(this.password)
-                : _patchMap[URLCredential$.password]
+          ? ((_patchMap[URLCredential$.password] is Function)
+                    ? _patchMap[URLCredential$.password](this.password)
+                    : (_patchMap[URLCredential$.password] is Patch)
+                    ? _patchMap[URLCredential$.password].applyTo(this.password)
+                    : _patchMap[URLCredential$.password])
+                as String?
           : this.password,
       certificates: _patchMap.containsKey(URLCredential$.certificates)
-          ? (_patchMap[URLCredential$.certificates] is Function)
-                ? _patchMap[URLCredential$.certificates](this.certificates)
-                : (_patchMap[URLCredential$.certificates] is Patch)
-                ? _patchMap[URLCredential$.certificates].applyTo(
-                    this.certificates,
-                  )
-                : _patchMap[URLCredential$.certificates]
+          ? ((_patchMap[URLCredential$.certificates] is Function)
+                    ? _patchMap[URLCredential$.certificates](this.certificates)
+                    : (_patchMap[URLCredential$.certificates] is Patch)
+                    ? _patchMap[URLCredential$.certificates].applyTo(
+                        this.certificates,
+                      )
+                    : _patchMap[URLCredential$.certificates])
+                as List<X509Certificate>?
           : this.certificates,
       persistence: _patchMap.containsKey(URLCredential$.persistence)
-          ? (_patchMap[URLCredential$.persistence] is Function)
-                ? _patchMap[URLCredential$.persistence](this.persistence)
-                : (_patchMap[URLCredential$.persistence] is Patch)
-                ? _patchMap[URLCredential$.persistence].applyTo(
-                    this.persistence,
-                  )
-                : _patchMap[URLCredential$.persistence]
+          ? ((_patchMap[URLCredential$.persistence] is Function)
+                    ? _patchMap[URLCredential$.persistence](this.persistence)
+                    : (_patchMap[URLCredential$.persistence] is Patch)
+                    ? _patchMap[URLCredential$.persistence].applyTo(
+                        this.persistence,
+                      )
+                    : _patchMap[URLCredential$.persistence])
+                as URLCredentialPersistence?
           : this.persistence,
     );
   }
@@ -131,7 +135,8 @@ class URLCredential {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$URLCredentialToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

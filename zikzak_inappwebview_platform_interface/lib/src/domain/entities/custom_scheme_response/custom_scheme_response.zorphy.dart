@@ -58,32 +58,38 @@ class CustomSchemeResponse {
     final _patchMap = _patcher.patchMap;
     return CustomSchemeResponse(
       data: _patchMap.containsKey(CustomSchemeResponse$.data)
-          ? (_patchMap[CustomSchemeResponse$.data] is Function)
-                ? _patchMap[CustomSchemeResponse$.data](this.data)
-                : (_patchMap[CustomSchemeResponse$.data] is Patch)
-                ? _patchMap[CustomSchemeResponse$.data].applyTo(this.data)
-                : _patchMap[CustomSchemeResponse$.data]
+          ? ((_patchMap[CustomSchemeResponse$.data] is Function)
+                    ? _patchMap[CustomSchemeResponse$.data](this.data)
+                    : (_patchMap[CustomSchemeResponse$.data] is Patch)
+                    ? _patchMap[CustomSchemeResponse$.data].applyTo(this.data)
+                    : _patchMap[CustomSchemeResponse$.data])
+                as Uint8List
           : this.data,
       contentType: _patchMap.containsKey(CustomSchemeResponse$.contentType)
-          ? (_patchMap[CustomSchemeResponse$.contentType] is Function)
-                ? _patchMap[CustomSchemeResponse$.contentType](this.contentType)
-                : (_patchMap[CustomSchemeResponse$.contentType] is Patch)
-                ? _patchMap[CustomSchemeResponse$.contentType].applyTo(
-                    this.contentType,
-                  )
-                : _patchMap[CustomSchemeResponse$.contentType]
+          ? ((_patchMap[CustomSchemeResponse$.contentType] is Function)
+                    ? _patchMap[CustomSchemeResponse$.contentType](
+                        this.contentType,
+                      )
+                    : (_patchMap[CustomSchemeResponse$.contentType] is Patch)
+                    ? _patchMap[CustomSchemeResponse$.contentType].applyTo(
+                        this.contentType,
+                      )
+                    : _patchMap[CustomSchemeResponse$.contentType])
+                as String
           : this.contentType,
       contentEncoding:
           _patchMap.containsKey(CustomSchemeResponse$.contentEncoding)
-          ? (_patchMap[CustomSchemeResponse$.contentEncoding] is Function)
-                ? _patchMap[CustomSchemeResponse$.contentEncoding](
-                    this.contentEncoding,
-                  )
-                : (_patchMap[CustomSchemeResponse$.contentEncoding] is Patch)
-                ? _patchMap[CustomSchemeResponse$.contentEncoding].applyTo(
-                    this.contentEncoding,
-                  )
-                : _patchMap[CustomSchemeResponse$.contentEncoding]
+          ? ((_patchMap[CustomSchemeResponse$.contentEncoding] is Function)
+                    ? _patchMap[CustomSchemeResponse$.contentEncoding](
+                        this.contentEncoding,
+                      )
+                    : (_patchMap[CustomSchemeResponse$.contentEncoding]
+                          is Patch)
+                    ? _patchMap[CustomSchemeResponse$.contentEncoding].applyTo(
+                        this.contentEncoding,
+                      )
+                    : _patchMap[CustomSchemeResponse$.contentEncoding])
+                as String
           : this.contentEncoding,
     );
   }
@@ -114,7 +120,8 @@ class CustomSchemeResponse {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$CustomSchemeResponseToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

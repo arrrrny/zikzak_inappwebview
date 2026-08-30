@@ -62,38 +62,41 @@ class WebAuthenticationSessionSettings {
           _patchMap.containsKey(
             WebAuthenticationSessionSettings$.prefersEphemeralWebBrowserSession,
           )
-          ? (_patchMap[WebAuthenticationSessionSettings$
-                        .prefersEphemeralWebBrowserSession]
-                    is Function)
-                ? _patchMap[WebAuthenticationSessionSettings$
-                      .prefersEphemeralWebBrowserSession](
-                    this.prefersEphemeralWebBrowserSession,
-                  )
-                : (_patchMap[WebAuthenticationSessionSettings$
-                          .prefersEphemeralWebBrowserSession]
-                      is Patch)
-                ? _patchMap[WebAuthenticationSessionSettings$
-                          .prefersEphemeralWebBrowserSession]
-                      .applyTo(this.prefersEphemeralWebBrowserSession)
-                : _patchMap[WebAuthenticationSessionSettings$
-                      .prefersEphemeralWebBrowserSession]
+          ? ((_patchMap[WebAuthenticationSessionSettings$
+                            .prefersEphemeralWebBrowserSession]
+                        is Function)
+                    ? _patchMap[WebAuthenticationSessionSettings$
+                          .prefersEphemeralWebBrowserSession](
+                        this.prefersEphemeralWebBrowserSession,
+                      )
+                    : (_patchMap[WebAuthenticationSessionSettings$
+                              .prefersEphemeralWebBrowserSession]
+                          is Patch)
+                    ? _patchMap[WebAuthenticationSessionSettings$
+                              .prefersEphemeralWebBrowserSession]
+                          .applyTo(this.prefersEphemeralWebBrowserSession)
+                    : _patchMap[WebAuthenticationSessionSettings$
+                          .prefersEphemeralWebBrowserSession])
+                as bool?
           : this.prefersEphemeralWebBrowserSession,
       additionalHeaderFields:
           _patchMap.containsKey(
             WebAuthenticationSessionSettings$.additionalHeaderFields,
           )
-          ? (_patchMap[WebAuthenticationSessionSettings$.additionalHeaderFields]
-                    is Function)
-                ? _patchMap[WebAuthenticationSessionSettings$
-                      .additionalHeaderFields](this.additionalHeaderFields)
-                : (_patchMap[WebAuthenticationSessionSettings$
-                          .additionalHeaderFields]
-                      is Patch)
-                ? _patchMap[WebAuthenticationSessionSettings$
-                          .additionalHeaderFields]
-                      .applyTo(this.additionalHeaderFields)
-                : _patchMap[WebAuthenticationSessionSettings$
-                      .additionalHeaderFields]
+          ? ((_patchMap[WebAuthenticationSessionSettings$
+                            .additionalHeaderFields]
+                        is Function)
+                    ? _patchMap[WebAuthenticationSessionSettings$
+                          .additionalHeaderFields](this.additionalHeaderFields)
+                    : (_patchMap[WebAuthenticationSessionSettings$
+                              .additionalHeaderFields]
+                          is Patch)
+                    ? _patchMap[WebAuthenticationSessionSettings$
+                              .additionalHeaderFields]
+                          .applyTo(this.additionalHeaderFields)
+                    : _patchMap[WebAuthenticationSessionSettings$
+                          .additionalHeaderFields])
+                as Map<String, String>?
           : this.additionalHeaderFields,
     );
   }
@@ -127,7 +130,8 @@ class WebAuthenticationSessionSettings {
     final Map<String, dynamic> data = _$WebAuthenticationSessionSettingsToJson(
       this,
     );
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

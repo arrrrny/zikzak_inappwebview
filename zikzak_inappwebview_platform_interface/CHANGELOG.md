@@ -1,3 +1,41 @@
+## Unreleased
+
+### Fixes
+
+- Export `webAuthenticationSupportFromWire` / `webAuthenticationSupportToWire` from the platform interface (they were generated but not exported, so custom platform implementations could not use them) and document the platform support matrix for `webAuthenticationSupport` (iOS 16.4+, macOS 13.3+, Android via `WebViewFeature.WEB_AUTHENTICATION`; ignored on Windows/Linux) (#272).
+- Document the `webAuthenticationSupport` runtime semantics (creation-time only on iOS/macOS; `null` read-back on Android when the WebView lacks `WebViewFeature.WEB_AUTHENTICATION`; WebAuthn requires a user gesture) and pin the enum to exactly NONE/FOR_APP/FOR_BROWSER in the wire-contract tests (#272 follow-up).
+
+## 5.1.3 (unreleased)
+
+### Docs
+
+- [platform_interface] Add an explicit **Migration note** paragraph to the `addJavaScriptHandler` API docstring calling out the rename of the injected JavaScript bridge global from `window.flutter_inappwebview` (upstream) to `window.zikzak_inappwebview` (#258). The dart API docstring is the canonical JS communication guide rendered on pub.dev and embedded via `{@macro}` by every platform implementation, so the note reaches migrators reading any platform's API reference.
+
+## 5.1.2 - 2026-08-24
+
+### Fixes
+
+- Add the missing `pressKey` method on `PlatformInAppWebViewController`. The published 5.1.1 artifact omitted this method even though `zikzak_inappwebview` 5.1.1 and `zikzak_inappwebview_macos` 5.1.1 call `platform.pressKey(...)`, which broke consumer compilation. Re-releasing with the method present.
+## 5.1.1 - 2026-08-24
+
+* chore: regenerate zorphy entity files for zorphy 2.3.0
+* chore: restore dev path deps and bump zorphy/zorphy_annotation to ^2.3.0
+* Prepare for publishing version
+## 5.1.0 - 2026-08-24
+
+
+### Fixes
+
+- [Android] Remove deprecated `WebSettingsCompat.setRequestedWithHeaderOriginAllowList` / `getRequestedWithHeaderOriginAllowList` calls (marked for removal in `androidx.webkit`). Eliminates the `[removal]` build warnings introduced in 5.0.0. The Dart `requestedWithHeaderOriginAllowList` setting is retained for API compatibility (#235)
+- [platform_interface] Correct the stale `in_app_webview_settings.dart` import in `PlatformSettingsDelegate` — the published 5.0.1 artifact shipped a broken relative import that broke every consumer; the source on `master` is corrected (`in_app_webview_settings` moved to `lib/src/domain/entities/`) (#249, #255, #257)
+- [docs] Document the JavaScript bridge global rename to `window.zikzak_inappwebview` (was `window.flutter_inappwebview`) in the migration guide (#258)
+## 5.0.1 - 2026-08-19
+
+### Fixes
+
+- [Android] Fix `ClassCastException: java.lang.String cannot be cast to java.lang.Integer` in `InAppWebViewSettings.parse()` — the Dart `toJson()` was serializing enum settings (`forceDark`, `forceDarkStrategy`, `mixedContentMode`, `cacheMode`, `disabledActionModeMenuItems`, `overScrollMode`, `scrollBarStyle`, `verticalScrollbarPosition`, `preferredContentMode`, `webAuthenticationSupport`) as string names instead of the integer wire values that the Android platform channel expects. Added `toJson`/`fromJson` converters on all affected `@JsonKey` annotations using the existing `toWire`/`fromWire` functions, which correctly handle non-sequential wire values (e.g., `CacheMode` → -1/1/2/3, `ScrollBarStyle` → 0/16777216/...).
+- Added missing `webAuthenticationSupportToWire`/`webAuthenticationSupportFromWire` helper functions.
+
 ## 5.0.0 - 2026-08-16
 
 

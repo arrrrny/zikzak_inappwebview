@@ -1,0 +1,12 @@
+{
+  "setup-worktree-unix": [
+    "test -f \"$ROOT_WORKTREE_PATH/.env\" && cp \"$ROOT_WORKTREE_PATH/.env\" .env || true",
+    "test -d \"$ROOT_WORKTREE_PATH/.specify\" && cp -R \"$ROOT_WORKTREE_PATH/.specify\" .specify 2>/dev/null || true"
+  ],
+  "setup-worktree-windows": [
+    "if exist \"%ROOT_WORKTREE_PATH%\\.env\" copy /Y \"%ROOT_WORKTREE_PATH%\\.env\" .env"
+  ],
+  "setup-worktree": [
+    "echo \"Define OS-specific setup in setup-worktree-unix / setup-worktree-windows for full support.\""
+  ]
+}
