@@ -87,13 +87,16 @@ void main() {
       expect(harvested.first.value, 'token-1');
     });
 
-    test('a failing or empty evaluation yields an empty list', () async {
+    test('an evaluation failure propagates to the caller', () async {
       expect(
-        await WebViewSessions.harvestLocalStorage(
+        WebViewSessions.harvestLocalStorage(
           (_) async => throw StateError('no page'),
         ),
-        isEmpty,
+        throwsA(isA<StateError>()),
       );
+    });
+
+    test('an empty or non-Map evaluation yields an empty list', () async {
       expect(
         await WebViewSessions.harvestLocalStorage((_) async => ''),
         isEmpty,
@@ -331,9 +334,16 @@ void main() {
       );
 
       expect(ok, isTrue);
+      expect(fakeCookies.deleteAllCookiesCalls, equals(1),
+          reason: 'destination cookies cleared before restore');
       expect(fakeCookies.setCalls, hasLength(1));
       expect(fakeCookies.setCalls.single.name, 'sid');
       expect(fakeCookies.setCalls.single.value, 'v1');
+      expect(
+        eval.scripts,
+        contains('window.localStorage.clear()'),
+        reason: 'localStorage cleared before restore',
+      );
       expect(
         eval.scripts,
         contains('window.localStorage.setItem("auth", "token-1")'),
@@ -484,7 +494,161 @@ void main() {
 
       expect(ok, isTrue);
       expect(fakeCookies.setCalls, isEmpty);
-      expect(eval.scripts, isEmpty);
+      // Prior state is always cleared before restore, even for empty sessions.
+      expect(fakeCookies.deleteAllCookiesCalls, equals(1));
+      expect(eval.scripts, contains('window.localStorage.clear()'));
+    });
+  });
+
+  group('sequential A-then-B restore (data isolation)', () {
+    test('loading session B clears A-only cookies and localStorage', () async {
+      final now = DateTime.now().millisecondsSinceEpoch;
+
+      // Save session A with unique keys.
+      await store.save(
+        PortableSession(
+          id: 'profile-a',
+          name: 'Account A',
+          origin: 'https://app.example.com',
+          createdAt: now,
+          updatedAt: now,
+          cookies: [
+            CookieEntry(
+              name: 'a_cookie',
+              value: 'a-value',
+              domain: '.example.com',
+              path: '/',
+              secure: false,
+              httpOnly: false,
+            ),
+          ],
+          storage: [
+            StorageEntry(
+              key: 'a_key',
+              value: 'a-secret',
+              area: 'localStorage',
+              origin: 'https://app.example.com',
+            ),
+          ],
+        ),
+      );
+
+      // Save session B with different keys.
+      await store.save(
+        PortableSession(
+          id: 'profile-b',
+          name: 'Account B',
+          origin: 'https://app.example.com',
+          createdAt: now,
+          updatedAt: now,
+          cookies: [
+            CookieEntry(
+              name: 'b_cookie',
+              value: 'b-value',
+              domain: '.example.com',
+              path: '/',
+              secure: false,
+              httpOnly: false,
+            ),
+          ],
+          storage: [
+            StorageEntry(
+              key: 'b_key',
+              value: 'b-secret',
+              area: 'localStorage',
+              origin: 'https://app.example.com',
+            ),
+          ],
+        ),
+      );
+
+      final fakeCookies = _FakeCookiePlatform();
+      final eval = _Eval({});
+      final s = WebViewSessions(
+        port: store,
+        cookieManager: CookieManager.fromPlatform(fakeCookies),
+        evaluateJavascript: eval.call,
+      );
+
+      // Load session A first.
+      await s.load(null, sessionId: 'profile-a', url: WebUri('https://app.example.com'));
+      expect(fakeCookies.setCalls, hasLength(1));
+      expect(fakeCookies.setCalls.single.name, 'a_cookie');
+      expect(eval.scripts, contains('window.localStorage.setItem("a_key", "a-secret")'));
+
+      // Reset tracking.
+      fakeCookies.setCalls.clear();
+      eval.scripts.clear();
+
+      // Load session B — A's cookie and storage must not survive.
+      await s.load(null, sessionId: 'profile-b', url: WebUri('https://app.example.com'));
+
+      // Only B's cookie is set (not A's).
+      expect(fakeCookies.setCalls, hasLength(1));
+      expect(fakeCookies.setCalls.single.name, 'b_cookie');
+
+      // Only B's localStorage entry is set (not A's).
+      expect(eval.scripts, contains('window.localStorage.setItem("b_key", "b-secret")'));
+      expect(eval.scripts, isNot(contains('window.localStorage.setItem("a_key", "a-secret")')));
+    });
+  });
+
+  group('origin mismatch rejection', () {
+    test('rejects a session whose origin differs from the URL', () async {
+      final now = DateTime.now().millisecondsSinceEpoch;
+      await store.save(
+        PortableSession(
+          id: 'alpha-session',
+          name: 'Alpha',
+          origin: 'https://alpha.test',
+          createdAt: now,
+          updatedAt: now,
+          cookies: [
+            CookieEntry(
+              name: 'sid',
+              value: 'alpha-token',
+              domain: 'alpha.test',
+              path: '/',
+              secure: false,
+              httpOnly: false,
+            ),
+          ],
+          storage: [
+            StorageEntry(
+              key: 'user',
+              value: 'alpha-user',
+              area: 'localStorage',
+              origin: 'https://alpha.test',
+            ),
+          ],
+        ),
+      );
+
+      final fakeCookies = _FakeCookiePlatform();
+      final eval = _Eval({});
+      final s = WebViewSessions(
+        port: store,
+        cookieManager: CookieManager.fromPlatform(fakeCookies),
+        evaluateJavascript: eval.call,
+      );
+
+      // Attempt to load an alpha.test session for beta.test.
+      final ok = await s.load(
+        null,
+        sessionId: 'alpha-session',
+        url: WebUri('https://beta.test'),
+      );
+
+      expect(ok, isFalse);
+      expect(fakeCookies.setCalls, isEmpty,
+          reason: 'no cookies applied on origin mismatch');
+      expect(fakeCookies.deleteAllCookiesCalls, equals(0),
+          reason: 'no prior state cleared on origin mismatch');
+      expect(
+        eval.scripts,
+        isNot(contains(contains('setItem'))),
+        reason: 'no setItem script executed on origin mismatch',
+      );
     });
   });
 
@@ -543,6 +707,7 @@ class _FakeCookiePlatform extends PlatformCookieManager {
   final List<Cookie> cookies = [];
   final List<({String name, String value, String? domain, String path})>
       setCalls = [];
+  int deleteAllCookiesCalls = 0;
 
   @override
   Future<List<Cookie>> getCookies({
@@ -565,6 +730,13 @@ class _FakeCookiePlatform extends PlatformCookieManager {
     PlatformInAppWebViewController? webViewController,
   }) async {
     setCalls.add((name: name, value: value, domain: domain, path: path));
+    return true;
+  }
+
+  @override
+  Future<bool> deleteAllCookies() async {
+    deleteAllCookiesCalls++;
+    cookies.clear();
     return true;
   }
 

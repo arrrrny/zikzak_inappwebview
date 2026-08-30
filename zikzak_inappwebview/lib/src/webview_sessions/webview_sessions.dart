@@ -142,6 +142,15 @@ class WebViewSessions {
     final session = await port.load(sessionId);
     if (session == null) return false;
 
+    // Reject sessions whose origin does not match the destination.
+    if (session.origin != _originOf(url)) return false;
+
+    // Clear destination-origin cookies and localStorage before restoring
+    // so that a previous session (B) does not retain entries from an
+    // earlier session (A) at the same origin.
+    await _cookies.deleteAllCookies();
+    await evaluate('window.localStorage.clear()');
+
     for (final entry in session.cookies) {
       await _cookies.setCookie(
         url: url,
@@ -194,18 +203,15 @@ class WebViewSessions {
   /// Reads `window.localStorage` through [evaluate] (the webview's
   /// `evaluateJavascript`) and returns its key/value pairs (FR-003, FR-006).
   ///
-  /// A page with no localStorage yields an empty list; a failing
-  /// evaluation yields an empty list too (best-effort harvest, matching
-  /// zikzak_session's corrupt-session tolerance).
+  /// A page with no localStorage yields an empty list. An evaluation
+  /// failure propagates to the caller so that save operations can
+  /// report the error rather than silently persisting an incomplete
+  /// session.
   static Future<List<({String key, String value})>> harvestLocalStorage(
     Future<Object?> Function(String source) evaluate,
   ) async {
-    final dynamic raw;
-    try {
-      raw = await evaluate('JSON.stringify(window.localStorage)');
-    } catch (_) {
-      return const [];
-    }
+    final dynamic raw =
+        await evaluate('JSON.stringify(window.localStorage)');
     if (raw is! String || raw.isEmpty) return const [];
     final Object? decoded;
     try {
