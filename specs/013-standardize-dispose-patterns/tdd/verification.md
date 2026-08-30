@@ -11,7 +11,7 @@ no_test: 15
 not_applicable: 4
 high_smells: 0
 criteria_total: 9
-criteria_covered: 2
+criteria_covered: 3
 mutation_score: N/A # no mutation tool in stack profile (mutation_test absent)
 mutants_survived: 0 # 2 deliberate mutants sampled (U15 per cycle-log; headless delegation this audit); both caught
 suite: umbrella 118 passed, 0 failed; dispose-specific 4/4 (headless_dispose, disposable_pattern x2, in_app_localhost_server_dispose)
@@ -82,5 +82,5 @@ Both mutants caught. Test strength for the two behavioral tests is **measured an
 
 - [ ] R001 **[F2]** Update `tdd/test-list.md`: mark U3, U16, A2, A3 as NOT_APPLICABLE (double-dispose guard removed by design) or reword to the delegate-through behavior the tests actually assert.
 - [ ] R002 **[F3]** Backfill `cycle-log.md` red evidence for `headless_dispose_test.dart` and `disposable_pattern_test.dart` (record the real red command + output, or state they were test-after and re-run red→green if the subject is still mutable).
-- [ ] R003 **[A1,A4-A9]** Add acceptance tests through the example app for the 9 acceptance criteria (at minimum US2-AC3 server lifecycle and US3 keep-alive semantics), so criteria are covered end-to-end rather than only at the unit/compile level.
+- [ ] R003 **[A1,A4-A9]** Add acceptance tests through the example app for the 7 applicable acceptance criteria (A2 and A3 are NOT_APPLICABLE — double-dispose guard removed by design; at minimum US2-AC3 server lifecycle and US3 keep-alive semantics), so criteria are covered end-to-end rather than only at the unit/compile level.
 - [ ] R004 **[F4]** Consider promoting `disposable_pattern_test.dart` from a pure compile-probe to also assert that a wrapper's `dispose` actually forwards to the platform (close the "behavioral drift" gap the probe cannot catch).

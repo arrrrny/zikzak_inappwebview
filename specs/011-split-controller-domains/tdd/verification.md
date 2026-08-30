@@ -13,7 +13,7 @@ high_smells: 0
 criteria_total: 6
 criteria_covered: 6
 mutation_score: N/A # no mutation tool in stack profile (mutation_test absent)
-mutants_survived: 0 # 3 deliberate mutants sampled across facades; all killed
+mutants_survived: 0 # 4 deliberate mutants sampled across facades; all killed
 suite: umbrella 184 passed, 0 failed; platform_interface 150 passed, 0 failed; android 4/4; ios 4/4
 ---
 
@@ -107,16 +107,15 @@ satisfied and red-proven.
 
 ## What was not audited
 
-- **A6 runtime non-null on Android/iOS against a live platform:** environment-blocked
-  (only iOS Simulator runs integration tests; Android emulator install and macOS
-  headless WebView unavailable — `tdd-profile.md` "Integration coverage is
-  platform-partial").
+- **A6 runtime non-null on iOS Simulator:** still pending — Android emulator runtime
+  was verified (Cycle 8, `emulator-5554`), but iOS Simulator has not yet been
+  exercised with `delegates_test.dart`.
 - **Mutation / property-based testing:** absent from the stack; test strength is
   sampled only (4 deliberate mutants).
 - **Edge cases** (disposed controller, HeadlessInAppWebView, cross-domain state,
   concurrency, FR-011 dedupe): listed in `test-list.md` "Invariants" but untested.
-- **A6 was not executed on a device:** verdict does not certify runtime delegate
-  non-null on physical Android/iOS.
+- **A6 was not executed on a physical device:** verdict certifies runtime delegate
+  non-null on Android emulator only, not on physical Android/iOS.
 
 ## Remediation
 
@@ -125,11 +124,10 @@ disposition:
 
 - R001, R002: DONE (delegate exports + getters).
 - R003: DONE (pre-existing broken tests fixed — `zikzak_session: ^0.2.0` added, headless dispose adapted).
-- R004, R008 (acceptance artifacts A1–A6): **DONE for A1–A5** (cycle 7); A6 runtime
-  portion remains environment-gated (Finding 3) and is not a code defect.
-- R005, R006, R007, R009, R010: A6 runtime non-null (R005/R006, environment) and the
+- R004, R008 (acceptance artifacts A1–A6): **DONE for A1–A5** (cycle 7); **A6 DONE for Android** (cycle 8); iOS runtime remains pending (environment, not a code defect).
+- R005, R006, R007, R009, R010: A6 iOS runtime non-null (R005/R006, environment — Android verified) and the
   U1–U4 singleton behavioral test (R007) remain OPEN but are non-blocking: R007 is
-  LOW, and R005/R006 cannot be closed without a real device/simulator run.
+  LOW, and R005/R006 require an iOS Simulator run to close.
 
 The feature's user-facing behavior is complete and behaviorally verified end to end
 through the public API and the four domain facades. Remaining work is environment

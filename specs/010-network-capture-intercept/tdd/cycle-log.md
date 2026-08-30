@@ -22,8 +22,10 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
   `proxy-authorization`, `cookie`, `set-cookie` headers with `kRedactionMarker`)
   and wired `redactRequest` / `redactResponse` / `redactBody` into
   `NetworkCaptureManager._onJavaScriptEvent` BEFORE the raw callbacks and the
-  collector, so secrets are removed at the source (FR-007 / SC-004). Suite
-  `flutter test` -> 185 passed, 0 failed (was 184).
+  collector, so secrets are removed at the source (FR-007 / SC-004). The unit
+  tests call `redactRequest` directly; an entry-point integration test that
+  exercises `_onJavaScriptEvent` is still needed to prove the wiring end-to-end.
+  Suite `flutter test` -> 185 passed, 0 failed (was 184).
 - refactor: none needed; `_redactHeaders` helper shared by request and response.
 - commit: 55e02139
 - note: the Baseline red (2 compile failures) is resolved at this branch HEAD; the

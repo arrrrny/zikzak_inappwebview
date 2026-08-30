@@ -1,7 +1,8 @@
 # Cycle Log: Dismiss Dialogues Setting (002)
 
-Append only. Newest last. Every entry's `red` block is the evidence that the test
-existed and failed before the implementation.
+Append only. Newest last. Implementation entries must include a `red` block showing that the test
+existed and failed before the implementation. Characterization entries may
+use `red: N/A` when the behavior predates the test, with the reason recorded.
 
 ## Baseline
 

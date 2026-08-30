@@ -80,10 +80,10 @@ Scope: 1 of 5 acceptance behaviors sampled. Not exhaustive.
 | Criterion | Tests | End to end |
 | --------- | ----- | ---------- |
 | SC-001 | A1 (`dismiss_dialogues_setting_test.dart`) | Yes (setting default) |
-| SC-002 | A2 (`dismiss_dialogues_test.dart` SC-002) | Yes (real WebView, iOS sim) |
-| SC-003 | A3 (`dismiss_dialogues_test.dart` SC-003) | Yes (real WebView, iOS sim) |
-| SC-004 | A4 (`dismiss_dialogues_test.dart` SC-004) | Yes (real WebView, iOS sim) |
-| SC-005 | A5 (`dismiss_dialogues_test.dart` SC-005) | Yes (real WebView, iOS sim) |
+| SC-002 | A2 (`dismiss_dialogues_test.dart` SC-002) | Yes (iOS sim, macOS desktop, Android emulator API 26) |
+| SC-003 | A3 (`dismiss_dialogues_test.dart` SC-003) | Yes (iOS sim, macOS desktop, Android emulator API 26) |
+| SC-004 | A4 (`dismiss_dialogues_test.dart` SC-004) | Yes (iOS sim, macOS desktop, Android emulator API 26) |
+| SC-005 | A5 (`dismiss_dialogues_test.dart` SC-005) | Yes (iOS sim, macOS desktop, Android emulator API 26) |
 
 Untested criteria: none. Tests tracing to nothing: U1–U7 trace to the separate
 `DialogueDismisser` module (intentional; see Finding #3). All five `traces` targets

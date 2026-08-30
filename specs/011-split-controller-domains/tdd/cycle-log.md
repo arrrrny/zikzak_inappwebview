@@ -55,7 +55,9 @@ These reds are pre-existing and unrelated to any TDD cycle. No TDD loop can star
 
 - behaviors: U10–U28 (NavigationController delegates each navigation method to the
   parent `InAppWebViewController`, reaching the platform with identical arguments
-  and return value) and U66–U67 (SettingsController delegates getSettings/setSettings).
+  and return value except that `loadSimulatedRequest` preserves the monolith's
+  `urlResponse: null` behavior) and U66–U67 (SettingsController delegates
+  getSettings/setSettings).
   Also U5/U9 monolith-surface checks: calling the monolith method reaches the platform
   identically (backward compatibility).
 - test file: `zikzak_inappwebview/test/domain_controllers_behavioral_test.dart`
@@ -202,8 +204,11 @@ These reds are pre-existing and unrelated to any TDD cycle. No TDD loop can star
   monolith.getSettings must route through settings facade
   ```
   (U5/U6/U8 fail; U7/U9 pass unchanged.)
-- green: inverted the four facades to delegate to `_controller.platform.xxx()`
-  directly (instead of `_controller.xxx()`), removing the extra monolith hop, then
+- green: inverted the navigation, JavaScript, and settings facades to delegate to
+  `_controller.platform.xxx()` directly (instead of `_controller.xxx()`), removing
+  the extra monolith hop. `CookieController` continues to delegate cookie
+  operations to `CookieManager`; only `_resolveUrl` reads
+  `_controller.platform.getUrl()` directly. Then
   changed the monolith's four grouped method blocks to delegate to the facade
   getters (`loadUrl` → `navigation.loadUrl()`, `evaluateJavascript` →
   `javaScript.evaluateJavascript()`, `getSettings` → `settings.getSettings()`, etc.).
@@ -261,7 +266,9 @@ These reds are pre-existing and unrelated to any TDD cycle. No TDD loop can star
   while the example app uses the **local** (buggy) base via `dependency_overrides`.
   Only the example build exercised the local base. Test-gap to note: the delegate
   override probes should resolve the local platform_interface so they catch local base
-  regressions, not just the published ones. A6 moved PENDING→DONE in test-list.md;
-  verification.md A6 row NO_TEST→PROVEN (runtime). Marked as the closure of the
+  regressions, not just the published ones. A6 moved PENDING→DONE (Android) in test-list.md;
+  verification.md A6 row NO_TEST→PROVEN (runtime, Android only). iOS runtime coverage
+  remains pending — a passing `delegates_test.dart` run on an iOS Simulator is required
+  before A6 can be marked fully DONE. Marked as the closure of the
   prior verification Finding 3 (MED) and the "Remaining gap" note.
 - commit: (pending — see report)
