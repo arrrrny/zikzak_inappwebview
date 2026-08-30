@@ -468,7 +468,11 @@ class InAppWebViewController implements Disposable {
     required URLRequest urlRequest,
     required Uint8List data,
     URLResponse? urlResponse,
-  }) => navigation.loadSimulatedRequest(urlRequest: urlRequest, data: data);
+  }) => navigation.loadSimulatedRequest(
+    urlRequest: urlRequest,
+    data: data,
+    urlResponse: urlResponse,
+  );
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.openDevTools}
   Future<void> openDevTools() => platform.openDevTools();

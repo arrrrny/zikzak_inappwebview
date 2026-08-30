@@ -58,8 +58,7 @@ class NavigationController {
 
   ///Loads a simulated request with the given [data] payload.
   ///
-  ///[urlResponse] is accepted for signature compatibility with the monolithic
-  ///method but, like that method, is not forwarded to the platform.
+  ///[urlResponse] is forwarded to the platform controller when provided.
   Future<void> loadSimulatedRequest({
     required URLRequest urlRequest,
     required Uint8List data,
@@ -67,6 +66,7 @@ class NavigationController {
   }) => _controller.platform.loadSimulatedRequest(
     urlRequest: urlRequest,
     data: data,
+    urlResponse: urlResponse,
   );
 
   ///Reloads the current page.
