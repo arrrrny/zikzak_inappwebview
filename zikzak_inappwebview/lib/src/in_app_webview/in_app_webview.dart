@@ -15,6 +15,7 @@ import 'in_app_webview_controller.dart';
 import '../find_interaction/find_interaction_controller.dart';
 import '../pull_to_refresh/main.dart';
 import '../pull_to_refresh/pull_to_refresh_controller.dart';
+import 'dismiss_dialogues_legacy.dart';
 import 'network_capture/network_capture_manager.dart';
 
 ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewWidget}
@@ -334,38 +335,8 @@ class InAppWebView extends StatefulWidget implements Disposable {
         onLoadStop: (controller, url) {
           networkCaptureManager?.onPageLoad(controller);
           onLoadStop?.call(controller, url);
-          if (initialSettings?.dismissDialogues ?? false) {
-            () async {
-              try {
-                for (var i = 0; i < 3; i++) {
-                  await controller.evaluateJavascript(
-                    source: '''
-                          (function() {
-                            var removed = 0;
-                            var all = document.querySelectorAll('*');
-                            all.forEach(function(el) {
-                              try {
-                                var style = window.getComputedStyle(el);
-                                if (style.position === 'fixed' || style.position === 'sticky') {
-                                  el.remove();
-                                  removed++;
-                                }
-                              } catch(e) {}
-                            });
-                            document.documentElement.style.overflow = '';
-                            document.documentElement.style.margin = '';
-                            document.body.style.overflow = '';
-                            document.body.style.margin = '';
-                            return removed;
-                          })();
-                        ''',
-                  );
-                  if (i < 2) {
-                    await Future.delayed(const Duration(milliseconds: 800));
-                  }
-                }
-              } catch (_) {}
-            }();
+          if (shouldDismissDialogues(initialSettings)) {
+            unawaited(runLegacyDismissDialogues(controller));
           }
         },
         onReceivedError: onReceivedError != null
