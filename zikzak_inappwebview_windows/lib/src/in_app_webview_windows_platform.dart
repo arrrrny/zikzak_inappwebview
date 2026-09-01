@@ -163,6 +163,8 @@ class _InAppWebViewWindowsWidgetStateImpl
         controllerParams,
         _controller,
       );
+      final callbackController =
+          widget.params.controllerFromPlatform?.call(controller) ?? controller;
 
       // Apply virtual host mappings from the environment settings. Each
       // mapping serves a local folder at https://<hostName>/ and bypasses
@@ -208,12 +210,12 @@ class _InAppWebViewWindowsWidgetStateImpl
         final url = currentUrl == null ? null : WebUri(currentUrl!);
         switch (state) {
           case LoadingState.loading:
-            widget.params.onProgressChanged?.call(controller, 0);
-            widget.params.onLoadStart?.call(controller, url);
+            widget.params.onProgressChanged?.call(callbackController, 0);
+            widget.params.onLoadStart?.call(callbackController, url);
             break;
           case LoadingState.navigationCompleted:
-            widget.params.onProgressChanged?.call(controller, 100);
-            widget.params.onLoadStop?.call(controller, url);
+            widget.params.onProgressChanged?.call(callbackController, 100);
+            widget.params.onLoadStop?.call(callbackController, url);
             break;
           case LoadingState.none:
             break;
@@ -233,9 +235,7 @@ class _InAppWebViewWindowsWidgetStateImpl
       }
 
       if (widget.params.onWebViewCreated != null) {
-        widget.params.onWebViewCreated!(
-          widget.params.controllerFromPlatform!(controller),
-        );
+        widget.params.onWebViewCreated!(callbackController);
       }
     } catch (e) {
       print("Failed to initialize webview: $e");
