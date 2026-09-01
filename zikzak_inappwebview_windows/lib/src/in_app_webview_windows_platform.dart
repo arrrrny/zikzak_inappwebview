@@ -155,6 +155,15 @@ class _InAppWebViewWindowsWidgetStateImpl
 
       await _controller.initialize();
 
+      final controllerParams = PlatformInAppWebViewControllerCreationParams(
+        id: widget.params.windowId,
+        webviewParams: widget.params,
+      );
+      final controller = InAppWebViewWindowsController(
+        controllerParams,
+        _controller,
+      );
+
       // Apply virtual host mappings from the environment settings. Each
       // mapping serves a local folder at https://<hostName>/ and bypasses
       // CORS for those resources when the access kind is allowCors.
@@ -192,15 +201,22 @@ class _InAppWebViewWindowsWidgetStateImpl
       }
 
       // Setup listeners
-      _controller.url.listen((url) {
-        // TODO: handle url change
-      });
+      String? currentUrl;
+      _controller.url.listen((url) => currentUrl = url);
 
       _controller.loadingState.listen((state) {
-        if (state == LoadingState.navigationCompleted) {
-          // TODO: handle load stop
-        } else if (state == LoadingState.loading) {
-          // TODO: handle load start
+        final url = currentUrl == null ? null : WebUri(currentUrl!);
+        switch (state) {
+          case LoadingState.loading:
+            widget.params.onProgressChanged?.call(controller, 0);
+            widget.params.onLoadStart?.call(controller, url);
+            break;
+          case LoadingState.navigationCompleted:
+            widget.params.onProgressChanged?.call(controller, 100);
+            widget.params.onLoadStop?.call(controller, url);
+            break;
+          case LoadingState.none:
+            break;
         }
       });
 
@@ -215,17 +231,6 @@ class _InAppWebViewWindowsWidgetStateImpl
           widget.params.initialUrlRequest!.url.toString(),
         );
       }
-
-      // Create controller
-      final controllerParams = PlatformInAppWebViewControllerCreationParams(
-        id: widget.params.windowId,
-        webviewParams: widget.params,
-      );
-
-      final controller = InAppWebViewWindowsController(
-        controllerParams,
-        _controller,
-      );
 
       if (widget.params.onWebViewCreated != null) {
         widget.params.onWebViewCreated!(
