@@ -1,9 +1,30 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/services.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 import 'package:zikzak_inappwebview_windows/src/in_app_webview_windows_platform.dart';
 
 void main() {
   const defaultFolder = '/tmp/default-zikzak-webview2-data';
+
+  group('WebView2 environment initialization', () {
+    test('recognizes an already initialized environment', () {
+      expect(
+        isEnvironmentAlreadyInitializedError(
+          PlatformException(code: 'environment_already_initialized'),
+        ),
+        isTrue,
+      );
+    });
+
+    test('does not swallow unrelated platform errors', () {
+      expect(
+        isEnvironmentAlreadyInitializedError(
+          PlatformException(code: 'other_error'),
+        ),
+        isFalse,
+      );
+    });
+  });
 
   group('resolveEnvironmentInitArgs', () {
     group('issue #178 regression — additionalBrowserArguments', () {
@@ -20,7 +41,8 @@ void main() {
           // `WebViewEnvironmentInitArgs.additionalArguments` so the
           // caller can forward it to
           // `WebviewController.initializeEnvironment(additionalArguments:)`.
-          const args = '--disable-web-security '
+          const args =
+              '--disable-web-security '
               '--allow-running-insecure-content '
               '--use-fake-ui-for-media-stream '
               '--use-fake-device-for-media-stream';
@@ -100,20 +122,23 @@ void main() {
       expect(resolved.additionalArguments, isNull);
     });
 
-    test('defaultUserDataFolder is NOT invoked when settings.userDataFolder is set', () {
-      var defaultInvoked = 0;
-      resolveEnvironmentInitArgs(
-        settings: WebViewEnvironmentSettings(
-          userDataFolder: '/tmp/explicit',
-          additionalBrowserArguments: '--disable-web-security',
-        ),
-        defaultUserDataFolder: () {
-          defaultInvoked++;
-          return defaultFolder;
-        },
-      );
+    test(
+      'defaultUserDataFolder is NOT invoked when settings.userDataFolder is set',
+      () {
+        var defaultInvoked = 0;
+        resolveEnvironmentInitArgs(
+          settings: WebViewEnvironmentSettings(
+            userDataFolder: '/tmp/explicit',
+            additionalBrowserArguments: '--disable-web-security',
+          ),
+          defaultUserDataFolder: () {
+            defaultInvoked++;
+            return defaultFolder;
+          },
+        );
 
-      expect(defaultInvoked, 0);
-    });
+        expect(defaultInvoked, 0);
+      },
+    );
   });
 }

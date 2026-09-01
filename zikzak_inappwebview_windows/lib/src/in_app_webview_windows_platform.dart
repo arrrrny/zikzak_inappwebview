@@ -2,12 +2,18 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show PlatformException;
 
 import 'package:path_provider/path_provider.dart';
 import 'package:webview_windows/webview_windows.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
 import 'in_app_webview_windows_controller.dart';
+
+bool isEnvironmentAlreadyInitializedError(Object error) {
+  return error is PlatformException &&
+      error.code == 'environment_already_initialized';
+}
 
 class _VirtualHostMappingInfo {
   final String folderPath;
@@ -99,12 +105,18 @@ class _InAppWebViewWindowsWidgetStateImpl
         defaultUserDataFolder: () => defaultUserDataFolder,
       );
 
-      // Initialize the shared WebView2 environment with the resolved args.
-      await WebviewController.initializeEnvironment(
-        userDataPath: args.userDataPath,
-        browserExePath: args.browserExePath,
-        additionalArguments: args.additionalArguments,
-      );
+      // The WebView2 environment is shared by all controllers and can only be
+      // initialized once. Reusing it is valid when another WebView already
+      // initialized the process-wide environment.
+      try {
+        await WebviewController.initializeEnvironment(
+          userDataPath: args.userDataPath,
+          browserExePath: args.browserExePath,
+          additionalArguments: args.additionalArguments,
+        );
+      } on PlatformException catch (error) {
+        if (!isEnvironmentAlreadyInitializedError(error)) rethrow;
+      }
 
       await _controller.initialize();
 
