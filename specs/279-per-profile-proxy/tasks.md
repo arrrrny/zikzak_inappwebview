@@ -57,8 +57,21 @@ Source: GitHub issue #279. One PR for the spec. TDD loop per
 
 ## Phase 7: Verify + PR
 
-- [ ] T006 Run `/speckit.tdd.verify` (auditor protocol) → commit
+- [X] T006 Run `/speckit.tdd.verify` (auditor protocol) → commit
       `specs/279-per-profile-proxy/tdd/verification.md` generated FRESH from
       this session's real run.
 - [ ] T007 Push branch + open PR
       `spec(279): per-profile and global proxy support (closes #279)`.
+
+## Phase 8: TDD remediation (from /speckit.tdd.verify at cd9b116c)
+
+- [ ] T-R1 (finding #2) Add a profile-level authenticated restart test: a
+      profile proxy with a password is restored after `Browser.open` with
+      its password re-resolved from the vault —
+      `test/profile_proxy_test.dart`, prove with
+      `flutter test test/profile_proxy_test.dart` in `zuraffa_browser`.
+- [ ] T-R2 (finding #1) Characterize `PlatformProxyApplier` against a
+      mocked `InAppWebViewPlatform`: `setProxyOverride` receives the mapped
+      `ProxySettings` for apply, `clearProxyOverride` for a null resolution
+      and for dispose — prove with
+      `flutter test` in `zuraffa_browser`.
