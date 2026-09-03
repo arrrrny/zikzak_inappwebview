@@ -1,7 +1,14 @@
+import 'package:zikzak_inappwebview/zikzak_inappwebview.dart';
+
+import 'page_host.dart';
 import 'proxy_config.dart';
 import 'proxy_ports.dart';
 
 part 'profile.dart';
+part 'page.dart';
+
+/// Creates the [PageHost] for pages opened on a [Profile].
+typedef PageHostFactory = PageHost Function(Profile profile);
 
 /// The browser: owns the global proxy configuration and the profiles.
 ///
@@ -13,6 +20,7 @@ class Browser {
   final ProxyConfigStore _store;
   final SecretVault _vault;
   final ProxyApplier _applier;
+  final PageHostFactory _pageHostFactory;
 
   ProxyConfig? _global;
   ResolvedProxy? _lastApplied;
@@ -23,9 +31,11 @@ class Browser {
     required ProxyConfigStore store,
     required SecretVault vault,
     required ProxyApplier applier,
+    PageHostFactory? pageHostFactory,
   })  : _store = store,
         _vault = vault,
-        _applier = applier;
+        _applier = applier,
+        _pageHostFactory = pageHostFactory ?? _defaultPageHostFactory;
 
   /// Opens a browser, restoring persisted proxy configuration.
   ///
@@ -36,11 +46,13 @@ class Browser {
     ProxyConfigStore? store,
     SecretVault? vault,
     required ProxyApplier applier,
+    PageHostFactory? pageHostFactory,
   }) async {
     final browser = Browser._(
       store: store ?? InMemoryProxyConfigStore(),
       vault: vault ?? InMemorySecretVault(),
       applier: applier,
+      pageHostFactory: pageHostFactory,
     );
     final record = await browser._store.loadGlobal();
     if (record != null) {
@@ -65,6 +77,7 @@ class Browser {
         store: browser._store,
         vault: browser._vault,
         globalLookup: () => browser._global,
+        pageHostFactory: browser._pageHostFactory,
       );
       profile._explicit = profileRecord.toConfig(password: password);
       browser._profiles[profileId] = profile;
@@ -91,6 +104,7 @@ class Browser {
       store: _store,
       vault: _vault,
       globalLookup: () => _global,
+      pageHostFactory: _pageHostFactory,
     );
     _profiles[id] = profile;
     return profile;
@@ -153,6 +167,15 @@ class Browser {
 
   /// Vault key for the global proxy password.
   static const String _globalSecretKey = 'proxy/global/password';
+
+  /// Default production page host: a headless webview bound to the profile
+  /// persistent store.
+  static PageHost _defaultPageHostFactory(Profile profile) =>
+      HeadlessPageHost(
+        settings: InAppWebViewSettings(
+          persistentStoreIdentifier: 'zuraffa_browser/${profile.id}',
+        ),
+      );
 
   void _guardNotDisposed() {
     if (_disposed) {

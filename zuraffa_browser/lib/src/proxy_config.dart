@@ -70,11 +70,15 @@ class ProxyConfig {
   /// The URL scheme for this configuration (equals [ProxyType.wire]).
   String get scheme => type.wire;
 
-  /// Renders `[scheme://][user:pass@]host:port`.
-  String toProxyUrl() {
-    final credentials = (username != null || password != null)
-        ? '${username ?? ''}:${password ?? ''}@'
-        : '';
+  /// Renders `[scheme://][user:pass@]host:port`; [password] overrides the
+  /// transient [ProxyConfig.password] (used when the password is resolved
+  /// from the vault at apply time).
+  String toProxyUrl({String? password}) {
+    final effectivePassword = password ?? this.password;
+    final credentials =
+        (username != null || effectivePassword != null)
+            ? '${username ?? ''}:${effectivePassword ?? ''}@'
+            : '';
     return '$scheme://$credentials$host:$port';
   }
 

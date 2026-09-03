@@ -82,6 +82,7 @@ void main() {
       final browser = await openBrowser();
       await browser.setProxy(globalProxy);
       final work = browser.createProfile('work');
+      await work.setProxy(workProxy);
       final pageInWork = work.openPage();
       final personal = browser.createProfile('personal');
       final pageInPersonal = personal.openPage();

@@ -16,9 +16,12 @@ class Profile {
   final ProxyConfigStore _store;
   final SecretVault _vault;
   final GlobalProxyLookup _globalLookup;
+  final PageHostFactory _pageHostFactory;
 
   ProxyConfig? _explicit;
   bool _disposed = false;
+  int _pageCounter = 0;
+  final List<BrowserPage> _pages = [];
 
   Profile._({
     required this.id,
@@ -26,9 +29,11 @@ class Profile {
     required ProxyConfigStore store,
     required SecretVault vault,
     required GlobalProxyLookup globalLookup,
+    required PageHostFactory pageHostFactory,
   })  : _store = store,
         _vault = vault,
-        _globalLookup = globalLookup;
+        _globalLookup = globalLookup,
+        _pageHostFactory = pageHostFactory;
 
   /// Vault key for this profile's proxy password.
   String get _secretKey => 'proxy/profile/$id/password';
@@ -73,6 +78,24 @@ class Profile {
     _explicit = null;
     await _store.saveProfile(id, null);
     await _vault.delete(_secretKey);
+  }
+
+  /// The live pages opened on this profile.
+  List<BrowserPage> get pages => List.unmodifiable(_pages);
+
+  /// Opens a new [BrowserPage] on this profile.
+  ///
+  /// The page host comes from the browser's [PageHostFactory]; the default
+  /// factory binds the page's webview to this profile's persistent store.
+  BrowserPage openPage() {
+    _guardNotDisposed();
+    final page = BrowserPage._(
+      id: '$id/page-${++_pageCounter}',
+      profile: this,
+      host: _pageHostFactory(this),
+    );
+    _pages.add(page);
+    return page;
   }
 
   void _guardNotDisposed() {

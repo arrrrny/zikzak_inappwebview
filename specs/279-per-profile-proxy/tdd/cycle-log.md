@@ -133,3 +133,26 @@ Compilation failed for testPath=.../test/page_api_test.dart
 
 The page layer (PageHost port, Profile.openPage, BrowserPage overrides) and
 the pure platform mapping do not exist yet.
+
+### Green (T003)
+
+- command: `flutter test` (cwd `zuraffa_browser`)
+- observed output:
+
+```text
+00:01 +35: All tests passed!
+```
+
+- implementation: `lib/src/page.dart` (BrowserPage override surface, part of
+  the browser library), `lib/src/page_host.dart` (PageHost port +
+  HeadlessPageHost bound to the profile persistentStoreIdentifier),
+  Profile.openPage, PageHostFactory on Browser.open,
+  `lib/src/platform_settings.dart` (pure proxySettingsFromConfig ->
+  Android ProxyRule(schemeFilter) + IOSProxySettings.proxyUrl),
+  ProxyConfig.toProxyUrl({password}) override.
+- test adjustment during green (setup bug, assertion unchanged): the
+  "effective resolution" test expected the profile proxy to apply but its
+  setup never called `work.setProxy(workProxy)`; the setup now does. The
+  asserted behavior (page ?? profile.effective ?? global) is unchanged.
+- PlatformProxyApplier (the channel-backed applier over
+  ProxyController.instance()) lands with the lifecycle cycle T004.

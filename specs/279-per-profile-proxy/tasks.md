@@ -29,10 +29,10 @@ Source: GitHub issue #279. One PR for the spec. TDD loop per
 
 ## Phase 4: T003 — Browser/Page programmatic API (RED → GREEN)
 
-- [ ] T003a RED: `test/page_api_test.dart` — page override precedence,
+- [X] T003a RED: `test/page_api_test.dart` — page override precedence,
       page fallback, authenticated proxy vault flow, platform mapping
       (A5/A6, U26-U30).
-- [ ] T003b GREEN: `BrowserPage` (setProxy/clearProxy/effectiveProxy),
+- [X] T003b GREEN: `BrowserPage` (setProxy/clearProxy/effectiveProxy),
       `PageHost` port + fake factory, `proxySettingsFromConfig` pure mapping,
       `PlatformProxyApplier`, password vaulting on set.
 
