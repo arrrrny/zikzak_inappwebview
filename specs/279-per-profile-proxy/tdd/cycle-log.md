@@ -78,3 +78,18 @@ Browser) does not exist yet.
   `final`; the validated behavior (U8 throwsArgumentError) is identical.
 - A1 stays RED at this point: "applied to all profiles" needs profiles and
   page navigation (cycles T002-T004).
+
+## Cycle T002 — Per-profile proxy (red → green)
+
+### Red
+
+- command: `flutter test test/profile_proxy_test.dart` (cwd `zuraffa_browser`)
+- observed output (excerpt):
+
+```text
+test/profile_proxy_test.dart:38:28: Error: The method 'createProfile' isn't defined for the type 'Browser'.
+Compilation failed for testPath=.../test/profile_proxy_test.dart
+```
+
+The whole Profile layer (createProfile/profile/effectiveProxy, per-profile
+store records) does not exist yet.

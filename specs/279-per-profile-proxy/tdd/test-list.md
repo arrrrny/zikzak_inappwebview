@@ -27,13 +27,13 @@ One per acceptance criterion in `spec.md`.
 | id  | behavior                                                                 | traces          | kind      | state   | test                                                                        |
 | --- | ------------------------------------------------------------------------ | --------------- | --------- | ------- | --------------------------------------------------------------------------- |
 | A1  | Global proxy set via API, persisted, and applied to all profiles         | AC1, FR-001/002 | example   | RED | `test/global_proxy_test.dart::global proxy (AC1/FR-001) ...`                |
-| A2  | Per-profile proxy overrides global for that profile only                 | AC2, FR-003     | example   | PLANNED | `test/profile_proxy_test.dart::per-profile proxy (AC2/FR-003) ...`          |
-| A3  | Removing a per-profile proxy falls back to global (or direct)            | AC3, FR-004     | example   | PLANNED | `test/profile_proxy_test.dart::per-profile proxy (AC3/FR-004) ...`          |
+| A2  | Per-profile proxy overrides global for that profile only                 | AC2, FR-003     | example   | RED    | `test/profile_proxy_test.dart::per-profile proxy (AC2/FR-003) ...`          |
+| A3  | Removing a per-profile proxy falls back to global (or direct)            | AC3, FR-004     | example   | RED    | `test/profile_proxy_test.dart::per-profile proxy (AC3/FR-004) ...`          |
 | A4  | Proxy configuration survives app restart (global + per-profile)          | AC4, FR-002/005 | example   | PLANNED | `test/global_proxy_test.dart` + `test/profile_proxy_test.dart` restart tests |
 | A5  | Authenticated proxies supported; password vaulted, never in plaintext    | AC5, FR-009     | example   | PLANNED | `test/page_api_test.dart::authenticated proxies (AC5/FR-009) ...`           |
 | A6  | Programmatic set/clear/get on Browser and Page levels + page override    | AC6, FR-006     | example   | PLANNED | `test/page_api_test.dart::page-level override (AC6/FR-006) ...`             |
 | A7  | No proxy anywhere = direct connection; first navigation clears override  | AC7, FR-010     | example   | PLANNED | `test/lifecycle_test.dart::direct connection default (AC7/FR-010)`          |
-| A8  | Profiles without explicit proxy inherit the global proxy                 | AC8, FR-011     | example   | PLANNED | `test/profile_proxy_test.dart::inheritance (AC8/FR-011)`                    |
+| A8  | Profiles without explicit proxy inherit the global proxy                 | AC8, FR-011     | example   | RED    | `test/profile_proxy_test.dart::inheritance (AC8/FR-011)`                    |
 
 ## Inner loop: unit behaviors
 
@@ -81,12 +81,12 @@ One per acceptance criterion in `spec.md`.
 
 | id  | behavior                                                            | traces     | kind             | state   | test                                   |
 | --- | -------------------------------------------------------------------- | --------- | ---------------- | ------- | -------------------------------------- |
-| U20 | profile.setProxy sets the explicit proxy; getter returns it         | FR-003     | characterization | PLANNED | `test/profile_proxy_test.dart`         |
-| U21 | effectiveProxy: explicit beats global; none → global; neither → null | FR-003/011 | characterization | PLANNED | `test/profile_proxy_test.dart`         |
-| U22 | profile.clearProxy falls back to global; no global → null           | FR-004     | characterization | PLANNED | `test/profile_proxy_test.dart`         |
-| U23 | Per-profile record is keyed by profileId (no cross-profile leak)    | FR-003     | characterization | PLANNED | `test/profile_proxy_test.dart`         |
-| U24 | Browser.open restores per-profile records keyed by profile          | FR-005     | characterization | PLANNED | `test/profile_proxy_test.dart`         |
-| U25 | Profiles created without proxy inherit global immediately           | FR-011     | characterization | PLANNED | `test/profile_proxy_test.dart`         |
+| U20 | profile.setProxy sets the explicit proxy; getter returns it         | FR-003     | characterization | RED    | `test/profile_proxy_test.dart`         |
+| U21 | effectiveProxy: explicit beats global; none → global; neither → null | FR-003/011 | characterization | RED    | `test/profile_proxy_test.dart`         |
+| U22 | profile.clearProxy falls back to global; no global → null           | FR-004     | characterization | RED    | `test/profile_proxy_test.dart`         |
+| U23 | Per-profile record is keyed by profileId (no cross-profile leak)    | FR-003     | characterization | RED    | `test/profile_proxy_test.dart`         |
+| U24 | Browser.open restores per-profile records keyed by profile          | FR-005     | characterization | RED    | `test/profile_proxy_test.dart`         |
+| U25 | Profiles created without proxy inherit global immediately           | FR-011     | characterization | RED    | `test/profile_proxy_test.dart`         |
 
 ### `zuraffa_browser/lib/src/page.dart`
 
