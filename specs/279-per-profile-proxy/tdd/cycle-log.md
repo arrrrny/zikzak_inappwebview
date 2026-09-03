@@ -156,3 +156,17 @@ the pure platform mapping do not exist yet.
   asserted behavior (page ?? profile.effective ?? global) is unchanged.
 - PlatformProxyApplier (the channel-backed applier over
   ProxyController.instance()) lands with the lifecycle cycle T004.
+
+## Cycle T004 — Lifecycle (red → green)
+
+### Red
+
+- command: `flutter test test/lifecycle_test.dart` (cwd `zuraffa_browser`)
+- observed output (excerpt):
+
+```text
+test/lifecycle_test.dart:77:18: Error: The method 'navigate' isn't defined for the type 'BrowserPage'.
+Compilation failed for testPath=.../test/lifecycle_test.dart
+```
+
+navigate / Profile.dispose / Browser.dispose do not exist yet.
