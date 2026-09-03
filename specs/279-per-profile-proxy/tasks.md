@@ -5,14 +5,14 @@ Source: GitHub issue #279. One PR for the spec. TDD loop per
 
 ## Phase 1: Feature scaffold
 
-- [ ] T000 Create `zuraffa_browser` package skeleton (pubspec, analysis
+- [X] T000 Create `zuraffa_browser` package skeleton (pubspec, analysis
       options, gitignore, library doc) + feature records (spec.md, plan.md,
       tasks.md, tdd/test-list.md, tdd/cycle-log.md baseline) and record the
       pre-existing suite baseline.
 
 ## Phase 2: T001 — Global proxy API (RED → GREEN)
 
-- [ ] T001a RED: `test/global_proxy_test.dart` + `test/proxy_config_test.dart`
+- [X] T001a RED: `test/global_proxy_test.dart` + `test/proxy_config_test.dart`
       — global set/get/clear, persistence through the store, application
       through the applier; ProxyConfig value-object units (U1-U19).
 - [ ] T001b GREEN: `ProxyType`, `ProxyConfig`, `ProxyConfigRecord`,

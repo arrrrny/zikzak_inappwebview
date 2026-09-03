@@ -26,7 +26,7 @@ One per acceptance criterion in `spec.md`.
 
 | id  | behavior                                                                 | traces          | kind      | state   | test                                                                        |
 | --- | ------------------------------------------------------------------------ | --------------- | --------- | ------- | --------------------------------------------------------------------------- |
-| A1  | Global proxy set via API, persisted, and applied to all profiles         | AC1, FR-001/002 | example   | PLANNED | `test/global_proxy_test.dart::global proxy (AC1/FR-001) ...`                |
+| A1  | Global proxy set via API, persisted, and applied to all profiles         | AC1, FR-001/002 | example   | RED | `test/global_proxy_test.dart::global proxy (AC1/FR-001) ...`                |
 | A2  | Per-profile proxy overrides global for that profile only                 | AC2, FR-003     | example   | PLANNED | `test/profile_proxy_test.dart::per-profile proxy (AC2/FR-003) ...`          |
 | A3  | Removing a per-profile proxy falls back to global (or direct)            | AC3, FR-004     | example   | PLANNED | `test/profile_proxy_test.dart::per-profile proxy (AC3/FR-004) ...`          |
 | A4  | Proxy configuration survives app restart (global + per-profile)          | AC4, FR-002/005 | example   | PLANNED | `test/global_proxy_test.dart` + `test/profile_proxy_test.dart` restart tests |
@@ -41,25 +41,25 @@ One per acceptance criterion in `spec.md`.
 
 | id  | behavior                                                            | traces     | kind             | state   | test                                   |
 | --- | ------------------------------------------------------------------- | ---------- | ---------------- | ------- | -------------------------------------- |
-| U1  | toProxyUrl maps type http/https/socks5 to scheme://host:port        | FR-001     | characterization | PLANNED | `test/proxy_config_test.dart`          |
-| U2  | toProxyUrl embeds user:pass@ when credentials present               | FR-009     | characterization | PLANNED | `test/proxy_config_test.dart`          |
-| U3  | toProxyUrl omits @ when no credentials                              | FR-001     | characterization | PLANNED | `test/proxy_config_test.dart`          |
-| U4  | toJson/fromJson round-trip host, port, type, username               | FR-002     | characterization | PLANNED | `test/proxy_config_test.dart`          |
-| U5  | toJson never contains the password                                  | FR-009     | characterization | PLANNED | `test/proxy_config_test.dart`          |
-| U6  | toString redacts the password                                       | FR-009     | characterization | PLANNED | `test/proxy_config_test.dart`          |
-| U7  | equality on host/port/type; different port ≠                        | FR-003     | characterization | PLANNED | `test/proxy_config_test.dart`          |
-| U8  | invalid port (0, 65536) rejected; empty host rejected               | FR-001     | characterization | PLANNED | `test/proxy_config_test.dart`          |
-| U9  | ProxyConfigRecord round-trips through toJson/fromJson with secretRef | FR-009    | characterization | PLANNED | `test/proxy_config_test.dart`          |
-| U10 | ProxyType enum wire values are the lowercase scheme strings         | FR-001     | characterization | PLANNED | `test/proxy_config_test.dart`          |
+| U1  | toProxyUrl maps type http/https/socks5 to scheme://host:port        | FR-001     | characterization | RED | `test/proxy_config_test.dart`          |
+| U2  | toProxyUrl embeds user:pass@ when credentials present               | FR-009     | characterization | RED | `test/proxy_config_test.dart`          |
+| U3  | toProxyUrl omits @ when no credentials                              | FR-001     | characterization | RED | `test/proxy_config_test.dart`          |
+| U4  | toJson/fromJson round-trip host, port, type, username               | FR-002     | characterization | RED | `test/proxy_config_test.dart`          |
+| U5  | toJson never contains the password                                  | FR-009     | characterization | RED | `test/proxy_config_test.dart`          |
+| U6  | toString redacts the password                                       | FR-009     | characterization | RED | `test/proxy_config_test.dart`          |
+| U7  | equality on host/port/type; different port ≠                        | FR-003     | characterization | RED | `test/proxy_config_test.dart`          |
+| U8  | invalid port (0, 65536) rejected; empty host rejected               | FR-001     | characterization | RED | `test/proxy_config_test.dart`          |
+| U9  | ProxyConfigRecord round-trips through toJson/fromJson with secretRef | FR-009    | characterization | RED | `test/proxy_config_test.dart`          |
+| U10 | ProxyType enum wire values are the lowercase scheme strings         | FR-001     | characterization | RED | `test/proxy_config_test.dart`          |
 
 ### `zuraffa_browser/lib/src/proxy_ports.dart`
 
 | id  | behavior                                                            | traces     | kind             | state   | test                                   |
 | --- | ------------------------------------------------------------------- | ---------- | ---------------- | ------- | -------------------------------------- |
-| U11 | InMemoryProxyConfigStore saves/loads/clears the global record       | FR-002     | characterization | PLANNED | `test/proxy_config_test.dart`          |
-| U12 | InMemoryProxyConfigStore saves/loads/clears per-profile records     | FR-005     | characterization | PLANNED | `test/proxy_config_test.dart`          |
-| U13 | FileProxyConfigStore round-trips records through a JSON file        | FR-002/005 | characterization | PLANNED | `test/proxy_config_test.dart`          |
-| U14 | InMemorySecretVault write/read/delete round-trip                    | FR-009     | characterization | PLANNED | `test/proxy_config_test.dart`          |
+| U11 | InMemoryProxyConfigStore saves/loads/clears the global record       | FR-002     | characterization | RED | `test/proxy_config_test.dart`          |
+| U12 | InMemoryProxyConfigStore saves/loads/clears per-profile records     | FR-005     | characterization | RED | `test/proxy_config_test.dart`          |
+| U13 | FileProxyConfigStore round-trips records through a JSON file        | FR-002/005 | characterization | RED | `test/proxy_config_test.dart`          |
+| U14 | InMemorySecretVault write/read/delete round-trip                    | FR-009     | characterization | RED | `test/proxy_config_test.dart`          |
 
 ### `zuraffa_browser/lib/src/proxy_resolver.dart`
 
@@ -72,10 +72,10 @@ One per acceptance criterion in `spec.md`.
 
 | id  | behavior                                                            | traces     | kind             | state   | test                                   |
 | --- | -------------------------------------------------------------------- | --------- | ---------------- | ------- | -------------------------------------- |
-| U17 | setProxy stores the config and the getter returns it                | FR-001     | characterization | PLANNED | `test/global_proxy_test.dart`          |
-| U18 | clearProxy nulls the getter and removes the stored record           | FR-001     | characterization | PLANNED | `test/global_proxy_test.dart`          |
-| U19 | Browser.open over the same store restores the global proxy          | FR-002     | characterization | PLANNED | `test/global_proxy_test.dart`          |
-| U19b| Global setProxy applies the new config through the applier          | AC1        | characterization | PLANNED | `test/global_proxy_test.dart`          |
+| U17 | setProxy stores the config and the getter returns it                | FR-001     | characterization | RED | `test/global_proxy_test.dart`          |
+| U18 | clearProxy nulls the getter and removes the stored record           | FR-001     | characterization | RED | `test/global_proxy_test.dart`          |
+| U19 | Browser.open over the same store restores the global proxy          | FR-002     | characterization | RED | `test/global_proxy_test.dart`          |
+| U19b| Global setProxy applies the new config through the applier          | AC1        | characterization | RED | `test/global_proxy_test.dart`          |
 
 ### `zuraffa_browser/lib/src/profile.dart`
 

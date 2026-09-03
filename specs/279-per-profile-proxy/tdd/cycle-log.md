@@ -33,3 +33,27 @@ never modifies:
 The loop for this feature runs inside the new `zuraffa_browser` package only,
 whose own suite starts empty (trivially green). Target for this feature:
 **NO NEW failures** in umbrella/platform_interface vs the counts above.
+
+## Cycle T001 — Global proxy API (red → green)
+
+### Red
+
+- command: `flutter test test/global_proxy_test.dart` and
+  `flutter test test/proxy_config_test.dart` (cwd `zuraffa_browser`)
+- commit-under-red: tests committed before any implementation exists.
+- observed output (excerpt):
+
+```text
+test/global_proxy_test.dart:9:40: Error: Type 'ProxyApplier' not found.
+test/global_proxy_test.dart:10:20: Error: 'ResolvedProxy' isn't a type.
+test/global_proxy_test.dart:25:23: Error: Method not found: 'ProxyConfig'.
+test/global_proxy_test.dart:28:11: Error: Undefined name 'ProxyType'.
+test/global_proxy_test.dart:35:29: Error: Undefined name 'Browser'.
+test/global_proxy_test.dart:36:16: Error: Method not found: 'InMemoryProxyConfigStore'.
+Compilation failed for testPath=.../test/global_proxy_test.dart
+Compilation failed for testPath=.../test/proxy_config_test.dart
+```
+
+Both files fail to load: the whole API surface under test (ProxyType,
+ProxyConfig, ProxyConfigRecord, stores, vault, ProxyApplier, ResolvedProxy,
+Browser) does not exist yet.
