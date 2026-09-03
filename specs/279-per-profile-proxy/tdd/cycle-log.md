@@ -93,3 +93,26 @@ Compilation failed for testPath=.../test/profile_proxy_test.dart
 
 The whole Profile layer (createProfile/profile/effectiveProxy, per-profile
 store records) does not exist yet.
+
+### Green (T002)
+
+- command: `flutter test` (cwd `zuraffa_browser`)
+- observed output:
+
+```text
+00:00 +26: All tests passed!
+```
+
+- implementation: `lib/src/profile.dart` (part of the browser library:
+  Profile with setProxy/clearProxy/proxy/effectiveProxy, per-profile vault
+  key `proxy/profile/<id>/password`), Browser.createProfile/profile/profiles,
+  restore-on-open of per-profile records (FR-003/004/005/011).
+- test adjustment during green (intent unchanged): the restart-restore test
+  asserted `browser2.profile('personal')!.effectiveProxy` — a profile with
+  no proxy record is not recreated by the proxy store on restart (the store
+  only knows profiles that carry records; profile-entity persistence is not
+  a proxy concern), so the line became null-aware (`personal?.effectiveProxy`).
+  The asserted behavior — record-less profiles resolve to direct/global —
+  is unchanged.
+- note: `setProxy` at profile level deliberately does NOT call the applier
+  (FR-007, covered by the T004 lifecycle cycle).

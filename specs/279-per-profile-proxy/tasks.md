@@ -24,7 +24,7 @@ Source: GitHub issue #279. One PR for the spec. TDD loop per
 - [ ] T002a RED: `test/profile_proxy_test.dart` — per-profile override,
       fallback on remove, inheritance by profiles without explicit proxy,
       per-profile persistence (A2/A3/A8, U20-U25).
-- [ ] T002b GREEN: `Profile` (setProxy/clearProxy/proxy/effectiveProxy),
+- [X] T002b GREEN: `Profile` (setProxy/clearProxy/proxy/effectiveProxy),
       `ProxyResolver` precedence, per-profile store records.
 
 ## Phase 4: T003 — Browser/Page programmatic API (RED → GREEN)

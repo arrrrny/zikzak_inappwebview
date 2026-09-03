@@ -167,7 +167,8 @@ void main() {
           reason: 'profiles with stored proxy records are restored');
       expect(browser2.profile('work')!.proxy, equals(workProxy),
           reason: 'the per-profile proxy must persist across restarts');
-      expect(browser2.profile('personal')!.effectiveProxy, isNull,
+      final personal = browser2.profile('personal');
+      expect(personal?.effectiveProxy, isNull,
           reason: 'profiles without a stored record stay on direct/global');
     });
   });

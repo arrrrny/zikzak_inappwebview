@@ -1,6 +1,8 @@
 import 'proxy_config.dart';
 import 'proxy_ports.dart';
 
+part 'profile.dart';
+
 /// The browser: owns the global proxy configuration and the profiles.
 ///
 /// Spec 279. The global proxy applies to every profile (FR-001); setting it
@@ -14,6 +16,7 @@ class Browser {
 
   ProxyConfig? _global;
   ResolvedProxy? _lastApplied;
+  final Map<String, Profile> _profiles = {};
   bool _disposed = false;
 
   Browser._({
@@ -46,11 +49,58 @@ class Browser {
           : await browser._vault.read(record.secretRef!);
       browser._global = record.toConfig(password: password);
     }
+    // Restore per-profile proxy records (FR-005): every profile the store
+    // knows a proxy record for comes back with its configuration attached.
+    for (final profileId in await browser._store.profileIds()) {
+      final profileRecord = await browser._store.loadProfile(profileId);
+      if (profileRecord == null) {
+        continue;
+      }
+      final password = profileRecord.secretRef == null
+          ? null
+          : await browser._vault.read(profileRecord.secretRef!);
+      final profile = Profile._(
+        id: profileId,
+        name: profileId,
+        store: browser._store,
+        vault: browser._vault,
+        globalLookup: () => browser._global,
+      );
+      profile._explicit = profileRecord.toConfig(password: password);
+      browser._profiles[profileId] = profile;
+    }
     return browser;
   }
 
   /// The current global proxy configuration, or null (direct connection).
   ProxyConfig? get proxy => _global;
+
+  /// Creates (or returns the already-known) profile with [id].
+  ///
+  /// Profiles restored from the store on [open] are returned as-is, so a
+  /// restart over the same store keeps their per-profile proxies (FR-005).
+  Profile createProfile(String id, {String? name}) {
+    _guardNotDisposed();
+    final existing = _profiles[id];
+    if (existing != null) {
+      return existing;
+    }
+    final profile = Profile._(
+      id: id,
+      name: name ?? id,
+      store: _store,
+      vault: _vault,
+      globalLookup: () => _global,
+    );
+    _profiles[id] = profile;
+    return profile;
+  }
+
+  /// The profile with [id], or null when unknown.
+  Profile? profile(String id) => _profiles[id];
+
+  /// The live profiles.
+  List<Profile> get profiles => _profiles.values.toList();
 
   /// Whether the browser has been disposed.
   bool get isDisposed => _disposed;
