@@ -1,10 +1,7 @@
 part of 'browser.dart';
 
-/// Looks up the browser's current global proxy configuration.
-typedef GlobalProxyLookup = ProxyConfig? Function();
-
 /// A profile: a session-isolated scope that may carry its own proxy
-/// configuration (FR-003).
+/// configuration (spec 279, FR-003).
 ///
 /// The per-profile proxy overrides the global proxy for this profile only
 /// (FR-003); removing it falls back to the global proxy, or to a direct
@@ -13,10 +10,7 @@ typedef GlobalProxyLookup = ProxyConfig? Function();
 class Profile {
   final String id;
   final String name;
-  final ProxyConfigStore _store;
-  final SecretVault _vault;
-  final GlobalProxyLookup _globalLookup;
-  final PageHostFactory _pageHostFactory;
+  final Browser _browser;
 
   ProxyConfig? _explicit;
   bool _disposed = false;
@@ -26,14 +20,8 @@ class Profile {
   Profile._({
     required this.id,
     required this.name,
-    required ProxyConfigStore store,
-    required SecretVault vault,
-    required GlobalProxyLookup globalLookup,
-    required PageHostFactory pageHostFactory,
-  })  : _store = store,
-        _vault = vault,
-        _globalLookup = globalLookup,
-        _pageHostFactory = pageHostFactory;
+    required Browser browser,
+  }) : _browser = browser;
 
   /// Vault key for this profile's proxy password.
   String get _secretKey => 'proxy/profile/$id/password';
@@ -47,7 +35,7 @@ class Profile {
     if (_disposed) {
       throw StateError('Profile $id has been disposed');
     }
-    return _explicit ?? _globalLookup();
+    return _explicit ?? _browser._global;
   }
 
   /// Whether this profile has been disposed.
@@ -63,11 +51,12 @@ class Profile {
     _guardNotDisposed();
     _explicit = config;
     if (config.password != null) {
-      await _vault.write(_secretKey, config.password!);
-      await _store.saveProfile(id, config.toRecord(secretRef: _secretKey));
+      await _browser._vault.write(_secretKey, config.password!);
+      await _browser._store
+          .saveProfile(id, config.toRecord(secretRef: _secretKey));
     } else {
-      await _vault.delete(_secretKey);
-      await _store.saveProfile(id, config.toRecord());
+      await _browser._vault.delete(_secretKey);
+      await _browser._store.saveProfile(id, config.toRecord());
     }
   }
 
@@ -76,8 +65,8 @@ class Profile {
   Future<void> clearProxy() async {
     _guardNotDisposed();
     _explicit = null;
-    await _store.saveProfile(id, null);
-    await _vault.delete(_secretKey);
+    await _browser._store.saveProfile(id, null);
+    await _browser._vault.delete(_secretKey);
   }
 
   /// The live pages opened on this profile.
@@ -92,21 +81,38 @@ class Profile {
     final page = BrowserPage._(
       id: '$id/page-${++_pageCounter}',
       profile: this,
-      host: _pageHostFactory(this),
+      host: _browser._pageHostFactory(this),
     );
     _pages.add(page);
     return page;
+  }
+
+  /// Disposes the profile (FR-008): closes and disposes its pages, removes
+  /// the profile from the live list, and — when the profile carried its own
+  /// proxy — re-applies the fallback (the global proxy, or a direct
+  /// connection) so the process override no longer routes through the
+  /// released profile's proxy. Persisted records are kept: the profile can
+  /// be re-created with its proxy later.
+  Future<void> dispose() async {
+    _guardNotDisposed();
+    _disposed = true;
+    for (final page in List.of(_pages)) {
+      await page.dispose();
+    }
+    _pages.clear();
+    _browser._profiles.remove(id);
+    if (_explicit != null) {
+      await _browser._applyForScope(
+        ResolvedScope.global,
+        'global',
+        _browser._global,
+      );
+    }
   }
 
   void _guardNotDisposed() {
     if (_disposed) {
       throw StateError('Profile $id has been disposed');
     }
-  }
-
-  /// Detaches runtime state (persistence stays; see Browser.dispose and the
-  /// lifecycle tests for the full dispose contract).
-  void markDisposed() {
-    _disposed = true;
   }
 }

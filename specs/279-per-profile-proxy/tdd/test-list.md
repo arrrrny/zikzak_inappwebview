@@ -32,7 +32,7 @@ One per acceptance criterion in `spec.md`.
 | A4  | Proxy configuration survives app restart (global + per-profile)          | AC4, FR-002/005 | example   | PLANNED | `test/global_proxy_test.dart` + `test/profile_proxy_test.dart` restart tests |
 | A5  | Authenticated proxies supported; password vaulted, never in plaintext    | AC5, FR-009     | example   | GREEN  | `test/page_api_test.dart::authenticated proxies (AC5/FR-009) ...`           |
 | A6  | Programmatic set/clear/get on Browser and Page levels + page override    | AC6, FR-006     | example   | GREEN  | `test/page_api_test.dart::page-level override (AC6/FR-006) ...`             |
-| A7  | No proxy anywhere = direct connection; first navigation clears override  | AC7, FR-010     | example   | RED    | `test/lifecycle_test.dart::direct connection default (AC7/FR-010)`          |
+| A7  | No proxy anywhere = direct connection; first navigation clears override  | AC7, FR-010     | example   | GREEN  | `test/lifecycle_test.dart::direct connection default (AC7/FR-010)`          |
 | A8  | Profiles without explicit proxy inherit the global proxy                 | AC8, FR-011     | example   | GREEN  | `test/profile_proxy_test.dart::inheritance (AC8/FR-011)`                    |
 
 ## Inner loop: unit behaviors
@@ -102,9 +102,9 @@ One per acceptance criterion in `spec.md`.
 
 | id  | behavior                                                            | traces     | kind             | state   | test                                   |
 | --- | -------------------------------------------------------------------- | --------- | ---------------- | ------- | -------------------------------------- |
-| U31 | navigate applies effective proxy BEFORE host.loadUrl                | FR-007     | characterization | RED    | `test/lifecycle_test.dart`             |
-| U32 | profile/page setProxy does NOT call the applier until next navigate  | FR-007     | characterization | RED    | `test/lifecycle_test.dart`             |
-| U33 | unchanged effective config → no redundant applier call              | FR-007     | characterization | RED    | `test/lifecycle_test.dart`             |
-| U34 | no config anywhere → navigate applies clear (direct connection)     | FR-010     | characterization | RED    | `test/lifecycle_test.dart`             |
-| U35 | Profile.dispose closes pages, drops profile, re-applies fallback    | FR-008     | characterization | RED    | `test/lifecycle_test.dart`             |
-| U36 | Browser.dispose disposes applier; post-dispose API throws StateError | FR-008    | characterization | RED    | `test/lifecycle_test.dart`             |
+| U31 | navigate applies effective proxy BEFORE host.loadUrl                | FR-007     | characterization | GREEN  | `test/lifecycle_test.dart`             |
+| U32 | profile/page setProxy does NOT call the applier until next navigate  | FR-007     | characterization | GREEN  | `test/lifecycle_test.dart`             |
+| U33 | unchanged effective config → no redundant applier call              | FR-007     | characterization | GREEN  | `test/lifecycle_test.dart`             |
+| U34 | no config anywhere → navigate applies clear (direct connection)     | FR-010     | characterization | GREEN  | `test/lifecycle_test.dart`             |
+| U35 | Profile.dispose closes pages, drops profile, re-applies fallback    | FR-008     | characterization | GREEN  | `test/lifecycle_test.dart`             |
+| U36 | Browser.dispose disposes applier; post-dispose API throws StateError | FR-008    | characterization | GREEN  | `test/lifecycle_test.dart`             |

@@ -38,11 +38,11 @@ Source: GitHub issue #279. One PR for the spec. TDD loop per
 
 ## Phase 5: T004 — Lifecycle (RED → GREEN)
 
-- [ ] T004a RED: `test/lifecycle_test.dart` — apply-before-load ordering,
+- [X] T004a RED: `test/lifecycle_test.dart` — apply-before-load ordering,
       not-retroactive (no applier call until next navigation), idempotent
       re-apply, direct-connection default, profile/browser dispose (A7,
       U31-U36).
-- [ ] T004b GREEN: navigate-time application, last-applied tracking,
+- [X] T004b GREEN: navigate-time application, last-applied tracking,
       `Profile.dispose`, `Browser.dispose`, post-dispose guards.
 
 ## Phase 6: T005 — Refactor + verify

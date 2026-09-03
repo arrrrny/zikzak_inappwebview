@@ -7,6 +7,11 @@ part of 'browser.dart';
 /// falls back to the profile proxy, then the global proxy, then direct
 /// connection ([effectiveProxy]). The override is deliberately NOT
 /// persisted — it is a one-off.
+///
+/// Lifecycle (FR-007): proxy changes are never retroactive. [navigate]
+/// resolves the page's effective proxy and applies it through the platform
+/// BEFORE loading the URL, and only when it differs from what the process
+/// override currently is.
 class BrowserPage {
   final String id;
   final Profile profile;
@@ -55,14 +60,41 @@ class BrowserPage {
     _override = null;
   }
 
+  /// Navigates to [uri]: applies the page's effective proxy through the
+  /// platform (when it differs from the currently applied process override,
+  /// or when nothing has been applied yet) and THEN loads the URL (FR-007).
+  Future<void> navigate(WebUri uri) async {
+    _guardNotDisposed();
+    final browser = profile._browser;
+    final effective = effectiveProxy;
+    final resolved = effective == null
+        ? null
+        : ResolvedProxy(
+            scope: ResolvedScope.page,
+            scopeId: id,
+            config: effective,
+            password: effective.password,
+          );
+    if (!browser._isApplied(resolved)) {
+      await browser._applier.apply(resolved);
+      browser._lastApplied = resolved;
+      browser._hasApplied = true;
+    }
+    await host.loadUrl(uri);
+  }
+
+  /// Disposes the page: closes the underlying host and detaches the page
+  /// from its profile. Persisted proxy configuration is not touched.
+  Future<void> dispose() async {
+    _guardNotDisposed();
+    _disposed = true;
+    profile._pages.remove(this);
+    await host.close();
+  }
+
   void _guardNotDisposed() {
     if (_disposed) {
       throw StateError('Page $id has been disposed');
     }
-  }
-
-  /// Detaches runtime state; the host is closed by [Profile.disposePage].
-  void markDisposed() {
-    _disposed = true;
   }
 }

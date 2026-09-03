@@ -11,6 +11,7 @@ library;
 
 export 'src/browser.dart';
 export 'src/page_host.dart';
+export 'src/platform_proxy_applier.dart';
 export 'src/platform_settings.dart';
 export 'src/proxy_config.dart';
 export 'src/proxy_ports.dart';

@@ -1,6 +1,7 @@
 import 'package:zikzak_inappwebview/zikzak_inappwebview.dart';
 
 import 'page_host.dart';
+import 'platform_settings.dart';
 import 'proxy_config.dart';
 import 'proxy_ports.dart';
 
@@ -24,6 +25,7 @@ class Browser {
 
   ProxyConfig? _global;
   ResolvedProxy? _lastApplied;
+  var _hasApplied = false;
   final Map<String, Profile> _profiles = {};
   bool _disposed = false;
 
@@ -74,10 +76,7 @@ class Browser {
       final profile = Profile._(
         id: profileId,
         name: profileId,
-        store: browser._store,
-        vault: browser._vault,
-        globalLookup: () => browser._global,
-        pageHostFactory: browser._pageHostFactory,
+        browser: browser,
       );
       profile._explicit = profileRecord.toConfig(password: password);
       browser._profiles[profileId] = profile;
@@ -101,10 +100,7 @@ class Browser {
     final profile = Profile._(
       id: id,
       name: name ?? id,
-      store: _store,
-      vault: _vault,
-      globalLookup: () => _global,
-      pageHostFactory: _pageHostFactory,
+      browser: this,
     );
     _profiles[id] = profile;
     return profile;
@@ -119,6 +115,20 @@ class Browser {
   /// Whether the browser has been disposed.
   bool get isDisposed => _disposed;
 
+  /// Disposes the browser (FR-008): disposes all live profiles (closing
+  /// their pages and releasing their proxy resources) and disposes the
+  /// applier. Further API calls throw [StateError].
+  Future<void> dispose() async {
+    if (_disposed) {
+      return;
+    }
+    for (final profile in _profiles.values.toList()) {
+      await profile.dispose();
+    }
+    await _applier.dispose();
+    _disposed = true;
+  }
+
   /// Sets (or changes) the global proxy (FR-001).
   ///
   /// Persists the configuration (password only into the vault, FR-009) and
@@ -129,14 +139,7 @@ class Browser {
     _guardNotDisposed();
     _global = config;
     await _persistGlobal(config);
-    final resolved = ResolvedProxy(
-      scope: ResolvedScope.global,
-      scopeId: 'global',
-      config: config,
-      password: config.password,
-    );
-    await _applier.apply(resolved);
-    _lastApplied = resolved;
+    await _applyForScope(ResolvedScope.global, 'global', config);
   }
 
   /// Clears the global proxy: direct connection for profiles without their
@@ -146,8 +149,45 @@ class Browser {
     _global = null;
     await _store.saveGlobal(null);
     await _vault.delete(_globalSecretKey);
-    await _applier.apply(null);
-    _lastApplied = null;
+    await _applyForScope(ResolvedScope.global, 'global', null);
+  }
+
+  /// Pushes [config] (or a clear, with null) through the applier and
+  /// records it as the currently applied process override.
+  Future<void> _applyForScope(
+    ResolvedScope scope,
+    String scopeId,
+    ProxyConfig? config,
+  ) async {
+    final resolved = config == null
+        ? null
+        : ResolvedProxy(
+            scope: scope,
+            scopeId: scopeId,
+            config: config,
+            password: config.password,
+          );
+    await _applier.apply(resolved);
+    _lastApplied = resolved;
+    _hasApplied = true;
+  }
+
+  /// Whether [resolved] is already the applied process override; the very
+  /// first application always counts as a change so that the
+  /// direct-connection default is established explicitly (FR-010).
+  bool _isApplied(ResolvedProxy? resolved) {
+    if (!_hasApplied) {
+      return false;
+    }
+    final last = _lastApplied;
+    if (last == null || resolved == null) {
+      return last == null && resolved == null;
+    }
+    // The process override carries only the configuration: scope/scopeId
+    // are not compared, so navigating from any scope with the same
+    // effective config is idempotent (FR-007).
+    return last.config == resolved.config &&
+        last.password == resolved.password;
   }
 
   Future<void> _persistGlobal(ProxyConfig? config) async {

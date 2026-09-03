@@ -170,3 +170,23 @@ Compilation failed for testPath=.../test/lifecycle_test.dart
 ```
 
 navigate / Profile.dispose / Browser.dispose do not exist yet.
+
+### Green (T004)
+
+- command: `flutter test` (cwd `zuraffa_browser`)
+- observed output:
+
+```text
+00:02 +44: All tests passed!
+```
+
+- implementation: `BrowserPage.navigate` (apply-before-load with change
+  detection: first application always pushes, so the direct-connection
+  default is established explicitly), `Profile.dispose` (closes pages,
+  removes the profile, re-applies global/direct fallback when the profile
+  carried its own proxy), `BrowserPage.dispose`, `Browser.dispose`
+  (profiles + applier, post-dispose StateError guards),
+  `lib/src/platform_proxy_applier.dart` (channel-backed applier over
+  ProxyController.instance()).
+- A1 is now fully served: navigation from profiles without an explicit
+  proxy applies the global proxy (lifecycle_test.dart).
