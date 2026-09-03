@@ -116,3 +116,20 @@ store records) does not exist yet.
   is unchanged.
 - note: `setProxy` at profile level deliberately does NOT call the applier
   (FR-007, covered by the T004 lifecycle cycle).
+
+## Cycle T003 — Browser/Page programmatic API (red → green)
+
+### Red
+
+- command: `flutter test test/page_api_test.dart` (cwd `zuraffa_browser`)
+- observed output (excerpt):
+
+```text
+test/page_api_test.dart:19:31: Error: Type 'PageHost' not found.
+test/page_api_test.dart:100:25: Error: The method 'openPage' isn't defined for the type 'Profile'.
+test/page_api_test.dart:207:20: Error: Method not found: 'proxySettingsFromConfig'.
+Compilation failed for testPath=.../test/page_api_test.dart
+```
+
+The page layer (PageHost port, Profile.openPage, BrowserPage overrides) and
+the pure platform mapping do not exist yet.

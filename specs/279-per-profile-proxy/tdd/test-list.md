@@ -30,8 +30,8 @@ One per acceptance criterion in `spec.md`.
 | A2  | Per-profile proxy overrides global for that profile only                 | AC2, FR-003     | example   | GREEN  | `test/profile_proxy_test.dart::per-profile proxy (AC2/FR-003) ...`          |
 | A3  | Removing a per-profile proxy falls back to global (or direct)            | AC3, FR-004     | example   | GREEN  | `test/profile_proxy_test.dart::per-profile proxy (AC3/FR-004) ...`          |
 | A4  | Proxy configuration survives app restart (global + per-profile)          | AC4, FR-002/005 | example   | PLANNED | `test/global_proxy_test.dart` + `test/profile_proxy_test.dart` restart tests |
-| A5  | Authenticated proxies supported; password vaulted, never in plaintext    | AC5, FR-009     | example   | PLANNED | `test/page_api_test.dart::authenticated proxies (AC5/FR-009) ...`           |
-| A6  | Programmatic set/clear/get on Browser and Page levels + page override    | AC6, FR-006     | example   | PLANNED | `test/page_api_test.dart::page-level override (AC6/FR-006) ...`             |
+| A5  | Authenticated proxies supported; password vaulted, never in plaintext    | AC5, FR-009     | example   | RED    | `test/page_api_test.dart::authenticated proxies (AC5/FR-009) ...`           |
+| A6  | Programmatic set/clear/get on Browser and Page levels + page override    | AC6, FR-006     | example   | RED    | `test/page_api_test.dart::page-level override (AC6/FR-006) ...`             |
 | A7  | No proxy anywhere = direct connection; first navigation clears override  | AC7, FR-010     | example   | PLANNED | `test/lifecycle_test.dart::direct connection default (AC7/FR-010)`          |
 | A8  | Profiles without explicit proxy inherit the global proxy                 | AC8, FR-011     | example   | GREEN  | `test/profile_proxy_test.dart::inheritance (AC8/FR-011)`                    |
 
@@ -92,11 +92,11 @@ One per acceptance criterion in `spec.md`.
 
 | id  | behavior                                                            | traces     | kind             | state   | test                                   |
 | --- | -------------------------------------------------------------------- | --------- | ---------------- | ------- | -------------------------------------- |
-| U26 | page.setProxy sets the override; effective = page ?? profile.eff.   | FR-006     | characterization | PLANNED | `test/page_api_test.dart`              |
-| U27 | page.clearProxyOverride falls back to profile/global                | FR-006     | characterization | PLANNED | `test/page_api_test.dart`              |
-| U28 | Browser-level set/clear/get remains usable page-independently       | AC6        | characterization | PLANNED | `test/page_api_test.dart`              |
-| U29 | setProxy with password routes password to vault; store record carries secretRef only; applier resolves password from vault | FR-009 | characterization | PLANNED | `test/page_api_test.dart`              |
-| U30 | proxySettingsFromConfig builds Android rules + iOS proxyUrl per type | FR-012    | characterization | PLANNED | `test/page_api_test.dart`              |
+| U26 | page.setProxy sets the override; effective = page ?? profile.eff.   | FR-006     | characterization | RED    | `test/page_api_test.dart`              |
+| U27 | page.clearProxyOverride falls back to profile/global                | FR-006     | characterization | RED    | `test/page_api_test.dart`              |
+| U28 | Browser-level set/clear/get remains usable page-independently       | AC6        | characterization | RED    | `test/page_api_test.dart`              |
+| U29 | setProxy with password routes password to vault; store record carries secretRef only; applier resolves password from vault | FR-009 | characterization | RED    | `test/page_api_test.dart`              |
+| U30 | proxySettingsFromConfig builds Android rules + iOS proxyUrl per type | FR-012    | characterization | RED    | `test/page_api_test.dart`              |
 
 ### `zuraffa_browser/lib/src/browser.dart` (lifecycle)
 
