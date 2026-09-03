@@ -1,0 +1,25 @@
+name: zuraffa_browser
+description: >-
+  Profile-isolated browser abstraction for zikzak_inappwebview — per-profile
+  and global proxy support, pages, and session-scoped navigation. Consumes
+  only the plugin core's public API.
+version: 0.1.0-dev
+publish_to: none
+
+environment:
+  sdk: '>=3.8.0 <4.0.0'
+  flutter: '>=3.38.6'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  zikzak_inappwebview:
+    path: ../zikzak_inappwebview
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: false
