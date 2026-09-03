@@ -48,10 +48,7 @@ void main() {
       final controller = _buildController();
       addTearDown(controller.dispose);
 
-      expect(
-        controller.hasJavaScriptHandler(handlerName: 'missing'),
-        false,
-      );
+      expect(controller.hasJavaScriptHandler(handlerName: 'missing'), false);
     });
   });
 
@@ -61,10 +58,7 @@ void main() {
       addTearDown(controller.dispose);
 
       dynamic received(List<dynamic> args) => 'pong';
-      controller.addJavaScriptHandler(
-        handlerName: 'ping',
-        callback: received,
-      );
+      controller.addJavaScriptHandler(handlerName: 'ping', callback: received);
 
       final removed = controller.removeJavaScriptHandler(handlerName: 'ping');
       expect(identical(removed, received), true);

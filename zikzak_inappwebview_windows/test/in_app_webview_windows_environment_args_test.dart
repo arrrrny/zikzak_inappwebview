@@ -20,7 +20,8 @@ void main() {
           // `WebViewEnvironmentInitArgs.additionalArguments` so the
           // caller can forward it to
           // `WebviewController.initializeEnvironment(additionalArguments:)`.
-          const args = '--disable-web-security '
+          const args =
+              '--disable-web-security '
               '--allow-running-insecure-content '
               '--use-fake-ui-for-media-stream '
               '--use-fake-device-for-media-stream';
@@ -100,20 +101,23 @@ void main() {
       expect(resolved.additionalArguments, isNull);
     });
 
-    test('defaultUserDataFolder is NOT invoked when settings.userDataFolder is set', () {
-      var defaultInvoked = 0;
-      resolveEnvironmentInitArgs(
-        settings: WebViewEnvironmentSettings(
-          userDataFolder: '/tmp/explicit',
-          additionalBrowserArguments: '--disable-web-security',
-        ),
-        defaultUserDataFolder: () {
-          defaultInvoked++;
-          return defaultFolder;
-        },
-      );
+    test(
+      'defaultUserDataFolder is NOT invoked when settings.userDataFolder is set',
+      () {
+        var defaultInvoked = 0;
+        resolveEnvironmentInitArgs(
+          settings: WebViewEnvironmentSettings(
+            userDataFolder: '/tmp/explicit',
+            additionalBrowserArguments: '--disable-web-security',
+          ),
+          defaultUserDataFolder: () {
+            defaultInvoked++;
+            return defaultFolder;
+          },
+        );
 
-      expect(defaultInvoked, 0);
-    });
+        expect(defaultInvoked, 0);
+      },
+    );
   });
 }

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:flutter/material.dart';
 
 import 'package:path_provider/path_provider.dart';
@@ -14,6 +15,34 @@ class _VirtualHostMappingInfo {
   final int accessKind;
 
   _VirtualHostMappingInfo({required this.folderPath, required this.accessKind});
+}
+
+/// Maps a [LoadingState] change onto the platform-agnostic load callbacks.
+///
+/// `loading` maps to `onLoadStart` + progress `0`, `navigationCompleted`
+/// maps to `onLoadStop` + progress `100` (webview_windows exposes no
+/// granular progress), and `none` produces no callbacks. Redirects produce
+/// multiple start/stop cycles — one per top-level navigation.
+@visibleForTesting
+void dispatchLoadingStateChange({
+  required LoadingState state,
+  required String? url,
+  required PlatformInAppWebViewController controller,
+  required PlatformInAppWebViewWidgetCreationParams params,
+}) {
+  final uri = url == null ? null : WebUri(url);
+  switch (state) {
+    case LoadingState.loading:
+      params.onProgressChanged?.call(controller, 0);
+      params.onLoadStart?.call(controller, uri);
+      break;
+    case LoadingState.navigationCompleted:
+      params.onProgressChanged?.call(controller, 100);
+      params.onLoadStop?.call(controller, uri);
+      break;
+    case LoadingState.none:
+      break;
+  }
 }
 
 class InAppWebViewWindowsPlatform extends PlatformInAppWebViewController {
@@ -56,6 +85,13 @@ class _InAppWebViewWindowsWidgetStateImpl
     extends State<_InAppWebViewWindowsWidgetState> {
   final _controller = WebviewController();
   bool _isInitialized = false;
+
+  /// Native-event subscriptions. `WebviewController.dispose()` never closes
+  /// its stream controllers, so these must be cancelled explicitly —
+  /// otherwise in-flight events can invoke callbacks after this `State` is
+  /// unmounted.
+  StreamSubscription<String>? _urlSubscription;
+  StreamSubscription<LoadingState>? _loadingStateSubscription;
 
   @override
   void initState() {
@@ -117,7 +153,17 @@ class _InAppWebViewWindowsWidgetStateImpl
         _controller,
       );
       final callbackController =
+          // The platform widget wrapper always installs this callback; the
+          // `?? controller` fallback only exists so direct platform-object
+          // usage (tests) keeps working.
           widget.params.controllerFromPlatform?.call(controller) ?? controller;
+
+      // Publish the controller BEFORE any listener or load can deliver load
+      // events: onWebViewCreated must precede onLoadStart/onLoadStop, the
+      // same contract every other platform implementation follows.
+      if (widget.params.onWebViewCreated != null) {
+        widget.params.onWebViewCreated!(callbackController);
+      }
 
       // Apply virtual host mappings from the environment settings. Each
       // mapping serves a local folder at https://<hostName>/ and bypasses
@@ -156,23 +202,23 @@ class _InAppWebViewWindowsWidgetStateImpl
       }
 
       // Setup listeners
+      //
+      // NOTE: `urlChanged` and `loadingStateChanged` arrive on two
+      // independent stream controllers fed by the same native event channel,
+      // so the relative ordering is not guaranteed: the URL passed to
+      // onLoadStart/onLoadStop is best-effort and may be null or stale when
+      // the loadingState event lands before the matching urlChanged event
+      // (webview_windows 0.4.0 has no synchronous url getter).
       String? currentUrl;
-      _controller.url.listen((url) => currentUrl = url);
-
-      _controller.loadingState.listen((state) {
-        final url = currentUrl == null ? null : WebUri(currentUrl!);
-        switch (state) {
-          case LoadingState.loading:
-            widget.params.onProgressChanged?.call(callbackController, 0);
-            widget.params.onLoadStart?.call(callbackController, url);
-            break;
-          case LoadingState.navigationCompleted:
-            widget.params.onProgressChanged?.call(callbackController, 100);
-            widget.params.onLoadStop?.call(callbackController, url);
-            break;
-          case LoadingState.none:
-            break;
-        }
+      _urlSubscription = _controller.url.listen((url) => currentUrl = url);
+      _loadingStateSubscription = _controller.loadingState.listen((state) {
+        if (!mounted) return;
+        dispatchLoadingStateChange(
+          state: state,
+          url: currentUrl,
+          controller: callbackController,
+          params: widget.params,
+        );
       });
 
       if (!mounted) return;
@@ -185,10 +231,6 @@ class _InAppWebViewWindowsWidgetStateImpl
         await _controller.loadUrl(
           widget.params.initialUrlRequest!.url.toString(),
         );
-      }
-
-      if (widget.params.onWebViewCreated != null) {
-        widget.params.onWebViewCreated!(callbackController);
       }
     } catch (e) {
       print("Failed to initialize webview: $e");
@@ -204,6 +246,8 @@ class _InAppWebViewWindowsWidgetStateImpl
 
   @override
   void dispose() {
+    _urlSubscription?.cancel();
+    _loadingStateSubscription?.cancel();
     _controller.dispose();
     super.dispose();
   }
