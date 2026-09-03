@@ -25,8 +25,11 @@ void main() {
         'https://secure.example.com:8443',
       );
       expect(
-        ProxyConfig(host: 'socks.example.com', port: 1080, type: ProxyType.socks5)
-            .toProxyUrl(),
+        ProxyConfig(
+          host: 'socks.example.com',
+          port: 1080,
+          type: ProxyType.socks5,
+        ).toProxyUrl(),
         'socks5://socks.example.com:1080',
       );
     });
@@ -79,8 +82,11 @@ void main() {
         password: 'hunter2',
       );
       final json = config.toJson();
-      expect(json.toString().contains('hunter2'), isFalse,
-          reason: 'toJson must redact the transient password (FR-009)');
+      expect(
+        json.toString().contains('hunter2'),
+        isFalse,
+        reason: 'toJson must redact the transient password (FR-009)',
+      );
     });
 
     test('toString redacts the password (U6)', () {
@@ -91,8 +97,11 @@ void main() {
         username: 'bob',
         password: 'hunter2',
       );
-      expect(config.toString().contains('hunter2'), isFalse,
-          reason: 'toString must never leak credentials (FR-009)');
+      expect(
+        config.toString().contains('hunter2'),
+        isFalse,
+        reason: 'toString must never leak credentials (FR-009)',
+      );
     });
   });
 

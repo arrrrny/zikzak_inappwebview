@@ -22,11 +22,7 @@ class BrowserPage {
   ProxyConfig? _override;
   bool _disposed = false;
 
-  BrowserPage._({
-    required this.id,
-    required this.profile,
-    required this.host,
-  });
+  BrowserPage._({required this.id, required this.profile, required this.host});
 
   /// The one-off per-page proxy override, or null when none is set.
   ProxyConfig? get proxyOverride => _override;

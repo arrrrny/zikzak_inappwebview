@@ -1,7 +1,7 @@
 import 'package:zikzak_inappwebview/zikzak_inappwebview.dart';
 
 import 'page_host.dart';
-import 'platform_settings.dart';
+
 import 'proxy_config.dart';
 import 'proxy_ports.dart';
 
@@ -34,10 +34,10 @@ class Browser {
     required SecretVault vault,
     required ProxyApplier applier,
     PageHostFactory? pageHostFactory,
-  })  : _store = store,
-        _vault = vault,
-        _applier = applier,
-        _pageHostFactory = pageHostFactory ?? _defaultPageHostFactory;
+  }) : _store = store,
+       _vault = vault,
+       _applier = applier,
+       _pageHostFactory = pageHostFactory ?? _defaultPageHostFactory;
 
   /// Opens a browser, restoring persisted proxy configuration.
   ///
@@ -97,11 +97,7 @@ class Browser {
     if (existing != null) {
       return existing;
     }
-    final profile = Profile._(
-      id: id,
-      name: name ?? id,
-      browser: this,
-    );
+    final profile = Profile._(id: id, name: name ?? id, browser: this);
     _profiles[id] = profile;
     return profile;
   }
@@ -186,8 +182,7 @@ class Browser {
     // The process override carries only the configuration: scope/scopeId
     // are not compared, so navigating from any scope with the same
     // effective config is idempotent (FR-007).
-    return last.config == resolved.config &&
-        last.password == resolved.password;
+    return last.config == resolved.config && last.password == resolved.password;
   }
 
   Future<void> _persistGlobal(ProxyConfig? config) async {
@@ -210,12 +205,11 @@ class Browser {
 
   /// Default production page host: a headless webview bound to the profile
   /// persistent store.
-  static PageHost _defaultPageHostFactory(Profile profile) =>
-      HeadlessPageHost(
-        settings: InAppWebViewSettings(
-          persistentStoreIdentifier: 'zuraffa_browser/${profile.id}',
-        ),
-      );
+  static PageHost _defaultPageHostFactory(Profile profile) => HeadlessPageHost(
+    settings: InAppWebViewSettings(
+      persistentStoreIdentifier: 'zuraffa_browser/${profile.id}',
+    ),
+  );
 
   void _guardNotDisposed() {
     if (_disposed) {

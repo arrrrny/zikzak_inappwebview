@@ -22,7 +22,7 @@ class HeadlessPageHost implements PageHost {
 
   /// Creates a headless page host.
   HeadlessPageHost({InAppWebViewSettings? settings})
-      : _webview = HeadlessInAppWebView(initialSettings: settings);
+    : _webview = HeadlessInAppWebView(initialSettings: settings);
 
   @override
   Future<void> loadUrl(WebUri uri) async {
@@ -30,8 +30,7 @@ class HeadlessPageHost implements PageHost {
       await _webview.run();
       _running = true;
     }
-    await _webview.webViewController
-        ?.loadUrl(urlRequest: URLRequest(url: uri));
+    await _webview.webViewController?.loadUrl(urlRequest: URLRequest(url: uri));
   }
 
   @override

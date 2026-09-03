@@ -17,11 +17,8 @@ class Profile {
   int _pageCounter = 0;
   final List<BrowserPage> _pages = [];
 
-  Profile._({
-    required this.id,
-    required this.name,
-    required Browser browser,
-  }) : _browser = browser;
+  Profile._({required this.id, required this.name, required Browser browser})
+    : _browser = browser;
 
   /// Vault key for this profile's proxy password.
   String get _secretKey => 'proxy/profile/$id/password';
@@ -52,8 +49,10 @@ class Profile {
     _explicit = config;
     if (config.password != null) {
       await _browser._vault.write(_secretKey, config.password!);
-      await _browser._store
-          .saveProfile(id, config.toRecord(secretRef: _secretKey));
+      await _browser._store.saveProfile(
+        id,
+        config.toRecord(secretRef: _secretKey),
+      );
     } else {
       await _browser._vault.delete(_secretKey);
       await _browser._store.saveProfile(id, config.toRecord());

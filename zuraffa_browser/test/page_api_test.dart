@@ -52,17 +52,15 @@ void main() {
     ProxyConfigStore? store,
     SecretVault? vault,
     RecordingProxyApplier? applier,
-  }) =>
-      Browser.open(
-        store: store ?? InMemoryProxyConfigStore(),
-        vault: vault ?? InMemorySecretVault(),
-        applier: applier ?? RecordingProxyApplier(),
-        pageHostFactory: (_) => FakePageHost(),
-      );
+  }) => Browser.open(
+    store: store ?? InMemoryProxyConfigStore(),
+    vault: vault ?? InMemorySecretVault(),
+    applier: applier ?? RecordingProxyApplier(),
+    pageHostFactory: (_) => FakePageHost(),
+  );
 
   group('page-level override (AC6/FR-006)', () {
-    test(
-        'page.setProxy sets the one-off override; '
+    test('page.setProxy sets the one-off override; '
         'effective beats profile and global (U26)', () async {
       final browser = await openBrowser();
       await browser.setProxy(globalProxy);
@@ -73,25 +71,36 @@ void main() {
       expect(page.proxyOverride, isNull);
       await page.setProxy(pageProxy);
       expect(page.proxyOverride, equals(pageProxy));
-      expect(page.effectiveProxy, equals(pageProxy),
-          reason: 'the page override wins over profile and global');
+      expect(
+        page.effectiveProxy,
+        equals(pageProxy),
+        reason: 'the page override wins over profile and global',
+      );
     });
 
-    test('effective resolution is page ?? profile.effective ?? global (U26)',
-        () async {
-      final browser = await openBrowser();
-      await browser.setProxy(globalProxy);
-      final work = browser.createProfile('work');
-      await work.setProxy(workProxy);
-      final pageInWork = work.openPage();
-      final personal = browser.createProfile('personal');
-      final pageInPersonal = personal.openPage();
+    test(
+      'effective resolution is page ?? profile.effective ?? global (U26)',
+      () async {
+        final browser = await openBrowser();
+        await browser.setProxy(globalProxy);
+        final work = browser.createProfile('work');
+        await work.setProxy(workProxy);
+        final pageInWork = work.openPage();
+        final personal = browser.createProfile('personal');
+        final pageInPersonal = personal.openPage();
 
-      expect(pageInWork.effectiveProxy, equals(workProxy),
-          reason: 'no page override: the profile proxy applies');
-      expect(pageInPersonal.effectiveProxy, equals(globalProxy),
-          reason: 'no page override, no profile proxy: global applies');
-    });
+        expect(
+          pageInWork.effectiveProxy,
+          equals(workProxy),
+          reason: 'no page override: the profile proxy applies',
+        );
+        expect(
+          pageInPersonal.effectiveProxy,
+          equals(globalProxy),
+          reason: 'no page override, no profile proxy: global applies',
+        );
+      },
+    );
 
     test('page.clearProxy falls back to profile/global (U27)', () async {
       final browser = await openBrowser();
@@ -103,57 +112,69 @@ void main() {
       await page.setProxy(pageProxy);
       await page.clearProxy();
       expect(page.proxyOverride, isNull);
-      expect(page.effectiveProxy, equals(workProxy),
-          reason: 'cleared page override falls back to the profile proxy');
+      expect(
+        page.effectiveProxy,
+        equals(workProxy),
+        reason: 'cleared page override falls back to the profile proxy',
+      );
     });
 
-    test('browser-level set/clear/get works page-independently (U28)',
-        () async {
-      final browser = await openBrowser();
-      final work = browser.createProfile('work');
-      final page = work.openPage();
+    test(
+      'browser-level set/clear/get works page-independently (U28)',
+      () async {
+        final browser = await openBrowser();
+        final work = browser.createProfile('work');
+        final page = work.openPage();
 
-      await browser.setProxy(globalProxy);
-      expect(browser.proxy, equals(globalProxy));
-      expect(browser.profile('work')!.effectiveProxy, equals(globalProxy));
-      await browser.clearProxy();
-      expect(browser.proxy, isNull);
-      expect(page.effectiveProxy, isNull);
-    });
+        await browser.setProxy(globalProxy);
+        expect(browser.proxy, equals(globalProxy));
+        expect(browser.profile('work')!.effectiveProxy, equals(globalProxy));
+        await browser.clearProxy();
+        expect(browser.proxy, isNull);
+        expect(page.effectiveProxy, isNull);
+      },
+    );
   });
 
   group('authenticated proxies (AC5/FR-009)', () {
     test(
-        'global auth proxy: password goes to the vault, the store record '
-        'carries a secretRef only, the applier receives the password (U29)',
-        () async {
-      final store = InMemoryProxyConfigStore();
-      final vault = InMemorySecretVault();
-      final applier = RecordingProxyApplier();
-      final browser = await openBrowser(
-        store: store,
-        vault: vault,
-        applier: applier,
-      );
+      'global auth proxy: password goes to the vault, the store record '
+      'carries a secretRef only, the applier receives the password (U29)',
+      () async {
+        final store = InMemoryProxyConfigStore();
+        final vault = InMemorySecretVault();
+        final applier = RecordingProxyApplier();
+        final browser = await openBrowser(
+          store: store,
+          vault: vault,
+          applier: applier,
+        );
 
-      await browser.setProxy(
-        ProxyConfig(
-          host: 'gate.example.com',
-          port: 3128,
-          type: ProxyType.http,
-          username: 'alice',
-          password: 's3cret!',
-        ),
-      );
+        await browser.setProxy(
+          ProxyConfig(
+            host: 'gate.example.com',
+            port: 3128,
+            type: ProxyType.http,
+            username: 'alice',
+            password: 's3cret!',
+          ),
+        );
 
-      expect(await vault.read('proxy/global/password'), 's3cret!');
-      final record = await store.loadGlobal();
-      expect(record!.secretRef, 'proxy/global/password');
-      expect(record.toJson().toString().contains('s3cret!'), isFalse,
-          reason: 'the persisted record must not contain the password');
-      expect(applier.applied.single!.password, 's3cret!',
-          reason: 'the applier must receive the resolved password');
-    });
+        expect(await vault.read('proxy/global/password'), 's3cret!');
+        final record = await store.loadGlobal();
+        expect(record!.secretRef, 'proxy/global/password');
+        expect(
+          record.toJson().toString().contains('s3cret!'),
+          isFalse,
+          reason: 'the persisted record must not contain the password',
+        );
+        expect(
+          applier.applied.single!.password,
+          's3cret!',
+          reason: 'the applier must receive the resolved password',
+        );
+      },
+    );
 
     test('profile auth proxy: password goes to the vault under the profile '
         'key (U29)', () async {
@@ -195,15 +216,18 @@ void main() {
       final browser2 = await openBrowser(store: store, vault: vault);
       expect(browser2.proxy, isNotNull);
       expect(browser2.proxy!.username, 'alice');
-      expect(browser2.proxy!.password, 's3cret!',
-          reason: 'the restored proxy re-resolves its password from the '
-              'vault');
+      expect(
+        browser2.proxy!.password,
+        's3cret!',
+        reason:
+            'the restored proxy re-resolves its password from the '
+            'vault',
+      );
     });
   });
 
   group('platform mapping (FR-012)', () {
-    test(
-        'proxySettingsFromConfig maps http/https/socks5 to Android rules '
+    test('proxySettingsFromConfig maps http/https/socks5 to Android rules '
         'and iOS proxyUrl (U30)', () {
       final http = proxySettingsFromConfig(
         ProxyConfig(host: 'p.example.com', port: 8080, type: ProxyType.http),
@@ -237,31 +261,34 @@ void main() {
       expect(
         socks5.androidProxySettings!.proxyRules.single.schemeFilter,
         isNull,
-        reason: 'the scheme filter enum has no SOCKS entry; the scheme is '
+        reason:
+            'the scheme filter enum has no SOCKS entry; the scheme is '
             'carried by the rule URL',
       );
       expect(socks5.iOSProxySettings!.proxyUrl, 'socks5://p.example.com:1080');
     });
 
-    test('authenticated mapping embeds credentials into the proxy URLs (U30)',
-        () {
-      final settings = proxySettingsFromConfig(
-        ProxyConfig(
-          host: 'gate.example.com',
-          port: 3128,
-          type: ProxyType.http,
-          username: 'alice',
-        ),
-        password: 's3cret!',
-      );
-      expect(
-        settings.androidProxySettings!.proxyRules.single.url,
-        WebUri('http://alice:s3cret!@gate.example.com:3128'),
-      );
-      expect(
-        settings.iOSProxySettings!.proxyUrl,
-        'http://alice:s3cret!@gate.example.com:3128',
-      );
-    });
+    test(
+      'authenticated mapping embeds credentials into the proxy URLs (U30)',
+      () {
+        final settings = proxySettingsFromConfig(
+          ProxyConfig(
+            host: 'gate.example.com',
+            port: 3128,
+            type: ProxyType.http,
+            username: 'alice',
+          ),
+          password: 's3cret!',
+        );
+        expect(
+          settings.androidProxySettings!.proxyRules.single.url,
+          WebUri('http://alice:s3cret!@gate.example.com:3128'),
+        );
+        expect(
+          settings.iOSProxySettings!.proxyUrl,
+          'http://alice:s3cret!@gate.example.com:3128',
+        );
+      },
+    );
   });
 }

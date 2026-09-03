@@ -21,10 +21,7 @@ class PlatformProxyApplier implements ProxyApplier {
       return;
     }
     await controller.setProxyOverride(
-      settings: proxySettingsFromConfig(
-        proxy.config,
-        password: proxy.password,
-      ),
+      settings: proxySettingsFromConfig(proxy.config, password: proxy.password),
     );
   }
 

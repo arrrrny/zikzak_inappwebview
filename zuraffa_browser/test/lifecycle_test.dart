@@ -77,29 +77,34 @@ void main() {
       await page.navigate(WebUri('https://example.com/'));
 
       expect(applier.applied.single!.config, equals(globalProxy));
-      expect(events, ['apply:global.example.com', 'load:https://example.com/'],
-          reason: 'the effective proxy must be applied before the load');
+      expect(events, [
+        'apply:global.example.com',
+        'load:https://example.com/',
+      ], reason: 'the effective proxy must be applied before the load');
     });
 
-    test('each profile resolves its own effective proxy on navigation (A1)',
-        () async {
-      final (browser, applier, _) = await makeBrowser();
-      await browser.setProxy(globalProxy);
-      final work = browser.createProfile('work');
-      await work.setProxy(workProxy);
-      final personalPage = browser.createProfile('personal').openPage();
-      final workPage = work.openPage();
+    test(
+      'each profile resolves its own effective proxy on navigation (A1)',
+      () async {
+        final (browser, applier, _) = await makeBrowser();
+        await browser.setProxy(globalProxy);
+        final work = browser.createProfile('work');
+        await work.setProxy(workProxy);
+        final personalPage = browser.createProfile('personal').openPage();
+        final workPage = work.openPage();
 
-      await personalPage.navigate(WebUri('https://example.com/'));
-      await workPage.navigate(WebUri('https://example.org/'));
+        await personalPage.navigate(WebUri('https://example.com/'));
+        await workPage.navigate(WebUri('https://example.org/'));
 
-      expect(
-        applier.applied.map((r) => r!.config),
-        orderedEquals([globalProxy, workProxy]),
-        reason: 'the personal page uses the global proxy, the work page '
-            'its own proxy',
-      );
-    });
+        expect(
+          applier.applied.map((r) => r!.config),
+          orderedEquals([globalProxy, workProxy]),
+          reason:
+              'the personal page uses the global proxy, the work page '
+              'its own proxy',
+        );
+      },
+    );
   });
 
   group('not retroactive (FR-007)', () {
@@ -113,9 +118,13 @@ void main() {
 
       await work.setProxy(workProxy);
 
-      expect(events, isEmpty,
-          reason: 'setting a proxy must not affect anything retroactively; '
-              'it applies on the next navigation');
+      expect(
+        events,
+        isEmpty,
+        reason:
+            'setting a proxy must not affect anything retroactively; '
+            'it applies on the next navigation',
+      );
 
       await page.navigate(WebUri('https://example.org/'));
       expect(events, ['apply:work.example.com', 'load:https://example.org/']);
@@ -131,25 +140,32 @@ void main() {
 
       await page.navigate(WebUri('https://example.org/'));
 
-      expect(events, ['load:https://example.org/'],
-          reason: 'the process override already matches; no redundant apply');
+      expect(events, [
+        'load:https://example.org/',
+      ], reason: 'the process override already matches; no redundant apply');
       expect(applier.applied, hasLength(1));
     });
   });
 
   group('direct connection default (AC7/FR-010)', () {
-    test('no config anywhere: the first navigation applies clear (U34)',
-        () async {
-      final (browser, applier, _) = await makeBrowser();
-      final page = browser.createProfile('work').openPage();
+    test(
+      'no config anywhere: the first navigation applies clear (U34)',
+      () async {
+        final (browser, applier, _) = await makeBrowser();
+        final page = browser.createProfile('work').openPage();
 
-      await page.navigate(WebUri('https://example.com/'));
+        await page.navigate(WebUri('https://example.com/'));
 
-      expect(applier.applied.single, isNull,
-          reason: 'the first navigation must establish "direct connection" '
-              'explicitly');
-      expect(page.effectiveProxy, isNull);
-    });
+        expect(
+          applier.applied.single,
+          isNull,
+          reason:
+              'the first navigation must establish "direct connection" '
+              'explicitly',
+        );
+        expect(page.effectiveProxy, isNull);
+      },
+    );
   });
 
   group('disposal (FR-008)', () {
@@ -167,17 +183,26 @@ void main() {
 
       expect(page.isDisposed, isTrue);
       expect(work.isDisposed, isTrue);
-      expect(browser.profile('work'), isNull,
-          reason: 'the disposed profile is no longer live');
-      expect(events.where((e) => e.startsWith('close')), isNotEmpty,
-          reason: 'the profile pages are closed');
-      expect(applier.applied.last!.config, equals(globalProxy),
-          reason: 'the fallback (global proxy) is re-applied when the '
-              "profile's own proxy is released");
+      expect(
+        browser.profile('work'),
+        isNull,
+        reason: 'the disposed profile is no longer live',
+      );
+      expect(
+        events.where((e) => e.startsWith('close')),
+        isNotEmpty,
+        reason: 'the profile pages are closed',
+      );
+      expect(
+        applier.applied.last!.config,
+        equals(globalProxy),
+        reason:
+            'the fallback (global proxy) is re-applied when the '
+            "profile's own proxy is released",
+      );
     });
 
-    test('Profile.dispose with no global falls back to direct (U35)',
-        () async {
+    test('Profile.dispose with no global falls back to direct (U35)', () async {
       final (browser, applier, _) = await makeBrowser();
       final work = browser.createProfile('work');
       await work.setProxy(workProxy);
@@ -186,8 +211,11 @@ void main() {
 
       await work.dispose();
 
-      expect(applier.applied.last, isNull,
-          reason: 'no global proxy: the fallback is a direct connection');
+      expect(
+        applier.applied.last,
+        isNull,
+        reason: 'no global proxy: the fallback is a direct connection',
+      );
     });
 
     test('navigating a disposed page throws (U35)', () async {
@@ -209,14 +237,8 @@ void main() {
       await browser.dispose();
 
       expect(applier.disposed, isTrue);
-      expect(
-        () => browser.setProxy(globalProxy),
-        throwsStateError,
-      );
-      expect(
-        () => work.setProxy(workProxy),
-        throwsStateError,
-      );
+      expect(() => browser.setProxy(globalProxy), throwsStateError);
+      expect(() => work.setProxy(workProxy), throwsStateError);
     });
   });
 }

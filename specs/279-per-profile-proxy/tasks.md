@@ -47,13 +47,13 @@ Source: GitHub issue #279. One PR for the spec. TDD loop per
 
 ## Phase 6: T005 — Refactor + verify
 
-- [ ] T005a Refactor via tooling: `dart format .`, `flutter analyze` clean,
+- [X] T005a Refactor via tooling: `dart format .`, `flutter analyze` clean,
       no analyzer warnings in `zuraffa_browser`.
-- [ ] T005b Full verification: `flutter analyze && flutter test` in
+- [X] T005b Full verification: `flutter analyze && flutter test` in
       `zikzak_inappwebview` and `zikzak_inappwebview_platform_interface`
       (NO NEW failures vs baseline), `dart format .` zero-diff in
       `zikzak_inappwebview`.
-- [ ] T005c Update test-list states, cycle-log entries, README.
+- [X] T005c Update test-list states, cycle-log entries, README.
 
 ## Phase 7: Verify + PR
 

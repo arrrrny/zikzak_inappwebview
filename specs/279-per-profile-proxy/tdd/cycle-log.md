@@ -190,3 +190,25 @@ navigate / Profile.dispose / Browser.dispose do not exist yet.
   ProxyController.instance()).
 - A1 is now fully served: navigation from profiles without an explicit
   proxy applies the global proxy (lifecycle_test.dart).
+
+## Cycle T005 — Refactor + verify
+
+- `dart format .` (cwd `zuraffa_browser`): 14 files formatted, re-run reports
+  0 changed (format-stable).
+- `flutter analyze` (cwd `zuraffa_browser`): **No issues found!**
+- `flutter test` (cwd `zuraffa_browser`): **+44, all green**.
+- `flutter analyze` / `flutter test` in `zikzak_inappwebview`:
+  43 pre-existing analyzer issues (untouched by this feature),
+  **+240 -2** — identical to the recorded baseline: **NO NEW failures**.
+- `flutter analyze` / `flutter test` in
+  `zikzak_inappwebview_platform_interface`: 944 pre-existing analyzer issues
+  (untouched by this feature), **+305 -1** — identical to baseline: **NO NEW
+  failures**.
+- formatting note: `dart format .` in the umbrella package reformats 39
+  files that predate this feature (pre-existing formatting drift, not
+  authored here). Those reformats were reverted — unrelated formatting is
+  out of this spec's scope and would pollute the PR. Every file this
+  feature adds is format-stable (`dart format` reports 0 changed).
+- refactor outcome: Profile holds a Browser back-reference (single library
+  via parts), application logic centralized in `Browser._applyForScope` /
+  `_isApplied`, analyzer-clean.

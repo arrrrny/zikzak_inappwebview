@@ -11,10 +11,7 @@ import 'proxy_config.dart';
 ///   http/https; no scheme filter for socks5 (the enum has no SOCKS entry —
 ///   the scheme is carried by the rule URL).
 /// - iOS: [IOSProxySettings.proxyUrl] with the same URL.
-ProxySettings proxySettingsFromConfig(
-  ProxyConfig config, {
-  String? password,
-}) {
+ProxySettings proxySettingsFromConfig(ProxyConfig config, {String? password}) {
   final effectivePassword = password ?? config.password;
   final url = config.toProxyUrl(password: effectivePassword);
   final ProxySchemeFilter? schemeFilter = switch (config.type) {

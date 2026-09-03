@@ -122,7 +122,8 @@ class FileProxyConfigStore implements ProxyConfigStore {
   @override
   Future<void> saveProfile(String profileId, ProxyConfigRecord? record) async {
     final all = _readAll();
-    final profiles = (all['profiles'] as Map?)?.cast<String, dynamic>() ??
+    final profiles =
+        (all['profiles'] as Map?)?.cast<String, dynamic>() ??
         <String, dynamic>{};
     if (record == null) {
       profiles.remove(profileId);
@@ -216,7 +217,8 @@ class ResolvedProxy {
   int get hashCode => Object.hash(scope, scopeId, config, password);
 
   @override
-  String toString() => 'ResolvedProxy(${scope.name}/$scopeId, $config'
+  String toString() =>
+      'ResolvedProxy(${scope.name}/$scopeId, $config'
       '${password != null ? ', password: •••' : ''})';
 }
 

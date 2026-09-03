@@ -75,38 +75,37 @@ class ProxyConfig {
   /// from the vault at apply time).
   String toProxyUrl({String? password}) {
     final effectivePassword = password ?? this.password;
-    final credentials =
-        (username != null || effectivePassword != null)
-            ? '${username ?? ''}:${effectivePassword ?? ''}@'
-            : '';
+    final credentials = (username != null || effectivePassword != null)
+        ? '${username ?? ''}:${effectivePassword ?? ''}@'
+        : '';
     return '$scheme://$credentials$host:$port';
   }
 
   /// Serializes the configuration WITHOUT the password (FR-009).
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'host': host,
-        'port': port,
-        'type': type.wire,
-        if (username != null) 'username': username,
-      };
+    'host': host,
+    'port': port,
+    'type': type.wire,
+    if (username != null) 'username': username,
+  };
 
   /// Restores a configuration from [ProxyConfig.toJson] output.
   factory ProxyConfig.fromJson(Map<String, dynamic> json) => ProxyConfig(
-        host: json['host'] as String,
-        port: json['port'] as int,
-        type: ProxyType.fromWire(json['type'] as String),
-        username: json['username'] as String?,
-      );
+    host: json['host'] as String,
+    port: json['port'] as int,
+    type: ProxyType.fromWire(json['type'] as String),
+    username: json['username'] as String?,
+  );
 
   /// Projects the configuration into a persistable record; [secretRef] is
   /// the vault key where the password (if any) is stored.
   ProxyConfigRecord toRecord({String? secretRef}) => ProxyConfigRecord(
-        host: host,
-        port: port,
-        type: type,
-        username: username,
-        secretRef: secretRef,
-      );
+    host: host,
+    port: port,
+    type: type,
+    username: username,
+    secretRef: secretRef,
+  );
 
   @override
   bool operator ==(Object other) =>
@@ -122,7 +121,8 @@ class ProxyConfig {
   int get hashCode => Object.hash(host, port, type, username, password);
 
   @override
-  String toString() => 'ProxyConfig(${scheme}://'
+  String toString() =>
+      'ProxyConfig($scheme://'
       '${username != null ? '$username:•••@' : ''}$host:$port)';
 }
 
@@ -149,12 +149,12 @@ class ProxyConfigRecord {
 
   /// Serializes the record; contains no secrets.
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'host': host,
-        'port': port,
-        'type': type.wire,
-        if (username != null) 'username': username,
-        if (secretRef != null) 'secretRef': secretRef,
-      };
+    'host': host,
+    'port': port,
+    'type': type.wire,
+    if (username != null) 'username': username,
+    if (secretRef != null) 'secretRef': secretRef,
+  };
 
   /// Restores a record from [toJson] output.
   factory ProxyConfigRecord.fromJson(Map<String, dynamic> json) =>
@@ -169,12 +169,12 @@ class ProxyConfigRecord {
   /// Expands the record back into a [ProxyConfig]; [password] comes from the
   /// vault at resolve time.
   ProxyConfig toConfig({String? password}) => ProxyConfig(
-        host: host,
-        port: port,
-        type: type,
-        username: username,
-        password: password,
-      );
+    host: host,
+    port: port,
+    type: type,
+    username: username,
+    password: password,
+  );
 
   @override
   bool operator ==(Object other) =>
@@ -190,7 +190,8 @@ class ProxyConfigRecord {
   int get hashCode => Object.hash(host, port, type, username, secretRef);
 
   @override
-  String toString() => 'ProxyConfigRecord($type://$host:$port'
+  String toString() =>
+      'ProxyConfigRecord($type://$host:$port'
       '${username != null ? ', user: $username' : ''}'
       '${secretRef != null ? ', secretRef: $secretRef' : ''})';
 }

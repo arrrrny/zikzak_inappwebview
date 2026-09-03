@@ -29,36 +29,39 @@ void main() {
   );
 
   group('global proxy (AC1/FR-001)', () {
-    test('setProxy stores the config and the getter returns it (U17)',
-        () async {
-      final applier = RecordingProxyApplier();
-      final browser = await Browser.open(
-        store: InMemoryProxyConfigStore(),
-        vault: InMemorySecretVault(),
-        applier: applier,
-      );
-      expect(browser.proxy, isNull);
-      await browser.setProxy(globalProxy);
-      expect(browser.proxy, equals(globalProxy));
-    });
-
-    test('global setProxy applies the new config through the applier (U19b)',
-        () async {
-      final applier = RecordingProxyApplier();
-      final browser = await Browser.open(
-        store: InMemoryProxyConfigStore(),
-        vault: InMemorySecretVault(),
-        applier: applier,
-      );
-      await browser.setProxy(globalProxy);
-      expect(applier.applied, hasLength(1));
-      expect(applier.applied.single, isNotNull);
-      expect(applier.applied.single!.config, equals(globalProxy));
-      expect(applier.applied.single!.scope, ResolvedScope.global);
-    });
+    test(
+      'setProxy stores the config and the getter returns it (U17)',
+      () async {
+        final applier = RecordingProxyApplier();
+        final browser = await Browser.open(
+          store: InMemoryProxyConfigStore(),
+          vault: InMemorySecretVault(),
+          applier: applier,
+        );
+        expect(browser.proxy, isNull);
+        await browser.setProxy(globalProxy);
+        expect(browser.proxy, equals(globalProxy));
+      },
+    );
 
     test(
-        'clearProxy nulls the getter, removes the stored record, '
+      'global setProxy applies the new config through the applier (U19b)',
+      () async {
+        final applier = RecordingProxyApplier();
+        final browser = await Browser.open(
+          store: InMemoryProxyConfigStore(),
+          vault: InMemorySecretVault(),
+          applier: applier,
+        );
+        await browser.setProxy(globalProxy);
+        expect(applier.applied, hasLength(1));
+        expect(applier.applied.single, isNotNull);
+        expect(applier.applied.single!.config, equals(globalProxy));
+        expect(applier.applied.single!.scope, ResolvedScope.global);
+      },
+    );
+
+    test('clearProxy nulls the getter, removes the stored record, '
         'and clears through the applier (U18)', () async {
       final applier = RecordingProxyApplier();
       final store = InMemoryProxyConfigStore();
@@ -71,32 +74,40 @@ void main() {
       await browser.clearProxy();
       expect(browser.proxy, isNull);
       expect(await store.loadGlobal(), isNull);
-      expect(applier.applied.last, isNull,
-          reason: 'clearProxy must push "clear override" (direct connection)');
+      expect(
+        applier.applied.last,
+        isNull,
+        reason: 'clearProxy must push "clear override" (direct connection)',
+      );
     });
   });
 
   group('restart survival (AC4/FR-002)', () {
-    test('Browser.open over the same store restores the global proxy (U19)',
-        () async {
-      final applier1 = RecordingProxyApplier();
-      final store = InMemoryProxyConfigStore();
-      final browser1 = await Browser.open(
-        store: store,
-        vault: InMemorySecretVault(),
-        applier: applier1,
-      );
-      await browser1.setProxy(globalProxy);
+    test(
+      'Browser.open over the same store restores the global proxy (U19)',
+      () async {
+        final applier1 = RecordingProxyApplier();
+        final store = InMemoryProxyConfigStore();
+        final browser1 = await Browser.open(
+          store: store,
+          vault: InMemorySecretVault(),
+          applier: applier1,
+        );
+        await browser1.setProxy(globalProxy);
 
-      // Simulate an app restart: a brand-new Browser over the same store.
-      final applier2 = RecordingProxyApplier();
-      final browser2 = await Browser.open(
-        store: store,
-        vault: InMemorySecretVault(),
-        applier: applier2,
-      );
-      expect(browser2.proxy, equals(globalProxy),
-          reason: 'the global proxy must persist across restarts (FR-002)');
-    });
+        // Simulate an app restart: a brand-new Browser over the same store.
+        final applier2 = RecordingProxyApplier();
+        final browser2 = await Browser.open(
+          store: store,
+          vault: InMemorySecretVault(),
+          applier: applier2,
+        );
+        expect(
+          browser2.proxy,
+          equals(globalProxy),
+          reason: 'the global proxy must persist across restarts (FR-002)',
+        );
+      },
+    );
   });
 }
