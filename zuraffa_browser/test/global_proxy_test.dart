@@ -22,7 +22,7 @@ class RecordingProxyApplier implements ProxyApplier {
 }
 
 void main() {
-  const globalProxy = ProxyConfig(
+  final globalProxy = ProxyConfig(
     host: 'global.example.com',
     port: 8080,
     type: ProxyType.http,

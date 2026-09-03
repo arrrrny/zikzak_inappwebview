@@ -8,3 +8,7 @@
 ///
 /// Spec: 279 (https://github.com/arrrrny/zikzak_inappwebview/issues/279)
 library;
+
+export 'src/browser.dart';
+export 'src/proxy_config.dart';
+export 'src/proxy_ports.dart';

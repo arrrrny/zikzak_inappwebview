@@ -57,3 +57,24 @@ Compilation failed for testPath=.../test/proxy_config_test.dart
 Both files fail to load: the whole API surface under test (ProxyType,
 ProxyConfig, ProxyConfigRecord, stores, vault, ProxyApplier, ResolvedProxy,
 Browser) does not exist yet.
+
+### Green (T001)
+
+- command: `flutter test` (cwd `zuraffa_browser`)
+- observed output:
+
+```text
+00:00 +18: All tests passed!
+```
+
+- implementation: `lib/src/proxy_config.dart` (ProxyType, ProxyConfig,
+  ProxyConfigRecord), `lib/src/proxy_ports.dart` (ProxyConfigStore +
+  InMemory/File, SecretVault + InMemory, ResolvedScope/ResolvedProxy,
+  ProxyApplier), `lib/src/browser.dart` (Browser.open/setProxy/clearProxy/
+  proxy with store+vault persistence and immediate applier push).
+- test adjustment during green (behavior unchanged): `ProxyConfig` validates
+  in its constructor (ArgumentError), which is incompatible with a const
+  constructor, so the test construction sites were changed from `const` to
+  `final`; the validated behavior (U8 throwsArgumentError) is identical.
+- A1 stays RED at this point: "applied to all profiles" needs profiles and
+  page navigation (cycles T002-T004).

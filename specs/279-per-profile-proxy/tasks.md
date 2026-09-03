@@ -15,7 +15,7 @@ Source: GitHub issue #279. One PR for the spec. TDD loop per
 - [X] T001a RED: `test/global_proxy_test.dart` + `test/proxy_config_test.dart`
       — global set/get/clear, persistence through the store, application
       through the applier; ProxyConfig value-object units (U1-U19).
-- [ ] T001b GREEN: `ProxyType`, `ProxyConfig`, `ProxyConfigRecord`,
+- [X] T001b GREEN: `ProxyType`, `ProxyConfig`, `ProxyConfigRecord`,
       `ProxyConfigStore` (InMemory + File), `SecretVault` (InMemory),
       `ProxyApplier` port, `Browser.open/setProxy/clearProxy/proxy`.
 

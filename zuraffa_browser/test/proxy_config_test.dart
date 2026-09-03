@@ -56,7 +56,7 @@ void main() {
 
   group('ProxyConfig serialization and redaction (U4-U6)', () {
     test('toJson/fromJson round-trips host, port, type, username (U4)', () {
-      const config = ProxyConfig(
+      final config = ProxyConfig(
         host: 'proxy.example.com',
         port: 9090,
         type: ProxyType.https,
@@ -71,7 +71,7 @@ void main() {
     });
 
     test('toJson never contains the password (U5)', () {
-      const config = ProxyConfig(
+      final config = ProxyConfig(
         host: 'proxy.example.com',
         port: 9090,
         type: ProxyType.http,
@@ -84,7 +84,7 @@ void main() {
     });
 
     test('toString redacts the password (U6)', () {
-      const config = ProxyConfig(
+      final config = ProxyConfig(
         host: 'proxy.example.com',
         port: 9090,
         type: ProxyType.http,
@@ -98,9 +98,9 @@ void main() {
 
   group('ProxyConfig equality and validation (U7-U8)', () {
     test('equality on host/port/type; different port is not equal (U7)', () {
-      const a = ProxyConfig(host: 'h', port: 1, type: ProxyType.http);
-      const b = ProxyConfig(host: 'h', port: 1, type: ProxyType.http);
-      const c = ProxyConfig(host: 'h', port: 2, type: ProxyType.http);
+      final a = ProxyConfig(host: 'h', port: 1, type: ProxyType.http);
+      final b = ProxyConfig(host: 'h', port: 1, type: ProxyType.http);
+      final c = ProxyConfig(host: 'h', port: 2, type: ProxyType.http);
       expect(a, equals(b));
       expect(a.hashCode, b.hashCode);
       expect(a, isNot(equals(c)));
