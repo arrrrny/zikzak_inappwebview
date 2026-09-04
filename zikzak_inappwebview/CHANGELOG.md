@@ -1,3 +1,11 @@
+## 5.2.1 - 2026-09-05
+
+### Bug Fixes
+
+- [macOS] Defensive deserialization of WKScriptMessage.body — prevents SIGSEGV crash when JS posts DOMException or other non-cloneable objects through the zikzak bridge (#309)
+- [macOS] Add ObjC exception boundary (ZikzakExceptionCatcher) to catch WebKit deserialization exceptions in WeakScriptMessageHandler
+- [macOS] Recursively sanitize message bodies for Flutter standard message codec — non-cloneable leaves converted to string representation
+
 ## 5.2.0 - 2026-09-04
 
 ### Features

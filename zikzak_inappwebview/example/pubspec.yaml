@@ -38,8 +38,8 @@ dependencies:
   url_launcher: ^6.2.0
   zikzak_inappwebview:
     path: ../
-  zikzak_inappwebview_platform_interface: ^5.2.0
-  zikzak_inappwebview_web: ^5.2.0
+  zikzak_inappwebview_platform_interface: ^5.2.1
+  zikzak_inappwebview_web: ^5.2.1
 
 # DEV ONLY: point at the local plugin source so Swift/ObjC/Java changes are
 # compiled into the example app during development. Remove before publishing.
