@@ -71,7 +71,7 @@ class AndroidProxyController extends PlatformProxyController
   }
 
   @override
-  Future<void> clearProxyOverride() async {
+  Future<void> clearProxyOverride({String? profileId}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     await channel?.invokeMethod('clearProxyOverride', args);
   }

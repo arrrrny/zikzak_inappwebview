@@ -18,6 +18,11 @@ public class ProxyManager: ChannelDelegate {
 
     private var plugin: InAppWebViewFlutterPlugin?
 
+    /// Per-profile proxy configurations keyed by persistentStoreIdentifier.
+    /// When a WebView is created with a custom data store, the proxy for its
+    /// identifier is applied to that data store.
+    static var profileProxies: [String: ProxyConfiguration] = [:]
+
     init(plugin: InAppWebViewFlutterPlugin) {
         super.init(
             channel: FlutterMethodChannel(
@@ -30,12 +35,15 @@ public class ProxyManager: ChannelDelegate {
         let arguments = call.arguments as? [String: Any]
         switch call.method {
         case "setProxyOverride":
-            if let args = arguments?["settings"] as? [String: Any] {
-                let settings = ProxySettings.fromMap(args)
+            if let settingsMap = arguments?["settings"] as? [String: Any] {
+                let settings = ProxySettings.fromMap(settingsMap)
+                let profileId = arguments?["profileId"] as? String
                 do {
                     let proxyConfiguration = try resolveProxyConfiguration(settings)
-                    let websiteDataStore = WKWebsiteDataStore.default()
-                    websiteDataStore.proxyConfigurations = [proxyConfiguration]
+                    if let pid = profileId, !pid.isEmpty {
+                        ProxyManager.profileProxies[pid] = proxyConfiguration
+                    }
+                    WKWebsiteDataStore.default().proxyConfigurations = [proxyConfiguration]
                     result(true)
                 } catch let error as ProxyConfigurationError {
                     result(FlutterError(code: error.code, message: error.message, details: nil))
@@ -50,11 +58,24 @@ public class ProxyManager: ChannelDelegate {
                 result(false)
             }
         case "clearProxyOverride":
+            if let args = arguments as? [String: Any],
+               let profileId = args["profileId"] as? String {
+                ProxyManager.profileProxies.removeValue(forKey: profileId)
+            } else {
+                ProxyManager.profileProxies.removeAll()
+            }
             WKWebsiteDataStore.default().proxyConfigurations = []
             result(true)
         default:
             result(FlutterMethodNotImplemented)
         }
+    }
+
+    /// Applies the stored proxy configuration for [identifier] to [dataStore].
+    /// Called by the WebView factory when a custom data store is created.
+    public static func applyProxy(forIdentifier identifier: String, to dataStore: WKWebsiteDataStore) {
+        guard let config = profileProxies[identifier] else { return }
+        dataStore.proxyConfigurations = [config]
     }
 
     private func resolveProxyConfiguration(_ settings: ProxySettings) throws -> ProxyConfiguration {

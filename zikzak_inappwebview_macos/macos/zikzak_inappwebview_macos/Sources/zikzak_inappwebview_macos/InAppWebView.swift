@@ -206,7 +206,13 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                    let id = settingsMap["persistentStoreIdentifier"] as? String,
                    !id.isEmpty,
                    let uuid = persistentUUID(from: id) {
-                    configuration.websiteDataStore = WKWebsiteDataStore(forIdentifier: uuid)
+                    let store = WKWebsiteDataStore(forIdentifier: uuid)
+                    // Apply the per-profile proxy (if any) to this custom
+                    // data store — the Dart ProxyController sets it on the
+                    // default store, but WebViews with a persistent identifier
+                    // use a custom store that misses the proxy otherwise.
+                    ProxyManager.applyProxy(forIdentifier: id, to: store)
+                    configuration.websiteDataStore = store
                 } else if let incognito = settingsMap["incognito"] as? Bool,
                           incognito {
                     configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
