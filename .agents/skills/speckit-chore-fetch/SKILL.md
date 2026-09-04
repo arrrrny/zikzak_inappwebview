@@ -1,0 +1,1 @@
+../../../.specify/extensions/chore/.specify-dev/agent-commands/zed/speckit-chore-fetch/SKILL.md
