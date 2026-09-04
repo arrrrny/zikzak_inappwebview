@@ -1,0 +1,1 @@
+../../../.specify/extensions/gym/.specify-dev/agent-commands/claude/speckit-gym-drop/SKILL.md

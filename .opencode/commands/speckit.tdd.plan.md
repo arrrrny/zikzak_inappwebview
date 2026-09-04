@@ -1,0 +1,1 @@
+../../.specify/extensions/tdd/.specify-dev/agent-commands/opencode/speckit.tdd.plan.md
