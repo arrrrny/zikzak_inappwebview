@@ -7,6 +7,7 @@ import 'in_app_webview/in_app_webview_controller.dart';
 import 'in_app_webview/headless_in_app_webview.dart';
 import 'in_app_browser/in_app_browser.dart';
 import 'print_job/print_job_controller.dart';
+import 'proxy_controller.dart';
 
 /// Implementation of [InAppWebViewPlatform] using the WebKit API for macOS.
 class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
@@ -72,5 +73,12 @@ class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
     PlatformPrintJobControllerCreationParams params,
   ) {
     return MacOSPrintJobController(params);
+  }
+
+  @override
+  PlatformProxyController createPlatformProxyController(
+    PlatformProxyControllerCreationParams params,
+  ) {
+    return MacOSProxyController(params);
   }
 }
