@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show PlatformException;
 
@@ -13,6 +14,48 @@ import 'in_app_webview_windows_controller.dart';
 bool isEnvironmentAlreadyInitializedError(Object error) {
   return error is PlatformException &&
       error.code == 'environment_already_initialized';
+}
+
+/// Ensures the process-wide WebView2 environment exists.
+///
+/// Calls [WebviewController.initializeEnvironment] with [args] when no
+/// environment has been created yet. The environment can only be created once
+/// per process, so when an earlier WebView already initialized it the platform
+/// reports a [PlatformException] with code `environment_already_initialized`;
+/// that is a benign signal that reuse succeeded and is swallowed here. Every
+/// other error is rethrown so real failures (for example
+/// `environment_creation_failed`) still surface.
+///
+/// Extracted from `initPlatformState` so the reuse logic is unit-testable
+/// against a mocked `webview_windows` method channel without booting a real
+/// WebView2 runtime.
+@visibleForTesting
+Future<void> ensureWebView2Environment(WebViewEnvironmentInitArgs args) async {
+  try {
+    await WebviewController.initializeEnvironment(
+      userDataPath: args.userDataPath,
+      browserExePath: args.browserExePath,
+      additionalArguments: args.additionalArguments,
+    );
+  } on PlatformException catch (error) {
+    if (!isEnvironmentAlreadyInitializedError(error)) rethrow;
+
+    // The process-wide environment already exists, so this WebView runs under
+    // whatever environment the first WebView created. Any configuration
+    // supplied here may therefore be ignored. Surface it in debug builds so
+    // divergent configurations are discoverable during development.
+    if (kDebugMode) {
+      debugPrint(
+        'WebView2 environment was already initialized and is being reused. '
+        'Environment settings supplied to this WebView '
+        '(userDataPath: ${args.userDataPath}, '
+        'browserExePath: ${args.browserExePath}, '
+        'additionalArguments: ${args.additionalArguments}) may not take '
+        'effect because the process-wide environment is controlled by the '
+        'first WebView that initialized it.',
+      );
+    }
+  }
 }
 
 class _VirtualHostMappingInfo {
@@ -108,15 +151,7 @@ class _InAppWebViewWindowsWidgetStateImpl
       // The WebView2 environment is shared by all controllers and can only be
       // initialized once. Reusing it is valid when another WebView already
       // initialized the process-wide environment.
-      try {
-        await WebviewController.initializeEnvironment(
-          userDataPath: args.userDataPath,
-          browserExePath: args.browserExePath,
-          additionalArguments: args.additionalArguments,
-        );
-      } on PlatformException catch (error) {
-        if (!isEnvironmentAlreadyInitializedError(error)) rethrow;
-      }
+      await ensureWebView2Environment(args);
 
       await _controller.initialize();
 

@@ -1,9 +1,11 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 import 'package:zikzak_inappwebview_windows/src/in_app_webview_windows_platform.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   const defaultFolder = '/tmp/default-zikzak-webview2-data';
 
   group('WebView2 environment initialization', () {
@@ -23,6 +25,97 @@ void main() {
         ),
         isFalse,
       );
+    });
+
+    test('does not treat non-platform errors as reuse', () {
+      expect(isEnvironmentAlreadyInitializedError(StateError('x')), isFalse);
+    });
+  });
+
+  group('ensureWebView2Environment', () {
+    // The webview_windows package routes every controller call through a
+    // single process-wide method channel. Mocking it lets the tests exercise
+    // the real reuse wiring without booting a WebView2 runtime.
+    const channel = MethodChannel('io.jns.webview.win');
+
+    void mockEnvironment({required Object? Function() onInitialize}) {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, (call) async {
+            expect(call.method, 'initializeEnvironment');
+            return onInitialize();
+          });
+    }
+
+    tearDown(() {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, null);
+    });
+
+    test('initializes when no environment exists', () async {
+      var invoked = false;
+      mockEnvironment(onInitialize: () => invoked = true);
+
+      await ensureWebView2Environment(
+        WebViewEnvironmentInitArgs(userDataPath: defaultFolder),
+      );
+
+      expect(invoked, isTrue);
+    });
+
+    test('reuses an already-initialized environment', () async {
+      mockEnvironment(
+        onInitialize: () =>
+            throw PlatformException(code: 'environment_already_initialized'),
+      );
+
+      await expectLater(
+        ensureWebView2Environment(
+          WebViewEnvironmentInitArgs(userDataPath: defaultFolder),
+        ),
+        completes,
+      );
+    });
+
+    test('rethrows unrelated platform errors', () async {
+      mockEnvironment(
+        onInitialize: () =>
+            throw PlatformException(code: 'environment_creation_failed'),
+      );
+
+      await expectLater(
+        ensureWebView2Environment(
+          WebViewEnvironmentInitArgs(userDataPath: defaultFolder),
+        ),
+        throwsA(
+          isA<PlatformException>().having(
+            (e) => e.code,
+            'code',
+            'environment_creation_failed',
+          ),
+        ),
+      );
+    });
+
+    test('forwards the resolved args to the platform channel', () async {
+      Map<String, dynamic>? received;
+      mockEnvironment(onInitialize: () => null);
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, (call) async {
+            received = Map<String, dynamic>.from(call.arguments as Map);
+            return null;
+          });
+
+      await ensureWebView2Environment(
+        WebViewEnvironmentInitArgs(
+          userDataPath: 'D:/appdata/wbv2',
+          browserExePath: 'C:/wbv2/fixed',
+          additionalArguments: '--disable-web-security',
+        ),
+      );
+
+      expect(received?['userDataPath'], 'D:/appdata/wbv2');
+      expect(received?['browserExePath'], 'C:/wbv2/fixed');
+      expect(received?['additionalArguments'], '--disable-web-security');
     });
   });
 
