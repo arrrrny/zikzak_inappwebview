@@ -58,7 +58,7 @@ class IosProxyController extends PlatformProxyController
   }
 
   @override
-  Future<void> clearProxyOverride() async {
+  Future<void> clearProxyOverride({String? profileId}) async {
     await channel?.invokeMethod('clearProxyOverride');
   }
 

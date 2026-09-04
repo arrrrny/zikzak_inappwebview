@@ -32,14 +32,22 @@ class MacOSProxyController extends PlatformProxyController
 
   @override
   Future<void> setProxyOverride({required ProxySettings settings}) async {
-    final args = <String, dynamic>{};
-    args['settings'] = settings.iOSProxySettings?.toJson();
+    final args = <String, dynamic>{
+      'settings': settings.iOSProxySettings?.toJson(),
+    };
+    if (settings.profileId != null) {
+      args['profileId'] = settings.profileId;
+    }
     await channel?.invokeMethod('setProxyOverride', args);
   }
 
   @override
-  Future<void> clearProxyOverride() async {
-    await channel?.invokeMethod('clearProxyOverride');
+  Future<void> clearProxyOverride({String? profileId}) async {
+    final args = <String, dynamic>{};
+    if (profileId != null) {
+      args['profileId'] = profileId;
+    }
+    await channel?.invokeMethod('clearProxyOverride', args);
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {}
