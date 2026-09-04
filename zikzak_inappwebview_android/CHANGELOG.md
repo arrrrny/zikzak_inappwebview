@@ -1,3 +1,87 @@
+## 5.2.0 - 2026-09-04
+
+
+### Features
+
+- [macOS] Per-profile proxy support via WKWebsiteDataStore.proxyConfigurations
+- [macOS] ProxyController implementation using WKWebsiteDataStore.proxyConfigurations
+- [Android] Honor PDFConfiguration page size/margins/orientation in createPdf
+- HeadlessInAppWebView double-dispose guard for safe reuse
+- Network capture: per-domain maxBodySize, maxBytes, maxEntries budget enforcement
+- Network capture: redact auth-shaped secrets at source (URL/body params)
+- Portable sessions (014), dismiss dialogues (002), dispose patterns (013)
+- Platform interface: expose and export four domain controller delegates (navigation, javaScript, cookie, settings)
+- Wave Z module scaffold — split map, ports, WebViewPool, VCR, grep gate
+- [iOS/macOS] Per-instance persistent isolated WKWebsiteDataStore via persistentStoreIdentifier
+- GYM real exercises for zikzak_inappwebview (warmup + js-bridge-round-trip)
+
+### Fixes
+
+- Remove duplicate delegate declarations and imports in android/iOS controllers
+- [macOS] Use registrar.messenger property, not method call
+- Controller forward urlResponse to navigation facade
+- WebView sessions reject mismatched-origin sessions and clear prior state on load
+- [Android] takeScreenshot reads laid-out size and defers capture until layout
+- Platform add WebContent readiness gate, emit enum wire names
+- Umbrella pin zuraffa to working hosted 6.0.1
+- [Android] lower minSdkVersion to API 24 (closes #276)
+- [iOS/Android] Bulletproof the WebAuthn/passkey wiring
+- [macOS] Restore headless run() Dart test + make run() re-runnable after dispose
+- [iOS] Route cookie ops through the webview's own data store
+- [macOS] Enable WebAuthn/passkey sign-in by wiring webAuthenticationSupport into WKWebViewConfiguration
+- [macOS] Dispatch onScrollChanged/onContentSizeChanged/onOverScrolled to callbacks
+- [Linux] Platform gap analysis and hardening - API coverage, CookieManager, error reporting
+- Address CodeRabbit review comments and auto-fixes
+
+### Refactors
+
+- Extract legacy dismissDialogues into testable seam
+
+### Tests
+
+- [iOS] dismissDialogues integration tests (A1-A6)
+- [macOS] takeScreenshot PNG, JPEG, rect crop acceptance tests (mutant-verified)
+- [Android] takeScreenshot rect crop acceptance test (mutant-verified)
+- [iOS] takeScreenshot PNG and createPdf acceptance tests
+- Dispose contract and keepAlive semantics tests across all controllers
+- Platform delegate behavioral tests for navigation, settings, JS, and cookie controllers
+- Full-feature conformance suite for Zorphy migration (Phase 4)
+
+### Docs
+
+- TDD audit and spec review comments addressed
+- TDD cycle logs and verification records for specs 001, 010-014
+- JS bridge rename documentation extended into API docstring and example assets
+
+### Chores
+
+- Exclude generated platform dirs from analyzer
+- Add TDD stack profile for lifecycle/sessions verification
+- Add generated coverage/lcov.info for platform_interface
+- Add spec-kit TDD/bug/git extensions and .kimi-code skills
+- Restore development path dependencies after 5.1.2 publish
+## 5.2.0 - 2026-09-04
+
+### Features
+
+- [Android] Honor PDFConfiguration page size/margins/orientation in createPdf
+- [Android] takeScreenshot reads laid-out size and defers capture until layout
+
+### Fixes
+
+- Remove duplicate delegate declarations and imports in android/iOS controllers
+- [Android] lower minSdkVersion to API 24 (closes #276)
+- [iOS/Android] Bulletproof the WebAuthn/passkey wiring
+
+### Tests
+
+- [Android] takeScreenshot rect crop acceptance test (mutant-verified)
+- [Android] createPdf returns valid PDF (acceptance)
+
+### Chores
+
+- Exclude generated platform dirs from analyzer
+
 ## Unreleased
 
 ### Fixes
