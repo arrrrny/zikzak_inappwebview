@@ -20,8 +20,9 @@ class MacOSProxyController extends PlatformProxyController
     : super.implementation(
         params is MacOSProxyControllerCreationParams
             ? params
-            : MacOSProxyControllerCreationParams
-                .fromPlatformProxyControllerCreationParams(params),
+            : MacOSProxyControllerCreationParams.fromPlatformProxyControllerCreationParams(
+                params,
+              ),
       ) {
     channel = const MethodChannel(
       'wtf.zikzak/zikzak_inappwebview_proxycontroller',

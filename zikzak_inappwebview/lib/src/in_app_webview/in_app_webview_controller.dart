@@ -153,7 +153,8 @@ class InAppWebViewController implements Disposable {
   Future<dynamic> evaluateJavascript({
     required String source,
     ContentWorld? contentWorld,
-  }) => javaScript.evaluateJavascript(source: source, contentWorld: contentWorld);
+  }) =>
+      javaScript.evaluateJavascript(source: source, contentWorld: contentWorld);
 
   /// Dispatches a native key press (keyDown + keyUp) to the underlying WebView
   /// so React / ProseMirror editors receive a trusted Enter / Backspace.

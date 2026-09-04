@@ -307,7 +307,9 @@ InAppWebViewSettings _$InAppWebViewSettingsFromJson(
       'rendererPriorityPolicy',
       (v) => v == null
           ? null
-          : RendererPriorityPolicy.fromJson(Map<String, dynamic>.from(v as Map)),
+          : RendererPriorityPolicy.fromJson(
+              Map<String, dynamic>.from(v as Map),
+            ),
     ),
     disableDefaultErrorPage: $checkedConvert(
       'disableDefaultErrorPage',

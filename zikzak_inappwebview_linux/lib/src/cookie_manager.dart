@@ -22,9 +22,7 @@ class LinuxCookieManager extends PlatformCookieManager {
   }
 
   static LinuxCookieManager _init() {
-    _instance = LinuxCookieManager(
-      const PlatformCookieManagerCreationParams(),
-    );
+    _instance = LinuxCookieManager(const PlatformCookieManagerCreationParams());
     return _instance!;
   }
 
@@ -93,7 +91,10 @@ class LinuxCookieManager extends PlatformCookieManager {
     required String name,
     PlatformInAppWebViewController? webViewController,
   }) async {
-    final cookies = await getCookies(url: url, webViewController: webViewController);
+    final cookies = await getCookies(
+      url: url,
+      webViewController: webViewController,
+    );
     for (final cookie in cookies) {
       if (cookie.name == name) return cookie;
     }
@@ -133,8 +134,7 @@ class LinuxCookieManager extends PlatformCookieManager {
   @override
   Future<bool> deleteAllCookies() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel.invokeMethod<bool>('deleteAllCookies', args) ??
-        false;
+    return await _channel.invokeMethod<bool>('deleteAllCookies', args) ?? false;
   }
 
   @override

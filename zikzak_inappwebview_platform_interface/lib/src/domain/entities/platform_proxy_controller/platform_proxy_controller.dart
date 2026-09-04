@@ -102,7 +102,11 @@ class ProxySettings {
   /// and applied to the WKWebsiteDataStore with that persistent identifier.
   String? profileId;
 
-  ProxySettings({this.androidProxySettings, this.iOSProxySettings, this.profileId});
+  ProxySettings({
+    this.androidProxySettings,
+    this.iOSProxySettings,
+    this.profileId,
+  });
 }
 
 @Zorphy(
