@@ -22,7 +22,7 @@ public class ProxyManager: ChannelDelegate {
         super.init(
             channel: FlutterMethodChannel(
                 name: ProxyManager.METHOD_CHANNEL_NAME,
-                binaryMessenger: plugin.registrar!.messenger()))
+                binaryMessenger: plugin.registrar!.messenger))
         self.plugin = plugin
     }
 
