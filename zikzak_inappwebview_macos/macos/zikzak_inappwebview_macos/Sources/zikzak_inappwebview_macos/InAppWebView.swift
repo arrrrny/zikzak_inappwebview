@@ -2312,12 +2312,12 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         }
     }
 
-    public func userContentController(
+    // Internal fallback for direct registration. Every zikzak macOS handler is
+    // registered via WeakScriptMessageHandler, which calls the sanitized variant
+    // below after defensively deserializing the body (#309).
+    func userContentController(
         _ userContentController: WKUserContentController, didReceive message: WKScriptMessage
     ) {
-        // Fallback for direct registration. Every zikzak macOS handler is
-        // registered via WeakScriptMessageHandler, which calls the sanitized
-        // variant below after defensively deserializing the body (#309).
         let (sanitizedBody, deserializationError) = WeakScriptMessageHandler.defensivelyDeserializeBody(of: message)
         self.userContentController(
             userContentController, didReceive: message,

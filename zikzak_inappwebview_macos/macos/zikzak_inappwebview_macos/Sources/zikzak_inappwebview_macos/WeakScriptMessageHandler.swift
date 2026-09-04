@@ -48,8 +48,13 @@ class WeakScriptMessageHandler: NSObject, WKScriptMessageHandler {
                 sanitizedBody: sanitizedBody,
                 deserializationError: deserializationError)
         } else {
-            // Foreign delegate: legacy forwarding, still defensively read so a
-            // fragile body never crosses this boundary unguarded.
+            // Foreign delegate: legacy forwarding. The delegate reads
+            // message.body directly (unguarded) — this path is only safe if
+            // the delegate itself handles non-cloneable values. All six zikzak
+            // registrations use the sanitizing path above; foreign delegates
+            // must adopt DefensivelyDeserializedScriptMessageHandling to be
+            // crash-safe.
+            NSLog("[ZikzakInAppWebView] Warning: delegate \(type(of: delegate)) does not conform to DefensivelyDeserializedScriptMessageHandling; message body is read unguarded.")
             delegate.userContentController(userContentController, didReceive: message)
         }
     }
@@ -76,7 +81,8 @@ class WeakScriptMessageHandler: NSObject, WKScriptMessageHandler {
             return (errorDescription, errorDescription)
         }
         guard let body = body else {
-            return (NSNull(), nil)
+            let nilError = "Script message body is nil for handler '\(message.name)'"
+            return (nilError, nilError)
         }
         return (sanitizeValueForMessageCodec(body), nil)
     }
