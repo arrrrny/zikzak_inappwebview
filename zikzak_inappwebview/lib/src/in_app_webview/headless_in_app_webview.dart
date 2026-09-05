@@ -4,6 +4,7 @@ import 'dart:ui';
 
 import 'package:flutter/services.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
+import '../dispose_lifecycle.dart';
 import '../find_interaction/find_interaction_controller.dart';
 import '../webview_environment/webview_environment.dart';
 import 'in_app_webview_controller.dart';
@@ -25,12 +26,13 @@ class HeadlessInAppWebView implements Disposable {
   /// Implementation of [PlatformHeadlessInAppWebView] for the current platform.
   final PlatformHeadlessInAppWebView platform;
 
-  /// Whether [dispose] has been invoked at least once.
+  /// KeepAlive-aware disposal lifecycle (bug #295); see [dispose].
   ///
-  /// Set synchronously at the start of [dispose] so callers and the idempotency
-  /// guard (spec 013) can reason about lifecycle state without awaiting the
-  /// platform teardown.
-  bool _disposed = false;
+  /// Updated synchronously at the start of [dispose] — before the platform
+  /// call is awaited — so concurrent dispose calls stay serialized and the
+  /// idempotency guard (spec 013 FR-008) can reason about lifecycle state
+  /// without awaiting platform teardown.
+  DisposeLifecycle _lifecycle = DisposeLifecycle.notDisposed;
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformHeadlessInAppWebView.id}
   String get id => platform.id;
@@ -661,12 +663,24 @@ class HeadlessInAppWebView implements Disposable {
   Future<Size?> getSize() => platform.getSize();
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformHeadlessInAppWebView.dispose}
+  ///
+  /// KeepAlive-aware disposal guard (bug #295): disposal is a three-state
+  /// lifecycle ([DisposeLifecycle.notDisposed] / [DisposeLifecycle.keepAliveHeld]
+  /// / [DisposeLifecycle.released]). `dispose(isKeepAlive: true)` records
+  /// [DisposeLifecycle.keepAliveHeld] — the native view is retained — so a
+  /// later plain `dispose()` still forwards `isKeepAlive: false` to the
+  /// platform and fully releases the retained native view (FR-007). Only
+  /// identical repeats are no-ops: a repeat keepAlive dispose, and any
+  /// dispose once fully released (FR-008).
   @override
   Future<void> dispose({bool isKeepAlive = false}) async {
-    if (_disposed) {
+    if (_lifecycle == DisposeLifecycle.released ||
+        (_lifecycle == DisposeLifecycle.keepAliveHeld && isKeepAlive)) {
       return;
     }
-    _disposed = true;
+    _lifecycle = isKeepAlive
+        ? DisposeLifecycle.keepAliveHeld
+        : DisposeLifecycle.released;
     await platform.dispose(isKeepAlive: isKeepAlive);
   }
 }

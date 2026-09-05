@@ -8,9 +8,9 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 /// the base class's `UnimplementedError` defaults.
 class _FakePlatformController extends PlatformInAppWebViewController {
   _FakePlatformController()
-      : super.implementation(
-          const PlatformInAppWebViewControllerCreationParams(id: 'c1'),
-        );
+    : super.implementation(
+        const PlatformInAppWebViewControllerCreationParams(id: 'c1'),
+      );
 
   int disposeCount = 0;
   bool lastKeepAlive = false;
@@ -25,9 +25,7 @@ class _FakePlatformController extends PlatformInAppWebViewController {
 /// Records dispose invocations for [InAppWebView] forwarding tests.
 class _FakePlatformWidget extends PlatformInAppWebViewWidget {
   _FakePlatformWidget()
-      : super.implementation(
-          PlatformInAppWebViewWidgetCreationParams(),
-        );
+    : super.implementation(PlatformInAppWebViewWidgetCreationParams());
 
   int disposeCount = 0;
   bool lastKeepAlive = false;
@@ -52,8 +50,9 @@ void main() {
       'U8: InAppWebViewController.dispose(isKeepAlive: true) forwards to platform.dispose(isKeepAlive: true)',
       () {
         final platform = _FakePlatformController();
-        final controller =
-            InAppWebViewController.fromPlatform(platform: platform);
+        final controller = InAppWebViewController.fromPlatform(
+          platform: platform,
+        );
 
         controller.dispose(isKeepAlive: true);
 
@@ -66,15 +65,77 @@ void main() {
       'U9: a later dispose(isKeepAlive: false) after dispose(isKeepAlive: true) forwards false and fully releases',
       () {
         final platform = _FakePlatformController();
-        final controller =
-            InAppWebViewController.fromPlatform(platform: platform);
+        final controller = InAppWebViewController.fromPlatform(
+          platform: platform,
+        );
 
         controller.dispose(isKeepAlive: true);
         controller.dispose(isKeepAlive: false);
 
         expect(platform.disposeCount, 2);
-        expect(platform.lastKeepAlive, isFalse,
-            reason: 'the second (non-keepAlive) call must forward false');
+        expect(
+          platform.lastKeepAlive,
+          isFalse,
+          reason: 'the second (non-keepAlive) call must forward false',
+        );
+      },
+    );
+
+    test(
+      'U9b: a repeated plain dispose() after release is a no-op (FR-008 idempotent)',
+      () {
+        final platform = _FakePlatformController();
+        final controller = InAppWebViewController.fromPlatform(
+          platform: platform,
+        );
+
+        controller.dispose();
+        controller.dispose();
+
+        expect(
+          platform.disposeCount,
+          1,
+          reason: 'a double plain dispose must not re-reach the platform',
+        );
+      },
+    );
+
+    test(
+      'U9c: a repeated dispose(isKeepAlive: true) while keepAlive is held is a no-op (idempotent)',
+      () {
+        final platform = _FakePlatformController();
+        final controller = InAppWebViewController.fromPlatform(
+          platform: platform,
+        );
+
+        controller.dispose(isKeepAlive: true);
+        controller.dispose(isKeepAlive: true);
+
+        expect(
+          platform.disposeCount,
+          1,
+          reason:
+              'an identical keepAlive repeat must not re-reach the platform',
+        );
+      },
+    );
+
+    test(
+      'U9d: after a plain dispose fully released, a later keepAlive dispose is a no-op',
+      () {
+        final platform = _FakePlatformController();
+        final controller = InAppWebViewController.fromPlatform(
+          platform: platform,
+        );
+
+        controller.dispose();
+        controller.dispose(isKeepAlive: true);
+
+        expect(
+          platform.disposeCount,
+          1,
+          reason: 'released is terminal: the native view cannot be re-retained',
+        );
       },
     );
 
@@ -101,8 +162,11 @@ void main() {
         webView.dispose(isKeepAlive: false);
 
         expect(platform.disposeCount, 2);
-        expect(platform.lastKeepAlive, isFalse,
-            reason: 'the second (non-keepAlive) call must forward false');
+        expect(
+          platform.lastKeepAlive,
+          isFalse,
+          reason: 'the second (non-keepAlive) call must forward false',
+        );
       },
     );
   });

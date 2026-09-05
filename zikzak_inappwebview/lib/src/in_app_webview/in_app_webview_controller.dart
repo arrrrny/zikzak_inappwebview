@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
+import '../dispose_lifecycle.dart';
 import '../web_message/main.dart';
 import '../web_storage/web_storage.dart';
 
@@ -578,21 +579,36 @@ class InAppWebViewController implements Disposable {
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getViewId}
   dynamic getViewId() => platform.getViewId();
 
-  bool _disposed = false;
+  /// KeepAlive-aware disposal lifecycle (bug #295); see [dispose].
+  DisposeLifecycle _lifecycle = DisposeLifecycle.notDisposed;
 
   /// Indicates if this controller has been disposed.
   ///
-  /// Becomes `true` after the first call to [dispose]; subsequent calls are
-  /// no-ops, which prevents double-dispose crashes.
-  bool get disposed => _disposed;
+  /// `true` once [dispose] has been called at least once, including a
+  /// keepAlive dispose (native view retained). Identical dispose repeats are
+  /// no-ops, which prevents double-dispose crashes; a keepAlive dispose is
+  /// fully completed by a later plain `dispose()` (bug #295, FR-007).
+  bool get disposed => _lifecycle != DisposeLifecycle.notDisposed;
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.dispose}
+  ///
+  /// KeepAlive-aware disposal guard (bug #295): disposal is a three-state
+  /// lifecycle ([DisposeLifecycle.notDisposed] / [DisposeLifecycle.keepAliveHeld]
+  /// / [DisposeLifecycle.released]). `dispose(isKeepAlive: true)` records
+  /// [DisposeLifecycle.keepAliveHeld] — the native view is retained — so a
+  /// later plain `dispose()` still forwards `isKeepAlive: false` to the
+  /// platform and fully releases the retained native view (FR-007). Only
+  /// identical repeats are no-ops: a repeat keepAlive dispose, and any
+  /// dispose once fully released (FR-008).
   @override
   void dispose({bool isKeepAlive = false}) {
-    if (_disposed) {
+    if (_lifecycle == DisposeLifecycle.released ||
+        (_lifecycle == DisposeLifecycle.keepAliveHeld && isKeepAlive)) {
       return;
     }
-    _disposed = true;
+    _lifecycle = isKeepAlive
+        ? DisposeLifecycle.keepAliveHeld
+        : DisposeLifecycle.released;
     platform.dispose(isKeepAlive: isKeepAlive);
   }
 }
