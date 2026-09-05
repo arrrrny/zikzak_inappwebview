@@ -16,7 +16,8 @@ class SettingsController {
   const SettingsController(this._controller);
 
   ///The current settings of the WebView.
-  Future<InAppWebViewSettings?> getSettings() => _controller.platform.getSettings();
+  Future<InAppWebViewSettings?> getSettings() =>
+      _controller.platform.getSettings();
 
   ///Updates the WebView with the given [settings].
   Future<void> setSettings({required InAppWebViewSettings settings}) =>

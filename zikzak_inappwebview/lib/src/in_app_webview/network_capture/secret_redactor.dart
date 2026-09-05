@@ -56,17 +56,14 @@ WebUri _redactUrl(WebUri url) {
 ///string, leaving keys and non-secret params intact (A15, source-level).
 String _redactFormBody(String body) {
   if (body.isEmpty) return body;
-  return body.replaceAllMapped(
-    RegExp(r'(^|&)([^=&]+)=([^&]*)'),
-    (m) {
-      final key = m.group(2)!;
-      final value = m.group(3)!;
-      if (_isRedactableParam(key)) {
-        return '${m.group(1)}${key}=${kRedactionMarker}';
-      }
-      return m.group(0)!;
-    },
-  );
+  return body.replaceAllMapped(RegExp(r'(^|&)([^=&]+)=([^&]*)'), (m) {
+    final key = m.group(2)!;
+    final value = m.group(3)!;
+    if (_isRedactableParam(key)) {
+      return '${m.group(1)}${key}=${kRedactionMarker}';
+    }
+    return m.group(0)!;
+  });
 }
 
 ///Redacts auth-shaped secrets from a captured [NetworkRequest] before any

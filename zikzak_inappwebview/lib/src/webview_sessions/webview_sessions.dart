@@ -93,7 +93,8 @@ class WebViewSessions {
     Future<Object?> Function(String source)? evaluateJavascript,
   }) async {
     final evaluate =
-        evaluateJavascript ?? _injectedEvaluator ??
+        evaluateJavascript ??
+        _injectedEvaluator ??
         (source) => controller!.evaluateJavascript(source: source);
     final now = _clock().millisecondsSinceEpoch;
     final cookies = await _cookies.getCookies(url: url);
@@ -137,7 +138,8 @@ class WebViewSessions {
     Future<Object?> Function(String source)? evaluateJavascript,
   }) async {
     final evaluate =
-        evaluateJavascript ?? _injectedEvaluator ??
+        evaluateJavascript ??
+        _injectedEvaluator ??
         (source) => controller!.evaluateJavascript(source: source);
     final session = await port.load(sessionId);
     if (session == null) return false;
@@ -210,8 +212,7 @@ class WebViewSessions {
   static Future<List<({String key, String value})>> harvestLocalStorage(
     Future<Object?> Function(String source) evaluate,
   ) async {
-    final dynamic raw =
-        await evaluate('JSON.stringify(window.localStorage)');
+    final dynamic raw = await evaluate('JSON.stringify(window.localStorage)');
     if (raw is! String || raw.isEmpty) return const [];
     final Object? decoded;
     try {

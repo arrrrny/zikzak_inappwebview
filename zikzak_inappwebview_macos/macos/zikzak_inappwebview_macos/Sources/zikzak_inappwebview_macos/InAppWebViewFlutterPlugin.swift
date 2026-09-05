@@ -7,17 +7,18 @@ public class InAppWebViewFlutterPlugin: NSObject, FlutterPlugin {
     var myCookieManager: MyCookieManager?
     var credentialDatabase: CredentialDatabase?
     var printJobManager: PrintJobManager?
+    var proxyManager: Any?
     var registrar: FlutterPluginRegistrar?
-    
+
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "dev.zuzu/zikzak_inappwebview", binaryMessenger: registrar.messenger)
         let instance = InAppWebViewFlutterPlugin()
         instance.registrar = registrar
         registrar.addMethodCallDelegate(instance, channel: channel)
-        
+
         let factory = InAppWebViewFactory(registrar: registrar, plugin: instance)
         registrar.register(factory, withId: "dev.zuzu/zikzak_inappwebview")
-        
+
         instance.headlessInAppWebViewManager = HeadlessInAppWebViewManager(registrar: registrar)
         instance.inAppBrowserManager = InAppBrowserManager(registrar: registrar)
         instance.myCookieManager = MyCookieManager(registrar: registrar)
@@ -27,6 +28,9 @@ public class InAppWebViewFlutterPlugin: NSObject, FlutterPlugin {
         MyCookieManager.headlessManager = instance.headlessInAppWebViewManager
         instance.credentialDatabase = CredentialDatabase(plugin: instance)
         instance.printJobManager = PrintJobManager(plugin: instance)
+        if #available(macOS 14.0, *) {
+            instance.proxyManager = ProxyManager(plugin: instance)
+        }
     }
 
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -41,5 +45,9 @@ public class InAppWebViewFlutterPlugin: NSObject, FlutterPlugin {
         credentialDatabase = nil
         printJobManager?.dispose()
         printJobManager = nil
+        if #available(macOS 14.0, *) {
+            (proxyManager as? ProxyManager)?.dispose()
+        }
+        proxyManager = nil
     }
 }

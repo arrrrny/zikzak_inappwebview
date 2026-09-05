@@ -82,7 +82,7 @@ abstract class PlatformProxyController extends PlatformInterface
   ///Clears the proxy settings.
   ///Network connections are not guaranteed to immediately use the new proxy setting; wait for the method to return before loading a page.
   ///{@endtemplate}
-  Future<void> clearProxyOverride() {
+  Future<void> clearProxyOverride({String? profileId}) {
     throw UnimplementedError(
       'clearProxyOverride is not implemented on the current platform',
     );
@@ -98,7 +98,15 @@ class ProxySettings {
   AndroidProxySettings? androidProxySettings;
   IOSProxySettings? iOSProxySettings;
 
-  ProxySettings({this.androidProxySettings, this.iOSProxySettings});
+  /// Optional profile identifier — when set, the proxy is stored per-profile
+  /// and applied to the WKWebsiteDataStore with that persistent identifier.
+  String? profileId;
+
+  ProxySettings({
+    this.androidProxySettings,
+    this.iOSProxySettings,
+    this.profileId,
+  });
 }
 
 @Zorphy(

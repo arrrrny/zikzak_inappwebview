@@ -47,7 +47,9 @@ class JavaScriptController {
   ///Injects a JavaScript file from the app assets into the page.
   Future<dynamic> injectJavascriptFileFromAsset({
     required String assetFilePath,
-  }) => _controller.platform.injectJavascriptFileFromAsset(assetFilePath: assetFilePath);
+  }) => _controller.platform.injectJavascriptFileFromAsset(
+    assetFilePath: assetFilePath,
+  );
 
   ///Registers a JavaScript handler with the given [handlerName].
   void addJavaScriptHandler({
@@ -88,7 +90,8 @@ class JavaScriptController {
       _controller.platform.removeUserScriptsByGroupName(groupName: groupName);
 
   ///Removes all user scripts.
-  Future<void> removeAllUserScripts() => _controller.platform.removeAllUserScripts();
+  Future<void> removeAllUserScripts() =>
+      _controller.platform.removeAllUserScripts();
 
   ///Whether the given [userScript] is currently injected.
   bool hasUserScript({required UserScript userScript}) =>

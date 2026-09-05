@@ -67,7 +67,7 @@ private func persistentUUID(from identifier: String) -> UUID? {
     return nil
 }
 
-public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler, WKUIDelegate, NSMenuDelegate {
+public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler, DefensivelyDeserializedScriptMessageHandling, WKUIDelegate, NSMenuDelegate {
     var channel: FlutterMethodChannel!
     var registrar: FlutterPluginRegistrar? = nil
     var plugin: InAppWebViewFlutterPlugin?
@@ -206,7 +206,13 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                    let id = settingsMap["persistentStoreIdentifier"] as? String,
                    !id.isEmpty,
                    let uuid = persistentUUID(from: id) {
-                    configuration.websiteDataStore = WKWebsiteDataStore(forIdentifier: uuid)
+                    let store = WKWebsiteDataStore(forIdentifier: uuid)
+                    // Apply the per-profile proxy (if any) to this custom
+                    // data store — the Dart ProxyController sets it on the
+                    // default store, but WebViews with a persistent identifier
+                    // use a custom store that misses the proxy otherwise.
+                    ProxyManager.applyProxy(forIdentifier: id, to: store)
+                    configuration.websiteDataStore = store
                 } else if let incognito = settingsMap["incognito"] as? Bool,
                           incognito {
                     configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
@@ -2306,10 +2312,39 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         }
     }
 
-    public func userContentController(
+    // Internal fallback for direct registration. Every zikzak macOS handler is
+    // registered via WeakScriptMessageHandler, which calls the sanitized variant
+    // below after defensively deserializing the body (#309).
+    func userContentController(
         _ userContentController: WKUserContentController, didReceive message: WKScriptMessage
     ) {
-        if message.name == "consoleHandler", let body = message.body as? [String: Any] {
+        let (sanitizedBody, deserializationError) = WeakScriptMessageHandler.defensivelyDeserializeBody(of: message)
+        self.userContentController(
+            userContentController, didReceive: message,
+            sanitizedBody: sanitizedBody, deserializationError: deserializationError)
+    }
+
+    /// #309 — the only body-consuming entry point on macOS. The body arrives
+    /// already deserialized defensively by `WeakScriptMessageHandler`:
+    /// - an ObjC exception boundary contained any WebKit deserialization
+    ///   exception (`deserializationError != nil`), reported to Dart as a
+    ///   normal string error below;
+    /// - non-cloneable values were converted to their string representation,
+    ///   so the Flutter standard message codec can always encode the payload.
+    public func userContentController(
+        _ userContentController: WKUserContentController,
+        didReceive message: WKScriptMessage,
+        sanitizedBody: Any,
+        deserializationError: String?
+    ) {
+        if let deserializationError = deserializationError {
+            // #309 — report as a normal string error instead of crashing.
+            channel?.invokeMethod("onConsoleMessage", arguments: [
+                "message": "[ZikzakInAppWebView] \(deserializationError)",
+                "messageLevel": 3,  // ERROR
+            ])
+        }
+        if message.name == "consoleHandler", let body = sanitizedBody as? [String: Any] {
             var arguments: [String: Any] = [:]
             arguments["message"] = (body["message"] as? String) ?? ""
 
@@ -2333,7 +2368,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             arguments["messageLevel"] = level
             channel?.invokeMethod("onConsoleMessage", arguments: arguments)
         } else if message.name == "callHandler",
-            let bodyString = message.body as? String,
+            let bodyString = sanitizedBody as? String,
             let bodyData = bodyString.data(using: .utf8),
             let body = try? JSONSerialization.jsonObject(with: bodyData) as? [String: Any]
         {
@@ -2410,11 +2445,11 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                         """, completionHandler: nil)
                 }
             }
-        } else if message.name == "onFindResultReceived", let body = message.body as? [String: Any]
+        } else if message.name == "onFindResultReceived", let body = sanitizedBody as? [String: Any]
         {
             findInteractionChannel?.invokeMethod("onFindResultReceived", arguments: body)
         } else if message.name == "onWebMessagePortMessageReceived",
-            let body = message.body as? [String: Any],
+            let body = sanitizedBody as? [String: Any],
             let webMessageChannelId = body["webMessageChannelId"] as? String,
             let index = body["index"] as? Int64
         {
@@ -2434,7 +2469,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 wmc.channelDelegate?.onMessage(message: webMessage, index: index)
             }
         } else if message.name == "onWebMessageListenerPostMessageReceived",
-            let body = message.body as? [String: Any],
+            let body = sanitizedBody as? [String: Any],
             let jsObjectName = body["jsObjectName"] as? String
         {
             // WebMessageListener page→Dart message (#197).
@@ -2455,7 +2490,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                     break
                 }
             }
-        } else if message.name == "onScrollChangedReceived", let body = message.body as? [String: Any] {
+        } else if message.name == "onScrollChangedReceived", let body = sanitizedBody as? [String: Any] {
             // onScrollChanged / onContentSizeChanged / onOverScrolled (#197).
             let x = body["x"] as? Int ?? 0
             let y = body["y"] as? Int ?? 0

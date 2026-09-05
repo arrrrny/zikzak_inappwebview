@@ -1,0 +1,1 @@
+../../.specify/extensions/chore/.specify-dev/agent-commands/opencode/speckit.chore.issue.md
