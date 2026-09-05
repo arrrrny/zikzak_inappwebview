@@ -156,6 +156,7 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
     public Boolean stylusHandwritingEnabled = true;
 
     public Boolean dismissDialogues = true;
+    public Boolean consoleLogEnabled = true;
 
     /**
      * Which window insets the WebView should <b>ignore</b> when laying out
@@ -467,6 +468,9 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
                 case "dismissDialogues":
                     dismissDialogues = (Boolean) value;
                     break;
+                case "consoleLogEnabled":
+                    consoleLogEnabled = (Boolean) value;
+                    break;
                 case "insetsForWebContentToIgnore":
                     insetsForWebContentToIgnore = (List<String>) value;
                     break;
@@ -644,6 +648,7 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
         );
         settings.put("stylusHandwritingEnabled", stylusHandwritingEnabled);
         settings.put("dismissDialogues", dismissDialogues);
+        settings.put("consoleLogEnabled", consoleLogEnabled);
         settings.put("insetsForWebContentToIgnore", insetsForWebContentToIgnore);
         return settings;
     }

@@ -119,6 +119,9 @@ class InAppWebViewWebController extends PlatformInAppWebViewController {
   """;
 
   void _injectConsoleInterception() {
+    // Skip console interception when consoleLogEnabled is false.
+    final settings = params.webviewParams?.settings;
+    if (settings != null && settings['consoleLogEnabled'] == false) return;
     try {
       final doc = _iframe.contentDocument;
       if (doc != null) {

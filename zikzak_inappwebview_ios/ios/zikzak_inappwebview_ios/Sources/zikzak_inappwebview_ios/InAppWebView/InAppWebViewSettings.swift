@@ -98,6 +98,7 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     var shouldPrintBackgrounds = false
     var webAuthenticationSupport = 0
     var dismissDialogues = true
+    var consoleLogEnabled = true
 
     override init() {
         super.init()

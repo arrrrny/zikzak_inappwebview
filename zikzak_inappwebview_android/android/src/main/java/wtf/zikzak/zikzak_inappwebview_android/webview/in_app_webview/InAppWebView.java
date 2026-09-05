@@ -956,9 +956,11 @@ public final class InAppWebView
         userContentController.addPluginScript(
             JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT
         );
-        userContentController.addPluginScript(
-            ConsoleLogJS.CONSOLE_LOG_JS_PLUGIN_SCRIPT
-        );
+        if (customSettings.consoleLogEnabled) {
+            userContentController.addPluginScript(
+                ConsoleLogJS.CONSOLE_LOG_JS_PLUGIN_SCRIPT
+            );
+        }
         userContentController.addPluginScript(PrintJS.PRINT_JS_PLUGIN_SCRIPT);
         userContentController.addPluginScript(
             OnWindowBlurEventJS.ON_WINDOW_BLUR_EVENT_JS_PLUGIN_SCRIPT
