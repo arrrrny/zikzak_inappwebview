@@ -271,9 +271,41 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 var originalWarn = console.warn;
                 var originalError = console.error;
 
+                // Sanitize non-cloneable objects (DOMException, etc.) to
+                // prevent WebKit SIGSEGV in CloneDeserializer (#309, #312).
+                // WebKit's SerializedScriptValue crashes on certain native
+                // objects; converting them to strings before postMessage
+                // keeps the bridge safe.
+                function sanitizeForBridge(obj) {
+                    if (obj === null || obj === undefined) return obj;
+                    var t = typeof obj;
+                    if (t === 'string' || t === 'number' || t === 'boolean') return obj;
+                    if (t === 'function') return '[Function]';
+                    if (t === 'symbol') return obj.toString();
+                    if (obj instanceof Error) return obj.toString();
+                    if (obj instanceof DOMException) return obj.toString();
+                    if (obj instanceof RegExp) return obj.toString();
+                    if (obj instanceof Date) return obj.toISOString();
+                    if (typeof Promise !== 'undefined' && obj instanceof Promise) return '[Promise]';
+                    if (typeof WeakMap !== 'undefined' && obj instanceof WeakMap) return '[WeakMap]';
+                    if (typeof WeakSet !== 'undefined' && obj instanceof WeakSet) return '[WeakSet]';
+                    if (Array.isArray(obj)) return obj.map(sanitizeForBridge);
+                    if (t === 'object') {
+                        try {
+                            var sanitized = {};
+                            var keys = Object.keys(obj);
+                            for (var i = 0; i < keys.length; i++) {
+                                try { sanitized[keys[i]] = sanitizeForBridge(obj[keys[i]]); } catch(_) {}
+                            }
+                            return sanitized;
+                        } catch(_) { return String(obj); }
+                    }
+                    return String(obj);
+                }
+
                 function log(level, message) {
                     window.webkit.messageHandlers.consoleHandler.postMessage({
-                        "message": message,
+                        "message": sanitizeForBridge(message),
                         "messageLevel": level
                     });
                 }
