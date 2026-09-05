@@ -1,3 +1,14 @@
+## 5.3.3 - 2026-09-05
+
+### Bug Fixes
+
+- [macOS] Sanitize non-cloneable objects (DOMException, Error, RegExp, Promise, etc.) in console bridge JS before postMessage — prevents WebKit SIGSEGV on multi-tab same-profile navigation (#309, #312)
+- [macOS] Restore `userContentController` public access to satisfy WKScriptMessageHandler protocol conformance (#314)
+
+### Features
+
+- Add `consoleLogEnabled` setting (default `true`) — when `false`, the console override script is not injected and console.log/error/warn messages are NOT forwarded to Dart. Wired on all 4 platforms that intercept console: macOS, iOS, Android, Web
+
 ## 5.3.2 - 2026-09-05
 
 ### Bug Fixes
