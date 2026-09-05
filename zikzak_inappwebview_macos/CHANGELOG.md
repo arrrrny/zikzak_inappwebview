@@ -1,3 +1,15 @@
+## 5.3.1 - 2026-09-05
+
+
+### Bug Fixes
+
+- [macOS] Restore public access on `userContentController(_:didReceive:)` to satisfy `WKScriptMessageHandler` protocol conformance — fixes build breakage in 5.3.0 (#312, #313)
+## 5.3.1 - 2026-09-05
+
+### Bug Fixes
+
+- [macOS] Restore public access on `userContentController(_:didReceive:)` to satisfy `WKScriptMessageHandler` protocol conformance — fixes build breakage in 5.3.0 (#312, #313)
+
 ## 5.3.0 - 2026-09-05
 
 
