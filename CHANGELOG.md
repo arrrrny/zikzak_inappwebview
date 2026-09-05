@@ -1,3 +1,9 @@
+## 5.3.2 - 2026-09-05
+
+### Bug Fixes
+
+- [Windows] Add missing `kDebugMode` import — fixes build error in 5.3.1 (#315)
+
 ## 5.3.1 - 2026-09-05
 
 ### Bug Fixes
