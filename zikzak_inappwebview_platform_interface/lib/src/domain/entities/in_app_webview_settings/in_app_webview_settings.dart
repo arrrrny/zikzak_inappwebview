@@ -993,6 +993,15 @@ abstract class $InAppWebViewSettings {
   @JsonKey(defaultValue: false)
   bool? get dismissDialogues;
 
+  ///When `false`, the console override script is not injected and
+  ///console.log/error/warn messages are NOT forwarded to Dart.
+  ///Set to `false` in apps that don't need console messages to reduce
+  ///bridge traffic and avoid WebKit SIGSEGV on non-cloneable objects.
+  ///
+  ///The default value is `true`.
+  @JsonKey(defaultValue: true)
+  bool? get consoleLogEnabled;
+
   ///Which window insets the Android WebView should **ignore** when laying out
   ///web content, so that content can render edge-to-edge behind the status bar,
   ///navigation bar, IME (keyboard), display cutout and/or system-gesture areas.

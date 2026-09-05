@@ -307,9 +307,7 @@ InAppWebViewSettings _$InAppWebViewSettingsFromJson(
       'rendererPriorityPolicy',
       (v) => v == null
           ? null
-          : RendererPriorityPolicy.fromJson(
-              Map<String, dynamic>.from(v as Map),
-            ),
+          : RendererPriorityPolicy.fromJson(v as Map<String, dynamic>),
     ),
     disableDefaultErrorPage: $checkedConvert(
       'disableDefaultErrorPage',
@@ -538,7 +536,7 @@ InAppWebViewSettings _$InAppWebViewSettingsFromJson(
       'webViewAssetLoader',
       (v) => v == null
           ? null
-          : WebViewAssetLoader.fromJson(Map<String, dynamic>.from(v as Map)),
+          : WebViewAssetLoader.fromJson(v as Map<String, dynamic>),
     ),
     iframeAllow: $checkedConvert('iframeAllow', (v) => v as String?),
     iframeAllowFullscreen: $checkedConvert(
@@ -558,6 +556,10 @@ InAppWebViewSettings _$InAppWebViewSettingsFromJson(
     dismissDialogues: $checkedConvert(
       'dismissDialogues',
       (v) => v as bool? ?? false,
+    ),
+    consoleLogEnabled: $checkedConvert(
+      'consoleLogEnabled',
+      (v) => v as bool? ?? true,
     ),
     insetsForWebContentToIgnore: $checkedConvert(
       'insetsForWebContentToIgnore',
@@ -779,6 +781,7 @@ Map<String, dynamic> _$InAppWebViewSettingsToJson(
   'iframeName': instance.iframeName,
   'iframeCsp': instance.iframeCsp,
   'dismissDialogues': instance.dismissDialogues,
+  'consoleLogEnabled': instance.consoleLogEnabled,
   'insetsForWebContentToIgnore': _insetsToJson(
     instance.insetsForWebContentToIgnore,
   ),

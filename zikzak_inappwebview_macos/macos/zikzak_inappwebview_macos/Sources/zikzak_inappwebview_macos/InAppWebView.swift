@@ -316,9 +316,15 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 console.error = function(message) { log("ERROR", message); if (originalError) originalError.call(console, message); };
             })();
             """
-        let userScript = WKUserScript(
-            source: consoleOverrideScript, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-        userContentController.addUserScript(userScript)
+        // Only inject the console override when consoleLogEnabled is true
+        // (default). Setting it to false stops all console.log/error/warn
+        // forwarding to Dart, reducing bridge traffic and eliminating the
+        // WebKit SIGSEGV vector on non-cloneable objects (#309, #312).
+        if settings?.consoleLogEnabled ?? true {
+            let userScript = WKUserScript(
+                source: consoleOverrideScript, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+            userContentController.addUserScript(userScript)
+        }
 
         let bridgeScript = WKUserScript(
             source: JAVASCRIPT_BRIDGE_JS_SOURCE, injectionTime: .atDocumentStart,

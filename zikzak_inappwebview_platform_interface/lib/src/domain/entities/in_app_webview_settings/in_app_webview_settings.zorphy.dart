@@ -152,6 +152,7 @@ class InAppWebViewSettings {
     String? this.iframeName,
     String? this.iframeCsp,
     bool? dismissDialogues,
+    bool? consoleLogEnabled,
     List<AndroidWebViewInsets>? this.insetsForWebContentToIgnore,
     bool? this.useNetworkCapture,
     int? networkCaptureMaxBodySize,
@@ -286,6 +287,7 @@ class InAppWebViewSettings {
        this.shouldPrintBackgrounds = shouldPrintBackgrounds ?? false,
        this.allowBackgroundAudioPlaying = allowBackgroundAudioPlaying ?? false,
        this.dismissDialogues = dismissDialogues ?? false,
+       this.consoleLogEnabled = consoleLogEnabled ?? true,
        this.networkCaptureMaxBodySize = networkCaptureMaxBodySize ?? 50000,
        this.networkCaptureBodies = networkCaptureBodies ?? true,
        this.networkCaptureBinaryBodies = networkCaptureBinaryBodies ?? false,
@@ -740,6 +742,9 @@ class InAppWebViewSettings {
   @JsonKey(defaultValue: false)
   final bool? dismissDialogues;
 
+  @JsonKey(defaultValue: true)
+  final bool? consoleLogEnabled;
+
   @JsonKey(toJson: _insetsToJson, fromJson: _insetsFromJson)
   final List<AndroidWebViewInsets>? insetsForWebContentToIgnore;
 
@@ -911,6 +916,7 @@ class InAppWebViewSettings {
     String? iframeName,
     String? iframeCsp,
     bool? dismissDialogues,
+    bool? consoleLogEnabled,
     List<AndroidWebViewInsets>? insetsForWebContentToIgnore,
     bool? useNetworkCapture,
     int? networkCaptureMaxBodySize,
@@ -1146,6 +1152,7 @@ class InAppWebViewSettings {
       iframeName: iframeName ?? this.iframeName,
       iframeCsp: iframeCsp ?? this.iframeCsp,
       dismissDialogues: dismissDialogues ?? this.dismissDialogues,
+      consoleLogEnabled: consoleLogEnabled ?? this.consoleLogEnabled,
       insetsForWebContentToIgnore:
           insetsForWebContentToIgnore ?? this.insetsForWebContentToIgnore,
       useNetworkCapture: useNetworkCapture ?? this.useNetworkCapture,
@@ -1308,6 +1315,7 @@ class InAppWebViewSettings {
     String? iframeName,
     String? iframeCsp,
     bool? dismissDialogues,
+    bool? consoleLogEnabled,
     List<AndroidWebViewInsets>? insetsForWebContentToIgnore,
     bool? useNetworkCapture,
     int? networkCaptureMaxBodySize,
@@ -1464,6 +1472,7 @@ class InAppWebViewSettings {
       iframeName: iframeName,
       iframeCsp: iframeCsp,
       dismissDialogues: dismissDialogues,
+      consoleLogEnabled: consoleLogEnabled,
       insetsForWebContentToIgnore: insetsForWebContentToIgnore,
       useNetworkCapture: useNetworkCapture,
       networkCaptureMaxBodySize: networkCaptureMaxBodySize,
@@ -3607,6 +3616,19 @@ class InAppWebViewSettings {
                     : _patchMap[InAppWebViewSettings$.dismissDialogues])
                 as bool?
           : this.dismissDialogues,
+      consoleLogEnabled:
+          _patchMap.containsKey(InAppWebViewSettings$.consoleLogEnabled)
+          ? ((_patchMap[InAppWebViewSettings$.consoleLogEnabled] is Function)
+                    ? _patchMap[InAppWebViewSettings$.consoleLogEnabled](
+                        this.consoleLogEnabled,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.consoleLogEnabled]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.consoleLogEnabled]
+                          .applyTo(this.consoleLogEnabled)
+                    : _patchMap[InAppWebViewSettings$.consoleLogEnabled])
+                as bool?
+          : this.consoleLogEnabled,
       insetsForWebContentToIgnore:
           _patchMap.containsKey(
             InAppWebViewSettings$.insetsForWebContentToIgnore,
@@ -3941,6 +3963,7 @@ class InAppWebViewSettings {
         iframeName == other.iframeName &&
         iframeCsp == other.iframeCsp &&
         dismissDialogues == other.dismissDialogues &&
+        consoleLogEnabled == other.consoleLogEnabled &&
         insetsForWebContentToIgnore == other.insetsForWebContentToIgnore &&
         useNetworkCapture == other.useNetworkCapture &&
         networkCaptureMaxBodySize == other.networkCaptureMaxBodySize &&
@@ -4111,6 +4134,7 @@ class InAppWebViewSettings {
         ) ^
         Object.hash(
           this.dismissDialogues,
+          this.consoleLogEnabled,
           this.insetsForWebContentToIgnore,
           this.useNetworkCapture,
           this.networkCaptureMaxBodySize,
@@ -4408,6 +4432,8 @@ class InAppWebViewSettings {
         'iframeCsp: ${iframeCsp}' +
         ', ' +
         'dismissDialogues: ${dismissDialogues}' +
+        ', ' +
+        'consoleLogEnabled: ${consoleLogEnabled}' +
         ', ' +
         'insetsForWebContentToIgnore: ${insetsForWebContentToIgnore}' +
         ', ' +
@@ -6589,6 +6615,19 @@ extension InAppWebViewSettingsPropertyHelpers on InAppWebViewSettings {
         (throw StateError('dismissDialogues is required but was null'));
   }
 
+  bool get hasConsoleLogEnabled {
+    return this.consoleLogEnabled != null;
+  }
+
+  bool get noConsoleLogEnabled {
+    return this.consoleLogEnabled == null;
+  }
+
+  bool get consoleLogEnabledRequired {
+    return this.consoleLogEnabled ??
+        (throw StateError('consoleLogEnabled is required but was null'));
+  }
+
   List<AndroidWebViewInsets> get insetsForWebContentToIgnoreRequired {
     return this.insetsForWebContentToIgnore ??
         (throw StateError(
@@ -6880,6 +6919,7 @@ enum InAppWebViewSettings$ {
   iframeName,
   iframeCsp,
   dismissDialogues,
+  consoleLogEnabled,
   insetsForWebContentToIgnore,
   useNetworkCapture,
   networkCaptureMaxBodySize,
@@ -7672,6 +7712,11 @@ class InAppWebViewSettingsPatch
 
   InAppWebViewSettingsPatch withDismissDialogues(bool? value) {
     patchMap[InAppWebViewSettings$.dismissDialogues] = value;
+    return this;
+  }
+
+  InAppWebViewSettingsPatch withConsoleLogEnabled(bool? value) {
+    patchMap[InAppWebViewSettings$.consoleLogEnabled] = value;
     return this;
   }
 
@@ -8482,6 +8527,11 @@ abstract final class InAppWebViewSettingsFields {
     _$dismissDialogues,
   );
 
+  static const consoleLogEnabled = Field<InAppWebViewSettings, bool?>(
+    'consoleLogEnabled',
+    _$consoleLogEnabled,
+  );
+
   static const insetsForWebContentToIgnore =
       Field<InAppWebViewSettings, List<AndroidWebViewInsets>?>(
         'insetsForWebContentToIgnore',
@@ -9119,6 +9169,10 @@ abstract final class InAppWebViewSettingsFields {
 
   static bool? _$dismissDialogues(InAppWebViewSettings e) {
     return e.dismissDialogues;
+  }
+
+  static bool? _$consoleLogEnabled(InAppWebViewSettings e) {
+    return e.consoleLogEnabled;
   }
 
   static List<AndroidWebViewInsets>? _$insetsForWebContentToIgnore(
@@ -9790,6 +9844,10 @@ extension InAppWebViewSettingsCompareE on InAppWebViewSettings {
 
     if (dismissDialogues != other.dismissDialogues) {
       diff['dismissDialogues'] = () => other.dismissDialogues;
+    }
+
+    if (consoleLogEnabled != other.consoleLogEnabled) {
+      diff['consoleLogEnabled'] = () => other.consoleLogEnabled;
     }
 
     if (insetsForWebContentToIgnore != other.insetsForWebContentToIgnore) {

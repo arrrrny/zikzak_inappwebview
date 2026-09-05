@@ -68,6 +68,12 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     var shouldPrintBackgrounds = false
     var webAuthenticationSupport = 0
     var dismissDialogues = true
+    /// When `false`, the console override script is not injected and
+    /// console.log/error/warn messages are NOT forwarded to Dart.
+    /// Set to `false` in apps that don't need console messages (e.g.
+    /// zuraffa_browser) to reduce bridge traffic and avoid the
+    /// WebKit SIGSEGV on non-cloneable objects (#309, #312).
+    var consoleLogEnabled = true
 
     override init() {
         super.init()
