@@ -1,3 +1,17 @@
+## 5.3.0 - 2026-09-05
+
+
+### Features
+
+- [Windows] WebView2 environment reuse is now observable and regression-tested (#300, #303)
+- [Windows] Enforce callback ordering and dispose safety for load events (#301, #304)
+## 5.3.0 - 2026-09-05
+
+### Features
+
+- [Windows] WebView2 environment reuse is now observable and regression-tested (#300, #303)
+- [Windows] Enforce callback ordering and dispose safety for load events (#301, #304)
+
 ## 5.2.1 - 2026-09-05
 
 
