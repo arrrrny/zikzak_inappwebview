@@ -1,9 +1,93 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/services.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 import 'package:zikzak_inappwebview_windows/src/in_app_webview_windows_platform.dart';
 
 void main() {
   const defaultFolder = '/tmp/default-zikzak-webview2-data';
+
+  group('WebView2 environment initialization', () {
+    test('recognizes an already initialized environment', () {
+      expect(
+        isEnvironmentAlreadyInitializedError(
+          PlatformException(code: 'environment_already_initialized'),
+        ),
+        isTrue,
+      );
+    });
+
+    test('does not swallow unrelated platform errors', () {
+      expect(
+        isEnvironmentAlreadyInitializedError(
+          PlatformException(code: 'other_error'),
+        ),
+        isFalse,
+      );
+    });
+
+    test('does not match non-PlatformException errors', () {
+      expect(isEnvironmentAlreadyInitializedError(StateError('boom')), isFalse);
+    });
+  });
+
+  group('ensureWebView2Environment (reuse wiring)', () {
+    const pluginChannel = MethodChannel('io.jns.webview.win');
+
+    tearDown(() {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(pluginChannel, null);
+    });
+
+    test('completes silently when the environment is already initialized '
+        '(reuse path)', () async {
+      TestWidgetsFlutterBinding.ensureInitialized();
+      var initializeCalls = 0;
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(pluginChannel, (call) async {
+            if (call.method == 'initializeEnvironment') {
+              initializeCalls++;
+              throw PlatformException(code: 'environment_already_initialized');
+            }
+            return null;
+          });
+
+      await ensureWebView2Environment(
+        const WebViewEnvironmentInitArgs(userDataPath: '/tmp/reuse-test'),
+      );
+
+      expect(
+        initializeCalls,
+        1,
+        reason:
+            'the upstream initializeEnvironment must still be attempted '
+            'exactly once before the reuse decision',
+      );
+    });
+
+    test('rethrows unrelated platform errors', () async {
+      TestWidgetsFlutterBinding.ensureInitialized();
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(pluginChannel, (call) async {
+            if (call.method == 'initializeEnvironment') {
+              throw PlatformException(code: 'environment_creation_failed');
+            }
+            return null;
+          });
+
+      await expectLater(
+        ensureWebView2Environment(
+          const WebViewEnvironmentInitArgs(userDataPath: '/tmp/rethrow-test'),
+        ),
+        throwsA(
+          isA<PlatformException>().having(
+            (e) => e.code,
+            'code',
+            'environment_creation_failed',
+          ),
+        ),
+      );
+    });
+  });
 
   group('resolveEnvironmentInitArgs', () {
     group('issue #178 regression — additionalBrowserArguments', () {
@@ -20,7 +104,8 @@ void main() {
           // `WebViewEnvironmentInitArgs.additionalArguments` so the
           // caller can forward it to
           // `WebviewController.initializeEnvironment(additionalArguments:)`.
-          const args = '--disable-web-security '
+          const args =
+              '--disable-web-security '
               '--allow-running-insecure-content '
               '--use-fake-ui-for-media-stream '
               '--use-fake-device-for-media-stream';
@@ -100,20 +185,23 @@ void main() {
       expect(resolved.additionalArguments, isNull);
     });
 
-    test('defaultUserDataFolder is NOT invoked when settings.userDataFolder is set', () {
-      var defaultInvoked = 0;
-      resolveEnvironmentInitArgs(
-        settings: WebViewEnvironmentSettings(
-          userDataFolder: '/tmp/explicit',
-          additionalBrowserArguments: '--disable-web-security',
-        ),
-        defaultUserDataFolder: () {
-          defaultInvoked++;
-          return defaultFolder;
-        },
-      );
+    test(
+      'defaultUserDataFolder is NOT invoked when settings.userDataFolder is set',
+      () {
+        var defaultInvoked = 0;
+        resolveEnvironmentInitArgs(
+          settings: WebViewEnvironmentSettings(
+            userDataFolder: '/tmp/explicit',
+            additionalBrowserArguments: '--disable-web-security',
+          ),
+          defaultUserDataFolder: () {
+            defaultInvoked++;
+            return defaultFolder;
+          },
+        );
 
-      expect(defaultInvoked, 0);
-    });
+        expect(defaultInvoked, 0);
+      },
+    );
   });
 }

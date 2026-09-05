@@ -26,10 +26,7 @@ void main() {
 
       // takeScreenshot on Windows is a stub: it must complete and return null
       // rather than throw (regression guard against issue #177-style gaps).
-      await expectLater(
-        controller.takeScreenshot(),
-        completion(isNull),
-      );
+      await expectLater(controller.takeScreenshot(), completion(isNull));
     });
   });
 }
