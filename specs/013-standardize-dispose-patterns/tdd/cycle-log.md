@@ -268,3 +268,13 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
 - A7 (keepAlive retains native view) is device-only: native-view retention is platform behavior not observable at the wrapper level with a fake platform, and no `integration_test/` harness exists. Left PENDING (not a unit-testable behavior), reported as such.
 - class: RECONCILIATION (acceptance rows closed by mapping to existing DONE unit tests) + ESCAPE_HATCH (U5/A8 conflict).
 - commit: not committed (working tree left dirty per `--no-commit` default).
+## Cycle 16 — U5/A8 unblocked via bug #295 fix (three-state guard)
+
+- scope: the BLOCKED conflict recorded in Cycle 15 (U5/A8 vs FR-008 U3/U6) was promoted to bug #295 and resolved by the keepAlive-aware three-state guard in commit a0c22131, not by weakening FR-008.
+- red: U5 (new) and U9 (existing, regressed by the #227 controller guard) both failed on the pre-fix tree with `Expected: <2> / Actual: <1>` — the plain release dispose never reached the platform.
+- green: `DisposeLifecycle` (notDisposed / keepAliveHeld / released) replaces the single boolean in HeadlessInAppWebView, InAppWebViewController, and InAppLocalhostServer; only identical repeats are no-ops. Umbrella 245 passed / 2 failed (both pre-existing on master 8c6c13f7); dispose suites 21/21.
+- refactor: InAppWebView widget path intentionally left unguarded (forwards directly, consistent keepAlive behavior per U11/U12).
+- test-list: U5 and A8 moved BLOCKED -> DONE with resolution notes.
+- full audit: .specify/bugs/keepalive-dispose-release-gap/tdd/verification.md (PASS_WITH_GAPS; 4 deliberate mutants, 0 survivors).
+- class: BUGFIX (ESCAPE_HATCH resolution).
+- commit: a0c22131 (fix + tests), docs commit follows.
