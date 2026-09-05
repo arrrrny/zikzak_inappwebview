@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+
+# Cancel in-progress runs for the same branch/PR.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    name: "analyze: ${{ matrix.package }}"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - zikzak_inappwebview_platform_interface
+          - zikzak_inappwebview_web
+          - zikzak_inappwebview_macos
+          - zikzak_inappwebview_windows
+          - zikzak_inappwebview_linux
+          - zikzak_inappwebview
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: flutter pub get
+        working-directory: ${{ matrix.package }}
+        run: flutter pub get
+      - name: flutter analyze
+        working-directory: ${{ matrix.package }}
+        run: flutter analyze
+
+  test:
+    name: "test: ${{ matrix.package }}"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - zikzak_inappwebview_platform_interface
+          - zikzak_inappwebview_macos
+          - zikzak_inappwebview_windows
+          - zikzak_inappwebview_linux
+          - zikzak_inappwebview
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: flutter pub get
+        working-directory: ${{ matrix.package }}
+        run: flutter pub get
+      - name: flutter test
+        working-directory: ${{ matrix.package }}
+        run: flutter test
+
+  test-web:
+    name: "test: zikzak_inappwebview_web"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: flutter pub get
+        working-directory: zikzak_inappwebview_web
+        run: flutter pub get
+      - name: flutter test --platform chrome
+        working-directory: zikzak_inappwebview_web
+        run: flutter test --platform chrome
