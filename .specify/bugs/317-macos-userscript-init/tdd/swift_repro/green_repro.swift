@@ -1,19 +1,37 @@
+// GREEN repro for issue #317 — shape-exact with the POST-FIX macOS UserScript.
 //
-//  UserScript.swift
-//  zikzak_inappwebview
+// Same WebKit stand-ins and same consumer construction as red_repro.swift, but
+// the UserScript subclass now carries the fourth initializer exactly as the fix
+// adds it to
+// zikzak_inappwebview_macos/macos/zikzak_inappwebview_macos/Sources/zikzak_inappwebview_macos/Types/UserScript.swift
+// (and exactly as the iOS implementation declares it):
 //
-//  macOS port of the iOS InAppWebViewUserScript type. Tracks a `groupName`
-//  so that `removeUserScriptsByGroupName` can find scripts injected via the
-//  Dart `addUserScript` API (WKUserContentController itself has no group
-//  concept). See issue #197.
-//
-//  Overrides both WKUserScript designated initializers (including
-//  `init(source:injectionTime:forMainFrameOnly:in:)`), matching iOS: a
-//  subclass that declares its own designated initializers does not inherit
-//  the superclass ones. See issue #317.
-//
+//   public override init(
+//       source: String, injectionTime: WKUserScriptInjectionTime,
+//       forMainFrameOnly: Bool, in contentWorld: WKContentWorld
+//   )
 
-import WebKit
+import Foundation
+
+// ---- WebKit stand-ins -------------------------------------------------------
+
+public enum WKUserScriptInjectionTime: Int {
+    case atDocumentStart
+    case atDocumentEnd
+}
+
+public class WKContentWorld {
+    public static let page = WKContentWorld()
+    public static let defaultClient = WKContentWorld()
+    public init() {}
+}
+
+public class WKUserScript {
+    public init(source: String, injectionTime: WKUserScriptInjectionTime, forMainFrameOnly: Bool) {}
+    public init(source: String, injectionTime: WKUserScriptInjectionTime, forMainFrameOnly: Bool, in contentWorld: WKContentWorld) {}
+}
+
+// ---- macOS UserScript — POST-FIX shape ---------------------------------------
 
 public class UserScript: WKUserScript {
     var groupName: String?
@@ -65,24 +83,16 @@ public class UserScript: WKUserScript {
         self.groupName = groupName
         self.contentWorld = contentWorld
     }
-
-    public static func fromMap(map: [String: Any?]?) -> UserScript? {
-        guard let map = map else { return nil }
-        let source = map["source"] as! String
-        let injectionTime =
-            WKUserScriptInjectionTime.init(rawValue: map["injectionTime"] as! Int)
-            ?? .atDocumentStart
-        let forMainFrameOnly = map["forMainFrameOnly"] as! Bool
-        let groupName = map["groupName"] as? String
-
-        if let contentWorldMap = map["contentWorld"] as? [String: Any?] {
-            let contentWorld = WKContentWorld.fromMap(map: contentWorldMap)!
-            return UserScript(
-                groupName: groupName, source: source, injectionTime: injectionTime,
-                forMainFrameOnly: forMainFrameOnly, in: contentWorld)
-        }
-        return UserScript(
-            groupName: groupName, source: source, injectionTime: injectionTime,
-            forMainFrameOnly: forMainFrameOnly)
-    }
 }
+
+// ---- Issue #317 construction site --------------------------------------------
+
+// With the fix the initializer named in the issue exists and the construction
+// compiles.
+let script = UserScript(
+    source: "window.flutter_inappwebview = {};",
+    injectionTime: .atDocumentStart,
+    forMainFrameOnly: true,
+    in: WKContentWorld.page
+)
+_ = script
