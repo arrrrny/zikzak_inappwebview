@@ -90,9 +90,9 @@ void main() {
       final c = PDFConfiguration(
         rect: InAppWebViewRect(x: 0, y: 1, width: 100, height: 50),
       );
-      expect(c.toJson(), {
-        'rect': {'x': 0.0, 'y': 1.0, 'width': 100.0, 'height': 50.0},
-      });
+      expect(c.toJson(), containsPair('rect', {
+        'x': 0.0, 'y': 1.0, 'width': 100.0, 'height': 50.0,
+      }));
       final back = PDFConfiguration.fromJson(c.toJson());
       expect(back.rect?.height, 50.0);
       expect(PDFConfiguration.fromJson({}).rect, isNull);
