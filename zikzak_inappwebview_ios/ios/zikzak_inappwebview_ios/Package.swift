@@ -4,7 +4,12 @@ import PackageDescription
 let package = Package(
     name: "zikzak_inappwebview_ios",
     platforms: [
-        .iOS("16.0")
+        // iOS 15.0: matches the oldest app target we support. Every
+        // iOS 15.4/16/16.4/17+ API used in the sources is already
+        // availability-guarded, so apps targeting iOS 15.0 are accepted by
+        // FlutterGeneratedPluginSwiftPackage (issue #316). Raise only with a
+        // matching availability guard audit.
+        .iOS("15.0")
     ],
     products: [
         .library(name: "zikzak-inappwebview-ios", targets: ["zikzak_inappwebview_ios"])
