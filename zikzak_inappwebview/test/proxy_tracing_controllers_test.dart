@@ -21,7 +21,7 @@ class _FakePlatformProxyController extends PlatformProxyController {
   }
 
   @override
-  Future<void> clearProxyOverride() async {
+  Future<void> clearProxyOverride({String? profileId}) async {
     clearOverrideCount++;
   }
 
