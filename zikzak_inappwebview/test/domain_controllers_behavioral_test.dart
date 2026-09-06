@@ -187,11 +187,7 @@ void main() {
       final args = calls.single.args;
       expect(args['urlRequest'], urlRequest);
       expect(args['data'], data);
-      // NOTE: the monolithic controller drops urlResponse before reaching the
-      // platform, so the facade inherits that behavior (FR-005: identical to the
-      // monolithic method). The argument is therefore forwarded to the parent
-      // but not to the platform call.
-      expect(args['urlResponse'], isNull);
+      expect(args['urlResponse'], response);
     });
 
     test('U15 reload delegates to parent', () async {
