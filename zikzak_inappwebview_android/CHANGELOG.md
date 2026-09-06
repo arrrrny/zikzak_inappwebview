@@ -1,3 +1,10 @@
+## 5.3.4 - 2026-09-06
+
+
+### Bug Fixes
+
+- [iOS] Fix `#available` usage and minimum platform version mismatch — resolves iOS build failures (#316, #319)
+- [macOS] Implement `UserScript` initializer `init(source:injectionTime:forMainFrameOnly:in:)` for iOS parity (#317, #318)
 ## 5.3.3 - 2026-09-05
 
 
