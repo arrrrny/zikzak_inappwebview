@@ -884,8 +884,21 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                     // data store, so skip the short-circuit and fall through to
                     // the master behavior (nonPersistent) when cacheEnabled is
                     // false — otherwise per-account isolation is silently lost.
-                    if !dataStoreWasSelected && (!hasValidPersistentId || !#available(iOS 17.0, *)) {
-                        configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+                    // NOTE: `#available` may only be the direct condition of an
+                    // `if`/`guard`/`while`, so the original boolean-folded form
+                    // (`!hasValidPersistentId || !#available(iOS 17.0, *)`,
+                    // issue #316) is expressed here as nested conditionals with
+                    // an identical truth table.
+                    if !dataStoreWasSelected {
+                        if #available(iOS 17.0, *) {
+                            if !hasValidPersistentId {
+                                configuration.websiteDataStore =
+                                    WKWebsiteDataStore.nonPersistent()
+                            }
+                        } else {
+                            configuration.websiteDataStore =
+                                WKWebsiteDataStore.nonPersistent()
+                        }
                     }
                     for cookie in HTTPCookieStorage.shared.cookies ?? [] {
                         configuration.websiteDataStore.httpCookieStore.setCookie(

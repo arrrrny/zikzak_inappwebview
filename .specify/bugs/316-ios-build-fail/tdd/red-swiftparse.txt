@@ -1,0 +1,156 @@
+# swiftc -parse evidence — mode: red
+# swiftc: Swift version 6.1 (swift-6.1-RELEASE)
+# date: 2026-09-06T11:52:08Z
+# note: -parse performs syntax parsing only; UIKit/WebKit are NOT
+#       resolved on Linux. This is the compiler level at which the
+#       '#available may only be used as condition...' diagnostic fires.
+
+## PASS: CredentialDatabase.swift
+## PASS: ISettings.swift
+## PASS: InAppWebViewFlutterPlugin.swift
+## PASS: LeakAvoider.swift
+## PASS: MyCookieManager.swift
+## PASS: MyWebStorageManager.swift
+## PASS: PlatformUtil.swift
+## PASS: ProxyManager.swift
+## PASS: SecurityLogger.swift
+## PASS: SwiftFlutterPlugin.swift
+## PASS: Util.swift
+## PASS: WKProcessPoolManager.swift
+## PASS: FindInteraction/FindInteractionChannelDelegate.swift
+## PASS: FindInteraction/FindInteractionController.swift
+## PASS: FindInteraction/FindInteractionSettings.swift
+## PASS: HeadlessInAppWebView/HeadlessInAppWebView.swift
+## PASS: HeadlessInAppWebView/HeadlessInAppWebViewManager.swift
+## PASS: HeadlessInAppWebView/HeadlessWebViewChannelDelegate.swift
+## PASS: InAppBrowser/InAppBrowserChannelDelegate.swift
+## PASS: InAppBrowser/InAppBrowserDelegate.swift
+## PASS: InAppBrowser/InAppBrowserManager.swift
+## PASS: InAppBrowser/InAppBrowserNavigationController.swift
+## PASS: InAppBrowser/InAppBrowserSettings.swift
+## PASS: InAppBrowser/InAppBrowserWebViewController.swift
+## PASS: InAppWebView/ContextMenuSettings.swift
+## PASS: InAppWebView/CustomSchemeHandler.swift
+## PASS: InAppWebView/FlutterWebViewController.swift
+## PASS: InAppWebView/FlutterWebViewFactory.swift
+## FAIL: InAppWebView/InAppWebView.swift (swiftc exit 1)
+/home/z/my-project/zikzak_inappwebview/zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/InAppWebView/InAppWebView.swift:887:76: error: #available may only be used as condition of an 'if', 'guard' or 'while' statement
+ 885 |                     // the master behavior (nonPersistent) when cacheEnabled is
+ 886 |                     // false — otherwise per-account isolation is silently lost.
+ 887 |                     if !dataStoreWasSelected && (!hasValidPersistentId || !#available(iOS 17.0, *)) {
+     |                                                                            `- error: #available may only be used as condition of an 'if', 'guard' or 'while' statement
+ 888 |                         configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+ 889 |                     }
+
+## PASS: InAppWebView/InAppWebViewManager.swift
+## PASS: InAppWebView/InAppWebViewSettings.swift
+## PASS: InAppWebView/WebViewChannelDelegate.swift
+## PASS: InAppWebView/WebViewChannelDelegateMethods.swift
+## PASS: PluginScriptsJS/CallAsyncJavaScriptBelowIOS14WrapperJS.swift
+## PASS: PluginScriptsJS/ConsoleLogJS.swift
+## PASS: PluginScriptsJS/EnableViewportScaleJS.swift
+## PASS: PluginScriptsJS/FindElementsAtPointJS.swift
+## PASS: PluginScriptsJS/FindTextHighlightJS.swift
+## PASS: PluginScriptsJS/InterceptAjaxRequestJS.swift
+## PASS: PluginScriptsJS/InterceptFetchRequestJS.swift
+## PASS: PluginScriptsJS/JavaScriptBridgeJS.swift
+## PASS: PluginScriptsJS/LastTouchedAnchorOrImageJS.swift
+## PASS: PluginScriptsJS/OnLoadResourceJS.swift
+## PASS: PluginScriptsJS/OnWindowBlurEventJS.swift
+## PASS: PluginScriptsJS/OnWindowFocusEventJS.swift
+## PASS: PluginScriptsJS/OriginalViewPortMetaTagContentJS.swift
+## PASS: PluginScriptsJS/PluginScriptsUtil.swift
+## PASS: PluginScriptsJS/PrintJS.swift
+## PASS: PluginScriptsJS/PromisePolyfillJS.swift
+## PASS: PluginScriptsJS/SupportZoomJS.swift
+## PASS: PluginScriptsJS/WebMessageChannelJS.swift
+## PASS: PluginScriptsJS/WebMessageListenerJS.swift
+## PASS: PluginScriptsJS/WindowIdJS.swift
+## PASS: PrintJob/CustomUIPrintPageRenderer.swift
+## PASS: PrintJob/PrintAttributes.swift
+## PASS: PrintJob/PrintJobChannelDelegate.swift
+## PASS: PrintJob/PrintJobController.swift
+## PASS: PrintJob/PrintJobInfo.swift
+## PASS: PrintJob/PrintJobManager.swift
+## PASS: PrintJob/PrintJobSettings.swift
+## PASS: PullToRefresh/PullToRefreshChannelDelegate.swift
+## PASS: PullToRefresh/PullToRefreshControl.swift
+## PASS: PullToRefresh/PullToRefreshDelegate.swift
+## PASS: PullToRefresh/PullToRefreshSettings.swift
+## PASS: SafariViewController/ChromeSafariBrowserManager.swift
+## PASS: SafariViewController/CustomUIActivity.swift
+## PASS: SafariViewController/SafariBrowserSettings.swift
+## PASS: SafariViewController/SafariViewController.swift
+## PASS: SafariViewController/SafariViewControllerChannelDelegate.swift
+## PASS: Security/CertificatePinningManager.swift
+## PASS: Security/HTTPSOnlyManager.swift
+## PASS: Security/SecurityCoordinator.swift
+## PASS: Security/URLValidationManager.swift
+## PASS: Types/ActivityButton.swift
+## PASS: Types/BaseCallbackResult.swift
+## PASS: Types/CGRect.swift
+## PASS: Types/CGSize.swift
+## PASS: Types/CallbackResult.swift
+## PASS: Types/ChannelDelegate.swift
+## PASS: Types/ClientCertChallenge.swift
+## PASS: Types/ClientCertResponse.swift
+## PASS: Types/CreateWindowAction.swift
+## PASS: Types/CustomSchemeResponse.swift
+## PASS: Types/Disposable.swift
+## PASS: Types/DownloadStartRequest.swift
+## PASS: Types/FlutterMethodCallDelegate.swift
+## PASS: Types/FlutterMethodChannel.swift
+## PASS: Types/HitTestResult.swift
+## PASS: Types/HttpAuthResponse.swift
+## PASS: Types/HttpAuthenticationChallenge.swift
+## PASS: Types/InAppBrowserMenuItem.swift
+## PASS: Types/JsAlertResponse.swift
+## PASS: Types/JsConfirmResponse.swift
+## PASS: Types/JsPromptResponse.swift
+## PASS: Types/MethodChannelResult.swift
+## PASS: Types/NSAttributedString.swift
+## PASS: Types/PermissionRequest.swift
+## PASS: Types/PermissionResponse.swift
+## PASS: Types/PluginScript.swift
+## PASS: Types/SecCertificate.swift
+## PASS: Types/ServerTrustAuthResponse.swift
+## PASS: Types/ServerTrustChallenge.swift
+## PASS: Types/Size2D.swift
+## PASS: Types/SslCertificate.swift
+## PASS: Types/SslError.swift
+## PASS: Types/StringOrInt.swift
+## PASS: Types/UIColor.swift
+## PASS: Types/UIEdgeInsets.swift
+## PASS: Types/UIEventAttribution.swift
+## PASS: Types/UIFindSession.swift
+## PASS: Types/UIImage.swift
+## PASS: Types/URLAuthenticationChallenge.swift
+## PASS: Types/URLCredential.swift
+## PASS: Types/URLProtectionSpace.swift
+## PASS: Types/URLRequest.swift
+## PASS: Types/URLResponse.swift
+## PASS: Types/UserScript.swift
+## PASS: Types/WKContentWorld.swift
+## PASS: Types/WKFrameInfo.swift
+## PASS: Types/WKNavigationAction.swift
+## PASS: Types/WKNavigationResponse.swift
+## PASS: Types/WKSecurityOrigin.swift
+## PASS: Types/WKUserContentController.swift
+## PASS: Types/WKWindowFeatures.swift
+## PASS: Types/WebMessage.swift
+## PASS: Types/WebMessagePort.swift
+## PASS: Types/WebResourceError.swift
+## PASS: Types/WebResourceRequest.swift
+## PASS: Types/WebResourceResponse.swift
+## PASS: Types/WebViewTransport.swift
+## PASS: UIApplication/VisibleViewController.swift
+## PASS: WebAuthenticationSession/WebAuthenticationSession.swift
+## PASS: WebAuthenticationSession/WebAuthenticationSessionChannelDelegate.swift
+## PASS: WebAuthenticationSession/WebAuthenticationSessionManager.swift
+## PASS: WebAuthenticationSession/WebAuthenticationSessionSettings.swift
+## PASS: InAppWebView/WebMessage/WebMessageChannel.swift
+## PASS: InAppWebView/WebMessage/WebMessageChannelChannelDelegate.swift
+## PASS: InAppWebView/WebMessage/WebMessageListener.swift
+## PASS: InAppWebView/WebMessage/WebMessageListenerChannelDelegate.swift
+
+# RESULT: PARSE ERRORS FOUND
