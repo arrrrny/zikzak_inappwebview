@@ -1,13 +1,13 @@
 import 'dart:convert';
 
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
-import 'package:zikzak_session/zikzak_session.dart';
+import 'package:zuraffa_session/zuraffa_session.dart';
 
 import '../cookie_manager.dart';
 import '../in_app_webview/in_app_webview_controller.dart';
 
 /// Portable webview sessions for zikzak_inappwebview, backed entirely by
-/// [zikzak_session](https://github.com/arrrrny/zikzak_session) (spec
+/// [zuraffa_session](https://github.com/arrrrny/zuraffa_session) (spec
 /// `014-portable-sessions`).
 ///
 /// A [WebViewSessions] instance saves a live webview's session state —

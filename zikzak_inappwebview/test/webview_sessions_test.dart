@@ -3,13 +3,13 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
-import 'package:zikzak_session/zikzak_session.dart';
+import 'package:zuraffa_session/zuraffa_session.dart';
 
 import 'package:zikzak_inappwebview/src/cookie_manager.dart';
 import 'package:zikzak_inappwebview/src/webview_sessions/webview_sessions.dart';
 
 /// Spec `014-portable-sessions` — the sessions controller against the real
-/// zikzak_session `FileSessionStore` (temp dir). The evaluator-closure
+/// zuraffa_session `FileSessionStore` (temp dir). The evaluator-closure
 /// seam lets the JS/localStorage paths run without a live webview, and
 /// cookie mapping is exercised as pure functions plus the full
 /// save→persist→load round-trip through the [SessionPort].

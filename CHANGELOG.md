@@ -1,3 +1,13 @@
+## 6.0.0
+
+### Breaking Changes
+
+- **Session layer renamed**: `zikzak_session` → [`zuraffa_session`](https://pub.dev/packages/zuraffa_session) (^1.1.0). `WebViewSessions` and the portable-session APIs now consume `zuraffa_session` types — consumers passing `zikzak_session` session stores must migrate their imports (`package:zikzak_session/zikzak_session.dart` → `package:zuraffa_session/zuraffa_session.dart`) or stay on 5.x.
+
+### Features
+
+- Aligned with the Zuraffa fleet package identity (`zuraffa_session`).
+
 ## 5.3.3 - 2026-09-05
 
 ### Bug Fixes

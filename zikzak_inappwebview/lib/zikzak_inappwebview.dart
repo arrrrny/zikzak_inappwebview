@@ -35,5 +35,5 @@ export 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
         MapEdgeInsets;
 export 'src/main.dart';
 
-// Portable webview sessions via zikzak_session (spec 014).
+// Portable webview sessions via zuraffa_session (spec 014).
 export 'src/webview_sessions/webview_sessions.dart';
