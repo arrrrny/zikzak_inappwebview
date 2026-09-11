@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:zikzak_inappwebview_ios/zikzak_inappwebview_ios.dart';
@@ -34,7 +32,9 @@ class _FakeChannel extends MethodChannel {
   }
 
   @override
-  void setMethodCallHandler(Future<dynamic> Function(MethodCall call)? handler) {
+  void setMethodCallHandler(
+    Future<dynamic> Function(MethodCall call)? handler,
+  ) {
     // Delegation tests drive outgoing calls only; ignore incoming handlers.
   }
 }
@@ -53,30 +53,29 @@ void main() {
 
   group('IOSInAppWebViewController screenshot/pdf delegation (spec 001)', () {
     test(
-        'U44 createPdf propagates a clear UNSUPPORTED_IOS_VERSION error instead '
-        'of silently returning null', () async {
-      final fake = _FakeChannel();
-      final controller = _newController(fake);
+      'U44 createPdf propagates a clear UNSUPPORTED_IOS_VERSION error instead '
+      'of silently returning null',
+      () async {
+        final fake = _FakeChannel();
+        final controller = _newController(fake);
 
-      fake.nextError = PlatformException(
-        code: 'UNSUPPORTED_IOS_VERSION',
-        message: 'createPdf requires iOS 14.0 or later',
-      );
+        fake.nextError = PlatformException(
+          code: 'UNSUPPORTED_IOS_VERSION',
+          message: 'createPdf requires iOS 14.0 or later',
+        );
 
-      await expectLater(
-        () => controller.createPdf(pdfConfiguration: PDFConfiguration()),
-        throwsA(
-          isA<PlatformException>()
-              .having((e) => e.code, 'code', 'UNSUPPORTED_IOS_VERSION')
-              .having(
-                (e) => e.message,
-                'message',
-                contains('iOS 14.0'),
-              ),
-        ),
-        reason: 'createPdf must surface the native clear error rather than '
-            'swallowing it into a null return',
-      );
-    });
+        await expectLater(
+          () => controller.createPdf(pdfConfiguration: PDFConfiguration()),
+          throwsA(
+            isA<PlatformException>()
+                .having((e) => e.code, 'code', 'UNSUPPORTED_IOS_VERSION')
+                .having((e) => e.message, 'message', contains('iOS 14.0')),
+          ),
+          reason:
+              'createPdf must surface the native clear error rather than '
+              'swallowing it into a null return',
+        );
+      },
+    );
   });
 }
