@@ -329,10 +329,9 @@ packages:
   zikzak_inappwebview_platform_interface:
     dependency: "direct main"
     description:
-      name: zikzak_inappwebview_platform_interface
-      sha256: "09305e7b85f032487836aa82f397fb49e48167836dc0399762cadb8314eda660"
-      url: "https://pub.dev"
-    source: hosted
+      path: "../../zikzak_inappwebview_platform_interface"
+      relative: true
+    source: path
     version: "6.0.1"
   zorphy_annotation:
     dependency: transitive
@@ -344,4 +343,4 @@ packages:
     version: "2.3.0"
 sdks:
   dart: ">=3.11.0-0 <4.0.0"
-  flutter: ">=3.38.6"
+  flutter: ">=3.18.0-18.0.pre.54"

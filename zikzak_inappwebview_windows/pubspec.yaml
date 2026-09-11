@@ -27,3 +27,10 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+
+# DEV ONLY: resolve intra-repo packages from local source so a single
+# checkout builds against itself. Stripped by scripts/prepare_for_publish.sh
+# before publishing — pub.dev rejects dependency_overrides.
+dependency_overrides:
+  zikzak_inappwebview_platform_interface:
+    path: ../zikzak_inappwebview_platform_interface
