@@ -178,21 +178,21 @@ cd zikzak_inappwebview/example && flutter test integration_test/<file>.dart -d <
 
 ### Known repository state — measured on `master` at 2026-09-11
 
-`master` is **green**: the CI matrix passes all 12 jobs, and every number below was reproduced locally on the same commit. Re-measure before leaning on it — this table moves.
+`master` is **green**: the CI matrix passes all 15 jobs, and every number below was reproduced locally on the same commit. Re-measure before leaning on it — this table moves.
 
 | Package | `flutter test` | `flutter analyze` |
 | --- | --- | --- |
 | `zikzak_inappwebview` | 250 pass — GREEN | 23 infos, 0 warnings, 0 errors |
 | `zikzak_inappwebview_platform_interface` | 306 pass — GREEN | 77 infos, 0 warnings, 0 errors |
+| `zikzak_inappwebview_ios` | 12 pass — GREEN | 192 infos, 0 warnings, 0 errors |
 | `zikzak_inappwebview_macos` | 48 pass — GREEN | clean |
 | `zikzak_inappwebview_windows` | 24 pass — GREEN | clean |
 | `zikzak_inappwebview_linux` | 9 pass — GREEN | 5 infos, 0 warnings, 0 errors |
 | `zikzak_inappwebview_web` | 1 pass — GREEN, but ONLY with `--platform chrome` | clean |
 | `zikzak_inappwebview_android` | not in the CI matrix | 197 infos, 0 warnings, 0 errors |
-| `zikzak_inappwebview_ios` | not in the CI matrix | 3 warnings, 0 errors |
 | `zikzak_inappwebview_module` | not in the CI matrix | clean (`publish_to: none`, analyzes in ~3 min) |
 
-The remaining infos are style-level and deliberately tolerated (`--no-fatal-infos`). Warnings are **not** tolerated — they fail the build, which is why `ios` would go red if it were added to the matrix today.
+The remaining infos are style-level and deliberately tolerated (`--no-fatal-infos`). Warnings are **not** tolerated — a new warning in any matrix package is a red build, which is why `zikzak_inappwebview_android` cannot join the matrix until its lint debt is cleared.
 
 ### Local-source dependencies (dev mode)
 
@@ -225,8 +225,9 @@ Per `.specify/memory/constitution.md` and `tdd-profile.md`:
 - Analyzer `exclude` lists `build/**` and all native platform dirs (`android/`, `ios/`, `web/`, `macos/`, `windows/`, `linux/`) so native code is not Dart-analyzed.
 - Native style follows each platform's norm: Java (Android), Swift (iOS/macOS) with `#if !os(macOS)` guards where an API is iOS-only (see `INSIGHTS.md` for WKWebView iOS/macOS divergences), C++ (Linux).
 - Commits follow Conventional Commits (`feat(...)`, `fix(...)`, `test(...)`, `refactor(...)`, `docs(...)`); scopes are package- or spec-based (e.g. `test(in_app_webview)`, `fix(android)`, `docs(specs)`, `test(001): ...` referencing a spec number). PRs are merged into `master` via GitHub merge commits (`Merge pull request #NNN from arrrrny/<branch>`); feature branches are named `feat/...`, `fix/...`, or `<NNN>-<slug>`.
-- **CI exists and gates `master`.** `.github/workflows/ci.yml` runs a 12-job matrix on every push to `master` and every PR into it: `flutter analyze` for `platform_interface`, `web`, `macos`, `windows`, `linux`, `zikzak_inappwebview`, and `flutter test` for the same six (`web` with `--platform chrome`). There is still no Makefile or Jenkinsfile, and `android`/`ios` are deliberately outside the matrix. The authoritative gate remains running `flutter analyze --no-fatal-infos` + `flutter test` yourself in each affected package before you push.
+- **CI exists and gates `master`.** `.github/workflows/ci.yml` runs a 15-job matrix on every push to `master` and every PR into it: `flutter analyze` and `flutter test` for `platform_interface`, `ios`, `web`, `macos`, `windows`, `linux` and `zikzak_inappwebview` (`web` with `--platform chrome`), plus a `build-ios` job on `macos-14` that compiles the iOS Swift sources by building the example app from this checkout. `zikzak_inappwebview_android` is the only published package still outside the matrix. There is no Makefile or Jenkinsfile. The authoritative gate remains running `flutter analyze --no-fatal-infos` + `flutter test` yourself in each affected package before you push.
 - The analyze step passes `--no-fatal-infos`: compile **errors and warnings fail the job**, style-level infos do not. A new warning in any matrix package is a red build.
+- **`build-ios` is the only job that compiles Swift.** The other jobs are pure Dart, so a Swift-only break — a bad `#available` scope, an override whose signature stops matching a different SDK — passes all of them. Run `cd zikzak_inappwebview/example && flutter build ios --release --no-codesign` locally when you touch iOS Swift, and be aware that a local Xcode may be newer than the runner's: the `evaluateJavaScript` override in `InAppWebView.swift` compiled on Xcode 26 and failed on the runner's older SDK, which is exactly the class of bug this job exists to catch.
 
 ---
 
