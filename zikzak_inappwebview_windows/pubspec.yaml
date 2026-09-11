@@ -1,6 +1,6 @@
 name: zikzak_inappwebview_windows
 description: The Windows implementation of zikzak_inappwebview.
-version: 6.0.0
+version: 6.0.1
 homepage: https://github.com/arrrrny/zikzak_inappwebview
 
 environment:
@@ -18,7 +18,7 @@ flutter:
 dependencies:
   flutter:
     sdk: flutter
-  zikzak_inappwebview_platform_interface: ^6.0.0
+  zikzak_inappwebview_platform_interface: ^6.0.1
   webview_windows: ^0.4.0
   path: ^1.9.0
   path_provider: ^2.1.0
@@ -27,10 +27,3 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
-
-# DEV ONLY: resolve intra-repo packages from local source so a single
-# checkout builds against itself. Stripped by scripts/prepare_for_publish.sh
-# before publishing — pub.dev rejects dependency_overrides.
-dependency_overrides:
-  zikzak_inappwebview_platform_interface:
-    path: ../zikzak_inappwebview_platform_interface

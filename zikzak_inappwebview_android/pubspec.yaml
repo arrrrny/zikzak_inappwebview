@@ -1,6 +1,6 @@
 name: zikzak_inappwebview_android
 description: Android implementation of the zikzak_inappwebview plugin.
-version: 6.0.0
+version: 6.0.1
 homepage: https://inappwebview.dev/
 repository: https://github.com/arrrrny/zikzak_inappwebview/tree/master/zikzak_inappwebview_android
 issue_tracker: https://github.com/arrrrny/zikzak_inappwebview/issues
@@ -18,7 +18,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  zikzak_inappwebview_platform_interface: ^6.0.0
+  zikzak_inappwebview_platform_interface: ^6.0.1
 
 dev_dependencies:
   flutter_test:
@@ -78,10 +78,3 @@ flutter:
   #
   # For details regarding fonts in packages, see
   # https://flutter.dev/custom-fonts/#from-packages
-
-# DEV ONLY: resolve intra-repo packages from local source so a single
-# checkout builds against itself. Stripped by scripts/prepare_for_publish.sh
-# before publishing — pub.dev rejects dependency_overrides.
-dependency_overrides:
-  zikzak_inappwebview_platform_interface:
-    path: ../zikzak_inappwebview_platform_interface

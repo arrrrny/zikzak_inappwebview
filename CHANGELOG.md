@@ -1,3 +1,19 @@
+## 6.0.1 - 2026-09-11
+
+### Bug Fixes
+
+- [iOS] Make `InAppWebView.evaluateJavaScript(_:completionHandler:)` portable across Xcode versions. Its completion handler was declared `@MainActor @Sendable (Any?, (any Error)?) -> Void`, which only matches the SDK bundled with recent Xcode. On older SDKs the method stopped overriding its superclass and the extra overload it left behind made every single-argument `evaluateJavaScript(...)` call ambiguous — 10 compile errors, meaning consumers on older Xcode could not build the iOS plugin at all
+- [Web] `consoleLogEnabled: false` now actually disables console interception. The guard read `params.webviewParams?.settings`, a field that does not exist on `PlatformWebViewCreationParams` — it is `initialSettings` — so the web implementation did not compile either
+- [iOS] Declare `dataStoreWasSelected` in the scope shared by the iOS 9 and iOS 11 availability blocks in `preWKWebViewConfiguration`; it was declared inside the iOS 9 block but read by the later cookie-setup block, so the file did not compile (#316, #329)
+- [iOS] Remove two always-true `!= null` guards in `HttpAuthCredentialsDatabase` and an unused `dart:typed_data` import in its screenshot/PDF delegation test
+
+### Internal
+
+- CI passes end to end again, now 15 jobs. `flutter analyze` runs with `--no-fatal-infos`: compile errors and warnings fail the build, style-level infos do not
+- `zikzak_inappwebview_ios` joined the analyze and test matrices, and a `build-ios` job compiles its Swift sources from this checkout — that job is what surfaced the `evaluateJavaScript` breakage above
+- Fixed `constant_identifier_names` in `zikzak_inappwebview_platform_interface/analysis_options.yaml` — `linter: rules:` accepts only booleans, so `ignore` left the rule enabled and produced 558 findings
+- Intra-repo dependencies resolve from local source through `dependency_overrides`, so CI exercises this checkout rather than the published artifacts
+
 ## 6.0.0
 
 ### Breaking Changes
