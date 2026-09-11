@@ -176,34 +176,33 @@ cd zikzak_inappwebview/example && flutter test integration_test/<file>.dart -d <
 ### GYM exercises (`.gym/`)
 `zikzak_inappwebview/.gym/gym.yaml` defines a package-level GYM: warmup reps `01-deps` (flutter pub get), `02-build` (analyze), `03-bridge-smoke` (flutter test `.gym/warmup/03-bridge-smoke_test.dart`), plus graded exercises (e.g. `js-bridge-round-trip`) graded by exit code.
 
-### Known repository state — measured on `master` at 2026-08-31
+### Known repository state — measured on `master` at 2026-09-11
 
-**Do NOT assume a green baseline.** Actual `flutter test` results per package:
+`master` is **green**: the CI matrix passes all 12 jobs, and every number below was reproduced locally on the same commit. Re-measure before leaning on it — this table moves.
 
-| Package | Result |
-| --- | --- |
-| `zikzak_inappwebview_macos` | 42 pass — GREEN |
-| `zikzak_inappwebview_windows` | 14 pass — GREEN |
-| `zikzak_inappwebview_linux` | 9 pass — GREEN |
-| `zikzak_inappwebview_web` | 1 pass — GREEN, but ONLY with `--platform chrome` |
-| `zikzak_inappwebview` | 240 pass / **2 fail** |
-| `zikzak_inappwebview_platform_interface` | 305 pass / **1 fail** |
-| `zikzak_inappwebview_android` | **does not compile** |
-| `zikzak_inappwebview_ios` | **does not compile** |
-| `zikzak_inappwebview_module` | **does not compile** (dependency, not source) |
+| Package | `flutter test` | `flutter analyze` |
+| --- | --- | --- |
+| `zikzak_inappwebview` | 250 pass — GREEN | 23 infos, 0 warnings, 0 errors |
+| `zikzak_inappwebview_platform_interface` | 306 pass — GREEN | 77 infos, 0 warnings, 0 errors |
+| `zikzak_inappwebview_macos` | 48 pass — GREEN | clean |
+| `zikzak_inappwebview_windows` | 24 pass — GREEN | clean |
+| `zikzak_inappwebview_linux` | 9 pass — GREEN | 5 infos, 0 warnings, 0 errors |
+| `zikzak_inappwebview_web` | 1 pass — GREEN, but ONLY with `--platform chrome` | clean |
+| `zikzak_inappwebview_android` | not in the CI matrix | 197 infos, 0 warnings, 0 errors |
+| `zikzak_inappwebview_ios` | not in the CI matrix | 3 warnings, 0 errors |
+| `zikzak_inappwebview_module` | not in the CI matrix | clean (`publish_to: none`, analyzes in ~3 min) |
 
-Pre-existing failures (not caused by you):
-- `zikzak_inappwebview/test/domain_controllers_behavioral_test.dart` — "U14 loadSimulatedRequest delegates to parent identically".
-- `zikzak_inappwebview/test/in_app_webview_dispose_test.dart` — "U9: a later dispose(isKeepAlive: false) after dispose(isKeepAlive: true) forwards false and fully releases" (expected 2, actual 1).
-- `zikzak_inappwebview_platform_interface/test/types/final_gap_entities_test.dart` — "PDFConfiguration wire: rect as nested map".
+The remaining infos are style-level and deliberately tolerated (`--no-fatal-infos`). Warnings are **not** tolerated — they fail the build, which is why `ios` would go red if it were added to the matrix today.
 
-Compile breakages:
-- `zikzak_inappwebview_android` and `zikzak_inappwebview_ios`: a committed merge left **duplicate** `_navigationDelegate` / `_javaScriptDelegate` / `_cookieDelegate` / `_settingsDelegate` field+getter declarations in `lib/src/in_app_webview/in_app_webview_controller.dart` — one set near lines 120–150 typed as `AndroidXxxDelegate?`/`IOSXxxDelegate?`, a second set near lines 2740–2775 typed as `PlatformXxxDelegate?`. `flutter analyze` reports 12 errors per package (`duplicate_definition` + `return_of_invalid_type`). Remove the duplicated block before working in these packages.
-- `zikzak_inappwebview_module`: `pubspec.lock` pins `zuraffa 6.0.0`, whose local pub-cache entry is missing `lib/src/extensions/future_extensions.dart`. A cache/version problem, not source. This package is `publish_to: none` and is not in the publish set.
+### Local-source dependencies (dev mode)
+
+Every publishable package resolves its intra-repo dependencies through `dependency_overrides:` pointing at sibling directories, so one checkout builds and tests against itself — that is what makes the CI matrix exercise monorepo source rather than pub.dev artifacts.
+
+**Use `dependency_overrides`, not `path:` under `dependencies:`.** A plain path dependency makes `flutter analyze` report `invalid_dependency` ("Publishable packages can't have 'path' dependencies") in every publishable package, and that diagnostic is a warning, i.e. fatal under the gate. `scripts/prepare_for_publish.sh` deletes the whole `dependency_overrides:` section before publishing, and also deletes bare `path:` lines. `scripts/restore_dev_setup.sh` writes path deps under `dependencies:` — it drives analyze red, so prefer editing the overrides by hand.
 
 Doc staleness to be aware of:
-- `.specify/memory/tdd-profile.md` claims 10 umbrella test files / 112 tests and a green baseline — reality is ~28 test files / 242 tests with 2 red. Treat it as partially outdated.
-- Package versions are skewed: umbrella `zikzak_inappwebview` is `5.0.0` while every other published package is `5.1.2`. `README.md` still tells consumers to install `^4.6.0`.
+- `.specify/memory/tdd-profile.md` claims 10 umbrella test files / 112 tests and a green baseline — the umbrella now has ~28 files / 250 tests. Treat it as partially outdated.
+- Every package is at `6.0.0`, but `README.md` still tells consumers to install `^4.6.0`.
 
 ---
 
@@ -222,11 +221,12 @@ Per `.specify/memory/constitution.md` and `tdd-profile.md`:
 
 ## 🎨 Code Style Guidelines
 
-- `analysis_options.yaml` in each package `include: package:flutter_lints/flutter.yaml`. Common overrides: `constant_identifier_names: ignore`, `deprecated_member_use(_from_same_package): ignore`, `unnecessary_cast/import: ignore` (deprecated-member errors are suppressed repo-wide — do not "fix" by removing deprecated calls unless the spec calls for it). The `module` package additionally enforces `prefer_single_quotes` and `avoid_print`.
+- `analysis_options.yaml` in each package `include: package:flutter_lints/flutter.yaml`. Common overrides: `deprecated_member_use(_from_same_package): ignore`, `unnecessary_cast/import: ignore` (deprecated-member errors are suppressed repo-wide — do not "fix" by removing deprecated calls unless the spec calls for it). The `module` package additionally enforces `prefer_single_quotes` and `avoid_print`. To disable a lint rule, write `rule_name: false` under `linter: rules:` — the value `ignore` is **not** accepted there and silently leaves the rule enabled (that mistake cost `constant_identifier_names` 558 findings in `platform_interface`); `ignore` is only valid under `analyzer: errors:`.
 - Analyzer `exclude` lists `build/**` and all native platform dirs (`android/`, `ios/`, `web/`, `macos/`, `windows/`, `linux/`) so native code is not Dart-analyzed.
 - Native style follows each platform's norm: Java (Android), Swift (iOS/macOS) with `#if !os(macOS)` guards where an API is iOS-only (see `INSIGHTS.md` for WKWebView iOS/macOS divergences), C++ (Linux).
 - Commits follow Conventional Commits (`feat(...)`, `fix(...)`, `test(...)`, `refactor(...)`, `docs(...)`); scopes are package- or spec-based (e.g. `test(in_app_webview)`, `fix(android)`, `docs(specs)`, `test(001): ...` referencing a spec number). PRs are merged into `master` via GitHub merge commits (`Merge pull request #NNN from arrrrny/<branch>`); feature branches are named `feat/...`, `fix/...`, or `<NNN>-<slug>`.
-- **There is no CI in this repo.** `.github/` contains only `FUNDING.yml` and `autolabeler.yml` — no GitHub Actions workflows, no Makefile, no Jenkinsfile. The authoritative gate is running `flutter analyze` + `flutter test` yourself in each affected package. Do not assume a pipeline will catch anything.
+- **CI exists and gates `master`.** `.github/workflows/ci.yml` runs a 12-job matrix on every push to `master` and every PR into it: `flutter analyze` for `platform_interface`, `web`, `macos`, `windows`, `linux`, `zikzak_inappwebview`, and `flutter test` for the same six (`web` with `--platform chrome`). There is still no Makefile or Jenkinsfile, and `android`/`ios` are deliberately outside the matrix. The authoritative gate remains running `flutter analyze --no-fatal-infos` + `flutter test` yourself in each affected package before you push.
+- The analyze step passes `--no-fatal-infos`: compile **errors and warnings fail the job**, style-level infos do not. A new warning in any matrix package is a red build.
 
 ---
 
