@@ -205,4 +205,43 @@ void main() {
     },
     timeout: const Timeout(Duration(minutes: 2)),
   );
+
+  test(
+    'data-store selection flag is visible to the iOS 11 cookie setup block',
+    () {
+      final iosDir = packageIosDir();
+      final source = File(
+        '${iosDir.path}/Sources/zikzak_inappwebview_ios/'
+        'InAppWebView/InAppWebView.swift',
+      ).readAsStringSync();
+      final functionStart = source.indexOf(
+        'public static func preWKWebViewConfiguration',
+      );
+      expect(functionStart, greaterThanOrEqualTo(0));
+      final functionSource = source.substring(functionStart);
+
+      final declaration = functionSource.indexOf(
+        'var dataStoreWasSelected = false',
+      );
+      final ios9ConfigurationBlock = functionSource.indexOf(
+        'if #available(iOS 9.0, *) {',
+      );
+      final cookieSetupUse = functionSource.indexOf(
+        'if !dataStoreWasSelected {',
+      );
+
+      expect(declaration, greaterThanOrEqualTo(0));
+      expect(ios9ConfigurationBlock, greaterThanOrEqualTo(0));
+      expect(cookieSetupUse, greaterThan(ios9ConfigurationBlock));
+      expect(
+        declaration,
+        lessThan(ios9ConfigurationBlock),
+        reason:
+            'The flag is read by a later iOS 11 availability block, so it must '
+            'be declared in their shared settings scope rather than inside the '
+            'iOS 9 block.',
+      );
+    },
+    timeout: const Timeout(Duration(minutes: 2)),
+  );
 }
