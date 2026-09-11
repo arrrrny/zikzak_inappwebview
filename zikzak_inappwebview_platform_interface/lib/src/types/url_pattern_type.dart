@@ -13,10 +13,10 @@ class UrlPatternType {
   static const regex = UrlPatternType._internal('regex', 'regex');
 
   ///Set of all values of [UrlPatternType].
-  static final Set<UrlPatternType> values = [
+  static final Set<UrlPatternType> values = {
     UrlPatternType.substring,
     UrlPatternType.regex,
-  ].toSet();
+  };
 
   ///Gets a possible [UrlPatternType] instance from [String] value.
   static UrlPatternType? fromValue(String? value) {

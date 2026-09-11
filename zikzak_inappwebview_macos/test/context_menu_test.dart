@@ -27,26 +27,24 @@ void main() {
     setUp(() {
       // Mock the method channel so invokeMethod doesn't throw
       // MissingPluginException.
-      TestDefaultBinaryMessengerBinding
-          .instance.defaultBinaryMessenger
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(
-        const MethodChannel('dev.zuzu/zikzak_inappwebview_12345'),
-        (MethodCall call) async {
-          if (call.method == 'setContextMenu') {
-            return true;
-          }
-          return null;
-        },
-      );
+            const MethodChannel('dev.zuzu/zikzak_inappwebview_12345'),
+            (MethodCall call) async {
+              if (call.method == 'setContextMenu') {
+                return true;
+              }
+              return null;
+            },
+          );
     });
 
     tearDown(() {
-      TestDefaultBinaryMessengerBinding
-          .instance.defaultBinaryMessenger
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(
-        const MethodChannel('dev.zuzu/zikzak_inappwebview_12345'),
-        null,
-      );
+            const MethodChannel('dev.zuzu/zikzak_inappwebview_12345'),
+            null,
+          );
     });
 
     test('is overridden and does not throw', () async {
@@ -75,9 +73,13 @@ void main() {
 
       final originalMenu = ContextMenu(
         menuItems: [
-          ContextMenuItem(id: 1, title: 'Original', action: () {
-            originalActionCalled = true;
-          }),
+          ContextMenuItem(
+            id: 1,
+            title: 'Original',
+            action: () {
+              originalActionCalled = true;
+            },
+          ),
         ],
       );
 
@@ -94,19 +96,22 @@ void main() {
       controller = MacOSInAppWebViewController(controllerParams);
 
       // Re-bind the mock channel for the new controller id.
-      TestDefaultBinaryMessengerBinding
-          .instance.defaultBinaryMessenger
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(
-        const MethodChannel('dev.zuzu/zikzak_inappwebview_77777'),
-        (MethodCall call) async => true,
-      );
+            const MethodChannel('dev.zuzu/zikzak_inappwebview_77777'),
+            (MethodCall call) async => true,
+          );
 
       // Swap to a new menu via setContextMenu.
       final newMenu = ContextMenu(
         menuItems: [
-          ContextMenuItem(id: 2, title: 'New', action: () {
-            newActionCalled = true;
-          }),
+          ContextMenuItem(
+            id: 2,
+            title: 'New',
+            action: () {
+              newActionCalled = true;
+            },
+          ),
         ],
         onContextMenuActionItemClicked: (_) {},
       );
@@ -121,18 +126,23 @@ void main() {
         }),
       );
 
-      expect(originalActionCalled, isFalse,
-          reason: 'original menu action must not fire after setContextMenu');
-      expect(newActionCalled, isTrue,
-          reason: 'new menu action should fire after setContextMenu');
+      expect(
+        originalActionCalled,
+        isFalse,
+        reason: 'original menu action must not fire after setContextMenu',
+      );
+      expect(
+        newActionCalled,
+        isTrue,
+        reason: 'new menu action should fire after setContextMenu',
+      );
 
       // Cleanup the mock handler we installed.
-      TestDefaultBinaryMessengerBinding
-          .instance.defaultBinaryMessenger
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(
-        const MethodChannel('dev.zuzu/zikzak_inappwebview_77777'),
-        null,
-      );
+            const MethodChannel('dev.zuzu/zikzak_inappwebview_77777'),
+            null,
+          );
     });
 
     test('setContextMenu(null) suppresses construction-time contextMenu', () async {
@@ -160,73 +170,83 @@ void main() {
       );
       controller = MacOSInAppWebViewController(controllerParams);
 
-      TestDefaultBinaryMessengerBinding
-          .instance.defaultBinaryMessenger
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(
-        const MethodChannel('dev.zuzu/zikzak_inappwebview_88888'),
-        (MethodCall call) async => true,
-      );
+            const MethodChannel('dev.zuzu/zikzak_inappwebview_88888'),
+            (MethodCall call) async => true,
+          );
 
       // Explicitly clear the menu.
       await controller.setContextMenu(null);
 
       // Simulate the native side firing onCreateContextMenu.
       await controller.handleMethod(
-        const MethodCall('onCreateContextMenu',
-            {'type': 7, 'extra': 'https://example.com'}),
+        const MethodCall('onCreateContextMenu', {
+          'type': 7,
+          'extra': 'https://example.com',
+        }),
       );
 
-      expect(originalCreateCalled, isFalse,
-          reason:
-              'construction-time menu onCreateContextMenu must not fire after '
-              'setContextMenu(null)');
+      expect(
+        originalCreateCalled,
+        isFalse,
+        reason:
+            'construction-time menu onCreateContextMenu must not fire after '
+            'setContextMenu(null)',
+      );
 
-      TestDefaultBinaryMessengerBinding
-          .instance.defaultBinaryMessenger
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(
-        const MethodChannel('dev.zuzu/zikzak_inappwebview_88888'),
-        null,
-      );
+            const MethodChannel('dev.zuzu/zikzak_inappwebview_88888'),
+            null,
+          );
     });
   });
 
   group('onCreateContextMenu event', () {
-    test('fires contextMenu.onCreateContextMenu when event is received',
-        () async {
-      var createCalled = false;
-      InAppWebViewHitTestResult? receivedHitTestResult;
+    test(
+      'fires contextMenu.onCreateContextMenu when event is received',
+      () async {
+        var createCalled = false;
+        InAppWebViewHitTestResult? receivedHitTestResult;
 
-      final contextMenu = ContextMenu(
-        menuItems: [],
-        onCreateContextMenu: (hitTestResult) {
-          createCalled = true;
-          receivedHitTestResult = hitTestResult;
-        },
-      );
+        final contextMenu = ContextMenu(
+          menuItems: [],
+          onCreateContextMenu: (hitTestResult) {
+            createCalled = true;
+            receivedHitTestResult = hitTestResult;
+          },
+        );
 
-      // Recreate controller with contextMenu set
-      controller.dispose();
-      final widgetParams = PlatformInAppWebViewWidgetCreationParams(
-        controllerFromPlatform: (c) => c,
-        contextMenu: contextMenu,
-      );
-      final controllerParams = PlatformInAppWebViewControllerCreationParams(
-        id: 54321,
-        webviewParams: widgetParams,
-      );
-      controller = MacOSInAppWebViewController(controllerParams);
+        // Recreate controller with contextMenu set
+        controller.dispose();
+        final widgetParams = PlatformInAppWebViewWidgetCreationParams(
+          controllerFromPlatform: (c) => c,
+          contextMenu: contextMenu,
+        );
+        final controllerParams = PlatformInAppWebViewControllerCreationParams(
+          id: 54321,
+          webviewParams: widgetParams,
+        );
+        controller = MacOSInAppWebViewController(controllerParams);
 
-      // Simulate the native side sending onCreateContextMenu
-      await controller.handleMethod(
-        const MethodCall('onCreateContextMenu', {'type': 7, 'extra': 'https://example.com'}),
-      );
+        // Simulate the native side sending onCreateContextMenu
+        await controller.handleMethod(
+          const MethodCall('onCreateContextMenu', {
+            'type': 7,
+            'extra': 'https://example.com',
+          }),
+        );
 
-      expect(createCalled, isTrue);
-      expect(receivedHitTestResult, isNotNull);
-      expect(receivedHitTestResult!.type,
-          InAppWebViewHitTestResultType.SRC_ANCHOR_TYPE);
-      expect(receivedHitTestResult!.extra, 'https://example.com');
-    });
+        expect(createCalled, isTrue);
+        expect(receivedHitTestResult, isNotNull);
+        expect(
+          receivedHitTestResult!.type,
+          InAppWebViewHitTestResultType.SRC_ANCHOR_TYPE,
+        );
+        expect(receivedHitTestResult!.extra, 'https://example.com');
+      },
+    );
 
     test('does nothing when no contextMenu is set', () async {
       // Controller with no contextMenu — should not throw
@@ -235,60 +255,62 @@ void main() {
       );
     });
 
-    test('does nothing when contextMenu has no onCreateContextMenu callback',
-        () async {
-      final contextMenu = ContextMenu(menuItems: []);
-      controller.dispose();
-      final widgetParams = PlatformInAppWebViewWidgetCreationParams(
-        controllerFromPlatform: (c) => c,
-        contextMenu: contextMenu,
-      );
-      final controllerParams = PlatformInAppWebViewControllerCreationParams(
-        id: 11111,
-        webviewParams: widgetParams,
-      );
-      controller = MacOSInAppWebViewController(controllerParams);
+    test(
+      'does nothing when contextMenu has no onCreateContextMenu callback',
+      () async {
+        final contextMenu = ContextMenu(menuItems: []);
+        controller.dispose();
+        final widgetParams = PlatformInAppWebViewWidgetCreationParams(
+          controllerFromPlatform: (c) => c,
+          contextMenu: contextMenu,
+        );
+        final controllerParams = PlatformInAppWebViewControllerCreationParams(
+          id: 11111,
+          webviewParams: widgetParams,
+        );
+        controller = MacOSInAppWebViewController(controllerParams);
 
-      // Should not throw even without the callback
-      await controller.handleMethod(
-        const MethodCall('onCreateContextMenu', {'type': 0, 'extra': null}),
-      );
-    });
+        // Should not throw even without the callback
+        await controller.handleMethod(
+          const MethodCall('onCreateContextMenu', {'type': 0, 'extra': null}),
+        );
+      },
+    );
   });
 
   group('onHideContextMenu event', () {
-    test('fires contextMenu.onHideContextMenu when event is received',
-        () async {
-      var hideCalled = false;
-      final contextMenu = ContextMenu(
-        menuItems: [],
-        onHideContextMenu: () {
-          hideCalled = true;
-        },
-      );
+    test(
+      'fires contextMenu.onHideContextMenu when event is received',
+      () async {
+        var hideCalled = false;
+        final contextMenu = ContextMenu(
+          menuItems: [],
+          onHideContextMenu: () {
+            hideCalled = true;
+          },
+        );
 
-      controller.dispose();
-      final widgetParams = PlatformInAppWebViewWidgetCreationParams(
-        controllerFromPlatform: (c) => c,
-        contextMenu: contextMenu,
-      );
-      final controllerParams = PlatformInAppWebViewControllerCreationParams(
-        id: 22222,
-        webviewParams: widgetParams,
-      );
-      controller = MacOSInAppWebViewController(controllerParams);
+        controller.dispose();
+        final widgetParams = PlatformInAppWebViewWidgetCreationParams(
+          controllerFromPlatform: (c) => c,
+          contextMenu: contextMenu,
+        );
+        final controllerParams = PlatformInAppWebViewControllerCreationParams(
+          id: 22222,
+          webviewParams: widgetParams,
+        );
+        controller = MacOSInAppWebViewController(controllerParams);
 
-      await controller.handleMethod(
-        const MethodCall('onHideContextMenu', {}),
-      );
+        await controller.handleMethod(
+          const MethodCall('onHideContextMenu', {}),
+        );
 
-      expect(hideCalled, isTrue);
-    });
+        expect(hideCalled, isTrue);
+      },
+    );
 
     test('does nothing when no contextMenu is set', () async {
-      await controller.handleMethod(
-        const MethodCall('onHideContextMenu', {}),
-      );
+      await controller.handleMethod(const MethodCall('onHideContextMenu', {}));
     });
   });
 
@@ -330,47 +352,51 @@ void main() {
         }),
       );
 
-      expect(itemActionCalled, isTrue,
-          reason: 'item action should be called');
-      expect(clickedItem, isNotNull,
-          reason: 'onContextMenuActionItemClicked should fire');
+      expect(itemActionCalled, isTrue, reason: 'item action should be called');
+      expect(
+        clickedItem,
+        isNotNull,
+        reason: 'onContextMenuActionItemClicked should fire',
+      );
       expect(clickedItem!.id, 1);
       expect(clickedItem!.title, 'Custom Action');
     });
 
-    test('fires onContextMenuActionItemClicked even for unknown item id',
-        () async {
-      ContextMenuItem? clickedItem;
+    test(
+      'fires onContextMenuActionItemClicked even for unknown item id',
+      () async {
+        ContextMenuItem? clickedItem;
 
-      final contextMenu = ContextMenu(
-        menuItems: [],
-        onContextMenuActionItemClicked: (item) {
-          clickedItem = item;
-        },
-      );
+        final contextMenu = ContextMenu(
+          menuItems: [],
+          onContextMenuActionItemClicked: (item) {
+            clickedItem = item;
+          },
+        );
 
-      controller.dispose();
-      final widgetParams = PlatformInAppWebViewWidgetCreationParams(
-        controllerFromPlatform: (c) => c,
-        contextMenu: contextMenu,
-      );
-      final controllerParams = PlatformInAppWebViewControllerCreationParams(
-        id: 44444,
-        webviewParams: widgetParams,
-      );
-      controller = MacOSInAppWebViewController(controllerParams);
+        controller.dispose();
+        final widgetParams = PlatformInAppWebViewWidgetCreationParams(
+          controllerFromPlatform: (c) => c,
+          contextMenu: contextMenu,
+        );
+        final controllerParams = PlatformInAppWebViewControllerCreationParams(
+          id: 44444,
+          webviewParams: widgetParams,
+        );
+        controller = MacOSInAppWebViewController(controllerParams);
 
-      await controller.handleMethod(
-        const MethodCall('onContextMenuActionItemClicked', {
-          'id': 99,
-          'title': 'Unknown',
-        }),
-      );
+        await controller.handleMethod(
+          const MethodCall('onContextMenuActionItemClicked', {
+            'id': 99,
+            'title': 'Unknown',
+          }),
+        );
 
-      expect(clickedItem, isNotNull);
-      expect(clickedItem!.id, 99);
-      expect(clickedItem!.title, 'Unknown');
-    });
+        expect(clickedItem, isNotNull);
+        expect(clickedItem!.id, 99);
+        expect(clickedItem!.title, 'Unknown');
+      },
+    );
 
     test('does nothing when no contextMenu is set', () async {
       await controller.handleMethod(
@@ -391,25 +417,30 @@ void main() {
       expect(map['disableContextMenu'], false);
     });
 
-    test('disableLongPressContextMenuOnLinks defaults to false and is serializable',
-        () {
-      final settings = InAppWebViewSettings();
-      expect(settings.disableLongPressContextMenuOnLinks, false);
-      final map = settings.toJson();
-      expect(map.containsKey('disableLongPressContextMenuOnLinks'), isTrue);
-      expect(map['disableLongPressContextMenuOnLinks'], false);
-    });
+    test(
+      'disableLongPressContextMenuOnLinks defaults to false and is serializable',
+      () {
+        final settings = InAppWebViewSettings();
+        expect(settings.disableLongPressContextMenuOnLinks, false);
+        final map = settings.toJson();
+        expect(map.containsKey('disableLongPressContextMenuOnLinks'), isTrue);
+        expect(map['disableLongPressContextMenuOnLinks'], false);
+      },
+    );
 
-    test('settings round-trip through fromMap preserves context menu fields', () {
-      final settings = InAppWebViewSettings(
-        disableContextMenu: true,
-        disableLongPressContextMenuOnLinks: true,
-      );
-      final map = settings.toJson();
-      final restored = InAppWebViewSettings.fromJson(map)!;
-      expect(restored.disableContextMenu, isTrue);
-      expect(restored.disableLongPressContextMenuOnLinks, isTrue);
-    });
+    test(
+      'settings round-trip through fromMap preserves context menu fields',
+      () {
+        final settings = InAppWebViewSettings(
+          disableContextMenu: true,
+          disableLongPressContextMenuOnLinks: true,
+        );
+        final map = settings.toJson();
+        final restored = InAppWebViewSettings.fromJson(map);
+        expect(restored.disableContextMenu, isTrue);
+        expect(restored.disableLongPressContextMenuOnLinks, isTrue);
+      },
+    );
   });
 
   group('ContextMenuSettings', () {
@@ -419,7 +450,9 @@ void main() {
     });
 
     test('hideDefaultSystemContextMenuItems can be set to true', () {
-      final settings = ContextMenuSettings(hideDefaultSystemContextMenuItems: true);
+      final settings = ContextMenuSettings(
+        hideDefaultSystemContextMenuItems: true,
+      );
       expect(settings.hideDefaultSystemContextMenuItems, isTrue);
     });
   });

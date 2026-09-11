@@ -42,7 +42,9 @@ void main() {
         ),
       ),
     );
-    final controller = await created.future.timeout(const Duration(seconds: 120));
+    final controller = await created.future.timeout(
+      const Duration(seconds: 120),
+    );
     await controller.loadData(
       data: '<html><body><h1>pdf</h1><p>hello zikzak</p></body></html>',
     );
@@ -56,25 +58,35 @@ void main() {
     return controller;
   }
 
-  testWidgets(
-    'A11 iOS createPdf on iOS 14.0+ returns valid PDF byte buffer',
-    (WidgetTester tester) async {
-      // createPdf is an iOS acceptance behavior (US5-AC2); skip elsewhere.
-      if (!Platform.isIOS) return;
+  testWidgets('A11 iOS createPdf on iOS 14.0+ returns valid PDF byte buffer', (
+    WidgetTester tester,
+  ) async {
+    // createPdf is an iOS acceptance behavior (US5-AC2); skip elsewhere.
+    if (!Platform.isIOS) return;
 
-      final controller = await pumpWebView(tester, pageLoaded: Completer());
+    final controller = await pumpWebView(tester, pageLoaded: Completer());
 
-      final Uint8List? pdf = await controller
-          .createPdf(pdfConfiguration: PDFConfiguration())
-          .timeout(const Duration(seconds: 120));
+    final Uint8List? pdf = await controller
+        .createPdf(pdfConfiguration: PDFConfiguration())
+        .timeout(const Duration(seconds: 120));
 
-      expect(pdf, isNotNull,
-          reason: 'createPdf must return non-null PDF bytes on iOS 14+ (US5-AC2)');
-      expect(pdf!.length, greaterThan(4),
-          reason: 'the PDF byte buffer must be non-trivial');
-      final header = String.fromCharCodes(pdf.sublist(0, pdf.length >= 5 ? 5 : pdf.length));
-      expect(header.startsWith('%PDF'), isTrue,
-          reason: 'returned bytes must be a valid PDF document (%PDF header)');
-    },
-  );
+    expect(
+      pdf,
+      isNotNull,
+      reason: 'createPdf must return non-null PDF bytes on iOS 14+ (US5-AC2)',
+    );
+    expect(
+      pdf!.length,
+      greaterThan(4),
+      reason: 'the PDF byte buffer must be non-trivial',
+    );
+    final header = String.fromCharCodes(
+      pdf.sublist(0, pdf.length >= 5 ? 5 : pdf.length),
+    );
+    expect(
+      header.startsWith('%PDF'),
+      isTrue,
+      reason: 'returned bytes must be a valid PDF document (%PDF header)',
+    );
+  });
 }

@@ -62,11 +62,17 @@ void main() {
     });
 
     test('strikethroughStyle uses the wire-int helper', () {
-      final a = AttributedString(string: 's', strikethroughStyle: UnderlineStyle.DOUBLE);
+      final a = AttributedString(
+        string: 's',
+        strikethroughStyle: UnderlineStyle.DOUBLE,
+      );
       // wire [0,1,2,9,256,...].index of 9 == DOUBLE == 3
       expect(a.toJson()['strikethroughStyle'], 9);
 
-      final back = AttributedString.fromJson({'string': 's', 'strikethroughStyle': 9});
+      final back = AttributedString.fromJson({
+        'string': 's',
+        'strikethroughStyle': 9,
+      });
       expect(back.strikethroughStyle, UnderlineStyle.DOUBLE);
     });
 
@@ -84,12 +90,18 @@ void main() {
         'textEffect': 'LETTERPRESS_STYLE',
         'underlineStyle': 'SINGLE',
       });
-      expect(back.textEffect, AttributedStringTextEffectStyle.LETTERPRESS_STYLE);
+      expect(
+        back.textEffect,
+        AttributedStringTextEffectStyle.LETTERPRESS_STYLE,
+      );
       expect(back.underlineStyle, UnderlineStyle.SINGLE);
     });
 
     test('round-trip keeps value + copyWith', () {
-      final a = AttributedString(string: 'hi', foregroundColor: Color_(0xFFFF0000));
+      final a = AttributedString(
+        string: 'hi',
+        foregroundColor: Color_(0xFFFF0000),
+      );
       final back = AttributedString.fromJson(a.toJson());
       expect(back.string, 'hi');
       expect(back.foregroundColor?.toHex(), '#ffff0000');

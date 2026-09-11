@@ -93,7 +93,9 @@ class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
             ].contains(defaultTargetPlatform)
         ? null
         : PullToRefreshController(
-            settings: PullToRefreshSettings(color: Color_(Colors.black.value)),
+            settings: PullToRefreshSettings(
+              color: Color_(Colors.black.toARGB32()),
+            ),
             onRefresh: () async {
               if (Platform.isAndroid) {
                 browser.webViewController?.reload();

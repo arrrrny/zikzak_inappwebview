@@ -52,12 +52,12 @@ class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
                 params,
               ),
       ) {
-    this._port = params.port;
-    this._directoryIndex = params.directoryIndex;
-    this._documentRoot = (params.documentRoot.endsWith('/'))
+    _port = params.port;
+    _directoryIndex = params.directoryIndex;
+    _documentRoot = (params.documentRoot.endsWith('/'))
         ? params.documentRoot
         : '${params.documentRoot}/';
-    this._shared = params.shared;
+    _shared = params.shared;
   }
 
   @override
@@ -87,7 +87,7 @@ class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
 
     try {
       _server = await HttpServer.bind('127.0.0.1', _port, shared: _shared);
-      print('Server running on http://localhost:' + _port.toString());
+      print('Server running on http://localhost:$_port');
 
       _server!.listen((HttpRequest request) async {
         Uint8List body = Uint8List(0);
@@ -172,7 +172,7 @@ class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
 
   @override
   bool isRunning() {
-    return this._server != null;
+    return _server != null;
   }
 
   ContentType _getContentTypeFromMimeType(String mimeType) {

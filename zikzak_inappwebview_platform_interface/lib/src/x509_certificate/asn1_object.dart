@@ -76,12 +76,12 @@ class ASN1Object {
         output += " ($descr)";
       }
     }
-    output += sub != null && sub!.length > 0 ? " {" : "";
+    output += sub != null && sub!.isNotEmpty ? " {" : "";
     output += "\n";
     for (var item in (sub ?? <ASN1Object>[])) {
       output += item.printAsn1(insets: insets + "    ");
     }
-    output += sub != null && sub!.length > 0 ? "}\n" : "";
+    output += sub != null && sub!.isNotEmpty ? "}\n" : "";
     return output;
   }
 
@@ -102,7 +102,7 @@ class ASN1Object {
       return value;
     }
 
-    if (sub != null && sub!.length > 0) {
+    if (sub != null && sub!.isNotEmpty) {
       for (var item in sub!) {
         var itemAsString = item.asString;
         if (itemAsString != null) {

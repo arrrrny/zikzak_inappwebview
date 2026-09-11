@@ -8,9 +8,11 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 /// defaults, which is fine because the test only exercises [dispose].
 class _FakeHeadlessPlatform extends PlatformHeadlessInAppWebView {
   _FakeHeadlessPlatform()
-      : super.implementation(PlatformHeadlessInAppWebViewCreationParams(
+    : super.implementation(
+        PlatformHeadlessInAppWebViewCreationParams(
           controllerFromPlatform: (_) => throw UnimplementedError(),
-        ));
+        ),
+      );
 
   int disposeCount = 0;
 

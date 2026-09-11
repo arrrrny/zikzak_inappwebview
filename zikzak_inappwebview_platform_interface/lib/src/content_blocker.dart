@@ -137,26 +137,26 @@ class ContentBlockerTrigger {
     this.unlessTopUrl = const <String>[],
     this.loadContext = const <ContentBlockerTriggerLoadContext>[],
   }) {
-    assert(!(this.ifDomain.isEmpty || this.unlessDomain.isEmpty) == false);
-    assert(this.loadType.length <= 2);
-    assert(!(this.ifTopUrl.isEmpty || this.unlessTopUrl.isEmpty) == false);
+    assert(!(ifDomain.isEmpty || unlessDomain.isEmpty) == false);
+    assert(loadType.length <= 2);
+    assert(!(ifTopUrl.isEmpty || unlessTopUrl.isEmpty) == false);
   }
 
   Map<String, dynamic> toMap() {
     List<String> resourceTypeStringList = [];
-    resourceType.forEach((type) {
+    for (var type in resourceType) {
       resourceTypeStringList.add(
         contentBlockerTriggerResourceTypeToWire(type)!,
       );
-    });
+    }
     List<String> loadTypeStringList = [];
-    loadType.forEach((type) {
+    for (var type in loadType) {
       loadTypeStringList.add(contentBlockerTriggerLoadTypeToWire(type)!);
-    });
+    }
     List<String> loadContextStringList = [];
-    loadContext.forEach((type) {
+    for (var type in loadContext) {
       loadContextStringList.add(contentBlockerTriggerLoadContextToWire(type)!);
-    });
+    }
 
     Map<String, dynamic> map = {
       "url-filter": urlFilter,
@@ -175,7 +175,7 @@ class ContentBlockerTrigger {
         .where(
           (key) =>
               map[key] == null ||
-              (map[key] is List && (map[key] as List).length == 0),
+              (map[key] is List && (map[key] as List).isEmpty),
         ) // filter keys
         .toList() // create a copy to avoid concurrent modifications
         .forEach(map.remove);
@@ -191,30 +191,30 @@ class ContentBlockerTrigger {
     List<String> resourceTypeStringList = List<String>.from(
       map["resource-type"] ?? [],
     );
-    resourceTypeStringList.forEach((typeValue) {
+    for (var typeValue in resourceTypeStringList) {
       var type = contentBlockerTriggerResourceTypeFromWire(typeValue);
       if (type != null) {
         resourceType.add(type);
       }
-    });
+    }
 
     List<String> loadTypeStringList = List<String>.from(map["load-type"] ?? []);
-    loadTypeStringList.forEach((typeValue) {
+    for (var typeValue in loadTypeStringList) {
       var type = contentBlockerTriggerLoadTypeFromWire(typeValue);
       if (type != null) {
         loadType.add(type);
       }
-    });
+    }
 
     List<String> loadContextStringList = List<String>.from(
       map["load-context"] ?? [],
     );
-    loadContextStringList.forEach((typeValue) {
+    for (var typeValue in loadContextStringList) {
       var context = contentBlockerTriggerLoadContextFromWire(typeValue);
       if (context != null) {
         loadContext.add(context);
       }
-    });
+    }
 
     return ContentBlockerTrigger(
       urlFilter: map["url-filter"],
@@ -250,8 +250,8 @@ class ContentBlockerAction {
   String? selector;
 
   ContentBlockerAction({required this.type, this.selector}) {
-    if (this.type == ContentBlockerActionType.CSS_DISPLAY_NONE) {
-      assert(this.selector != null);
+    if (type == ContentBlockerActionType.CSS_DISPLAY_NONE) {
+      assert(selector != null);
     }
   }
 
@@ -265,7 +265,7 @@ class ContentBlockerAction {
         .where(
           (key) =>
               map[key] == null ||
-              (map[key] is List && (map[key] as List).length == 0),
+              (map[key] is List && (map[key] as List).isEmpty),
         ) // filter keys
         .toList() // create a copy to avoid concurrent modifications
         .forEach(map.remove);

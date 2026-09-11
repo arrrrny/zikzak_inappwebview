@@ -43,10 +43,7 @@ void main() {
     });
 
     test('fromJson applies fork defaults on missing keys', () {
-      final s = UserScript.fromJson({
-        'source': 'x',
-        'injectionTime': 0,
-      });
+      final s = UserScript.fromJson({'source': 'x', 'injectionTime': 0});
       expect(s.source, 'x');
       expect(s.allowedOriginRules, {'*'});
       expect(s.forMainFrameOnly, true);
@@ -55,7 +52,10 @@ void main() {
       expect(s.groupName, isNull);
 
       // source is required.
-      expect(() => UserScript.fromJson({'injectionTime': 0}), throwsA(anything));
+      expect(
+        () => UserScript.fromJson({'injectionTime': 0}),
+        throwsA(anything),
+      );
       // injectionTime requires an int.
       expect(
         () => UserScript.fromJson({'source': 'x', 'injectionTime': 'end'}),
@@ -90,9 +90,7 @@ void main() {
       final t = MetaTag(
         name: 'viewport',
         content: 'width=device-width',
-        attrs: [
-          MetaTagAttribute(name: 'data-x', value: '1'),
-        ],
+        attrs: [MetaTagAttribute(name: 'data-x', value: '1')],
       );
       expect(t.toJson(), {
         'name': 'viewport',

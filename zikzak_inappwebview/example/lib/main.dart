@@ -203,9 +203,9 @@ class _MyAppState extends State<MyApp> {
         initialRoute: '/',
         routes: {
           '/': (context) => const InAppWebViewExampleScreen(),
-        '/EdgeToEdge': (context) =>
-            const InAppWebViewEdgeToEdgeExampleScreen(),
-            '/HeadlessInAppWebView': (context) =>
+          '/EdgeToEdge': (context) =>
+              const InAppWebViewEdgeToEdgeExampleScreen(),
+          '/HeadlessInAppWebView': (context) =>
               const HeadlessInAppWebViewExampleScreen(),
         },
       );
@@ -215,10 +215,10 @@ class _MyAppState extends State<MyApp> {
         initialRoute: '/',
         routes: {
           '/': (context) => const InAppWebViewExampleScreen(),
-        '/EdgeToEdge': (context) =>
-            const InAppWebViewEdgeToEdgeExampleScreen(),
+          '/EdgeToEdge': (context) =>
+              const InAppWebViewEdgeToEdgeExampleScreen(),
           '/InAppBrowser': (context) => const InAppBrowserExampleScreen(),
-            '/HeadlessInAppWebView': (context) =>
+          '/HeadlessInAppWebView': (context) =>
               const HeadlessInAppWebViewExampleScreen(),
         },
       );
@@ -228,10 +228,10 @@ class _MyAppState extends State<MyApp> {
         initialRoute: '/',
         routes: {
           '/': (context) => const InAppWebViewExampleScreen(),
-        '/EdgeToEdge': (context) =>
-            const InAppWebViewEdgeToEdgeExampleScreen(),
+          '/EdgeToEdge': (context) =>
+              const InAppWebViewEdgeToEdgeExampleScreen(),
           '/InAppBrowser': (context) => const InAppBrowserExampleScreen(),
-            '/HeadlessInAppWebView': (context) =>
+          '/HeadlessInAppWebView': (context) =>
               const HeadlessInAppWebViewExampleScreen(),
         },
       );
@@ -240,8 +240,7 @@ class _MyAppState extends State<MyApp> {
       initialRoute: '/',
       routes: {
         '/': (context) => const InAppWebViewExampleScreen(),
-        '/EdgeToEdge': (context) =>
-            const InAppWebViewEdgeToEdgeExampleScreen(),
+        '/EdgeToEdge': (context) => const InAppWebViewEdgeToEdgeExampleScreen(),
         '/InAppBrowser': (context) => const InAppBrowserExampleScreen(),
         '/ChromeSafariBrowser': (context) => ChromeSafariBrowserExampleScreen(),
         '/HeadlessInAppWebView': (context) =>

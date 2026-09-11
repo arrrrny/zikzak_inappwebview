@@ -76,7 +76,12 @@ void main() {
         colorMode: PrintJobColorMode.COLOR,
         duplexMode: PrintJobDuplexMode.LONG_EDGE,
         orientation: PrintJobOrientation.LANDSCAPE,
-        mediaSize: PrintJobMediaSize(id: 'A4', widthMils: 8267, heightMils: 11692, label: 'A4'),
+        mediaSize: PrintJobMediaSize(
+          id: 'A4',
+          widthMils: 8267,
+          heightMils: 11692,
+          label: 'A4',
+        ),
         resolution: PrintJobResolution(
           id: 'r',
           label: '300',
@@ -111,8 +116,18 @@ void main() {
         'verticalDpi': 300,
         'horizontalDpi': 300,
       });
-      expect(map['printableRect'], {'x': 0.0, 'y': 0.0, 'width': 100.0, 'height': 50.0});
-      expect(map['paperRect'], {'x': 0.0, 'y': 0.0, 'width': 200.0, 'height': 100.0});
+      expect(map['printableRect'], {
+        'x': 0.0,
+        'y': 0.0,
+        'width': 100.0,
+        'height': 50.0,
+      });
+      expect(map['paperRect'], {
+        'x': 0.0,
+        'y': 0.0,
+        'width': 200.0,
+        'height': 100.0,
+      });
       expect(map['jobDisposition'], 2); // SAVE index
       expect(map['horizontalPagination'], 1); // FIT index
 

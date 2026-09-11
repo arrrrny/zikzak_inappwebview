@@ -156,27 +156,30 @@ void main() {
   });
 
   group('onWebContentProcessDidTerminate', () {
-    test('invokes the callback when the method is dispatched (issue #194)', () async {
-      var invoked = false;
-      final widgetParams = PlatformInAppWebViewWidgetCreationParams(
-        controllerFromPlatform: (c) => c,
-        onWebContentProcessDidTerminate: (c) {
-          invoked = true;
-        },
-      );
-      final controllerParams = PlatformInAppWebViewControllerCreationParams(
-        id: 12345,
-        webviewParams: widgetParams,
-      );
-      final ctl = MacOSInAppWebViewController(controllerParams);
+    test(
+      'invokes the callback when the method is dispatched (issue #194)',
+      () async {
+        var invoked = false;
+        final widgetParams = PlatformInAppWebViewWidgetCreationParams(
+          controllerFromPlatform: (c) => c,
+          onWebContentProcessDidTerminate: (c) {
+            invoked = true;
+          },
+        );
+        final controllerParams = PlatformInAppWebViewControllerCreationParams(
+          id: 12345,
+          webviewParams: widgetParams,
+        );
+        final ctl = MacOSInAppWebViewController(controllerParams);
 
-      await ctl.handleMethod(
-        const MethodCall('onWebContentProcessDidTerminate'),
-      );
+        await ctl.handleMethod(
+          const MethodCall('onWebContentProcessDidTerminate'),
+        );
 
-      expect(invoked, isTrue);
-      ctl.dispose();
-    });
+        expect(invoked, isTrue);
+        ctl.dispose();
+      },
+    );
 
     test('does not throw when no callback is registered', () async {
       // controller in setUp has no onWebContentProcessDidTerminate callback
@@ -318,42 +321,42 @@ void main() {
       final ctl = MacOSInAppWebViewController(controllerParams);
       addTearDown(ctl.dispose);
 
-      await ctl.handleMethod(
-        MethodCall('onScrollChanged', {'x': 12, 'y': 34}),
-      );
+      await ctl.handleMethod(MethodCall('onScrollChanged', {'x': 12, 'y': 34}));
 
       expect(receivedX, 12);
       expect(receivedY, 34);
     });
 
-    test('onContentSizeChanged invokes the callback with decoded sizes',
-        () async {
-      Size? oldSize;
-      Size? newSize;
-      final widgetParams = PlatformInAppWebViewWidgetCreationParams(
-        controllerFromPlatform: (c) => c,
-        onContentSizeChanged: (c, oldContentSize, newContentSize) {
-          oldSize = oldContentSize;
-          newSize = newContentSize;
-        },
-      );
-      final controllerParams = PlatformInAppWebViewControllerCreationParams(
-        id: 22222,
-        webviewParams: widgetParams,
-      );
-      final ctl = MacOSInAppWebViewController(controllerParams);
-      addTearDown(ctl.dispose);
+    test(
+      'onContentSizeChanged invokes the callback with decoded sizes',
+      () async {
+        Size? oldSize;
+        Size? newSize;
+        final widgetParams = PlatformInAppWebViewWidgetCreationParams(
+          controllerFromPlatform: (c) => c,
+          onContentSizeChanged: (c, oldContentSize, newContentSize) {
+            oldSize = oldContentSize;
+            newSize = newContentSize;
+          },
+        );
+        final controllerParams = PlatformInAppWebViewControllerCreationParams(
+          id: 22222,
+          webviewParams: widgetParams,
+        );
+        final ctl = MacOSInAppWebViewController(controllerParams);
+        addTearDown(ctl.dispose);
 
-      await ctl.handleMethod(
-        MethodCall('onContentSizeChanged', {
-          'oldContentSize': {'width': 100.0, 'height': 200.0},
-          'newContentSize': {'width': 300.0, 'height': 400.0},
-        }),
-      );
+        await ctl.handleMethod(
+          MethodCall('onContentSizeChanged', {
+            'oldContentSize': {'width': 100.0, 'height': 200.0},
+            'newContentSize': {'width': 300.0, 'height': 400.0},
+          }),
+        );
 
-      expect(oldSize, const Size(100, 200));
-      expect(newSize, const Size(300, 400));
-    });
+        expect(oldSize, const Size(100, 200));
+        expect(newSize, const Size(300, 400));
+      },
+    );
 
     test('onOverScrolled invokes the callback with decoded flags', () async {
       int? x;

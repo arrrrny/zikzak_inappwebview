@@ -11,9 +11,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:zikzak_inappwebview/zikzak_inappwebview.dart';
 
 class _FakePlatformController extends PlatformInAppWebViewController {
-  _FakePlatformController() : super.implementation(
-          const PlatformInAppWebViewControllerCreationParams(id: 'test'),
-        );
+  _FakePlatformController()
+    : super.implementation(
+        const PlatformInAppWebViewControllerCreationParams(id: 'test'),
+      );
 
   final Map<String, JavaScriptHandlerCallback> handlers = {};
   final List<String> evaluateCalls = [];
@@ -56,10 +57,10 @@ InAppWebViewController _controller(_FakePlatformController fake) =>
     InAppWebViewController.fromPlatform(platform: fake);
 
 Map<String, dynamic> _payload(Map<String, dynamic> extra) => {
-      'pageId': 'p1',
-      'seq': 1,
-      ...extra,
-    };
+  'pageId': 'p1',
+  'seq': 1,
+  ...extra,
+};
 
 void main() {
   group('NetworkCaptureManager.maybeCreate', () {
@@ -249,10 +250,20 @@ void main() {
         }),
       ]);
       await handler([
-        _payload({'seq': 4, 'kind': 'request', 'requestId': 'r2', 'url': 'https://api.dev/fail'}),
+        _payload({
+          'seq': 4,
+          'kind': 'request',
+          'requestId': 'r2',
+          'url': 'https://api.dev/fail',
+        }),
       ]);
       await handler([
-        _payload({'seq': 5, 'kind': 'error', 'requestId': 'r2', 'error': 'timeout'}),
+        _payload({
+          'seq': 5,
+          'kind': 'error',
+          'requestId': 'r2',
+          'error': 'timeout',
+        }),
       ]);
 
       final entries = await collector.getEntries();
@@ -301,7 +312,9 @@ void main() {
 
       await handler([]); // no payload
       await handler(['not-a-map']); // non-map payload
-      await handler([_payload({'kind': 'request'})]); // missing url -> null
+      await handler([
+        _payload({'kind': 'request'}),
+      ]); // missing url -> null
       expect(collector.count, 0);
     });
   });

@@ -15,9 +15,8 @@ class FakePlatformInAppWebViewController
   FakePlatformInAppWebViewController([
     PlatformInAppWebViewControllerCreationParams? params,
   ]) : super.implementation(
-          params ??
-              const PlatformInAppWebViewControllerCreationParams(id: 0),
-        );
+         params ?? const PlatformInAppWebViewControllerCreationParams(id: 0),
+       );
 
   /// Ordered record of every recorded method call.
   final List<_Call> calls = [];
@@ -56,7 +55,10 @@ class FakePlatformInAppWebViewController
   }
 
   @override
-  Future<void> postUrl({required WebUri url, required Uint8List postData}) async {
+  Future<void> postUrl({
+    required WebUri url,
+    required Uint8List postData,
+  }) async {
     _record('postUrl', {'url': url, 'postData': postData});
   }
 
@@ -282,15 +284,12 @@ class FakePlatformInAppWebViewController
   }
 
   @override
-  Future<void> removeUserScriptsByGroupName({
-    required String groupName,
-  }) async {
+  Future<void> removeUserScriptsByGroupName({required String groupName}) async {
     _record('removeUserScriptsByGroupName', {'groupName': groupName});
   }
 
   @override
-  Future<void> removeAllUserScripts() async =>
-      _record('removeAllUserScripts');
+  Future<void> removeAllUserScripts() async => _record('removeAllUserScripts');
 
   @override
   bool hasUserScript({required UserScript userScript}) {

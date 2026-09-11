@@ -226,7 +226,7 @@ class InAppWebViewController implements Disposable {
       this.settings.setSettings(settings: settings);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getSettings}
-  Future<InAppWebViewSettings?> getSettings() => this.settings.getSettings();
+  Future<InAppWebViewSettings?> getSettings() => settings.getSettings();
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getCopyBackForwardList}
   Future<WebHistory?> getCopyBackForwardList() =>

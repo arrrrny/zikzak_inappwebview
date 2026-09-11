@@ -17,7 +17,11 @@ void main() {
     // PROGRESS.md anomalies.
     test('constructor + toJson/fromJson round-trip', () {
       final r = AndroidResource(name: 'ic_launcher', defType: 'drawable');
-      expect(r.toJson(), {'name': 'ic_launcher', 'defType': 'drawable', 'defPackage': null});
+      expect(r.toJson(), {
+        'name': 'ic_launcher',
+        'defType': 'drawable',
+        'defPackage': null,
+      });
       final back = AndroidResource.fromJson(r.toJson());
       expect(back.name, 'ic_launcher');
       expect(back.defType, 'drawable');
@@ -33,7 +37,11 @@ void main() {
         extensionIdentifier: 'com.app.share',
       );
       expect(b.toJson(), {
-        'templateImage': {'name': 'share.png', 'systemName': null, 'data': null},
+        'templateImage': {
+          'name': 'share.png',
+          'systemName': null,
+          'data': null,
+        },
         'extensionIdentifier': 'com.app.share',
       });
       expect(() => ActivityButton.fromJson({}), throwsA(anything));
@@ -73,8 +81,10 @@ void main() {
       expect(d.toJson(), {'didCrash': true, 'rendererPriorityAtExit': 2});
       final back = RenderProcessGoneDetail.fromJson(d.toJson());
       expect(back.didCrash, true);
-      expect(back.rendererPriorityAtExit,
-          RendererPriority.RENDERER_PRIORITY_IMPORTANT);
+      expect(
+        back.rendererPriorityAtExit,
+        RendererPriority.RENDERER_PRIORITY_IMPORTANT,
+      );
       final none = RenderProcessGoneDetail.fromJson({'didCrash': false});
       expect(none.rendererPriorityAtExit, isNull);
     });
@@ -86,10 +96,15 @@ void main() {
         rendererRequestedPriority: RendererPriority.RENDERER_PRIORITY_BOUND,
         waivedWhenNotVisible: true,
       );
-      expect(p.toJson(), {'rendererRequestedPriority': 1, 'waivedWhenNotVisible': true});
+      expect(p.toJson(), {
+        'rendererRequestedPriority': 1,
+        'waivedWhenNotVisible': true,
+      });
       final back = RendererPriorityPolicy.fromJson(p.toJson());
-      expect(back.rendererRequestedPriority,
-          RendererPriority.RENDERER_PRIORITY_BOUND);
+      expect(
+        back.rendererRequestedPriority,
+        RendererPriority.RENDERER_PRIORITY_BOUND,
+      );
       expect(back.waivedWhenNotVisible, true);
     });
   });
@@ -109,10 +124,28 @@ void main() {
       expect(back.schemeFilter, ProxySchemeFilter.MATCH_HTTP);
       expect(ProxyRule.fromJson({'url': 'https://x.dev'}).schemeFilter, isNull);
       // Wire map: ['*', 'http', 'https'] — MATCH_ALL_SCHEMES='*', MATCH_HTTP='http', MATCH_HTTPS='https'
-      expect(ProxyRule(url: WebUri('https://x.dev'), schemeFilter: ProxySchemeFilter.MATCH_ALL_SCHEMES).toJson()['schemeFilter'], '*');
-      expect(ProxyRule(url: WebUri('https://x.dev'), schemeFilter: ProxySchemeFilter.MATCH_HTTPS).toJson()['schemeFilter'], 'https');
+      expect(
+        ProxyRule(
+          url: WebUri('https://x.dev'),
+          schemeFilter: ProxySchemeFilter.MATCH_ALL_SCHEMES,
+        ).toJson()['schemeFilter'],
+        '*',
+      );
+      expect(
+        ProxyRule(
+          url: WebUri('https://x.dev'),
+          schemeFilter: ProxySchemeFilter.MATCH_HTTPS,
+        ).toJson()['schemeFilter'],
+        'https',
+      );
       // fromWire('wss') is not in the wire map → returns null.
-      expect(ProxyRule.fromJson({'url': 'https://x.dev', 'schemeFilter': 'wss'}).schemeFilter, isNull);
+      expect(
+        ProxyRule.fromJson({
+          'url': 'https://x.dev',
+          'schemeFilter': 'wss',
+        }).schemeFilter,
+        isNull,
+      );
     });
   });
 
@@ -165,16 +198,33 @@ void main() {
   group('TracingCategory wire (bitmask list [1,2,64,8,32,0,16,4])', () {
     test('wire helper round-trips', () {
       expect(tracingCategoryToWire(TracingCategory.CATEGORIES_ALL), 1);
-      expect(tracingCategoryToWire(TracingCategory.CATEGORIES_ANDROID_WEBVIEW), 2);
-      expect(tracingCategoryToWire(TracingCategory.CATEGORIES_FRAME_VIEWER), 64);
-      expect(tracingCategoryToWire(TracingCategory.CATEGORIES_INPUT_LATENCY), 8);
       expect(
-        tracingCategoryToWire(TracingCategory.CATEGORIES_JAVASCRIPT_AND_RENDERING),
+        tracingCategoryToWire(TracingCategory.CATEGORIES_ANDROID_WEBVIEW),
+        2,
+      );
+      expect(
+        tracingCategoryToWire(TracingCategory.CATEGORIES_FRAME_VIEWER),
+        64,
+      );
+      expect(
+        tracingCategoryToWire(TracingCategory.CATEGORIES_INPUT_LATENCY),
+        8,
+      );
+      expect(
+        tracingCategoryToWire(
+          TracingCategory.CATEGORIES_JAVASCRIPT_AND_RENDERING,
+        ),
         32,
       );
       expect(tracingCategoryToWire(TracingCategory.CATEGORIES_RENDERING), 16);
-      expect(tracingCategoryToWire(TracingCategory.CATEGORIES_WEB_DEVELOPER), 4);
-      expect(tracingCategoryFromWire(64), TracingCategory.CATEGORIES_FRAME_VIEWER);
+      expect(
+        tracingCategoryToWire(TracingCategory.CATEGORIES_WEB_DEVELOPER),
+        4,
+      );
+      expect(
+        tracingCategoryFromWire(64),
+        TracingCategory.CATEGORIES_FRAME_VIEWER,
+      );
       expect(tracingCategoryFromWire(999), isNull);
       expect(tracingCategoryFromWire('x'), isNull);
     });
@@ -183,9 +233,14 @@ void main() {
   group('WebViewRenderProcessAction', () {
     test('wire + helper', () {
       expect(WebViewRenderProcessAction.TERMINATE.index, 0);
-      expect(webViewRenderProcessActionToWire(WebViewRenderProcessAction.TERMINATE), 0);
-      expect(webViewRenderProcessActionFromWire(0),
-          WebViewRenderProcessAction.TERMINATE);
+      expect(
+        webViewRenderProcessActionToWire(WebViewRenderProcessAction.TERMINATE),
+        0,
+      );
+      expect(
+        webViewRenderProcessActionFromWire(0),
+        WebViewRenderProcessAction.TERMINATE,
+      );
       expect(webViewRenderProcessActionFromWire(5), isNull);
     });
   });

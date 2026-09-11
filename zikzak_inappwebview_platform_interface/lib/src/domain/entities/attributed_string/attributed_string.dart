@@ -168,10 +168,3 @@ UnderlineStyle? _strikethroughStyleFromJson(Object? value) =>
 
 Object? _strikethroughStyleToJson(UnderlineStyle? value) =>
     underlineStyleToWire(value);
-
-AttributedStringTextEffectStyle _textEffectFromJson(Object? value) =>
-    attributedStringTextEffectStyleFromWire(value) ??
-    AttributedStringTextEffectStyle.values.first;
-
-Object? _textEffectToJson(AttributedStringTextEffectStyle value) =>
-    attributedStringTextEffectStyleToWire(value);

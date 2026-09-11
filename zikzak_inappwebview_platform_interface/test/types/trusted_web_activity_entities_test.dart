@@ -29,10 +29,7 @@ void main() {
       final fromMap = TrustedWebActivityImmersiveDisplayMode.fromMap(m.toMap());
       expect(fromMap?.isSticky, true);
       expect(fromMap?.displayCutoutMode, LayoutInDisplayCutoutMode.ALWAYS);
-      expect(
-        TrustedWebActivityImmersiveDisplayMode.fromMap(null),
-        isNull,
-      );
+      expect(TrustedWebActivityImmersiveDisplayMode.fromMap(null), isNull);
     });
 
     test('displayMode round-trips through ChromeSafariBrowserSettings', () {
@@ -80,7 +77,10 @@ void main() {
       final s2 = ChromeSafariBrowserSettings.fromJson({});
       expect(s2.screenOrientation, TrustedWebActivityScreenOrientation.DEFAULT);
       final s3 = ChromeSafariBrowserSettings.fromJson({'screenOrientation': 4});
-      expect(s3.screenOrientation, TrustedWebActivityScreenOrientation.LANDSCAPE_SECONDARY);
+      expect(
+        s3.screenOrientation,
+        TrustedWebActivityScreenOrientation.LANDSCAPE_SECONDARY,
+      );
     });
   });
 }

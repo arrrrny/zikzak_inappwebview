@@ -7,9 +7,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:zikzak_inappwebview/zikzak_inappwebview.dart';
 
 class _FakeWebStorageManager extends PlatformWebStorageManager {
-  _FakeWebStorageManager() : super.implementation(
-          const PlatformWebStorageManagerCreationParams(),
-        );
+  _FakeWebStorageManager()
+    : super.implementation(const PlatformWebStorageManagerCreationParams());
 
   final List<String> calls = [];
   List<WebStorageOrigin> origins = [];
@@ -39,9 +38,8 @@ class _FakeWebStorageManager extends PlatformWebStorageManager {
 }
 
 class _FakeFindInteraction extends PlatformFindInteractionController {
-  _FakeFindInteraction() : super.implementation(
-          PlatformFindInteractionControllerCreationParams(),
-        );
+  _FakeFindInteraction()
+    : super.implementation(PlatformFindInteractionControllerCreationParams());
 
   final List<String> calls = [];
 
@@ -53,10 +51,6 @@ class _FakeFindInteraction extends PlatformFindInteractionController {
       calls.add('findNext:$forward');
 
   @override
-  Future<void> findPrevious({bool forward = true}) async =>
-      calls.add('findPrevious:$forward');
-
-  @override
   Future<void> clearMatches() async => calls.add('clearMatches');
 
   @override
@@ -64,9 +58,8 @@ class _FakeFindInteraction extends PlatformFindInteractionController {
 }
 
 class _FakePullToRefresh extends PlatformPullToRefreshController {
-  _FakePullToRefresh() : super.implementation(
-          PlatformPullToRefreshControllerCreationParams(),
-        );
+  _FakePullToRefresh()
+    : super.implementation(PlatformPullToRefreshControllerCreationParams());
 
   final List<String> calls = [];
   bool enabled = true;
@@ -85,9 +78,10 @@ class _FakePullToRefresh extends PlatformPullToRefreshController {
 }
 
 class _FakePrintJob extends PlatformPrintJobController {
-  _FakePrintJob() : super.implementation(
-          PlatformPrintJobControllerCreationParams(id: 'job-1'),
-        );
+  _FakePrintJob()
+    : super.implementation(
+        PlatformPrintJobControllerCreationParams(id: 'job-1'),
+      );
 
   final List<String> calls = [];
 
@@ -102,9 +96,10 @@ class _FakePrintJob extends PlatformPrintJobController {
 }
 
 class _FakeServiceWorker extends PlatformServiceWorkerController {
-  _FakeServiceWorker() : super.implementation(
-          const PlatformServiceWorkerControllerCreationParams(),
-        );
+  _FakeServiceWorker()
+    : super.implementation(
+        const PlatformServiceWorkerControllerCreationParams(),
+      );
 
   final List<String> calls = [];
   ServiceWorkerClient? client;

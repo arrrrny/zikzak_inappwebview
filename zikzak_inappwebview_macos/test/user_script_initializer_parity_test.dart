@@ -29,7 +29,8 @@ void main() {
       expect(
         userScriptSwift.existsSync(),
         isTrue,
-        reason: 'UserScript.swift not found relative to package root '
+        reason:
+            'UserScript.swift not found relative to package root '
             '(cwd: ${Directory.current.path})',
       );
       source = userScriptSwift.readAsStringSync();
@@ -44,7 +45,8 @@ void main() {
           r'forMainFrameOnly:\s*Bool\s*\)',
         ).hasMatch(source),
         isTrue,
-        reason: 'the base 3-argument WKUserScript initializer must be '
+        reason:
+            'the base 3-argument WKUserScript initializer must be '
             'overridden by the UserScript subclass',
       );
     });
@@ -79,7 +81,8 @@ void main() {
           r'forMainFrameOnly:\s*Bool\s*\)',
         ).hasMatch(source),
         isTrue,
-        reason: 'groupName-tracking initializer (issue #197 support) '
+        reason:
+            'groupName-tracking initializer (issue #197 support) '
             'must remain declared',
       );
     });
@@ -133,19 +136,25 @@ void main() {
       );
     });
 
-    test('fromMap keeps deserializing contentWorld scripts over the channel',
-        () {
-      // Guard the platform-channel deserialization entry point that the
-      // issue's crash flows through: it must keep constructing UserScript
-      // values with the contentWorld form when the map carries one.
-      expect(source, contains('public static func fromMap(map:'));
-      expect(source, contains('WKContentWorld.fromMap(map: contentWorldMap)'));
-      expect(
-        source,
-        contains('forMainFrameOnly: forMainFrameOnly, in: contentWorld)'),
-        reason: 'fromMap must construct contentWorld-carrying scripts via the '
-            'contentWorld initializer form',
-      );
-    });
+    test(
+      'fromMap keeps deserializing contentWorld scripts over the channel',
+      () {
+        // Guard the platform-channel deserialization entry point that the
+        // issue's crash flows through: it must keep constructing UserScript
+        // values with the contentWorld form when the map carries one.
+        expect(source, contains('public static func fromMap(map:'));
+        expect(
+          source,
+          contains('WKContentWorld.fromMap(map: contentWorldMap)'),
+        );
+        expect(
+          source,
+          contains('forMainFrameOnly: forMainFrameOnly, in: contentWorld)'),
+          reason:
+              'fromMap must construct contentWorld-carrying scripts via the '
+              'contentWorld initializer form',
+        );
+      },
+    );
   });
 }

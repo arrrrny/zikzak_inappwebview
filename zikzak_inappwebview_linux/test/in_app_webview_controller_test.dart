@@ -15,7 +15,7 @@ void main() {
   late List<MethodCall> calls;
   late LinuxInAppWebViewController controller;
 
-  LinuxInAppWebViewController _build({
+  LinuxInAppWebViewController build({
     PlatformInAppWebViewWidgetCreationParams Function()? widgetParams,
   }) {
     final params = PlatformInAppWebViewControllerCreationParams(
@@ -43,7 +43,7 @@ void main() {
           return null;
       }
     });
-    controller = _build();
+    controller = build();
   });
 
   tearDown(() {
@@ -82,12 +82,17 @@ void main() {
       expect(await controller.canGoBack(), true);
       expect(await controller.canGoForward(), true);
       expect(await controller.isLoading(), true);
-      expect(calls.map((c) => c.method).toList(),
-          ['canGoBack', 'canGoForward', 'isLoading']);
+      expect(calls.map((c) => c.method).toList(), [
+        'canGoBack',
+        'canGoForward',
+        'isLoading',
+      ]);
     });
 
     test('loadUrl with null urlRequest fields', () async {
-      await controller.loadUrl(urlRequest: URLRequest(url: WebUri('https://a.dev/')));
+      await controller.loadUrl(
+        urlRequest: URLRequest(url: WebUri('https://a.dev/')),
+      );
       final args = calls.single.arguments as Map;
       final urlRequest = args['urlRequest'] as Map;
       expect(urlRequest['url'], 'https://a.dev/');
@@ -99,7 +104,7 @@ void main() {
     test('onLoadStart + onLoadStop deliver WebUri', () async {
       final loaded = <WebUri?>[];
       final stopped = <WebUri?>[];
-      controller = _build(
+      controller = build(
         widgetParams: () => PlatformInAppWebViewWidgetCreationParams(
           controllerFromPlatform: (c) => c,
           onLoadStart: (c, url) => loaded.add(url),
@@ -133,10 +138,7 @@ void main() {
       expect(result, 'result');
 
       final missing = await controller.handleMethod(
-        MethodCall('onCallJsHandler', {
-          'handlerName': 'nope',
-          'args': [],
-        }),
+        MethodCall('onCallJsHandler', {'handlerName': 'nope', 'args': []}),
       );
       expect(missing, isNull);
     });

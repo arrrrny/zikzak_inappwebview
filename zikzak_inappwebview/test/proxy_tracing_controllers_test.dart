@@ -6,9 +6,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:zikzak_inappwebview/zikzak_inappwebview.dart';
 
 class _FakePlatformProxyController extends PlatformProxyController {
-  _FakePlatformProxyController() : super.implementation(
-          const PlatformProxyControllerCreationParams(),
-        );
+  _FakePlatformProxyController()
+    : super.implementation(const PlatformProxyControllerCreationParams());
 
   ProxySettings? lastSettings;
   int setOverrideCount = 0;
@@ -21,7 +20,7 @@ class _FakePlatformProxyController extends PlatformProxyController {
   }
 
   @override
-  Future<void> clearProxyOverride() async {
+  Future<void> clearProxyOverride({String? profileId}) async {
     clearOverrideCount++;
   }
 
@@ -30,9 +29,8 @@ class _FakePlatformProxyController extends PlatformProxyController {
 }
 
 class _FakePlatformTracingController extends PlatformTracingController {
-  _FakePlatformTracingController() : super.implementation(
-          const PlatformTracingControllerCreationParams(),
-        );
+  _FakePlatformTracingController()
+    : super.implementation(const PlatformTracingControllerCreationParams());
 
   TracingSettings? lastSettings;
   String? lastFilePath;
@@ -71,10 +69,13 @@ void main() {
       await controller.setProxyOverride(settings: settings);
       expect(fake.setOverrideCount, 1);
       expect(fake.lastSettings, same(settings));
-      expect(fake.lastSettings?.androidProxySettings?.bypassRules,
-          ['*example.com']);
-      expect(fake.lastSettings?.iOSProxySettings?.proxyUrl,
-          'https://proxy.dev:8080');
+      expect(fake.lastSettings?.androidProxySettings?.bypassRules, [
+        '*example.com',
+      ]);
+      expect(
+        fake.lastSettings?.iOSProxySettings?.proxyUrl,
+        'https://proxy.dev:8080',
+      );
     });
 
     test('clearProxyOverride delegates', () async {

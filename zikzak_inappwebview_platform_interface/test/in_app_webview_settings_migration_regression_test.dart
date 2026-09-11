@@ -103,109 +103,101 @@ void main() {
       );
     });
 
-    test(
-      'platform_settings_delegate.dart imports the canonical migrated path',
-      () {
-        expect(
-          _delegateFile.existsSync(),
-          isTrue,
-          reason:
-              'lib/src/in_app_webview/modules/platform_settings_delegate.dart '
-              'must exist (it is the settings-delegate facade for '
-              'PlatformInAppWebViewController).',
-        );
-        final src = _delegateFile.readAsStringSync();
+    test('platform_settings_delegate.dart imports the canonical migrated path', () {
+      expect(
+        _delegateFile.existsSync(),
+        isTrue,
+        reason:
+            'lib/src/in_app_webview/modules/platform_settings_delegate.dart '
+            'must exist (it is the settings-delegate facade for '
+            'PlatformInAppWebViewController).',
+      );
+      final src = _delegateFile.readAsStringSync();
 
-        // The canonical import line, exactly as the fixed source carries it.
-        const canonicalImport =
-            "import '../../domain/entities/in_app_webview_settings/in_app_webview_settings.dart';";
-        expect(
-          src.contains(canonicalImport),
-          isTrue,
-          reason:
-              'platform_settings_delegate.dart must import InAppWebViewSettings '
-              "from the canonical migrated path. Expected to find: "
-              '$canonicalImport',
-        );
+      // The canonical import line, exactly as the fixed source carries it.
+      const canonicalImport =
+          "import '../../domain/entities/in_app_webview_settings/in_app_webview_settings.dart';";
+      expect(
+        src.contains(canonicalImport),
+        isTrue,
+        reason:
+            'platform_settings_delegate.dart must import InAppWebViewSettings '
+            "from the canonical migrated path. Expected to find: "
+            '$canonicalImport',
+      );
 
-        // The stale pre-migration relative import that shipped in 5.0.1.
-        // Reject it in EITHER single-quote or double-quote form.
-        const staleSingle =
-            "import '../in_app_webview_settings.dart';";
-        const staleDouble =
-            'import "../in_app_webview_settings.dart";';
-        expect(
-          src.contains(staleSingle),
-          isFalse,
-          reason:
-              'platform_settings_delegate.dart must NOT carry the stale '
-              "pre-migration relative import `import '../in_app_webview_settings.dart';` "
-              '— that import shipped in published 5.0.1 and broke every consumer of '
-              'zikzak_inappwebview_platform_interface ^5.0.0.',
-        );
-        expect(
-          src.contains(staleDouble),
-          isFalse,
-          reason:
-              'platform_settings_delegate.dart must NOT carry the stale '
-              'pre-migration relative import (double-quote variant) either.',
-        );
-      },
-    );
+      // The stale pre-migration relative import that shipped in 5.0.1.
+      // Reject it in EITHER single-quote or double-quote form.
+      const staleSingle = "import '../in_app_webview_settings.dart';";
+      const staleDouble = 'import "../in_app_webview_settings.dart";';
+      expect(
+        src.contains(staleSingle),
+        isFalse,
+        reason:
+            'platform_settings_delegate.dart must NOT carry the stale '
+            "pre-migration relative import `import '../in_app_webview_settings.dart';` "
+            '— that import shipped in published 5.0.1 and broke every consumer of '
+            'zikzak_inappwebview_platform_interface ^5.0.0.',
+      );
+      expect(
+        src.contains(staleDouble),
+        isFalse,
+        reason:
+            'platform_settings_delegate.dart must NOT carry the stale '
+            'pre-migration relative import (double-quote variant) either.',
+      );
+    });
 
-    test(
-      'no .dart file under lib/ imports the pre-migration settings path',
-      () {
-        final libDir = Directory.fromUri(_pkgRootUri().resolve('lib'));
-        expect(
-          libDir.existsSync(),
-          isTrue,
-          reason: 'lib/ must exist — this is a Dart package.',
-        );
+    test('no .dart file under lib/ imports the pre-migration settings path', () {
+      final libDir = Directory.fromUri(_pkgRootUri().resolve('lib'));
+      expect(
+        libDir.existsSync(),
+        isTrue,
+        reason: 'lib/ must exist — this is a Dart package.',
+      );
 
-        final staleImports = <String>[];
-        for (final entity in libDir.listSync(recursive: true)) {
-          if (entity is! File) continue;
-          if (!entity.path.endsWith('.dart')) continue;
+      final staleImports = <String>[];
+      for (final entity in libDir.listSync(recursive: true)) {
+        if (entity is! File) continue;
+        if (!entity.path.endsWith('.dart')) continue;
 
-          final src = entity.readAsStringSync();
-          final importerUri = entity.uri;
+        final src = entity.readAsStringSync();
+        final importerUri = entity.uri;
 
-          for (final match in _importDirective.allMatches(src)) {
-            // Extract the complete matched directive text
-            final directiveText = match.group(0)!;
-            // Extract all URI literals from the directive (including if alternatives)
-            for (final uriMatch in _uriPattern.allMatches(directiveText)) {
-              final rawPath = uriMatch.group(1)!;
-              // Package imports are absolute; only relative imports can
-              // accidentally resolve to a stale in-repo path.
-              if (rawPath.startsWith('package:')) continue;
-              if (rawPath.startsWith('dart:')) continue;
+        for (final match in _importDirective.allMatches(src)) {
+          // Extract the complete matched directive text
+          final directiveText = match.group(0)!;
+          // Extract all URI literals from the directive (including if alternatives)
+          for (final uriMatch in _uriPattern.allMatches(directiveText)) {
+            final rawPath = uriMatch.group(1)!;
+            // Package imports are absolute; only relative imports can
+            // accidentally resolve to a stale in-repo path.
+            if (rawPath.startsWith('package:')) continue;
+            if (rawPath.startsWith('dart:')) continue;
 
-              // Only consider imports that touch the settings entity file.
-              if (!rawPath.endsWith('in_app_webview_settings.dart')) continue;
+            // Only consider imports that touch the settings entity file.
+            if (!rawPath.endsWith('in_app_webview_settings.dart')) continue;
 
-              final resolved = importerUri.resolve(rawPath);
-              if (resolved.toString() ==
-                  _preMigrationSettingsFile.uri.toString()) {
-                staleImports.add(
-                  '${entity.path}: import \'$rawPath\' -> $resolved',
-                );
-              }
+            final resolved = importerUri.resolve(rawPath);
+            if (resolved.toString() ==
+                _preMigrationSettingsFile.uri.toString()) {
+              staleImports.add(
+                '${entity.path}: import \'$rawPath\' -> $resolved',
+              );
             }
           }
         }
+      }
 
-        expect(
-          staleImports,
-          isEmpty,
-          reason:
-              'No .dart file under lib/ may carry a relative import that '
-              'resolves to lib/src/in_app_webview/in_app_webview_settings.dart '
-              '(the pre-migration settings location). Stale imports found:\n'
-              '  - ${staleImports.join('\n  - ')}',
-        );
-      },
-    );
+      expect(
+        staleImports,
+        isEmpty,
+        reason:
+            'No .dart file under lib/ may carry a relative import that '
+            'resolves to lib/src/in_app_webview/in_app_webview_settings.dart '
+            '(the pre-migration settings location). Stale imports found:\n'
+            '  - ${staleImports.join('\n  - ')}',
+      );
+    });
   });
 }

@@ -9,7 +9,7 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 /// exercised inherit the `throw UnimplementedError` body from the base class.
 class FakePlatformCookieManager extends PlatformCookieManager {
   FakePlatformCookieManager()
-      : super.implementation(const PlatformCookieManagerCreationParams());
+    : super.implementation(const PlatformCookieManagerCreationParams());
 
   /// Ordered record of every recorded method call.
   final List<_CookieCall> calls = [];
@@ -30,10 +30,7 @@ class FakePlatformCookieManager extends PlatformCookieManager {
     required WebUri url,
     PlatformInAppWebViewController? webViewController,
   }) async {
-    _record('getCookies', {
-      'url': url,
-      'webViewController': webViewController,
-    });
+    _record('getCookies', {'url': url, 'webViewController': webViewController});
     return nextCookies;
   }
 

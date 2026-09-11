@@ -2528,6 +2528,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@template zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.dispose}
   ///Disposes the controller.
   ///{@endtemplate}
+  @override
   void dispose({bool isKeepAlive = false}) {
     throw UnimplementedError(
       'dispose is not implemented on the current platform',

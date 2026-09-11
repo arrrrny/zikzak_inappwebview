@@ -22,7 +22,10 @@ void main() {
       expect(json['verticalScrollbarThumbColor'], equals('#fff44336'));
       final restored = InAppWebViewSettings.fromJson(json);
       expect(restored.verticalScrollbarThumbColor, isNotNull);
-      expect(restored.verticalScrollbarThumbColor?.value, equals(Colors.red.value));
+      expect(
+        restored.verticalScrollbarThumbColor?.value,
+        equals(Colors.red.value),
+      );
     });
   });
 }

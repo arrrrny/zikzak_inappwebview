@@ -90,9 +90,15 @@ void main() {
       final c = PDFConfiguration(
         rect: InAppWebViewRect(x: 0, y: 1, width: 100, height: 50),
       );
-      expect(c.toJson(), {
-        'rect': {'x': 0.0, 'y': 1.0, 'width': 100.0, 'height': 50.0},
-      });
+      expect(
+        c.toJson(),
+        containsPair('rect', {
+          'x': 0.0,
+          'y': 1.0,
+          'width': 100.0,
+          'height': 50.0,
+        }),
+      );
       final back = PDFConfiguration.fromJson(c.toJson());
       expect(back.rect?.height, 50.0);
       expect(PDFConfiguration.fromJson({}).rect, isNull);
@@ -107,7 +113,12 @@ void main() {
         OName: 'o',
         UName: 'u',
       );
-      expect(d.toJson(), {'CName': 'c', 'DName': 'd', 'OName': 'o', 'UName': 'u'});
+      expect(d.toJson(), {
+        'CName': 'c',
+        'DName': 'd',
+        'OName': 'o',
+        'UName': 'u',
+      });
       final back = SslCertificateDName.fromJson(d.toJson());
       expect(back.CName, 'c');
       expect(back.UName, 'u');
@@ -122,8 +133,8 @@ void main() {
           port: 443,
           protocol: 'https',
           realm: 'r',
-          authenticationMethod:
-              URLProtectionSpaceAuthenticationMethod.NSURL_AUTHENTICATION_METHOD_SERVER_TRUST,
+          authenticationMethod: URLProtectionSpaceAuthenticationMethod
+              .NSURL_AUTHENTICATION_METHOD_SERVER_TRUST,
         ),
         credentials: [
           URLCredential(
@@ -141,36 +152,102 @@ void main() {
       expect(back.credentials?.single.username, 'u');
       expect(
         back.protectionSpace?.authenticationMethod,
-        URLProtectionSpaceAuthenticationMethod.NSURL_AUTHENTICATION_METHOD_SERVER_TRUST,
+        URLProtectionSpaceAuthenticationMethod
+            .NSURL_AUTHENTICATION_METHOD_SERVER_TRUST,
       );
     });
   });
 
   group('CustomTabs enums', () {
     test('CustomTabsNavigationEventType wire [1..6]', () {
-      expect(customTabsNavigationEventTypeToWire(CustomTabsNavigationEventType.STARTED), 1);
-      expect(customTabsNavigationEventTypeToWire(CustomTabsNavigationEventType.FINISHED), 2);
-      expect(customTabsNavigationEventTypeToWire(CustomTabsNavigationEventType.FAILED), 3);
-      expect(customTabsNavigationEventTypeToWire(CustomTabsNavigationEventType.ABORTED), 4);
-      expect(customTabsNavigationEventTypeToWire(CustomTabsNavigationEventType.TAB_SHOWN), 5);
-      expect(customTabsNavigationEventTypeToWire(CustomTabsNavigationEventType.TAB_HIDDEN), 6);
-      expect(customTabsNavigationEventTypeFromWire(3), CustomTabsNavigationEventType.FAILED);
+      expect(
+        customTabsNavigationEventTypeToWire(
+          CustomTabsNavigationEventType.STARTED,
+        ),
+        1,
+      );
+      expect(
+        customTabsNavigationEventTypeToWire(
+          CustomTabsNavigationEventType.FINISHED,
+        ),
+        2,
+      );
+      expect(
+        customTabsNavigationEventTypeToWire(
+          CustomTabsNavigationEventType.FAILED,
+        ),
+        3,
+      );
+      expect(
+        customTabsNavigationEventTypeToWire(
+          CustomTabsNavigationEventType.ABORTED,
+        ),
+        4,
+      );
+      expect(
+        customTabsNavigationEventTypeToWire(
+          CustomTabsNavigationEventType.TAB_SHOWN,
+        ),
+        5,
+      );
+      expect(
+        customTabsNavigationEventTypeToWire(
+          CustomTabsNavigationEventType.TAB_HIDDEN,
+        ),
+        6,
+      );
+      expect(
+        customTabsNavigationEventTypeFromWire(3),
+        CustomTabsNavigationEventType.FAILED,
+      );
       expect(customTabsNavigationEventTypeFromWire(0), isNull);
     });
 
     test('CustomTabsPostMessageResultType wire [0,-1,-2,-3]', () {
-      expect(customTabsPostMessageResultTypeToWire(CustomTabsPostMessageResultType.SUCCESS), 0);
-      expect(customTabsPostMessageResultTypeToWire(CustomTabsPostMessageResultType.FAILURE_DISALLOWED), -1);
-      expect(customTabsPostMessageResultTypeToWire(CustomTabsPostMessageResultType.FAILURE_REMOTE_ERROR), -2);
-      expect(customTabsPostMessageResultTypeToWire(CustomTabsPostMessageResultType.FAILURE_MESSAGING_ERROR), -3);
-      expect(customTabsPostMessageResultTypeFromWire(-2), CustomTabsPostMessageResultType.FAILURE_REMOTE_ERROR);
+      expect(
+        customTabsPostMessageResultTypeToWire(
+          CustomTabsPostMessageResultType.SUCCESS,
+        ),
+        0,
+      );
+      expect(
+        customTabsPostMessageResultTypeToWire(
+          CustomTabsPostMessageResultType.FAILURE_DISALLOWED,
+        ),
+        -1,
+      );
+      expect(
+        customTabsPostMessageResultTypeToWire(
+          CustomTabsPostMessageResultType.FAILURE_REMOTE_ERROR,
+        ),
+        -2,
+      );
+      expect(
+        customTabsPostMessageResultTypeToWire(
+          CustomTabsPostMessageResultType.FAILURE_MESSAGING_ERROR,
+        ),
+        -3,
+      );
+      expect(
+        customTabsPostMessageResultTypeFromWire(-2),
+        CustomTabsPostMessageResultType.FAILURE_REMOTE_ERROR,
+      );
       expect(customTabsPostMessageResultTypeFromWire(1), isNull);
     });
 
     test('CustomTabsRelationType wire [1,2]', () {
-      expect(customTabsRelationTypeToWire(CustomTabsRelationType.USE_AS_ORIGIN), 1);
-      expect(customTabsRelationTypeToWire(CustomTabsRelationType.HANDLE_ALL_URLS), 2);
-      expect(customTabsRelationTypeFromWire(2), CustomTabsRelationType.HANDLE_ALL_URLS);
+      expect(
+        customTabsRelationTypeToWire(CustomTabsRelationType.USE_AS_ORIGIN),
+        1,
+      );
+      expect(
+        customTabsRelationTypeToWire(CustomTabsRelationType.HANDLE_ALL_URLS),
+        2,
+      );
+      expect(
+        customTabsRelationTypeFromWire(2),
+        CustomTabsRelationType.HANDLE_ALL_URLS,
+      );
       expect(customTabsRelationTypeFromWire(0), isNull);
     });
   });

@@ -3,7 +3,7 @@
 /// InAppLocalhostServer is a native-only feature (it binds a TCP socket via
 /// `dart:io`'s `HttpServer`). On Web/WASM this stub is used instead,
 /// providing the same API surface but throwing [UnsupportedError] at runtime.
-library zikzak_inappwebview_platform_interface.src.in_app_localhost_server_stub;
+library;
 
 import 'package:flutter/foundation.dart';
 import 'platform_in_app_localhost_server.dart';
@@ -25,7 +25,7 @@ class DefaultInAppLocalhostServerCreationParams
 
 ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppLocalhostServer}
 class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
-  bool _started = false;
+  final bool _started = false;
 
   @override
   int get port => throw UnsupportedError(

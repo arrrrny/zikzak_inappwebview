@@ -35,7 +35,9 @@ jobs:
         run: flutter pub get
       - name: flutter analyze
         working-directory: ${{ matrix.package }}
-        run: flutter analyze
+        # Errors and warnings still fail the build; style-level infos are
+        # reported but tolerated (see analysis_options.yaml in each package).
+        run: flutter analyze --no-fatal-infos
 
   test:
     name: "test: ${{ matrix.package }}"

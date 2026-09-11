@@ -3,12 +3,12 @@ class ASN1IdentifierClass {
 
   const ASN1IdentifierClass._internal(this._value);
 
-  static final Set<ASN1IdentifierClass> values = [
+  static final Set<ASN1IdentifierClass> values = {
     ASN1IdentifierClass.UNIVERSAL,
     ASN1IdentifierClass.APPLICATION,
     ASN1IdentifierClass.CONTEXT_SPECIFIC,
     ASN1IdentifierClass.PRIVATE,
-  ].toSet();
+  };
 
   static ASN1IdentifierClass? fromValue(int? value) {
     if (value != null) {
@@ -25,14 +25,14 @@ class ASN1IdentifierClass {
 
   int toValue() => _value;
 
-  static const UNIVERSAL = const ASN1IdentifierClass._internal(0x00);
-  static const APPLICATION = const ASN1IdentifierClass._internal(0x40);
-  static const CONTEXT_SPECIFIC = const ASN1IdentifierClass._internal(0x80);
-  static const PRIVATE = const ASN1IdentifierClass._internal(0xC0);
+  static const UNIVERSAL = ASN1IdentifierClass._internal(0x00);
+  static const APPLICATION = ASN1IdentifierClass._internal(0x40);
+  static const CONTEXT_SPECIFIC = ASN1IdentifierClass._internal(0x80);
+  static const PRIVATE = ASN1IdentifierClass._internal(0xC0);
 
   @override
   String toString() {
-    switch (this.toValue()) {
+    switch (toValue()) {
       case 0x00:
         return "UNIVERSAL";
       case 0x40:
@@ -45,6 +45,7 @@ class ASN1IdentifierClass {
     return "";
   }
 
+  @override
   bool operator ==(value) => value == _value;
 
   @override
@@ -56,7 +57,7 @@ class ASN1IdentifierTagNumber {
 
   const ASN1IdentifierTagNumber._internal(this._value);
 
-  static final Set<ASN1IdentifierTagNumber> values = [
+  static final Set<ASN1IdentifierTagNumber> values = {
     ASN1IdentifierTagNumber.END_OF_CONTENT,
     ASN1IdentifierTagNumber.BOOLEAN,
     ASN1IdentifierTagNumber.INTEGER,
@@ -86,7 +87,7 @@ class ASN1IdentifierTagNumber {
     ASN1IdentifierTagNumber.UNIVERSAL_STRING,
     ASN1IdentifierTagNumber.CHARACTER_STRING,
     ASN1IdentifierTagNumber.BMP_STRING,
-  ].toSet();
+  };
 
   static ASN1IdentifierTagNumber? fromValue(int? value) {
     if (value != null) {
@@ -103,43 +104,39 @@ class ASN1IdentifierTagNumber {
 
   int toValue() => _value;
 
-  static const END_OF_CONTENT = const ASN1IdentifierTagNumber._internal(0x00);
-  static const BOOLEAN = const ASN1IdentifierTagNumber._internal(0x01);
-  static const INTEGER = const ASN1IdentifierTagNumber._internal(0x02);
-  static const BIT_STRING = const ASN1IdentifierTagNumber._internal(0x03);
-  static const OCTET_STRING = const ASN1IdentifierTagNumber._internal(0x04);
-  static const NULL = const ASN1IdentifierTagNumber._internal(0x05);
-  static const OBJECT_IDENTIFIER = const ASN1IdentifierTagNumber._internal(
-    0x06,
-  );
-  static const OBJECT_DESCRIPTOR = const ASN1IdentifierTagNumber._internal(
-    0x07,
-  );
-  static const EXTERNAL = const ASN1IdentifierTagNumber._internal(0x08);
-  static const READ = const ASN1IdentifierTagNumber._internal(0x09);
-  static const ENUMERATED = const ASN1IdentifierTagNumber._internal(0x0A);
-  static const EMBEDDED_PDV = const ASN1IdentifierTagNumber._internal(0x0B);
-  static const UTF8_STRING = const ASN1IdentifierTagNumber._internal(0x0C);
-  static const RELATIVE_OID = const ASN1IdentifierTagNumber._internal(0x0D);
-  static const SEQUENCE = const ASN1IdentifierTagNumber._internal(0x10);
-  static const SET = const ASN1IdentifierTagNumber._internal(0x11);
-  static const NUMERIC_STRING = const ASN1IdentifierTagNumber._internal(0x12);
-  static const PRINTABLE_STRING = const ASN1IdentifierTagNumber._internal(0x13);
-  static const T61_STRING = const ASN1IdentifierTagNumber._internal(0x14);
-  static const VIDEOTEX_STRING = const ASN1IdentifierTagNumber._internal(0x15);
-  static const IA5_STRING = const ASN1IdentifierTagNumber._internal(0x16);
-  static const UTC_TIME = const ASN1IdentifierTagNumber._internal(0x17);
-  static const GENERALIZED_TIME = const ASN1IdentifierTagNumber._internal(0x18);
-  static const GRAPHIC_STRING = const ASN1IdentifierTagNumber._internal(0x19);
-  static const VISIBLE_STRING = const ASN1IdentifierTagNumber._internal(0x1A);
-  static const GENERAL_STRING = const ASN1IdentifierTagNumber._internal(0x1B);
-  static const UNIVERSAL_STRING = const ASN1IdentifierTagNumber._internal(0x1C);
-  static const CHARACTER_STRING = const ASN1IdentifierTagNumber._internal(0x1D);
-  static const BMP_STRING = const ASN1IdentifierTagNumber._internal(0x1E);
+  static const END_OF_CONTENT = ASN1IdentifierTagNumber._internal(0x00);
+  static const BOOLEAN = ASN1IdentifierTagNumber._internal(0x01);
+  static const INTEGER = ASN1IdentifierTagNumber._internal(0x02);
+  static const BIT_STRING = ASN1IdentifierTagNumber._internal(0x03);
+  static const OCTET_STRING = ASN1IdentifierTagNumber._internal(0x04);
+  static const NULL = ASN1IdentifierTagNumber._internal(0x05);
+  static const OBJECT_IDENTIFIER = ASN1IdentifierTagNumber._internal(0x06);
+  static const OBJECT_DESCRIPTOR = ASN1IdentifierTagNumber._internal(0x07);
+  static const EXTERNAL = ASN1IdentifierTagNumber._internal(0x08);
+  static const READ = ASN1IdentifierTagNumber._internal(0x09);
+  static const ENUMERATED = ASN1IdentifierTagNumber._internal(0x0A);
+  static const EMBEDDED_PDV = ASN1IdentifierTagNumber._internal(0x0B);
+  static const UTF8_STRING = ASN1IdentifierTagNumber._internal(0x0C);
+  static const RELATIVE_OID = ASN1IdentifierTagNumber._internal(0x0D);
+  static const SEQUENCE = ASN1IdentifierTagNumber._internal(0x10);
+  static const SET = ASN1IdentifierTagNumber._internal(0x11);
+  static const NUMERIC_STRING = ASN1IdentifierTagNumber._internal(0x12);
+  static const PRINTABLE_STRING = ASN1IdentifierTagNumber._internal(0x13);
+  static const T61_STRING = ASN1IdentifierTagNumber._internal(0x14);
+  static const VIDEOTEX_STRING = ASN1IdentifierTagNumber._internal(0x15);
+  static const IA5_STRING = ASN1IdentifierTagNumber._internal(0x16);
+  static const UTC_TIME = ASN1IdentifierTagNumber._internal(0x17);
+  static const GENERALIZED_TIME = ASN1IdentifierTagNumber._internal(0x18);
+  static const GRAPHIC_STRING = ASN1IdentifierTagNumber._internal(0x19);
+  static const VISIBLE_STRING = ASN1IdentifierTagNumber._internal(0x1A);
+  static const GENERAL_STRING = ASN1IdentifierTagNumber._internal(0x1B);
+  static const UNIVERSAL_STRING = ASN1IdentifierTagNumber._internal(0x1C);
+  static const CHARACTER_STRING = ASN1IdentifierTagNumber._internal(0x1D);
+  static const BMP_STRING = ASN1IdentifierTagNumber._internal(0x1E);
 
   @override
   String toString() {
-    switch (this.toValue()) {
+    switch (toValue()) {
       case 0x00:
         return "END_OF_CONTENT";
       case 0x01:
@@ -202,6 +199,7 @@ class ASN1IdentifierTagNumber {
     return "";
   }
 
+  @override
   bool operator ==(value) => value == _value;
 
   @override

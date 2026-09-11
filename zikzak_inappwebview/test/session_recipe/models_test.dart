@@ -180,19 +180,24 @@ void main() {
         'https://www.hepsiburada.com/giris-yap',
       ]);
       expect(login.tapTarget, isNull);
-      expect(login.signals.single.url,
-          'https://www.hepsiburada.com/api/account');
+      expect(
+        login.signals.single.url,
+        'https://www.hepsiburada.com/api/account',
+      );
       expect(login.signals.single.method, 'POST');
       expect(login.signals.single.statusCode, 200);
-      expect(login.signals.single.requestHeaders,
-          {'content-type': 'application/json'});
+      expect(login.signals.single.requestHeaders, {
+        'content-type': 'application/json',
+      });
       expect(login.signals.single.matchedPattern, 'account');
       expect(login.confirmedAt, '2026-08-02T04:01:00.000Z');
 
       final goToOrders = decoded.steps[1];
       expect(goToOrders.tapTarget, isNotNull);
-      expect(goToOrders.tapTarget!.selectorCandidates,
-          ['#orders-link', 'a.menu-orders']);
+      expect(goToOrders.tapTarget!.selectorCandidates, [
+        '#orders-link',
+        'a.menu-orders',
+      ]);
       expect(goToOrders.tapTarget!.textContent, 'Siparişlerim');
       expect(goToOrders.tapTarget!.tagName, 'A');
       expect(goToOrders.tapTarget!.pageUrl, 'https://www.hepsiburada.com');
@@ -368,8 +373,11 @@ void main() {
     });
 
     test('ReplayStepState values', () {
-      expect(ReplayStepState.values.map((e) => e.name),
-          ['navigating', 'tapping', 'done']);
+      expect(ReplayStepState.values.map((e) => e.name), [
+        'navigating',
+        'tapping',
+        'done',
+      ]);
     });
   });
 }

@@ -31,7 +31,10 @@ class FakeReplayDriver implements ReplayDriver {
   final List<String> evaluatedSources = <String>[];
 
   @override
-  Future<void> restoreCookies(List<CookieEntry> cookies, String entryUrl) async {
+  Future<void> restoreCookies(
+    List<CookieEntry> cookies,
+    String entryUrl,
+  ) async {
     calls.add('restoreCookies:${cookies.map((c) => c.name).join(',')}');
   }
 
@@ -123,83 +126,83 @@ RecipeRecording buildRecording() {
 
 void main() {
   group('RecipeReplayer', () {
-    test('success: cookies restored before first loadUrl, steps completed', () async {
-      final driver = FakeReplayDriver();
-      final progress = <ReplayProgress>[];
+    test(
+      'success: cookies restored before first loadUrl, steps completed',
+      () async {
+        final driver = FakeReplayDriver();
+        final progress = <ReplayProgress>[];
 
-      final result = await RecipeReplayer().replayWithDriver(
-        driver: driver,
-        recipe: buildRecipe(),
-        recording: buildRecording(),
-        onProgress: progress.add,
-      );
+        final result = await RecipeReplayer().replayWithDriver(
+          driver: driver,
+          recipe: buildRecipe(),
+          recording: buildRecording(),
+          onProgress: progress.add,
+        );
 
-      expect(result.status, ReplayStatus.success);
-      expect(result.completedSteps, ['login', 'go-to-orders']);
-      expect(result.finalUrl, isNotNull);
-      expect(result.finalHtml, '<html>final</html>');
+        expect(result.status, ReplayStatus.success);
+        expect(result.completedSteps, ['login', 'go-to-orders']);
+        expect(result.finalUrl, isNotNull);
+        expect(result.finalHtml, '<html>final</html>');
 
-      // Cookies restored before the first loadUrl.
-      expect(driver.calls.first, 'restoreCookies:session');
-      expect(driver.calls.indexWhere((c) => c.startsWith('loadUrl:')), 1);
+        // Cookies restored before the first loadUrl.
+        expect(driver.calls.first, 'restoreCookies:session');
+        expect(driver.calls.indexWhere((c) => c.startsWith('loadUrl:')), 1);
 
-      // Steps navigate to the first recorded visitedUrl.
-      expect(
-        driver.calls.where((c) => c.startsWith('loadUrl:')).toList(),
-        [
+        // Steps navigate to the first recorded visitedUrl.
+        expect(driver.calls.where((c) => c.startsWith('loadUrl:')).toList(), [
           'loadUrl:https://shop.example.com',
           'loadUrl:https://shop.example.com/account',
-        ],
-      );
+        ]);
 
-      // Progress events emitted per step in order.
-      expect(
-        progress.map((p) => '${p.stepId}:${p.state.name}').toList(),
-        [
+        // Progress events emitted per step in order.
+        expect(progress.map((p) => '${p.stepId}:${p.state.name}').toList(), [
           'login:navigating',
           'login:done',
           'go-to-orders:navigating',
           'go-to-orders:tapping',
           'go-to-orders:done',
-        ],
-      );
-    });
+        ]);
+      },
+    );
 
-    test('selector candidates sent in recorded order to the click dispatcher',
-        () async {
-      final driver = FakeReplayDriver();
-      String? clickSource;
-      driver.evaluator = (source) {
-        if (source.contains('usedSelector')) clickSource = source;
-        return jsonEncode({'matched': true, 'usedSelector': 'a.menu-orders'});
-      };
+    test(
+      'selector candidates sent in recorded order to the click dispatcher',
+      () async {
+        final driver = FakeReplayDriver();
+        String? clickSource;
+        driver.evaluator = (source) {
+          if (source.contains('usedSelector')) clickSource = source;
+          return jsonEncode({'matched': true, 'usedSelector': 'a.menu-orders'});
+        };
 
-      await RecipeReplayer().replayWithDriver(
-        driver: driver,
-        recipe: buildRecipe(),
-        recording: buildRecording(),
-      );
+        await RecipeReplayer().replayWithDriver(
+          driver: driver,
+          recipe: buildRecipe(),
+          recording: buildRecording(),
+        );
 
-      expect(clickSource, isNotNull);
-      final firstId = clickSource!.indexOf('#orders-link');
-      final secondSel = clickSource!.indexOf('a.menu-orders');
-      expect(firstId, greaterThanOrEqualTo(0));
-      expect(secondSel, greaterThan(firstId));
-    });
+        expect(clickSource, isNotNull);
+        final firstId = clickSource!.indexOf('#orders-link');
+        final secondSel = clickSource!.indexOf('a.menu-orders');
+        expect(firstId, greaterThanOrEqualTo(0));
+        expect(secondSel, greaterThan(firstId));
+      },
+    );
 
     test('zero selector matches -> stepFailed(no-selector-matched)', () async {
       final driver = FakeReplayDriver();
       driver.evaluator = (source) =>
           jsonEncode({'matched': false, 'usedSelector': null});
 
-      final result = await RecipeReplayer(
-        // Tap dispatch polls until stepTimeout; keep the test fast.
-        stepTimeout: const Duration(milliseconds: 900),
-      ).replayWithDriver(
-        driver: driver,
-        recipe: buildRecipe(),
-        recording: buildRecording(),
-      );
+      final result =
+          await RecipeReplayer(
+            // Tap dispatch polls until stepTimeout; keep the test fast.
+            stepTimeout: const Duration(milliseconds: 900),
+          ).replayWithDriver(
+            driver: driver,
+            recipe: buildRecipe(),
+            recording: buildRecording(),
+          );
 
       expect(result.status, ReplayStatus.stepFailed);
       expect(result.failureReason, 'no-selector-matched');
@@ -207,31 +210,34 @@ void main() {
       expect(result.completedSteps, ['login']);
     });
 
-    test('tap dispatch retries until the selector appears (SPA settle)',
-        () async {
-      final driver = FakeReplayDriver();
-      var attempts = 0;
-      driver.evaluator = (source) {
-        attempts++;
-        // Selector "appears" on the 3rd poll — earlier polls click nothing.
-        return jsonEncode({
-          'matched': attempts >= 3,
-          'usedSelector': attempts >= 3 ? '#orders-link' : null,
-        });
-      };
+    test(
+      'tap dispatch retries until the selector appears (SPA settle)',
+      () async {
+        final driver = FakeReplayDriver();
+        var attempts = 0;
+        driver.evaluator = (source) {
+          attempts++;
+          // Selector "appears" on the 3rd poll — earlier polls click nothing.
+          return jsonEncode({
+            'matched': attempts >= 3,
+            'usedSelector': attempts >= 3 ? '#orders-link' : null,
+          });
+        };
 
-      final result = await RecipeReplayer(
-        stepTimeout: const Duration(seconds: 5),
-      ).replayWithDriver(
-        driver: driver,
-        recipe: buildRecipe(),
-        recording: buildRecording(),
-      );
+        final result =
+            await RecipeReplayer(
+              stepTimeout: const Duration(seconds: 5),
+            ).replayWithDriver(
+              driver: driver,
+              recipe: buildRecipe(),
+              recording: buildRecording(),
+            );
 
-      expect(result.status, ReplayStatus.success);
-      expect(result.completedSteps, ['login', 'go-to-orders']);
-      expect(attempts, greaterThanOrEqualTo(3));
-    });
+        expect(result.status, ReplayStatus.success);
+        expect(result.completedSteps, ['login', 'go-to-orders']);
+        expect(attempts, greaterThanOrEqualTo(3));
+      },
+    );
 
     test('navigation timeout -> stepFailed(navigation-timeout)', () async {
       final driver = FakeReplayDriver();
@@ -288,40 +294,42 @@ void main() {
       final driver = FakeReplayDriver();
       driver.evaluator = (_) => throw StateError('boom');
 
-      final result = await RecipeReplayer(
-        // Tap dispatch keeps polling through JS errors until stepTimeout.
-        stepTimeout: const Duration(milliseconds: 900),
-      ).replayWithDriver(
-        driver: driver,
-        recipe: buildRecipe(),
-        recording: buildRecording(),
-      );
+      final result =
+          await RecipeReplayer(
+            // Tap dispatch keeps polling through JS errors until stepTimeout.
+            stepTimeout: const Duration(milliseconds: 900),
+          ).replayWithDriver(
+            driver: driver,
+            recipe: buildRecipe(),
+            recording: buildRecording(),
+          );
 
       expect(result.status, ReplayStatus.stepFailed);
     });
 
-    test('untilStepId stops after the named step and ignores later steps',
-        () async {
-      final driver = FakeReplayDriver();
+    test(
+      'untilStepId stops after the named step and ignores later steps',
+      () async {
+        final driver = FakeReplayDriver();
 
-      final result = await RecipeReplayer().replayWithDriver(
-        driver: driver,
-        recipe: buildRecipe(),
-        recording: buildRecording(),
-        untilStepId: 'login',
-      );
+        final result = await RecipeReplayer().replayWithDriver(
+          driver: driver,
+          recipe: buildRecipe(),
+          recording: buildRecording(),
+          untilStepId: 'login',
+        );
 
-      expect(result.status, ReplayStatus.success);
-      expect(result.completedSteps, ['login']);
-      expect(result.finalUrl, isNotNull);
-      expect(result.finalHtml, '<html>final</html>');
+        expect(result.status, ReplayStatus.success);
+        expect(result.completedSteps, ['login']);
+        expect(result.finalUrl, isNotNull);
+        expect(result.finalHtml, '<html>final</html>');
 
-      // Only the first step navigated; the second step's tap/URL untouched.
-      expect(
-        driver.calls.where((c) => c.startsWith('loadUrl:')).toList(),
-        ['loadUrl:https://shop.example.com'],
-      );
-    });
+        // Only the first step navigated; the second step's tap/URL untouched.
+        expect(driver.calls.where((c) => c.startsWith('loadUrl:')).toList(), [
+          'loadUrl:https://shop.example.com',
+        ]);
+      },
+    );
 
     test('untilStepId on the last step behaves like a full replay', () async {
       final driver = FakeReplayDriver();
@@ -337,24 +345,26 @@ void main() {
       expect(result.completedSteps, ['login', 'go-to-orders']);
     });
 
-    test('unknown untilStepId fails fast with stepFailed(unknown-step)',
-        () async {
-      final driver = FakeReplayDriver();
+    test(
+      'unknown untilStepId fails fast with stepFailed(unknown-step)',
+      () async {
+        final driver = FakeReplayDriver();
 
-      final result = await RecipeReplayer().replayWithDriver(
-        driver: driver,
-        recipe: buildRecipe(),
-        recording: buildRecording(),
-        untilStepId: 'no-such-step',
-      );
+        final result = await RecipeReplayer().replayWithDriver(
+          driver: driver,
+          recipe: buildRecipe(),
+          recording: buildRecording(),
+          untilStepId: 'no-such-step',
+        );
 
-      expect(result.status, ReplayStatus.stepFailed);
-      expect(result.failureReason, 'unknown-step');
-      expect(result.failedStepId, 'no-such-step');
-      expect(result.completedSteps, isEmpty);
-      // Fails before any WebView interaction — no cookies restored.
-      expect(driver.calls, isEmpty);
-    });
+        expect(result.status, ReplayStatus.stepFailed);
+        expect(result.failureReason, 'unknown-step');
+        expect(result.failedStepId, 'no-such-step');
+        expect(result.completedSteps, isEmpty);
+        // Fails before any WebView interaction — no cookies restored.
+        expect(driver.calls, isEmpty);
+      },
+    );
 
     test('replay follows recording steps, so old short recordings still '
         'succeed against a longer recipe', () async {
@@ -377,37 +387,36 @@ void main() {
 
       expect(result.status, ReplayStatus.success);
       expect(result.completedSteps, ['login', 'go-to-orders']);
-      expect(
-        driver.calls.where((c) => c.startsWith('loadUrl:')).length,
-        2,
-      );
+      expect(driver.calls.where((c) => c.startsWith('loadUrl:')).length, 2);
     });
 
-    test('recorded step without a recipe definition still dispatches its tap',
-        () async {
-      final driver = FakeReplayDriver();
-      // Recipe only knows 'login'; recording has an extra recorded step.
-      final recipe = SessionRecipe(
-        id: 'test-recipe',
-        name: 'Test',
-        entryUrl: 'https://shop.example.com',
-        steps: [RecipeStepDefinition(id: 'login', instruction: 'Log in')],
-      );
+    test(
+      'recorded step without a recipe definition still dispatches its tap',
+      () async {
+        final driver = FakeReplayDriver();
+        // Recipe only knows 'login'; recording has an extra recorded step.
+        final recipe = SessionRecipe(
+          id: 'test-recipe',
+          name: 'Test',
+          entryUrl: 'https://shop.example.com',
+          steps: [RecipeStepDefinition(id: 'login', instruction: 'Log in')],
+        );
 
-      final result = await RecipeReplayer().replayWithDriver(
-        driver: driver,
-        recipe: recipe,
-        recording: buildRecording(),
-      );
+        final result = await RecipeReplayer().replayWithDriver(
+          driver: driver,
+          recipe: recipe,
+          recording: buildRecording(),
+        );
 
-      expect(result.status, ReplayStatus.success);
-      expect(result.completedSteps, ['login', 'go-to-orders']);
-      // The tap JS ran for the undefined step's captured tap target.
-      expect(
-        driver.evaluatedSources.any((s) => s.contains('#orders-link')),
-        isTrue,
-      );
-    });
+        expect(result.status, ReplayStatus.success);
+        expect(result.completedSteps, ['login', 'go-to-orders']);
+        // The tap JS ran for the undefined step's captured tap target.
+        expect(
+          driver.evaluatedSources.any((s) => s.contains('#orders-link')),
+          isTrue,
+        );
+      },
+    );
   });
 
   group('RecipeReplayer.matchesUrlPattern', () {
@@ -444,15 +453,17 @@ void main() {
   });
 
   group('resolveAndClickJs / matchesAnySelectorJs', () {
-    test('resolveAndClickJs embeds candidates in order and the text fallback',
-        () {
-      final js = resolveAndClickJs(['#a', '.b', 'div > c'], 'Hello');
-      expect(js.indexOf('"#a"'), lessThan(js.indexOf('".b"')));
-      expect(js.indexOf('".b"'), lessThan(js.indexOf('"div > c"')));
-      expect(js, contains('Hello'));
-      expect(js, contains('matched'));
-      expect(js, contains('usedSelector'));
-    });
+    test(
+      'resolveAndClickJs embeds candidates in order and the text fallback',
+      () {
+        final js = resolveAndClickJs(['#a', '.b', 'div > c'], 'Hello');
+        expect(js.indexOf('"#a"'), lessThan(js.indexOf('".b"')));
+        expect(js.indexOf('".b"'), lessThan(js.indexOf('"div > c"')));
+        expect(js, contains('Hello'));
+        expect(js, contains('matched'));
+        expect(js, contains('usedSelector'));
+      },
+    );
 
     test('resolveAndClickJs prefers text-matching candidates', () {
       final js = resolveAndClickJs(['a.card-link', 'a[href*="urun"]'], 'Lav');
@@ -487,54 +498,53 @@ void main() {
   });
 
   group('tap-step navigation', () {
-    test('tap step loads the page the tap happened on, not the post-tap URL',
-        () async {
-      final driver = FakeReplayDriver();
-      final recording = RecipeRecording(
-        id: 'rec-2',
-        recipeId: 'test-recipe',
-        recipeVersion: 1,
-        siteHost: 'shop.example.com',
-        createdAt: '2026-08-02T04:00:00.000Z',
-        steps: [
-          RecordedStep(
-            stepId: 'login',
-            visitedUrls: ['https://shop.example.com'],
-            confirmedAt: '2026-08-02T04:01:00.000Z',
-          ),
-          RecordedStep(
-            stepId: 'go-to-orders',
-            // visitedUrls holds the POST-tap destination (orders list)…
-            visitedUrls: ['https://shop.example.com/orders'],
-            tapTarget: TapTarget(
-              selectorCandidates: ['a.menu-orders'],
-              textContent: 'Orders',
-              tagName: 'A',
-              // …but the tap happened on the account page.
-              pageUrl: 'https://shop.example.com/account',
+    test(
+      'tap step loads the page the tap happened on, not the post-tap URL',
+      () async {
+        final driver = FakeReplayDriver();
+        final recording = RecipeRecording(
+          id: 'rec-2',
+          recipeId: 'test-recipe',
+          recipeVersion: 1,
+          siteHost: 'shop.example.com',
+          createdAt: '2026-08-02T04:00:00.000Z',
+          steps: [
+            RecordedStep(
+              stepId: 'login',
+              visitedUrls: ['https://shop.example.com'],
+              confirmedAt: '2026-08-02T04:01:00.000Z',
             ),
-            confirmedAt: '2026-08-02T04:02:00.000Z',
-          ),
-        ],
-        complete: true,
-      );
+            RecordedStep(
+              stepId: 'go-to-orders',
+              // visitedUrls holds the POST-tap destination (orders list)…
+              visitedUrls: ['https://shop.example.com/orders'],
+              tapTarget: TapTarget(
+                selectorCandidates: ['a.menu-orders'],
+                textContent: 'Orders',
+                tagName: 'A',
+                // …but the tap happened on the account page.
+                pageUrl: 'https://shop.example.com/account',
+              ),
+              confirmedAt: '2026-08-02T04:02:00.000Z',
+            ),
+          ],
+          complete: true,
+        );
 
-      final result = await RecipeReplayer().replayWithDriver(
-        driver: driver,
-        recipe: buildRecipe(),
-        recording: recording,
-      );
+        final result = await RecipeReplayer().replayWithDriver(
+          driver: driver,
+          recipe: buildRecipe(),
+          recording: recording,
+        );
 
-      expect(result.status, ReplayStatus.success);
-      expect(
-        driver.calls.where((c) => c.startsWith('loadUrl:')).toList(),
-        [
+        expect(result.status, ReplayStatus.success);
+        expect(driver.calls.where((c) => c.startsWith('loadUrl:')).toList(), [
           'loadUrl:https://shop.example.com',
           // Tap step navigates to the tap's origin page so the recorded
           // selector actually resolves there.
           'loadUrl:https://shop.example.com/account',
-        ],
-      );
-    });
+        ]);
+      },
+    );
   });
 }

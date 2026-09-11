@@ -115,10 +115,15 @@ void main() {
         url: WebUri('https://a.dev/b'),
         body: '{"k": [1, 2]}',
       );
-      expect(b.decoded, {'k': [1, 2]});
+      expect(b.decoded, {
+        'k': [1, 2],
+      });
       // cached: same instance
       expect(identical(b.decoded, b.decoded), isTrue);
-      final bad = NetworkResponseBody(url: WebUri('https://a.dev/x'), body: 'not json');
+      final bad = NetworkResponseBody(
+        url: WebUri('https://a.dev/x'),
+        body: 'not json',
+      );
       expect(bad.decoded, isNull);
       final base64 = NetworkResponseBody(
         url: WebUri('https://a.dev/y'),
@@ -130,7 +135,10 @@ void main() {
     });
 
     test('bytes null when not base64; fromMap round-trip', () {
-      final b = NetworkResponseBody(url: WebUri('https://a.dev/z'), body: 'text');
+      final b = NetworkResponseBody(
+        url: WebUri('https://a.dev/z'),
+        body: 'text',
+      );
       expect(b.bytes, isNull);
       final full = NetworkResponseBody(
         requestId: 'r1',
@@ -191,8 +199,12 @@ void main() {
   group('NetworkCaptureController', () {
     test('accumulates entries + dedupes request ids', () {
       final c = NetworkCaptureController();
-      c.trackRequest(NetworkRequest(requestId: 'a', url: WebUri('https://a.dev/1')));
-      c.trackRequest(NetworkRequest(requestId: 'a', url: WebUri('https://a.dev/2')));
+      c.trackRequest(
+        NetworkRequest(requestId: 'a', url: WebUri('https://a.dev/1')),
+      );
+      c.trackRequest(
+        NetworkRequest(requestId: 'a', url: WebUri('https://a.dev/2')),
+      );
       expect(c.count, 1);
       expect(c.getEntries(), isA<Future<List<NetworkEntry>>>());
     });
@@ -200,13 +212,23 @@ void main() {
     test('response/body before request are pending then attached', () async {
       final c = NetworkCaptureController();
       c.attachResponse(
-        NetworkResponse(requestId: 'b', url: WebUri('https://b.dev/'), statusCode: 200),
+        NetworkResponse(
+          requestId: 'b',
+          url: WebUri('https://b.dev/'),
+          statusCode: 200,
+        ),
       );
       c.attachBody(
-        NetworkResponseBody(requestId: 'b', url: WebUri('https://b.dev/'), body: '{}'),
+        NetworkResponseBody(
+          requestId: 'b',
+          url: WebUri('https://b.dev/'),
+          body: '{}',
+        ),
       );
       expect(c.count, 0);
-      c.trackRequest(NetworkRequest(requestId: 'b', url: WebUri('https://b.dev/')));
+      c.trackRequest(
+        NetworkRequest(requestId: 'b', url: WebUri('https://b.dev/')),
+      );
       final entries = await c.getEntries();
       expect(c.count, 1);
       expect(entries.single.response?.statusCode, 200);
@@ -215,7 +237,9 @@ void main() {
 
     test('attachError flags the entry', () async {
       final c = NetworkCaptureController();
-      c.trackRequest(NetworkRequest(requestId: 'c', url: WebUri('https://c.dev/')));
+      c.trackRequest(
+        NetworkRequest(requestId: 'c', url: WebUri('https://c.dev/')),
+      );
       c.attachError('c', 'timeout');
       final entries = await c.getEntries();
       expect(entries.single.hasError, true);
@@ -249,11 +273,22 @@ void main() {
         ),
       );
 
-      expect((await c.getEntries(urlPatterns: ['API.'])).map((e) => e.request.requestId), ['1']);
-      expect((await c.getEntries(mimeTypes: ['css'])).map((e) => e.request.requestId), ['2']);
       expect(
-        (await c.getEntries(resourceTypes: [ResourceType.stylesheet]))
-            .map((e) => e.request.requestId),
+        (await c.getEntries(
+          urlPatterns: ['API.'],
+        )).map((e) => e.request.requestId),
+        ['1'],
+      );
+      expect(
+        (await c.getEntries(
+          mimeTypes: ['css'],
+        )).map((e) => e.request.requestId),
+        ['2'],
+      );
+      expect(
+        (await c.getEntries(
+          resourceTypes: [ResourceType.stylesheet],
+        )).map((e) => e.request.requestId),
         ['2'],
       );
       expect(await c.getEntries(withBodyOnly: true), isEmpty);
@@ -262,7 +297,9 @@ void main() {
 
     test('clear resets everything', () async {
       final c = NetworkCaptureController();
-      c.trackRequest(NetworkRequest(requestId: 'a', url: WebUri('https://a.dev/')));
+      c.trackRequest(
+        NetworkRequest(requestId: 'a', url: WebUri('https://a.dev/')),
+      );
       c.attachResponse(
         NetworkResponse(requestId: 'x', url: WebUri('https://x.dev/')),
       );
@@ -270,13 +307,17 @@ void main() {
       c.clear();
       expect(c.count, 0);
       // pending response is dropped too
-      c.trackRequest(NetworkRequest(requestId: 'x', url: WebUri('https://x.dev/')));
+      c.trackRequest(
+        NetworkRequest(requestId: 'x', url: WebUri('https://x.dev/')),
+      );
       expect((await c.getEntries()).single.response, isNull);
     });
 
     test('waitForIdle returns when quiet', () async {
       final c = NetworkCaptureController();
-      c.trackRequest(NetworkRequest(requestId: 'a', url: WebUri('https://a.dev/')));
+      c.trackRequest(
+        NetworkRequest(requestId: 'a', url: WebUri('https://a.dev/')),
+      );
       await c.waitForIdle(quietDuration: const Duration(milliseconds: 50));
     }, timeout: const Timeout(Duration(seconds: 10)));
   });

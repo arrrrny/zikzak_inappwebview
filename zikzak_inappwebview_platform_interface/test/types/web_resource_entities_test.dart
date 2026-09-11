@@ -55,13 +55,16 @@ void main() {
   });
 
   group('ConsoleMessageLevel', () {
-    test('int enums keep the old native values (index == old _nativeValue)', () {
-      expect(ConsoleMessageLevel.TIP.index, 0);
-      expect(ConsoleMessageLevel.LOG.index, 1);
-      expect(ConsoleMessageLevel.WARNING.index, 2);
-      expect(ConsoleMessageLevel.ERROR.index, 3);
-      expect(ConsoleMessageLevel.DEBUG.index, 4);
-    });
+    test(
+      'int enums keep the old native values (index == old _nativeValue)',
+      () {
+        expect(ConsoleMessageLevel.TIP.index, 0);
+        expect(ConsoleMessageLevel.LOG.index, 1);
+        expect(ConsoleMessageLevel.WARNING.index, 2);
+        expect(ConsoleMessageLevel.ERROR.index, 3);
+        expect(ConsoleMessageLevel.DEBUG.index, 4);
+      },
+    );
   });
 
   group('WebResourceError', () {
@@ -74,7 +77,10 @@ void main() {
     });
 
     test('fromJson maps native strings back to enum values', () {
-      final e = WebResourceError.fromJson({'type': 'TIMEOUT', 'description': 't'});
+      final e = WebResourceError.fromJson({
+        'type': 'TIMEOUT',
+        'description': 't',
+      });
       expect(e.type, WebResourceErrorType.TIMEOUT);
       expect(e.description, 't');
       expect(WebResourceError.fromJson({}).type, isNull);

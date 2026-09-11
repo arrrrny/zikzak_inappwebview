@@ -25,12 +25,7 @@ void main() {
 
   group('ContextMenuItem', () {
     test('wire is id + title only (action callback excluded)', () {
-      var clicked = false;
-      final item = ContextMenuItem(
-        id: 42,
-        title: 'Item 1',
-        action: () => clicked = true,
-      );
+      final item = ContextMenuItem(id: 42, title: 'Item 1', action: () {});
       final map = item.toMap();
       expect(map['id'], 42);
       expect(map['title'], 'Item 1');

@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:zikzak_inappwebview_linux/src/in_app_webview/in_app_webview_controller.dart';
@@ -29,19 +27,17 @@ void main() {
     late List<MethodCall> calls;
     late Uint8List? nextResult;
 
-    LinuxInAppWebViewController _newController() {
+    LinuxInAppWebViewController newController() {
       final controller = LinuxInAppWebViewController(
         PlatformInAppWebViewControllerCreationParams(id: 0),
       );
-      TestDefaultBinaryMessengerBinding
-          .instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(
-        const MethodChannel(_kChannelName),
-        (call) async {
-          calls.add(call);
-          return nextResult;
-        },
-      );
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(const MethodChannel(_kChannelName), (
+            call,
+          ) async {
+            calls.add(call);
+            return nextResult;
+          });
       return controller;
     }
 
@@ -51,74 +47,103 @@ void main() {
     });
 
     tearDown(() {
-      TestDefaultBinaryMessengerBinding
-          .instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(
-        const MethodChannel(_kChannelName),
-        null,
-      );
-    });
-
-    test('U25 createPdf delegates to channel with pdfConfiguration.toJson()',
-        () async {
-      final controller = _newController();
-      final config = PDFConfiguration();
-
-      await controller.createPdf(pdfConfiguration: config);
-
-      expect(calls, hasLength(1),
-          reason: 'createPdf must reach the method channel exactly once');
-      expect(calls.single.method, equals('createPdf'),
-          reason: 'the channel method must be the literal "createPdf"');
-      expect(
-        calls.single.arguments['pdfConfiguration'],
-        equals(config.toJson()),
-        reason: 'pdfConfiguration must be forwarded as its JSON map',
-      );
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(const MethodChannel(_kChannelName), null);
     });
 
     test(
-        'U26 takeScreenshot delegates to channel with screenshotConfiguration.toJson()',
-        () async {
-      final controller = _newController();
-      final config = ScreenshotConfiguration();
+      'U25 createPdf delegates to channel with pdfConfiguration.toJson()',
+      () async {
+        final controller = newController();
+        final config = PDFConfiguration();
 
-      await controller.takeScreenshot(screenshotConfiguration: config);
+        await controller.createPdf(pdfConfiguration: config);
 
-      expect(calls, hasLength(1),
-          reason: 'takeScreenshot must reach the method channel exactly once');
-      expect(calls.single.method, equals('takeScreenshot'),
-          reason: 'the channel method must be the literal "takeScreenshot"');
-      expect(
-        calls.single.arguments['screenshotConfiguration'],
-        equals(config.toJson()),
-        reason: 'screenshotConfiguration must be forwarded as its JSON map',
-      );
-    });
+        expect(
+          calls,
+          hasLength(1),
+          reason: 'createPdf must reach the method channel exactly once',
+        );
+        expect(
+          calls.single.method,
+          equals('createPdf'),
+          reason: 'the channel method must be the literal "createPdf"',
+        );
+        expect(
+          calls.single.arguments['pdfConfiguration'],
+          equals(config.toJson()),
+          reason: 'pdfConfiguration must be forwarded as its JSON map',
+        );
+      },
+    );
+
+    test(
+      'U26 takeScreenshot delegates to channel with screenshotConfiguration.toJson()',
+      () async {
+        final controller = newController();
+        final config = ScreenshotConfiguration();
+
+        await controller.takeScreenshot(screenshotConfiguration: config);
+
+        expect(
+          calls,
+          hasLength(1),
+          reason: 'takeScreenshot must reach the method channel exactly once',
+        );
+        expect(
+          calls.single.method,
+          equals('takeScreenshot'),
+          reason: 'the channel method must be the literal "takeScreenshot"',
+        );
+        expect(
+          calls.single.arguments['screenshotConfiguration'],
+          equals(config.toJson()),
+          reason: 'screenshotConfiguration must be forwarded as its JSON map',
+        );
+      },
+    );
 
     test('U27 overrides return the channel Uint8List or null', () async {
-      final controller = _newController();
+      final controller = newController();
 
       final bytes = Uint8List.fromList([10, 20, 30]);
       nextResult = bytes;
-      final pdfResult = await controller.createPdf(pdfConfiguration: PDFConfiguration());
-      expect(pdfResult, equals(bytes),
-          reason: 'the Uint8List the channel returns must be propagated as-is');
+      final pdfResult = await controller.createPdf(
+        pdfConfiguration: PDFConfiguration(),
+      );
+      expect(
+        pdfResult,
+        equals(bytes),
+        reason: 'the Uint8List the channel returns must be propagated as-is',
+      );
 
-      final shotResult =
-          await controller.takeScreenshot(screenshotConfiguration: ScreenshotConfiguration());
-      expect(shotResult, equals(bytes),
-          reason: 'takeScreenshot must also propagate the channel Uint8List');
+      final shotResult = await controller.takeScreenshot(
+        screenshotConfiguration: ScreenshotConfiguration(),
+      );
+      expect(
+        shotResult,
+        equals(bytes),
+        reason: 'takeScreenshot must also propagate the channel Uint8List',
+      );
 
       nextResult = null;
-      final nullPdf =
-          await controller.createPdf(pdfConfiguration: PDFConfiguration());
-      expect(nullPdf, isNull,
-          reason: 'a null channel result must pass through as null');
-      final nullShot = await controller
-          .takeScreenshot(screenshotConfiguration: ScreenshotConfiguration());
-      expect(nullShot, isNull,
-          reason: 'a null channel result must pass through as null for both methods');
+      final nullPdf = await controller.createPdf(
+        pdfConfiguration: PDFConfiguration(),
+      );
+      expect(
+        nullPdf,
+        isNull,
+        reason: 'a null channel result must pass through as null',
+      );
+      final nullShot = await controller.takeScreenshot(
+        screenshotConfiguration: ScreenshotConfiguration(),
+      );
+      expect(
+        nullShot,
+        isNull,
+        reason:
+            'a null channel result must pass through as null for both methods',
+      );
     });
   });
 }

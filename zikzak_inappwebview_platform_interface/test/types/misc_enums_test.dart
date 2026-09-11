@@ -10,9 +10,14 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 void main() {
   group('ContentBlockerActionType (native strings)', () {
     test('wire round-trips', () {
-      expect(contentBlockerActionTypeToWire(ContentBlockerActionType.BLOCK), 'block');
       expect(
-        contentBlockerActionTypeToWire(ContentBlockerActionType.CSS_DISPLAY_NONE),
+        contentBlockerActionTypeToWire(ContentBlockerActionType.BLOCK),
+        'block',
+      );
+      expect(
+        contentBlockerActionTypeToWire(
+          ContentBlockerActionType.CSS_DISPLAY_NONE,
+        ),
         'css-display-none',
       );
       expect(
@@ -24,7 +29,9 @@ void main() {
         'block-cookies',
       );
       expect(
-        contentBlockerActionTypeToWire(ContentBlockerActionType.IGNORE_PREVIOUS_RULES),
+        contentBlockerActionTypeToWire(
+          ContentBlockerActionType.IGNORE_PREVIOUS_RULES,
+        ),
         'ignore-previous-rules',
       );
       expect(
@@ -38,11 +45,15 @@ void main() {
   group('ContentBlockerTriggerLoadType (native strings)', () {
     test('wire round-trips', () {
       expect(
-        contentBlockerTriggerLoadTypeToWire(ContentBlockerTriggerLoadType.FIRST_PARTY),
+        contentBlockerTriggerLoadTypeToWire(
+          ContentBlockerTriggerLoadType.FIRST_PARTY,
+        ),
         'first-party',
       );
       expect(
-        contentBlockerTriggerLoadTypeToWire(ContentBlockerTriggerLoadType.THIRD_PARTY),
+        contentBlockerTriggerLoadTypeToWire(
+          ContentBlockerTriggerLoadType.THIRD_PARTY,
+        ),
         'third-party',
       );
       expect(
@@ -55,19 +66,27 @@ void main() {
   group('ContentBlockerTriggerResourceType (native strings)', () {
     test('wire round-trips', () {
       expect(
-        contentBlockerTriggerResourceTypeToWire(ContentBlockerTriggerResourceType.DOCUMENT),
+        contentBlockerTriggerResourceTypeToWire(
+          ContentBlockerTriggerResourceType.DOCUMENT,
+        ),
         'document',
       );
       expect(
-        contentBlockerTriggerResourceTypeToWire(ContentBlockerTriggerResourceType.SVG_DOCUMENT),
+        contentBlockerTriggerResourceTypeToWire(
+          ContentBlockerTriggerResourceType.SVG_DOCUMENT,
+        ),
         'svg-document',
       );
       expect(
-        contentBlockerTriggerResourceTypeToWire(ContentBlockerTriggerResourceType.RAW),
+        contentBlockerTriggerResourceTypeToWire(
+          ContentBlockerTriggerResourceType.RAW,
+        ),
         'raw',
       );
-      expect(contentBlockerTriggerResourceTypeFromWire('media'),
-          ContentBlockerTriggerResourceType.MEDIA);
+      expect(
+        contentBlockerTriggerResourceTypeFromWire('media'),
+        ContentBlockerTriggerResourceType.MEDIA,
+      );
       expect(contentBlockerTriggerResourceTypeFromWire('bogus'), isNull);
     });
   });
@@ -75,11 +94,15 @@ void main() {
   group('ContentBlockerTriggerLoadContext (native strings, FIXED wire)', () {
     test('wire matches upstream (TOP_FRAME -> top-frame)', () {
       expect(
-        contentBlockerTriggerLoadContextToWire(ContentBlockerTriggerLoadContext.TOP_FRAME),
+        contentBlockerTriggerLoadContextToWire(
+          ContentBlockerTriggerLoadContext.TOP_FRAME,
+        ),
         'top-frame',
       );
       expect(
-        contentBlockerTriggerLoadContextToWire(ContentBlockerTriggerLoadContext.CHILD_FRAME),
+        contentBlockerTriggerLoadContextToWire(
+          ContentBlockerTriggerLoadContext.CHILD_FRAME,
+        ),
         'child-frame',
       );
       expect(
@@ -101,30 +124,45 @@ void main() {
       expect(ForceDark.ON.index, 2);
       expect(ForceDarkStrategy.USER_AGENT_DARKENING_ONLY.index, 0);
       expect(ForceDarkStrategy.WEB_THEME_DARKENING_ONLY.index, 1);
-      expect(ForceDarkStrategy.PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING.index, 2);
+      expect(
+        ForceDarkStrategy.PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING.index,
+        2,
+      );
     });
   });
 
-  group('FormResubmissionAction + NavigationActionPolicy + NavigationResponseAction', () {
-    test('indexes are the wire', () {
-      expect(FormResubmissionAction.RESEND.index, 0);
-      expect(FormResubmissionAction.DONT_RESEND.index, 1);
-      expect(NavigationActionPolicy.CANCEL.index, 0);
-      expect(NavigationActionPolicy.ALLOW.index, 1);
-      expect(NavigationActionPolicy.DOWNLOAD.index, 2);
-      expect(NavigationResponseAction.CANCEL.index, 0);
-      expect(NavigationResponseAction.ALLOW.index, 1);
-      expect(NavigationResponseAction.DOWNLOAD.index, 2);
-    });
-  });
+  group(
+    'FormResubmissionAction + NavigationActionPolicy + NavigationResponseAction',
+    () {
+      test('indexes are the wire', () {
+        expect(FormResubmissionAction.RESEND.index, 0);
+        expect(FormResubmissionAction.DONT_RESEND.index, 1);
+        expect(NavigationActionPolicy.CANCEL.index, 0);
+        expect(NavigationActionPolicy.ALLOW.index, 1);
+        expect(NavigationActionPolicy.DOWNLOAD.index, 2);
+        expect(NavigationResponseAction.CANCEL.index, 0);
+        expect(NavigationResponseAction.ALLOW.index, 1);
+        expect(NavigationResponseAction.DOWNLOAD.index, 2);
+      });
+    },
+  );
 
   group('ActionModeMenuItem wire [0,1,2,4]', () {
     test('wire round-trips', () {
       expect(actionModeMenuItemToWire(ActionModeMenuItem.MENU_ITEM_NONE), 0);
       expect(actionModeMenuItemToWire(ActionModeMenuItem.MENU_ITEM_SHARE), 1);
-      expect(actionModeMenuItemToWire(ActionModeMenuItem.MENU_ITEM_WEB_SEARCH), 2);
-      expect(actionModeMenuItemToWire(ActionModeMenuItem.MENU_ITEM_PROCESS_TEXT), 4);
-      expect(actionModeMenuItemFromWire(4), ActionModeMenuItem.MENU_ITEM_PROCESS_TEXT);
+      expect(
+        actionModeMenuItemToWire(ActionModeMenuItem.MENU_ITEM_WEB_SEARCH),
+        2,
+      );
+      expect(
+        actionModeMenuItemToWire(ActionModeMenuItem.MENU_ITEM_PROCESS_TEXT),
+        4,
+      );
+      expect(
+        actionModeMenuItemFromWire(4),
+        ActionModeMenuItem.MENU_ITEM_PROCESS_TEXT,
+      );
       expect(actionModeMenuItemFromWire(3), isNull);
     });
   });
@@ -143,11 +181,34 @@ void main() {
 
   group('InAppWebViewHitTestResultType wire [0,2,3,4,5,7,8,9]', () {
     test('wire round-trips', () {
-      expect(inAppWebViewHitTestResultTypeToWire(InAppWebViewHitTestResultType.UNKNOWN_TYPE), 0);
-      expect(inAppWebViewHitTestResultTypeToWire(InAppWebViewHitTestResultType.SRC_ANCHOR_TYPE), 7);
-      expect(inAppWebViewHitTestResultTypeToWire(InAppWebViewHitTestResultType.SRC_IMAGE_ANCHOR_TYPE), 8);
-      expect(inAppWebViewHitTestResultTypeToWire(InAppWebViewHitTestResultType.EDIT_TEXT_TYPE), 9);
-      expect(inAppWebViewHitTestResultTypeFromWire(5), InAppWebViewHitTestResultType.IMAGE_TYPE);
+      expect(
+        inAppWebViewHitTestResultTypeToWire(
+          InAppWebViewHitTestResultType.UNKNOWN_TYPE,
+        ),
+        0,
+      );
+      expect(
+        inAppWebViewHitTestResultTypeToWire(
+          InAppWebViewHitTestResultType.SRC_ANCHOR_TYPE,
+        ),
+        7,
+      );
+      expect(
+        inAppWebViewHitTestResultTypeToWire(
+          InAppWebViewHitTestResultType.SRC_IMAGE_ANCHOR_TYPE,
+        ),
+        8,
+      );
+      expect(
+        inAppWebViewHitTestResultTypeToWire(
+          InAppWebViewHitTestResultType.EDIT_TEXT_TYPE,
+        ),
+        9,
+      );
+      expect(
+        inAppWebViewHitTestResultTypeFromWire(5),
+        InAppWebViewHitTestResultType.IMAGE_TYPE,
+      );
       expect(inAppWebViewHitTestResultTypeFromWire(1), isNull);
     });
   });
@@ -187,46 +248,58 @@ void main() {
   });
 
   group('remaining index enums', () {
-    test('ScrollView* + SelectionGranularity + ShouldAllow* + UserPreferredContentMode + VerticalScrollbarPosition', () {
-      // NOTE: enum declaration order is AUTOMATIC, SCROLLABLE_AXES, NEVER,
-      // ALWAYS (differs from upstream inappwebview order) — pinned as shipped.
-      expect(ScrollViewContentInsetAdjustmentBehavior.AUTOMATIC.index, 0);
-      expect(ScrollViewContentInsetAdjustmentBehavior.SCROLLABLE_AXES.index, 1);
-      expect(ScrollViewContentInsetAdjustmentBehavior.NEVER.index, 2);
-      expect(ScrollViewContentInsetAdjustmentBehavior.ALWAYS.index, 3);
-      expect(ScrollViewDecelerationRate.NORMAL.index, 0);
-      expect(ScrollViewDecelerationRate.FAST.index, 1);
-      expect(SelectionGranularity.DYNAMIC.index, 0);
-      expect(SelectionGranularity.CHARACTER.index, 1);
-      expect(ShouldAllowDeprecatedTLSAction.CANCEL.index, 0);
-      expect(ShouldAllowDeprecatedTLSAction.ALLOW.index, 1);
-      expect(UserPreferredContentMode.RECOMMENDED.index, 0);
-      expect(UserPreferredContentMode.MOBILE.index, 1);
-      expect(UserPreferredContentMode.DESKTOP.index, 2);
-      expect(VerticalScrollbarPosition.SCROLLBAR_POSITION_DEFAULT.index, 0);
-      expect(VerticalScrollbarPosition.SCROLLBAR_POSITION_LEFT.index, 1);
-      expect(VerticalScrollbarPosition.SCROLLBAR_POSITION_RIGHT.index, 2);
-    });
+    test(
+      'ScrollView* + SelectionGranularity + ShouldAllow* + UserPreferredContentMode + VerticalScrollbarPosition',
+      () {
+        // NOTE: enum declaration order is AUTOMATIC, SCROLLABLE_AXES, NEVER,
+        // ALWAYS (differs from upstream inappwebview order) — pinned as shipped.
+        expect(ScrollViewContentInsetAdjustmentBehavior.AUTOMATIC.index, 0);
+        expect(
+          ScrollViewContentInsetAdjustmentBehavior.SCROLLABLE_AXES.index,
+          1,
+        );
+        expect(ScrollViewContentInsetAdjustmentBehavior.NEVER.index, 2);
+        expect(ScrollViewContentInsetAdjustmentBehavior.ALWAYS.index, 3);
+        expect(ScrollViewDecelerationRate.NORMAL.index, 0);
+        expect(ScrollViewDecelerationRate.FAST.index, 1);
+        expect(SelectionGranularity.DYNAMIC.index, 0);
+        expect(SelectionGranularity.CHARACTER.index, 1);
+        expect(ShouldAllowDeprecatedTLSAction.CANCEL.index, 0);
+        expect(ShouldAllowDeprecatedTLSAction.ALLOW.index, 1);
+        expect(UserPreferredContentMode.RECOMMENDED.index, 0);
+        expect(UserPreferredContentMode.MOBILE.index, 1);
+        expect(UserPreferredContentMode.DESKTOP.index, 2);
+        expect(VerticalScrollbarPosition.SCROLLBAR_POSITION_DEFAULT.index, 0);
+        expect(VerticalScrollbarPosition.SCROLLBAR_POSITION_LEFT.index, 1);
+        expect(VerticalScrollbarPosition.SCROLLBAR_POSITION_RIGHT.index, 2);
+      },
+    );
 
-    test('SearchResultDisplayStyle + WindowType + WindowTitlebarSeparatorStyle', () {
-      expect(SearchResultDisplayStyle.CURRENT_AND_TOTAL.index, 0);
-      expect(SearchResultDisplayStyle.TOTAL.index, 1);
-      expect(SearchResultDisplayStyle.NONE.index, 2);
-      expect(WindowType.WINDOW.index, 0);
-      expect(WindowType.CHILD.index, 1);
-      expect(WindowType.TABBED.index, 2);
-      expect(WindowTitlebarSeparatorStyle.AUTOMATIC.index, 0);
-      expect(WindowTitlebarSeparatorStyle.NONE.index, 1);
-      expect(WindowTitlebarSeparatorStyle.LINE.index, 2);
-      expect(WindowTitlebarSeparatorStyle.SHADOW.index, 3);
-    });
+    test(
+      'SearchResultDisplayStyle + WindowType + WindowTitlebarSeparatorStyle',
+      () {
+        expect(SearchResultDisplayStyle.CURRENT_AND_TOTAL.index, 0);
+        expect(SearchResultDisplayStyle.TOTAL.index, 1);
+        expect(SearchResultDisplayStyle.NONE.index, 2);
+        expect(WindowType.WINDOW.index, 0);
+        expect(WindowType.CHILD.index, 1);
+        expect(WindowType.TABBED.index, 2);
+        expect(WindowTitlebarSeparatorStyle.AUTOMATIC.index, 0);
+        expect(WindowTitlebarSeparatorStyle.NONE.index, 1);
+        expect(WindowTitlebarSeparatorStyle.LINE.index, 2);
+        expect(WindowTitlebarSeparatorStyle.SHADOW.index, 3);
+      },
+    );
 
     test('URLRequestCachePolicy + Attribution + NetworkServiceType', () {
       expect(URLRequestCachePolicy.USE_PROTOCOL_CACHE_POLICY.index, 0);
       expect(URLRequestCachePolicy.RELOAD_IGNORING_LOCAL_CACHE_DATA.index, 1);
       expect(URLRequestCachePolicy.RETURN_CACHE_DATA_ELSE_LOAD.index, 2);
       expect(URLRequestCachePolicy.RETURN_CACHE_DATA_DONT_LOAD.index, 3);
-      expect(URLRequestCachePolicy.RELOAD_IGNORING_LOCAL_AND_REMOTE_CACHE_DATA.index, 4);
+      expect(
+        URLRequestCachePolicy.RELOAD_IGNORING_LOCAL_AND_REMOTE_CACHE_DATA.index,
+        4,
+      );
       expect(URLRequestCachePolicy.RELOAD_REVALIDATING_CACHE_DATA.index, 5);
       expect(URLRequestAttribution.DEVELOPER.index, 0);
       expect(URLRequestAttribution.USER.index, 1);
@@ -236,14 +309,46 @@ void main() {
     });
 
     test('URLProtectionSpaceAuthenticationMethod + ProxyType', () {
-      expect(URLProtectionSpaceAuthenticationMethod.NSURL_AUTHENTICATION_METHOD_CLIENT_CERTIFICATE.index, 0);
-      expect(URLProtectionSpaceAuthenticationMethod.NSURL_AUTHENTICATION_METHOD_NEGOTIATE.index, 1);
-      expect(URLProtectionSpaceAuthenticationMethod.NSURL_AUTHENTICATION_METHOD_NTLM.index, 2);
-      expect(URLProtectionSpaceAuthenticationMethod.NSURL_AUTHENTICATION_METHOD_SERVER_TRUST.index, 3);
-      expect(URLProtectionSpaceProxyType.URL_PROTECTION_SPACE_HTTP_PROXY.index, 0);
-      expect(URLProtectionSpaceProxyType.URL_PROTECTION_SPACE_HTTPS_PROXY.index, 1);
-      expect(URLProtectionSpaceProxyType.URL_PROTECTION_SPACE_FTP_PROXY.index, 2);
-      expect(URLProtectionSpaceProxyType.URL_PROTECTION_SPACE_SOCKS_PROXY.index, 3);
+      expect(
+        URLProtectionSpaceAuthenticationMethod
+            .NSURL_AUTHENTICATION_METHOD_CLIENT_CERTIFICATE
+            .index,
+        0,
+      );
+      expect(
+        URLProtectionSpaceAuthenticationMethod
+            .NSURL_AUTHENTICATION_METHOD_NEGOTIATE
+            .index,
+        1,
+      );
+      expect(
+        URLProtectionSpaceAuthenticationMethod
+            .NSURL_AUTHENTICATION_METHOD_NTLM
+            .index,
+        2,
+      );
+      expect(
+        URLProtectionSpaceAuthenticationMethod
+            .NSURL_AUTHENTICATION_METHOD_SERVER_TRUST
+            .index,
+        3,
+      );
+      expect(
+        URLProtectionSpaceProxyType.URL_PROTECTION_SPACE_HTTP_PROXY.index,
+        0,
+      );
+      expect(
+        URLProtectionSpaceProxyType.URL_PROTECTION_SPACE_HTTPS_PROXY.index,
+        1,
+      );
+      expect(
+        URLProtectionSpaceProxyType.URL_PROTECTION_SPACE_FTP_PROXY.index,
+        2,
+      );
+      expect(
+        URLProtectionSpaceProxyType.URL_PROTECTION_SPACE_SOCKS_PROXY.index,
+        3,
+      );
     });
   });
 
@@ -264,7 +369,10 @@ void main() {
       expect(windowStyleMaskToWire(WindowStyleMask.MINIATURIZABLE), 4);
       expect(windowStyleMaskToWire(WindowStyleMask.RESIZABLE), 8);
       expect(windowStyleMaskToWire(WindowStyleMask.FULLSCREEN), 16384);
-      expect(windowStyleMaskToWire(WindowStyleMask.FULL_SIZE_CONTENT_VIEW), 32768);
+      expect(
+        windowStyleMaskToWire(WindowStyleMask.FULL_SIZE_CONTENT_VIEW),
+        32768,
+      );
       expect(windowStyleMaskToWire(WindowStyleMask.UTILITY_WINDOW), 16);
       expect(windowStyleMaskToWire(WindowStyleMask.DOC_MODAL_WINDOW), 64);
       expect(windowStyleMaskToWire(WindowStyleMask.NONACTIVATING_PANEL), 128);

@@ -73,7 +73,10 @@ class _FirstLoadRaceScreenState extends State<FirstLoadRaceScreen> {
       _visibleHtml = null;
       _visibleLoadStopUrl = null;
     });
-    _log(_visibleLog, '── run #$_visibleRun: fresh widget, immediate loadUrl ──');
+    _log(
+      _visibleLog,
+      '── run #$_visibleRun: fresh widget, immediate loadUrl ──',
+    );
   }
 
   void _onVisibleWebViewCreated(InAppWebViewController controller) async {
@@ -85,13 +88,13 @@ class _FirstLoadRaceScreenState extends State<FirstLoadRaceScreen> {
     try {
       await controller.loadUrl(urlRequest: URLRequest(url: WebUri(targetUrl)));
       final stopUrl = await completer.future.timeout(
-            const Duration(seconds: 15),
-            onTimeout: () => throw TimeoutException('onLoadStop never fired'),
-          );
+        const Duration(seconds: 15),
+        onTimeout: () => throw TimeoutException('onLoadStop never fired'),
+      );
       final html = await controller.getHtml().timeout(
-            const Duration(seconds: 15),
-            onTimeout: () => throw TimeoutException('getHtml() HUNG'),
-          );
+        const Duration(seconds: 15),
+        onTimeout: () => throw TimeoutException('getHtml() HUNG'),
+      );
       final ok = (html ?? '').contains(marker);
       _log(
         _visibleLog,
@@ -174,8 +177,7 @@ class _FirstLoadRaceScreenState extends State<FirstLoadRaceScreen> {
                 height: 260,
                 child: InAppWebView(
                   key: ValueKey('visible-run-$_visibleRun'),
-                  initialUrlRequest:
-                      URLRequest(url: WebUri('about:blank')),
+                  initialUrlRequest: URLRequest(url: WebUri('about:blank')),
                   initialSettings: InAppWebViewSettings(
                     isInspectable: kDebugMode,
                   ),
@@ -264,9 +266,9 @@ Future<String> runHeadlessStressAttempts({
       // 2. run() — with the gate this only completes when the web
       //    process is ready; without it, returns immediately.
       await webview.run().timeout(
-            const Duration(seconds: 15),
-            onTimeout: () => throw TimeoutException('run() HUNG'),
-          );
+        const Duration(seconds: 15),
+        onTimeout: () => throw TimeoutException('run() HUNG'),
+      );
       final runMs = stopwatch.elapsedMilliseconds;
       attemptLog.add('run(): ${runMs}ms');
 
@@ -275,16 +277,18 @@ Future<String> runHeadlessStressAttempts({
       // 3. IMMEDIATELY issue the first real navigation.
       await controller.loadUrl(urlRequest: URLRequest(url: WebUri(targetUrl)));
       final stopUrl = await loadStop.future.timeout(
-            const Duration(seconds: 15),
-            onTimeout: () => throw TimeoutException('onLoadStop never fired'),
-          );
-      attemptLog.add('onLoadStop: ${stopwatch.elapsedMilliseconds}ms ($stopUrl)');
+        const Duration(seconds: 15),
+        onTimeout: () => throw TimeoutException('onLoadStop never fired'),
+      );
+      attemptLog.add(
+        'onLoadStop: ${stopwatch.elapsedMilliseconds}ms ($stopUrl)',
+      );
 
       // 4. Verify content actually rendered.
       final html = await controller.getHtml().timeout(
-            const Duration(seconds: 15),
-            onTimeout: () => throw TimeoutException('getHtml() HUNG'),
-          );
+        const Duration(seconds: 15),
+        onTimeout: () => throw TimeoutException('getHtml() HUNG'),
+      );
       final ok = (html ?? '').contains(marker);
       attemptLog.add('html: ${(html ?? '').length} chars, marker=$ok');
       if (ok) passed++;

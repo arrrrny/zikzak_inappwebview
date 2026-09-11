@@ -43,6 +43,7 @@ class FetchRequestPasswordCredential extends FetchRequestCredential {
   }
 
   ///Converts instance to a map.
+  @override
   Map<String, dynamic> toMap() {
     return {
       "type": type,
@@ -54,6 +55,7 @@ class FetchRequestPasswordCredential extends FetchRequestCredential {
   }
 
   ///Converts instance to a map.
+  @override
   Map<String, dynamic> toJson() {
     return toMap();
   }

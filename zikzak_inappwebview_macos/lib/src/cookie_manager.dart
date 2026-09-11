@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
-import 'package:zikzak_inappwebview_platform_interface/src/domain/entities/enums/http_cookie_same_site_policy.dart'
-    show httpCookieSameSitePolicyFromWire, httpCookieSameSitePolicyToWire;
 
 class MacOSCookieManager extends PlatformCookieManager {
   static const MethodChannel _channel = MethodChannel(

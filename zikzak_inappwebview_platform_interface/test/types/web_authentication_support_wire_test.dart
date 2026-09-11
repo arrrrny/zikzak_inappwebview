@@ -24,10 +24,7 @@ void main() {
     });
 
     test('toWire serializes to the enum index', () {
-      expect(
-        webAuthenticationSupportToWire(WebAuthenticationSupport.NONE),
-        0,
-      );
+      expect(webAuthenticationSupportToWire(WebAuthenticationSupport.NONE), 0);
       expect(
         webAuthenticationSupportToWire(WebAuthenticationSupport.FOR_APP),
         1,

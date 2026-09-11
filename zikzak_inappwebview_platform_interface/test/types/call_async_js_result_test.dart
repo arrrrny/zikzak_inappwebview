@@ -20,8 +20,15 @@ void main() {
       final r = CallAsyncJavaScriptResult(value: 42, error: null);
       expect(r.toJson(), {'value': 42, 'error': null});
 
-      final r2 = CallAsyncJavaScriptResult(value: {'a': [1, 2]}, error: 'boom');
-      expect(r2.toJson()['value'], {'a': [1, 2]});
+      final r2 = CallAsyncJavaScriptResult(
+        value: {
+          'a': [1, 2],
+        },
+        error: 'boom',
+      );
+      expect(r2.toJson()['value'], {
+        'a': [1, 2],
+      });
       expect(r2.toJson()['error'], 'boom');
     });
 
@@ -29,18 +36,27 @@ void main() {
       final r = CallAsyncJavaScriptResult.fromJson({});
       expect(r.value, isNull);
       expect(r.error, isNull);
-      final r2 = CallAsyncJavaScriptResult.fromJson({'value': null, 'error': 'e'});
+      final r2 = CallAsyncJavaScriptResult.fromJson({
+        'value': null,
+        'error': 'e',
+      });
       expect(r2.value, isNull);
       expect(r2.error, 'e');
     });
 
     test('round-trip preserves dynamic value', () {
       final r = CallAsyncJavaScriptResult(
-        value: {'result': true, 'list': [1, 2, 3]},
+        value: {
+          'result': true,
+          'list': [1, 2, 3],
+        },
         error: null,
       );
       final back = CallAsyncJavaScriptResult.fromJson(r.toJson());
-      expect(back.value, {'result': true, 'list': [1, 2, 3]});
+      expect(back.value, {
+        'result': true,
+        'list': [1, 2, 3],
+      });
       expect(back.error, isNull);
     });
 

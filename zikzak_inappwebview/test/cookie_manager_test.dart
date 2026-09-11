@@ -6,9 +6,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:zikzak_inappwebview/zikzak_inappwebview.dart';
 
 class _FakePlatformCookieManager extends PlatformCookieManager {
-  _FakePlatformCookieManager() : super.implementation(
-          const PlatformCookieManagerCreationParams(),
-        );
+  _FakePlatformCookieManager()
+    : super.implementation(const PlatformCookieManagerCreationParams());
 
   final List<Map<String, Object?>> calls = [];
 
@@ -172,23 +171,31 @@ void main() {
       expect(result?.value, 'v');
     });
 
-    test('deleteCookie / deleteCookies / deleteAll / getAll / removeSession',
-        () async {
-      final fake = _FakePlatformCookieManager();
-      final manager = CookieManager.fromPlatform(fake);
-      expect(
-        await manager.deleteCookie(url: WebUri('https://a.dev/'), name: 'n'),
-        true,
-      );
-      expect(await manager.deleteCookies(url: WebUri('https://a.dev/')), true);
-      expect(await manager.deleteAllCookies(), true);
-      expect(await manager.getAllCookies(), isEmpty);
-      expect(await manager.removeSessionCookies(), true);
-      expect(
-        fake.calls.map((c) => c['op']).toList(),
-        ['deleteCookie', 'deleteCookies', 'deleteAllCookies', 'getAllCookies', 'removeSessionCookies'],
-      );
-    });
+    test(
+      'deleteCookie / deleteCookies / deleteAll / getAll / removeSession',
+      () async {
+        final fake = _FakePlatformCookieManager();
+        final manager = CookieManager.fromPlatform(fake);
+        expect(
+          await manager.deleteCookie(url: WebUri('https://a.dev/'), name: 'n'),
+          true,
+        );
+        expect(
+          await manager.deleteCookies(url: WebUri('https://a.dev/')),
+          true,
+        );
+        expect(await manager.deleteAllCookies(), true);
+        expect(await manager.getAllCookies(), isEmpty);
+        expect(await manager.removeSessionCookies(), true);
+        expect(fake.calls.map((c) => c['op']).toList(), [
+          'deleteCookie',
+          'deleteCookies',
+          'deleteAllCookies',
+          'getAllCookies',
+          'removeSessionCookies',
+        ]);
+      },
+    );
 
     test('instance() caches the shared instance', () {
       // instance() constructs via the platform factory, which needs a fake

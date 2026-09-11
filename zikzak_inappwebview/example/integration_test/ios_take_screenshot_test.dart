@@ -43,7 +43,9 @@ void main() {
         ),
       ),
     );
-    final controller = await created.future.timeout(const Duration(seconds: 120));
+    final controller = await created.future.timeout(
+      const Duration(seconds: 120),
+    );
     await controller.loadData(
       data: '<html><body><h1>shot</h1><p>hello zikzak</p></body></html>',
     );
@@ -65,16 +67,25 @@ void main() {
 
       final controller = await pumpWebView(tester, pageLoaded: Completer());
 
-      final Uint8List? bytes = await controller
-          .takeScreenshot()
-          .timeout(const Duration(seconds: 120));
+      final Uint8List? bytes = await controller.takeScreenshot().timeout(
+        const Duration(seconds: 120),
+      );
 
-      expect(bytes, isNotNull,
-          reason: 'takeScreenshot must return non-null bytes on iOS (US5-AC1)');
-      expect(bytes!.length, greaterThan(100),
-          reason: 'the screenshot byte buffer must be non-trivial');
-      expect(bytes.sublist(0, 4), [0x89, 0x50, 0x4E, 0x47],
-          reason: 'returned bytes must be a valid PNG image (magic 89 50 4E 47)');
+      expect(
+        bytes,
+        isNotNull,
+        reason: 'takeScreenshot must return non-null bytes on iOS (US5-AC1)',
+      );
+      expect(
+        bytes!.length,
+        greaterThan(100),
+        reason: 'the screenshot byte buffer must be non-trivial',
+      );
+      expect(
+        bytes.sublist(0, 4),
+        [0x89, 0x50, 0x4E, 0x47],
+        reason: 'returned bytes must be a valid PNG image (magic 89 50 4E 47)',
+      );
     },
   );
 }

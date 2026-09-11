@@ -8,7 +8,6 @@ import 'package:flutter/widgets.dart';
 import '../../../content_blocker.dart';
 import '../context_menu/context_menu.dart';
 import '../platform_webview_asset_loader/platform_webview_asset_loader.dart';
-import '../platform_webview_feature/platform_webview_feature.dart';
 import '../../../types/android_webview_insets.dart';
 import '../../../types/network_capture_controller.dart';
 import '../../../types/resource_type.dart';
@@ -43,7 +42,7 @@ List<ContentBlocker> _deserializeContentBlockers(
 ) {
   List<ContentBlocker> contentBlockers = [];
   if (contentBlockersMapList != null) {
-    (contentBlockersMapList as List).forEach((contentBlocker) {
+    for (var contentBlocker in (contentBlockersMapList as List)) {
       contentBlockers.add(
         ContentBlocker.fromMap(
           Map<dynamic, Map<dynamic, dynamic>>.from(
@@ -51,7 +50,7 @@ List<ContentBlocker> _deserializeContentBlockers(
           ),
         ),
       );
-    });
+    }
   }
   return contentBlockers;
 }
@@ -119,12 +118,12 @@ abstract class $InAppWebViewSettings {
   bool? get horizontalScrollBarEnabled;
 
   ///List of custom schemes that the WebView must handle. Use the [PlatformWebViewCreationParams.onLoadResourceWithCustomScheme] event to intercept resource requests with custom scheme.
-  @JsonKey(defaultValue: const [])
+  @JsonKey(defaultValue: [])
   List<String>? get resourceCustomSchemes;
 
   ///List of [ContentBlocker] that are a set of rules used to block content in the browser window.
   @JsonKey(
-    defaultValue: const [],
+    defaultValue: [],
     fromJson: _deserializeContentBlockers,
     toJson: _serializeContentBlockers,
   )
@@ -1068,7 +1067,7 @@ abstract class $InAppWebViewSettings {
   ///Patterns are interpreted according to [networkCaptureUrlPatternType].
   ///
   ///The default value is an empty list (capture all).
-  @JsonKey(defaultValue: const [])
+  @JsonKey(defaultValue: [])
   List<String>? get networkCaptureUrlPatterns;
 
   ///How [networkCaptureUrlPatterns] are interpreted.
@@ -1092,7 +1091,7 @@ abstract class $InAppWebViewSettings {
   ///response metadata is still reported; only the body is discarded.
   ///
   ///The default value is an empty list (capture all bodies).
-  @JsonKey(defaultValue: const [])
+  @JsonKey(defaultValue: [])
   List<String>? get networkCaptureMimeTypes;
 
   ///A [NetworkCaptureController] that accumulates all captured

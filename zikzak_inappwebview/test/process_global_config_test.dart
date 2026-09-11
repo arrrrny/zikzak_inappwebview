@@ -5,9 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:zikzak_inappwebview/zikzak_inappwebview.dart';
 
 class _FakeProcessGlobalConfig extends PlatformProcessGlobalConfig {
-  _FakeProcessGlobalConfig() : super.implementation(
-          const PlatformProcessGlobalConfigCreationParams(),
-        );
+  _FakeProcessGlobalConfig()
+    : super.implementation(const PlatformProcessGlobalConfigCreationParams());
 
   ProcessGlobalConfigSettings? lastSettings;
   int applyCount = 0;

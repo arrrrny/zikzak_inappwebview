@@ -38,7 +38,10 @@ void main() {
         extra: 'https://a.dev/i.png',
       );
       expect(r.toJson(), {'type': 5, 'extra': 'https://a.dev/i.png'});
-      final back = InAppWebViewHitTestResult.fromJson({'type': 8, 'extra': 'x'});
+      final back = InAppWebViewHitTestResult.fromJson({
+        'type': 8,
+        'extra': 'x',
+      });
       expect(back.type, InAppWebViewHitTestResultType.SRC_IMAGE_ANCHOR_TYPE);
       expect(back.extra, 'x');
     });
@@ -130,8 +133,10 @@ void main() {
 
       final img = RequestImageRefResult(url: WebUri('https://a.dev/i.png'));
       expect(img.toJson(), {'url': 'https://a.dev/i.png'});
-      expect(RequestImageRefResult.fromJson(img.toJson()).url?.toString(),
-          'https://a.dev/i.png');
+      expect(
+        RequestImageRefResult.fromJson(img.toJson()).url?.toString(),
+        'https://a.dev/i.png',
+      );
     });
   });
 
@@ -255,7 +260,10 @@ void main() {
       expect(viaList.data, Uint8List.fromList([4, 5]));
       // data is required
       expect(
-        () => CustomSchemeResponse.fromJson({'contentType': 'x', 'contentEncoding': 'y'}),
+        () => CustomSchemeResponse.fromJson({
+          'contentType': 'x',
+          'contentEncoding': 'y',
+        }),
         throwsA(anything),
       );
     });

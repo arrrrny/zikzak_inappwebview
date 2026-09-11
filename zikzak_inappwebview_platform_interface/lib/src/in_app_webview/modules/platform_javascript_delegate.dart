@@ -16,7 +16,7 @@ import '../../types/main.dart';
 /// been migrated.
 abstract class PlatformJavaScriptDelegate extends PlatformInterface {
   /// Creates a new [PlatformJavaScriptDelegate].
-  PlatformJavaScriptDelegate({required Object token}) : super(token: token);
+  PlatformJavaScriptDelegate({required super.token});
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.evaluateJavascript}
   Future<dynamic> evaluateJavascript({required String source}) {

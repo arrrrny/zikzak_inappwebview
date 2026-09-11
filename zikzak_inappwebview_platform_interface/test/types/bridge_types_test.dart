@@ -19,7 +19,12 @@ void main() {
 
     test('fromJson requires all fields; round-trips', () {
       expect(() => InAppWebViewRect.fromJson({'x': 1}), throwsA(anything));
-      final r = InAppWebViewRect.fromJson({'x': 1, 'y': 2, 'width': 3, 'height': 4});
+      final r = InAppWebViewRect.fromJson({
+        'x': 1,
+        'y': 2,
+        'width': 3,
+        'height': 4,
+      });
       expect(r.x, 1);
       expect(r.height, 4);
       final back = InAppWebViewRect.fromJson(r.toJson());
@@ -130,21 +135,26 @@ void main() {
 
   group('callback typedefs', () {
     test('JavaScriptHandlerCallback is a List<dynamic> -> dynamic fn', () {
-      JavaScriptHandlerCallback cb = (arguments) => arguments.length;
+      cb(List<dynamic> arguments) => arguments.length;
       expect(cb(['a']), 1);
     });
 
     test('WebMessageCallback + OnPostMessageCallback are void fns', () {
       int calls = 0;
-      WebMessageCallback wcb = (message) {
+      void wcb(WebMessage? message) {
         calls++;
         expect(message, isNull);
-      };
+      }
+
       wcb(null);
       expect(calls, 1);
 
-      OnPostMessageCallback ocb =
-          (message, sourceOrigin, isMainFrame, replyProxy) {};
+      void ocb(
+        WebMessage? message,
+        WebUri? sourceOrigin,
+        bool isMainFrame,
+        PlatformJavaScriptReplyProxy replyProxy,
+      ) {}
       expect(ocb, isNotNull);
     });
   });

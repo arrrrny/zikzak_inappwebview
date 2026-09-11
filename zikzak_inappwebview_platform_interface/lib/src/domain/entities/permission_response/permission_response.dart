@@ -21,7 +21,7 @@ abstract class $PermissionResponse {
   ///
   ///**NOTE for iOS**: not used. The [action] taken is based on the [PermissionRequest.resources].
   @JsonKey(
-    defaultValue: const [],
+    defaultValue: [],
     fromJson: _resourcesFromJson,
     toJson: _resourcesToJson,
   )

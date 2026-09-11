@@ -87,8 +87,10 @@ void main() {
 
     test('copyWith is available (zorphy addition)', () {
       final r = PermissionResponse();
-      expect(r.copyWith(action: PermissionResponseAction.GRANT).action,
-          PermissionResponseAction.GRANT);
+      expect(
+        r.copyWith(action: PermissionResponseAction.GRANT).action,
+        PermissionResponseAction.GRANT,
+      );
       expect(r.copyWith().action, PermissionResponseAction.DENY);
     });
   });
@@ -194,7 +196,10 @@ void main() {
       expect(SafeBrowsingThreat.SAFE_BROWSING_THREAT_UNKNOWN.index, 0);
       expect(SafeBrowsingThreat.SAFE_BROWSING_THREAT_MALWARE.index, 1);
       expect(SafeBrowsingThreat.SAFE_BROWSING_THREAT_PHISHING.index, 2);
-      expect(SafeBrowsingThreat.SAFE_BROWSING_THREAT_UNWANTED_SOFTWARE.index, 3);
+      expect(
+        SafeBrowsingThreat.SAFE_BROWSING_THREAT_UNWANTED_SOFTWARE.index,
+        3,
+      );
       expect(SafeBrowsingThreat.SAFE_BROWSING_THREAT_BILLING.index, 4);
     });
   });
@@ -202,12 +207,14 @@ void main() {
   group('PermissionResourceType native-value mapping (per platform)', () {
     test('Android sends android.webkit.resource.* names', () {
       withPlatform(TargetPlatform.android, () {
-        final r = PermissionResponse(resources: const [
-          PermissionResourceType.CAMERA,
-          PermissionResourceType.MICROPHONE,
-          PermissionResourceType.MIDI_SYSEX,
-          PermissionResourceType.PROTECTED_MEDIA_ID,
-        ]);
+        final r = PermissionResponse(
+          resources: const [
+            PermissionResourceType.CAMERA,
+            PermissionResourceType.MICROPHONE,
+            PermissionResourceType.MIDI_SYSEX,
+            PermissionResourceType.PROTECTED_MEDIA_ID,
+          ],
+        );
         expect(r.toJson()['resources'], [
           'android.webkit.resource.VIDEO_CAPTURE',
           'android.webkit.resource.AUDIO_CAPTURE',
@@ -226,11 +233,13 @@ void main() {
 
     test('iOS/macOS send WKMediaCaptureType raw values', () {
       withPlatform(TargetPlatform.macOS, () {
-        final r = PermissionResponse(resources: const [
-          PermissionResourceType.CAMERA,
-          PermissionResourceType.MICROPHONE,
-          PermissionResourceType.CAMERA_AND_MICROPHONE,
-        ]);
+        final r = PermissionResponse(
+          resources: const [
+            PermissionResourceType.CAMERA,
+            PermissionResourceType.MICROPHONE,
+            PermissionResourceType.CAMERA_AND_MICROPHONE,
+          ],
+        );
         expect(r.toJson()['resources'], [0, 1, 2]);
         final back = PermissionResponse.fromJson(r.toJson());
         expect(back.resources, const [

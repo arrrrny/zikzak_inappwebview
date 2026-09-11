@@ -106,11 +106,10 @@ void main() {
     await tester.pump(const Duration(milliseconds: 500));
     // 120s ceilings: Intel-2019 macOS needs the headroom; fast platforms finish
     // well under this and are unaffected by the higher ceiling.
-    final controller = await created.future
-        .timeout(const Duration(seconds: 120));
-    await controller
-        .loadData(data: html)
-        .timeout(const Duration(seconds: 120));
+    final controller = await created.future.timeout(
+      const Duration(seconds: 120),
+    );
+    await controller.loadData(data: html).timeout(const Duration(seconds: 120));
     await pageLoaded.future.timeout(const Duration(seconds: 120));
     // Give the onLoadStop removal loop (3 retries) time to run.
     await Future<void>.delayed(const Duration(seconds: 4));
@@ -141,7 +140,9 @@ void main() {
       MaterialApp(
         home: Scaffold(
           body: InAppWebView(
-            initialSettings: InAppWebViewSettings(dismissDialogues: dismissDialogues),
+            initialSettings: InAppWebViewSettings(
+              dismissDialogues: dismissDialogues,
+            ),
             onWebViewCreated: (c) {
               if (!created.isCompleted) created.complete(c);
             },
@@ -152,7 +153,9 @@ void main() {
         ),
       ),
     );
-    final controller = await created.future.timeout(const Duration(seconds: 15));
+    final controller = await created.future.timeout(
+      const Duration(seconds: 15),
+    );
     await controller.loadData(data: html);
     await loaded.future.timeout(const Duration(seconds: 15));
     // Wait out the legacy dismissal retry window (3x with 800ms between).
@@ -192,11 +195,17 @@ void main() {
         final stickyPresent = await elementPresent(controller, '"#sticky"');
         final contentPresent = await elementPresent(controller, '"h1"');
 
-        expect(cookiePresent, isFalse,
-            reason: 'fixed cookie banner must be removed');
+        expect(
+          cookiePresent,
+          isFalse,
+          reason: 'fixed cookie banner must be removed',
+        );
         expect(stickyPresent, isFalse, reason: 'sticky nav must be removed');
-        expect(contentPresent, isTrue,
-            reason: 'page content must be preserved');
+        expect(
+          contentPresent,
+          isTrue,
+          reason: 'page content must be preserved',
+        );
       },
       timeout: const Timeout(Duration(minutes: 8)),
     );
@@ -213,10 +222,16 @@ void main() {
         final cookiePresent = await elementPresent(controller, '"#cookie"');
         final stickyPresent = await elementPresent(controller, '"#sticky"');
 
-        expect(cookiePresent, isTrue,
-            reason: 'fixed cookie banner must remain when disabled');
-        expect(stickyPresent, isTrue,
-            reason: 'sticky nav must remain when disabled');
+        expect(
+          cookiePresent,
+          isTrue,
+          reason: 'fixed cookie banner must remain when disabled',
+        );
+        expect(
+          stickyPresent,
+          isTrue,
+          reason: 'sticky nav must remain when disabled',
+        );
       },
       timeout: const Timeout(Duration(minutes: 8)),
     );
@@ -231,15 +246,27 @@ void main() {
           html: dynamicOverlayHtml,
         );
 
-        expect(await elementPresent(controller, '"#cookie"'), isFalse,
-            reason: 'fixed cookie banner must be removed');
-        expect(await elementPresent(controller, '"#sticky"'), isFalse,
-            reason: 'sticky nav must be removed');
-        expect(await elementPresent(controller, '"#late"'), isFalse,
-            reason:
-                'dynamically injected fixed overlay must be removed within the retry window');
-        expect(await elementPresent(controller, '"h1"'), isTrue,
-            reason: 'page content must be preserved');
+        expect(
+          await elementPresent(controller, '"#cookie"'),
+          isFalse,
+          reason: 'fixed cookie banner must be removed',
+        );
+        expect(
+          await elementPresent(controller, '"#sticky"'),
+          isFalse,
+          reason: 'sticky nav must be removed',
+        );
+        expect(
+          await elementPresent(controller, '"#late"'),
+          isFalse,
+          reason:
+              'dynamically injected fixed overlay must be removed within the retry window',
+        );
+        expect(
+          await elementPresent(controller, '"h1"'),
+          isTrue,
+          reason: 'page content must be preserved',
+        );
       },
       timeout: const Timeout(Duration(minutes: 8)),
     );
@@ -259,8 +286,11 @@ void main() {
         final title = await controller
             .evaluateJavascript(source: 'document.title')
             .timeout(const Duration(seconds: 20));
-        expect(title, 'Throw',
-            reason: 'web view must remain responsive after a JS error');
+        expect(
+          title,
+          'Throw',
+          reason: 'web view must remain responsive after a JS error',
+        );
       },
       timeout: const Timeout(Duration(minutes: 8)),
     );
@@ -278,7 +308,11 @@ void main() {
 <div id="ovl" class="fixed">overlay</div>
 <div id="stk" class="sticky">sticky</div>
 </body></html>''';
-      final c = await pumpDismissWebView(tester, html: html, dismissDialogues: true);
+      final c = await pumpDismissWebView(
+        tester,
+        html: html,
+        dismissDialogues: true,
+      );
       expect(await countFixedSticky(c), 0);
       final out = await c.getHtml();
       expect(out, isNotNull);
@@ -287,20 +321,41 @@ void main() {
     });
 
     // A2 — US1-S3, FR-005
-    testWidgets('A2: dismissDialogues resets overflow/margin on documentElement and body', (
-      WidgetTester tester,
-    ) async {
-      const html = '''
+    testWidgets(
+      'A2: dismissDialogues resets overflow/margin on documentElement and body',
+      (WidgetTester tester) async {
+        const html = '''
 <!DOCTYPE html><html><head></head>
 <body style="overflow:hidden;margin:10px">
 <div id="ovl" style="position:fixed">overlay</div>
 </body></html>''';
-      final c = await pumpDismissWebView(tester, html: html, dismissDialogues: true);
-      expect(await c.evaluateJavascript(source: "document.documentElement.style.overflow"), '');
-      expect(await c.evaluateJavascript(source: "document.documentElement.style.margin"), '');
-      expect(await c.evaluateJavascript(source: "document.body.style.overflow"), '');
-      expect(await c.evaluateJavascript(source: "document.body.style.margin"), '');
-    });
+        final c = await pumpDismissWebView(
+          tester,
+          html: html,
+          dismissDialogues: true,
+        );
+        expect(
+          await c.evaluateJavascript(
+            source: "document.documentElement.style.overflow",
+          ),
+          '',
+        );
+        expect(
+          await c.evaluateJavascript(
+            source: "document.documentElement.style.margin",
+          ),
+          '',
+        );
+        expect(
+          await c.evaluateJavascript(source: "document.body.style.overflow"),
+          '',
+        );
+        expect(
+          await c.evaluateJavascript(source: "document.body.style.margin"),
+          '',
+        );
+      },
+    );
 
     // A3 — US2-S1, FR-007
     testWidgets('A3: dismissDialogues false keeps fixed/sticky elements', (
@@ -315,7 +370,11 @@ void main() {
 <div id="ovl" class="fixed">overlay</div>
 <div id="stk" class="sticky">sticky</div>
 </body></html>''';
-      final c = await pumpDismissWebView(tester, html: html, dismissDialogues: false);
+      final c = await pumpDismissWebView(
+        tester,
+        html: html,
+        dismissDialogues: false,
+      );
       expect(await countFixedSticky(c), 2);
       final out = await c.getHtml();
       expect(out, isNotNull);
@@ -324,65 +383,77 @@ void main() {
     });
 
     // A4 — US2-S2, SC-004
-    testWidgets('A4: dismissDialogues false leaves overlays in a screenshot capture', (
-      WidgetTester tester,
-    ) async {
-      const html = '''
+    testWidgets(
+      'A4: dismissDialogues false leaves overlays in a screenshot capture',
+      (WidgetTester tester) async {
+        const html = '''
 <!DOCTYPE html><html><head></head>
 <body><div id="ovl" style="position:fixed">overlay</div></body></html>''';
-      final c = await pumpDismissWebView(tester, html: html, dismissDialogues: false);
-      expect(await countFixedSticky(c), 1);
-      final shot = await c.takeScreenshot();
-      expect(shot, isNotNull);
-      expect(shot!.length, greaterThan(0));
-    });
+        final c = await pumpDismissWebView(
+          tester,
+          html: html,
+          dismissDialogues: false,
+        );
+        expect(await countFixedSticky(c), 1);
+        final shot = await c.takeScreenshot();
+        expect(shot, isNotNull);
+        expect(shot!.length, greaterThan(0));
+      },
+    );
 
     // A5 — US3-S1, FR-006
-    testWidgets('A5: dismissDialogues removes a fixed overlay injected after load', (
-      WidgetTester tester,
-    ) async {
-      const html = '<!DOCTYPE html><html><body><h1>content</h1></body></html>';
-      final loaded = Completer<void>();
-      final created = Completer<InAppWebViewController>();
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: InAppWebView(
-              initialSettings: InAppWebViewSettings(dismissDialogues: true),
-              onWebViewCreated: (c) {
-                if (!created.isCompleted) created.complete(c);
-              },
-              onLoadStop: (c, url) {
-                if (!loaded.isCompleted) loaded.complete();
-              },
+    testWidgets(
+      'A5: dismissDialogues removes a fixed overlay injected after load',
+      (WidgetTester tester) async {
+        const html =
+            '<!DOCTYPE html><html><body><h1>content</h1></body></html>';
+        final loaded = Completer<void>();
+        final created = Completer<InAppWebViewController>();
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: InAppWebView(
+                initialSettings: InAppWebViewSettings(dismissDialogues: true),
+                onWebViewCreated: (c) {
+                  if (!created.isCompleted) created.complete(c);
+                },
+                onLoadStop: (c, url) {
+                  if (!loaded.isCompleted) loaded.complete();
+                },
+              ),
             ),
           ),
-        ),
-      );
-      final c = await created.future.timeout(const Duration(seconds: 15));
-      await c.loadData(data: html);
-      await loaded.future.timeout(const Duration(seconds: 15));
-      // Inject a fixed overlay after the first dismissal attempt but before the
-      // 800ms retry window closes, so a later retry must catch it.
-      await Future.delayed(const Duration(milliseconds: 400));
-      await c.evaluateJavascript(
-        source:
-            "var d=document.createElement('div');d.id='dyn';d.style.position='fixed';d.textContent='late';document.body.appendChild(d);",
-      );
-      await Future.delayed(const Duration(seconds: 3));
-      await tester.pumpAndSettle();
-      expect(await countFixedSticky(c), 0);
-      final out = await c.getHtml();
-      expect(out, isNotNull);
-      expect(out!, isNot(contains('id="dyn"')));
-    });
+        );
+        final c = await created.future.timeout(const Duration(seconds: 15));
+        await c.loadData(data: html);
+        await loaded.future.timeout(const Duration(seconds: 15));
+        // Inject a fixed overlay after the first dismissal attempt but before the
+        // 800ms retry window closes, so a later retry must catch it.
+        await Future.delayed(const Duration(milliseconds: 400));
+        await c.evaluateJavascript(
+          source:
+              "var d=document.createElement('div');d.id='dyn';d.style.position='fixed';d.textContent='late';document.body.appendChild(d);",
+        );
+        await Future.delayed(const Duration(seconds: 3));
+        await tester.pumpAndSettle();
+        expect(await countFixedSticky(c), 0);
+        final out = await c.getHtml();
+        expect(out, isNotNull);
+        expect(out!, isNot(contains('id="dyn"')));
+      },
+    );
 
     // A6 — US3-S2, FR-008, FR-009
     testWidgets('A6: dismissDialogues with no overlays completes cleanly', (
       WidgetTester tester,
     ) async {
-      const html = '<!DOCTYPE html><html><body><h1>clean page</h1><p>body text</p></body></html>';
-      final c = await pumpDismissWebView(tester, html: html, dismissDialogues: true);
+      const html =
+          '<!DOCTYPE html><html><body><h1>clean page</h1><p>body text</p></body></html>';
+      final c = await pumpDismissWebView(
+        tester,
+        html: html,
+        dismissDialogues: true,
+      );
       expect(await countFixedSticky(c), 0);
       final out = await c.getHtml();
       expect(out, isNotNull);

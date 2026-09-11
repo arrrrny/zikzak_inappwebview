@@ -83,7 +83,7 @@ class _SpyMonolith extends InAppWebViewController {
   late final _SpySettingsController _settings;
 
   _SpyMonolith(FakePlatformInAppWebViewController platform)
-      : super.fromPlatform(platform: platform) {
+    : super.fromPlatform(platform: platform) {
     _nav = _SpyNavigationController(this);
     _js = _SpyJavaScriptController(this);
     _settings = _SpySettingsController(this);
@@ -187,11 +187,9 @@ void main() {
       final args = calls.single.args;
       expect(args['urlRequest'], urlRequest);
       expect(args['data'], data);
-      // NOTE: the monolithic controller drops urlResponse before reaching the
-      // platform, so the facade inherits that behavior (FR-005: identical to the
-      // monolithic method). The argument is therefore forwarded to the parent
-      // but not to the platform call.
-      expect(args['urlResponse'], isNull);
+      // 185bb273 fixed the monolith + facade to forward urlResponse, so the
+      // facade now delivers it to the platform call too.
+      expect(args['urlResponse'], same(response));
     });
 
     test('U15 reload delegates to parent', () async {
@@ -266,23 +264,32 @@ void main() {
       expect(fake.recorded('canGoBack'), hasLength(1));
     });
 
-    test('U23 canGoForward delegates to parent and returns same value', () async {
-      final fake = FakePlatformInAppWebViewController()..nextBool = true;
-      final controller = _controller(fake);
+    test(
+      'U23 canGoForward delegates to parent and returns same value',
+      () async {
+        final fake = FakePlatformInAppWebViewController()..nextBool = true;
+        final controller = _controller(fake);
 
-      expect(await controller.navigation.canGoForward(), isTrue);
-      expect(fake.recorded('canGoForward'), hasLength(1));
-    });
+        expect(await controller.navigation.canGoForward(), isTrue);
+        expect(fake.recorded('canGoForward'), hasLength(1));
+      },
+    );
 
-    test('U24 canGoBackOrForward delegates to parent with same steps', () async {
-      final fake = FakePlatformInAppWebViewController()..nextBool = true;
-      final controller = _controller(fake);
+    test(
+      'U24 canGoBackOrForward delegates to parent with same steps',
+      () async {
+        final fake = FakePlatformInAppWebViewController()..nextBool = true;
+        final controller = _controller(fake);
 
-      expect(await controller.navigation.canGoBackOrForward(steps: 5), isTrue);
-      final calls = fake.recorded('canGoBackOrForward');
-      expect(calls, hasLength(1));
-      expect(calls.single.args['steps'], 5);
-    });
+        expect(
+          await controller.navigation.canGoBackOrForward(steps: 5),
+          isTrue,
+        );
+        final calls = fake.recorded('canGoBackOrForward');
+        expect(calls, hasLength(1));
+        expect(calls.single.args['steps'], 5);
+      },
+    );
 
     test('U25 goTo delegates to parent with same history item', () async {
       final fake = FakePlatformInAppWebViewController();
@@ -296,14 +303,16 @@ void main() {
       expect(calls.single.args['historyItem'], item);
     });
 
-    test('U26 getCopyBackForwardList delegates to parent and returns same',
-        () async {
-      final fake = FakePlatformInAppWebViewController();
-      final controller = _controller(fake);
+    test(
+      'U26 getCopyBackForwardList delegates to parent and returns same',
+      () async {
+        final fake = FakePlatformInAppWebViewController();
+        final controller = _controller(fake);
 
-      expect(await controller.navigation.getCopyBackForwardList(), isNull);
-      expect(fake.recorded('getCopyBackForwardList'), hasLength(1));
-    });
+        expect(await controller.navigation.getCopyBackForwardList(), isNull);
+        expect(fake.recorded('getCopyBackForwardList'), hasLength(1));
+      },
+    );
 
     test('U27 clearHistory delegates to parent', () async {
       final fake = FakePlatformInAppWebViewController();
@@ -319,34 +328,44 @@ void main() {
         ..nextUrl = WebUri('https://example.com/page');
       final controller = _controller(fake);
 
-      expect(await controller.navigation.getUrl(),
-          WebUri('https://example.com/page'));
+      expect(
+        await controller.navigation.getUrl(),
+        WebUri('https://example.com/page'),
+      );
       expect(fake.recorded('getUrl'), hasLength(1));
     });
   });
 
   group('SettingsController delegates to parent (U66-U67)', () {
-    test('U66 getSettings delegates to parent and returns same value', () async {
-      final fake = FakePlatformInAppWebViewController()
-        ..nextSettings = InAppWebViewSettings();
-      final controller = _controller(fake);
+    test(
+      'U66 getSettings delegates to parent and returns same value',
+      () async {
+        final fake = FakePlatformInAppWebViewController()
+          ..nextSettings = InAppWebViewSettings();
+        final controller = _controller(fake);
 
-      expect(await controller.settings.getSettings(),
-          isA<InAppWebViewSettings>());
-      expect(fake.recorded('getSettings'), hasLength(1));
-    });
+        expect(
+          await controller.settings.getSettings(),
+          isA<InAppWebViewSettings>(),
+        );
+        expect(fake.recorded('getSettings'), hasLength(1));
+      },
+    );
 
-    test('U67 setSettings delegates to parent with identical settings', () async {
-      final fake = FakePlatformInAppWebViewController();
-      final controller = _controller(fake);
-      final settings = InAppWebViewSettings(useOnLoadResource: true);
+    test(
+      'U67 setSettings delegates to parent with identical settings',
+      () async {
+        final fake = FakePlatformInAppWebViewController();
+        final controller = _controller(fake);
+        final settings = InAppWebViewSettings(useOnLoadResource: true);
 
-      await controller.settings.setSettings(settings: settings);
+        await controller.settings.setSettings(settings: settings);
 
-      final calls = fake.recorded('setSettings');
-      expect(calls, hasLength(1));
-      expect(calls.single.args['settings'], settings);
-    });
+        final calls = fake.recorded('setSettings');
+        expect(calls, hasLength(1));
+        expect(calls.single.args['settings'], settings);
+      },
+    );
   });
 
   group('Monolith delegates to domain facades (U5-U9)', () {
@@ -359,12 +378,21 @@ void main() {
       await controller.getUrl();
       await controller.reload();
 
-      expect(controller._nav.loadUrlCount, 1,
-          reason: 'monolith.loadUrl must route through navigation facade');
-      expect(controller._nav.getUrlCount, 1,
-          reason: 'monolith.getUrl must route through navigation facade');
-      expect(controller._nav.reloadCount, 1,
-          reason: 'monolith.reload must route through navigation facade');
+      expect(
+        controller._nav.loadUrlCount,
+        1,
+        reason: 'monolith.loadUrl must route through navigation facade',
+      );
+      expect(
+        controller._nav.getUrlCount,
+        1,
+        reason: 'monolith.getUrl must route through navigation facade',
+      );
+      expect(
+        controller._nav.reloadCount,
+        1,
+        reason: 'monolith.reload must route through navigation facade',
+      );
       // Each still reaches the platform exactly once with identical args.
       expect(fake.recorded('loadUrl'), hasLength(1));
       expect(fake.recorded('loadUrl').single.args['urlRequest'], urlRequest);
@@ -378,8 +406,12 @@ void main() {
 
       await controller.evaluateJavascript(source: '1+1');
 
-      expect(controller._js.evaluateCount, 1,
-          reason: 'monolith.evaluateJavascript must route through javaScript facade');
+      expect(
+        controller._js.evaluateCount,
+        1,
+        reason:
+            'monolith.evaluateJavascript must route through javaScript facade',
+      );
       expect(fake.recorded('evaluateJavascript'), hasLength(1));
       expect(fake.recorded('evaluateJavascript').single.args['source'], '1+1');
     });
@@ -390,8 +422,11 @@ void main() {
 
       await controller.getSettings();
 
-      expect(controller._settings.getSettingsCount, 1,
-          reason: 'monolith.getSettings must route through settings facade');
+      expect(
+        controller._settings.getSettingsCount,
+        1,
+        reason: 'monolith.getSettings must route through settings facade',
+      );
       expect(fake.recorded('getSettings'), hasLength(1));
     });
 

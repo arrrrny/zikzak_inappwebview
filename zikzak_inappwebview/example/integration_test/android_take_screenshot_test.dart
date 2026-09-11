@@ -42,7 +42,9 @@ void main() {
         ),
       ),
     );
-    final controller = await created.future.timeout(const Duration(seconds: 120));
+    final controller = await created.future.timeout(
+      const Duration(seconds: 120),
+    );
     await controller.loadData(
       data: '<html><body><h1>shot</h1><p>hello zikzak</p></body></html>',
     );
@@ -60,20 +62,29 @@ void main() {
 
       final controller = await pumpWebView(tester, pageLoaded: Completer());
 
-      final Uint8List? bytes = await controller
-          .takeScreenshot()
-          .timeout(const Duration(seconds: 120));
+      final Uint8List? bytes = await controller.takeScreenshot().timeout(
+        const Duration(seconds: 120),
+      );
 
-      expect(bytes, isNotNull,
-          reason: 'takeScreenshot must return non-null bytes on Android (FR-001)');
-      expect(bytes!.length, greaterThan(100),
-          reason: 'the screenshot byte buffer must be non-trivial');
-      expect(bytes.sublist(0, 4), [0x89, 0x50, 0x4E, 0x47],
-          reason: 'returned bytes must be a valid PNG image (magic 89 50 4E 47)');
+      expect(
+        bytes,
+        isNotNull,
+        reason: 'takeScreenshot must return non-null bytes on Android (FR-001)',
+      );
+      expect(
+        bytes!.length,
+        greaterThan(100),
+        reason: 'the screenshot byte buffer must be non-trivial',
+      );
+      expect(
+        bytes.sublist(0, 4),
+        [0x89, 0x50, 0x4E, 0x47],
+        reason: 'returned bytes must be a valid PNG image (magic 89 50 4E 47)',
+      );
     },
   );
 
-  (int, int) _pngSize(Uint8List b) {
+  (int, int) pngSize(Uint8List b) {
     // PNG IHDR: width at bytes 16..19, height at bytes 20..23 (big-endian).
     final w = (b[16] << 24) | (b[17] << 16) | (b[18] << 8) | b[19];
     final h = (b[20] << 24) | (b[21] << 16) | (b[22] << 8) | b[23];
@@ -87,13 +98,21 @@ void main() {
 
       final controller = await pumpWebView(tester, pageLoaded: Completer());
 
-      final Uint8List? full = await controller
-          .takeScreenshot()
-          .timeout(const Duration(seconds: 120));
-      expect(full, isNotNull, reason: 'full screenshot must be non-null (FR-001)');
-      expect(full!.sublist(0, 4), [0x89, 0x50, 0x4E, 0x47],
-          reason: 'full screenshot must be a valid PNG');
-      final (fullW, fullH) = _pngSize(full);
+      final Uint8List? full = await controller.takeScreenshot().timeout(
+        const Duration(seconds: 120),
+      );
+      expect(
+        full,
+        isNotNull,
+        reason: 'full screenshot must be non-null (FR-001)',
+      );
+      expect(full!.sublist(0, 4), [
+        0x89,
+        0x50,
+        0x4E,
+        0x47,
+      ], reason: 'full screenshot must be a valid PNG');
+      final (fullW, fullH) = pngSize(full);
       expect(fullW, greaterThan(0));
       expect(fullH, greaterThan(0));
 
@@ -105,20 +124,42 @@ void main() {
             ),
           )
           .timeout(const Duration(seconds: 120));
-      expect(cropped, isNotNull, reason: 'cropped screenshot must be non-null (FR-002)');
-      expect(cropped!.sublist(0, 4), [0x89, 0x50, 0x4E, 0x47],
-          reason: 'cropped screenshot must be a valid PNG');
-      final (cropW, cropH) = _pngSize(cropped);
+      expect(
+        cropped,
+        isNotNull,
+        reason: 'cropped screenshot must be non-null (FR-002)',
+      );
+      expect(cropped!.sublist(0, 4), [
+        0x89,
+        0x50,
+        0x4E,
+        0x47,
+      ], reason: 'cropped screenshot must be a valid PNG');
+      final (cropW, cropH) = pngSize(cropped);
 
       // Density-independent: the crop is exactly half the view in each axis (rect
       // 200x300 of a 400x600 view), so the captured PNG must be smaller than the
       // full one and ~half its size in each dimension.
-      expect(cropW, lessThan(fullW), reason: 'rect must crop the width (FR-002)');
-      expect(cropH, lessThan(fullH), reason: 'rect must crop the height (FR-002)');
-      expect(cropW, closeTo(fullW / 2, 2.0),
-          reason: 'cropped width must be ~half the full width');
-      expect(cropH, closeTo(fullH / 2, 2.0),
-          reason: 'cropped height must be ~half the full height');
+      expect(
+        cropW,
+        lessThan(fullW),
+        reason: 'rect must crop the width (FR-002)',
+      );
+      expect(
+        cropH,
+        lessThan(fullH),
+        reason: 'rect must crop the height (FR-002)',
+      );
+      expect(
+        cropW,
+        closeTo(fullW / 2, 2.0),
+        reason: 'cropped width must be ~half the full width',
+      );
+      expect(
+        cropH,
+        closeTo(fullH / 2, 2.0),
+        reason: 'cropped height must be ~half the full height',
+      );
     },
   );
 }

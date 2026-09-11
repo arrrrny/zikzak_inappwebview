@@ -16,18 +16,23 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 
 void main() {
   group('InAppWebViewSettings.persistentStoreIdentifier', () {
-    test('default-constructed settings omit the key (includeIfNull: false)',
-        () {
-      final settings = InAppWebViewSettings();
-      final map = settings.toJson();
-      expect(map.containsKey('persistentStoreIdentifier'), isFalse,
+    test(
+      'default-constructed settings omit the key (includeIfNull: false)',
+      () {
+        final settings = InAppWebViewSettings();
+        final map = settings.toJson();
+        expect(
+          map.containsKey('persistentStoreIdentifier'),
+          isFalse,
           reason:
               'When the field is null, the key MUST be absent so the macOS/iOS '
               'native init falls through to the existing incognito/default() '
               'branch (issue #253: "No behavioral change when '
-              'persistentStoreIdentifier is null").');
-      expect(settings.persistentStoreIdentifier, isNull);
-    });
+              'persistentStoreIdentifier is null").',
+        );
+        expect(settings.persistentStoreIdentifier, isNull);
+      },
+    );
 
     test('a non-null value is included verbatim in the wire format', () {
       const id = 'alice-profile';
@@ -61,17 +66,19 @@ void main() {
       expect(restored.persistentStoreIdentifier, id);
     });
 
-    test('round-trips an empty string as null (no-op, no behavioral change)',
-        () {
-      // The Swift side treats an empty string the same as null (guard
-      // !id.isEmpty), so the Dart wire format should not let an empty
-      // string leak through and surprise the native side — verify the
-      // explicit-null path produces a missing key, mirroring the
-      // includeIfNull: false semantics.
-      final settings = InAppWebViewSettings(persistentStoreIdentifier: null);
-      final map = settings.toJson();
-      expect(map.containsKey('persistentStoreIdentifier'), isFalse);
-    });
+    test(
+      'round-trips an empty string as null (no-op, no behavioral change)',
+      () {
+        // The Swift side treats an empty string the same as null (guard
+        // !id.isEmpty), so the Dart wire format should not let an empty
+        // string leak through and surprise the native side — verify the
+        // explicit-null path produces a missing key, mirroring the
+        // includeIfNull: false semantics.
+        final settings = InAppWebViewSettings(persistentStoreIdentifier: null);
+        final map = settings.toJson();
+        expect(map.containsKey('persistentStoreIdentifier'), isFalse);
+      },
+    );
 
     test('incognito and persistentStoreIdentifier can coexist on the wire '
         '(native side resolves precedence — incognito wins)', () {
@@ -94,8 +101,11 @@ void main() {
     // preserved unless the developer explicitly opts in.
     test('default-constructed settings expose dismissDialogues == false', () {
       final settings = InAppWebViewSettings();
-      expect(settings.dismissDialogues, isFalse,
-          reason: 'FR-002: dismissDialogues MUST default to false.');
+      expect(
+        settings.dismissDialogues,
+        isFalse,
+        reason: 'FR-002: dismissDialogues MUST default to false.',
+      );
     });
 
     // U2 — FR-001: the option MUST be settable to true.
@@ -106,18 +116,27 @@ void main() {
 
     // U3 — FR-001 invariant: dismissDialogues MUST round-trip through
     // toJson/fromJson unchanged at both boundaries (true and false).
-    test('dismissDialogues round-trips through toJson/fromJson (true and false)',
-        () {
-      for (final value in const [true, false]) {
-        final settings = InAppWebViewSettings(dismissDialogues: value);
-        final restored = InAppWebViewSettings.fromJson(settings.toJson());
-        expect(restored.dismissDialogues, value,
-            reason: 'dismissDialogues MUST survive a wire round-trip unchanged '
-                'at both boundaries (FR-001).');
-      }
-      // The implicit default also serializes to false and restores to false.
-      final def = InAppWebViewSettings();
-      expect(InAppWebViewSettings.fromJson(def.toJson()).dismissDialogues, isFalse);
-    });
+    test(
+      'dismissDialogues round-trips through toJson/fromJson (true and false)',
+      () {
+        for (final value in const [true, false]) {
+          final settings = InAppWebViewSettings(dismissDialogues: value);
+          final restored = InAppWebViewSettings.fromJson(settings.toJson());
+          expect(
+            restored.dismissDialogues,
+            value,
+            reason:
+                'dismissDialogues MUST survive a wire round-trip unchanged '
+                'at both boundaries (FR-001).',
+          );
+        }
+        // The implicit default also serializes to false and restores to false.
+        final def = InAppWebViewSettings();
+        expect(
+          InAppWebViewSettings.fromJson(def.toJson()).dismissDialogues,
+          isFalse,
+        );
+      },
+    );
   });
 }

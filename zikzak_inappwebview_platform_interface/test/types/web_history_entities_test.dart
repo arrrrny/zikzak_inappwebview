@@ -61,8 +61,22 @@ void main() {
       );
       expect(h.toJson(), {
         'list': [
-          {'originalUrl': null, 'title': null, 'url': 'https://a.dev', 'index': 0, 'offset': null, 'entryId': null},
-          {'originalUrl': null, 'title': null, 'url': 'https://b.dev', 'index': 1, 'offset': null, 'entryId': null},
+          {
+            'originalUrl': null,
+            'title': null,
+            'url': 'https://a.dev',
+            'index': 0,
+            'offset': null,
+            'entryId': null,
+          },
+          {
+            'originalUrl': null,
+            'title': null,
+            'url': 'https://b.dev',
+            'index': 1,
+            'offset': null,
+            'entryId': null,
+          },
         ],
         'currentIndex': 1,
       });

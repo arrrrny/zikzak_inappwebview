@@ -20,7 +20,7 @@ class TrustedWebActivityImmersiveDisplayMode
   TrustedWebActivityImmersiveDisplayMode({
     required this.isSticky,
     this.displayCutoutMode = LayoutInDisplayCutoutMode.DEFAULT,
-  }) {}
+  });
 
   ///Gets a possible [TrustedWebActivityImmersiveDisplayMode] instance from a [Map] value.
   static TrustedWebActivityImmersiveDisplayMode? fromMap(

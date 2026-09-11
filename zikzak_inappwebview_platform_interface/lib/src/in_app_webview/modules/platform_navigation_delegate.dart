@@ -19,7 +19,7 @@ import '../platform_inappwebview_controller.dart';
 /// been migrated.
 abstract class PlatformNavigationDelegate extends PlatformInterface {
   /// Creates a new [PlatformNavigationDelegate].
-  PlatformNavigationDelegate({required Object token}) : super(token: token);
+  PlatformNavigationDelegate({required super.token});
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.getUrl}
   Future<WebUri?> getUrl() {

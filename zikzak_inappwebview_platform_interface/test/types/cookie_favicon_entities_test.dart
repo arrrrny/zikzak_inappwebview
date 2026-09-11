@@ -46,24 +46,27 @@ void main() {
       });
     });
 
-    test('fromJson is null/missing-key tolerant (except name) + round-trip', () {
-      final c = Cookie.fromJson({'name': 'x'});
-      expect(c.value, isNull);
-      expect(c.expiresDate, isNull);
-      expect(c.isSessionOnly, isNull);
+    test(
+      'fromJson is null/missing-key tolerant (except name) + round-trip',
+      () {
+        final c = Cookie.fromJson({'name': 'x'});
+        expect(c.value, isNull);
+        expect(c.expiresDate, isNull);
+        expect(c.isSessionOnly, isNull);
 
-      final full = Cookie(
-        name: 'y',
-        value: 'v',
-        sameSite: HTTPCookieSameSitePolicy.STRICT,
-        isSessionOnly: true,
-      );
-      final back = Cookie.fromJson(full.toJson());
-      expect(back.name, 'y');
-      expect(back.value, 'v');
-      expect(back.sameSite, HTTPCookieSameSitePolicy.STRICT);
-      expect(back.isSessionOnly, true);
-    });
+        final full = Cookie(
+          name: 'y',
+          value: 'v',
+          sameSite: HTTPCookieSameSitePolicy.STRICT,
+          isSessionOnly: true,
+        );
+        final back = Cookie.fromJson(full.toJson());
+        expect(back.name, 'y');
+        expect(back.value, 'v');
+        expect(back.sameSite, HTTPCookieSameSitePolicy.STRICT);
+        expect(back.isSessionOnly, true);
+      },
+    );
 
     test('copyWith is available (zorphy addition)', () {
       final c = Cookie(name: 'n', value: '1');
@@ -74,13 +77,22 @@ void main() {
 
   group('HTTPCookieSameSitePolicy wire', () {
     test('native strings match the old wire', () {
-      expect(httpCookieSameSitePolicyToWire(HTTPCookieSameSitePolicy.LAX), 'Lax');
+      expect(
+        httpCookieSameSitePolicyToWire(HTTPCookieSameSitePolicy.LAX),
+        'Lax',
+      );
       expect(
         httpCookieSameSitePolicyToWire(HTTPCookieSameSitePolicy.STRICT),
         'Strict',
       );
-      expect(httpCookieSameSitePolicyToWire(HTTPCookieSameSitePolicy.NONE), 'None');
-      expect(httpCookieSameSitePolicyFromWire('Lax'), HTTPCookieSameSitePolicy.LAX);
+      expect(
+        httpCookieSameSitePolicyToWire(HTTPCookieSameSitePolicy.NONE),
+        'None',
+      );
+      expect(
+        httpCookieSameSitePolicyFromWire('Lax'),
+        HTTPCookieSameSitePolicy.LAX,
+      );
       expect(httpCookieSameSitePolicyFromWire('bogus'), isNull);
       expect(httpCookieSameSitePolicyFromWire(3), isNull);
     });

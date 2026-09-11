@@ -58,9 +58,8 @@ String _redactFormBody(String body) {
   if (body.isEmpty) return body;
   return body.replaceAllMapped(RegExp(r'(^|&)([^=&]+)=([^&]*)'), (m) {
     final key = m.group(2)!;
-    final value = m.group(3)!;
     if (_isRedactableParam(key)) {
-      return '${m.group(1)}${key}=${kRedactionMarker}';
+      return '${m.group(1)}$key=$kRedactionMarker';
     }
     return m.group(0)!;
   });

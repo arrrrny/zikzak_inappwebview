@@ -16,7 +16,7 @@ import '../platform_inappwebview_controller.dart';
 /// been migrated.
 abstract class PlatformSettingsDelegate extends PlatformInterface {
   /// Creates a new [PlatformSettingsDelegate].
-  PlatformSettingsDelegate({required Object token}) : super(token: token);
+  PlatformSettingsDelegate({required super.token});
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewController.setSettings}
   Future<void> setSettings({required InAppWebViewSettings settings}) {

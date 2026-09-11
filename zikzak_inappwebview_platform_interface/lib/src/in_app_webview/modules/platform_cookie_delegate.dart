@@ -21,7 +21,7 @@ import '../platform_inappwebview_controller.dart';
 /// been migrated.
 abstract class PlatformCookieDelegate extends PlatformInterface {
   /// Creates a new [PlatformCookieDelegate].
-  PlatformCookieDelegate({required Object token}) : super(token: token);
+  PlatformCookieDelegate({required super.token});
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformCookieManager.setCookie}
   Future<bool> setCookie({

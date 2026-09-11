@@ -49,7 +49,9 @@ void main() {
         ),
       ),
     );
-    final controller = await created.future.timeout(const Duration(seconds: 120));
+    final controller = await created.future.timeout(
+      const Duration(seconds: 120),
+    );
     await controller.loadData(
       data: '<html><body><h1>shot</h1><p>hello zikzak</p></body></html>',
     );
@@ -59,26 +61,35 @@ void main() {
     return controller;
   }
 
-  testWidgets(
-    'A1 macOS takeScreenshot returns non-null valid PNG image bytes',
-    (WidgetTester tester) async {
-      // takeScreenshot is a macOS acceptance behavior (US1-AC1); skip elsewhere.
-      if (!Platform.isMacOS) return;
+  testWidgets('A1 macOS takeScreenshot returns non-null valid PNG image bytes', (
+    WidgetTester tester,
+  ) async {
+    // takeScreenshot is a macOS acceptance behavior (US1-AC1); skip elsewhere.
+    if (!Platform.isMacOS) return;
 
-      final controller = await pumpWebView(tester, pageLoaded: Completer());
+    final controller = await pumpWebView(tester, pageLoaded: Completer());
 
-      final Uint8List? bytes = await controller
-          .takeScreenshot()
-          .timeout(const Duration(seconds: 120));
+    final Uint8List? bytes = await controller.takeScreenshot().timeout(
+      const Duration(seconds: 120),
+    );
 
-      expect(bytes, isNotNull,
-          reason: 'takeScreenshot must return non-null bytes on macOS (US1-AC1)');
-      expect(bytes!.length, greaterThan(100),
-          reason: 'the screenshot byte buffer must be non-trivial');
-      expect(bytes.sublist(0, 4), [0x89, 0x50, 0x4E, 0x47],
-          reason: 'returned bytes must be a valid PNG image (magic 89 50 4E 47)');
-    },
-  );
+    expect(
+      bytes,
+      isNotNull,
+      reason: 'takeScreenshot must return non-null bytes on macOS (US1-AC1)',
+    );
+    expect(
+      bytes!.length,
+      greaterThan(100),
+      reason: 'the screenshot byte buffer must be non-trivial',
+    );
+    expect(bytes.sublist(0, 4), [
+      0x89,
+      0x50,
+      0x4E,
+      0x47,
+    ], reason: 'returned bytes must be a valid PNG image (magic 89 50 4E 47)');
+  });
 
   testWidgets(
     'A2 macOS takeScreenshot with JPEG format and quality 80 returns valid JPEG bytes',
@@ -97,13 +108,22 @@ void main() {
           )
           .timeout(const Duration(seconds: 120));
 
-      expect(bytes, isNotNull,
-          reason: 'takeScreenshot must return non-null bytes on macOS (US1-AC2)');
-      expect(bytes!.length, greaterThan(100),
-          reason: 'the screenshot byte buffer must be non-trivial');
+      expect(
+        bytes,
+        isNotNull,
+        reason: 'takeScreenshot must return non-null bytes on macOS (US1-AC2)',
+      );
+      expect(
+        bytes!.length,
+        greaterThan(100),
+        reason: 'the screenshot byte buffer must be non-trivial',
+      );
       // JPEG SOI marker is FF D8 FF (the 4th byte may vary, so check the first 3).
-      expect(bytes.sublist(0, 3), [0xFF, 0xD8, 0xFF],
-          reason: 'returned bytes must be a valid JPEG image (magic FF D8 FF)');
+      expect(bytes.sublist(0, 3), [
+        0xFF,
+        0xD8,
+        0xFF,
+      ], reason: 'returned bytes must be a valid JPEG image (magic FF D8 FF)');
     },
   );
 
@@ -115,12 +135,20 @@ void main() {
 
       final controller = await pumpWebView(tester, pageLoaded: Completer());
 
-      final Uint8List? full = await controller
-          .takeScreenshot()
-          .timeout(const Duration(seconds: 120));
-      expect(full, isNotNull, reason: 'full screenshot must be non-null (US1-AC1)');
-      expect(full!.sublist(0, 4), [0x89, 0x50, 0x4E, 0x47],
-          reason: 'full screenshot must be a valid PNG');
+      final Uint8List? full = await controller.takeScreenshot().timeout(
+        const Duration(seconds: 120),
+      );
+      expect(
+        full,
+        isNotNull,
+        reason: 'full screenshot must be non-null (US1-AC1)',
+      );
+      expect(full!.sublist(0, 4), [
+        0x89,
+        0x50,
+        0x4E,
+        0x47,
+      ], reason: 'full screenshot must be a valid PNG');
       final (fullW, fullH) = _pngSize(full);
       expect(fullW, greaterThan(0));
       expect(fullH, greaterThan(0));
@@ -133,20 +161,42 @@ void main() {
             ),
           )
           .timeout(const Duration(seconds: 120));
-      expect(cropped, isNotNull, reason: 'cropped screenshot must be non-null (US1-AC3)');
-      expect(cropped!.sublist(0, 4), [0x89, 0x50, 0x4E, 0x47],
-          reason: 'cropped screenshot must be a valid PNG');
+      expect(
+        cropped,
+        isNotNull,
+        reason: 'cropped screenshot must be non-null (US1-AC3)',
+      );
+      expect(cropped!.sublist(0, 4), [
+        0x89,
+        0x50,
+        0x4E,
+        0x47,
+      ], reason: 'cropped screenshot must be a valid PNG');
       final (cropW, cropH) = _pngSize(cropped);
 
       // The crop is exactly half the view in each axis (rect 200x300 of a 400x600
       // view); the captured PNG must be smaller than the full one and ~half its
       // size in each dimension (US1-AC3).
-      expect(cropW, lessThan(fullW), reason: 'rect must crop the width (US1-AC3)');
-      expect(cropH, lessThan(fullH), reason: 'rect must crop the height (US1-AC3)');
-      expect(cropW, closeTo(fullW / 2, 2.0),
-          reason: 'cropped width must be ~half the full width');
-      expect(cropH, closeTo(fullH / 2, 2.0),
-          reason: 'cropped height must be ~half the full height');
+      expect(
+        cropW,
+        lessThan(fullW),
+        reason: 'rect must crop the width (US1-AC3)',
+      );
+      expect(
+        cropH,
+        lessThan(fullH),
+        reason: 'rect must crop the height (US1-AC3)',
+      );
+      expect(
+        cropW,
+        closeTo(fullW / 2, 2.0),
+        reason: 'cropped width must be ~half the full width',
+      );
+      expect(
+        cropH,
+        closeTo(fullH / 2, 2.0),
+        reason: 'cropped height must be ~half the full height',
+      );
     },
   );
 }

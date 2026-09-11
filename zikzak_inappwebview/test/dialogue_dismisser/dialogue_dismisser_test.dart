@@ -239,7 +239,9 @@ void main() {
     });
 
     test('template is shadow-DOM aware (CMP web components)', () {
-      final js = buildDialogueDismisserJs({DialogueDismissPreset.cookieConsent});
+      final js = buildDialogueDismisserJs({
+        DialogueDismissPreset.cookieConsent,
+      });
       expect(js, contains('shadowRoot'));
       // Unmatched candidates are re-evaluated on later scans (late shadow
       // content) — processed marking happens only after classification.
@@ -281,27 +283,34 @@ void main() {
       expect(DialogueDismisser.mergeUserScripts(null, null), isNull);
     });
 
-    test('mergeUserScripts keeps non-empty caller scripts and appends dismisser last', () {
-      final dismisser = DialogueDismisser.maybeCreate(
-        presets: {DialogueDismissPreset.cookieConsent},
-      )!;
-      final caller = UserScript(
-        groupName: 'caller',
-        source: 'console.log("hi");',
-        injectionTime: UserScriptInjectionTime.AT_DOCUMENT_END,
-        forMainFrameOnly: true,
-      );
+    test(
+      'mergeUserScripts keeps non-empty caller scripts and appends dismisser last',
+      () {
+        final dismisser = DialogueDismisser.maybeCreate(
+          presets: {DialogueDismissPreset.cookieConsent},
+        )!;
+        final caller = UserScript(
+          groupName: 'caller',
+          source: 'console.log("hi");',
+          injectionTime: UserScriptInjectionTime.AT_DOCUMENT_END,
+          forMainFrameOnly: true,
+        );
 
-      final merged = DialogueDismisser.mergeUserScripts([caller], dismisser)!;
-      expect(merged, hasLength(2), reason: 'caller script + dismisser script');
-      expect(merged[0], same(caller), reason: 'caller script is preserved');
-      expect(merged[1].groupName, 'zikzakDialogueDismisser');
+        final merged = DialogueDismisser.mergeUserScripts([caller], dismisser)!;
+        expect(
+          merged,
+          hasLength(2),
+          reason: 'caller script + dismisser script',
+        );
+        expect(merged[0], same(caller), reason: 'caller script is preserved');
+        expect(merged[1].groupName, 'zikzakDialogueDismisser');
 
-      // Null dismisser returns only the caller script, unchanged.
-      final passthrough = DialogueDismisser.mergeUserScripts([caller], null)!;
-      expect(passthrough, hasLength(1));
-      expect(passthrough.single, same(caller));
-    });
+        // Null dismisser returns only the caller script, unchanged.
+        final passthrough = DialogueDismisser.mergeUserScripts([caller], null)!;
+        expect(passthrough, hasLength(1));
+        expect(passthrough.single, same(caller));
+      },
+    );
 
     test('handleJsPayload routes dismissals to the callback', () {
       final received = <DialogueDismissal>[];
@@ -335,10 +344,7 @@ void main() {
     test('tap listener JS ignores synthetic events', () {
       // The dismisser removes elements directly; the tap listener must still
       // ignore any synthetic events from the replayer or other scripts.
-      expect(
-        buildRecipeTapListenerJs(),
-        contains('event.isTrusted === false'),
-      );
+      expect(buildRecipeTapListenerJs(), contains('event.isTrusted === false'));
     });
   });
 }

@@ -18,20 +18,28 @@ import 'src/fake_platform_controller.dart';
 
 void main() {
   group('InAppWebViewController screenshot/pdf delegation (spec 001)', () {
-    test('U6 takeScreenshot delegates to platform with the screenshotConfiguration',
-        () async {
-      final fake = FakePlatformInAppWebViewController();
-      final controller = InAppWebViewController.fromPlatform(platform: fake);
-      final config = ScreenshotConfiguration();
+    test(
+      'U6 takeScreenshot delegates to platform with the screenshotConfiguration',
+      () async {
+        final fake = FakePlatformInAppWebViewController();
+        final controller = InAppWebViewController.fromPlatform(platform: fake);
+        final config = ScreenshotConfiguration();
 
-      await controller.takeScreenshot(screenshotConfiguration: config);
+        await controller.takeScreenshot(screenshotConfiguration: config);
 
-      final calls = fake.recorded('takeScreenshot');
-      expect(calls, hasLength(1),
-          reason: 'takeScreenshot must reach the platform exactly once');
-      expect(calls.single.args['screenshotConfiguration'], same(config),
-          reason: 'the same ScreenshotConfiguration object must be forwarded');
-    });
+        final calls = fake.recorded('takeScreenshot');
+        expect(
+          calls,
+          hasLength(1),
+          reason: 'takeScreenshot must reach the platform exactly once',
+        );
+        expect(
+          calls.single.args['screenshotConfiguration'],
+          same(config),
+          reason: 'the same ScreenshotConfiguration object must be forwarded',
+        );
+      },
+    );
 
     test('U7 takeScreenshot returns the platform Uint8List or null', () async {
       final fake = FakePlatformInAppWebViewController();
@@ -39,32 +47,47 @@ void main() {
 
       final bytes = Uint8List.fromList([1, 2, 3, 4]);
       fake.nextBytes = bytes;
-      final result = await controller
-          .takeScreenshot(screenshotConfiguration: ScreenshotConfiguration());
-      expect(result, equals(bytes),
-          reason: 'the Uint8List the platform returns must be propagated as-is');
+      final result = await controller.takeScreenshot(
+        screenshotConfiguration: ScreenshotConfiguration(),
+      );
+      expect(
+        result,
+        equals(bytes),
+        reason: 'the Uint8List the platform returns must be propagated as-is',
+      );
 
       fake.nextBytes = null;
-      final nullResult = await controller
-          .takeScreenshot(screenshotConfiguration: ScreenshotConfiguration());
-      expect(nullResult, isNull,
-          reason: 'a null platform result must pass through as null');
+      final nullResult = await controller.takeScreenshot(
+        screenshotConfiguration: ScreenshotConfiguration(),
+      );
+      expect(
+        nullResult,
+        isNull,
+        reason: 'a null platform result must pass through as null',
+      );
     });
 
     test(
-        'U34 deprecated IOSInAppWebViewController forwards takeScreenshot to its platform controller',
-        () async {
-      final fake = FakePlatformInAppWebViewController();
-      final deprecated = IOSInAppWebViewController(controller: fake);
-      final config = ScreenshotConfiguration();
+      'U34 deprecated IOSInAppWebViewController forwards takeScreenshot to its platform controller',
+      () async {
+        final fake = FakePlatformInAppWebViewController();
+        final deprecated = IOSInAppWebViewController(controller: fake);
+        final config = ScreenshotConfiguration();
 
-      await deprecated.takeScreenshot(screenshotConfiguration: config);
+        await deprecated.takeScreenshot(screenshotConfiguration: config);
 
-      final calls = fake.recorded('takeScreenshot');
-      expect(calls, hasLength(1),
-          reason: 'the deprecated facade must reach the platform exactly once');
-      expect(calls.single.args['screenshotConfiguration'], same(config),
-          reason: 'the same ScreenshotConfiguration object must be forwarded');
-    });
+        final calls = fake.recorded('takeScreenshot');
+        expect(
+          calls,
+          hasLength(1),
+          reason: 'the deprecated facade must reach the platform exactly once',
+        );
+        expect(
+          calls.single.args['screenshotConfiguration'],
+          same(config),
+          reason: 'the same ScreenshotConfiguration object must be forwarded',
+        );
+      },
+    );
   });
 }

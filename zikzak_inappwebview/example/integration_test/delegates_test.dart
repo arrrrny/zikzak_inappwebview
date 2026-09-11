@@ -41,7 +41,9 @@ void main() {
         ),
       ),
     );
-    final controller = await created.future.timeout(const Duration(seconds: 120));
+    final controller = await created.future.timeout(
+      const Duration(seconds: 120),
+    );
     await controller.loadData(
       data: '<html><body><h1>delegates</h1></body></html>',
     );
@@ -51,36 +53,47 @@ void main() {
     return controller;
   }
 
-  testWidgets(
-    'A6 platform exposes non-null domain delegates at runtime',
-    (WidgetTester tester) async {
-      // SC-004 is an Android/iOS requirement; desktop platforms do not override
-      // the delegate getters, so skip elsewhere rather than fail.
-      if (!Platform.isAndroid && !Platform.isIOS) {
-        return;
-      }
+  testWidgets('A6 platform exposes non-null domain delegates at runtime', (
+    WidgetTester tester,
+  ) async {
+    // SC-004 is an Android/iOS requirement; desktop platforms do not override
+    // the delegate getters, so skip elsewhere rather than fail.
+    if (!Platform.isAndroid && !Platform.isIOS) {
+      return;
+    }
 
-      final controller = await pumpWebView(tester, pageLoaded: Completer());
+    final controller = await pumpWebView(tester, pageLoaded: Completer());
 
-      final platform = controller.platform;
-      expect(platform, isNotNull);
+    final platform = controller.platform;
+    expect(platform, isNotNull);
 
-      // Each domain delegate must be a concrete, non-null instance supplied by
-      // the live platform implementation (FR-004 / SC-004).
-      expect(platform.navigationDelegate, isNotNull,
-          reason: 'navigationDelegate must be non-null at runtime (FR-004/SC-004)');
-      expect(platform.javaScriptDelegate, isNotNull,
-          reason: 'javaScriptDelegate must be non-null at runtime (FR-004/SC-004)');
-      expect(platform.cookieDelegate, isNotNull,
-          reason: 'cookieDelegate must be non-null at runtime (FR-004/SC-004)');
-      expect(platform.settingsDelegate, isNotNull,
-          reason: 'settingsDelegate must be non-null at runtime (FR-004/SC-004)');
+    // Each domain delegate must be a concrete, non-null instance supplied by
+    // the live platform implementation (FR-004 / SC-004).
+    expect(
+      platform.navigationDelegate,
+      isNotNull,
+      reason: 'navigationDelegate must be non-null at runtime (FR-004/SC-004)',
+    );
+    expect(
+      platform.javaScriptDelegate,
+      isNotNull,
+      reason: 'javaScriptDelegate must be non-null at runtime (FR-004/SC-004)',
+    );
+    expect(
+      platform.cookieDelegate,
+      isNotNull,
+      reason: 'cookieDelegate must be non-null at runtime (FR-004/SC-004)',
+    );
+    expect(
+      platform.settingsDelegate,
+      isNotNull,
+      reason: 'settingsDelegate must be non-null at runtime (FR-004/SC-004)',
+    );
 
-      // The convenience facades on the monolith must resolve through them too.
-      expect(controller.navigation, isNotNull);
-      expect(controller.javaScript, isNotNull);
-      expect(controller.cookies, isNotNull);
-      expect(controller.settings, isNotNull);
-    },
-  );
+    // The convenience facades on the monolith must resolve through them too.
+    expect(controller.navigation, isNotNull);
+    expect(controller.javaScript, isNotNull);
+    expect(controller.cookies, isNotNull);
+    expect(controller.settings, isNotNull);
+  });
 }

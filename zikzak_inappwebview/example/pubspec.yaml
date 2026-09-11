@@ -97,3 +97,24 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+# DEV ONLY: resolve intra-repo packages from local source so a single
+# checkout builds against itself. Stripped by scripts/prepare_for_publish.sh
+# before publishing — pub.dev rejects dependency_overrides.
+dependency_overrides:
+  zikzak_inappwebview:
+    path: ../
+  zikzak_inappwebview_platform_interface:
+    path: ../../zikzak_inappwebview_platform_interface
+  zikzak_inappwebview_android:
+    path: ../../zikzak_inappwebview_android
+  zikzak_inappwebview_ios:
+    path: ../../zikzak_inappwebview_ios
+  zikzak_inappwebview_macos:
+    path: ../../zikzak_inappwebview_macos
+  zikzak_inappwebview_web:
+    path: ../../zikzak_inappwebview_web
+  zikzak_inappwebview_windows:
+    path: ../../zikzak_inappwebview_windows
+  zikzak_inappwebview_linux:
+    path: ../../zikzak_inappwebview_linux

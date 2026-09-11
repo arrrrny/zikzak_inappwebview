@@ -9,7 +9,7 @@ class FetchRequestCredentialDefault extends FetchRequestCredential {
   ///The value of the credentials.
   String? value;
 
-  FetchRequestCredentialDefault({this.value, String? type}) : super(type: type);
+  FetchRequestCredentialDefault({this.value, super.type});
 
   ///Gets a possible [FetchRequestCredentialDefault] instance from a [Map] value.
   static FetchRequestCredentialDefault? fromMap(Map<String, dynamic>? map) {
@@ -22,11 +22,13 @@ class FetchRequestCredentialDefault extends FetchRequestCredential {
   }
 
   ///Converts instance to a map.
+  @override
   Map<String, dynamic> toMap() {
     return {"type": type, "value": value};
   }
 
   ///Converts instance to a map.
+  @override
   Map<String, dynamic> toJson() {
     return toMap();
   }

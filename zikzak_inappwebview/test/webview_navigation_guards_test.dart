@@ -5,15 +5,15 @@
 //
 // Uses a fake PlatformInAppWebViewController so the controller can be built
 // without a real platform channel.
-import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:zikzak_inappwebview/zikzak_inappwebview.dart';
 
 class _FakePlatformController extends PlatformInAppWebViewController {
-  _FakePlatformController() : super.implementation(
-          const PlatformInAppWebViewControllerCreationParams(id: 'test'),
-        );
+  _FakePlatformController()
+    : super.implementation(
+        const PlatformInAppWebViewControllerCreationParams(id: 'test'),
+      );
 
   final List<URLRequest> loadUrlCalls = <URLRequest>[];
 
@@ -27,7 +27,7 @@ class _FakePlatformController extends PlatformInAppWebViewController {
 }
 
 void main() {
-  NavigationAction _action({
+  NavigationAction action({
     required String url,
     NavigationType? navigationType,
     bool isForMainFrame = true,
@@ -46,7 +46,10 @@ void main() {
       );
       final policy = await keepNavigationInWebView(
         controller,
-        _action(url: 'https://example.com/', navigationType: NavigationType.LINK_ACTIVATED),
+        action(
+          url: 'https://example.com/',
+          navigationType: NavigationType.LINK_ACTIVATED,
+        ),
       );
       expect(policy, NavigationActionPolicy.CANCEL);
       final fake = controller.platform as _FakePlatformController;
@@ -60,10 +63,16 @@ void main() {
       );
       final policy = await keepNavigationInWebView(
         controller,
-        _action(url: 'https://example.com/', navigationType: NavigationType.FORM_SUBMITTED),
+        action(
+          url: 'https://example.com/',
+          navigationType: NavigationType.FORM_SUBMITTED,
+        ),
       );
       expect(policy, NavigationActionPolicy.ALLOW);
-      expect((controller.platform as _FakePlatformController).loadUrlCalls, isEmpty);
+      expect(
+        (controller.platform as _FakePlatformController).loadUrlCalls,
+        isEmpty,
+      );
     });
 
     test('ALLOWs LINK_ACTIVATED non-http schemes', () async {
@@ -72,10 +81,13 @@ void main() {
       );
       final policy = await keepNavigationInWebView(
         controller,
-        _action(url: 'tel:+123', navigationType: NavigationType.LINK_ACTIVATED),
+        action(url: 'tel:+123', navigationType: NavigationType.LINK_ACTIVATED),
       );
       expect(policy, NavigationActionPolicy.ALLOW);
-      expect((controller.platform as _FakePlatformController).loadUrlCalls, isEmpty);
+      expect(
+        (controller.platform as _FakePlatformController).loadUrlCalls,
+        isEmpty,
+      );
     });
 
     test('ALLOWs LINK_ACTIVATED sub-frame navigations', () async {
@@ -84,14 +96,17 @@ void main() {
       );
       final policy = await keepNavigationInWebView(
         controller,
-        _action(
+        action(
           url: 'https://example.com/',
           navigationType: NavigationType.LINK_ACTIVATED,
           isForMainFrame: false,
         ),
       );
       expect(policy, NavigationActionPolicy.ALLOW);
-      expect((controller.platform as _FakePlatformController).loadUrlCalls, isEmpty);
+      expect(
+        (controller.platform as _FakePlatformController).loadUrlCalls,
+        isEmpty,
+      );
     });
 
     test('ALLOWs navigations with null url', () async {
@@ -107,7 +122,10 @@ void main() {
         ),
       );
       expect(policy, NavigationActionPolicy.ALLOW);
-      expect((controller.platform as _FakePlatformController).loadUrlCalls, isEmpty);
+      expect(
+        (controller.platform as _FakePlatformController).loadUrlCalls,
+        isEmpty,
+      );
     });
   });
 }

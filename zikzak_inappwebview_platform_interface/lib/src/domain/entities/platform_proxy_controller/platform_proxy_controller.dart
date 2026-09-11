@@ -124,9 +124,9 @@ abstract class $IOSProxySettings {
   ///Failover isn’t allowed by default.
   @JsonKey(defaultValue: false)
   bool get allowFailover;
-  @JsonKey(defaultValue: const [])
+  @JsonKey(defaultValue: [])
   List<String> get excludedDomains;
-  @JsonKey(defaultValue: const [])
+  @JsonKey(defaultValue: [])
   List<String> get matchDomains;
 }
 
@@ -141,13 +141,13 @@ abstract class $AndroidProxySettings {
   ///A bypass rule describes URLs that should skip proxy override settings and make a direct connection instead. These can be URLs or IP addresses. Wildcards are accepted.
   ///For instance, the rule "*example.com" would mean that requests to "http://example.com" and "www.example.com" would not be directed to any proxy,
   ///instead, would be made directly to the origin specified by the URL.
-  @JsonKey(defaultValue: const [])
+  @JsonKey(defaultValue: [])
   List<String> get bypassRules;
 
   ///List of scheme filters.
   ///
   ///URLs that match these scheme filters are connected to directly instead of using a proxy server.
-  @JsonKey(defaultValue: const [])
+  @JsonKey(defaultValue: [])
   List<String> get directs;
 
   ///List of proxy rules to be used for all URLs. This method can be called multiple times to add multiple rules. Additional rules have decreasing precedence.
@@ -158,7 +158,7 @@ abstract class $AndroidProxySettings {
   ///Port number is optional and defaults to `80` for `HTTP`, `443` for `HTTPS` and `1080` for `SOCKS`.
   ///
   ///The correct syntax for hosts is defined by [RFC 3986](https://tools.ietf.org/html/rfc3986#section-3.2.2).
-  @JsonKey(defaultValue: const [])
+  @JsonKey(defaultValue: [])
   List<ProxyRule> get proxyRules;
 
   ///Hostnames without a period in them (and that are not IP literals) will skip proxy settings and be connected to directly instead. Examples: `"abc"`, `"local"`, `"some-domain"`.

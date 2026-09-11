@@ -30,8 +30,7 @@ class _TestPlatform extends InAppWebViewPlatform {
   @override
   PlatformCookieManager createPlatformCookieManager(
     PlatformCookieManagerCreationParams params,
-  ) =>
-      cookieManager;
+  ) => cookieManager;
 }
 
 InAppWebViewController _controller(FakePlatformInAppWebViewController fake) =>
@@ -71,19 +70,21 @@ void main() {
       expect(url, WebUri('https://example.com/a1'));
     });
 
-    test('A1 public surface is unchanged: all cross-domain entry points exist',
-        () async {
-      final controller = _controller(FakePlatformInAppWebViewController());
+    test(
+      'A1 public surface is unchanged: all cross-domain entry points exist',
+      () async {
+        final controller = _controller(FakePlatformInAppWebViewController());
 
-      expect(controller.loadUrl, isA<Function>());
-      expect(controller.getUrl, isA<Function>());
-      expect(controller.evaluateJavascript, isA<Function>());
-      expect(controller.getSettings, isA<Function>());
-      expect(controller.cookies, isA<CookieController>());
-      expect(controller.navigation, isA<NavigationController>());
-      expect(controller.javaScript, isA<JavaScriptController>());
-      expect(controller.settings, isA<SettingsController>());
-    });
+        expect(controller.loadUrl, isA<Function>());
+        expect(controller.getUrl, isA<Function>());
+        expect(controller.evaluateJavascript, isA<Function>());
+        expect(controller.getSettings, isA<Function>());
+        expect(controller.cookies, isA<CookieController>());
+        expect(controller.navigation, isA<NavigationController>());
+        expect(controller.javaScript, isA<JavaScriptController>());
+        expect(controller.settings, isA<SettingsController>());
+      },
+    );
   });
 
   group('A2 navigation facade equivalence', () {
@@ -111,10 +112,10 @@ void main() {
       final fake = FakePlatformInAppWebViewController()..nextEvaluate = 2;
       final controller = _controller(fake);
 
-      final viaFacade =
-          await controller.javaScript.evaluateJavascript(source: '1+1');
-      final viaMonolith =
-          await controller.evaluateJavascript(source: '1+1');
+      final viaFacade = await controller.javaScript.evaluateJavascript(
+        source: '1+1',
+      );
+      final viaMonolith = await controller.evaluateJavascript(source: '1+1');
 
       expect(viaFacade, 2);
       expect(viaMonolith, 2);
@@ -125,22 +126,25 @@ void main() {
   });
 
   group('A4 cookie facade default-to-current-URL semantics', () {
-    test('A4 controller.cookies.getCookies() defers to current URL and resolves '
-        'via the shared CookieManager', () async {
-      final fake = FakePlatformInAppWebViewController()
-        ..nextUrl = WebUri('https://example.com/a4');
-      final controller = _controller(fake);
-      cookieFake.nextCookies = [Cookie(name: 'a', value: '1')];
+    test(
+      'A4 controller.cookies.getCookies() defers to current URL and resolves '
+      'via the shared CookieManager',
+      () async {
+        final fake = FakePlatformInAppWebViewController()
+          ..nextUrl = WebUri('https://example.com/a4');
+        final controller = _controller(fake);
+        cookieFake.nextCookies = [Cookie(name: 'a', value: '1')];
 
-      final result = await controller.cookies.getCookies();
+        final result = await controller.cookies.getCookies();
 
-      expect(result, hasLength(1));
-      expect(result.single.name, 'a');
-      final calls = cookieFake.recorded('getCookies');
-      expect(calls, hasLength(1));
-      expect(calls.single.args['url'], WebUri('https://example.com/a4'));
-      expect(calls.single.args['webViewController'], same(fake));
-    });
+        expect(result, hasLength(1));
+        expect(result.single.name, 'a');
+        final calls = cookieFake.recorded('getCookies');
+        expect(calls, hasLength(1));
+        expect(calls.single.args['url'], WebUri('https://example.com/a4'));
+        expect(calls.single.args['webViewController'], same(fake));
+      },
+    );
   });
 
   group('A5 settings facade equivalence', () {
@@ -161,7 +165,9 @@ void main() {
       expect(fake.recorded('setSettings'), hasLength(2));
       expect(fake.recorded('getSettings'), hasLength(2));
       expect(
-        fake.recorded('setSettings').every((c) => c.args['settings'] == settings),
+        fake
+            .recorded('setSettings')
+            .every((c) => c.args['settings'] == settings),
         isTrue,
       );
     });

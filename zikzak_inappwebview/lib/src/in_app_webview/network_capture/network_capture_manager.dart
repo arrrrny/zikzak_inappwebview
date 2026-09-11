@@ -117,7 +117,7 @@ class NetworkCaptureManager {
       return initialUserScripts;
     }
     return UnmodifiableListView<UserScript>(<UserScript>[
-      if (initialUserScripts != null) ...initialUserScripts,
+      ...?initialUserScripts,
       manager.buildUserScript(),
     ]);
   }

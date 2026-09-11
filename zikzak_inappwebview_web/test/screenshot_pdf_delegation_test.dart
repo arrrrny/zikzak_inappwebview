@@ -1,5 +1,3 @@
-import 'dart:js_interop';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:web/web.dart' as web;
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
@@ -22,10 +20,7 @@ void main() {
       );
       addTearDown(controller.dispose);
 
-      await expectLater(
-        controller.takeScreenshot(),
-        completion(isNull),
-      );
+      await expectLater(controller.takeScreenshot(), completion(isNull));
     });
   });
 }

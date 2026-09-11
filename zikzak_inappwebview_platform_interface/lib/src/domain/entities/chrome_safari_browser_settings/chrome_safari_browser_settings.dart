@@ -51,7 +51,7 @@ abstract class $ChromeSafariBrowserSettings {
   bool? get noHistory;
   @JsonKey(defaultValue: false)
   bool? get isTrustedWebActivity;
-  @JsonKey(defaultValue: const [])
+  @JsonKey(defaultValue: [])
   List<String>? get additionalTrustedOrigins;
   @JsonKey(fromJson: _displayModeFromJson, toJson: _displayModeToJson)
   TrustedWebActivityDisplayMode? get displayMode;
@@ -208,7 +208,7 @@ Object? _displayModeToJson(TrustedWebActivityDisplayMode? displayMode) {
 List<AndroidResource>? _startAnimationsFromJson(Object? value) {
   if (value is! List) return null;
   return value
-      .map((e) => AndroidResource.fromJson((e as Map).cast<String, dynamic>())!)
+      .map((e) => AndroidResource.fromJson((e as Map).cast<String, dynamic>()))
       .toList();
 }
 
@@ -218,7 +218,7 @@ Object? _startAnimationsToJson(List<AndroidResource>? startAnimations) =>
 List<AndroidResource>? _exitAnimationsFromJson(Object? value) {
   if (value is! List) return null;
   return value
-      .map((e) => AndroidResource.fromJson((e as Map).cast<String, dynamic>())!)
+      .map((e) => AndroidResource.fromJson((e as Map).cast<String, dynamic>()))
       .toList();
 }
 
