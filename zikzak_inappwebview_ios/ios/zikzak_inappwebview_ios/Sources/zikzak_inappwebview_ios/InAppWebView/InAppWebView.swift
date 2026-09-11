@@ -811,6 +811,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                     settings.allowFileAccessFromFileURLs, forKey: "allowFileAccessFromFileURLs")
             }
 
+            var dataStoreWasSelected = false
             if #available(iOS 9.0, *) {
                 // Per-instance persistent, isolated WKWebsiteDataStore
                 // (iOS 17+/macOS 14+). Same persistentStoreIdentifier
@@ -825,7 +826,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 // websiteDataStore is immutable post-init, so a later
                 // `setSettings` cannot change it (see issue #253
                 // acceptance criteria).
-                var dataStoreWasSelected = false
                 if settings.incognito {
                     configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
                     dataStoreWasSelected = true

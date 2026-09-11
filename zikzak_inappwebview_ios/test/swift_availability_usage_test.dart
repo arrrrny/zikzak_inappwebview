@@ -149,6 +149,39 @@ List<String> scanAvailabilityUsage(String source) {
   return violations;
 }
 
+/// Returns the text between the `{` that opens the braces-delimited block at or
+/// after [start] and its matching `}`. Returns the empty string when the block
+/// is unterminated, so the caller's index lookups fail loudly rather than
+/// silently passing.
+String functionBody(String code, int start) {
+  final open = code.indexOf('{', start);
+  if (open == -1) return '';
+  var depth = 0;
+  for (var i = open; i < code.length; i++) {
+    if (code[i] == '{') {
+      depth++;
+    } else if (code[i] == '}') {
+      depth--;
+      if (depth == 0) return code.substring(open + 1, i);
+    }
+  }
+  return '';
+}
+
+/// Number of `{`-blocks still open at [index] in [code] — the brace depth of
+/// the character at that position.
+int braceDepthAt(String code, int index) {
+  var depth = 0;
+  for (var i = 0; i < index && i < code.length; i++) {
+    if (code[i] == '{') {
+      depth++;
+    } else if (code[i] == '}') {
+      depth--;
+    }
+  }
+  return depth;
+}
+
 /// Locates the iOS package root (`ios/zikzak_inappwebview_ios`) relative to the
 /// current working directory, walking up at most a few levels so the test works
 /// when invoked from the package dir or the repo root.
@@ -202,6 +235,52 @@ void main() {
               '#available/#unavailable may only be the direct condition of an '
               "'if', 'guard' or 'while' statement. Violations (relative to "
               '$iosDir.path):');
+    },
+    timeout: const Timeout(Duration(minutes: 2)),
+  );
+
+  test(
+    'data-store selection flag is visible to the iOS 11 cookie setup block',
+    () {
+      final iosDir = packageIosDir();
+      final source = File(
+        '${iosDir.path}/Sources/zikzak_inappwebview_ios/'
+        'InAppWebView/InAppWebView.swift',
+      ).readAsStringSync();
+      final code = stripSwiftNonCode(source);
+      final functionStart = code.indexOf(
+        'public static func preWKWebViewConfiguration',
+      );
+      expect(functionStart, greaterThanOrEqualTo(0));
+      final functionSource = functionBody(code, functionStart);
+
+      final declaration = functionSource.indexOf(
+        'var dataStoreWasSelected = false',
+      );
+      final ios9ConfigurationBlock = functionSource.indexOf(
+        'if #available(iOS 9.0, *) {',
+      );
+      final cookieSetupUse = functionSource.indexOf(
+        'if !dataStoreWasSelected {',
+      );
+
+      expect(declaration, greaterThanOrEqualTo(0));
+      expect(ios9ConfigurationBlock, greaterThanOrEqualTo(0));
+      expect(cookieSetupUse, greaterThan(ios9ConfigurationBlock));
+      // Textual order alone is not the invariant: a declaration nested inside a
+      // sibling block that closes before the iOS 9 block is still "above" it,
+      // yet is out of scope for the iOS 11 cookie block and fails to compile.
+      // Equal brace depth proves the declaration sits in the scope that
+      // encloses both availability blocks.
+      expect(
+        braceDepthAt(functionSource, declaration),
+        equals(braceDepthAt(functionSource, ios9ConfigurationBlock)),
+        reason:
+            'The flag is read by a later iOS 11 availability block, so it must '
+            'be declared in their shared settings scope — a sibling of the '
+            'iOS 9 block, not nested inside another block that closes before '
+            'it.',
+      );
     },
     timeout: const Timeout(Duration(minutes: 2)),
   );

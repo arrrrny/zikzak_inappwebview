@@ -24,6 +24,7 @@ jobs:
           - zikzak_inappwebview_macos
           - zikzak_inappwebview_windows
           - zikzak_inappwebview_linux
+          - zikzak_inappwebview_ios
           - zikzak_inappwebview
     steps:
       - uses: actions/checkout@v4
@@ -50,6 +51,7 @@ jobs:
           - zikzak_inappwebview_macos
           - zikzak_inappwebview_windows
           - zikzak_inappwebview_linux
+          - zikzak_inappwebview_ios
           - zikzak_inappwebview
     steps:
       - uses: actions/checkout@v4
@@ -77,3 +79,33 @@ jobs:
       - name: flutter test --platform chrome
         working-directory: zikzak_inappwebview_web
         run: flutter test --platform chrome
+
+  # The iOS Swift sources are only compiled by a real iOS build, and only
+  # through a consuming app (the plugin's Package.swift expects the
+  # FlutterFramework package Flutter generates into the app). The example
+  # resolves the platform packages from pub.dev, so the override below is what
+  # makes this job compile *this* checkout — without it the published iOS
+  # package would be compiled instead, which is how the 6.0.0 scope error went
+  # unnoticed.
+  build-ios:
+    name: "build: zikzak_inappwebview_ios (iOS)"
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: Point the example at this checkout
+        working-directory: zikzak_inappwebview/example
+        run: |
+          cat > pubspec_overrides.yaml <<'YAML'
+          dependency_overrides:
+            zikzak_inappwebview_ios:
+              path: ../../zikzak_inappwebview_ios
+          YAML
+      - name: flutter pub get
+        working-directory: zikzak_inappwebview/example
+        run: flutter pub get
+      - name: flutter build ios --release --no-codesign
+        working-directory: zikzak_inappwebview/example
+        run: flutter build ios --release --no-codesign
