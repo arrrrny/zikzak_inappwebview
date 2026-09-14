@@ -259,18 +259,19 @@ packages:
   zikzak_inappwebview_platform_interface:
     dependency: "direct main"
     description:
-      path: "../zikzak_inappwebview_platform_interface"
-      relative: true
-    source: path
-    version: "6.0.1"
+      name: zikzak_inappwebview_platform_interface
+      sha256: "9157ac7c1d2befa580645563bfd140e1f8a433e5c8f7f1e86f0d66d1a1e3ee00"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.0.2"
   zorphy_annotation:
     dependency: transitive
     description:
       name: zorphy_annotation
-      sha256: "6cfaa9dd22a61c63945b17acfa8d5451c83bded31e5ee7ba2aee79d4b301ef47"
+      sha256: "4fe7f27731b73c7eca5b8aaa7af962875b3ec9ec875621bd75d00f4dc021fd6b"
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.0"
+    version: "2.4.0"
 sdks:
   dart: ">=3.11.0-0 <4.0.0"
   flutter: ">=3.38.6"

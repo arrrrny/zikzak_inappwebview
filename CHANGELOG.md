@@ -3,7 +3,7 @@
 ### Changes
 
 - Bump `zorphy` / `zorphy_annotation` to `^2.4.0`
-- Bump `zuraffa_session` to `^6.3.0`
+- Bump `zuraffa_session` to `^1.1.0`
 - Add centralized version constant system (`tool/versions.dart`, `tool/update_readmes.dart`) so all package and dependency versions are defined in one place and README snippets stay in sync automatically
 - Fix stale `^4.6.0` install snippet in root README and umbrella README to `^6.0.2`
 

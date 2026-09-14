@@ -20,4 +20,4 @@ const String zorphyVersion = '2.4.0';
 const String zorphyAnnotationVersion = '2.4.0';
 const String zuraffaVersion = '6.3.0';
 const String zuraffaFlutterVersion = '6.3.0';
-const String zuraffaSessionVersion = '6.3.0';
+const String zuraffaSessionVersion = '1.1.0';
