@@ -1,3 +1,24 @@
+## 6.0.2 - 2026-09-14
+
+### Changes
+
+- Bump `zorphy` / `zorphy_annotation` to `^2.4.0`
+- Bump `zuraffa_session` to `^6.3.0`
+- Add centralized version constant system (`tool/versions.dart`, `tool/update_readmes.dart`) so all package and dependency versions are defined in one place and README snippets stay in sync automatically
+- Fix stale `^4.6.0` install snippet in root README and umbrella README to `^6.0.2`
+
+### Bug Fixes
+
+- [iOS] Restore the Swift 6 `evaluateJavaScript` override to stop a SIGBUS on first evaluation
+- [iOS] Fail `build-ios` CI job when a runner stops compiling its ARM arm
+- [iOS] Build the example on macOS 15 too so both `evaluateJavaScript` arms compile
+
+### Docs
+
+- Record the 15-job CI matrix and the build-ios coverage gap in AGENTS.md
+
+---
+
 ## 6.0.1 - 2026-09-11
 
 ### Bug Fixes
