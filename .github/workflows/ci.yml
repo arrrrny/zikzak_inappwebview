@@ -91,12 +91,23 @@ jobs:
   # This job earns its keep: on its first run it caught
   # InAppWebView.evaluateJavaScript(_:completionHandler:) failing to override on
   # the runner's SDK, which is a hard build failure for consumers on older Xcode
-  # (see the signature note in InAppWebView.swift).
+  # (see the two-arm `#if compiler(>=6.0)` override in InAppWebView.swift).
+  #
+  # That override has one arm per toolchain generation, so the example is built
+  # on two runners: macos-14 (Xcode 15, Swift 5.10) compiles the `#else` arm and
+  # macos-15 (Xcode 16, Swift 6) compiles the `#if` arm. A local Xcode 26 only
+  # ever compiles the latter.
   build-ios:
-    name: "build: zikzak_inappwebview_ios (iOS)"
-    runs-on: macos-14
+    name: "build: zikzak_inappwebview_ios (iOS, ${{ matrix.runner }})"
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [macos-14, macos-15]
     steps:
       - uses: actions/checkout@v4
+      - name: Show the Swift toolchain under test
+        run: swift --version
       - uses: subosito/flutter-action@v2
         with:
           channel: stable

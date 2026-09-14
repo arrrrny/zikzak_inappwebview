@@ -2008,6 +2008,14 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         }
     }
 
+    // Two arms on purpose (#330, #333). WebKit annotates the completion block
+    // `WK_SWIFT_UI_ACTOR` from the iOS 18 / macOS 15 SDKs on, and every Swift 6
+    // toolchain bundles such an SDK, hence the compiler check. The annotated
+    // form on an older SDK stops overriding the superclass (hard build failure,
+    // #330). The plain form on a Swift 6 SDK still compiles, but its block type
+    // no longer matches WebKit's and the first evaluation crashes in
+    // objc_retain with SIGBUS (#332). Upstream flutter_inappwebview carries the
+    // same split.
 #if compiler(>=6.0)
     public override func evaluateJavaScript(
         _ javaScriptString: String,
