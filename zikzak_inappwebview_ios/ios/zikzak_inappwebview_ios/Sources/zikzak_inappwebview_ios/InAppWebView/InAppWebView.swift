@@ -2008,14 +2008,18 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         }
     }
 
-    // Signature note: the completion handler is declared without `@MainActor`
-    // and `@Sendable` on purpose. The SDK bundled with recent Xcode annotates
-    // WKWebView's parameter that way, but the older SDKs do not, and a
-    // parameter type that carries those attributes does not override the
-    // superclass method there — `override` then fails outright ("method does
-    // not override any method from its superclass") and the extra overload it
-    // leaves behind makes every single-argument `evaluateJavaScript(...)` call
-    // in this file ambiguous. The unannotated form is what both SDKs accept.
+#if compiler(>=6.0)
+    public override func evaluateJavaScript(
+        _ javaScriptString: String,
+        completionHandler: (@MainActor @Sendable (Any?, (any Error)?) -> Void)? = nil
+    ) {
+        if let applePayAPIEnabled = settings?.applePayAPIEnabled, applePayAPIEnabled {
+            completionHandler?(nil, nil)
+            return
+        }
+        super.evaluateJavaScript(javaScriptString, completionHandler: completionHandler)
+    }
+#else
     public override func evaluateJavaScript(
         _ javaScriptString: String,
         completionHandler: ((Any?, Error?) -> Void)? = nil
@@ -2026,6 +2030,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         }
         super.evaluateJavaScript(javaScriptString, completionHandler: completionHandler)
     }
+#endif
 
     public func evaluateJavaScript(
         _ javaScript: String, frame: WKFrameInfo? = nil, contentWorld: WKContentWorld,
