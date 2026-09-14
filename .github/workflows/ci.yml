@@ -91,12 +91,48 @@ jobs:
   # This job earns its keep: on its first run it caught
   # InAppWebView.evaluateJavaScript(_:completionHandler:) failing to override on
   # the runner's SDK, which is a hard build failure for consumers on older Xcode
-  # (see the signature note in InAppWebView.swift).
+  # (see the two-arm `#if compiler(>=6.0)` override in InAppWebView.swift).
+  #
+  # That override has one arm per toolchain generation, so the example is built
+  # on two runners: macos-14 (Xcode 15, Swift 5.10) compiles the `#else` arm and
+  # macos-15 (Xcode 16, Swift 6) compiles the `#if` arm. A local Xcode 26 only
+  # ever compiles the latter.
+  #
+  # macos-14 is the `#else` arm's only home — macos-15's oldest Xcode is 16.0,
+  # already Swift 6 — and actions/runner-images has announced it goes unsupported
+  # on November 2. When that lands the `#else` arm has no runner left; the
+  # matrix then needs reworking (drop the arm if no supported toolchain still
+  # needs it, or find another pre-Swift-6 toolchain) rather than deleting it
+  # silently.
   build-ios:
-    name: "build: zikzak_inappwebview_ios (iOS)"
-    runs-on: macos-14
+    name: "build: zikzak_inappwebview_ios (iOS, ${{ matrix.runner }})"
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [macos-14, macos-15]
     steps:
       - uses: actions/checkout@v4
+      - name: Check the toolchain compiles the arm this job exists for
+        run: |
+          version="$(swift --version 2>&1)"
+          echo "$version"
+          if [ "${{ matrix.runner }}" = "macos-15" ]; then
+            # This runner is here for the `#if compiler(>=6.0)` arm.
+            case "$version" in
+              *"Swift version 6"*) ;;
+              *) echo "::error::macos-15 must run a Swift 6 toolchain"; exit 1 ;;
+            esac
+          else
+            # This runner is here for the `#else` arm. If the image's default
+            # Xcode ever moves to Swift 6, this job would compile the `#if` arm
+            # instead and silently leave `#else` uncovered — the gap #333 exists
+            # to close — so fail instead.
+            case "$version" in
+              *"Swift version 6"*)
+                echo "::error::macos-14 must run a pre-Swift-6 toolchain"; exit 1 ;;
+            esac
+          fi
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
