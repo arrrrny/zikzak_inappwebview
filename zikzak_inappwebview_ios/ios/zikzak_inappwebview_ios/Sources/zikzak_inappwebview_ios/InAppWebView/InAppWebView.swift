@@ -2463,7 +2463,16 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         }
 
         let validator = URLValidationManager()
-        if let url = navigationAction.request.url, !validator.validateURL(url).allowed {
+        // Unknown custom schemes are handed to the host navigation delegate
+        // instead of being cancelled here, so the classification is computed
+        // once and reused as the default answer below. Re-deriving it from
+        // `validateURL` would run a host-installed custom validator twice per
+        // navigation and could disagree with this gate.
+        let preDelegateDecision: URLValidationManager.PreDelegateDecision =
+            navigationAction.request.url.map {
+                validator.decisionBeforeHostDelegate($0)
+            } ?? .allow
+        if preDelegateDecision == .block {
             decisionHandler(.cancel)
             return
         }
@@ -2478,7 +2487,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         callback.defaultBehaviour = { (response: WKNavigationActionPolicy?) in
             if !decisionHandlerCalled {
                 decisionHandlerCalled = true
-                decisionHandler(.allow)
+                // Fail-closed: the pre-delegate gate lets unknown custom schemes
+                // through so the host can inspect them, so a navigation that no
+                // host policy handled is still cancelled.
+                decisionHandler(preDelegateDecision == .allow ? .allow : .cancel)
             }
         }
         callback.error = { [weak callback] (code: String, message: String?, details: Any?) in
