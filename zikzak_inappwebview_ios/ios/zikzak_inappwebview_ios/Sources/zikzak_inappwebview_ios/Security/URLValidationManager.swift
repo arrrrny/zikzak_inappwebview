@@ -56,6 +56,32 @@ public class URLValidationManager {
         self.customValidator = validator
     }
 
+    /// Returns whether a URL must be rejected before the host application's
+    /// navigation delegate can inspect it.
+    ///
+    /// Unknown custom schemes are intentionally not rejected here. Payment,
+    /// authentication, and other app links commonly use private schemes, and
+    /// the host must be able to cancel the WebView navigation and open the URL
+    /// externally. Full validation still applies when no host policy handles
+    /// the navigation.
+    public func shouldBlockBeforeNavigationDelegate(_ url: URL) -> Bool {
+        if let customValidator = customValidator,
+           !customValidator(url).allowed {
+            return true
+        }
+
+        guard let scheme = url.scheme?.lowercased() else {
+            return true
+        }
+        if blockedSchemes.contains(scheme) {
+            return true
+        }
+        if safeSchemes.contains(scheme) {
+            return !validateSchemeSpecific(url: url, scheme: scheme).allowed
+        }
+        return false
+    }
+
     /// Validate a URL
     /// - Parameter url: The URL to validate
     /// - Returns: ValidationResult indicating if URL is safe

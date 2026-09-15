@@ -2463,7 +2463,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         }
 
         let validator = URLValidationManager()
-        if let url = navigationAction.request.url, !validator.validateURL(url).allowed {
+        if let url = navigationAction.request.url,
+           validator.shouldBlockBeforeNavigationDelegate(url) {
             decisionHandler(.cancel)
             return
         }
@@ -2478,7 +2479,12 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         callback.defaultBehaviour = { (response: WKNavigationActionPolicy?) in
             if !decisionHandlerCalled {
                 decisionHandlerCalled = true
-                decisionHandler(.allow)
+                if let url = navigationAction.request.url,
+                   !validator.validateURL(url).allowed {
+                    decisionHandler(.cancel)
+                } else {
+                    decisionHandler(.allow)
+                }
             }
         }
         callback.error = { [weak callback] (code: String, message: String?, details: Any?) in
