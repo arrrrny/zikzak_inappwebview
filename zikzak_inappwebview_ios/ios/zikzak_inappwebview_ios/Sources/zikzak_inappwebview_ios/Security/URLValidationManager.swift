@@ -64,7 +64,7 @@ public class URLValidationManager {
     /// the host must be able to cancel the WebView navigation and open the URL
     /// externally. Full validation still applies when no host policy handles
     /// the navigation.
-    public func shouldBlockBeforeNavigationDelegate(_ url: URL) -> Bool {
+    func shouldBlockBeforeNavigationDelegate(_ url: URL) -> Bool {
         if let customValidator = customValidator,
            !customValidator(url).allowed {
             return true
