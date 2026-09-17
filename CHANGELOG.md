@@ -1,3 +1,11 @@
+## Unreleased
+
+### Bug Fixes
+
+- [iOS] Forward private custom URL schemes to `shouldOverrideUrlLoading`. Payment and authentication deep links such as `weixin://` were cancelled by the native pre-navigation gate before the host navigation delegate ran, so a host could not intercept them and open the URL externally. The gate now blocks only what `URLValidationManager` already treats as dangerous (blocked schemes, failing scheme-specific checks, schemeless URLs, a rejecting custom validator); a custom scheme that no host policy handles is still cancelled
+
+---
+
 ## 6.0.2 - 2026-09-14
 
 ### Changes
