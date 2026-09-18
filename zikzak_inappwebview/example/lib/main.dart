@@ -10,6 +10,7 @@ import 'package:zikzak_inappwebview_example/headless_in_app_webview.screen.dart'
 import 'package:zikzak_inappwebview_example/in_app_webiew_example.screen.dart';
 import 'package:zikzak_inappwebview_example/in_app_webview_edge_to_edge.screen.dart';
 import 'package:zikzak_inappwebview_example/in_app_browser_example.screen.dart';
+import 'package:zikzak_inappwebview_example/passkey_example.screen.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 // import 'package:path_provider/path_provider.dart';
@@ -131,6 +132,12 @@ PointerInterceptor myDrawer({required BuildContext context}) {
           Navigator.pushReplacementNamed(context, '/HeadlessInAppWebView');
         },
       ),
+      ListTile(
+        title: const Text('Passkey Test'),
+        onTap: () {
+          Navigator.pushReplacementNamed(context, '/Passkey');
+        },
+      ),
     ];
   } else if (defaultTargetPlatform == TargetPlatform.windows ||
       defaultTargetPlatform == TargetPlatform.linux) {
@@ -212,7 +219,12 @@ class _MyAppState extends State<MyApp> {
     }
     if (defaultTargetPlatform == TargetPlatform.macOS) {
       return MaterialApp(
-        initialRoute: '/',
+        // Defaults to '/' — set START_ROUTE to open a specific screen on launch,
+        // e.g. `flutter run -d macos --dart-define=START_ROUTE=/Passkey`.
+        initialRoute: const String.fromEnvironment(
+          'START_ROUTE',
+          defaultValue: '/',
+        ),
         routes: {
           '/': (context) => const InAppWebViewExampleScreen(),
           '/EdgeToEdge': (context) =>
@@ -220,6 +232,7 @@ class _MyAppState extends State<MyApp> {
           '/InAppBrowser': (context) => const InAppBrowserExampleScreen(),
           '/HeadlessInAppWebView': (context) =>
               const HeadlessInAppWebViewExampleScreen(),
+          '/Passkey': (context) => const PasskeyExampleScreen(),
         },
       );
     } else if (defaultTargetPlatform == TargetPlatform.windows ||
