@@ -68,7 +68,10 @@ String stripSwiftNonCode(String source) {
     if (source[i] == '"') {
       var j = i + 1;
       while (j < source.length) {
-        if (source[j] == r'\\') {
+        // One backslash: raw r'\' is a 1-char string (r'\\' would be 2 chars
+        // and can never equal the 1-char source[j], silently disabling the
+        // escape skip).
+        if (source[j] == r'\') {
           j += 2;
           continue;
         }
