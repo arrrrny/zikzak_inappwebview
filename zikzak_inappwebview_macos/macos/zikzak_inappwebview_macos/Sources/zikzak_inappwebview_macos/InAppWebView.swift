@@ -2675,16 +2675,10 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         ]
         // body is skipped for now
 
-        var targetFrame: [String: Any] = [:]
-        if let target = navigationAction.targetFrame {
-            targetFrame["isMainFrame"] = target.isMainFrame
-            targetFrame["request"] = ["url": target.request.url?.absoluteString ?? ""]
-            targetFrame["securityOrigin"] = [
-                "host": target.securityOrigin.host,
-                "port": target.securityOrigin.port,
-                "protocol": target.securityOrigin.protocol,
-            ]
-        }
+        // KVC-backed read (issue #327 class): the target frame's request and
+        // security origin go through the same nil-safe accessor as
+        // sourceFrame, instead of direct member access.
+        let targetFrame = WKNavigationAction.frameMap(navigationAction.targetFrame)
 
         arguments["navigationAction"] = [
             "request": request,
@@ -2839,18 +2833,10 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         // KVC-backed read (issue #327): nil when WebKit hands a nil runtime
         // frame, instead of trapping the unconditional bridge.
         let sourceFrame = navigationAction.sourceFrameMap()
-        let targetFrame: [String: Any]? = {
-            guard let frame = navigationAction.targetFrame else { return nil }
-            return [
-                "isMainFrame": frame.isMainFrame,
-                "request": ["url": frame.request.url?.absoluteString ?? ""],
-                "securityOrigin": [
-                    "host": frame.securityOrigin.host,
-                    "port": frame.securityOrigin.port,
-                    "protocol": frame.securityOrigin.protocol,
-                ],
-            ]
-        }()
+        // KVC-backed read (issue #327 class): the target frame's request and
+        // security origin go through the same nil-safe accessor as
+        // sourceFrame, instead of direct member access.
+        let targetFrame = WKNavigationAction.frameMap(navigationAction.targetFrame)
 
         let createWindowAction: [String: Any?] = [
             "request": navigationAction.request.toMap(),

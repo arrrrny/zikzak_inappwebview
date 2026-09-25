@@ -17,11 +17,14 @@
 import WebKit
 
 extension WKNavigationAction {
-    /// Map for the `sourceFrame` channel key, or `nil` when the runtime frame
-    /// is absent. When the frame is present the emitted keys and value types
-    /// are identical to the pre-#327 handler maps.
-    public func sourceFrameMap() -> [String: Any?]? {
-        guard let frame = value(forKey: "sourceFrame") as? WKFrameInfo else {
+    /// Map for a navigation-action frame channel key (`sourceFrame` /
+    /// `targetFrame`), or `nil` when the runtime frame is absent. When the
+    /// frame is present the emitted keys and value types are identical to the
+    /// pre-#327 handler maps. The frame's request and security origin are read
+    /// via KVC so a nil runtime member yields nil instead of trapping the
+    /// unconditional ObjC bridge (issue #327 class).
+    public static func frameMap(_ frame: WKFrameInfo?) -> [String: Any?]? {
+        guard let frame = frame else {
             return nil
         }
         let request: URLRequest? = frame.value(forKey: "request") as? URLRequest
@@ -35,5 +38,12 @@ extension WKNavigationAction {
                 "protocol": origin?.protocol ?? "",
             ],
         ]
+    }
+
+    /// Map for the `sourceFrame` channel key, or `nil` when the runtime frame
+    /// is absent. When the frame is present the emitted keys and value types
+    /// are identical to the pre-#327 handler maps.
+    public func sourceFrameMap() -> [String: Any?]? {
+        WKNavigationAction.frameMap(value(forKey: "sourceFrame") as? WKFrameInfo)
     }
 }
