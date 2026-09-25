@@ -37,19 +37,49 @@ void main() {
 
       final source = sourceFile!.readAsStringSync();
       // Strip line comments so a commented-out assignment cannot satisfy the
-      // contract.
+      // contract. NOTE: this naive split also truncates `https://` inside
+      // string literals — harmless for this contract (the statements it pins
+      // never live inside a string literal), so do not "fix" the stripping
+      // without re-proving the contract still fails on a commented-out or
+      // opt-out assignment.
       final code = source
           .split('\n')
           .map((line) => line.contains('//') ? line.split('//').first : line)
           .join('\n');
 
-      final matches = RegExp(r'\bclipsToBounds\s*=\s*true\b').allMatches(code);
-      expect(matches, isNotEmpty,
-          reason:
-              'InAppWebView must set clipsToBounds = true on its root view: '
-              'the Flutter 3.47.x TLHC path can hand the native layer a wrong '
-              'clip, and an unclipped WKWebView then paints over sibling '
-              'Flutter content (issue #331 rendering confusion).');
+      // Pin the root-view assignment by whole trimmed statement, not by a
+      // regex anywhere in the file: `\b` matches right after a `.`, so a
+      // future unrelated `scrollView.clipsToBounds = true` would satisfy a
+      // regex match while the root view stays unclipped — a false green for
+      // exactly the regression this test exists to catch. The lines that
+      // legitimately trim to `clipsToBounds = true` are the root assignments
+      // (the designated-initializer belt-and-braces and prepare()).
+      final codeLines = code
+          .split('\n')
+          .map((line) => line.trim())
+          .map(
+            (line) => line.endsWith(';')
+                ? line.substring(0, line.length - 1).trim()
+                : line,
+          )
+          .toList();
+
+      expect(
+        codeLines.contains('clipsToBounds = true'),
+        isTrue,
+        reason:
+            'InAppWebView must set clipsToBounds = true on its root view: '
+            'the Flutter 3.47.x TLHC path can hand the native layer a wrong '
+            'clip, and an unclipped WKWebView then paints over sibling '
+            'Flutter content (issue #331 rendering confusion).',
+      );
+      expect(
+        codeLines.where((line) => line == 'clipsToBounds = false'),
+        isEmpty,
+        reason: 'Nothing may un-clip the platform view root: a '
+            '`clipsToBounds = false` on the root view reintroduces the '
+            'issue #331 native-paint-over-Flutter-content defect.',
+      );
     },
     timeout: const Timeout(Duration(minutes: 2)),
   );
