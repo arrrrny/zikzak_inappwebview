@@ -2,7 +2,7 @@
 
 > Ready to file at https://github.com/flutter/flutter/issues/new?template=2_bug.yml
 > Attach the three `ev_3475_*.png` frames from this directory when filing.
-> Status: DRAFT — not yet filed (awaiting maintainer go-ahead).
+> Status: **FILED** as https://github.com/flutter/flutter/issues/193363 (2026-09-25).
 
 ---
 
