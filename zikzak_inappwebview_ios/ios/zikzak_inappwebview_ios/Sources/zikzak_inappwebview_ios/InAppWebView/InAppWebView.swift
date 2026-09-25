@@ -167,6 +167,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         contextMenu: [String: Any]?, userScripts: [UserScript] = []
     ) {
         super.init(frame: frame, configuration: configuration)
+        // Bug #331 belt-and-braces: pin the root clip at construction time,
+        // independently of prepare(). prepare() re-asserts it on every
+        // on-screen path; this guarantees the root view is clipped from the
+        // moment it exists even if a future construction path skips prepare().
+        clipsToBounds = true
         self.id = id
         self.plugin = plugin
         if let id = id, let registrar = plugin?.registrar {
@@ -218,6 +223,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         }
     }
 
+    // Bug #331: this path never runs prepare(), so a storyboard-constructed
+    // instance would keep the root view unclipped (the designated initializer
+    // and prepare() both pin clipsToBounds = true, but neither runs here).
+    // Unreachable today — the plugin constructs InAppWebView programmatically;
+    // if this initializer is ever enabled, assert the root clip here too.
     required public init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)!
     }
@@ -557,6 +567,14 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             name: UIWindow.didBecomeHiddenNotification,
             object: window)
         //        }
+
+        // Bug #331: the WKWebView is the native layer of a Flutter platform
+        // view and must never paint outside the bounds Flutter allocates for
+        // it. UIView.clipsToBounds defaults to NO and WebKit does not
+        // guarantee clipping on the root view either; on Flutter 3.47.x TLHC
+        // compositing a mis-clipped native layer paints over sibling Flutter
+        // content (the reported "rendering layer confusion").
+        clipsToBounds = true
 
         if let settings = settings {
             if settings.transparentBackground {
