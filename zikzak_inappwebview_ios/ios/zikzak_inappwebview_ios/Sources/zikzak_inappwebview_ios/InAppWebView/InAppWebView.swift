@@ -558,6 +558,14 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             object: window)
         //        }
 
+        // Bug #331: the WKWebView is the native layer of a Flutter platform
+        // view and must never paint outside the bounds Flutter allocates for
+        // it. UIView.clipsToBounds defaults to NO and WebKit does not
+        // guarantee clipping on the root view either; on Flutter 3.47.x TLHC
+        // compositing a mis-clipped native layer paints over sibling Flutter
+        // content (the reported "rendering layer confusion").
+        clipsToBounds = true
+
         if let settings = settings {
             if settings.transparentBackground {
                 isOpaque = false
