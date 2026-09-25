@@ -2675,18 +2675,6 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         ]
         // body is skipped for now
 
-        let sourceFrame: [String: Any] = [
-            "isMainFrame": navigationAction.sourceFrame.isMainFrame,
-            "request": [
-                "url": navigationAction.sourceFrame.request.url?.absoluteString ?? ""
-            ],
-            "securityOrigin": [
-                "host": navigationAction.sourceFrame.securityOrigin.host,
-                "port": navigationAction.sourceFrame.securityOrigin.port,
-                "protocol": navigationAction.sourceFrame.securityOrigin.protocol,
-            ],
-        ]
-
         var targetFrame: [String: Any] = [:]
         if let target = navigationAction.targetFrame {
             targetFrame["isMainFrame"] = target.isMainFrame
@@ -2705,7 +2693,9 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 || navigationAction.navigationType == .formSubmitted,
             "isRedirect": false,
             "navigationType": navigationAction.navigationType.rawValue,
-            "sourceFrame": sourceFrame,
+            // KVC-backed read (issue #327): nil when WebKit hands a nil
+            // runtime frame, instead of trapping the unconditional bridge.
+            "sourceFrame": navigationAction.sourceFrameMap(),
             "targetFrame": targetFrame,
         ]
 
@@ -2846,18 +2836,9 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
 
         // Build the same CreateWindowAction map the iOS implementation sends
         // (see CreateWindowAction.toMap() / WKNavigationAction.toMap()).
-        let sourceFrame: [String: Any]? = {
-            let frame = navigationAction.sourceFrame
-            return [
-                "isMainFrame": frame.isMainFrame,
-                "request": ["url": frame.request.url?.absoluteString ?? ""],
-                "securityOrigin": [
-                    "host": frame.securityOrigin.host,
-                    "port": frame.securityOrigin.port,
-                    "protocol": frame.securityOrigin.protocol,
-                ],
-            ]
-        }()
+        // KVC-backed read (issue #327): nil when WebKit hands a nil runtime
+        // frame, instead of trapping the unconditional bridge.
+        let sourceFrame = navigationAction.sourceFrameMap()
         let targetFrame: [String: Any]? = {
             guard let frame = navigationAction.targetFrame else { return nil }
             return [
