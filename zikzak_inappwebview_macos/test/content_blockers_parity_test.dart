@@ -182,6 +182,11 @@ void main() {
     '../zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/'
     'zikzak_inappwebview_ios/InAppWebView/InAppWebView.swift',
   );
+  // The iOS cross-check test is the only gate that needs the sibling package
+  // checkout; without it that one test skips instead of failing the file.
+  final iosCrossCheckSkip = iOSWebViewSwift.existsSync()
+      ? null
+      : 'sibling iOS checkout not present';
 
   group('native macOS contentBlockers consumption (issue #338)', () {
     late String macOSCode; // comments stripped, strings kept
@@ -199,30 +204,28 @@ void main() {
             '(cwd: ${Directory.current.path})',
       );
       expect(settingsCode = macOSSettingsSwift.readAsStringSync(), isNotEmpty);
-      expect(
-        iOSWebViewSwift.existsSync(),
-        isTrue,
-        reason:
-            'iOS InAppWebView.swift not found — parity cross-check '
-            'requires the sibling package checkout',
-      );
       macOSCode = stripCommentsKeepStrings(
         macOSWebViewSwift.readAsStringSync(),
       );
       macOSBraces = blankStringContents(macOSWebViewSwift.readAsStringSync());
-      final iOSCode = stripCommentsKeepStrings(
-        iOSWebViewSwift.readAsStringSync(),
-      );
-      // The issue calls it the "updateSettings branch"; in this tree the iOS
-      // InAppWebView funnels both creation and runtime updates through
-      // setSettings (same signature as macOS), and the contentBlockers block
-      // lives there.
-      iOSSetSettingsBody =
-          functionBody(
-            iOSCode,
-            'func setSettings(newSettings: InAppWebViewSettings, newSettingsMap: [String: Any])',
-          ) ??
-          '';
+      // The iOS cross-check below is the only gate that needs the sibling
+      // package checkout; when it is absent (standalone package checkout,
+      // sparse clone) that one test is skipped instead of failing the file.
+      if (iOSWebViewSwift.existsSync()) {
+        final iOSCode = stripCommentsKeepStrings(
+          iOSWebViewSwift.readAsStringSync(),
+        );
+        // The issue calls it the "updateSettings branch"; in this tree the iOS
+        // InAppWebView funnels both creation and runtime updates through
+        // setSettings (same signature as macOS), and the contentBlockers block
+        // lives there.
+        iOSSetSettingsBody =
+            functionBody(
+              iOSCode,
+              'func setSettings(newSettings: InAppWebViewSettings, newSettingsMap: [String: Any])',
+            ) ??
+            '';
+      }
     });
 
     test('InAppWebViewSettings still declares contentBlockers on macOS', () {
@@ -248,7 +251,7 @@ void main() {
       // be re-derived — it must not silently rot into a trivially-true scan.
       expect(
         iOSSetSettingsBody,
-        isNotNull,
+        isNotEmpty,
         reason:
             'iOS setSettings must exist for the cross-check to mean '
             'anything',
@@ -272,7 +275,7 @@ void main() {
             'iOS uses the ContentBlockingRules store identifier — macOS '
             'must share it',
       );
-    });
+    }, skip: iosCrossCheckSkip);
 
     test('macOS setSettings reacts to the contentBlockers settings key — #338', () {
       final body = functionBody(
