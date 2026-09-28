@@ -2818,6 +2818,14 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         decisionHandler(.allow)
     }
 
+    // NOTE (#339 review): currently unreachable — WebKit invokes this
+    // destination callback only when the app sets `download.delegate` inside
+    // the `didBecome` handoff, and both handoffs below keep it `nil`
+    // (verbatim iOS-master parity). The `didBecome` handoffs are therefore
+    // the sole dispatch points, and the native download is cancelled by
+    // WebKit's nil-delegate no-destination behavior. Do NOT set
+    // `download.delegate = self` without also moving the dispatch out of the
+    // `didBecome` handoffs into this callback, or the event fires twice.
     public func download(
         _ download: WKDownload, decideDestinationUsing response: URLResponse,
         suggestedFilename: String, completionHandler: @escaping (URL?) -> Void
@@ -2857,6 +2865,35 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 suggestedFilename: response.suggestedFilename,
                 textEncodingName: response.textEncodingName)
             channelDelegate?.onDownloadStartRequest(request: downloadStartRequest)
+        }
+        download.delegate = nil
+    }
+
+    // Action-stage download handoff (#339 review): when
+    // `shouldOverrideUrlLoading` resolves `.download` (policy 2), WebKit
+    // invokes THIS `didBecome` variant — not the navigationResponse one
+    // above — and creates the download with no destination. Without this
+    // method nothing dispatched the event on that path and the
+    // delegate-less download was dropped, matching the old `.cancel`.
+    // There is no URLResponse at the action stage, so mime, length and
+    // filename are unknown here. iOS omits this variant (upstream-shaped);
+    // macOS implements it because its Dart API exposes policy 2.
+    public func webView(
+        _ webView: WKWebView, navigationAction: WKNavigationAction,
+        didBecome download: WKDownload
+    ) {
+        let request = navigationAction.request
+        if let url = request.url, let useOnDownloadStart = settings?.useOnDownloadStart,
+            useOnDownloadStart
+        {
+            channelDelegate?.onDownloadStartRequest(request: DownloadStartRequest(
+                url: url.absoluteString,
+                userAgent: nil,
+                contentDisposition: nil,
+                mimeType: nil,
+                contentLength: 0,
+                suggestedFilename: nil,
+                textEncodingName: nil))
         }
         download.delegate = nil
     }
