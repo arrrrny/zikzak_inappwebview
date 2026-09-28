@@ -417,4 +417,63 @@ void main() {
       // exist and the default throw is no longer hit for these method names.
     });
   });
+
+  group('onDownloadStartRequest dispatch (issue #339)', () {
+    test(
+      'routes a native download event to the webview params callback',
+      () async {
+        DownloadStartRequest? received;
+        final widgetParams = PlatformInAppWebViewWidgetCreationParams(
+          controllerFromPlatform: (c) => c,
+          onDownloadStartRequest: (controller, request) {
+            received = request;
+          },
+        );
+        final downloadController = MacOSInAppWebViewController(
+          PlatformInAppWebViewControllerCreationParams(
+            id: 339,
+            webviewParams: widgetParams,
+          ),
+        );
+
+        addTearDown(downloadController.dispose);
+
+        await downloadController.handleMethod(
+          const MethodCall('onDownloadStartRequest', <String, dynamic>{
+            'url': 'https://example.com/report.zip',
+            'userAgent': null,
+            'contentDisposition': 'attachment; filename="report.zip"',
+            'mimeType': 'application/zip',
+            'contentLength': 1234,
+            'suggestedFilename': 'report.zip',
+            'textEncodingName': null,
+          }),
+        );
+
+        expect(received, isNotNull);
+        expect(received!.url, WebUri('https://example.com/report.zip'));
+        expect(received!.userAgent, isNull);
+        expect(
+          received!.contentDisposition,
+          'attachment; filename="report.zip"',
+        );
+        expect(received!.mimeType, 'application/zip');
+        expect(received!.contentLength, 1234);
+        expect(received!.suggestedFilename, 'report.zip');
+        expect(received!.textEncodingName, isNull);
+      },
+    );
+
+    test('does not throw when no callback is registered', () async {
+      // controller from setUp has no download callback wired up.
+      await controller.handleMethod(
+        const MethodCall('onDownloadStartRequest', <String, dynamic>{
+          'url': 'https://example.com/report.zip',
+          'contentLength': 0,
+        }),
+      );
+      // reaching here without throwing is the assertion: the case arm exists
+      // and the default throw is no longer hit for this method name.
+    });
+  });
 }

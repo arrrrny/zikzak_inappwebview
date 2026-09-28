@@ -67,7 +67,7 @@ private func persistentUUID(from identifier: String) -> UUID? {
     return nil
 }
 
-public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler, DefensivelyDeserializedScriptMessageHandling, WKUIDelegate, NSMenuDelegate {
+public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler, DefensivelyDeserializedScriptMessageHandling, WKUIDelegate, NSMenuDelegate, WKDownloadDelegate {
     var channel: FlutterMethodChannel!
     var registrar: FlutterPluginRegistrar? = nil
     var plugin: InAppWebViewFlutterPlugin?
@@ -2715,9 +2715,11 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         // (e.g. to block `intent:` or custom schemes) was silently ignored.
         //
         // The Dart handler returns the `NavigationActionPolicy` native int:
-        //   0 = CANCEL, 1 = ALLOW, 2 = DOWNLOAD (iOS 14.5+ only — not yet
-        //   exposed on macOS; treat as CANCEL to honor the user's intent to
-        //   block rather than silently allow).
+        //   0 = CANCEL, 1 = ALLOW, 2 = DOWNLOAD. DOWNLOAD (issue #339) hands
+        //   the resource to WebKit's download machinery (macOS 11+; this
+        //   package's floor is macOS 12); WebKit then calls
+        //   webView(_:navigationAction:didBecome:), which dispatches
+        //   `onDownloadStartRequest` to Dart.
         var decisionHandlerCalled = false
         let resolvePolicy: (WKNavigationActionPolicy) -> Void = { policy in
             guard !decisionHandlerCalled else { return }
@@ -2734,10 +2736,9 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 switch action {
                 case 1:
                     policy = .allow
-                case 0, 2:
-                    // 0 = CANCEL; 2 = DOWNLOAD (not supported on macOS yet —
-                    // fall back to CANCEL so we never silently allow a
-                    // navigation the user explicitly tried to block).
+                case 2:
+                    policy = .download
+                case 0:
                     policy = .cancel
                 default:
                     policy = .cancel
@@ -2747,6 +2748,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 // macOS. Normalize before comparing.
                 switch action.intValue {
                 case 1: policy = .allow
+                case 2: policy = .download
                 default: policy = .cancel
                 }
             } else {
@@ -2778,7 +2780,116 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             ]
             channel?.invokeMethod("onReceivedHttpError", arguments: arguments)
         }
+
+        // Issue #339 (iOS parity with decidePolicyFor navigationResponse):
+        // when `useOnDownloadStart` is on, a response WebKit cannot display
+        // inline starts a download instead of a navigation.
+        // WKNavigationResponsePolicy.download needs macOS 11+ and this
+        // package's floor is macOS 12. WebKit then calls
+        // webView(_:navigationResponse:didBecome:), which dispatches the
+        // event to Dart.
+        if settings?.useOnDownloadStart == true {
+            if !navigationResponse.canShowMIMEType {
+                decisionHandler(.download)
+                return
+            }
+            // WebKit can display this MIME type, but the iOS fallback still
+            // treats a main-frame non-text response as a download: dispatch
+            // the event directly and cancel the navigation. (iOS skips the
+            // cancel only when its onNavigationResponse callback decides —
+            // that callback has no macOS plumbing, so cancel unconditionally
+            // here.)
+            let response = navigationResponse.response
+            if let url = response.url, navigationResponse.isForMainFrame,
+                url.scheme != "file", let mimeType = response.mimeType,
+                !mimeType.starts(with: "text/")
+            {
+                channelDelegate?.onDownloadStartRequest(
+                    request: DownloadStartRequest(
+                        url: url.absoluteString,
+                        userAgent: nil,
+                        contentDisposition: nil,
+                        mimeType: mimeType,
+                        contentLength: response.expectedContentLength,
+                        suggestedFilename: response.suggestedFilename,
+                        textEncodingName: response.textEncodingName))
+                decisionHandler(.cancel)
+                return
+            }
+        }
+
         decisionHandler(.allow)
+    }
+
+    // MARK: - WKDownloadDelegate (issue #339, iOS parity)
+
+    // WebKit calls this once a native download has data to write. The plugin
+    // never writes the file itself: the event goes to Dart (which streams the
+    // bytes itself) and the native transfer is cancelled by completing with a
+    // nil destination — the same contract the iOS implementation ships.
+    public func download(
+        _ download: WKDownload, decideDestinationUsing response: URLResponse,
+        suggestedFilename: String,
+        completionHandler: @escaping (URL?) -> Void
+    ) {
+        if let url = response.url, settings?.useOnDownloadStart == true {
+            channelDelegate?.onDownloadStartRequest(
+                request: DownloadStartRequest(
+                    url: url.absoluteString,
+                    userAgent: nil,
+                    contentDisposition: nil,
+                    mimeType: response.mimeType,
+                    contentLength: response.expectedContentLength,
+                    suggestedFilename: suggestedFilename,
+                    textEncodingName: response.textEncodingName))
+        }
+        download.delegate = nil
+        // cancel the native download; Dart owns the bytes
+        completionHandler(nil)
+    }
+
+    // Called when a `.download` decision made in decidePolicyFor
+    // navigationResponse becomes a WKDownload.
+    public func webView(
+        _ webView: WKWebView, navigationResponse: WKNavigationResponse,
+        didBecome download: WKDownload
+    ) {
+        let response = navigationResponse.response
+        if let url = response.url, settings?.useOnDownloadStart == true {
+            channelDelegate?.onDownloadStartRequest(
+                request: DownloadStartRequest(
+                    url: url.absoluteString,
+                    userAgent: nil,
+                    contentDisposition: nil,
+                    mimeType: response.mimeType,
+                    contentLength: response.expectedContentLength,
+                    suggestedFilename: response.suggestedFilename,
+                    textEncodingName: response.textEncodingName))
+        }
+        download.delegate = nil
+    }
+
+    // Called when a `.download` decision made in decidePolicyFor
+    // navigationAction (NavigationActionPolicy.DOWNLOAD returned by
+    // shouldOverrideUrlLoading) becomes a WKDownload.
+    public func webView(
+        _ webView: WKWebView, navigationAction: WKNavigationAction,
+        didBecome download: WKDownload
+    ) {
+        if let url = navigationAction.request.url,
+            settings?.useOnDownloadStart == true
+        {
+            channelDelegate?.onDownloadStartRequest(
+                request: DownloadStartRequest(
+                    url: url.absoluteString,
+                    userAgent: nil,
+                    contentDisposition: nil,
+                    mimeType: nil,
+                    contentLength: -1,
+                    suggestedFilename: url.lastPathComponent,
+                    textEncodingName: nil))
+        }
+        download.delegate = nil
     }
 
     public func webView(

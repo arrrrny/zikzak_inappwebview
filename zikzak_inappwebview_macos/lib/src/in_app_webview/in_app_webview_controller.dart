@@ -218,6 +218,20 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
           );
         }
         break;
+      case 'onDownloadStartRequest':
+        // Native counterpart ships with issue #339 (iOS parity): the macOS
+        // Swift sources previously had no download chain, so this event could
+        // never arrive.
+        if (params.webviewParams?.onDownloadStartRequest != null) {
+          var arguments = (call.arguments as Map<dynamic, dynamic>? ?? const {})
+              .cast<String, dynamic>();
+          var downloadStartRequest = DownloadStartRequest.fromJson(arguments);
+          params.webviewParams!.onDownloadStartRequest!(
+            controller,
+            downloadStartRequest,
+          );
+        }
+        break;
       case 'onWebContentProcessDidTerminate':
         if (params.webviewParams?.onWebContentProcessDidTerminate != null) {
           params.webviewParams!.onWebContentProcessDidTerminate!(controller);

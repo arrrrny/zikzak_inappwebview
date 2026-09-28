@@ -101,4 +101,11 @@ public class WebViewChannelDelegate: ChannelDelegate {
             }
         }
     }
+
+    // Issue #339 (iOS parity, WebViewChannelDelegate.swift on iOS): the
+    // typed bridge that carries a native download start to the Dart
+    // `onDownloadStartRequest` callback.
+    public func onDownloadStartRequest(request: DownloadStartRequest) {
+        channel?.invokeMethod("onDownloadStartRequest", arguments: request.toMap())
+    }
 }
