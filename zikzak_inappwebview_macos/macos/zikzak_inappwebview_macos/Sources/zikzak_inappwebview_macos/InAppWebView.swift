@@ -400,7 +400,12 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                     debugLog("INITIAL_LOAD")
                     let request = URLRequest(fromPluginMap: initialUrlRequest)
                     self.performLoad { [weak self] in
-                        self?.load(request)
+                        // #338: hold the load until any content-rule
+                        // compilation kicked off by setSettings below settles,
+                        // so the first navigation cannot outrun the rules.
+                        self?.loadAfterContentRuleLists { [weak self] in
+                            self?.load(request)
+                        }
                     }
                 }
             }
@@ -472,6 +477,15 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     ///`initialFile` and `initialData` (mirrors the iOS port). No-op when the
     ///params carry no initial load.
     func makeInitialLoad(params: [String: Any]) {
+        // #338: hold the initial load until any in-flight content-rule
+        // compilation settles, so the first navigation cannot outrun the
+        // rules (mirrors the iOS initial-load deferral).
+        if isCompilingContentRuleLists {
+            pendingContentRuleListLoad = { [weak self] in
+                self?.makeInitialLoad(params: params)
+            }
+            return
+        }
         let initialUrlRequest = params["initialUrlRequest"] as? [String: Any]
         let initialFile = params["initialFile"] as? String
         let initialData = params["initialData"] as? [String: Any]
@@ -2007,7 +2021,78 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             clearCache()
         }
 
+        // #338: compile `contentBlockers` into a WKContentRuleList and add it
+        // to the WebView configuration, mirroring the iOS updateSettings
+        // branch — without this the setting is decoded but silently inert.
+        if newSettingsMap["contentBlockers"] != nil {
+            applyContentBlockers(newSettings.contentBlockers)
+        }
+
         self.settings = newSettings
+    }
+
+    // MARK: - Content blockers (issue #338)
+
+    ///Serializes WKContentRuleList compilations: the completion of a stale
+    ///compilation must not re-add rules that a newer settings update removed.
+    private var contentRuleListCompileToken = 0
+
+    ///True while the latest `contentBlockers` compilation is in flight; the
+    ///initial load is held back until it settles.
+    private var isCompilingContentRuleLists = false
+
+    ///The initial load, held while `isCompilingContentRuleLists` is true.
+    private var pendingContentRuleListLoad: (() -> Void)?
+
+    ///Compiles `contentBlockers` into a WKContentRuleList and adds it to the
+    ///configuration's userContentController, mirroring the iOS
+    ///updateSettings branch (#338). Compilation is asynchronous; loads routed
+    ///through `loadAfterContentRuleLists` wait for it to settle.
+    func applyContentBlockers(_ contentBlockers: [[String: [String: Any]]]) {
+        configuration.userContentController.removeAllContentRuleLists()
+        guard !contentBlockers.isEmpty else {
+            return
+        }
+        do {
+            let jsonData = try JSONSerialization.data(
+                withJSONObject: contentBlockers, options: [])
+            let blockRules = String(data: jsonData, encoding: .utf8)
+            contentRuleListCompileToken += 1
+            let token = contentRuleListCompileToken
+            isCompilingContentRuleLists = true
+            WKContentRuleListStore.default().compileContentRuleList(
+                forIdentifier: "ContentBlockingRules",
+                encodedContentRuleList: blockRules
+            ) { [weak self] (contentRuleList, error) in
+                DispatchQueue.main.async {
+                    guard let self = self, token == self.contentRuleListCompileToken else {
+                        return
+                    }
+                    self.isCompilingContentRuleLists = false
+                    if let error = error {
+                        print(error.localizedDescription)
+                    } else if let contentRuleList = contentRuleList {
+                        self.configuration.userContentController.add(contentRuleList)
+                    }
+                    if let pendingLoad = self.pendingContentRuleListLoad {
+                        self.pendingContentRuleListLoad = nil
+                        pendingLoad()
+                    }
+                }
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+
+    ///Runs `load` once any in-flight content-rule compilation has settled, so
+    ///a navigation never starts before the rules it must obey are installed.
+    func loadAfterContentRuleLists(_ load: @escaping () -> Void) {
+        if isCompilingContentRuleLists {
+            pendingContentRuleListLoad = load
+            return
+        }
+        load()
     }
 
     func clearCache() {
