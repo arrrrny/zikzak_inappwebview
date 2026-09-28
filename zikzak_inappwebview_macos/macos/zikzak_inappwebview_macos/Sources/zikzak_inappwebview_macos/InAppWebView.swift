@@ -244,6 +244,16 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
 
         self.registrar = registrar
         super.init(frame: .zero, configuration: configuration)
+        // Bug #331 belt-and-braces (macOS parity, issue #337): pin the root
+        // clip at construction time, independently of the on-screen setup
+        // path in FlutterWebViewController. FlutterWebViewController re-asserts
+        // it on every platform-view path; this guarantees the root view is
+        // clipped from the moment it exists even if a future construction
+        // path skips the controller. wantsLayer forces the backing layer to
+        // exist now so the pin cannot be a silent no-op on a view that is
+        // not yet in a layer-backed hierarchy.
+        self.wantsLayer = true
+        self.layer?.masksToBounds = true
         self.plugin = plugin
         self.autoresizingMask = [.width, .height]
         self.navigationDelegate = self
@@ -567,6 +577,14 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     ///when the Flutter side creates a platform view for it.
     public override init(frame frameRect: NSRect, configuration: WKWebViewConfiguration) {
         super.init(frame: frameRect, configuration: configuration)
+        // Bug #331 belt-and-braces (macOS parity, issue #337): this
+        // designated initializer does not run the registrar init above, so
+        // popup webviews created through init(frame:configuration:) need
+        // their own root-clip pin. wantsLayer forces the backing layer to
+        // exist now so the pin cannot be a silent no-op on a view that is
+        // not yet in a layer-backed hierarchy.
+        self.wantsLayer = true
+        self.layer?.masksToBounds = true
         self.autoresizingMask = [.width, .height]
         self.navigationDelegate = self
         self.uiDelegate = self
