@@ -1892,39 +1892,6 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             configuration.defaultWebpagePreferences.allowsContentJavaScript = newSettings.javaScriptEnabled
         }
 
-        // Content blockers (issue #338): the setting was declared and decoded
-        // but never consumed on macOS, leaving the shield silently inert while
-        // the identical setting works on iOS. Mirror the iOS setSettings
-        // branch (zikzak_inappwebview_ios InAppWebView.swift): drop stale rule
-        // lists, serialize the decoded blockers to the WebKit rule JSON,
-        // compile, and add the list in the completion handler. The branch runs
-        // whenever the key arrives — creation-time initialSettings AND runtime
-        // updates — so an empty list clears blocking instead of being ignored.
-        // WKContentRuleListStore is macOS 10.13+, above the 12.0 package floor.
-        if newSettingsMap["contentBlockers"] != nil {
-            configuration.userContentController.removeAllContentRuleLists()
-            let contentBlockers = newSettings.contentBlockers
-            if contentBlockers.count > 0 {
-                do {
-                    let jsonData = try JSONSerialization.data(
-                        withJSONObject: contentBlockers, options: [])
-                    let blockRules = String(data: jsonData, encoding: .utf8)
-                    WKContentRuleListStore.default().compileContentRuleList(
-                        forIdentifier: "ContentBlockingRules",
-                        encodedContentRuleList: blockRules
-                    ) { (contentRuleList, error) in
-                        if let error = error {
-                            print(error.localizedDescription)
-                            return
-                        }
-                        self.configuration.userContentController.add(contentRuleList!)
-                    }
-                } catch {
-                    print(error.localizedDescription)
-                }
-            }
-        }
-
         if newSettingsMap["javaScriptCanOpenWindowsAutomatically"] != nil
             && settings?.javaScriptCanOpenWindowsAutomatically
                 != newSettings.javaScriptCanOpenWindowsAutomatically
