@@ -223,6 +223,18 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
           params.webviewParams!.onWebContentProcessDidTerminate!(controller);
         }
         break;
+      case 'onDownloadStartRequest':
+        if (params.webviewParams?.onDownloadStartRequest != null) {
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
+          DownloadStartRequest downloadStartRequest =
+              DownloadStartRequest.fromJson(arguments);
+          params.webviewParams!.onDownloadStartRequest!(
+            controller,
+            downloadStartRequest,
+          );
+        }
+        break;
       case 'onJsAlert':
         if (params.webviewParams?.onJsAlert != null) {
           Map<String, dynamic> arguments = call.arguments
