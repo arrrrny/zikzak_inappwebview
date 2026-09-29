@@ -150,6 +150,8 @@ class MacOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
           eventHandler?.onConsoleMessage(consoleMessage),
       onWebContentProcessDidTerminate: (controller) =>
           eventHandler?.onWebContentProcessDidTerminate(),
+      onDownloadStartRequest: (controller, downloadStartRequest) =>
+          eventHandler?.onDownloadStartRequest(downloadStartRequest),
       shouldOverrideUrlLoading: (controller, navigationAction) async {
         return await eventHandler?.shouldOverrideUrlLoading(navigationAction);
       },

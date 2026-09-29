@@ -1,11 +1,15 @@
 import FlutterMacOS
 
 public class WebViewChannelDelegate: ChannelDelegate {
-    
+
     public override init(channel: FlutterMethodChannel) {
         super.init(channel: channel)
     }
-    
+
+    public func onDownloadStartRequest(request: DownloadStartRequest) {
+        channel?.invokeMethod("onDownloadStartRequest", arguments: request.toMap())
+    }
+
     public class ReceivedHttpAuthRequestCallback: BaseCallbackResult<HttpAuthResponse> {
         override init() {
             super.init()

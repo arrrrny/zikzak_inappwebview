@@ -223,6 +223,25 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
           params.webviewParams!.onWebContentProcessDidTerminate!(controller);
         }
         break;
+      case 'onDownloadStartRequest':
+        if (params.webviewParams?.onDownloadStartRequest != null) {
+          // Native counterpart ships with issue #339 (iOS parity): the macOS
+          // Swift sources previously had no download chain, so this event
+          // could never arrive. Tolerate a null arguments map, and drop a
+          // malformed payload: the entity's url is required, so decoding a
+          // url-less event would throw.
+          var arguments = (call.arguments as Map<dynamic, dynamic>? ?? const {})
+              .cast<String, dynamic>();
+          if (arguments['url'] == null) {
+            break;
+          }
+          var downloadStartRequest = DownloadStartRequest.fromJson(arguments);
+          params.webviewParams!.onDownloadStartRequest!(
+            controller,
+            downloadStartRequest,
+          );
+        }
+        break;
       case 'onJsAlert':
         if (params.webviewParams?.onJsAlert != null) {
           Map<String, dynamic> arguments = call.arguments
