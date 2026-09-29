@@ -374,6 +374,55 @@ void main() {
             'the action-stage filename must be derived from the URL path '
             'since no response suggested one',
       );
+      expect(
+        actionDidBecome,
+        contains('url.lastPathComponent.isEmpty'),
+        reason:
+            'an empty path component (path-less or /-terminated URL) must '
+            'map to nil (unknown), not "" — an empty string is a usable '
+            'name save dialogs would prefill',
+      );
+    });
+
+    test('AC4c: every response-stage dispatch maps an empty suggested filename '
+        'to nil, not ""', () {
+      // AC4b pins the action-stage handoff. The response-stage handoffs read
+      // their name from URLResponse (non-optional, but not contractually
+      // non-empty), so an empty value would reach Dart as "" and prefill a
+      // save dialog with a blank name — the same defect the action stage
+      // fixed. Each site is asserted inside its OWN function body so a sibling
+      // site's mapping cannot satisfy the check by substring overlap.
+      final sites = <String, String?>{
+        'decidePolicyFor navigationResponse (mime-type path)':
+            functionBodyContaining(
+          inAppWebViewSwift,
+          'decidePolicyFor navigationResponse: WKNavigationResponse',
+        ),
+        // The FIRST `didBecome download:` is the navigationResponse variant
+        // (same ordering note as AC4).
+        'webView(_:navigationResponse:didBecome:)': functionBodyContaining(
+          inAppWebViewSwift,
+          'didBecome download: WKDownload',
+        ),
+        'WKDownloadDelegate destination callback': functionBodyContaining(
+          inAppWebViewSwift,
+          'decideDestinationUsing response: URLResponse',
+        ),
+      };
+      for (final site in sites.entries) {
+        expect(
+          site.value,
+          isNotNull,
+          reason: '${site.key} must exist to be pinned',
+        );
+        expect(
+          site.value,
+          contains('suggestedFilename.isEmpty'),
+          reason:
+              '${site.key} must map an empty suggested filename to nil so the '
+              'Dart side reads it as "unknown" rather than a blank name',
+        );
+      }
     });
 
     test('AC5: WebViewChannelDelegate bridges onDownloadStartRequest to the '

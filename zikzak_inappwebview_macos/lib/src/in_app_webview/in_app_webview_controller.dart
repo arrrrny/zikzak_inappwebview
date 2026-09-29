@@ -227,19 +227,37 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
         if (params.webviewParams?.onDownloadStartRequest != null) {
           // Native counterpart ships with issue #339 (iOS parity): the macOS
           // Swift sources previously had no download chain, so this event
-          // could never arrive. Tolerate a null arguments map, and drop a
-          // malformed payload: the entity's url is required, so decoding a
-          // url-less event would throw.
-          var arguments = (call.arguments as Map<dynamic, dynamic>? ?? const {})
-              .cast<String, dynamic>();
-          if (arguments['url'] == null) {
-            break;
+          // could never arrive. Drop a malformed payload instead of letting
+          // it throw out of the decoder: a non-map payload fails the cast, a
+          // missing or non-String url fails the entity's required url, and an
+          // empty-string url would fire the callback with an empty WebUri.
+          if (call.arguments
+              case final Map<dynamic, dynamic> raw
+              when raw['url'] is String &&
+                  (raw['url'] as String).isNotEmpty) {
+            DownloadStartRequest? downloadStartRequest;
+            try {
+              downloadStartRequest = DownloadStartRequest.fromJson(
+                raw.cast<String, dynamic>(),
+              );
+            } on Object catch (_) {
+              // A url-shaped payload can still carry a type-mismatched sibling
+              // field (a String `contentLength`, a non-String
+              // `suggestedFilename`). The checked decoder rethrows that as a
+              // `CheckedFromJsonException`, which is an `Exception` rather than
+              // an `Error` — so the `on Error` wrapper in the constructor does
+              // not catch it and it escapes the channel handler entirely.
+              // Catch it around the decode only; the callback stays outside the
+              // try so a listener bug still surfaces.
+            }
+            if (downloadStartRequest == null) {
+              break;
+            }
+            params.webviewParams!.onDownloadStartRequest!(
+              controller,
+              downloadStartRequest,
+            );
           }
-          var downloadStartRequest = DownloadStartRequest.fromJson(arguments);
-          params.webviewParams!.onDownloadStartRequest!(
-            controller,
-            downloadStartRequest,
-          );
         }
         break;
       case 'onJsAlert':
