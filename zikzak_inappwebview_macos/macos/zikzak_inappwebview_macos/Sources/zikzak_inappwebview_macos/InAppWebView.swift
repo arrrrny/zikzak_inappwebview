@@ -2902,15 +2902,19 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 let mimeType = navigationResponse.response.mimeType
                 if let url = navigationResponse.response.url, navigationResponse.isForMainFrame {
                     if url.scheme != "file", mimeType != nil, !mimeType!.starts(with: "text/") {
+                        // URLResponse.suggestedFilename is `String?` on macOS,
+                        // so unwrap it first: a nil name is "unknown", which the
+                        // empty check below maps to nil just like "".
+                        let suggestedFilename = navigationResponse.response.suggestedFilename ?? ""
                         let downloadStartRequest = DownloadStartRequest(
                             url: url.absoluteString,
                             userAgent: nil,
                             contentDisposition: nil,
                             mimeType: mimeType,
                             contentLength: navigationResponse.response.expectedContentLength,
-                            suggestedFilename: navigationResponse.response.suggestedFilename.isEmpty
+                            suggestedFilename: suggestedFilename.isEmpty
                                 ? nil
-                                : navigationResponse.response.suggestedFilename,
+                                : suggestedFilename,
                             textEncodingName: navigationResponse.response.textEncodingName)
                         channelDelegate?.onDownloadStartRequest(request: downloadStartRequest)
                         decisionHandler(.cancel)
@@ -2960,6 +2964,9 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         didBecome download: WKDownload
     ) {
         let response = navigationResponse.response
+        // Same optional unwrap as the mime-type path above: `String?` on
+        // macOS, and a nil name is "unknown" rather than a blank save name.
+        let suggestedFilename = response.suggestedFilename ?? ""
         if let url = response.url, let useOnDownloadStart = settings?.useOnDownloadStart,
             useOnDownloadStart
         {
@@ -2969,9 +2976,9 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 contentDisposition: nil,
                 mimeType: response.mimeType,
                 contentLength: response.expectedContentLength,
-                suggestedFilename: response.suggestedFilename.isEmpty
+                suggestedFilename: suggestedFilename.isEmpty
                     ? nil
-                    : response.suggestedFilename,
+                    : suggestedFilename,
                 textEncodingName: response.textEncodingName)
             channelDelegate?.onDownloadStartRequest(request: downloadStartRequest)
         }
