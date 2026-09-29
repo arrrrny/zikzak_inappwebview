@@ -2997,7 +2997,9 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 contentDisposition: nil,
                 mimeType: nil,
                 contentLength: -1,
-                suggestedFilename: url.lastPathComponent,
+                suggestedFilename: url.lastPathComponent.isEmpty
+                    ? nil
+                    : url.lastPathComponent,
                 textEncodingName: nil))
         }
         download.delegate = nil

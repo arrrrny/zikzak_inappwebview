@@ -374,6 +374,14 @@ void main() {
             'the action-stage filename must be derived from the URL path '
             'since no response suggested one',
       );
+      expect(
+        actionDidBecome,
+        contains('url.lastPathComponent.isEmpty'),
+        reason:
+            'an empty path component (path-less or /-terminated URL) must '
+            'map to nil (unknown), not "" — an empty string is a usable '
+            'name save dialogs would prefill',
+      );
     });
 
     test('AC5: WebViewChannelDelegate bridges onDownloadStartRequest to the '
