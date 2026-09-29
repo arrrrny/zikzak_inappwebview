@@ -273,10 +273,10 @@ packages:
     dependency: "direct main"
     description:
       name: zikzak_inappwebview_platform_interface
-      sha256: "9157ac7c1d2befa580645563bfd140e1f8a433e5c8f7f1e86f0d66d1a1e3ee00"
+      sha256: "5cfe5ccea96f99b566c992396c341aba13cac50605c3cb397f4cd510be138b6c"
       url: "https://pub.dev"
     source: hosted
-    version: "6.0.2"
+    version: "6.1.0"
   zorphy_annotation:
     dependency: transitive
     description:
