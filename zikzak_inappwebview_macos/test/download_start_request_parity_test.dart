@@ -331,6 +331,51 @@ void main() {
       );
     });
 
+    test('AC4b: the action-stage didBecome variant exists, dispatches the '
+        'event gated by useOnDownloadStart, and reports an unknown content '
+        'length (-1) with a URL-derived filename', () {
+      // functionBodyContaining finds the FIRST `didBecome download:` (the
+      // navigationResponse variant); pin the navigationAction variant
+      // separately — it is the entry point for NavigationActionPolicy
+      // .DOWNLOAD handoffs and macOS-only (iOS omits it).
+      final marker =
+          'navigationAction: WKNavigationAction,\n'
+          '        didBecome download: WKDownload';
+      final actionDidBecome = functionBodyContaining(inAppWebViewSwift, marker);
+      expect(
+        actionDidBecome,
+        isNotNull,
+        reason:
+            'webView(_:navigationAction:didBecome:) must be implemented: '
+            'WebKit invokes it when shouldOverrideUrlLoading resolves '
+            '.download (policy 2)',
+      );
+      expect(
+        actionDidBecome!,
+        contains('onDownloadStartRequest'),
+        reason: 'the action-stage handoff must dispatch the event',
+      );
+      expect(
+        actionDidBecome,
+        contains('useOnDownloadStart'),
+        reason: 'the action-stage dispatch must be gated by useOnDownloadStart',
+      );
+      expect(
+        actionDidBecome,
+        contains('contentLength: -1'),
+        reason:
+            'there is no URLResponse at the action stage, so the length '
+            'must use the unknown sentinel -1, not 0',
+      );
+      expect(
+        actionDidBecome,
+        contains('url.lastPathComponent'),
+        reason:
+            'the action-stage filename must be derived from the URL path '
+            'since no response suggested one',
+      );
+    });
+
     test('AC5: WebViewChannelDelegate bridges onDownloadStartRequest to the '
         'method channel', () {
       expect(
