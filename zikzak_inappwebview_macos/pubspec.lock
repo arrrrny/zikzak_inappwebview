@@ -252,17 +252,16 @@ packages:
     dependency: transitive
     description:
       name: vm_service
-      sha256: "45caa6c5917fa127b5dbcfbd1fa60b14e583afdc08bfc96dda38886ca252eb60"
+      sha256: "5f37239c4851efcef929cea7824e76df7f2f0970aef85d66bbc430afa40e72f0"
       url: "https://pub.dev"
     source: hosted
-    version: "15.0.2"
+    version: "15.3.0"
   zikzak_inappwebview_platform_interface:
     dependency: "direct main"
     description:
-      name: zikzak_inappwebview_platform_interface
-      sha256: "5cfe5ccea96f99b566c992396c341aba13cac50605c3cb397f4cd510be138b6c"
-      url: "https://pub.dev"
-    source: hosted
+      path: "../zikzak_inappwebview_platform_interface"
+      relative: true
+    source: path
     version: "6.1.0"
   zorphy_annotation:
     dependency: transitive
