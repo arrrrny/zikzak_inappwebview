@@ -10,7 +10,7 @@ import 'versions.dart' as v;
 void main() {
   final root = Directory.current.path;
 
-  final updates = <String, List<RegExpReplacement>>{};
+  final updates = <String>[];
 
   // 1. Root README and umbrella README: ^4.6.0 → ^{packageVersion}
   final readmeFiles = [
@@ -22,36 +22,36 @@ void main() {
     final file = File(path);
     if (!file.existsSync()) continue;
 
-    var content = file.readAsStringSync();
+    final content = file.readAsStringSync();
 
     // Update zikzak_inappwebview install snippet version
-    content = content.replaceAllMapped(
+    final updated = content.replaceAllMapped(
       RegExp(r'(zikzak_inappwebview:\s*\^)\d+\.\d+\.\d+'),
-      (m) => '${m.group(1)}$packageVersion',
+      (m) => '${m.group(1)}${v.packageVersion}',
     );
 
-    file.writeAsStringSync(content);
-    updates[path] = [RegExpReplacement()];
+    if (updated != content) file.writeAsStringSync(updated);
+    updates.add(path);
   }
 
-  // 2. AGENTS.md — fix the stale "6.0.0" / "^4.6.0" note
+  // 2. AGENTS.md — keep the recorded package version in sync
   final agentsMd = File('$root/AGENTS.md');
   if (agentsMd.existsSync()) {
-    var content = agentsMd.readAsStringSync();
-    content = content.replaceAllMapped(
-      RegExp(r'Every package is at `[\d.]+`, but `README\.md` still tells consumers to install `\^[\d.]+`\.'),
+    final content = agentsMd.readAsStringSync();
+    final updated = content.replaceAllMapped(
+      RegExp(r'Every package is at `[\d.]+`, and README installation snippets match\.'),
       (m) =>
-          'Every package is at `$packageVersion`, and README installation snippets match.',
+          'Every package is at `${v.packageVersion}`, and README installation snippets match.',
     );
-    agentsMd.writeAsStringSync(content);
-    updates['$root/AGENTS.md'] = [RegExpReplacement()];
+    if (updated != content) agentsMd.writeAsStringSync(updated);
+    updates.add('$root/AGENTS.md');
   }
 
-  print('Updated ${updates.length} files:');
-  for (final path in updates.keys) {
+  print('Checked ${updates.length} files:');
+  for (final path in updates) {
     print('  $path');
   }
   if (updates.isEmpty) {
-    print('  (no changes needed)');
+    print('  (no files to check)');
   }
 }
