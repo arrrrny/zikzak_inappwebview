@@ -2926,9 +2926,11 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     // above — and creates the download with no destination. Without this
     // method nothing dispatched the event on that path and the
     // delegate-less download was dropped, matching the old `.cancel`.
-    // There is no URLResponse at the action stage, so mime, length and
-    // filename are unknown here. iOS omits this variant (upstream-shaped);
-    // macOS implements it because its Dart API exposes policy 2.
+    // There is no URLResponse at the action stage, so mime and length are
+    // unknown here (-1 is URLResponse's "unknown length" sentinel); the
+    // filename is derived from the URL path. iOS omits this variant
+    // (upstream-shaped); macOS implements it because its Dart API exposes
+    // policy 2.
     public func webView(
         _ webView: WKWebView, navigationAction: WKNavigationAction,
         didBecome download: WKDownload
@@ -2942,8 +2944,8 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 userAgent: nil,
                 contentDisposition: nil,
                 mimeType: nil,
-                contentLength: 0,
-                suggestedFilename: nil,
+                contentLength: -1,
+                suggestedFilename: url.lastPathComponent,
                 textEncodingName: nil))
         }
         download.delegate = nil
