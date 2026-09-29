@@ -2908,7 +2908,9 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                             contentDisposition: nil,
                             mimeType: mimeType,
                             contentLength: navigationResponse.response.expectedContentLength,
-                            suggestedFilename: navigationResponse.response.suggestedFilename,
+                            suggestedFilename: navigationResponse.response.suggestedFilename.isEmpty
+                                ? nil
+                                : navigationResponse.response.suggestedFilename,
                             textEncodingName: navigationResponse.response.textEncodingName)
                         channelDelegate?.onDownloadStartRequest(request: downloadStartRequest)
                         decisionHandler(.cancel)
@@ -2942,7 +2944,9 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 contentDisposition: nil,
                 mimeType: response.mimeType,
                 contentLength: response.expectedContentLength,
-                suggestedFilename: suggestedFilename,
+                suggestedFilename: suggestedFilename.isEmpty
+                    ? nil
+                    : suggestedFilename,
                 textEncodingName: response.textEncodingName)
             channelDelegate?.onDownloadStartRequest(request: downloadStartRequest)
         }
@@ -2965,7 +2969,9 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 contentDisposition: nil,
                 mimeType: response.mimeType,
                 contentLength: response.expectedContentLength,
-                suggestedFilename: response.suggestedFilename,
+                suggestedFilename: response.suggestedFilename.isEmpty
+                    ? nil
+                    : response.suggestedFilename,
                 textEncodingName: response.textEncodingName)
             channelDelegate?.onDownloadStartRequest(request: downloadStartRequest)
         }

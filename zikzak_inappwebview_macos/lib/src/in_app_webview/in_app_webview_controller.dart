@@ -235,9 +235,24 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
               case final Map<dynamic, dynamic> raw
               when raw['url'] is String &&
                   (raw['url'] as String).isNotEmpty) {
-            var downloadStartRequest = DownloadStartRequest.fromJson(
-              raw.cast<String, dynamic>(),
-            );
+            DownloadStartRequest? downloadStartRequest;
+            try {
+              downloadStartRequest = DownloadStartRequest.fromJson(
+                raw.cast<String, dynamic>(),
+              );
+            } on Object catch (_) {
+              // A url-shaped payload can still carry a type-mismatched sibling
+              // field (a String `contentLength`, a non-String
+              // `suggestedFilename`). The checked decoder rethrows that as a
+              // `CheckedFromJsonException`, which is an `Exception` rather than
+              // an `Error` — so the `on Error` wrapper in the constructor does
+              // not catch it and it escapes the channel handler entirely.
+              // Catch it around the decode only; the callback stays outside the
+              // try so a listener bug still surfaces.
+            }
+            if (downloadStartRequest == null) {
+              break;
+            }
             params.webviewParams!.onDownloadStartRequest!(
               controller,
               downloadStartRequest,

@@ -542,5 +542,45 @@ void main() {
 
       expect(received, isNull);
     });
+
+    test('drops a well-shaped-url payload with a type-mismatched field',
+        () async {
+      DownloadStartRequest? received;
+      final widgetParams = PlatformInAppWebViewWidgetCreationParams(
+        controllerFromPlatform: (c) => c,
+        onDownloadStartRequest: (controller, request) {
+          received = request;
+        },
+      );
+      final downloadController = MacOSInAppWebViewController(
+        PlatformInAppWebViewControllerCreationParams(
+          id: 342,
+          webviewParams: widgetParams,
+        ),
+      );
+
+      addTearDown(downloadController.dispose);
+
+      // The url guard only inspects `url`, so a payload with a real url but a
+      // type-mismatched sibling field still reaches the generated decoder.
+      // `contentLength` is decoded as `(v as num).toInt()`, and the checked
+      // decoder rethrows the resulting TypeError as a CheckedFromJsonException
+      // — an Exception, not an Error, so the channel wrapper's `on Error` does
+      // not catch it. handleMethod must drop the event rather than propagate.
+      await downloadController.handleMethod(
+        const MethodCall('onDownloadStartRequest', <String, dynamic>{
+          'url': 'https://example.com/f.zip',
+          'contentLength': 'oops',
+        }),
+      );
+      await downloadController.handleMethod(
+        const MethodCall('onDownloadStartRequest', <String, dynamic>{
+          'url': 'https://example.com/f.zip',
+          'suggestedFilename': 342,
+        }),
+      );
+
+      expect(received, isNull);
+    });
   });
 }
