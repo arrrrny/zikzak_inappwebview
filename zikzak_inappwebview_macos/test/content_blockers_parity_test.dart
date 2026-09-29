@@ -12,11 +12,12 @@
 // (swift_sourceframe_kvc_test.dart, user_script_initializer_parity_test.dart).
 //
 // The scan asserts the iOS updateSettings branch shape, mirrored into the
-// macOS `setSettings` funnel: every creation-time `initialSettings` and
-// runtime `setSettings` call passes through it, and the InAppBrowser override
-// delegates to super — so one branch covers platform views, the browser and
-// headless webviews, on both creation and update paths (the iOS initial-load
-// controllers reduce to the same calls).
+// macOS `applyContentBlockers` funnel reached from `setSettings`: every
+// creation-time `initialSettings` and runtime `setSettings` call passes
+// through that key branch, and the InAppBrowser override delegates to super —
+// so one funnel covers platform views, the browser and headless webviews, on
+// both creation and update paths (the iOS initial-load controllers reduce to
+// the same calls).
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -277,7 +278,8 @@ void main() {
       );
     }, skip: iosCrossCheckSkip);
 
-    test('macOS setSettings reacts to the contentBlockers settings key — #338', () {
+    test('macOS setSettings routes the contentBlockers key to '
+        'applyContentBlockers — #338', () {
       final body = functionBody(
         macOSBraces,
         'func setSettings(newSettings: InAppWebViewSettings, newSettingsMap: [String: Any])',
@@ -304,32 +306,38 @@ void main() {
             'updateSettings branch does — the decoded setting was never '
             'consumed on macOS (#338)',
       );
+      expect(
+        keptBody,
+        contains('applyContentBlockers('),
+        reason:
+            'setSettings must delegate the key to applyContentBlockers (the '
+            'token-guarded compile funnel); an inline duplicate of the '
+            'compile chain here would compile and add the rules twice',
+      );
     });
 
-    test(
-      'macOS setSettings clears stale rule lists before re-applying — #338',
-      () {
-        final keptBody = functionBody(
-          macOSCode,
-          'func setSettings(newSettings: InAppWebViewSettings, newSettingsMap: [String: Any])',
-        )!;
-        expect(
-          keptBody,
-          contains('removeAllContentRuleLists()'),
-          reason:
-              'Stale rule lists must be dropped whenever the contentBlockers '
-              'key arrives (iOS parity: updateSettings calls '
-              'userContentController.removeAllContentRuleLists() before '
-              'compiling), otherwise runtime updates would stack lists',
-        );
-      },
-    );
-
-    test('macOS setSettings serializes and compiles the decoded blockers via '
-        'WKContentRuleListStore — #338', () {
+    test('macOS applyContentBlockers clears stale rule lists before re-applying '
+        '— #338', () {
       final keptBody = functionBody(
         macOSCode,
-        'func setSettings(newSettings: InAppWebViewSettings, newSettingsMap: [String: Any])',
+        'func applyContentBlockers(_ contentBlockers: [[String: [String: Any]]])',
+      )!;
+      expect(
+        keptBody,
+        contains('removeAllContentRuleLists()'),
+        reason:
+            'Stale rule lists must be dropped whenever the contentBlockers '
+            'key arrives (iOS parity: updateSettings calls '
+            'userContentController.removeAllContentRuleLists() before '
+            'compiling), otherwise runtime updates would stack lists',
+      );
+    });
+
+    test('macOS applyContentBlockers serializes and compiles the decoded '
+        'blockers via WKContentRuleListStore — #338', () {
+      final keptBody = functionBody(
+        macOSCode,
+        'func applyContentBlockers(_ contentBlockers: [[String: [String: Any]]])',
       )!;
       expect(
         RegExp(
@@ -358,11 +366,11 @@ void main() {
       );
     });
 
-    test('macOS setSettings adds the compiled list to the content controller — '
-        '#338', () {
+    test('macOS applyContentBlockers adds the compiled list to the content '
+        'controller — #338', () {
       final keptBody = functionBody(
         macOSCode,
-        'func setSettings(newSettings: InAppWebViewSettings, newSettingsMap: [String: Any])',
+        'func applyContentBlockers(_ contentBlockers: [[String: [String: Any]]])',
       )!;
       expect(
         keptBody,
@@ -374,21 +382,31 @@ void main() {
       );
     });
 
-    test('macOS setSettings skips compilation for an empty blockers list — '
-        '#338', () {
+    test('macOS applyContentBlockers skips compilation for an empty blockers '
+        'list — #338', () {
       final keptBody = functionBody(
         macOSCode,
-        'func setSettings(newSettings: InAppWebViewSettings, newSettingsMap: [String: Any])',
+        'func applyContentBlockers(_ contentBlockers: [[String: [String: Any]]])',
       )!;
       // Setting an empty list must CLEAR (removeAll runs on key presence)
       // without compiling an empty rule set — iOS guards with count > 0.
       expect(
         keptBody,
-        contains('contentBlockers.count > 0'),
+        contains('guard !contentBlockers.isEmpty'),
         reason:
-            'The compile block must be guarded by contentBlockers.count > 0 '
+            'The compile block must be guarded by an emptiness check '
             '(iOS parity): an empty list clears blocking instead of '
             'compiling an empty rule set',
+      );
+      // A stale completion must not re-add rules a newer settings update
+      // removed: the compile funnel serializes compilations with a token.
+      expect(
+        keptBody,
+        contains('token == self.contentRuleListCompileToken'),
+        reason:
+            'A late completion from a superseded compilation must be dropped '
+            'by the compile token, or an older rule list would be re-added '
+            'after a newer update removed it',
       );
     });
   });
