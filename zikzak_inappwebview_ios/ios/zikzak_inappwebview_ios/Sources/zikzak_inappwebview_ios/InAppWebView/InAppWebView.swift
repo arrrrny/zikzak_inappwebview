@@ -1333,6 +1333,87 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         }
     }
 
+    // MARK: - Content blockers (#349)
+
+    ///Serializes WKContentRuleList compilations: the completion of a stale
+    ///compilation must not re-add rules that a newer settings update removed.
+    private var contentRuleListCompileToken = 0
+
+    ///True while the latest `contentBlockers` compilation is in flight; the
+    ///initial load is held back until it settles.
+    private var isCompilingContentRuleLists = false
+
+    ///The initial load, held while `isCompilingContentRuleLists` is true.
+    private var pendingContentRuleListLoad: (() -> Void)?
+
+    ///Derives the WKContentRuleListStore identifier from the compiled rule
+    ///content (SHA-256 hex). The previous fixed "ContentBlockingRules"
+    ///identifier was recompiled across app launches and webviews against the
+    ///persistent store, and WebKit can fail to deliver that recompilation's
+    ///completion — which silently orphaned the initial load held on it (#349).
+    ///A content-derived identifier gives every distinct ruleset its own store
+    ///slot and identical rulesets a deterministic cache hit.
+    private func contentRuleListIdentifier(forRules blockRules: String?) -> String {
+        let digest = SHA256.hash(data: Data((blockRules ?? "").utf8))
+        return digest.map { String(format: "%02x", $0) }.joined()
+    }
+
+    ///Compiles `contentBlockers` into a WKContentRuleList and adds it to the
+    ///configuration's userContentController (mirrors the macOS #338 funnel).
+    ///Compilation is asynchronous; loads routed through
+    ///`loadAfterContentRuleLists` wait for it to settle — on success AND on
+    ///error, so a compile failure can never orphan the initial navigation.
+    func applyContentBlockers(_ contentBlockers: [[String: [String: Any]]]) {
+        configuration.userContentController.removeAllContentRuleLists()
+        guard !contentBlockers.isEmpty else {
+            return
+        }
+        do {
+            let jsonData = try JSONSerialization.data(
+                withJSONObject: contentBlockers, options: [])
+            let blockRules = String(data: jsonData, encoding: .utf8)
+            contentRuleListCompileToken += 1
+            let token = contentRuleListCompileToken
+            isCompilingContentRuleLists = true
+            WKContentRuleListStore.default().compileContentRuleList(
+                forIdentifier: contentRuleListIdentifier(forRules: blockRules),
+                encodedContentRuleList: blockRules
+            ) { [weak self] (contentRuleList, error) in
+                DispatchQueue.main.async {
+                    guard let self = self,
+                        token == self.contentRuleListCompileToken
+                    else {
+                        return
+                    }
+                    self.isCompilingContentRuleLists = false
+                    if let error = error {
+                        print(error.localizedDescription)
+                    } else if let contentRuleList = contentRuleList {
+                        self.configuration.userContentController.add(contentRuleList)
+                    }
+                    if let pendingLoad = self.pendingContentRuleListLoad {
+                        self.pendingContentRuleListLoad = nil
+                        pendingLoad()
+                    }
+                }
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+
+    ///Runs `load` once any in-flight content-rule compilation has settled, so
+    ///a navigation never starts before the rules it must obey are installed —
+    ///and is never orphaned by a compile error or an undelivered completion
+    ///(#349).
+    func loadAfterContentRuleLists(_ load: @escaping () -> Void) {
+        if isCompilingContentRuleLists {
+            pendingContentRuleListLoad = load
+            return
+        }
+        load()
+    }
+
     func setSettings(newSettings: InAppWebViewSettings, newSettingsMap: [String: Any]) {
 
         // MUST be the first! In this way, all the settings that uses evaluateJavaScript can be applied/blocked!
@@ -1789,28 +1870,13 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             }
         }
 
+        // #349: the inline compile block (fixed "ContentBlockingRules"
+        // identifier, contentRuleList! force unwrap, error path that could
+        // leave loads held on an undelivered completion) moved into the
+        // shared applyContentBlockers funnel — same machinery as the initial
+        // load and the InAppBrowser.
         if #available(iOS 11.0, *), newSettingsMap["contentBlockers"] != nil {
-            configuration.userContentController.removeAllContentRuleLists()
-            let contentBlockers = newSettings.contentBlockers
-            if contentBlockers.count > 0 {
-                do {
-                    let jsonData = try JSONSerialization.data(
-                        withJSONObject: contentBlockers, options: [])
-                    let blockRules = String(data: jsonData, encoding: .utf8)
-                    WKContentRuleListStore.default().compileContentRuleList(
-                        forIdentifier: "ContentBlockingRules",
-                        encodedContentRuleList: blockRules
-                    ) { (contentRuleList, error) in
-                        if let error = error {
-                            print(error.localizedDescription)
-                            return
-                        }
-                        self.configuration.userContentController.add(contentRuleList!)
-                    }
-                } catch {
-                    print(error.localizedDescription)
-                }
-            }
+            applyContentBlockers(newSettings.contentBlockers)
         }
 
         if #available(iOS 15.0, *) {
