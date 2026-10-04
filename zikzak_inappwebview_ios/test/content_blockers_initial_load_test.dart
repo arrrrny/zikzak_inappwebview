@@ -177,7 +177,8 @@ void main() {
       expect(
         body,
         isNotNull,
-        reason: 'FlutterWebViewController.makeInitialLoad must exist — it '
+        reason:
+            'FlutterWebViewController.makeInitialLoad must exist — it '
             'issues the platform-view initial load',
       );
       expect(
@@ -317,10 +318,10 @@ void main() {
       );
       expect(
         body,
-        contains('SHA256'),
+        contains('contentRuleListIdentifier(forRules:'),
         reason:
-            'The store identifier must be derived from the rule content '
-            '(SHA-256) — see B6',
+            'The store identifier must be derived from the rule content via '
+            'the SHA-256 helper (see B6), not a fixed literal — #349',
       );
     });
 
@@ -330,7 +331,9 @@ void main() {
         webViewCode,
         'func applyContentBlockers(_ contentBlockers: [[String: [String: Any]]])',
       )!;
-      final idxToken = body.indexOf('token == self.contentRuleListCompileToken');
+      final idxToken = body.indexOf(
+        'token == self.contentRuleListCompileToken',
+      );
       final idxFlagReset = body.indexOf('isCompilingContentRuleLists = false');
       final idxErrorBranch = body.indexOf('if let error = error');
       final idxAdd = body.indexOf('userContentController.add(contentRuleList');
@@ -358,21 +361,35 @@ void main() {
             'The pending initial load must be fired when the compilation '
             'settles',
       );
-      expect(idxToken, lessThan(idxFlagReset),
-          reason: 'The stale-completion guard must run before the flag reset');
-      expect(idxFlagReset, lessThan(idxErrorBranch),
-          reason:
-              'The flag must reset BEFORE the error branch: an error '
-              'outcome still settles the compilation');
-      expect(idxErrorBranch, lessThan(idxAdd),
-          reason: 'The success path adds the compiled list');
-      expect(idxAdd, lessThan(idxPendingFire),
-          reason:
-              'The pending initial load fires last, on BOTH the success and '
-              'the error outcome');
+      expect(
+        idxToken,
+        lessThan(idxFlagReset),
+        reason: 'The stale-completion guard must run before the flag reset',
+      );
+      expect(
+        idxFlagReset,
+        lessThan(idxErrorBranch),
+        reason:
+            'The flag must reset BEFORE the error branch: an error '
+            'outcome still settles the compilation',
+      );
+      expect(
+        idxErrorBranch,
+        lessThan(idxAdd),
+        reason: 'The success path adds the compiled list',
+      );
+      expect(
+        idxAdd,
+        lessThan(idxPendingFire),
+        reason:
+            'The pending initial load fires last, on BOTH the success and '
+            'the error outcome',
+      );
       // The error branch must not early-return past the pending-load fire.
-      final betweenErrorAndFire =
-          body.substring(idxErrorBranch, idxPendingFire);
+      final betweenErrorAndFire = body.substring(
+        idxErrorBranch,
+        idxPendingFire,
+      );
       expect(
         betweenErrorAndFire.contains('return'),
         isFalse,
@@ -525,8 +542,7 @@ void main() {
       expect(
         body,
         contains('about:blank'),
-        reason:
-            'The fallback target must stay about:blank for compatibility',
+        reason: 'The fallback target must stay about:blank for compatibility',
       );
       expect(
         body,

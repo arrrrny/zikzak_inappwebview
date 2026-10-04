@@ -194,6 +194,7 @@ void main() {
     late String macOSBraces; // comments + string contents stripped
     late String settingsCode;
     late String iOSSetSettingsBody;
+    late String iOSApplyContentBlockersBody;
 
     setUpAll(() {
       // `flutter test` runs with the package root as the working directory.
@@ -216,14 +217,21 @@ void main() {
         final iOSCode = stripCommentsKeepStrings(
           iOSWebViewSwift.readAsStringSync(),
         );
-        // The issue calls it the "updateSettings branch"; in this tree the iOS
-        // InAppWebView funnels both creation and runtime updates through
-        // setSettings (same signature as macOS), and the contentBlockers block
-        // lives there.
+        // The issue calls it the "updateSettings branch"; in this tree iOS
+        // funnels both creation and runtime updates through setSettings (same
+        // signature as macOS), and since #349 the contentBlockers key is
+        // delegated to the shared applyContentBlockers funnel (mirroring the
+        // macOS shape this package adopted for #338).
         iOSSetSettingsBody =
             functionBody(
               iOSCode,
               'func setSettings(newSettings: InAppWebViewSettings, newSettingsMap: [String: Any])',
+            ) ??
+            '';
+        iOSApplyContentBlockersBody =
+            functionBody(
+              iOSCode,
+              'func applyContentBlockers(_ contentBlockers: [[String: [String: Any]]])',
             ) ??
             '';
       }
@@ -264,17 +272,31 @@ void main() {
             'iOS setSettings must react to the contentBlockers key '
             '(the reference branch for #338)',
       );
+      // Re-derived for #349: iOS no longer compiles inline in setSettings —
+      // the key is delegated to the shared applyContentBlockers funnel (the
+      // same shape macOS uses), and the compilation itself moved there.
       expect(
         iOSSetSettingsBody,
-        contains('compileContentRuleList('),
-        reason: 'iOS setSettings must compile the rule list',
+        contains('applyContentBlockers('),
+        reason:
+            'iOS setSettings must delegate the contentBlockers key to the '
+            'applyContentBlockers funnel (#349 — mirrors the macOS '
+            'setSettings funnel this gate enforces on macOS)',
       );
       expect(
-        iOSSetSettingsBody,
-        contains('"ContentBlockingRules"'),
+        iOSApplyContentBlockersBody,
+        isNotEmpty,
         reason:
-            'iOS uses the ContentBlockingRules store identifier — macOS '
-            'must share it',
+            'iOS applyContentBlockers must exist for the cross-check to '
+            'mean anything after the #349 funneling',
+      );
+      expect(
+        iOSApplyContentBlockersBody,
+        contains('WKContentRuleListStore.default().compileContentRuleList('),
+        reason:
+            'iOS must still compile the rule list through '
+            'WKContentRuleListStore.default().compileContentRuleList — the '
+            'reference implementation for #338',
       );
     }, skip: iosCrossCheckSkip);
 

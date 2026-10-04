@@ -144,30 +144,19 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
             channelDelegate?.onBrowserCreated()
             webView?.runWindowBeforeCreatedCallbacks()
         } else {
-            if let contentBlockers = webView?.settings?.contentBlockers, contentBlockers.count > 0 {
-                do {
-                    let jsonData = try JSONSerialization.data(
-                        withJSONObject: contentBlockers, options: [])
-                    let blockRules = String(data: jsonData, encoding: .utf8)
-                    WKContentRuleListStore.default().compileContentRuleList(
-                        forIdentifier: "ContentBlockingRules",
-                        encodedContentRuleList: blockRules
-                    ) { (contentRuleList, error) in
-
-                        if let error = error {
-                            print(error.localizedDescription)
-                            return
-                        }
-
-                        let configuration = self.webView!.configuration
-                        configuration.userContentController.add(contentRuleList!)
-
-                        self.initLoad()
-                    }
-                    return
-                } catch {
-                    print(error.localizedDescription)
+            // #349: compile through the shared applyContentBlockers funnel
+            // and hold the initial load until the compilation SETTLES (the
+            // previous inline compile issued initLoad() only from inside the
+            // completion, dropping the first navigation on a compile error or
+            // an undelivered completion).
+            if let contentBlockers = webView?.settings?.contentBlockers,
+                contentBlockers.count > 0
+            {
+                webView?.applyContentBlockers(contentBlockers)
+                webView?.loadAfterContentRuleLists { [weak self] in
+                    self?.initLoad()
                 }
+                return
             }
 
             initLoad()

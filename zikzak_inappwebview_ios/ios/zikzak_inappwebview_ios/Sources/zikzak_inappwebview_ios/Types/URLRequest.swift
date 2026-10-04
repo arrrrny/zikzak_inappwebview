@@ -13,6 +13,13 @@ extension URLRequest {
         if let urlString = fromPluginMap["url"] as? String, let url = URL(string: urlString) {
             self.init(url: url)
         } else {
+            // #349: an unparsable `url` silently produced an about:blank
+            // request — a second path to the same invisible-blank symptom the
+            // issue describes. Log the rejected input so this class of bug is
+            // diagnosable.
+            print(
+                "ZIKZAK_DEBUG: URLRequest(fromPluginMap:) rejected unparsable url: \(String(describing: fromPluginMap["url"])) — falling back to about:blank"
+            )
             self.init(url: URL(string: "about:blank")!)
         }
         
