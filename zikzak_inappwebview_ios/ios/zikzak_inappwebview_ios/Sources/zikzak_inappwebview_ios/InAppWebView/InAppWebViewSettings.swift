@@ -324,6 +324,14 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
                     // getRealSettings() crash-proof on unexpected SDK states.
                     let boundValue =
                         webAuthSupport.value(forKey: "boundKeychainForPasskeys") as? Bool ?? false
+                    // getRealSettings reports the APPLIED level only: iOS has no
+                    // browser-mode WebAuthn surface, so a FOR_BROWSER (2)
+                    // request is never applied and always reads back as NONE.
+                    // That lossiness is deliberate and documented rather than
+                    // papered over — the creation-time path logs a native
+                    // warning for the dropped FOR_BROWSER request (issue #352),
+                    // and a read-back of NONE means "no app-bound passkeys are
+                    // enabled", not "FOR_BROWSER was requested".
                     realSettings["webAuthenticationSupport"] = boundValue ? 1 : 0
                 }
             }

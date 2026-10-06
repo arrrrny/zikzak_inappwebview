@@ -563,11 +563,38 @@ abstract class $InAppWebViewSettings {
   ///or have no public WebAuthn API (Linux/WebKitGTK), so the setting is
   ///ignored there.
   ///
+  ///Per-value support matrix (NONE / FOR_APP / FOR_BROWSER by platform):
+  ///
+  ///| Value        | Android | iOS | macOS | Windows | Linux | Web |
+  ///|--------------|---------|-----|-------|---------|-------|-----|
+  ///| `NONE`       | applied | applied | applied | ignored | ignored | ignored |
+  ///| `FOR_APP`    | applied | applied (16.4+) | applied (13.3+) | ignored | ignored | ignored |
+  ///| `FOR_BROWSER`| applied | **never applied** - warns at creation, reads back as `NONE` | **not applied yet** - the public API exists (13.3+) but this plugin does not call it, see issue #351 | ignored | ignored | ignored |
+  ///
+  ///"applied" means the value reaches the platform WebView (Android:
+  ///`WebSettingsCompat.setWebAuthenticationSupport`, feature-detected at
+  ///runtime). "ignored" means no platform code reads the value at all.
+  ///
+  ///`FOR_BROWSER` is macOS-only in principle: it is the only level that asks
+  ///for the WebView to act as a browser for arbitrary relying parties.
+  ///iOS has no surface for it at all - `WKWebView` exposes no public
+  ///`webAuthenticationSupport` (macOS 13.3+ only), and the private
+  ///WKWebViewWebAuthenticationSupport carries only the app-bound
+  ///`boundKeychainForPasskeys` flag. Apple gives third-party browsers no
+  ///passkey path for arbitrary relying parties on iOS, so no implementation
+  ///can honor it there.
+  ///
   ///Notes:
   ///- On iOS and macOS this setting is applied when the WebView is created
   ///  and cannot be changed afterwards (the underlying WKWebViewConfiguration
   ///  is immutable after init); changing it later through setSettings is a
   ///  no-op and logs a native warning.
+  ///- On iOS, requesting `FOR_BROWSER` logs a native warning at WebView
+  ///  creation instead of being dropped silently, and getRealSettings reports
+  ///  the APPLIED level only: such a WebView reads back as `NONE`, which means
+  ///  "no app-bound passkeys are enabled", not "FOR_BROWSER was requested".
+  ///- On iOS below 16.4 the whole WebAuthn surface is unavailable, so
+  ///  `FOR_APP` is ignored as well (no warning is logged for it).
   ///- On Android, getSettings returns `null` for this setting when the
   ///  installed WebView does not support `WebViewFeature.WEB_AUTHENTICATION`
   ///  or the OEM WebView wrapper rejects the call.

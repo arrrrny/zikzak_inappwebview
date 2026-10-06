@@ -934,6 +934,23 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 configuration.upgradeKnownHostsToHTTPS = settings.upgradeKnownHostsToHTTPS
             }
 
+            // FOR_BROWSER has no iOS surface to apply to: WKWebView exposes no
+            // public webAuthenticationSupport (macOS 13.3+ only), and the
+            // private WKWebViewWebAuthenticationSupport the apply path reaches
+            // through KVC carries only boundKeychainForPasskeys — the app-bound
+            // model. Apple gives third-party browsers no passkey path for
+            // arbitrary relying parties on iOS, so no implementation can honor
+            // this value. Report the request instead of dropping it silently,
+            // matching Android's behavior when a level cannot be applied
+            // (InAppWebView.java:762-770). Deliberately outside the iOS 16.4
+            // availability block below: the value is unsupported on every iOS
+            // version, so an older OS must report it too.
+            if settings.webAuthenticationSupport == 2 {  // FOR_BROWSER
+                print(
+                    "webAuthenticationSupport=FOR_BROWSER is not supported on iOS; only FOR_APP (app-bound) passkeys are available. The request was dropped — use FOR_APP for the embedding app's own domains (webcredentials Associated Domains + apple-app-site-association)."
+                )
+            }
+
             if #available(iOS 16.4, *) {
                 if settings.webAuthenticationSupport == 1 {  // FOR_APP
                     // Use KVC to avoid compile-time availability issues with older SDKs
