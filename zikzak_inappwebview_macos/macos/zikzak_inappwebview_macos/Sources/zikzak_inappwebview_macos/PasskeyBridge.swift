@@ -163,13 +163,13 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
         guard let params = options["pubKeyCredParams"] as? [[String: Any]], !params.isEmpty else {
             // WebAuthn default when the RP omits the list.
             return [
-                ASAuthorizationPublicKeyCredentialParameters(algorithm: ASAuthorizationCOSEAlgorithmIdentifier(rawValue: -7)),
-                ASAuthorizationPublicKeyCredentialParameters(algorithm: ASAuthorizationCOSEAlgorithmIdentifier(rawValue: -257)),
+                ASAuthorizationPublicKeyCredentialParameters(algorithm: ASCOSEAlgorithmIdentifier(rawValue: -7)),
+                ASAuthorizationPublicKeyCredentialParameters(algorithm: ASCOSEAlgorithmIdentifier(rawValue: -257)),
             ]
         }
         return params.compactMap { param in
             guard let alg = param["alg"] as? Int else { return nil }
-            return ASAuthorizationPublicKeyCredentialParameters(algorithm: ASAuthorizationCOSEAlgorithmIdentifier(rawValue: alg))
+            return ASAuthorizationPublicKeyCredentialParameters(algorithm: ASCOSEAlgorithmIdentifier(rawValue: alg))
         }
     }
 
@@ -241,9 +241,10 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
             request.userVerificationPreference = userVerificationPreference(from: options)
             request.attestationPreference = attestationPreference(from: options)
             let excluded = platformDescriptors(from: options, key: "excludeCredentials")
-            if !excluded.isEmpty { request.excludedCredentials = excluded }
-            if #available(macOS 14.4, *) {
-                request.residentKeyPreference = residentKeyPreference(from: options)
+            // The browser-request protocol carrying `excludedCredentials`
+            // only reaches the platform registration request on macOS 13.5+.
+            if #available(macOS 13.5, *) {
+                if !excluded.isEmpty { request.excludedCredentials = excluded }
             }
             requests.append(request)
         }
@@ -344,7 +345,11 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
     }
 
     func cancelCeremony() {
-        controller?.cancel()
+        // `ASAuthorizationController.cancel()` is macOS 13.0+; on 12.x the
+        // ceremony simply runs to its own timeout.
+        if #available(macOS 13.0, *) {
+            controller?.cancel()
+        }
     }
 
     // MARK: - ASAuthorizationControllerPresentationContextProviding
