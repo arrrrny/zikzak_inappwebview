@@ -34,9 +34,9 @@ String readJava(String relativePath) {
   return stripJavaNonCode(file.readAsStringSync());
 }
 
-/// Strips line/block comments and string literals so only real code tokens
-/// are scanned (an assertion can never be satisfied by a comment or a
-/// string that merely mentions the pattern).
+/// Strips line/block comments, string literals, char literals and text blocks
+/// so only real code tokens are scanned (an assertion can never be satisfied
+/// by a comment or a string that merely mentions the pattern).
 String stripJavaNonCode(String source) {
   final out = StringBuffer();
   var i = 0;
@@ -63,6 +63,20 @@ String stripJavaNonCode(String source) {
       i = end == -1 ? source.length : end;
       continue;
     }
+    if (rest.startsWith('"""')) {
+      var j = i + 3;
+      while (j < source.length) {
+        if (source[j] == r'\') {
+          j += 2;
+          continue;
+        }
+        if (source.startsWith('"""', j)) break;
+        j++;
+      }
+      i = j + 3;
+      out.write('""');
+      continue;
+    }
     if (source[i] == '"') {
       var j = i + 1;
       while (j < source.length) {
@@ -75,6 +89,20 @@ String stripJavaNonCode(String source) {
       }
       i = j + 1;
       out.write('""');
+      continue;
+    }
+    if (source[i] == "'") {
+      var j = i + 1;
+      while (j < source.length) {
+        if (source[j] == r'\') {
+          j += 2;
+          continue;
+        }
+        if (source[j] == "'") break;
+        j++;
+      }
+      i = j + 1;
+      out.write("''");
       continue;
     }
     out.write(source[i]);
@@ -121,12 +149,14 @@ void expectWindowTransportContract(String javaSource, String label) {
   );
 
   // (4) When the transport is unavailable the normal initial load path still
-  // runs — the popup must not end up silently dead.
+  // runs — the popup must not end up silently dead. Branching on the flag
+  // (not merely mentioning it) pins the fallback load itself.
   expect(
-    javaSource.contains('windowTransportWired'),
+    javaSource.contains('if (!windowTransportWired)'),
     isTrue,
     reason:
-        '$label must track whether the window transport was wired so the '
+        '$label must branch on whether the window transport was wired '
+        '(if (!windowTransportWired)) so the '
         'initialFile/initialData/initialUrlRequest fallback load still runs '
         'when it was not.',
   );
