@@ -934,20 +934,22 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 configuration.upgradeKnownHostsToHTTPS = settings.upgradeKnownHostsToHTTPS
             }
 
-            // FOR_BROWSER has no iOS surface to apply to: WKWebView exposes no
-            // public webAuthenticationSupport (macOS 13.3+ only), and the
-            // private WKWebViewWebAuthenticationSupport the apply path reaches
-            // through KVC carries only boundKeychainForPasskeys — the app-bound
-            // model. Apple gives third-party browsers no passkey path for
-            // arbitrary relying parties on iOS, so no implementation can honor
-            // this value. Report the request instead of dropping it silently,
-            // matching Android's behavior when a level cannot be applied
+            // Neither WebAuthn level has an iOS surface to apply to: no iOS
+            // version exposes a webAuthenticationSupport key on WKWebView /
+            // WKWebViewConfiguration — the symbol is absent from every WebKit
+            // header, and the runtime guard below (responds(to:)) is false on
+            // the iOS 26.3 simulator runtime — so the KVC write never runs and
+            // FOR_APP is inert as well as FOR_BROWSER. Passkey ceremonies are
+            // gated by the host app's webcredentials Associated Domains entry
+            // plus apple-app-site-association, not by this setting. Report the
+            // request instead of dropping it silently, matching Android's
+            // behavior when a level cannot be applied
             // (InAppWebView.java:762-770). Deliberately outside the iOS 16.4
             // availability block below: the value is unsupported on every iOS
             // version, so an older OS must report it too.
             if settings.webAuthenticationSupport == 2 {  // FOR_BROWSER
                 print(
-                    "webAuthenticationSupport=FOR_BROWSER is not supported on iOS; only FOR_APP (app-bound) passkeys are available. The request was dropped — use FOR_APP for the embedding app's own domains (webcredentials Associated Domains + apple-app-site-association)."
+                    "webAuthenticationSupport=FOR_BROWSER was requested but iOS does not expose it (WKWebView has no webAuthenticationSupport); the value was not applied. Passkey ceremonies on iOS are gated by the host app's webcredentials Associated Domains entry plus apple-app-site-association."
                 )
             }
 
@@ -965,8 +967,25 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                         if webAuthSupport.responds(to: Selector(("boundKeychainForPasskeys"))) {
                             webAuthSupport.setValue(true, forKey: "boundKeychainForPasskeys")
                         }
+                    } else {
+                        // FOR_APP is inert wherever WebKit exposes no such key,
+                        // which is every current iOS — the KVC write above never
+                        // runs. Surface it instead of dropping it silently, so a
+                        // caller can tell an inert setting from an unset one
+                        // (issue #352).
+                        print(
+                            "webAuthenticationSupport=FOR_APP was requested but this iOS version's WebKit does not expose WKWebViewConfiguration.webAuthenticationSupport; the value was not applied."
+                        )
                     }
                 }
+            } else if settings.webAuthenticationSupport == 1 {  // FOR_APP
+                // iOS 16.3 and older sit below the availability gate, so the
+                // else inside it never runs there — without this arm a
+                // requested FOR_APP is still dropped without a word
+                // (issue #352).
+                print(
+                    "webAuthenticationSupport=FOR_APP was requested but iOS 16.3 or older does not expose WKWebViewConfiguration.webAuthenticationSupport; the value was not applied."
+                )
             }
         }
 

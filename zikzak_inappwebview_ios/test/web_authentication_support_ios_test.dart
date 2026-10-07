@@ -1,20 +1,23 @@
 // Issue #352 regression contract (iOS). `webAuthenticationSupport` accepts
-// FOR_BROWSER (wire value 2) on the Dart side, but the iOS apply path only acts
-// on FOR_APP (1): `preWKWebViewConfiguration` gated the whole block on
-// `== 1`, so a requested 2 fell through with no error and no log, and
-// `getRealSettings()` — which mirrors only the applied
-// `boundKeychainForPasskeys` flag as `boundValue ? 1 : 0` — read the WebView
-// back as NONE.
+// FOR_BROWSER (wire value 2) on the Dart side, but the iOS apply path only ever
+// reached for FOR_APP (1), behind a `responds(to:)` guard — and runtime
+// verification shows that guard is false on every tested iOS runtime, so
+// nothing was ever applied: a requested 2 fell through with no error and no
+// log, a requested FOR_APP fell the same way, and `getRealSettings()` echoed
+// the *requested* level back out of its `toMap()` seed.
 //
-// Unlike macOS (#351, where the public
-// `WKWebViewConfiguration.webAuthenticationSupport` exists), iOS exposes no
-// browser-mode WebAuthn surface at all: the private
-// WKWebViewWebAuthenticationSupport carries only `boundKeychainForPasskeys`,
-// the app-bound model. FOR_BROWSER therefore cannot be honored by any
-// implementation on iOS — the defect is that it is silent. These contracts pin
-// the two surfaces that make the limitation observable: a creation-time native
-// diagnostic (matching Android's InAppWebView.java:762-770 behavior) and an
-// honest, documented read-back.
+// Like macOS (#351), iOS exposes no `webAuthenticationSupport` key at all —
+// verified at runtime: `WKWebViewConfiguration().responds(to:
+// Selector("webAuthenticationSupport"))` is false inside the iOS 26.3
+// simulator runtime, and the symbol is absent from every WebKit header. The
+// private WKWebViewWebAuthenticationSupport carries only
+// `boundKeychainForPasskeys`, the app-bound model, and that object is only
+// reachable through the key that does not exist. Neither non-NONE level can be
+// honored by any implementation on iOS — the defect is that the drop was
+// silent and the read-back lied. These contracts pin the surfaces that make
+// the limitation observable: creation-time native diagnostics for both levels
+// (matching Android's InAppWebView.java:762-770 behavior) and an honest
+// read-back.
 //
 // Executable on any host (no Xcode required) — the #316/#328/#331 source-contract
 // precedent. These read the Swift sources as text, so they are evidence about
@@ -57,6 +60,32 @@ String blockBody(String code, int start) {
     }
   }
   return '';
+}
+
+/// Index of the `}` matching the `{` at [open], or -1 when unterminated.
+int matchingBrace(String code, int open) {
+  var depth = 0;
+  for (var i = open; i < code.length; i++) {
+    if (code[i] == '{') {
+      depth++;
+    } else if (code[i] == '}') {
+      depth--;
+      if (depth == 0) return i;
+    }
+  }
+  return -1;
+}
+
+/// The body of the `else` that follows the `if` whose body ends at [close], or
+/// '' when there is no else.
+String elseBodyAfter(String code, int close) {
+  final after = code.substring(close);
+  final at = after.indexOf('else');
+  if (at == -1) return '';
+  final open = after.indexOf('{', at);
+  if (open == -1) return '';
+  final closeIdx = matchingBrace(after, open);
+  return closeIdx == -1 ? '' : after.substring(open + 1, closeIdx);
 }
 
 /// Locates the iOS package root (`ios/zikzak_inappwebview_ios`) relative to the
@@ -165,6 +194,63 @@ void main() {
             'dropped.',
       );
 
+      // FOR_APP is inert too: the same absent key means the KVC write never
+      // runs, so the guard must carry an else that reports, and the gate
+      // itself must carry a FOR_APP arm for iOS 16.3 and older, where the
+      // in-block else never runs.
+      final respondsGuard = functionSource.indexOf(
+        'configuration.responds(to: selector)',
+        forApp,
+      );
+      expect(
+        respondsGuard,
+        greaterThanOrEqualTo(0),
+        reason: 'responds(to:) guard not found in the FOR_APP branch',
+      );
+      final guardOpen = functionSource.indexOf('{', respondsGuard);
+      expect(guardOpen, greaterThanOrEqualTo(0));
+      final guardClose = matchingBrace(functionSource, guardOpen);
+      expect(guardClose, greaterThanOrEqualTo(0));
+      expect(
+        elseBodyAfter(functionSource, guardClose).contains('print('),
+        isTrue,
+        reason:
+            'The FOR_APP path must report that the value was not applied '
+            'when WKWebViewConfiguration does not respond to '
+            'webAuthenticationSupport — runtime verification shows the guard '
+            'is false on every current iOS, so without the else FOR_APP is '
+            'dropped as silently as FOR_BROWSER was (issue #352).',
+      );
+
+      final gateOpen = functionSource.indexOf('{', availability);
+      expect(gateOpen, greaterThanOrEqualTo(0));
+      final gateClose = matchingBrace(functionSource, gateOpen);
+      expect(gateClose, greaterThanOrEqualTo(0));
+      final onOlder = elseBodyAfter(functionSource, gateClose);
+      expect(
+        onOlder.contains('print('),
+        isTrue,
+        reason:
+            'The availability gate must carry its own FOR_APP report arm: on '
+            'iOS 16.3 and older the in-block else is unreachable, so a '
+            'requested FOR_APP would still be dropped without a word '
+            '(issue #352).',
+      );
+      final elseClause = functionSource.substring(
+        gateClose,
+        gateClose + 200 > functionSource.length
+            ? functionSource.length
+            : gateClose + 200,
+      );
+      expect(
+        elseClause.contains('settings.webAuthenticationSupport == 1'),
+        isTrue,
+        reason:
+            'The pre-16.4 report arm must be gated on a requested FOR_APP '
+            '(webAuthenticationSupport == 1) — other levels must stay '
+            'unreported.',
+      );
+
       // The warning text is stripped as a string literal above, so assert it on
       // the raw source — it has to name the level it refused and the OS, or a
       // developer reading the log cannot tell what was dropped.
@@ -245,6 +331,55 @@ void main() {
             'The settings mirror must name FOR_BROWSER as the value that '
             'cannot round-trip on iOS, so the read-back is not mistaken for a '
             'lossless round-trip (issue #352).',
+      );
+
+      // When the mirror cannot run — guard false, or below iOS 16.4 — the
+      // read-back must report NONE (0) rather than echoing the requested
+      // level out of its toMap() seed.
+      final mirror = source.indexOf(
+        'realSettings["webAuthenticationSupport"] = boundValue ? 1 : 0',
+      );
+      expect(mirror, greaterThanOrEqualTo(0));
+      final gate = source.lastIndexOf('#available(iOS 16.4, *)', mirror);
+      expect(
+        gate,
+        greaterThanOrEqualTo(0),
+        reason: 'iOS 16.4 availability gate not found above the mirror',
+      );
+      final gateOpen = source.indexOf('{', gate);
+      expect(gateOpen, greaterThanOrEqualTo(0));
+      final gateClose = matchingBrace(source, gateOpen);
+      expect(gateClose, greaterThanOrEqualTo(0));
+      expect(
+        elseBodyAfter(source, gateClose).contains(
+          'realSettings["webAuthenticationSupport"] = 0',
+        ),
+        isTrue,
+        reason:
+            'The availability gate must report NONE (0) itself: on iOS 16.3 '
+            'and older the read-back mirror never runs, so a requested '
+            'FOR_APP or FOR_BROWSER would still echo back out of toMap() '
+            '(issue #352).',
+      );
+      final respondsGuard = source.indexOf(
+        'configuration.responds(to: selector)',
+        gate,
+      );
+      expect(respondsGuard, greaterThanOrEqualTo(0));
+      final guardOpen = source.indexOf('{', respondsGuard);
+      expect(guardOpen, greaterThanOrEqualTo(0));
+      final guardClose = matchingBrace(source, guardOpen);
+      expect(guardClose, greaterThanOrEqualTo(0));
+      expect(
+        elseBodyAfter(source, guardClose).contains(
+          'realSettings["webAuthenticationSupport"] = 0',
+        ),
+        isTrue,
+        reason:
+            'When the read-back guard is false, getRealSettings() must report '
+            'NONE (0) rather than echoing the requested level out of toMap() '
+            '— nothing was applied, so NONE is the only honest answer '
+            '(issue #352).',
       );
     },
     timeout: const Timeout(Duration(minutes: 2)),
