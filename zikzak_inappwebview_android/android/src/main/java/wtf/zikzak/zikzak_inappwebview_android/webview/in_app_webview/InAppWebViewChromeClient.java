@@ -667,12 +667,12 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
                   isDialog
           );
 
-          if (plugin != null && plugin.inAppWebViewManager != null) {
-            plugin.inAppWebViewManager.windowWebViewMessages.put(windowId, resultMsg);
-          }
-
+          // resultMsg has already been dispatched by the sendToTarget() call
+          // below, so the Looper owns it now: re-parking it here would let a
+          // consumer read a recycled message whose obj is null (issue #357).
+          // The popup URL is delivered to Dart through the CreateWindowAction
+          // request instead, so the window can be opened from that URL.
           if (inAppWebView != null && inAppWebView.channelDelegate != null) {
-            final int finalWindowId = windowId;
             inAppWebView.channelDelegate.onCreateWindow(createWindowAction, new WebViewChannelDelegate.CreateWindowCallback() {
               @Override
               public boolean nonNullSuccess(@NonNull Boolean handledByClient) {
@@ -680,16 +680,8 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
               }
 
               @Override
-              public void defaultBehaviour(@Nullable Boolean handledByClient) {
-                if (plugin != null && plugin.inAppWebViewManager != null) {
-                  plugin.inAppWebViewManager.windowWebViewMessages.remove(finalWindowId);
-                }
-              }
-
-              @Override
               public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
                 Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
-                defaultBehaviour(null);
               }
             });
 
