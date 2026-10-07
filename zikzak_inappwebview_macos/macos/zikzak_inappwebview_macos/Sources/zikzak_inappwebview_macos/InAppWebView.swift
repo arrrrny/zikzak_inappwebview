@@ -97,6 +97,13 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     private static var credentialsProposed: [URLCredential] = []
     var channelDelegate: WebViewChannelDelegate?
 
+    /// Issue #358: native WebAuthn/passkey bridge. The injected PasskeysJS
+    /// shim forwards `navigator.credentials.create/get` (publicKey options
+    /// only) here over the `callHandler` channel; this drives the ceremony
+    /// through `ASAuthorizationController`, bypassing WebKit's broken
+    /// in-page mediation (zuraffa_browser#278).
+    var passkeyBridge: PasskeyBridge?
+
     // MARK: - Issue #197 state (method-channel parity with iOS)
 
     /// Active `WebMessageChannel` instances, keyed by id. Populated by
@@ -258,6 +265,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         self.autoresizingMask = [.width, .height]
         self.navigationDelegate = self
         self.uiDelegate = self
+        self.passkeyBridge = PasskeyBridge(webView: self)
 
         userContentController.add(WeakScriptMessageHandler(delegate: self), name: "consoleHandler")
         userContentController.add(
@@ -340,6 +348,18 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             source: JAVASCRIPT_BRIDGE_JS_SOURCE, injectionTime: .atDocumentStart,
             forMainFrameOnly: false)
         userContentController.addUserScript(bridgeScript)
+
+        // Issue #358: WebAuthn/passkey shim. Injected in every frame at
+        // document start, right after the JS bridge it calls through.
+        // Popup webviews share this configuration, so they get the shim
+        // too; headless webviews are failed fast natively by PasskeyBridge
+        // (isHeadlessOffscreen) rather than by withholding the shim, which
+        // cannot be decided here (the flag is set post-init).
+        let passkeysScript = WKUserScript(
+            source: PASSKEYS_JS_SOURCE, injectionTime: .atDocumentStart,
+            forMainFrameOnly: false)
+        userContentController.addUserScript(passkeysScript)
+
         let printScript = WKUserScript(
             source: PRINT_JS_SOURCE, injectionTime: .atDocumentStart, forMainFrameOnly: true)
         userContentController.addUserScript(printScript)
@@ -683,6 +703,10 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             webMessageChannels.removeAll()
             for (_, wml) in webMessageListeners { wml.dispose() }
             webMessageListeners.removeAll()
+            // Cancel any outstanding passkey ceremony so the webview is not
+            // retained by a dangling ASAuthorizationController (#358).
+            passkeyBridge?.cancelCeremony()
+            passkeyBridge = nil
             channel?.setMethodCallHandler(nil)
             findInteractionChannel?.setMethodCallHandler(nil)
             isDisposed = true
@@ -2529,6 +2553,30 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                             }
                         }
                     }
+                }
+                return
+            }
+            if handlerName == "PasskeyBridge" {
+                // Issue #358: WebAuthn/passkey ceremonies are handled
+                // natively (ASAuthorizationController), never round-tripped
+                // to Dart. The bridge always RESOLVES the JS promise — the
+                // shim converts {"ok": false, error: {name, message}} into
+                // a DOMException so the WebAuthn error names survive.
+                let _callHandlerID = body["_callHandlerID"] as? Int64 ?? 0
+                let args = body["args"] as? String ?? "[]"
+                passkeyBridge?.handleCall(argsJson: args) { [weak self] result in
+                    guard let self = self else { return }
+                    let jsonData =
+                        (try? JSONSerialization.data(withJSONObject: result))
+                        ?? Data("{}".utf8)
+                    let json = String(data: jsonData, encoding: .utf8) ?? "{}"
+                    self.evaluateJavaScript(
+                        """
+                            if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
+                                window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)].resolve(\(json));
+                                delete window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)];
+                            }
+                        """, completionHandler: nil)
                 }
                 return
             }
