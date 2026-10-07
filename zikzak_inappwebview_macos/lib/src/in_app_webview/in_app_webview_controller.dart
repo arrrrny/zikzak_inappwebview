@@ -231,10 +231,8 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
           // it throw out of the decoder: a non-map payload fails the cast, a
           // missing or non-String url fails the entity's required url, and an
           // empty-string url would fire the callback with an empty WebUri.
-          if (call.arguments
-              case final Map<dynamic, dynamic> raw
-              when raw['url'] is String &&
-                  (raw['url'] as String).isNotEmpty) {
+          if (call.arguments case final Map<dynamic, dynamic> raw
+              when raw['url'] is String && (raw['url'] as String).isNotEmpty) {
             DownloadStartRequest? downloadStartRequest;
             try {
               downloadStartRequest = DownloadStartRequest.fromJson(
