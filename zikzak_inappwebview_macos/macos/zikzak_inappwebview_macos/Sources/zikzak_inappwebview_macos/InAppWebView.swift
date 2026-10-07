@@ -267,6 +267,15 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                             )
                         }
                     }
+                } else if let webAuthnSupport = settingsMap["webAuthenticationSupport"] as? Int,
+                          webAuthnSupport == 1 {  // FOR_APP
+                    // macOS 13.2 and older sit below the availability gate, so
+                    // the else inside it never runs there — without this arm a
+                    // requested FOR_APP is still dropped without a word
+                    // (issue #351).
+                    print(
+                        "webAuthenticationSupport=FOR_APP was requested but macOS 13.2 or older does not expose WKWebViewConfiguration.webAuthenticationSupport; the value was not applied."
+                    )
                 }
             }
         }

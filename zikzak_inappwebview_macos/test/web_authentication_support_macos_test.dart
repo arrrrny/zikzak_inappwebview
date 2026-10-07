@@ -293,6 +293,41 @@ void main() {
             'webAuthenticationSupport — today the KVC write is silently '
             'skipped and a caller has no way to tell (issue #351).',
       );
+
+      // macOS 13.2 and older sit below the availability gate, so the else
+      // inside it never runs there: the gate itself must carry a FOR_APP
+      // report arm, or pre-13.3 drops the value without a word.
+      final gate = initCode.lastIndexOf('#available(macOS 13.3, *)', guard);
+      expect(
+        gate,
+        greaterThanOrEqualTo(0),
+        reason: 'macOS 13.3 availability gate not found above the FOR_APP branch',
+      );
+      final gateOpen = initCode.indexOf('{', gate);
+      expect(gateOpen, greaterThanOrEqualTo(0));
+      final gateClose = matchingBrace(initCode, gateOpen);
+      expect(gateClose, greaterThanOrEqualTo(0));
+      final onOlder = elseBodyAfter(initCode, gateClose);
+      expect(
+        onOlder.contains('print('),
+        isTrue,
+        reason:
+            'The availability gate must carry its own FOR_APP report arm: on '
+            'macOS 13.2 and older the in-block else is unreachable, so a '
+            'requested FOR_APP would still be dropped without a word '
+            '(issue #351).',
+      );
+      final elseClause = initCode.substring(
+        gateClose,
+        gateClose + 200 > initCode.length ? initCode.length : gateClose + 200,
+      );
+      expect(
+        elseClause.contains('webAuthnSupport == 1'),
+        isTrue,
+        reason:
+            'The pre-13.3 report arm must be gated on a requested FOR_APP '
+            '(webAuthnSupport == 1) — other levels must stay unreported.',
+      );
     }, timeout: const Timeout(Duration(minutes: 2)));
 
     test(
@@ -339,6 +374,30 @@ void main() {
               'NONE (0) rather than echoing the requested level out of '
               'toMap() — a WebView that was never configured must not claim '
               'WebAuthn support it does not have (issue #351).',
+        );
+
+        // macOS 13.2 and older sit below the availability gate, so the honest
+        // else inside it never runs there: the gate itself must report NONE,
+        // or pre-13.3 echoes the requested level out of toMap().
+        final gate = region.lastIndexOf('#available(macOS 13.3, *)', guard);
+        expect(
+          gate,
+          greaterThanOrEqualTo(0),
+          reason: 'macOS 13.3 availability gate not found above the read-back guard',
+        );
+        final gateOpen = region.indexOf('{', gate);
+        expect(gateOpen, greaterThanOrEqualTo(0));
+        final gateClose = matchingBrace(region, gateOpen);
+        expect(gateClose, greaterThanOrEqualTo(0));
+        final onOlderGate = elseBodyAfter(region, gateClose);
+        expect(
+          onOlderGate.contains('realSettings[""] = 0'),
+          isTrue,
+          reason:
+              'The availability gate must report NONE (0) itself: on macOS '
+              '13.2 and older the in-block else is unreachable, so a requested '
+              'FOR_APP or FOR_BROWSER would still echo back out of toMap() '
+              '(issue #351).',
         );
       },
       timeout: const Timeout(Duration(minutes: 2)),

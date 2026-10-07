@@ -254,6 +254,13 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
                     // the dropped request (issue #351).
                     realSettings["webAuthenticationSupport"] = 0
                 }
+            } else {
+                // macOS 13.2 and older sit below the availability gate, so the
+                // honest else inside it never runs there — realSettings would
+                // echo the requested level out of toMap(). Nothing can be
+                // applied below 13.3, so NONE is the only honest answer
+                // (issue #351).
+                realSettings["webAuthenticationSupport"] = 0
             }
             // isFindInteractionEnabled is not available on macOS
         }
