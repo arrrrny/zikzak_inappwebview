@@ -176,23 +176,23 @@ cd zikzak_inappwebview/example && flutter test integration_test/<file>.dart -d <
 ### GYM exercises (`.gym/`)
 `zikzak_inappwebview/.gym/gym.yaml` defines a package-level GYM: warmup reps `01-deps` (flutter pub get), `02-build` (analyze), `03-bridge-smoke` (flutter test `.gym/warmup/03-bridge-smoke_test.dart`), plus graded exercises (e.g. `js-bridge-round-trip`) graded by exit code.
 
-### Known repository state — measured on `master` at 2026-09-11
+### Known repository state — measured on `master` at 2026-10-07, after the `6.2.0` release
 
 `master` is **green**: the CI matrix passes all 17 jobs, and every number below was reproduced locally on the same commit. Re-measure before leaning on it — this table moves.
 
-| Package | `flutter test` | `flutter analyze` |
-| --- | --- | --- |
-| `zikzak_inappwebview` | 250 pass — GREEN | 23 infos, 0 warnings, 0 errors |
-| `zikzak_inappwebview_platform_interface` | 306 pass — GREEN | 77 infos, 0 warnings, 0 errors |
-| `zikzak_inappwebview_ios` | 12 pass — GREEN | 192 infos, 0 warnings, 0 errors |
-| `zikzak_inappwebview_macos` | 48 pass — GREEN | clean |
-| `zikzak_inappwebview_windows` | 24 pass — GREEN | clean |
-| `zikzak_inappwebview_linux` | 9 pass — GREEN | 5 infos, 0 warnings, 0 errors |
-| `zikzak_inappwebview_web` | 1 pass — GREEN, but ONLY with `--platform chrome` | clean |
-| `zikzak_inappwebview_android` | not in the CI matrix | 197 infos, 0 warnings, 0 errors |
-| `zikzak_inappwebview_module` | not in the CI matrix | clean (`publish_to: none`, analyzes in ~3 min) |
+| Package | test files | `flutter test` | `flutter analyze` |
+| --- | --- | --- | --- |
+| `zikzak_inappwebview` | 27 | 250 pass — GREEN | 23 infos, 0 warnings, 0 errors |
+| `zikzak_inappwebview_platform_interface` | 38 | 306 pass — GREEN | 77 infos, 0 warnings, 0 errors |
+| `zikzak_inappwebview_macos` | 10 | 101 pass — GREEN | clean |
+| `zikzak_inappwebview_ios` | 7 | 23 pass — GREEN | 192 infos, 0 warnings, 0 errors |
+| `zikzak_inappwebview_windows` | 4 | 24 pass — GREEN | clean |
+| `zikzak_inappwebview_linux` | 2 | 9 pass — GREEN | 5 infos, 0 warnings, 0 errors |
+| `zikzak_inappwebview_web` | 1 | 1 pass — GREEN, but ONLY with `--platform chrome` | clean |
+| `zikzak_inappwebview_android` | 3 | 12 pass — outside the CI matrix | 197 infos, 0 warnings, 0 errors |
+| `zikzak_inappwebview_module` | 1 | 6 pass — outside the CI matrix | clean (`publish_to: none`, never published) |
 
-The remaining infos are style-level and deliberately tolerated (`--no-fatal-infos`). Warnings are **not** tolerated — a new warning in any matrix package is a red build, which is why `zikzak_inappwebview_android` cannot join the matrix until its lint debt is cleared.
+The remaining infos are style-level and deliberately tolerated (`--no-fatal-infos`). Warnings are **not** tolerated — a new warning in any matrix package is a red build. Note that `zikzak_inappwebview_android` and `zikzak_inappwebview_module` are simply absent from both matrices (`analyze` covers 7 packages, `test` covers 6 plus the `--platform chrome` web job); both are green when measured locally, so their exclusion is not a lint-debt gate. Treat their numbers as unverified-in-CI.
 
 ### Local-source dependencies (dev mode)
 
@@ -201,7 +201,7 @@ Every publishable package resolves its intra-repo dependencies through `dependen
 **Use `dependency_overrides`, not `path:` under `dependencies:`.** A plain path dependency makes `flutter analyze` report `invalid_dependency` ("Publishable packages can't have 'path' dependencies") in every publishable package, and that diagnostic is a warning, i.e. fatal under the gate. `scripts/prepare_for_publish.sh` deletes the whole `dependency_overrides:` section before publishing, and also deletes bare `path:` lines. `scripts/restore_dev_setup.sh` writes path deps under `dependencies:` — it drives analyze red, so prefer editing the overrides by hand.
 
 Doc staleness to be aware of:
-- `.specify/memory/tdd-profile.md` claims 10 umbrella test files / 112 tests and a green baseline — the umbrella now has ~28 files / 250 tests. Treat it as partially outdated.
+- `.specify/memory/tdd-profile.md` claims 10 umbrella test files / 112 tests and a green baseline — the umbrella now has 27 files / 250 tests. Treat it as partially outdated.
 - Every package is at `6.2.0`, and README installation snippets match.
 
 ---
