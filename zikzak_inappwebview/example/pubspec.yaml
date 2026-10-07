@@ -38,8 +38,8 @@ dependencies:
   url_launcher: ^6.2.0
   zikzak_inappwebview:
     path: ../
-  zikzak_inappwebview_platform_interface: ^6.1.0
-  zikzak_inappwebview_web: ^6.1.0
+  zikzak_inappwebview_platform_interface: ^6.2.0
+  zikzak_inappwebview_web: ^6.2.0
 
 # DEV ONLY: point at the local plugin source so Swift/ObjC/Java changes are
 # compiled into the example app during development. Remove before publishing.
@@ -105,6 +105,3 @@ flutter:
 # DEV ONLY: resolve intra-repo packages from local source so a single
 # checkout builds against itself. Stripped by scripts/prepare_for_publish.sh
 # before publishing — pub.dev rejects dependency_overrides.
-dependency_overrides:
-  zikzak_inappwebview_platform_interface:
-    path: ../../zikzak_inappwebview_platform_interface
