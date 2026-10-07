@@ -1,0 +1,64 @@
+schema_version: "1.0"
+
+extension:
+  id: spec-stats
+  name: "Spec Stats — Spec Dashboard at a Glance"
+  version: "1.2.0"
+  description: "Generates a beautiful markdown dashboard showing every spec at a glance — stage, progress, health, last-updated — so the user can see the whole portfolio without opening a dozen folders. Plus four on-demand views: open (unfinished), not-green (no green test evidence / failing), reconcile (fix tasks.md checkboxes from actual implementation state), and runs (actually execute the recorded test command per spec on demand and record the result)."
+  author: arrrrny
+  repository: https://github.com/arrrrny/speckit-extensions
+  homepage: https://github.com/arrrrny/speckit-extensions
+  license: MIT
+
+requires:
+  speckit_version: ">=0.9.0"
+  tools:
+    - name: node
+      required: true
+    - name: git
+      required: false
+
+provides:
+  commands:
+    - name: speckit.spec-stats.report
+      file: commands/speckit.spec-stats.report.md
+      description: "Main generator — scans all specs/*/, derives per-feature stage, task progress, checklist progress, health/green state, last updated, active marker, branch presence; when the TDD extension is installed, adds a deep TDD table (acceptance/unit/characterization counts, DONE, loop mode, tasks.md state); renders dashboard to configurable output path and writes .specify/stats/stats.json snapshot"
+    - name: speckit.spec-stats.open
+      file: commands/speckit.spec-stats.open.md
+      description: "On-demand view of everything not complete: what stage each is stuck at, what the immediate next artifact/command is, oldest-untouched first, stale warnings past stale_after_days"
+    - name: speckit.spec-stats.not-green
+      file: commands/speckit.spec-stats.not-green.md
+      description: "On-demand view of specs whose latest test evidence is red or unknown, with the exact evidence line quoted from tdd/cycle-log.md and the command that would produce evidence"
+    - name: speckit.spec-stats.reconcile
+      file: commands/speckit.spec-stats.reconcile.md
+      description: "Reconcile tasks.md checkboxes against actual implementation — cross-references TDD test-list.md DONE behaviors and file existence to mark tasks that were implemented but never checked"
+    - name: speckit.spec-stats.runs
+      file: commands/speckit.spec-stats.runs.md
+      description: "On-demand execution — reads verified suite command from .specify/memory/tdd-profile.md, runs it for selected specs (--all, spec id/slug, or default active feature), captures pass/fail + duration + tail, appends run record to .specify/stats/runs.json, refreshes dashboard health column"
+
+  config:
+    - name: "spec-stats-config.yml"
+      template: "config-template.yml"
+      description: "Spec Stats configuration (output path, specs dir, sort order, inclusions, git usage, stale threshold, runs history limit, emoji)"
+      required: false
+
+tags:
+  - stats
+  - dashboard
+  - reporting
+  - specs
+  - progress
+  - observability
+
+config:
+  defaults:
+    output_path: ".specify/stats/SPEC-STATS.md"
+    specs_dir: "specs"
+    sort_by: "number"
+    include_bugs: true
+    include_chores: true
+    include_tupec: true
+    use_git: true
+    stale_after_days: 14
+    runs_history_limit: 50
+    emoji: true

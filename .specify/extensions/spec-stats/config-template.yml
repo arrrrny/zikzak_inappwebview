@@ -1,0 +1,37 @@
+# Spec Stats — Spec Dashboard at a Glance Configuration
+# Copied to .specify/extensions/spec-stats/spec-stats-config.yml on install
+
+# Output file for the rendered dashboard markdown
+# Relative to repository root
+output_path: ".specify/stats/SPEC-STATS.md"
+
+# Directory containing spec folders (relative to repo root)
+# Each spec lives at specs/<NNN>-<slug>/
+specs_dir: "specs"
+
+# Sort order for the at-a-glance table
+# Options: number | last_updated | progress | stage
+sort_by: "number"
+
+# Include Bugs section (.specify/bugs/*)
+include_bugs: true
+
+# Include Chores section (.specify/chores/*)
+include_chores: true
+
+# Include TUPEC rewrite inventory line (.specify/tupec/inventory.json)
+include_tupec: true
+
+# Use git to get last commit date+sha per feature dir (when available)
+# Falls back to filesystem mtime when git unavailable or not a repo
+use_git: true
+
+# Days after which a feature is flagged as stale in the 'open' view
+stale_after_days: 14
+
+# Maximum run records to keep in .specify/stats/runs.json (bounded history)
+runs_history_limit: 50
+
+# Show emoji in legend/health column (✅ green / ❌ red / ⚪ unknown)
+# Disable for CI/log parsing environments
+emoji: true

@@ -1,0 +1,1 @@
+../../.specify/extensions/spec-stats/.specify-dev/agent-commands/opencode/speckit.spec-stats.not-green.md
