@@ -13,9 +13,13 @@ extension UIApplication {
     /// `UIApplication.shared.delegate?.window` are deprecated, and the
     /// AppDelegate `window` is `nil` once an app adopts the UIScene lifecycle
     /// (mandatory with the iOS 27 SDK), so window access must go through the
-    /// connected `UIWindowScene`s: the foreground-active scene first, then any
-    /// other connected scene (e.g. a lookup while the app is transitioning
-    /// between activation states).
+    /// connected `UIWindowScene`s: the foreground-active scene's `keyWindow`
+    /// when one is connected, otherwise any other connected scene's
+    /// `keyWindow` (e.g. a lookup while the app is transitioning between
+    /// activation states). The fallback is scene-level, not keyWindow-level:
+    /// another scene is consulted only when no foreground-active scene is
+    /// connected — a foreground-active scene whose `keyWindow` is momentarily
+    /// `nil` (all its windows hidden, mid-relayout) yields `nil`.
     ///
     /// `UIWindowScene.keyWindow` is iOS 15.0+, matching this package's
     /// deployment floor, so no availability guard is needed here.

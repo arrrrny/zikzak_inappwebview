@@ -27,6 +27,11 @@ Map<String, String> swiftSources() {
 
 /// Strips line/block comments and string literals so only real code tokens are
 /// scanned. Block comments nest, matching Swift's grammar.
+///
+/// Known limitation: Swift raw string literals (`#"…"#`, `####…"…"####`) and
+/// quote characters inside `\(...)` interpolation are not tokenized, so quotes
+/// inside such constructs can make the scanner mis-skip or mis-tokenize.
+/// Improbable in this codebase; extend the scanner if such sources appear.
 String stripSwiftNonCode(String source) {
   final out = StringBuffer();
   var i = 0;
