@@ -444,7 +444,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
             } completion: { (finished) in
                 if finished {
                     window.isHidden = true
-                    UIApplication.shared.delegate?.window??.makeKeyAndVisible()
+                    UIApplication.shared.sceneKeyWindow?.makeKeyAndVisible()
                     completion?()
                 }
             }
