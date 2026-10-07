@@ -9,9 +9,9 @@ Every other file (pubspec.yaml, README snippets, CHANGELOG headers) is derived f
 
 ```dart
 // tool/versions.dart
-const String packageVersion = '6.0.2';       // all zikzak packages
-const String zorphyVersion = '2.4.0';
-const String zorphyAnnotationVersion = '2.4.0';
+const String packageVersion = '6.2.0';       // all zikzak packages
+const String zorphyVersion = '2.4.3';
+const String zorphyAnnotationVersion = '2.4.3';
 const String zuraffaVersion = '6.3.0';
 const String zuraffaFlutterVersion = '6.3.0';
 const String zuraffaSessionVersion = '1.1.0';

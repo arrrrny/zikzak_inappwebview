@@ -1,3 +1,31 @@
+## 6.2.0 - 2026-10-07
+
+### Changes
+
+- Bump `zorphy` / `zorphy_annotation` to `^2.4.3` (from `^2.4.0`). The 2.4.3 generators add a `copyWithField<T>(Field<TEntity, T> field, T value)` method to every entity family, which delegates to `copyWith` and never mutates the receiver. Entity JSON output is unchanged — regenerating produced **no** `.g.dart` diffs. The two hand-written `TrustedWebActivityDisplayMode` implementations (`TrustedWebActivityDefaultDisplayMode`, `TrustedWebActivityImmersiveDisplayMode`) now satisfy the widened interface: the fieldless default mode rejects every field name, and the immersive mode routes `displayCutoutMode` / `isSticky` through its parameterless `copyWith`
+
+### Features
+
+- [macOS] WebAuthn / passkey support via a JS→native bridge. `navigator.credentials.create` / `.get` with `publicKey` options are intercepted by an injected shim (`PasskeysJS.swift`, installed as a `WKUserScript` at `documentStart` in every frame) and forwarded over the plugin's JS-handler channel to a native `PasskeyBridge.swift` driving `ASAuthorizationController`, which hands a WebAuthn-shaped `PublicKeyCredential` back to JS. This bypasses WebKit's in-page WKWebView mediation, which is broken for entitled custom-browser apps — `ASCAgent` dies with `AuthorizationError Code=1` ~2 ms after "Allowing request from web browser." and no sheet is ever shown. WebAuthn options map onto platform registration/authentication requests (`rpId` defaulting to `location.hostname`, COSE algorithm identifiers, `excludeCredentials`/`allowCredentials`, `attestation`, `userVerification`, `residentKey` on macOS 14.4+); results serialize back as base64url and failures surface as real `DOMException`s — `NotAllowedError` for user cancel / timeout / no credentials, `TypeError` for malformed options, `SecurityError` for a non-domain `rpId`. Headless webviews fail fast with `NotAllowedError`, `PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()` bridges to native availability, and non-`publicKey` credentials fall through to the platform default implementation (#358)
+- [macOS] An example WebAuthn passkey test page plus a local relying-party host, wired into the example drawer, for manual passkey validation
+
+### Bug Fixes
+
+- [iOS] `contentBlockers` no longer silently drops the initial navigation. The first load was issued only from inside the `WKContentRuleListStore.compileContentRuleList` completion, so a compilation error, a `(nil, nil)` completion, or an undelivered completion left the webview blank with no `onLoadStart` and no `onLoadError` — no error, no logs. iOS now mirrors the macOS #338 machinery: a shared `applyContentBlockers` funnel (stale-completion token, guarded add, main-thread completion) plus a `loadAfterContentRuleLists` gate that holds the initial load until compilation settles on success **and** on error; the content-rule store identifier is now derived from a SHA-256 of the rule content instead of a fixed `ContentBlockingRules` identifier that was recompiled across launches and webviews. Wired through `makeInitialLoad`, `InAppBrowserWebViewController.viewDidLoad` and `setSettings`. `URLRequest(fromPluginMap:)` now logs the rejected url before the `about:blank` fallback (#349)
+- [macOS] `URLResponse.suggestedFilename` is `String?` on macOS, so the empty-filename → `nil` mapping added for #345 did not compile and broke the build. The property is now bound to a non-optional local with `?? ""` before the emptiness check — the idiom already used throughout `InAppWebView.swift` — so a nil name unwraps to `""` and still maps to `nil`, preserving both the intended behavior and the pinned `X.isEmpty ? nil : X` shape (#346)
+- [macOS] `onDownloadStartRequest` drops a malformed download event instead of throwing out of the decode (#346)
+
+### Internal
+
+- CI now compiles the macOS Swift sources. A `build-macos` job (`macos-15`) builds the example app from this checkout via a `pubspec_overrides.yaml` path override, taking the matrix from 15 to 17 jobs. This closes a real gap: the macOS package's tests are source-contract tests that read the `.swift` files as text and assert on their shape, so they pass on Swift that does not compile — before this job landed, all 73 of them passed while nothing compiled the package at all. A green macOS test run is a floor, not evidence of compilation (#347)
+- `scripts/publish.sh` analyzes with `--no-fatal-infos`, matching the CI gate. Bare `flutter analyze` exits 1 on every package's tolerated info baseline, which under `set -e` aborted the release before the first package shipped
+- `PasskeyBridge` compiles against the macOS SDK surface rather than the iOS one: `ASCOSEAlgorithmIdentifier` on macOS (`ASAuthorizationCOSEAlgorithmIdentifier` is iOS-only), the excluded-credentials protocol guarded to macOS 13.5+, no `residentKeyPreference` on the platform registration request (it exists only on the security-key request, already guarded at macOS 14.4), and `ASAuthorizationController.cancel()` guarded to macOS 13.0+
+- Passkey option errors are carried in a private `PasskeyOptionError` struct instead of a `(String, String)` tuple — Swift's `Result` requires its `Failure` to conform to `Error` and tuples do not (same shape as `ProxyManager`'s private `ProxyConfigurationError`)
+- Every gap above is guarded by tests runnable on any host, including a red-phase source-contract regression gate for the iOS content-rule load path (`content_blockers_initial_load_test`) and the passkey bridge (`passkey_bridge_test`); the macOS bridge also clears a real compile gate (`flutter build macos --debug`)
+- The spec-kit fleet extension set is installed and the `worktrees` extension removed, putting the triage/assess workflow on the default branch so a fresh clone already has `speckit-bug-assess` / `speckit-chore-assess` / `speckit-gh-triage`. Installed: `spec-stats`; already present: `bug`, `chore`, `gh-triage`, `gym`, `tdd`, `git`. No source files change
+
+---
+
 ## 6.1.0 - 2026-09-29
 
 ### Features

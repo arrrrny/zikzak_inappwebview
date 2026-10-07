@@ -1005,10 +1005,10 @@ packages:
     dependency: transitive
     description:
       name: zorphy_annotation
-      sha256: "4fe7f27731b73c7eca5b8aaa7af962875b3ec9ec875621bd75d00f4dc021fd6b"
+      sha256: "43da3ace1e407573cb57a32ed7f395f087a65dcae9f51e28cde64ab0244e3c86"
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.0"
+    version: "2.4.3"
   zuraffa:
     dependency: transitive
     description:
