@@ -104,6 +104,13 @@ void main() {
       expect(source, contains('allowCredentials'));
     });
 
+    test('accepts the top-level rpId fallback for authentication options', () {
+      // Authentication options never carry `rp.id`; the native side must
+      // read the top-level `rpId` too (issue #359 review finding 2).
+      expect(source, contains('?["id"] as? String'));
+      expect(source, contains('options["rpId"] as? String'));
+    });
+
     test('serializes attestation and assertion responses back to JS', () {
       expect(source, contains('attestationObject'));
       expect(source, contains('clientDataJSON'));
@@ -167,6 +174,29 @@ void main() {
 
     test('bridges through the PasskeyBridge JS handler', () {
       expect(source, contains("callHandler('PasskeyBridge'"));
+    });
+
+    test(
+      'interpolates the JS bridge name (no literal backslash-paren in emitted JS)',
+      () {
+        // A `\\(` inside the Swift multiline string emits a literal
+        // backslash — a JS SyntaxError that kills the whole shim IIFE while
+        // every `contains` assertion still passes. Pin the interpolation
+        // contract so the next escape slip goes red.
+        expect(source, contains(r'window.\(JAVASCRIPT_BRIDGE_NAME)'));
+        expect(source, isNot(contains(r'window.\\(')));
+      },
+    );
+
+    test('normalizes the top-level rpId for authentication options', () {
+      // PublicKeyCredentialRequestOptions carries the optional rpId at the
+      // top level — there is no `rp` object — so the shim must map it onto
+      // both shapes for the native bridge.
+      expect(source, contains('publicKey.rpId'));
+    });
+
+    test('rejects an rpId outside the caller origin with SecurityError', () {
+      expect(source, contains('registrable suffix of the caller origin'));
     });
 
     test(

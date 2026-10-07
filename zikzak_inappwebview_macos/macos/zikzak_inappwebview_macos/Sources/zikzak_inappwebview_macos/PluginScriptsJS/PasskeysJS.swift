@@ -97,8 +97,21 @@ let PASSKEYS_JS_SOURCE = """
 
     function runCeremony(method, options) {
         var publicKey = options.publicKey;
-        // The WebAuthn default for rp.id is the caller's effective domain.
-        if (publicKey.rp && !publicKey.rp.id) publicKey.rp.id = location.hostname;
+        // WebAuthn defaults rp.id to the caller's effective domain, and the
+        // authentication shape (PublicKeyCredentialRequestOptions) carries
+        // the optional rpId at the top level — there is no `rp` object — so
+        // normalize both shapes for the native bridge.
+        var rpId = publicKey.rpId || (publicKey.rp && publicKey.rp.id) || location.hostname;
+        // Spec-mandated SecurityError: rp.id must be a registrable suffix of
+        // the caller's effective domain, rejected before any user gesture is
+        // spent. (Ends-with is an approximation of the public-suffix list.)
+        if (rpId !== location.hostname &&
+            location.hostname.indexOf('.' + rpId) !== location.hostname.length - rpId.length - 1) {
+            return Promise.reject(new DOMException('publicKey.rp.id is not a registrable suffix of the caller origin.', 'SecurityError'));
+        }
+        publicKey.rpId = rpId;
+        publicKey.rp = Object.assign({name: location.hostname}, publicKey.rp);
+        publicKey.rp.id = rpId;
 
         var signal = options.signal || null;
         if (signal && signal.aborted) {
@@ -106,7 +119,7 @@ let PASSKEYS_JS_SOURCE = """
         }
 
         var payload = encodeBinary(publicKey);
-        var bridgePromise = window.\\(JAVASCRIPT_BRIDGE_NAME).callHandler('PasskeyBridge', {
+        var bridgePromise = window.\(JAVASCRIPT_BRIDGE_NAME).callHandler('PasskeyBridge', {
             method: method,
             options: payload
         }).then(function(result) {
@@ -120,7 +133,7 @@ let PASSKEYS_JS_SOURCE = """
                 // Cancel the outstanding ASAuthorizationController; the
                 // late native resolve is ignored because this promise is
                 // already settled.
-                window.\\(JAVASCRIPT_BRIDGE_NAME).callHandler('PasskeyBridge', {method: 'cancel'});
+                window.\(JAVASCRIPT_BRIDGE_NAME).callHandler('PasskeyBridge', {method: 'cancel'});
                 reject(new DOMException('The operation was aborted.', 'AbortError'));
             };
             signal.addEventListener('abort', onAbort, {once: true});
@@ -154,7 +167,7 @@ let PASSKEYS_JS_SOURCE = """
         window.PublicKeyCredential = function() {};
     }
     window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable = function() {
-        return window.\\(JAVASCRIPT_BRIDGE_NAME).callHandler('PasskeyBridge', {method: 'isUvPaa'})
+        return window.\(JAVASCRIPT_BRIDGE_NAME).callHandler('PasskeyBridge', {method: 'isUvPaa'})
             .then(function(result) { return !!(result && result.ok && result.available); })
             .catch(function() { return false; });
     };

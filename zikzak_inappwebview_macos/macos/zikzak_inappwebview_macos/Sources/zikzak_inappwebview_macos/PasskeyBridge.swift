@@ -64,6 +64,15 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
 
     // MARK: - Availability
 
+    /// Window/presentation check only — NOT an entitlement or consent probe.
+    /// `true` here means the webview can present the ASAuthorization sheet;
+    /// whether the host actually carries the
+    /// `com.apple.developer.web-browser.authentication-services` entitlement
+    /// (and the user has enabled browser passkeys) is only enforced by
+    /// ASCAgent at ceremony time, so an unentitled host advertises `true`
+    /// here and then fails every ceremony. Sites gate passkey UX on this
+    /// static; consulting `ASAuthorizationWebBrowserPublicKeyCredentialManager`
+    /// (macOS 14.2+) is the follow-up for real fidelity.
     private func isPlatformAuthenticatorAvailable() -> Bool {
         guard let webView = webView, !webView.isHeadlessOffscreen, webView.window != nil else {
             return false
@@ -111,8 +120,12 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
     }
 
     private func parseRpId(_ options: [String: Any]) -> Result<String, (String, String)> {
-        guard let rp = options["rp"] as? [String: Any],
-              let rpId = rp["id"] as? String, !rpId.isEmpty else {
+        // Authentication options carry the optional rpId at the top level
+        // (PublicKeyCredentialRequestOptions has no `rp` object); creation
+        // options nest it under rp.id. Accept both shapes.
+        let rpId = (options["rp"] as? [String: Any])?["id"] as? String
+            ?? (options["rpId"] as? String)
+        guard let rpId = rpId, !rpId.isEmpty else {
             return .failure(("TypeError", "publicKey.rp.id is required."))
         }
         if rpId.contains("://") || rpId.contains("/") {
