@@ -232,6 +232,84 @@ class InAppBrowserSettings {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  InAppBrowserSettings copyWithField<T>(
+    Field<InAppBrowserSettings, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'hidden':
+        return copyWith(hidden: value as bool?);
+      case 'hideToolbarTop':
+        return copyWith(hideToolbarTop: value as bool?);
+      case 'toolbarTopBackgroundColor':
+        return copyWith(toolbarTopBackgroundColor: value as Color?);
+      case 'hideUrlBar':
+        return copyWith(hideUrlBar: value as bool?);
+      case 'hideProgressBar':
+        return copyWith(hideProgressBar: value as bool?);
+      case 'hideDefaultMenuItems':
+        return copyWith(hideDefaultMenuItems: value as bool?);
+      case 'toolbarTopTranslucent':
+        return copyWith(toolbarTopTranslucent: value as bool?);
+      case 'toolbarTopBarTintColor':
+        return copyWith(toolbarTopBarTintColor: value as Color?);
+      case 'toolbarTopTintColor':
+        return copyWith(toolbarTopTintColor: value as Color?);
+      case 'hideToolbarBottom':
+        return copyWith(hideToolbarBottom: value as bool?);
+      case 'toolbarBottomBackgroundColor':
+        return copyWith(toolbarBottomBackgroundColor: value as Color?);
+      case 'toolbarBottomTintColor':
+        return copyWith(toolbarBottomTintColor: value as Color?);
+      case 'toolbarBottomTranslucent':
+        return copyWith(toolbarBottomTranslucent: value as bool?);
+      case 'closeButtonCaption':
+        return copyWith(closeButtonCaption: value as String?);
+      case 'closeButtonColor':
+        return copyWith(closeButtonColor: value as Color?);
+      case 'hideCloseButton':
+        return copyWith(hideCloseButton: value as bool?);
+      case 'menuButtonColor':
+        return copyWith(menuButtonColor: value as Color?);
+      case 'presentationStyle':
+        return copyWith(presentationStyle: value as ModalPresentationStyle?);
+      case 'transitionStyle':
+        return copyWith(transitionStyle: value as ModalTransitionStyle?);
+      case 'hideTitleBar':
+        return copyWith(hideTitleBar: value as bool?);
+      case 'toolbarTopFixedTitle':
+        return copyWith(toolbarTopFixedTitle: value as String?);
+      case 'closeOnCannotGoBack':
+        return copyWith(closeOnCannotGoBack: value as bool?);
+      case 'allowGoBackWithBackButton':
+        return copyWith(allowGoBackWithBackButton: value as bool?);
+      case 'shouldCloseOnBackButtonPressed':
+        return copyWith(shouldCloseOnBackButtonPressed: value as bool?);
+      case 'windowType':
+        return copyWith(windowType: value as WindowType?);
+      case 'windowAlphaValue':
+        return copyWith(windowAlphaValue: value as double?);
+      case 'windowStyleMask':
+        return copyWith(windowStyleMask: value as WindowStyleMask?);
+      case 'windowTitlebarSeparatorStyle':
+        return copyWith(
+          windowTitlebarSeparatorStyle: value as WindowTitlebarSeparatorStyle?,
+        );
+      case 'windowFrame':
+        return copyWith(windowFrame: value as InAppWebViewRect?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'InAppBrowserSettings has no settable field with this name',
+        );
+    }
+  }
+
   InAppBrowserSettings copyWithInAppBrowserSettings({
     bool? hidden,
     bool? hideToolbarTop,

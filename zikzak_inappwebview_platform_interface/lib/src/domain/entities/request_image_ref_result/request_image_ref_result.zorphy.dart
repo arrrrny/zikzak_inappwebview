@@ -22,6 +22,26 @@ class RequestImageRefResult {
     return RequestImageRefResult(url: url ?? this.url);
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  RequestImageRefResult copyWithField<T>(
+    Field<RequestImageRefResult, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'url':
+        return copyWith(url: value as WebUri?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'RequestImageRefResult has no settable field with this name',
+        );
+    }
+  }
+
   RequestImageRefResult copyWithRequestImageRefResult({WebUri? url}) {
     return copyWith(url: url);
   }

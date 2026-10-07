@@ -43,6 +43,27 @@ class WebMessage {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  WebMessage copyWithField<T>(Field<WebMessage, T> field, T value) {
+    switch (field.name) {
+      case 'data':
+        return copyWith(data: value as dynamic);
+      case 'type':
+        return copyWith(type: value as WebMessageType);
+      case 'ports':
+        return copyWith(ports: value as List<IWebMessagePort>?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'WebMessage has no settable field with this name',
+        );
+    }
+  }
+
   WebMessage copyWithWebMessage({
     dynamic data,
     WebMessageType? type,

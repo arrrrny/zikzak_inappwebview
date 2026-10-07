@@ -26,6 +26,28 @@ class CallAsyncJavaScriptResult {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  CallAsyncJavaScriptResult copyWithField<T>(
+    Field<CallAsyncJavaScriptResult, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'value':
+        return copyWith(value: value as dynamic);
+      case 'error':
+        return copyWith(error: value as String?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'CallAsyncJavaScriptResult has no settable field with this name',
+        );
+    }
+  }
+
   CallAsyncJavaScriptResult copyWithCallAsyncJavaScriptResult({
     dynamic value,
     String? error,

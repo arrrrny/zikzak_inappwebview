@@ -37,6 +37,25 @@ class ConsoleMessage {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  ConsoleMessage copyWithField<T>(Field<ConsoleMessage, T> field, T value) {
+    switch (field.name) {
+      case 'message':
+        return copyWith(message: value as String?);
+      case 'messageLevel':
+        return copyWith(messageLevel: value as ConsoleMessageLevel?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'ConsoleMessage has no settable field with this name',
+        );
+    }
+  }
+
   ConsoleMessage copyWithConsoleMessage({
     String? message,
     ConsoleMessageLevel? messageLevel,

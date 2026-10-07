@@ -49,6 +49,32 @@ class SslCertificateDName {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  SslCertificateDName copyWithField<T>(
+    Field<SslCertificateDName, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'CName':
+        return copyWith(CName: value as String?);
+      case 'DName':
+        return copyWith(DName: value as String?);
+      case 'OName':
+        return copyWith(OName: value as String?);
+      case 'UName':
+        return copyWith(UName: value as String?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'SslCertificateDName has no settable field with this name',
+        );
+    }
+  }
+
   SslCertificateDName copyWithSslCertificateDName({
     String? CName,
     String? DName,

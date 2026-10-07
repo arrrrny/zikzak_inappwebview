@@ -63,6 +63,38 @@ class PullToRefreshSettings {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  PullToRefreshSettings copyWithField<T>(
+    Field<PullToRefreshSettings, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'enabled':
+        return copyWith(enabled: value as bool?);
+      case 'color':
+        return copyWith(color: value as Color?);
+      case 'backgroundColor':
+        return copyWith(backgroundColor: value as Color?);
+      case 'distanceToTriggerSync':
+        return copyWith(distanceToTriggerSync: value as int?);
+      case 'slingshotDistance':
+        return copyWith(slingshotDistance: value as int?);
+      case 'size':
+        return copyWith(size: value as PullToRefreshSize?);
+      case 'attributedTitle':
+        return copyWith(attributedTitle: value as AttributedString?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'PullToRefreshSettings has no settable field with this name',
+        );
+    }
+  }
+
   PullToRefreshSettings copyWithPullToRefreshSettings({
     bool? enabled,
     Color? color,

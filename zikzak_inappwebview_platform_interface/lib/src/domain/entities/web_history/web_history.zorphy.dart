@@ -26,6 +26,25 @@ class WebHistory {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  WebHistory copyWithField<T>(Field<WebHistory, T> field, T value) {
+    switch (field.name) {
+      case 'list':
+        return copyWith(list: value as List<WebHistoryItem>?);
+      case 'currentIndex':
+        return copyWith(currentIndex: value as int?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'WebHistory has no settable field with this name',
+        );
+    }
+  }
+
   WebHistory copyWithWebHistory({
     List<WebHistoryItem>? list,
     int? currentIndex,

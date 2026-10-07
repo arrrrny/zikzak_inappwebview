@@ -109,6 +109,51 @@ class AttributedString {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  AttributedString copyWithField<T>(Field<AttributedString, T> field, T value) {
+    switch (field.name) {
+      case 'string':
+        return copyWith(string: value as String);
+      case 'backgroundColor':
+        return copyWith(backgroundColor: value as Color?);
+      case 'baselineOffset':
+        return copyWith(baselineOffset: value as double?);
+      case 'expansion':
+        return copyWith(expansion: value as double?);
+      case 'foregroundColor':
+        return copyWith(foregroundColor: value as Color?);
+      case 'kern':
+        return copyWith(kern: value as double?);
+      case 'ligature':
+        return copyWith(ligature: value as int?);
+      case 'obliqueness':
+        return copyWith(obliqueness: value as double?);
+      case 'strikethroughColor':
+        return copyWith(strikethroughColor: value as Color?);
+      case 'strikethroughStyle':
+        return copyWith(strikethroughStyle: value as UnderlineStyle?);
+      case 'strokeColor':
+        return copyWith(strokeColor: value as Color?);
+      case 'strokeWidth':
+        return copyWith(strokeWidth: value as double?);
+      case 'textEffect':
+        return copyWith(textEffect: value as AttributedStringTextEffectStyle?);
+      case 'underlineColor':
+        return copyWith(underlineColor: value as Color?);
+      case 'underlineStyle':
+        return copyWith(underlineStyle: value as UnderlineStyle?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'AttributedString has no settable field with this name',
+        );
+    }
+  }
+
   AttributedString copyWithAttributedString({
     String? string,
     Color? backgroundColor,

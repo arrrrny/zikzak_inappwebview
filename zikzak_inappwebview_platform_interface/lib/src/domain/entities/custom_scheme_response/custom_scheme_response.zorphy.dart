@@ -39,6 +39,30 @@ class CustomSchemeResponse {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  CustomSchemeResponse copyWithField<T>(
+    Field<CustomSchemeResponse, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'data':
+        return copyWith(data: value as Uint8List);
+      case 'contentType':
+        return copyWith(contentType: value as String);
+      case 'contentEncoding':
+        return copyWith(contentEncoding: value as String);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'CustomSchemeResponse has no settable field with this name',
+        );
+    }
+  }
+
   CustomSchemeResponse copyWithCustomSchemeResponse({
     Uint8List? data,
     String? contentType,

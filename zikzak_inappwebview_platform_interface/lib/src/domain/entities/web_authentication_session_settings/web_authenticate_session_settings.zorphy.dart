@@ -42,6 +42,28 @@ class WebAuthenticationSessionSettings {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  WebAuthenticationSessionSettings copyWithField<T>(
+    Field<WebAuthenticationSessionSettings, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'prefersEphemeralWebBrowserSession':
+        return copyWith(prefersEphemeralWebBrowserSession: value as bool?);
+      case 'additionalHeaderFields':
+        return copyWith(additionalHeaderFields: value as Map<String, String>?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'WebAuthenticationSessionSettings has no settable field with this name',
+        );
+    }
+  }
+
   WebAuthenticationSessionSettings copyWithWebAuthenticationSessionSettings({
     bool? prefersEphemeralWebBrowserSession,
     Map<String, String>? additionalHeaderFields,

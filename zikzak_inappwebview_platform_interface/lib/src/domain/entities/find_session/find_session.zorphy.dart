@@ -39,6 +39,29 @@ class FindSession {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  FindSession copyWithField<T>(Field<FindSession, T> field, T value) {
+    switch (field.name) {
+      case 'resultCount':
+        return copyWith(resultCount: value as int);
+      case 'highlightedResultIndex':
+        return copyWith(highlightedResultIndex: value as int);
+      case 'searchResultDisplayStyle':
+        return copyWith(
+          searchResultDisplayStyle: value as SearchResultDisplayStyle,
+        );
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'FindSession has no settable field with this name',
+        );
+    }
+  }
+
   FindSession copyWithFindSession({
     int? resultCount,
     int? highlightedResultIndex,

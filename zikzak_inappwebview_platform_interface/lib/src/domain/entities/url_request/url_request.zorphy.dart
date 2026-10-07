@@ -111,6 +111,53 @@ class URLRequest {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  URLRequest copyWithField<T>(Field<URLRequest, T> field, T value) {
+    switch (field.name) {
+      case 'url':
+        return copyWith(url: value as WebUri?);
+      case 'method':
+        return copyWith(method: value as String?);
+      case 'headers':
+        return copyWith(headers: value as Map<String, String>?);
+      case 'body':
+        return copyWith(body: value as Uint8List?);
+      case 'allowsCellularAccess':
+        return copyWith(allowsCellularAccess: value as bool?);
+      case 'allowsConstrainedNetworkAccess':
+        return copyWith(allowsConstrainedNetworkAccess: value as bool?);
+      case 'allowsExpensiveNetworkAccess':
+        return copyWith(allowsExpensiveNetworkAccess: value as bool?);
+      case 'cachePolicy':
+        return copyWith(cachePolicy: value as URLRequestCachePolicy?);
+      case 'httpShouldHandleCookies':
+        return copyWith(httpShouldHandleCookies: value as bool?);
+      case 'httpShouldUsePipelining':
+        return copyWith(httpShouldUsePipelining: value as bool?);
+      case 'networkServiceType':
+        return copyWith(
+          networkServiceType: value as URLRequestNetworkServiceType?,
+        );
+      case 'timeoutInterval':
+        return copyWith(timeoutInterval: value as double?);
+      case 'mainDocumentURL':
+        return copyWith(mainDocumentURL: value as WebUri?);
+      case 'assumesHTTP3Capable':
+        return copyWith(assumesHTTP3Capable: value as bool?);
+      case 'attribution':
+        return copyWith(attribution: value as URLRequestAttribution?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'URLRequest has no settable field with this name',
+        );
+    }
+  }
+
   URLRequest copyWithURLRequest({
     WebUri? url,
     String? method,

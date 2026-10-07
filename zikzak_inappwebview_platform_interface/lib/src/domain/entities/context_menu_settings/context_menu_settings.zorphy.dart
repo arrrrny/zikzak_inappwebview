@@ -28,6 +28,26 @@ class ContextMenuSettings {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  ContextMenuSettings copyWithField<T>(
+    Field<ContextMenuSettings, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'hideDefaultSystemContextMenuItems':
+        return copyWith(hideDefaultSystemContextMenuItems: value as bool);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'ContextMenuSettings has no settable field with this name',
+        );
+    }
+  }
+
   ContextMenuSettings copyWithContextMenuSettings({
     bool? hideDefaultSystemContextMenuItems,
   }) {

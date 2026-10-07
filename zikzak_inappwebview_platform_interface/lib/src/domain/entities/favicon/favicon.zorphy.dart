@@ -38,6 +38,29 @@ class Favicon {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  Favicon copyWithField<T>(Field<Favicon, T> field, T value) {
+    switch (field.name) {
+      case 'url':
+        return copyWith(url: value as WebUri);
+      case 'rel':
+        return copyWith(rel: value as String?);
+      case 'width':
+        return copyWith(width: value as int?);
+      case 'height':
+        return copyWith(height: value as int?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'Favicon has no settable field with this name',
+        );
+    }
+  }
+
   Favicon copyWithFavicon({WebUri? url, String? rel, int? width, int? height}) {
     return copyWith(url: url, rel: rel, width: width, height: height);
   }

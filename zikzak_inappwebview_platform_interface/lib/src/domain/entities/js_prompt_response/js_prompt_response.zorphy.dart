@@ -72,6 +72,35 @@ class JsPromptResponse {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  JsPromptResponse copyWithField<T>(Field<JsPromptResponse, T> field, T value) {
+    switch (field.name) {
+      case 'message':
+        return copyWith(message: value as String);
+      case 'defaultValue':
+        return copyWith(defaultValue: value as String);
+      case 'confirmButtonTitle':
+        return copyWith(confirmButtonTitle: value as String);
+      case 'cancelButtonTitle':
+        return copyWith(cancelButtonTitle: value as String);
+      case 'handledByClient':
+        return copyWith(handledByClient: value as bool);
+      case 'value':
+        return copyWith(value: value as String?);
+      case 'action':
+        return copyWith(action: value as JsPromptResponseAction?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'JsPromptResponse has no settable field with this name',
+        );
+    }
+  }
+
   JsPromptResponse copyWithJsPromptResponse({
     String? message,
     String? defaultValue,

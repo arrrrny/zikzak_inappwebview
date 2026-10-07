@@ -26,6 +26,25 @@ class MetaTagAttribute {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  MetaTagAttribute copyWithField<T>(Field<MetaTagAttribute, T> field, T value) {
+    switch (field.name) {
+      case 'name':
+        return copyWith(name: value as String?);
+      case 'value':
+        return copyWith(value: value as String?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'MetaTagAttribute has no settable field with this name',
+        );
+    }
+  }
+
   MetaTagAttribute copyWithMetaTagAttribute({String? name, String? value}) {
     return copyWith(name: name, value: value);
   }

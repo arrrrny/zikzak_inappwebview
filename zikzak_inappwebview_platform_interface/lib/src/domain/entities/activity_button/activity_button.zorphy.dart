@@ -33,6 +33,25 @@ class ActivityButton {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  ActivityButton copyWithField<T>(Field<ActivityButton, T> field, T value) {
+    switch (field.name) {
+      case 'templateImage':
+        return copyWith(templateImage: value as UIImage);
+      case 'extensionIdentifier':
+        return copyWith(extensionIdentifier: value as String);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'ActivityButton has no settable field with this name',
+        );
+    }
+  }
+
   ActivityButton copyWithActivityButton({
     UIImage? templateImage,
     String? extensionIdentifier,

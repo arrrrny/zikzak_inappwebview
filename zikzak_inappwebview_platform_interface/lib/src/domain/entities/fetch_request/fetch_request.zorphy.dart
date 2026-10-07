@@ -96,6 +96,47 @@ class FetchRequest {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  FetchRequest copyWithField<T>(Field<FetchRequest, T> field, T value) {
+    switch (field.name) {
+      case 'url':
+        return copyWith(url: value as WebUri?);
+      case 'method':
+        return copyWith(method: value as String?);
+      case 'headers':
+        return copyWith(headers: value as Map<String, dynamic>?);
+      case 'body':
+        return copyWith(body: value as dynamic);
+      case 'mode':
+        return copyWith(mode: value as String?);
+      case 'credentials':
+        return copyWith(credentials: value as FetchRequestCredential?);
+      case 'cache':
+        return copyWith(cache: value as String?);
+      case 'redirect':
+        return copyWith(redirect: value as String?);
+      case 'referrer':
+        return copyWith(referrer: value as String?);
+      case 'referrerPolicy':
+        return copyWith(referrerPolicy: value as ReferrerPolicy?);
+      case 'integrity':
+        return copyWith(integrity: value as String?);
+      case 'keepalive':
+        return copyWith(keepalive: value as bool?);
+      case 'action':
+        return copyWith(action: value as FetchRequestAction?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'FetchRequest has no settable field with this name',
+        );
+    }
+  }
+
   FetchRequest copyWithFetchRequest({
     WebUri? url,
     String? method,

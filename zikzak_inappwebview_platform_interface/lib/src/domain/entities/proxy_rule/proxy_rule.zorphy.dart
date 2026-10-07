@@ -28,6 +28,25 @@ class ProxyRule {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  ProxyRule copyWithField<T>(Field<ProxyRule, T> field, T value) {
+    switch (field.name) {
+      case 'url':
+        return copyWith(url: value as WebUri);
+      case 'schemeFilter':
+        return copyWith(schemeFilter: value as ProxySchemeFilter?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'ProxyRule has no settable field with this name',
+        );
+    }
+  }
+
   ProxyRule copyWithProxyRule({WebUri? url, ProxySchemeFilter? schemeFilter}) {
     return copyWith(url: url, schemeFilter: schemeFilter);
   }

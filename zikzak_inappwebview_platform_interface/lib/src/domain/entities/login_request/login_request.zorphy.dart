@@ -33,6 +33,27 @@ class LoginRequest {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  LoginRequest copyWithField<T>(Field<LoginRequest, T> field, T value) {
+    switch (field.name) {
+      case 'realm':
+        return copyWith(realm: value as String);
+      case 'account':
+        return copyWith(account: value as String?);
+      case 'args':
+        return copyWith(args: value as String);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'LoginRequest has no settable field with this name',
+        );
+    }
+  }
+
   LoginRequest copyWithLoginRequest({
     String? realm,
     String? account,

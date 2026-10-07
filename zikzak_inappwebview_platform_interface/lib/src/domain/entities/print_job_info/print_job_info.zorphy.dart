@@ -108,6 +108,55 @@ class PrintJobInfo {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  PrintJobInfo copyWithField<T>(Field<PrintJobInfo, T> field, T value) {
+    switch (field.name) {
+      case 'state':
+        return copyWith(state: value as PrintJobState?);
+      case 'copies':
+        return copyWith(copies: value as int?);
+      case 'numberOfPages':
+        return copyWith(numberOfPages: value as int?);
+      case 'creationTime':
+        return copyWith(creationTime: value as int?);
+      case 'label':
+        return copyWith(label: value as String?);
+      case 'printer':
+        return copyWith(printer: value as Printer?);
+      case 'pageOrder':
+        return copyWith(pageOrder: value as PrintJobPageOrder?);
+      case 'preferredRenderingQuality':
+        return copyWith(
+          preferredRenderingQuality: value as PrintJobRenderingQuality?,
+        );
+      case 'showsProgressPanel':
+        return copyWith(showsProgressPanel: value as bool?);
+      case 'showsPrintPanel':
+        return copyWith(showsPrintPanel: value as bool?);
+      case 'canSpawnSeparateThread':
+        return copyWith(canSpawnSeparateThread: value as bool?);
+      case 'isCopyingOperation':
+        return copyWith(isCopyingOperation: value as bool?);
+      case 'currentPage':
+        return copyWith(currentPage: value as int?);
+      case 'firstPage':
+        return copyWith(firstPage: value as int?);
+      case 'lastPage':
+        return copyWith(lastPage: value as int?);
+      case 'attributes':
+        return copyWith(attributes: value as PrintJobAttributes?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'PrintJobInfo has no settable field with this name',
+        );
+    }
+  }
+
   PrintJobInfo copyWithPrintJobInfo({
     PrintJobState? state,
     int? copies,

@@ -33,6 +33,27 @@ class SecurityOrigin {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  SecurityOrigin copyWithField<T>(Field<SecurityOrigin, T> field, T value) {
+    switch (field.name) {
+      case 'host':
+        return copyWith(host: value as String);
+      case 'port':
+        return copyWith(port: value as int);
+      case 'protocol':
+        return copyWith(protocol: value as String);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'SecurityOrigin has no settable field with this name',
+        );
+    }
+  }
+
   SecurityOrigin copyWithSecurityOrigin({
     String? host,
     int? port,

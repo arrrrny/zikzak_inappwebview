@@ -23,6 +23,25 @@ class WebStorageItem {
     return WebStorageItem(key: key ?? this.key, value: value ?? this.value);
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  WebStorageItem copyWithField<T>(Field<WebStorageItem, T> field, T value) {
+    switch (field.name) {
+      case 'key':
+        return copyWith(key: value as String?);
+      case 'value':
+        return copyWith(value: value as dynamic);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'WebStorageItem has no settable field with this name',
+        );
+    }
+  }
+
   WebStorageItem copyWithWebStorageItem({String? key, dynamic value}) {
     return copyWith(key: key, value: value);
   }

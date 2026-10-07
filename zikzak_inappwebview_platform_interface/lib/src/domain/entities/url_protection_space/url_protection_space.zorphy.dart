@@ -84,6 +84,47 @@ class URLProtectionSpace {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  URLProtectionSpace copyWithField<T>(
+    Field<URLProtectionSpace, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'host':
+        return copyWith(host: value as String);
+      case 'protocol':
+        return copyWith(protocol: value as String?);
+      case 'realm':
+        return copyWith(realm: value as String?);
+      case 'port':
+        return copyWith(port: value as int?);
+      case 'sslCertificate':
+        return copyWith(sslCertificate: value as SslCertificate?);
+      case 'sslError':
+        return copyWith(sslError: value as SslError?);
+      case 'authenticationMethod':
+        return copyWith(
+          authenticationMethod:
+              value as URLProtectionSpaceAuthenticationMethod?,
+        );
+      case 'distinguishedNames':
+        return copyWith(distinguishedNames: value as List<X509Certificate>?);
+      case 'proxyType':
+        return copyWith(proxyType: value as URLProtectionSpaceProxyType?);
+      case 'receivesCredentialSecurely':
+        return copyWith(receivesCredentialSecurely: value as bool?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'URLProtectionSpace has no settable field with this name',
+        );
+    }
+  }
+
   URLProtectionSpace copyWithURLProtectionSpace({
     String? host,
     String? protocol,

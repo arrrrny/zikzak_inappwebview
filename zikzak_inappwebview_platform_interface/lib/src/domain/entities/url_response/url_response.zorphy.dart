@@ -60,6 +60,35 @@ class URLResponse {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  URLResponse copyWithField<T>(Field<URLResponse, T> field, T value) {
+    switch (field.name) {
+      case 'url':
+        return copyWith(url: value as WebUri?);
+      case 'expectedContentLength':
+        return copyWith(expectedContentLength: value as int);
+      case 'mimeType':
+        return copyWith(mimeType: value as String?);
+      case 'suggestedFilename':
+        return copyWith(suggestedFilename: value as String?);
+      case 'textEncodingName':
+        return copyWith(textEncodingName: value as String?);
+      case 'headers':
+        return copyWith(headers: value as Map<String, String>?);
+      case 'statusCode':
+        return copyWith(statusCode: value as int?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'URLResponse has no settable field with this name',
+        );
+    }
+  }
+
   URLResponse copyWithURLResponse({
     WebUri? url,
     int? expectedContentLength,

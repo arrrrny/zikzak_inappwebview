@@ -62,6 +62,37 @@ class WindowFeatures {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  WindowFeatures copyWithField<T>(Field<WindowFeatures, T> field, T value) {
+    switch (field.name) {
+      case 'allowsResizing':
+        return copyWith(allowsResizing: value as bool?);
+      case 'height':
+        return copyWith(height: value as double?);
+      case 'menuBarVisibility':
+        return copyWith(menuBarVisibility: value as bool?);
+      case 'statusBarVisibility':
+        return copyWith(statusBarVisibility: value as bool?);
+      case 'toolbarsVisibility':
+        return copyWith(toolbarsVisibility: value as bool?);
+      case 'width':
+        return copyWith(width: value as double?);
+      case 'x':
+        return copyWith(x: value as double?);
+      case 'y':
+        return copyWith(y: value as double?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'WindowFeatures has no settable field with this name',
+        );
+    }
+  }
+
   WindowFeatures copyWithWindowFeatures({
     bool? allowsResizing,
     double? height,

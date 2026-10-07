@@ -51,6 +51,27 @@ class AndroidResource {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  AndroidResource copyWithField<T>(Field<AndroidResource, T> field, T value) {
+    switch (field.name) {
+      case 'name':
+        return copyWith(name: value as String);
+      case 'defType':
+        return copyWith(defType: value as String?);
+      case 'defPackage':
+        return copyWith(defPackage: value as String?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'AndroidResource has no settable field with this name',
+        );
+    }
+  }
+
   AndroidResource copyWithAndroidResource({
     String? name,
     String? defType,

@@ -42,6 +42,32 @@ class PrintJobResolution {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  PrintJobResolution copyWithField<T>(
+    Field<PrintJobResolution, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'id':
+        return copyWith(id: value as String);
+      case 'label':
+        return copyWith(label: value as String);
+      case 'verticalDpi':
+        return copyWith(verticalDpi: value as int);
+      case 'horizontalDpi':
+        return copyWith(horizontalDpi: value as int);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'PrintJobResolution has no settable field with this name',
+        );
+    }
+  }
+
   PrintJobResolution copyWithPrintJobResolution({
     String? id,
     String? label,

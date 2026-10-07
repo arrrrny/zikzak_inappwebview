@@ -37,6 +37,28 @@ class RendererPriorityPolicy {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  RendererPriorityPolicy copyWithField<T>(
+    Field<RendererPriorityPolicy, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'rendererRequestedPriority':
+        return copyWith(rendererRequestedPriority: value as RendererPriority?);
+      case 'waivedWhenNotVisible':
+        return copyWith(waivedWhenNotVisible: value as bool);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'RendererPriorityPolicy has no settable field with this name',
+        );
+    }
+  }
+
   RendererPriorityPolicy copyWithRendererPriorityPolicy({
     RendererPriority? rendererRequestedPriority,
     bool? waivedWhenNotVisible,

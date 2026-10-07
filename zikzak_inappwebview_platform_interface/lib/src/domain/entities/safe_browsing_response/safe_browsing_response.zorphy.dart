@@ -37,6 +37,28 @@ class SafeBrowsingResponse {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  SafeBrowsingResponse copyWithField<T>(
+    Field<SafeBrowsingResponse, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'report':
+        return copyWith(report: value as bool?);
+      case 'action':
+        return copyWith(action: value as SafeBrowsingResponseAction?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'SafeBrowsingResponse has no settable field with this name',
+        );
+    }
+  }
+
   SafeBrowsingResponse copyWithSafeBrowsingResponse({
     bool? report,
     SafeBrowsingResponseAction? action,

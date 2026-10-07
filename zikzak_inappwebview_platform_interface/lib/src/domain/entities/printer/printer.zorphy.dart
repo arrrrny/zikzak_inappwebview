@@ -42,6 +42,29 @@ class Printer {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  Printer copyWithField<T>(Field<Printer, T> field, T value) {
+    switch (field.name) {
+      case 'id':
+        return copyWith(id: value as String?);
+      case 'type':
+        return copyWith(type: value as String?);
+      case 'languageLevel':
+        return copyWith(languageLevel: value as int?);
+      case 'name':
+        return copyWith(name: value as String?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'Printer has no settable field with this name',
+        );
+    }
+  }
+
   Printer copyWithPrinter({
     String? id,
     String? type,

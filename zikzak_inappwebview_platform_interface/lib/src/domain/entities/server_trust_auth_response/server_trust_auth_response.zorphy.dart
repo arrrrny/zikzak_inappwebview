@@ -27,6 +27,26 @@ class ServerTrustAuthResponse {
     return ServerTrustAuthResponse(action: action ?? this.action);
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  ServerTrustAuthResponse copyWithField<T>(
+    Field<ServerTrustAuthResponse, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'action':
+        return copyWith(action: value as ServerTrustAuthResponseAction?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'ServerTrustAuthResponse has no settable field with this name',
+        );
+    }
+  }
+
   ServerTrustAuthResponse copyWithServerTrustAuthResponse({
     ServerTrustAuthResponseAction? action,
   }) {

@@ -167,6 +167,74 @@ class PrintJobAttributes {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  PrintJobAttributes copyWithField<T>(
+    Field<PrintJobAttributes, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'colorMode':
+        return copyWith(colorMode: value as PrintJobColorMode?);
+      case 'duplexMode':
+        return copyWith(duplexMode: value as PrintJobDuplexMode?);
+      case 'orientation':
+        return copyWith(orientation: value as PrintJobOrientation?);
+      case 'mediaSize':
+        return copyWith(mediaSize: value as PrintJobMediaSize?);
+      case 'resolution':
+        return copyWith(resolution: value as PrintJobResolution?);
+      case 'margins':
+        return copyWith(margins: value as EdgeInsets?);
+      case 'footerHeight':
+        return copyWith(footerHeight: value as double?);
+      case 'headerHeight':
+        return copyWith(headerHeight: value as double?);
+      case 'paperName':
+        return copyWith(paperName: value as String?);
+      case 'localizedPaperName':
+        return copyWith(localizedPaperName: value as String?);
+      case 'printableRect':
+        return copyWith(printableRect: value as InAppWebViewRect?);
+      case 'paperRect':
+        return copyWith(paperRect: value as InAppWebViewRect?);
+      case 'detailedErrorReporting':
+        return copyWith(detailedErrorReporting: value as bool?);
+      case 'faxNumber':
+        return copyWith(faxNumber: value as String?);
+      case 'headerAndFooter':
+        return copyWith(headerAndFooter: value as bool?);
+      case 'horizontalPagination':
+        return copyWith(horizontalPagination: value as PrintJobPaginationMode?);
+      case 'isHorizontallyCentered':
+        return copyWith(isHorizontallyCentered: value as bool?);
+      case 'isVerticallyCentered':
+        return copyWith(isVerticallyCentered: value as bool?);
+      case 'jobDisposition':
+        return copyWith(jobDisposition: value as PrintJobDisposition?);
+      case 'jobSavingURL':
+        return copyWith(jobSavingURL: value as WebUri?);
+      case 'verticalPagination':
+        return copyWith(verticalPagination: value as PrintJobPaginationMode?);
+      case 'maximumContentHeight':
+        return copyWith(maximumContentHeight: value as double?);
+      case 'maximumContentWidth':
+        return copyWith(maximumContentWidth: value as double?);
+      case 'firstPage':
+        return copyWith(firstPage: value as int?);
+      case 'lastPage':
+        return copyWith(lastPage: value as int?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'PrintJobAttributes has no settable field with this name',
+        );
+    }
+  }
+
   PrintJobAttributes copyWithPrintJobAttributes({
     PrintJobColorMode? colorMode,
     PrintJobDuplexMode? duplexMode,

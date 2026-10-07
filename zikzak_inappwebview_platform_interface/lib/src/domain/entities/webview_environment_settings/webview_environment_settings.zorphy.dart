@@ -44,6 +44,30 @@ class VirtualHostMapping {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  VirtualHostMapping copyWithField<T>(
+    Field<VirtualHostMapping, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'hostName':
+        return copyWith(hostName: value as String);
+      case 'folderPath':
+        return copyWith(folderPath: value as String);
+      case 'accessKind':
+        return copyWith(accessKind: value as HostResourceAccessKind);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'VirtualHostMapping has no settable field with this name',
+        );
+    }
+  }
+
   VirtualHostMapping copyWithVirtualHostMapping({
     String? hostName,
     String? folderPath,
@@ -303,6 +327,40 @@ class WebViewEnvironmentSettings {
           targetCompatibleBrowserVersion ?? this.targetCompatibleBrowserVersion,
       virtualHostMappings: virtualHostMappings ?? this.virtualHostMappings,
     );
+  }
+
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  WebViewEnvironmentSettings copyWithField<T>(
+    Field<WebViewEnvironmentSettings, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'browserExecutableFolder':
+        return copyWith(browserExecutableFolder: value as String?);
+      case 'userDataFolder':
+        return copyWith(userDataFolder: value as String?);
+      case 'additionalBrowserArguments':
+        return copyWith(additionalBrowserArguments: value as String?);
+      case 'allowSingleSignOnUsingOSPrimaryAccount':
+        return copyWith(allowSingleSignOnUsingOSPrimaryAccount: value as bool?);
+      case 'language':
+        return copyWith(language: value as String?);
+      case 'targetCompatibleBrowserVersion':
+        return copyWith(targetCompatibleBrowserVersion: value as String?);
+      case 'virtualHostMappings':
+        return copyWith(
+          virtualHostMappings: value as List<VirtualHostMapping>?,
+        );
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'WebViewEnvironmentSettings has no settable field with this name',
+        );
+    }
   }
 
   WebViewEnvironmentSettings copyWithWebViewEnvironmentSettings({

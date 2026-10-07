@@ -104,7 +104,7 @@ class ChromeSafariBrowserSettings {
   @JsonKey(defaultValue: false)
   final bool? isTrustedWebActivity;
 
-  @JsonKey(defaultValue: const [])
+  @JsonKey(defaultValue: [])
   final List<String>? additionalTrustedOrigins;
 
   @JsonKey(toJson: _displayModeToJson, fromJson: _displayModeFromJson)
@@ -232,6 +232,82 @@ class ChromeSafariBrowserSettings {
       activityButton: activityButton ?? this.activityButton,
       eventAttribution: eventAttribution ?? this.eventAttribution,
     );
+  }
+
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  ChromeSafariBrowserSettings copyWithField<T>(
+    Field<ChromeSafariBrowserSettings, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'shareState':
+        return copyWith(shareState: value as CustomTabsShareState?);
+      case 'showTitle':
+        return copyWith(showTitle: value as bool?);
+      case 'toolbarBackgroundColor':
+        return copyWith(toolbarBackgroundColor: value as Color?);
+      case 'navigationBarColor':
+        return copyWith(navigationBarColor: value as Color?);
+      case 'navigationBarDividerColor':
+        return copyWith(navigationBarDividerColor: value as Color?);
+      case 'secondaryToolbarColor':
+        return copyWith(secondaryToolbarColor: value as Color?);
+      case 'enableUrlBarHiding':
+        return copyWith(enableUrlBarHiding: value as bool?);
+      case 'instantAppsEnabled':
+        return copyWith(instantAppsEnabled: value as bool?);
+      case 'packageName':
+        return copyWith(packageName: value as String?);
+      case 'keepAliveEnabled':
+        return copyWith(keepAliveEnabled: value as bool?);
+      case 'isSingleInstance':
+        return copyWith(isSingleInstance: value as bool?);
+      case 'noHistory':
+        return copyWith(noHistory: value as bool?);
+      case 'isTrustedWebActivity':
+        return copyWith(isTrustedWebActivity: value as bool?);
+      case 'additionalTrustedOrigins':
+        return copyWith(additionalTrustedOrigins: value as List<String>?);
+      case 'displayMode':
+        return copyWith(displayMode: value as TrustedWebActivityDisplayMode?);
+      case 'screenOrientation':
+        return copyWith(
+          screenOrientation: value as TrustedWebActivityScreenOrientation?,
+        );
+      case 'startAnimations':
+        return copyWith(startAnimations: value as List<AndroidResource>?);
+      case 'exitAnimations':
+        return copyWith(exitAnimations: value as List<AndroidResource>?);
+      case 'alwaysUseBrowserUI':
+        return copyWith(alwaysUseBrowserUI: value as bool?);
+      case 'entersReaderIfAvailable':
+        return copyWith(entersReaderIfAvailable: value as bool?);
+      case 'barCollapsingEnabled':
+        return copyWith(barCollapsingEnabled: value as bool?);
+      case 'dismissButtonStyle':
+        return copyWith(dismissButtonStyle: value as DismissButtonStyle?);
+      case 'preferredBarTintColor':
+        return copyWith(preferredBarTintColor: value as Color?);
+      case 'preferredControlTintColor':
+        return copyWith(preferredControlTintColor: value as Color?);
+      case 'presentationStyle':
+        return copyWith(presentationStyle: value as ModalPresentationStyle?);
+      case 'transitionStyle':
+        return copyWith(transitionStyle: value as ModalTransitionStyle?);
+      case 'activityButton':
+        return copyWith(activityButton: value as ActivityButton?);
+      case 'eventAttribution':
+        return copyWith(eventAttribution: value as UIEventAttribution?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'ChromeSafariBrowserSettings has no settable field with this name',
+        );
+    }
   }
 
   ChromeSafariBrowserSettings copyWithChromeSafariBrowserSettings({

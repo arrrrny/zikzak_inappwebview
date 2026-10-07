@@ -26,6 +26,28 @@ class WebViewPackageInfo {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  WebViewPackageInfo copyWithField<T>(
+    Field<WebViewPackageInfo, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'versionName':
+        return copyWith(versionName: value as String?);
+      case 'packageName':
+        return copyWith(packageName: value as String?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'WebViewPackageInfo has no settable field with this name',
+        );
+    }
+  }
+
   WebViewPackageInfo copyWithWebViewPackageInfo({
     String? versionName,
     String? packageName,

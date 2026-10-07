@@ -54,6 +54,36 @@ class WebResourceRequest {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  WebResourceRequest copyWithField<T>(
+    Field<WebResourceRequest, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'url':
+        return copyWith(url: value as WebUri?);
+      case 'headers':
+        return copyWith(headers: value as Map<String, String>?);
+      case 'method':
+        return copyWith(method: value as String?);
+      case 'hasGesture':
+        return copyWith(hasGesture: value as bool?);
+      case 'isForMainFrame':
+        return copyWith(isForMainFrame: value as bool?);
+      case 'isRedirect':
+        return copyWith(isRedirect: value as bool?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'WebResourceRequest has no settable field with this name',
+        );
+    }
+  }
+
   WebResourceRequest copyWithWebResourceRequest({
     WebUri? url,
     Map<String, String>? headers,

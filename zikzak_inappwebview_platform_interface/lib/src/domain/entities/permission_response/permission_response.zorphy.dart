@@ -20,7 +20,7 @@ class PermissionResponse {
       _$PermissionResponseFromJson(json);
 
   @JsonKey(
-    defaultValue: const [],
+    defaultValue: [],
     toJson: _resourcesToJson,
     fromJson: _resourcesFromJson,
   )
@@ -41,6 +41,28 @@ class PermissionResponse {
       resources: resources ?? this.resources,
       action: action ?? this.action,
     );
+  }
+
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  PermissionResponse copyWithField<T>(
+    Field<PermissionResponse, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'resources':
+        return copyWith(resources: value as List<PermissionResourceType>?);
+      case 'action':
+        return copyWith(action: value as PermissionResponseAction?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'PermissionResponse has no settable field with this name',
+        );
+    }
   }
 
   PermissionResponse copyWithPermissionResponse({

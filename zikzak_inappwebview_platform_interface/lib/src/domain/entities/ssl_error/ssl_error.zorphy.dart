@@ -24,6 +24,25 @@ class SslError {
     return SslError(code: code ?? this.code, message: message ?? this.message);
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  SslError copyWithField<T>(Field<SslError, T> field, T value) {
+    switch (field.name) {
+      case 'code':
+        return copyWith(code: value as SslErrorType?);
+      case 'message':
+        return copyWith(message: value as String?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'SslError has no settable field with this name',
+        );
+    }
+  }
+
   SslError copyWithSslError({SslErrorType? code, String? message}) {
     return copyWith(code: code, message: message);
   }

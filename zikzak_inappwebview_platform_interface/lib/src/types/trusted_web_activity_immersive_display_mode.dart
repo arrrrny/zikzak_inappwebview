@@ -1,3 +1,5 @@
+import 'package:zorphy_annotation/zorphy_annotation.dart';
+
 import '../domain/entities/trusted_web_activity_display_mode/trusted_web_activity_display_mode.dart';
 import '../domain/entities/enums/layout_in_display_cutout_mode.dart';
 
@@ -67,6 +69,36 @@ class TrustedWebActivityImmersiveDisplayMode
   TrustedWebActivityImmersiveDisplayMode
   copyWithTrustedWebActivityDisplayMode() {
     return copyWith();
+  }
+
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value. This hand-written class's
+  /// [copyWith] takes no parameters, so each branch builds the copy directly.
+  @override
+  TrustedWebActivityImmersiveDisplayMode copyWithField<T>(
+    Field<TrustedWebActivityDisplayMode, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'displayCutoutMode':
+        return TrustedWebActivityImmersiveDisplayMode(
+          isSticky: isSticky,
+          displayCutoutMode: value as LayoutInDisplayCutoutMode,
+        );
+      case 'isSticky':
+        return TrustedWebActivityImmersiveDisplayMode(
+          isSticky: value as bool,
+          displayCutoutMode: displayCutoutMode,
+        );
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'TrustedWebActivityImmersiveDisplayMode has no settable field with this name',
+        );
+    }
   }
 
   @override

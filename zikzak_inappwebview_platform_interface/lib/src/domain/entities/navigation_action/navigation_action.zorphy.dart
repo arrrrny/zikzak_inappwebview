@@ -67,6 +67,37 @@ class NavigationAction {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  NavigationAction copyWithField<T>(Field<NavigationAction, T> field, T value) {
+    switch (field.name) {
+      case 'request':
+        return copyWith(request: value as URLRequest);
+      case 'isForMainFrame':
+        return copyWith(isForMainFrame: value as bool);
+      case 'hasGesture':
+        return copyWith(hasGesture: value as bool?);
+      case 'isRedirect':
+        return copyWith(isRedirect: value as bool?);
+      case 'navigationType':
+        return copyWith(navigationType: value as NavigationType?);
+      case 'sourceFrame':
+        return copyWith(sourceFrame: value as FrameInfo?);
+      case 'targetFrame':
+        return copyWith(targetFrame: value as FrameInfo?);
+      case 'shouldPerformDownload':
+        return copyWith(shouldPerformDownload: value as bool?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'NavigationAction has no settable field with this name',
+        );
+    }
+  }
+
   NavigationAction copyWithNavigationAction({
     URLRequest? request,
     bool? isForMainFrame,

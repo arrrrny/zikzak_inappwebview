@@ -57,6 +57,36 @@ class WebResourceResponse {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  WebResourceResponse copyWithField<T>(
+    Field<WebResourceResponse, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'contentType':
+        return copyWith(contentType: value as String?);
+      case 'contentEncoding':
+        return copyWith(contentEncoding: value as String?);
+      case 'data':
+        return copyWith(data: value as Uint8List?);
+      case 'headers':
+        return copyWith(headers: value as Map<String, String>?);
+      case 'statusCode':
+        return copyWith(statusCode: value as int?);
+      case 'reasonPhrase':
+        return copyWith(reasonPhrase: value as String?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'WebResourceResponse has no settable field with this name',
+        );
+    }
+  }
+
   WebResourceResponse copyWithWebResourceResponse({
     String? contentType,
     String? contentEncoding,

@@ -40,6 +40,30 @@ class GeolocationPermissionShowPromptResponse {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  GeolocationPermissionShowPromptResponse copyWithField<T>(
+    Field<GeolocationPermissionShowPromptResponse, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'origin':
+        return copyWith(origin: value as WebUri?);
+      case 'allow':
+        return copyWith(allow: value as bool?);
+      case 'retain':
+        return copyWith(retain: value as bool?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'GeolocationPermissionShowPromptResponse has no settable field with this name',
+        );
+    }
+  }
+
   GeolocationPermissionShowPromptResponse
   copyWithGeolocationPermissionShowPromptResponse({
     WebUri? origin,

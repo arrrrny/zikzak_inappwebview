@@ -37,6 +37,28 @@ class RenderProcessGoneDetail {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  RenderProcessGoneDetail copyWithField<T>(
+    Field<RenderProcessGoneDetail, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'didCrash':
+        return copyWith(didCrash: value as bool);
+      case 'rendererPriorityAtExit':
+        return copyWith(rendererPriorityAtExit: value as RendererPriority?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'RenderProcessGoneDetail has no settable field with this name',
+        );
+    }
+  }
+
   RenderProcessGoneDetail copyWithRenderProcessGoneDetail({
     bool? didCrash,
     RendererPriority? rendererPriorityAtExit,

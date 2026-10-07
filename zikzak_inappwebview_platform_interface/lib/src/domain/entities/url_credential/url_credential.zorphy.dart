@@ -44,6 +44,29 @@ class URLCredential {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  URLCredential copyWithField<T>(Field<URLCredential, T> field, T value) {
+    switch (field.name) {
+      case 'username':
+        return copyWith(username: value as String?);
+      case 'password':
+        return copyWith(password: value as String?);
+      case 'certificates':
+        return copyWith(certificates: value as List<X509Certificate>?);
+      case 'persistence':
+        return copyWith(persistence: value as URLCredentialPersistence?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'URLCredential has no settable field with this name',
+        );
+    }
+  }
+
   URLCredential copyWithURLCredential({
     String? username,
     String? password,

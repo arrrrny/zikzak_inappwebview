@@ -34,6 +34,27 @@ class JsAlertRequest {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  JsAlertRequest copyWithField<T>(Field<JsAlertRequest, T> field, T value) {
+    switch (field.name) {
+      case 'url':
+        return copyWith(url: value as WebUri?);
+      case 'message':
+        return copyWith(message: value as String?);
+      case 'isMainFrame':
+        return copyWith(isMainFrame: value as bool?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'JsAlertRequest has no settable field with this name',
+        );
+    }
+  }
+
   JsAlertRequest copyWithJsAlertRequest({
     WebUri? url,
     String? message,

@@ -29,6 +29,27 @@ class WebStorageOrigin {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  WebStorageOrigin copyWithField<T>(Field<WebStorageOrigin, T> field, T value) {
+    switch (field.name) {
+      case 'origin':
+        return copyWith(origin: value as String?);
+      case 'quota':
+        return copyWith(quota: value as int?);
+      case 'usage':
+        return copyWith(usage: value as int?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'WebStorageOrigin has no settable field with this name',
+        );
+    }
+  }
+
   WebStorageOrigin copyWithWebStorageOrigin({
     String? origin,
     int? quota,

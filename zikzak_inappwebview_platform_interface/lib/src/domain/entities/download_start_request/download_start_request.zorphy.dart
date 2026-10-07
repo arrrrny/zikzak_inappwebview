@@ -58,6 +58,38 @@ class DownloadStartRequest {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  DownloadStartRequest copyWithField<T>(
+    Field<DownloadStartRequest, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'url':
+        return copyWith(url: value as WebUri);
+      case 'userAgent':
+        return copyWith(userAgent: value as String?);
+      case 'contentDisposition':
+        return copyWith(contentDisposition: value as String?);
+      case 'mimeType':
+        return copyWith(mimeType: value as String?);
+      case 'contentLength':
+        return copyWith(contentLength: value as int);
+      case 'suggestedFilename':
+        return copyWith(suggestedFilename: value as String?);
+      case 'textEncodingName':
+        return copyWith(textEncodingName: value as String?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'DownloadStartRequest has no settable field with this name',
+        );
+    }
+  }
+
   DownloadStartRequest copyWithDownloadStartRequest({
     WebUri? url,
     String? userAgent,

@@ -54,6 +54,33 @@ class WebHistoryItem {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  WebHistoryItem copyWithField<T>(Field<WebHistoryItem, T> field, T value) {
+    switch (field.name) {
+      case 'originalUrl':
+        return copyWith(originalUrl: value as WebUri?);
+      case 'title':
+        return copyWith(title: value as String?);
+      case 'url':
+        return copyWith(url: value as WebUri?);
+      case 'index':
+        return copyWith(index: value as int?);
+      case 'offset':
+        return copyWith(offset: value as int?);
+      case 'entryId':
+        return copyWith(entryId: value as int?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'WebHistoryItem has no settable field with this name',
+        );
+    }
+  }
+
   WebHistoryItem copyWithWebHistoryItem({
     WebUri? originalUrl,
     String? title,

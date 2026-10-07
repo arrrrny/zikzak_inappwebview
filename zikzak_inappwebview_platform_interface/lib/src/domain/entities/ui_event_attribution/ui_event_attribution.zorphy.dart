@@ -43,6 +43,32 @@ class UIEventAttribution {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  UIEventAttribution copyWithField<T>(
+    Field<UIEventAttribution, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'sourceIdentifier':
+        return copyWith(sourceIdentifier: value as int);
+      case 'destinationURL':
+        return copyWith(destinationURL: value as WebUri);
+      case 'sourceDescription':
+        return copyWith(sourceDescription: value as String);
+      case 'purchaser':
+        return copyWith(purchaser: value as String);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'UIEventAttribution has no settable field with this name',
+        );
+    }
+  }
+
   UIEventAttribution copyWithUIEventAttribution({
     int? sourceIdentifier,
     WebUri? destinationURL,

@@ -57,6 +57,33 @@ class UserScript {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  UserScript copyWithField<T>(Field<UserScript, T> field, T value) {
+    switch (field.name) {
+      case 'allowedOriginRules':
+        return copyWith(allowedOriginRules: value as Set<String>);
+      case 'contentWorld':
+        return copyWith(contentWorld: value as ContentWorld?);
+      case 'forMainFrameOnly':
+        return copyWith(forMainFrameOnly: value as bool);
+      case 'groupName':
+        return copyWith(groupName: value as String?);
+      case 'injectionTime':
+        return copyWith(injectionTime: value as UserScriptInjectionTime);
+      case 'source':
+        return copyWith(source: value as String);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'UserScript has no settable field with this name',
+        );
+    }
+  }
+
   UserScript copyWithUserScript({
     Set<String>? allowedOriginRules,
     ContentWorld? contentWorld,

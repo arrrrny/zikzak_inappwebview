@@ -38,6 +38,30 @@ class NavigationResponse {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  NavigationResponse copyWithField<T>(
+    Field<NavigationResponse, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'response':
+        return copyWith(response: value as URLResponse?);
+      case 'isForMainFrame':
+        return copyWith(isForMainFrame: value as bool);
+      case 'canShowMIMEType':
+        return copyWith(canShowMIMEType: value as bool);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'NavigationResponse has no settable field with this name',
+        );
+    }
+  }
+
   NavigationResponse copyWithNavigationResponse({
     URLResponse? response,
     bool? isForMainFrame,

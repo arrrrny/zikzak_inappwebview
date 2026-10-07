@@ -32,6 +32,30 @@ class ProcessGlobalConfigSettings {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  ProcessGlobalConfigSettings copyWithField<T>(
+    Field<ProcessGlobalConfigSettings, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'dataDirectorySuffix':
+        return copyWith(dataDirectorySuffix: value as String?);
+      case 'directoryBasePaths':
+        return copyWith(
+          directoryBasePaths: value as ProcessGlobalConfigDirectoryBasePaths?,
+        );
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'ProcessGlobalConfigSettings has no settable field with this name',
+        );
+    }
+  }
+
   ProcessGlobalConfigSettings copyWithProcessGlobalConfigSettings({
     String? dataDirectorySuffix,
     ProcessGlobalConfigDirectoryBasePaths? directoryBasePaths,
@@ -272,6 +296,28 @@ class ProcessGlobalConfigDirectoryBasePaths {
       cacheDirectoryBasePath:
           cacheDirectoryBasePath ?? this.cacheDirectoryBasePath,
     );
+  }
+
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  ProcessGlobalConfigDirectoryBasePaths copyWithField<T>(
+    Field<ProcessGlobalConfigDirectoryBasePaths, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'dataDirectoryBasePath':
+        return copyWith(dataDirectoryBasePath: value as String);
+      case 'cacheDirectoryBasePath':
+        return copyWith(cacheDirectoryBasePath: value as String);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'ProcessGlobalConfigDirectoryBasePaths has no settable field with this name',
+        );
+    }
   }
 
   ProcessGlobalConfigDirectoryBasePaths

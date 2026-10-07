@@ -33,6 +33,28 @@ class WebsiteDataRecord {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  WebsiteDataRecord copyWithField<T>(
+    Field<WebsiteDataRecord, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'displayName':
+        return copyWith(displayName: value as String?);
+      case 'dataTypes':
+        return copyWith(dataTypes: value as Set<WebsiteDataType>?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'WebsiteDataRecord has no settable field with this name',
+        );
+    }
+  }
+
   WebsiteDataRecord copyWithWebsiteDataRecord({
     String? displayName,
     Set<WebsiteDataType>? dataTypes,

@@ -43,6 +43,29 @@ class LoadedResource {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  LoadedResource copyWithField<T>(Field<LoadedResource, T> field, T value) {
+    switch (field.name) {
+      case 'initiatorType':
+        return copyWith(initiatorType: value as String?);
+      case 'url':
+        return copyWith(url: value as WebUri?);
+      case 'startTime':
+        return copyWith(startTime: value as double?);
+      case 'duration':
+        return copyWith(duration: value as double?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'LoadedResource has no settable field with this name',
+        );
+    }
+  }
+
   LoadedResource copyWithLoadedResource({
     String? initiatorType,
     WebUri? url,

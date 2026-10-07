@@ -46,6 +46,29 @@ class PDFConfiguration {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  PDFConfiguration copyWithField<T>(Field<PDFConfiguration, T> field, T value) {
+    switch (field.name) {
+      case 'rect':
+        return copyWith(rect: value as InAppWebViewRect?);
+      case 'pageSize':
+        return copyWith(pageSize: value as Size?);
+      case 'margins':
+        return copyWith(margins: value as EdgeInsets?);
+      case 'orientation':
+        return copyWith(orientation: value as PrintJobOrientation?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'PDFConfiguration has no settable field with this name',
+        );
+    }
+  }
+
   PDFConfiguration copyWithPDFConfiguration({
     InAppWebViewRect? rect,
     Size? pageSize,

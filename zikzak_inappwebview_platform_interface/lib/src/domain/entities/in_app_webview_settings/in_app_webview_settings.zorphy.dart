@@ -326,11 +326,11 @@ class InAppWebViewSettings {
   @JsonKey(defaultValue: true)
   final bool? horizontalScrollBarEnabled;
 
-  @JsonKey(defaultValue: const [])
+  @JsonKey(defaultValue: [])
   final List<String>? resourceCustomSchemes;
 
   @JsonKey(
-    defaultValue: const [],
+    defaultValue: [],
     toJson: _serializeContentBlockers,
     fromJson: _deserializeContentBlockers,
   )
@@ -759,7 +759,7 @@ class InAppWebViewSettings {
   @JsonKey(defaultValue: false)
   final bool? networkCaptureBinaryBodies;
 
-  @JsonKey(defaultValue: const [])
+  @JsonKey(defaultValue: [])
   final List<String>? networkCaptureUrlPatterns;
 
   @JsonKey(toJson: _urlPatternTypeToJson, fromJson: _urlPatternTypeFromJson)
@@ -768,7 +768,7 @@ class InAppWebViewSettings {
   @JsonKey(toJson: _resourceTypesToJson, fromJson: _resourceTypesFromJson)
   final List<ResourceType>? networkCaptureResourceTypes;
 
-  @JsonKey(defaultValue: const [])
+  @JsonKey(defaultValue: [])
   final List<String>? networkCaptureMimeTypes;
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1171,6 +1171,351 @@ class InAppWebViewSettings {
           networkCaptureMimeTypes ?? this.networkCaptureMimeTypes,
       networkCapture: networkCapture ?? this.networkCapture,
     );
+  }
+
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  InAppWebViewSettings copyWithField<T>(
+    Field<InAppWebViewSettings, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'useShouldOverrideUrlLoading':
+        return copyWith(useShouldOverrideUrlLoading: value as bool?);
+      case 'useOnLoadResource':
+        return copyWith(useOnLoadResource: value as bool?);
+      case 'useOnDownloadStart':
+        return copyWith(useOnDownloadStart: value as bool?);
+      case 'userAgent':
+        return copyWith(userAgent: value as String?);
+      case 'applicationNameForUserAgent':
+        return copyWith(applicationNameForUserAgent: value as String?);
+      case 'javaScriptEnabled':
+        return copyWith(javaScriptEnabled: value as bool?);
+      case 'javaScriptCanOpenWindowsAutomatically':
+        return copyWith(javaScriptCanOpenWindowsAutomatically: value as bool?);
+      case 'mediaPlaybackRequiresUserGesture':
+        return copyWith(mediaPlaybackRequiresUserGesture: value as bool?);
+      case 'minimumFontSize':
+        return copyWith(minimumFontSize: value as int?);
+      case 'verticalScrollBarEnabled':
+        return copyWith(verticalScrollBarEnabled: value as bool?);
+      case 'horizontalScrollBarEnabled':
+        return copyWith(horizontalScrollBarEnabled: value as bool?);
+      case 'resourceCustomSchemes':
+        return copyWith(resourceCustomSchemes: value as List<String>?);
+      case 'contentBlockers':
+        return copyWith(contentBlockers: value as List<ContentBlocker>?);
+      case 'preferredContentMode':
+        return copyWith(
+          preferredContentMode: value as UserPreferredContentMode?,
+        );
+      case 'useShouldInterceptAjaxRequest':
+        return copyWith(useShouldInterceptAjaxRequest: value as bool?);
+      case 'interceptOnlyAsyncAjaxRequests':
+        return copyWith(interceptOnlyAsyncAjaxRequests: value as bool?);
+      case 'useShouldInterceptFetchRequest':
+        return copyWith(useShouldInterceptFetchRequest: value as bool?);
+      case 'incognito':
+        return copyWith(incognito: value as bool?);
+      case 'persistentStoreIdentifier':
+        return copyWith(persistentStoreIdentifier: value as String?);
+      case 'cacheEnabled':
+        return copyWith(cacheEnabled: value as bool?);
+      case 'transparentBackground':
+        return copyWith(transparentBackground: value as bool?);
+      case 'disableVerticalScroll':
+        return copyWith(disableVerticalScroll: value as bool?);
+      case 'disableHorizontalScroll':
+        return copyWith(disableHorizontalScroll: value as bool?);
+      case 'disableContextMenu':
+        return copyWith(disableContextMenu: value as bool?);
+      case 'stylusHandwritingEnabled':
+        return copyWith(stylusHandwritingEnabled: value as bool?);
+      case 'supportZoom':
+        return copyWith(supportZoom: value as bool?);
+      case 'allowFileAccessFromFileURLs':
+        return copyWith(allowFileAccessFromFileURLs: value as bool?);
+      case 'allowUniversalAccessFromFileURLs':
+        return copyWith(allowUniversalAccessFromFileURLs: value as bool?);
+      case 'builtInZoomControls':
+        return copyWith(builtInZoomControls: value as bool?);
+      case 'displayZoomControls':
+        return copyWith(displayZoomControls: value as bool?);
+      case 'databaseEnabled':
+        return copyWith(databaseEnabled: value as bool?);
+      case 'domStorageEnabled':
+        return copyWith(domStorageEnabled: value as bool?);
+      case 'useWideViewPort':
+        return copyWith(useWideViewPort: value as bool?);
+      case 'safeBrowsingEnabled':
+        return copyWith(safeBrowsingEnabled: value as bool?);
+      case 'mixedContentMode':
+        return copyWith(mixedContentMode: value as MixedContentMode?);
+      case 'allowContentAccess':
+        return copyWith(allowContentAccess: value as bool?);
+      case 'allowFileAccess':
+        return copyWith(allowFileAccess: value as bool?);
+      case 'blockNetworkImage':
+        return copyWith(blockNetworkImage: value as bool?);
+      case 'blockNetworkLoads':
+        return copyWith(blockNetworkLoads: value as bool?);
+      case 'cacheMode':
+        return copyWith(cacheMode: value as CacheMode?);
+      case 'cursiveFontFamily':
+        return copyWith(cursiveFontFamily: value as String?);
+      case 'defaultFixedFontSize':
+        return copyWith(defaultFixedFontSize: value as int?);
+      case 'defaultFontSize':
+        return copyWith(defaultFontSize: value as int?);
+      case 'defaultTextEncodingName':
+        return copyWith(defaultTextEncodingName: value as String?);
+      case 'disabledActionModeMenuItems':
+        return copyWith(
+          disabledActionModeMenuItems: value as ActionModeMenuItem?,
+        );
+      case 'fantasyFontFamily':
+        return copyWith(fantasyFontFamily: value as String?);
+      case 'fixedFontFamily':
+        return copyWith(fixedFontFamily: value as String?);
+      case 'forceDark':
+        return copyWith(forceDark: value as ForceDark?);
+      case 'forceDarkStrategy':
+        return copyWith(forceDarkStrategy: value as ForceDarkStrategy?);
+      case 'geolocationEnabled':
+        return copyWith(geolocationEnabled: value as bool?);
+      case 'layoutAlgorithm':
+        return copyWith(layoutAlgorithm: value as LayoutAlgorithm?);
+      case 'loadWithOverviewMode':
+        return copyWith(loadWithOverviewMode: value as bool?);
+      case 'loadsImagesAutomatically':
+        return copyWith(loadsImagesAutomatically: value as bool?);
+      case 'minimumLogicalFontSize':
+        return copyWith(minimumLogicalFontSize: value as int?);
+      case 'needInitialFocus':
+        return copyWith(needInitialFocus: value as bool?);
+      case 'offscreenPreRaster':
+        return copyWith(offscreenPreRaster: value as bool?);
+      case 'sansSerifFontFamily':
+        return copyWith(sansSerifFontFamily: value as String?);
+      case 'serifFontFamily':
+        return copyWith(serifFontFamily: value as String?);
+      case 'standardFontFamily':
+        return copyWith(standardFontFamily: value as String?);
+      case 'saveFormData':
+        return copyWith(saveFormData: value as bool?);
+      case 'thirdPartyCookiesEnabled':
+        return copyWith(thirdPartyCookiesEnabled: value as bool?);
+      case 'hardwareAcceleration':
+        return copyWith(hardwareAcceleration: value as bool?);
+      case 'initialScale':
+        return copyWith(initialScale: value as int?);
+      case 'supportMultipleWindows':
+        return copyWith(supportMultipleWindows: value as bool?);
+      case 'regexToCancelSubFramesLoading':
+        return copyWith(regexToCancelSubFramesLoading: value as String?);
+      case 'regexToCancelOverrideUrlLoading':
+        return copyWith(regexToCancelOverrideUrlLoading: value as String?);
+      case 'useHybridComposition':
+        return copyWith(useHybridComposition: value as bool?);
+      case 'useShouldInterceptRequest':
+        return copyWith(useShouldInterceptRequest: value as bool?);
+      case 'useOnRenderProcessGone':
+        return copyWith(useOnRenderProcessGone: value as bool?);
+      case 'overScrollMode':
+        return copyWith(overScrollMode: value as OverScrollMode?);
+      case 'networkAvailable':
+        return copyWith(networkAvailable: value as bool?);
+      case 'scrollBarStyle':
+        return copyWith(scrollBarStyle: value as ScrollBarStyle?);
+      case 'verticalScrollbarPosition':
+        return copyWith(
+          verticalScrollbarPosition: value as VerticalScrollbarPosition?,
+        );
+      case 'scrollBarDefaultDelayBeforeFade':
+        return copyWith(scrollBarDefaultDelayBeforeFade: value as int?);
+      case 'scrollbarFadingEnabled':
+        return copyWith(scrollbarFadingEnabled: value as bool?);
+      case 'scrollBarFadeDuration':
+        return copyWith(scrollBarFadeDuration: value as int?);
+      case 'rendererPriorityPolicy':
+        return copyWith(
+          rendererPriorityPolicy: value as RendererPriorityPolicy?,
+        );
+      case 'disableDefaultErrorPage':
+        return copyWith(disableDefaultErrorPage: value as bool?);
+      case 'verticalScrollbarThumbColor':
+        return copyWith(verticalScrollbarThumbColor: value as Color?);
+      case 'verticalScrollbarTrackColor':
+        return copyWith(verticalScrollbarTrackColor: value as Color?);
+      case 'horizontalScrollbarThumbColor':
+        return copyWith(horizontalScrollbarThumbColor: value as Color?);
+      case 'horizontalScrollbarTrackColor':
+        return copyWith(horizontalScrollbarTrackColor: value as Color?);
+      case 'algorithmicDarkeningAllowed':
+        return copyWith(algorithmicDarkeningAllowed: value as bool?);
+      case 'paymentRequestEnabled':
+        return copyWith(paymentRequestEnabled: value as bool?);
+      case 'webAuthenticationSupport':
+        return copyWith(
+          webAuthenticationSupport: value as WebAuthenticationSupport?,
+        );
+      case 'enterpriseAuthenticationAppLinkPolicyEnabled':
+        return copyWith(
+          enterpriseAuthenticationAppLinkPolicyEnabled: value as bool?,
+        );
+      case 'defaultVideoPoster':
+        return copyWith(defaultVideoPoster: value as Uint8List?);
+      case 'requestedWithHeaderOriginAllowList':
+        return copyWith(
+          requestedWithHeaderOriginAllowList: value as Set<String>?,
+        );
+      case 'disallowOverScroll':
+        return copyWith(disallowOverScroll: value as bool?);
+      case 'enableViewportScale':
+        return copyWith(enableViewportScale: value as bool?);
+      case 'suppressesIncrementalRendering':
+        return copyWith(suppressesIncrementalRendering: value as bool?);
+      case 'allowsAirPlayForMediaPlayback':
+        return copyWith(allowsAirPlayForMediaPlayback: value as bool?);
+      case 'allowsBackForwardNavigationGestures':
+        return copyWith(allowsBackForwardNavigationGestures: value as bool?);
+      case 'allowsLinkPreview':
+        return copyWith(allowsLinkPreview: value as bool?);
+      case 'ignoresViewportScaleLimits':
+        return copyWith(ignoresViewportScaleLimits: value as bool?);
+      case 'allowsInlineMediaPlayback':
+        return copyWith(allowsInlineMediaPlayback: value as bool?);
+      case 'allowsPictureInPictureMediaPlayback':
+        return copyWith(allowsPictureInPictureMediaPlayback: value as bool?);
+      case 'isFraudulentWebsiteWarningEnabled':
+        return copyWith(isFraudulentWebsiteWarningEnabled: value as bool?);
+      case 'selectionGranularity':
+        return copyWith(selectionGranularity: value as SelectionGranularity?);
+      case 'dataDetectorTypes':
+        return copyWith(dataDetectorTypes: value as List<DataDetectorTypes>?);
+      case 'sharedCookiesEnabled':
+        return copyWith(sharedCookiesEnabled: value as bool?);
+      case 'automaticallyAdjustsScrollIndicatorInsets':
+        return copyWith(
+          automaticallyAdjustsScrollIndicatorInsets: value as bool?,
+        );
+      case 'accessibilityIgnoresInvertColors':
+        return copyWith(accessibilityIgnoresInvertColors: value as bool?);
+      case 'decelerationRate':
+        return copyWith(decelerationRate: value as ScrollViewDecelerationRate?);
+      case 'alwaysBounceVertical':
+        return copyWith(alwaysBounceVertical: value as bool?);
+      case 'alwaysBounceHorizontal':
+        return copyWith(alwaysBounceHorizontal: value as bool?);
+      case 'bouncesHorizontally':
+        return copyWith(bouncesHorizontally: value as bool?);
+      case 'bouncesVertically':
+        return copyWith(bouncesVertically: value as bool?);
+      case 'scrollsToTop':
+        return copyWith(scrollsToTop: value as bool?);
+      case 'isPagingEnabled':
+        return copyWith(isPagingEnabled: value as bool?);
+      case 'maximumZoomScale':
+        return copyWith(maximumZoomScale: value as double?);
+      case 'minimumZoomScale':
+        return copyWith(minimumZoomScale: value as double?);
+      case 'contentInsetAdjustmentBehavior':
+        return copyWith(
+          contentInsetAdjustmentBehavior:
+              value as ScrollViewContentInsetAdjustmentBehavior?,
+        );
+      case 'isDirectionalLockEnabled':
+        return copyWith(isDirectionalLockEnabled: value as bool?);
+      case 'mediaType':
+        return copyWith(mediaType: value as String?);
+      case 'pageZoom':
+        return copyWith(pageZoom: value as double?);
+      case 'limitsNavigationsToAppBoundDomains':
+        return copyWith(limitsNavigationsToAppBoundDomains: value as bool?);
+      case 'useOnNavigationResponse':
+        return copyWith(useOnNavigationResponse: value as bool?);
+      case 'applePayAPIEnabled':
+        return copyWith(applePayAPIEnabled: value as bool?);
+      case 'allowingReadAccessTo':
+        return copyWith(allowingReadAccessTo: value as WebUri?);
+      case 'disableLongPressContextMenuOnLinks':
+        return copyWith(disableLongPressContextMenuOnLinks: value as bool?);
+      case 'disableInputAccessoryView':
+        return copyWith(disableInputAccessoryView: value as bool?);
+      case 'underPageBackgroundColor':
+        return copyWith(underPageBackgroundColor: value as Color?);
+      case 'isTextInteractionEnabled':
+        return copyWith(isTextInteractionEnabled: value as bool?);
+      case 'isSiteSpecificQuirksModeEnabled':
+        return copyWith(isSiteSpecificQuirksModeEnabled: value as bool?);
+      case 'upgradeKnownHostsToHTTPS':
+        return copyWith(upgradeKnownHostsToHTTPS: value as bool?);
+      case 'isElementFullscreenEnabled':
+        return copyWith(isElementFullscreenEnabled: value as bool?);
+      case 'isFindInteractionEnabled':
+        return copyWith(isFindInteractionEnabled: value as bool?);
+      case 'minimumViewportInset':
+        return copyWith(minimumViewportInset: value as EdgeInsets?);
+      case 'maximumViewportInset':
+        return copyWith(maximumViewportInset: value as EdgeInsets?);
+      case 'isInspectable':
+        return copyWith(isInspectable: value as bool?);
+      case 'shouldPrintBackgrounds':
+        return copyWith(shouldPrintBackgrounds: value as bool?);
+      case 'allowBackgroundAudioPlaying':
+        return copyWith(allowBackgroundAudioPlaying: value as bool?);
+      case 'webViewAssetLoader':
+        return copyWith(webViewAssetLoader: value as WebViewAssetLoader?);
+      case 'iframeAllow':
+        return copyWith(iframeAllow: value as String?);
+      case 'iframeAllowFullscreen':
+        return copyWith(iframeAllowFullscreen: value as bool?);
+      case 'iframeSandbox':
+        return copyWith(iframeSandbox: value as Set<Sandbox>?);
+      case 'iframeReferrerPolicy':
+        return copyWith(iframeReferrerPolicy: value as ReferrerPolicy?);
+      case 'iframeName':
+        return copyWith(iframeName: value as String?);
+      case 'iframeCsp':
+        return copyWith(iframeCsp: value as String?);
+      case 'dismissDialogues':
+        return copyWith(dismissDialogues: value as bool?);
+      case 'consoleLogEnabled':
+        return copyWith(consoleLogEnabled: value as bool?);
+      case 'insetsForWebContentToIgnore':
+        return copyWith(
+          insetsForWebContentToIgnore: value as List<AndroidWebViewInsets>?,
+        );
+      case 'useNetworkCapture':
+        return copyWith(useNetworkCapture: value as bool?);
+      case 'networkCaptureMaxBodySize':
+        return copyWith(networkCaptureMaxBodySize: value as int?);
+      case 'networkCaptureBodies':
+        return copyWith(networkCaptureBodies: value as bool?);
+      case 'networkCaptureBinaryBodies':
+        return copyWith(networkCaptureBinaryBodies: value as bool?);
+      case 'networkCaptureUrlPatterns':
+        return copyWith(networkCaptureUrlPatterns: value as List<String>?);
+      case 'networkCaptureUrlPatternType':
+        return copyWith(networkCaptureUrlPatternType: value as UrlPatternType?);
+      case 'networkCaptureResourceTypes':
+        return copyWith(
+          networkCaptureResourceTypes: value as List<ResourceType>?,
+        );
+      case 'networkCaptureMimeTypes':
+        return copyWith(networkCaptureMimeTypes: value as List<String>?);
+      case 'networkCapture':
+        return copyWith(networkCapture: value as NetworkCaptureController?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'InAppWebViewSettings has no settable field with this name',
+        );
+    }
   }
 
   InAppWebViewSettings copyWithInAppWebViewSettings({

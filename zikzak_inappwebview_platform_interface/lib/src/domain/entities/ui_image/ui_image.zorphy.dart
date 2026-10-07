@@ -30,6 +30,27 @@ class UIImage {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  UIImage copyWithField<T>(Field<UIImage, T> field, T value) {
+    switch (field.name) {
+      case 'name':
+        return copyWith(name: value as String?);
+      case 'systemName':
+        return copyWith(systemName: value as String?);
+      case 'data':
+        return copyWith(data: value as Uint8List?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'UIImage has no settable field with this name',
+        );
+    }
+  }
+
   UIImage copyWithUIImage({String? name, String? systemName, Uint8List? data}) {
     return copyWith(name: name, systemName: systemName, data: data);
   }

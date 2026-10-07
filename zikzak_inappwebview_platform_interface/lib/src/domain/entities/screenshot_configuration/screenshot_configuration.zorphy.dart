@@ -52,6 +52,34 @@ class ScreenshotConfiguration {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  ScreenshotConfiguration copyWithField<T>(
+    Field<ScreenshotConfiguration, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'rect':
+        return copyWith(rect: value as InAppWebViewRect?);
+      case 'snapshotWidth':
+        return copyWith(snapshotWidth: value as double?);
+      case 'compressFormat':
+        return copyWith(compressFormat: value as CompressFormat);
+      case 'quality':
+        return copyWith(quality: value as int);
+      case 'afterScreenUpdates':
+        return copyWith(afterScreenUpdates: value as bool);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'ScreenshotConfiguration has no settable field with this name',
+        );
+    }
+  }
+
   ScreenshotConfiguration copyWithScreenshotConfiguration({
     InAppWebViewRect? rect,
     double? snapshotWidth,

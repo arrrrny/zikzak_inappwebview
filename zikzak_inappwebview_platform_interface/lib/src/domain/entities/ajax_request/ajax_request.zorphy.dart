@@ -128,6 +128,59 @@ class AjaxRequest {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  AjaxRequest copyWithField<T>(Field<AjaxRequest, T> field, T value) {
+    switch (field.name) {
+      case 'data':
+        return copyWith(data: value as dynamic);
+      case 'method':
+        return copyWith(method: value as String?);
+      case 'url':
+        return copyWith(url: value as WebUri?);
+      case 'isAsync':
+        return copyWith(isAsync: value as bool?);
+      case 'user':
+        return copyWith(user: value as String?);
+      case 'password':
+        return copyWith(password: value as String?);
+      case 'withCredentials':
+        return copyWith(withCredentials: value as bool?);
+      case 'headers':
+        return copyWith(headers: value as AjaxRequestHeaders?);
+      case 'readyState':
+        return copyWith(readyState: value as AjaxRequestReadyState?);
+      case 'status':
+        return copyWith(status: value as int?);
+      case 'responseURL':
+        return copyWith(responseURL: value as WebUri?);
+      case 'responseType':
+        return copyWith(responseType: value as String?);
+      case 'response':
+        return copyWith(response: value as dynamic);
+      case 'responseText':
+        return copyWith(responseText: value as String?);
+      case 'responseXML':
+        return copyWith(responseXML: value as String?);
+      case 'statusText':
+        return copyWith(statusText: value as String?);
+      case 'responseHeaders':
+        return copyWith(responseHeaders: value as Map<String, dynamic>?);
+      case 'event':
+        return copyWith(event: value as AjaxRequestEvent?);
+      case 'action':
+        return copyWith(action: value as AjaxRequestAction?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'AjaxRequest has no settable field with this name',
+        );
+    }
+  }
+
   AjaxRequest copyWithAjaxRequest({
     dynamic data,
     String? method,

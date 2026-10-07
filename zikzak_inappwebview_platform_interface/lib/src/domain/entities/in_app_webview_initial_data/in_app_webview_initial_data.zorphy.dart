@@ -52,6 +52,34 @@ class InAppWebViewInitialData {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  InAppWebViewInitialData copyWithField<T>(
+    Field<InAppWebViewInitialData, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'data':
+        return copyWith(data: value as String);
+      case 'mimeType':
+        return copyWith(mimeType: value as String);
+      case 'encoding':
+        return copyWith(encoding: value as String);
+      case 'baseUrl':
+        return copyWith(baseUrl: value as WebUri?);
+      case 'historyUrl':
+        return copyWith(historyUrl: value as WebUri?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'InAppWebViewInitialData has no settable field with this name',
+        );
+    }
+  }
+
   InAppWebViewInitialData copyWithInAppWebViewInitialData({
     String? data,
     String? mimeType,

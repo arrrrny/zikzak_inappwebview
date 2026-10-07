@@ -38,6 +38,30 @@ class RequestFocusNodeHrefResult {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  RequestFocusNodeHrefResult copyWithField<T>(
+    Field<RequestFocusNodeHrefResult, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'url':
+        return copyWith(url: value as WebUri?);
+      case 'title':
+        return copyWith(title: value as String?);
+      case 'src':
+        return copyWith(src: value as String?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'RequestFocusNodeHrefResult has no settable field with this name',
+        );
+    }
+  }
+
   RequestFocusNodeHrefResult copyWithRequestFocusNodeHrefResult({
     WebUri? url,
     String? title,

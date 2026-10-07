@@ -67,6 +67,39 @@ class Cookie {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  Cookie copyWithField<T>(Field<Cookie, T> field, T value) {
+    switch (field.name) {
+      case 'name':
+        return copyWith(name: value as String);
+      case 'value':
+        return copyWith(value: value as dynamic);
+      case 'expiresDate':
+        return copyWith(expiresDate: value as int?);
+      case 'isSessionOnly':
+        return copyWith(isSessionOnly: value as bool?);
+      case 'domain':
+        return copyWith(domain: value as String?);
+      case 'sameSite':
+        return copyWith(sameSite: value as HTTPCookieSameSitePolicy?);
+      case 'isSecure':
+        return copyWith(isSecure: value as bool?);
+      case 'isHttpOnly':
+        return copyWith(isHttpOnly: value as bool?);
+      case 'path':
+        return copyWith(path: value as String?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'Cookie has no settable field with this name',
+        );
+    }
+  }
+
   Cookie copyWithCookie({
     String? name,
     dynamic value,

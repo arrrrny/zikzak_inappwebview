@@ -23,7 +23,7 @@ class PermissionRequest {
   final WebUri? origin;
 
   @JsonKey(
-    defaultValue: const [],
+    defaultValue: [],
     toJson: _resourcesToJson,
     fromJson: _resourcesFromJson,
   )
@@ -42,6 +42,30 @@ class PermissionRequest {
       resources: resources ?? this.resources,
       frame: frame ?? this.frame,
     );
+  }
+
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  PermissionRequest copyWithField<T>(
+    Field<PermissionRequest, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'origin':
+        return copyWith(origin: value as WebUri?);
+      case 'resources':
+        return copyWith(resources: value as List<PermissionResourceType>?);
+      case 'frame':
+        return copyWith(frame: value as FrameInfo?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'PermissionRequest has no settable field with this name',
+        );
+    }
   }
 
   PermissionRequest copyWithPermissionRequest({

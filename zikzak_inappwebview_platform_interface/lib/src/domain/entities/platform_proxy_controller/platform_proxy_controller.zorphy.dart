@@ -29,10 +29,10 @@ class IOSProxySettings {
   @JsonKey(defaultValue: false)
   final bool allowFailover;
 
-  @JsonKey(defaultValue: const [])
+  @JsonKey(defaultValue: [])
   final List<String> excludedDomains;
 
-  @JsonKey(defaultValue: const [])
+  @JsonKey(defaultValue: [])
   final List<String> matchDomains;
 
   IOSProxySettings copyWith({
@@ -47,6 +47,29 @@ class IOSProxySettings {
       excludedDomains: excludedDomains ?? this.excludedDomains,
       matchDomains: matchDomains ?? this.matchDomains,
     );
+  }
+
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  IOSProxySettings copyWithField<T>(Field<IOSProxySettings, T> field, T value) {
+    switch (field.name) {
+      case 'proxyUrl':
+        return copyWith(proxyUrl: value as String);
+      case 'allowFailover':
+        return copyWith(allowFailover: value as bool);
+      case 'excludedDomains':
+        return copyWith(excludedDomains: value as List<String>);
+      case 'matchDomains':
+        return copyWith(matchDomains: value as List<String>);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'IOSProxySettings has no settable field with this name',
+        );
+    }
   }
 
   IOSProxySettings copyWithIOSProxySettings({
@@ -314,13 +337,13 @@ class AndroidProxySettings {
   factory AndroidProxySettings.fromJson(Map<String, dynamic> json) =>
       _$AndroidProxySettingsFromJson(json);
 
-  @JsonKey(defaultValue: const [])
+  @JsonKey(defaultValue: [])
   final List<String> bypassRules;
 
-  @JsonKey(defaultValue: const [])
+  @JsonKey(defaultValue: [])
   final List<String> directs;
 
-  @JsonKey(defaultValue: const [])
+  @JsonKey(defaultValue: [])
   final List<ProxyRule> proxyRules;
 
   final bool? bypassSimpleHostnames;
@@ -347,6 +370,36 @@ class AndroidProxySettings {
       removeImplicitRules: removeImplicitRules ?? this.removeImplicitRules,
       reverseBypassEnabled: reverseBypassEnabled ?? this.reverseBypassEnabled,
     );
+  }
+
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  AndroidProxySettings copyWithField<T>(
+    Field<AndroidProxySettings, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'bypassRules':
+        return copyWith(bypassRules: value as List<String>);
+      case 'directs':
+        return copyWith(directs: value as List<String>);
+      case 'proxyRules':
+        return copyWith(proxyRules: value as List<ProxyRule>);
+      case 'bypassSimpleHostnames':
+        return copyWith(bypassSimpleHostnames: value as bool?);
+      case 'removeImplicitRules':
+        return copyWith(removeImplicitRules: value as bool?);
+      case 'reverseBypassEnabled':
+        return copyWith(reverseBypassEnabled: value as bool);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'AndroidProxySettings has no settable field with this name',
+        );
+    }
   }
 
   AndroidProxySettings copyWithAndroidProxySettings({

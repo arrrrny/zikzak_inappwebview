@@ -34,6 +34,27 @@ class JsConfirmRequest {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  JsConfirmRequest copyWithField<T>(Field<JsConfirmRequest, T> field, T value) {
+    switch (field.name) {
+      case 'url':
+        return copyWith(url: value as WebUri?);
+      case 'message':
+        return copyWith(message: value as String?);
+      case 'isMainFrame':
+        return copyWith(isMainFrame: value as bool?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'JsConfirmRequest has no settable field with this name',
+        );
+    }
+  }
+
   JsConfirmRequest copyWithJsConfirmRequest({
     WebUri? url,
     String? message,

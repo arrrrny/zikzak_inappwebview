@@ -51,6 +51,32 @@ class ClientCertResponse {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  ClientCertResponse copyWithField<T>(
+    Field<ClientCertResponse, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'certificatePath':
+        return copyWith(certificatePath: value as String);
+      case 'certificatePassword':
+        return copyWith(certificatePassword: value as String?);
+      case 'keyStoreType':
+        return copyWith(keyStoreType: value as String?);
+      case 'action':
+        return copyWith(action: value as ClientCertResponseAction?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'ClientCertResponse has no settable field with this name',
+        );
+    }
+  }
+
   ClientCertResponse copyWithClientCertResponse({
     String? certificatePath,
     String? certificatePassword,

@@ -35,6 +35,28 @@ class URLProtectionSpaceHttpAuthCredentials {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  URLProtectionSpaceHttpAuthCredentials copyWithField<T>(
+    Field<URLProtectionSpaceHttpAuthCredentials, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'protectionSpace':
+        return copyWith(protectionSpace: value as URLProtectionSpace?);
+      case 'credentials':
+        return copyWith(credentials: value as List<URLCredential>?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'URLProtectionSpaceHttpAuthCredentials has no settable field with this name',
+        );
+    }
+  }
+
   URLProtectionSpaceHttpAuthCredentials
   copyWithURLProtectionSpaceHttpAuthCredentials({
     URLProtectionSpace? protectionSpace,

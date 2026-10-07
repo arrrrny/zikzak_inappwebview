@@ -38,6 +38,30 @@ class WebViewAssetLoader {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  WebViewAssetLoader copyWithField<T>(
+    Field<WebViewAssetLoader, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'domain':
+        return copyWith(domain: value as String?);
+      case 'httpAllowed':
+        return copyWith(httpAllowed: value as bool?);
+      case 'pathHandlers':
+        return copyWith(pathHandlers: value as List<PlatformPathHandler>?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'WebViewAssetLoader has no settable field with this name',
+        );
+    }
+  }
+
   WebViewAssetLoader copyWithWebViewAssetLoader({
     String? domain,
     bool? httpAllowed,

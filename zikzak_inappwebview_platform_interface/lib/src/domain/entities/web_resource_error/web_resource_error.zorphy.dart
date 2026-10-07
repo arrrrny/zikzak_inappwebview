@@ -27,6 +27,25 @@ class WebResourceError {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  WebResourceError copyWithField<T>(Field<WebResourceError, T> field, T value) {
+    switch (field.name) {
+      case 'type':
+        return copyWith(type: value as WebResourceErrorType?);
+      case 'description':
+        return copyWith(description: value as String?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'WebResourceError has no settable field with this name',
+        );
+    }
+  }
+
   WebResourceError copyWithWebResourceError({
     WebResourceErrorType? type,
     String? description,

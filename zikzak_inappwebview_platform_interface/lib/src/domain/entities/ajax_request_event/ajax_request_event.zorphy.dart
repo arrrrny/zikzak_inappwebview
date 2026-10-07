@@ -43,6 +43,29 @@ class AjaxRequestEvent {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  AjaxRequestEvent copyWithField<T>(Field<AjaxRequestEvent, T> field, T value) {
+    switch (field.name) {
+      case 'type':
+        return copyWith(type: value as AjaxRequestEventType?);
+      case 'lengthComputable':
+        return copyWith(lengthComputable: value as bool?);
+      case 'loaded':
+        return copyWith(loaded: value as int?);
+      case 'total':
+        return copyWith(total: value as int?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'AjaxRequestEvent has no settable field with this name',
+        );
+    }
+  }
+
   AjaxRequestEvent copyWithAjaxRequestEvent({
     AjaxRequestEventType? type,
     bool? lengthComputable,

@@ -39,6 +39,27 @@ class FrameInfo {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  FrameInfo copyWithField<T>(Field<FrameInfo, T> field, T value) {
+    switch (field.name) {
+      case 'isMainFrame':
+        return copyWith(isMainFrame: value as bool);
+      case 'request':
+        return copyWith(request: value as URLRequest?);
+      case 'securityOrigin':
+        return copyWith(securityOrigin: value as SecurityOrigin?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'FrameInfo has no settable field with this name',
+        );
+    }
+  }
+
   FrameInfo copyWithFrameInfo({
     bool? isMainFrame,
     URLRequest? request,

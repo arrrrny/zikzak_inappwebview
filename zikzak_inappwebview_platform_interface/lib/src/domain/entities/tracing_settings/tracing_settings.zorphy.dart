@@ -34,6 +34,25 @@ class TracingSettings {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  TracingSettings copyWithField<T>(Field<TracingSettings, T> field, T value) {
+    switch (field.name) {
+      case 'categories':
+        return copyWith(categories: value as List<dynamic>);
+      case 'tracingMode':
+        return copyWith(tracingMode: value as TracingMode?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'TracingSettings has no settable field with this name',
+        );
+    }
+  }
+
   TracingSettings copyWithTracingSettings({
     List<dynamic>? categories,
     TracingMode? tracingMode,

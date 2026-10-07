@@ -53,6 +53,29 @@ class HttpAuthResponse {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  HttpAuthResponse copyWithField<T>(Field<HttpAuthResponse, T> field, T value) {
+    switch (field.name) {
+      case 'username':
+        return copyWith(username: value as String);
+      case 'password':
+        return copyWith(password: value as String);
+      case 'permanentPersistence':
+        return copyWith(permanentPersistence: value as bool);
+      case 'action':
+        return copyWith(action: value as HttpAuthResponseAction?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'HttpAuthResponse has no settable field with this name',
+        );
+    }
+  }
+
   HttpAuthResponse copyWithHttpAuthResponse({
     String? username,
     String? password,

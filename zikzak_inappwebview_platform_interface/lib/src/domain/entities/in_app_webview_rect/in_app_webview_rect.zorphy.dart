@@ -42,6 +42,29 @@ class InAppWebViewRect {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  InAppWebViewRect copyWithField<T>(Field<InAppWebViewRect, T> field, T value) {
+    switch (field.name) {
+      case 'x':
+        return copyWith(x: value as double);
+      case 'y':
+        return copyWith(y: value as double);
+      case 'width':
+        return copyWith(width: value as double);
+      case 'height':
+        return copyWith(height: value as double);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'InAppWebViewRect has no settable field with this name',
+        );
+    }
+  }
+
   InAppWebViewRect copyWithInAppWebViewRect({
     double? x,
     double? y,

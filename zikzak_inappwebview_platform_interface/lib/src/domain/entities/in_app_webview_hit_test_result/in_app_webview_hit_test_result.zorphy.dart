@@ -33,6 +33,28 @@ class InAppWebViewHitTestResult {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  InAppWebViewHitTestResult copyWithField<T>(
+    Field<InAppWebViewHitTestResult, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'type':
+        return copyWith(type: value as InAppWebViewHitTestResultType?);
+      case 'extra':
+        return copyWith(extra: value as String?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'InAppWebViewHitTestResult has no settable field with this name',
+        );
+    }
+  }
+
   InAppWebViewHitTestResult copyWithInAppWebViewHitTestResult({
     InAppWebViewHitTestResultType? type,
     String? extra,

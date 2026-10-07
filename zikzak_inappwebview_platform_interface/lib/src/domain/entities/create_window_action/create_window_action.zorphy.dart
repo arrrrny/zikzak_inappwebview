@@ -77,6 +77,44 @@ class CreateWindowAction {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  CreateWindowAction copyWithField<T>(
+    Field<CreateWindowAction, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'windowId':
+        return copyWith(windowId: value as int);
+      case 'isDialog':
+        return copyWith(isDialog: value as bool?);
+      case 'windowFeatures':
+        return copyWith(windowFeatures: value as WindowFeatures?);
+      case 'request':
+        return copyWith(request: value as URLRequest);
+      case 'isForMainFrame':
+        return copyWith(isForMainFrame: value as bool);
+      case 'hasGesture':
+        return copyWith(hasGesture: value as bool?);
+      case 'isRedirect':
+        return copyWith(isRedirect: value as bool?);
+      case 'navigationType':
+        return copyWith(navigationType: value as NavigationType?);
+      case 'sourceFrame':
+        return copyWith(sourceFrame: value as FrameInfo?);
+      case 'targetFrame':
+        return copyWith(targetFrame: value as FrameInfo?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'CreateWindowAction has no settable field with this name',
+        );
+    }
+  }
+
   CreateWindowAction copyWithCreateWindowAction({
     int? windowId,
     bool? isDialog,
