@@ -112,24 +112,32 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
 
     // MARK: - Option mapping
 
-    private func parseChallenge(_ options: [String: Any]) -> Result<Data, (String, String)> {
+    /// DOMException-shaped option-parse error. A `(String, String)` tuple
+    /// cannot be a `Result` failure (tuples do not conform to `Error`), so
+    /// the parsers carry name/message in this struct instead.
+    private struct PasskeyOptionError: Error {
+        let name: String
+        let message: String
+    }
+
+    private func parseChallenge(_ options: [String: Any]) -> Result<Data, PasskeyOptionError> {
         guard let challenge = Self.decodeBase64urlField(options["challenge"]), !challenge.isEmpty else {
-            return .failure(("TypeError", "The challenge is required and must be a base64url-encoded buffer."))
+            return .failure(PasskeyOptionError(name: "TypeError", message: "The challenge is required and must be a base64url-encoded buffer."))
         }
         return .success(challenge)
     }
 
-    private func parseRpId(_ options: [String: Any]) -> Result<String, (String, String)> {
+    private func parseRpId(_ options: [String: Any]) -> Result<String, PasskeyOptionError> {
         // Authentication options carry the optional rpId at the top level
         // (PublicKeyCredentialRequestOptions has no `rp` object); creation
         // options nest it under rp.id. Accept both shapes.
         let rpId = (options["rp"] as? [String: Any])?["id"] as? String
             ?? (options["rpId"] as? String)
         guard let rpId = rpId, !rpId.isEmpty else {
-            return .failure(("TypeError", "publicKey.rp.id is required."))
+            return .failure(PasskeyOptionError(name: "TypeError", message: "publicKey.rp.id is required."))
         }
         if rpId.contains("://") || rpId.contains("/") {
-            return .failure(("SecurityError", "publicKey.rp.id must be a domain, not a URL."))
+            return .failure(PasskeyOptionError(name: "SecurityError", message: "publicKey.rp.id must be a domain, not a URL."))
         }
         return .success(rpId)
     }
@@ -214,7 +222,7 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
             rpId = rp
             challenge = ch
         case (.failure(let e), _), (_, .failure(let e)):
-            completion(Self.errorResult(name: e.0, message: e.1))
+            completion(Self.errorResult(name: e.name, message: e.message))
             return
         }
         guard let user = options["user"] as? [String: Any],
@@ -263,7 +271,7 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
             rpId = rp
             challenge = ch
         case (.failure(let e), _), (_, .failure(let e)):
-            completion(Self.errorResult(name: e.0, message: e.1))
+            completion(Self.errorResult(name: e.name, message: e.message))
             return
         }
         guard beginCeremony(completion: completion) else { return }
