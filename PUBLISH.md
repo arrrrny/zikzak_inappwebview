@@ -75,6 +75,33 @@ bash scripts/prepare_for_publish.sh <version> <<< "" && \
 
 ## Notes
 
+- **`HTTPS_PROXY` breaks pub.** When `HTTPS_PROXY` contains embedded credentials
+  (`https://proxy:TOKEN@proxy-node…`), Dart pub rejects it with
+  `Invalid proxy configuration`, and every `flutter pub get` / `pub publish`
+  inside the scripts fails. Direct egress works, so run the pub-touching scripts
+  with the proxy unset:
+
+  ```bash
+  env -u HTTPS_PROXY -u https_proxy bash scripts/publish.sh
+  ```
+
+  `prepare_for_publish.sh` and `push_to_master.sh` only use curl/git, so they are
+  unaffected.
+- **Do NOT finish with `restore_dev_setup.sh`.** It rewrites the intra-repo
+  dependencies as `path:` entries under `dependencies:`, which makes every
+  publishable package emit `invalid_dependency` — a *warning*, and therefore a
+  red CI build. Restore the dev setup by hand instead: append a
+  `dependency_overrides:` block to each pubspec (7 platform packages for the
+  umbrella, `platform_interface` for each platform package, and the matching set
+  for the example apps). `zikzak_inappwebview_platform_interface` needs no
+  override — it has no intra-repo dependencies. Verify with
+  `flutter analyze --no-fatal-infos` that `invalid_dependency` is 0.
+- `scripts/publish.sh` runs `dart format lib/` per package, so an unformatted
+  file will be silently rewritten mid-release. Pre-check with
+  `dart format --output=none --set-exit-if-changed lib/` inside each package
+  first and commit any formatting fix before starting.
+- `publish.sh` creates and pushes the git tag itself; `push_to_master.sh` then
+  finds it already present and skips. That is expected, not an error.
 - The pre-publish script is interactive (asks for commit message). Pipe `echo ""` for default.
 - The root `CHANGELOG.md` is the single source of truth for changelog content. The script reads the entry for the new version from it and propagates to all sub-package changelogs.
 - `zikzak_inappwebview_windows` may show path dependency warnings for `webview_windows` and `path` — these are external deps, not zikzak packages, and are expected.
