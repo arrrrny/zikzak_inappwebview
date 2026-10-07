@@ -224,6 +224,26 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                           incognito {
                     configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
                 }
+                // FOR_BROWSER (2) has no macOS surface to apply to:
+                // WKWebViewConfiguration exposes no public
+                // webAuthenticationSupport on any macOS SDK, and the private
+                // WKWebViewWebAuthenticationSupport the FOR_APP path reaches
+                // through KVC carries only boundKeychainForPasskeys — the
+                // app-bound model. macOS runs a passkey ceremony only for a
+                // relying party the host app holds a validated
+                // com.apple.developer.associated-domains (webcredentials) entry
+                // for, so no implementation can honor this value. Report the
+                // request instead of dropping it silently, matching the
+                // creation-time warning this setting already emits in
+                // setSettings. Deliberately outside the macOS 13.3 availability
+                // block below: the value is unsupported on every macOS version,
+                // so an older OS must report it too (issue #351).
+                if let webAuthnSupport = settingsMap["webAuthenticationSupport"] as? Int,
+                   webAuthnSupport == 2 {  // FOR_BROWSER
+                    print(
+                        "webAuthenticationSupport=FOR_BROWSER was requested but macOS does not expose it (WKWebViewConfiguration has no webAuthenticationSupport); the value was not applied. Passkey ceremonies on macOS are gated by the host app's webcredentials Associated Domains entry plus apple-app-site-association."
+                    )
+                }
                 // WebAuthn / passkey support (issue #272).
                 // Mirrors the iOS KVC wiring (PR #131).
                 // Must be set before super.init because the configuration is
@@ -243,8 +263,26 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                             if webAuthSupport.responds(to: Selector(("boundKeychainForPasskeys"))) {
                                 webAuthSupport.setValue(true, forKey: "boundKeychainForPasskeys")
                             }
+                        } else {
+                            // FOR_APP is inert wherever WebKit exposes no such
+                            // key, which is every current macOS — the KVC write
+                            // above never runs. Surface it instead of dropping
+                            // it silently, so a caller can tell an inert
+                            // setting from an unset one (issue #351).
+                            print(
+                                "webAuthenticationSupport=FOR_APP was requested but this macOS version's WebKit does not expose WKWebViewConfiguration.webAuthenticationSupport; the value was not applied."
+                            )
                         }
                     }
+                } else if let webAuthnSupport = settingsMap["webAuthenticationSupport"] as? Int,
+                          webAuthnSupport == 1 {  // FOR_APP
+                    // macOS 13.2 and older sit below the availability gate, so
+                    // the else inside it never runs there — without this arm a
+                    // requested FOR_APP is still dropped without a word
+                    // (issue #351).
+                    print(
+                        "webAuthenticationSupport=FOR_APP was requested but macOS 13.2 or older does not expose WKWebViewConfiguration.webAuthenticationSupport; the value was not applied."
+                    )
                 }
             }
         }
