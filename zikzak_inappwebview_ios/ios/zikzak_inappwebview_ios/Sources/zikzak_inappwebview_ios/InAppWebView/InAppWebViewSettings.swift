@@ -324,8 +324,29 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
                     // getRealSettings() crash-proof on unexpected SDK states.
                     let boundValue =
                         webAuthSupport.value(forKey: "boundKeychainForPasskeys") as? Bool ?? false
+                    // Reports the APPLIED boundKeychain flag only. No iOS
+                    // version applies either non-NONE level — FOR_APP and
+                    // FOR_BROWSER both fall through — so in practice the else
+                    // arm below is what runs. A read-back of NONE means "no
+                    // passkeys are enabled via this setting", not "FOR_BROWSER
+                    // was requested" (issue #352).
                     realSettings["webAuthenticationSupport"] = boundValue ? 1 : 0
+                } else {
+                    // realSettings is seeded from toMap(), so a skipped mirror
+                    // leaves the *requested* level echoed back — a WebView that
+                    // was never configured would claim FOR_APP or FOR_BROWSER.
+                    // No iOS version applies a non-NONE level, so NONE is the
+                    // only honest answer. The creation-time path logs a native
+                    // warning for the dropped request (issue #352).
+                    realSettings["webAuthenticationSupport"] = 0
                 }
+            } else {
+                // iOS 16.3 and older sit below the availability gate, so the
+                // read-back mirror inside it never runs there — realSettings
+                // would echo the requested level out of toMap(). Nothing can
+                // be applied below 16.4, so NONE is the only honest answer
+                // (issue #352).
+                realSettings["webAuthenticationSupport"] = 0
             }
         }
 
