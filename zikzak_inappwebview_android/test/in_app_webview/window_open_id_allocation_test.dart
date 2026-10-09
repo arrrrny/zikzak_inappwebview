@@ -33,17 +33,16 @@ String readJava(String relativePath) {
   return stripJavaNonCode(file.readAsStringSync());
 }
 
-/// Strips line/block comments, string literals and char literals so only real
-/// code tokens are scanned (an assertion can never be satisfied by a comment
-/// or a string that merely mentions the pattern).
+/// Strips line/block comments, string literals, char literals and text blocks
+/// so only real code tokens are scanned (an assertion can never be satisfied
+/// by a comment or a string that merely mentions the pattern).
 String stripJavaNonCode(String source) {
   final out = StringBuffer();
   var i = 0;
   var blockDepth = 0;
   while (i < source.length) {
-    final rest = source.substring(i);
     if (blockDepth > 0) {
-      if (rest.startsWith('*/')) {
+      if (source.startsWith('*/', i)) {
         blockDepth--;
         i += 2;
       } else {
@@ -52,14 +51,28 @@ String stripJavaNonCode(String source) {
       }
       continue;
     }
-    if (rest.startsWith('/*')) {
+    if (source.startsWith('/*', i)) {
       blockDepth++;
       i += 2;
       continue;
     }
-    if (rest.startsWith('//')) {
+    if (source.startsWith('//', i)) {
       final end = source.indexOf('\n', i);
       i = end == -1 ? source.length : end;
+      continue;
+    }
+    if (source.startsWith('"""', i)) {
+      var j = i + 3;
+      while (j < source.length) {
+        if (source[j] == r'\') {
+          j += 2;
+          continue;
+        }
+        if (source.startsWith('"""', j)) break;
+        j++;
+      }
+      i = j + 3;
+      out.write('""');
       continue;
     }
     if (source[i] == '"') {
