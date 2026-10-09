@@ -26,7 +26,19 @@ dependencies:
   zikzak_inappwebview_windows: ^6.2.0
   zikzak_inappwebview_linux: ^6.2.0
   synchronized: ^3.4.1
-  zuraffa_session: ^1.1.0
+  # Held below 1.2.0 on purpose (#363): 1.2.0 only widens its `zuraffa`
+  # constraint to ^7.0.1, and zuraffa 7.x's CLI subtree
+  # (lib/src/cli/zfa_executable.dart, reachable from the public barrel) uses
+  # 64-bit integer literals that fail dart2js in every Flutter Web build.
+  # Both session releases carry identical code, but this cap keeps `zuraffa`
+  # below 7.0.0 on every platform, not just under dart2js: 1.1.0 requires
+  # `zuraffa: ^6.2.2`, so an app whose graph also requires `zuraffa: ^7.x`
+  # (e.g. alongside other zuraffa-7-era packages) will fail pub version
+  # solving after taking this release, where previously only its Web build
+  # failed. Lift the cap once zuraffa ships a web-safe release
+  # (arrrrny/zuraffa#1729); re-verify a consumer dart2js build before
+  # lifting — no CI job covers it.
+  zuraffa_session: ">=1.1.0 <1.2.0"
 
 dev_dependencies:
   flutter_test:
