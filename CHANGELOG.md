@@ -1,5 +1,9 @@
 ## Unreleased
 
+### Bug Fixes
+
+- Hold `zuraffa_session` at `>=1.1.0 <1.2.0` so Flutter Web consumers stop resolving zuraffa 7.x, whose CLI subtree (`lib/src/cli/zfa_executable.dart`, reachable from the public barrel) uses 64-bit integer literals that fail dart2js. 1.2.0 differs from 1.1.0 only by widening its `zuraffa` constraint to `^7.0.1` — the session code is identical. Note the cap also keeps `zuraffa` below 7.0.0 on every platform, not just under dart2js: an app whose graph requires `zuraffa: ^7.x` will fail pub version solving after taking this release, where previously only its Web build failed. Root cause upstream: arrrrny/zuraffa#1729 (#363)
+
 ---
 
 ## 6.2.0 - 2026-10-07
