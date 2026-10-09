@@ -26,7 +26,14 @@ dependencies:
   zikzak_inappwebview_windows: ^6.2.0
   zikzak_inappwebview_linux: ^6.2.0
   synchronized: ^3.4.1
-  zuraffa_session: ^1.1.0
+  # Held below 1.2.0 on purpose (#363): 1.2.0 only widens its `zuraffa`
+  # constraint to ^7.0.1, and zuraffa 7.x's CLI subtree
+  # (lib/src/cli/zfa_executable.dart, reachable from the public barrel) uses
+  # 64-bit integer literals that fail dart2js in every Flutter Web build.
+  # Both session releases carry identical code, so holding the older one costs
+  # nothing; lift the cap once zuraffa ships a web-safe release
+  # (arrrrny/zuraffa#1729).
+  zuraffa_session: ">=1.1.0 <1.2.0"
 
 dev_dependencies:
   flutter_test:
