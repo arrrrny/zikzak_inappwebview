@@ -648,22 +648,21 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     }
 
     if (result.getType() == WebView.HitTestResult.UNKNOWN_TYPE) {
+      // Reuse the id allocated at the top of this request: allocating a second
+      // id here used to burn one, so the FIRST window.open() popup was
+      // reported to Dart with windowId 2 instead of 1 (issue #362).
+      final int popupWindowId = windowId;
       WebView targetWebView = new WebView(getActivity());
       targetWebView.setWebViewClient(new WebViewClient() {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
-          int windowId = 0;
-          if (plugin != null && plugin.inAppWebViewManager != null) {
-            plugin.inAppWebViewManager.windowAutoincrementId++;
-            windowId = plugin.inAppWebViewManager.windowAutoincrementId;
-          }
           URLRequest request = new URLRequest(url, "GET", null, null, null);
           CreateWindowAction createWindowAction = new CreateWindowAction(
                   request,
                   true,
                   isUserGesture,
                   false,
-                  windowId,
+                  popupWindowId,
                   isDialog
           );
 
