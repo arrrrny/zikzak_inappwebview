@@ -77,6 +77,44 @@ class CreateWindowAction {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  CreateWindowAction copyWithField<T>(
+    Field<CreateWindowAction, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'windowId':
+        return copyWith(windowId: value as int);
+      case 'isDialog':
+        return copyWith(isDialog: value as bool?);
+      case 'windowFeatures':
+        return copyWith(windowFeatures: value as WindowFeatures?);
+      case 'request':
+        return copyWith(request: value as URLRequest);
+      case 'isForMainFrame':
+        return copyWith(isForMainFrame: value as bool);
+      case 'hasGesture':
+        return copyWith(hasGesture: value as bool?);
+      case 'isRedirect':
+        return copyWith(isRedirect: value as bool?);
+      case 'navigationType':
+        return copyWith(navigationType: value as NavigationType?);
+      case 'sourceFrame':
+        return copyWith(sourceFrame: value as FrameInfo?);
+      case 'targetFrame':
+        return copyWith(targetFrame: value as FrameInfo?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'CreateWindowAction has no settable field with this name',
+        );
+    }
+  }
+
   CreateWindowAction copyWithCreateWindowAction({
     int? windowId,
     bool? isDialog,
@@ -110,94 +148,114 @@ class CreateWindowAction {
     final _patchMap = _patcher.patchMap;
     return CreateWindowAction(
       windowId: _patchMap.containsKey(CreateWindowAction$.windowId)
-          ? (_patchMap[CreateWindowAction$.windowId] is Function)
-                ? _patchMap[CreateWindowAction$.windowId](this.windowId)
-                : (_patchMap[CreateWindowAction$.windowId] is Patch)
-                ? _patchMap[CreateWindowAction$.windowId].applyTo(this.windowId)
-                : _patchMap[CreateWindowAction$.windowId]
+          ? ((_patchMap[CreateWindowAction$.windowId] is Function)
+                    ? _patchMap[CreateWindowAction$.windowId](this.windowId)
+                    : (_patchMap[CreateWindowAction$.windowId] is Patch)
+                    ? _patchMap[CreateWindowAction$.windowId].applyTo(
+                        this.windowId,
+                      )
+                    : _patchMap[CreateWindowAction$.windowId])
+                as int
           : this.windowId,
       isDialog: _patchMap.containsKey(CreateWindowAction$.isDialog)
-          ? (_patchMap[CreateWindowAction$.isDialog] is Function)
-                ? _patchMap[CreateWindowAction$.isDialog](this.isDialog)
-                : (_patchMap[CreateWindowAction$.isDialog] is Patch)
-                ? _patchMap[CreateWindowAction$.isDialog].applyTo(this.isDialog)
-                : _patchMap[CreateWindowAction$.isDialog]
+          ? ((_patchMap[CreateWindowAction$.isDialog] is Function)
+                    ? _patchMap[CreateWindowAction$.isDialog](this.isDialog)
+                    : (_patchMap[CreateWindowAction$.isDialog] is Patch)
+                    ? _patchMap[CreateWindowAction$.isDialog].applyTo(
+                        this.isDialog,
+                      )
+                    : _patchMap[CreateWindowAction$.isDialog])
+                as bool?
           : this.isDialog,
       windowFeatures: _patchMap.containsKey(CreateWindowAction$.windowFeatures)
-          ? (_patchMap[CreateWindowAction$.windowFeatures] is Function)
-                ? _patchMap[CreateWindowAction$.windowFeatures](
-                    this.windowFeatures,
-                  )
-                : (_patchMap[CreateWindowAction$.windowFeatures] is Patch)
-                ? _patchMap[CreateWindowAction$.windowFeatures].applyTo(
-                    this.windowFeatures,
-                  )
-                : _patchMap[CreateWindowAction$.windowFeatures]
+          ? ((_patchMap[CreateWindowAction$.windowFeatures] is Function)
+                    ? _patchMap[CreateWindowAction$.windowFeatures](
+                        this.windowFeatures,
+                      )
+                    : (_patchMap[CreateWindowAction$.windowFeatures] is Patch)
+                    ? _patchMap[CreateWindowAction$.windowFeatures].applyTo(
+                        this.windowFeatures,
+                      )
+                    : _patchMap[CreateWindowAction$.windowFeatures])
+                as WindowFeatures?
           : this.windowFeatures,
       request: _patchMap.containsKey(CreateWindowAction$.request)
-          ? (_patchMap[CreateWindowAction$.request] is Function)
-                ? _patchMap[CreateWindowAction$.request](this.request)
-                : (_patchMap[CreateWindowAction$.request] is Patch)
-                ? _patchMap[CreateWindowAction$.request].applyTo(this.request)
-                : _patchMap[CreateWindowAction$.request]
+          ? ((_patchMap[CreateWindowAction$.request] is Function)
+                    ? _patchMap[CreateWindowAction$.request](this.request)
+                    : (_patchMap[CreateWindowAction$.request] is Patch)
+                    ? _patchMap[CreateWindowAction$.request].applyTo(
+                        this.request,
+                      )
+                    : _patchMap[CreateWindowAction$.request])
+                as URLRequest
           : this.request,
       isForMainFrame: _patchMap.containsKey(CreateWindowAction$.isForMainFrame)
-          ? (_patchMap[CreateWindowAction$.isForMainFrame] is Function)
-                ? _patchMap[CreateWindowAction$.isForMainFrame](
-                    this.isForMainFrame,
-                  )
-                : (_patchMap[CreateWindowAction$.isForMainFrame] is Patch)
-                ? _patchMap[CreateWindowAction$.isForMainFrame].applyTo(
-                    this.isForMainFrame,
-                  )
-                : _patchMap[CreateWindowAction$.isForMainFrame]
+          ? ((_patchMap[CreateWindowAction$.isForMainFrame] is Function)
+                    ? _patchMap[CreateWindowAction$.isForMainFrame](
+                        this.isForMainFrame,
+                      )
+                    : (_patchMap[CreateWindowAction$.isForMainFrame] is Patch)
+                    ? _patchMap[CreateWindowAction$.isForMainFrame].applyTo(
+                        this.isForMainFrame,
+                      )
+                    : _patchMap[CreateWindowAction$.isForMainFrame])
+                as bool
           : this.isForMainFrame,
       hasGesture: _patchMap.containsKey(CreateWindowAction$.hasGesture)
-          ? (_patchMap[CreateWindowAction$.hasGesture] is Function)
-                ? _patchMap[CreateWindowAction$.hasGesture](this.hasGesture)
-                : (_patchMap[CreateWindowAction$.hasGesture] is Patch)
-                ? _patchMap[CreateWindowAction$.hasGesture].applyTo(
-                    this.hasGesture,
-                  )
-                : _patchMap[CreateWindowAction$.hasGesture]
+          ? ((_patchMap[CreateWindowAction$.hasGesture] is Function)
+                    ? _patchMap[CreateWindowAction$.hasGesture](this.hasGesture)
+                    : (_patchMap[CreateWindowAction$.hasGesture] is Patch)
+                    ? _patchMap[CreateWindowAction$.hasGesture].applyTo(
+                        this.hasGesture,
+                      )
+                    : _patchMap[CreateWindowAction$.hasGesture])
+                as bool?
           : this.hasGesture,
       isRedirect: _patchMap.containsKey(CreateWindowAction$.isRedirect)
-          ? (_patchMap[CreateWindowAction$.isRedirect] is Function)
-                ? _patchMap[CreateWindowAction$.isRedirect](this.isRedirect)
-                : (_patchMap[CreateWindowAction$.isRedirect] is Patch)
-                ? _patchMap[CreateWindowAction$.isRedirect].applyTo(
-                    this.isRedirect,
-                  )
-                : _patchMap[CreateWindowAction$.isRedirect]
+          ? ((_patchMap[CreateWindowAction$.isRedirect] is Function)
+                    ? _patchMap[CreateWindowAction$.isRedirect](this.isRedirect)
+                    : (_patchMap[CreateWindowAction$.isRedirect] is Patch)
+                    ? _patchMap[CreateWindowAction$.isRedirect].applyTo(
+                        this.isRedirect,
+                      )
+                    : _patchMap[CreateWindowAction$.isRedirect])
+                as bool?
           : this.isRedirect,
       navigationType: _patchMap.containsKey(CreateWindowAction$.navigationType)
-          ? (_patchMap[CreateWindowAction$.navigationType] is Function)
-                ? _patchMap[CreateWindowAction$.navigationType](
-                    this.navigationType,
-                  )
-                : (_patchMap[CreateWindowAction$.navigationType] is Patch)
-                ? _patchMap[CreateWindowAction$.navigationType].applyTo(
-                    this.navigationType,
-                  )
-                : _patchMap[CreateWindowAction$.navigationType]
+          ? ((_patchMap[CreateWindowAction$.navigationType] is Function)
+                    ? _patchMap[CreateWindowAction$.navigationType](
+                        this.navigationType,
+                      )
+                    : (_patchMap[CreateWindowAction$.navigationType] is Patch)
+                    ? _patchMap[CreateWindowAction$.navigationType].applyTo(
+                        this.navigationType,
+                      )
+                    : _patchMap[CreateWindowAction$.navigationType])
+                as NavigationType?
           : this.navigationType,
       sourceFrame: _patchMap.containsKey(CreateWindowAction$.sourceFrame)
-          ? (_patchMap[CreateWindowAction$.sourceFrame] is Function)
-                ? _patchMap[CreateWindowAction$.sourceFrame](this.sourceFrame)
-                : (_patchMap[CreateWindowAction$.sourceFrame] is Patch)
-                ? _patchMap[CreateWindowAction$.sourceFrame].applyTo(
-                    this.sourceFrame,
-                  )
-                : _patchMap[CreateWindowAction$.sourceFrame]
+          ? ((_patchMap[CreateWindowAction$.sourceFrame] is Function)
+                    ? _patchMap[CreateWindowAction$.sourceFrame](
+                        this.sourceFrame,
+                      )
+                    : (_patchMap[CreateWindowAction$.sourceFrame] is Patch)
+                    ? _patchMap[CreateWindowAction$.sourceFrame].applyTo(
+                        this.sourceFrame,
+                      )
+                    : _patchMap[CreateWindowAction$.sourceFrame])
+                as FrameInfo?
           : this.sourceFrame,
       targetFrame: _patchMap.containsKey(CreateWindowAction$.targetFrame)
-          ? (_patchMap[CreateWindowAction$.targetFrame] is Function)
-                ? _patchMap[CreateWindowAction$.targetFrame](this.targetFrame)
-                : (_patchMap[CreateWindowAction$.targetFrame] is Patch)
-                ? _patchMap[CreateWindowAction$.targetFrame].applyTo(
-                    this.targetFrame,
-                  )
-                : _patchMap[CreateWindowAction$.targetFrame]
+          ? ((_patchMap[CreateWindowAction$.targetFrame] is Function)
+                    ? _patchMap[CreateWindowAction$.targetFrame](
+                        this.targetFrame,
+                      )
+                    : (_patchMap[CreateWindowAction$.targetFrame] is Patch)
+                    ? _patchMap[CreateWindowAction$.targetFrame].applyTo(
+                        this.targetFrame,
+                      )
+                    : _patchMap[CreateWindowAction$.targetFrame])
+                as FrameInfo?
           : this.targetFrame,
     );
   }
@@ -260,7 +318,8 @@ class CreateWindowAction {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$CreateWindowActionToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

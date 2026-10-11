@@ -10,14 +10,13 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 void main() {
   group('InAppBrowserMenuItem', () {
     test('wire round-trip (onClick excluded)', () {
-      var clicked = false;
       final item = InAppBrowserMenuItem(
         id: 1,
         title: 'Item',
         order: 2,
         showAsAction: true,
         iconColor: Color_(0xFF112233),
-        onClick: () => clicked = true,
+        onClick: () {},
       );
       final map = item.toMap();
       expect(map['id'], 1);

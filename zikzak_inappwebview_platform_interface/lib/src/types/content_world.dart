@@ -20,8 +20,7 @@ class ContentWorld {
   ContentWorld.world({required this.name}) {
     // WINDOW-ID- is used internally by the plugin!
     assert(
-      !this.name.startsWith("WINDOW-ID-") &&
-          !this.name.contains(_contentWorldNameRegExp),
+      !name.startsWith("WINDOW-ID-") && !name.contains(_contentWorldNameRegExp),
     );
   }
 
@@ -43,7 +42,7 @@ class ContentWorld {
 
   ///Converts instance to a map.
   Map<String, dynamic> toJson() {
-    return this.toMap();
+    return toMap();
   }
 
   @override

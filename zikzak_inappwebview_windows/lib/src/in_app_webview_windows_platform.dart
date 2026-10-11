@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show kDebugMode, visibleForTesting;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show PlatformException;
 
 import 'package:path_provider/path_provider.dart';
 import 'package:webview_windows/webview_windows.dart';
@@ -9,11 +11,75 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 
 import 'in_app_webview_windows_controller.dart';
 
+bool isEnvironmentAlreadyInitializedError(Object error) {
+  return error is PlatformException &&
+      error.code == 'environment_already_initialized';
+}
+
+/// Initializes the shared WebView2 environment, tolerating an environment
+/// that another WebView already created.
+///
+/// The WebView2 environment is process-wide and immutable: once some other
+/// WebView has created it, this WebView reuses it and its own requested
+/// args (user-data folder, browser executable, additional arguments) are
+/// NOT applied — a `debugPrint` in debug builds surfaces that divergence.
+/// Any other [PlatformException] is rethrown: only
+/// `environment_already_initialized` is safe to ignore.
+@visibleForTesting
+Future<void> ensureWebView2Environment(WebViewEnvironmentInitArgs args) async {
+  try {
+    await WebviewController.initializeEnvironment(
+      userDataPath: args.userDataPath,
+      browserExePath: args.browserExePath,
+      additionalArguments: args.additionalArguments,
+    );
+  } on PlatformException catch (error) {
+    if (!isEnvironmentAlreadyInitializedError(error)) rethrow;
+    if (kDebugMode) {
+      debugPrint(
+        'zikzak_inappwebview_windows: WebView2 environment already initialized '
+        'by another WebView; reusing it. Requested args were NOT applied '
+        '(userDataPath: ${args.userDataPath}, browserExePath: '
+        '${args.browserExePath}, additionalArguments: '
+        '${args.additionalArguments}).',
+      );
+    }
+  }
+}
+
 class _VirtualHostMappingInfo {
   final String folderPath;
   final int accessKind;
 
   _VirtualHostMappingInfo({required this.folderPath, required this.accessKind});
+}
+
+/// Maps a [LoadingState] change onto the platform-agnostic load callbacks.
+///
+/// `loading` maps to `onLoadStart` + progress `0`, `navigationCompleted`
+/// maps to `onLoadStop` + progress `100` (webview_windows exposes no
+/// granular progress), and `none` produces no callbacks. Redirects produce
+/// multiple start/stop cycles — one per top-level navigation.
+@visibleForTesting
+void dispatchLoadingStateChange({
+  required LoadingState state,
+  required String? url,
+  required PlatformInAppWebViewController controller,
+  required PlatformInAppWebViewWidgetCreationParams params,
+}) {
+  final uri = url == null ? null : WebUri(url);
+  switch (state) {
+    case LoadingState.loading:
+      params.onProgressChanged?.call(controller, 0);
+      params.onLoadStart?.call(controller, uri);
+      break;
+    case LoadingState.navigationCompleted:
+      params.onProgressChanged?.call(controller, 100);
+      params.onLoadStop?.call(controller, uri);
+      break;
+    case LoadingState.none:
+      break;
+  }
 }
 
 class InAppWebViewWindowsPlatform extends PlatformInAppWebViewController {
@@ -57,6 +123,13 @@ class _InAppWebViewWindowsWidgetStateImpl
   final _controller = WebviewController();
   bool _isInitialized = false;
 
+  /// Native-event subscriptions. `WebviewController.dispose()` never closes
+  /// its stream controllers, so these must be cancelled explicitly —
+  /// otherwise in-flight events can invoke callbacks after this `State` is
+  /// unmounted.
+  StreamSubscription<String>? _urlSubscription;
+  StreamSubscription<LoadingState>? _loadingStateSubscription;
+
   @override
   void initState() {
     super.initState();
@@ -99,14 +172,33 @@ class _InAppWebViewWindowsWidgetStateImpl
         defaultUserDataFolder: () => defaultUserDataFolder,
       );
 
-      // Initialize the shared WebView2 environment with the resolved args.
-      await WebviewController.initializeEnvironment(
-        userDataPath: args.userDataPath,
-        browserExePath: args.browserExePath,
-        additionalArguments: args.additionalArguments,
-      );
+      // The WebView2 environment is shared by all controllers and can only be
+      // initialized once. Reusing it is valid when another WebView already
+      // initialized the process-wide environment; any other failure rethrows.
+      await ensureWebView2Environment(args);
 
       await _controller.initialize();
+
+      final controllerParams = PlatformInAppWebViewControllerCreationParams(
+        id: widget.params.windowId,
+        webviewParams: widget.params,
+      );
+      final controller = InAppWebViewWindowsController(
+        controllerParams,
+        _controller,
+      );
+      final callbackController =
+          // The platform widget wrapper always installs this callback; the
+          // `?? controller` fallback only exists so direct platform-object
+          // usage (tests) keeps working.
+          widget.params.controllerFromPlatform?.call(controller) ?? controller;
+
+      // Publish the controller BEFORE any listener or load can deliver load
+      // events: onWebViewCreated must precede onLoadStart/onLoadStop, the
+      // same contract every other platform implementation follows.
+      if (widget.params.onWebViewCreated != null) {
+        widget.params.onWebViewCreated!(callbackController);
+      }
 
       // Apply virtual host mappings from the environment settings. Each
       // mapping serves a local folder at https://<hostName>/ and bypasses
@@ -145,16 +237,23 @@ class _InAppWebViewWindowsWidgetStateImpl
       }
 
       // Setup listeners
-      _controller.url.listen((url) {
-        // TODO: handle url change
-      });
-
-      _controller.loadingState.listen((state) {
-        if (state == LoadingState.navigationCompleted) {
-          // TODO: handle load stop
-        } else if (state == LoadingState.loading) {
-          // TODO: handle load start
-        }
+      //
+      // NOTE: `urlChanged` and `loadingStateChanged` arrive on two
+      // independent stream controllers fed by the same native event channel,
+      // so the relative ordering is not guaranteed: the URL passed to
+      // onLoadStart/onLoadStop is best-effort and may be null or stale when
+      // the loadingState event lands before the matching urlChanged event
+      // (webview_windows 0.4.0 has no synchronous url getter).
+      String? currentUrl;
+      _urlSubscription = _controller.url.listen((url) => currentUrl = url);
+      _loadingStateSubscription = _controller.loadingState.listen((state) {
+        if (!mounted) return;
+        dispatchLoadingStateChange(
+          state: state,
+          url: currentUrl,
+          controller: callbackController,
+          params: widget.params,
+        );
       });
 
       if (!mounted) return;
@@ -166,23 +265,6 @@ class _InAppWebViewWindowsWidgetStateImpl
       if (widget.params.initialUrlRequest != null) {
         await _controller.loadUrl(
           widget.params.initialUrlRequest!.url.toString(),
-        );
-      }
-
-      // Create controller
-      final controllerParams = PlatformInAppWebViewControllerCreationParams(
-        id: widget.params.windowId,
-        webviewParams: widget.params,
-      );
-
-      final controller = InAppWebViewWindowsController(
-        controllerParams,
-        _controller,
-      );
-
-      if (widget.params.onWebViewCreated != null) {
-        widget.params.onWebViewCreated!(
-          widget.params.controllerFromPlatform!(controller),
         );
       }
     } catch (e) {
@@ -199,6 +281,8 @@ class _InAppWebViewWindowsWidgetStateImpl
 
   @override
   void dispose() {
+    _urlSubscription?.cancel();
+    _loadingStateSubscription?.cancel();
     _controller.dispose();
     super.dispose();
   }

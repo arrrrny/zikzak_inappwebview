@@ -1,0 +1,1 @@
+../../../.specify/extensions/git/.specify-dev/agent-commands/zed/speckit-git-remote/SKILL.md

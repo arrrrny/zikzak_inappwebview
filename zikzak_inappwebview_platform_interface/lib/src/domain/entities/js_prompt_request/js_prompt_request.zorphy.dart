@@ -43,6 +43,29 @@ class JsPromptRequest {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  JsPromptRequest copyWithField<T>(Field<JsPromptRequest, T> field, T value) {
+    switch (field.name) {
+      case 'url':
+        return copyWith(url: value as WebUri?);
+      case 'message':
+        return copyWith(message: value as String?);
+      case 'defaultValue':
+        return copyWith(defaultValue: value as String?);
+      case 'isMainFrame':
+        return copyWith(isMainFrame: value as bool?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'JsPromptRequest has no settable field with this name',
+        );
+    }
+  }
+
   JsPromptRequest copyWithJsPromptRequest({
     WebUri? url,
     String? message,
@@ -62,36 +85,42 @@ class JsPromptRequest {
     final _patchMap = _patcher.patchMap;
     return JsPromptRequest(
       url: _patchMap.containsKey(JsPromptRequest$.url)
-          ? (_patchMap[JsPromptRequest$.url] is Function)
-                ? _patchMap[JsPromptRequest$.url](this.url)
-                : (_patchMap[JsPromptRequest$.url] is Patch)
-                ? _patchMap[JsPromptRequest$.url].applyTo(this.url)
-                : _patchMap[JsPromptRequest$.url]
+          ? ((_patchMap[JsPromptRequest$.url] is Function)
+                    ? _patchMap[JsPromptRequest$.url](this.url)
+                    : (_patchMap[JsPromptRequest$.url] is Patch)
+                    ? _patchMap[JsPromptRequest$.url].applyTo(this.url)
+                    : _patchMap[JsPromptRequest$.url])
+                as WebUri?
           : this.url,
       message: _patchMap.containsKey(JsPromptRequest$.message)
-          ? (_patchMap[JsPromptRequest$.message] is Function)
-                ? _patchMap[JsPromptRequest$.message](this.message)
-                : (_patchMap[JsPromptRequest$.message] is Patch)
-                ? _patchMap[JsPromptRequest$.message].applyTo(this.message)
-                : _patchMap[JsPromptRequest$.message]
+          ? ((_patchMap[JsPromptRequest$.message] is Function)
+                    ? _patchMap[JsPromptRequest$.message](this.message)
+                    : (_patchMap[JsPromptRequest$.message] is Patch)
+                    ? _patchMap[JsPromptRequest$.message].applyTo(this.message)
+                    : _patchMap[JsPromptRequest$.message])
+                as String?
           : this.message,
       defaultValue: _patchMap.containsKey(JsPromptRequest$.defaultValue)
-          ? (_patchMap[JsPromptRequest$.defaultValue] is Function)
-                ? _patchMap[JsPromptRequest$.defaultValue](this.defaultValue)
-                : (_patchMap[JsPromptRequest$.defaultValue] is Patch)
-                ? _patchMap[JsPromptRequest$.defaultValue].applyTo(
-                    this.defaultValue,
-                  )
-                : _patchMap[JsPromptRequest$.defaultValue]
+          ? ((_patchMap[JsPromptRequest$.defaultValue] is Function)
+                    ? _patchMap[JsPromptRequest$.defaultValue](
+                        this.defaultValue,
+                      )
+                    : (_patchMap[JsPromptRequest$.defaultValue] is Patch)
+                    ? _patchMap[JsPromptRequest$.defaultValue].applyTo(
+                        this.defaultValue,
+                      )
+                    : _patchMap[JsPromptRequest$.defaultValue])
+                as String?
           : this.defaultValue,
       isMainFrame: _patchMap.containsKey(JsPromptRequest$.isMainFrame)
-          ? (_patchMap[JsPromptRequest$.isMainFrame] is Function)
-                ? _patchMap[JsPromptRequest$.isMainFrame](this.isMainFrame)
-                : (_patchMap[JsPromptRequest$.isMainFrame] is Patch)
-                ? _patchMap[JsPromptRequest$.isMainFrame].applyTo(
-                    this.isMainFrame,
-                  )
-                : _patchMap[JsPromptRequest$.isMainFrame]
+          ? ((_patchMap[JsPromptRequest$.isMainFrame] is Function)
+                    ? _patchMap[JsPromptRequest$.isMainFrame](this.isMainFrame)
+                    : (_patchMap[JsPromptRequest$.isMainFrame] is Patch)
+                    ? _patchMap[JsPromptRequest$.isMainFrame].applyTo(
+                        this.isMainFrame,
+                      )
+                    : _patchMap[JsPromptRequest$.isMainFrame])
+                as bool?
           : this.isMainFrame,
     );
   }
@@ -130,7 +159,8 @@ class JsPromptRequest {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$JsPromptRequestToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

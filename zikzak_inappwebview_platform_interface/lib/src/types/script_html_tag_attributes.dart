@@ -80,9 +80,9 @@ class ScriptHtmlTagAttributes {
     this.onLoad,
     this.onError,
   }) {
-    if (this.onLoad != null || this.onError != null) {
+    if (onLoad != null || onError != null) {
       assert(
-        this.id != null,
+        id != null,
         'onLoad and onError callbacks require the id property to be set.',
       );
     }

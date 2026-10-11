@@ -23,6 +23,25 @@ class WebStorageItem {
     return WebStorageItem(key: key ?? this.key, value: value ?? this.value);
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  WebStorageItem copyWithField<T>(Field<WebStorageItem, T> field, T value) {
+    switch (field.name) {
+      case 'key':
+        return copyWith(key: value as String?);
+      case 'value':
+        return copyWith(value: value as dynamic);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'WebStorageItem has no settable field with this name',
+        );
+    }
+  }
+
   WebStorageItem copyWithWebStorageItem({String? key, dynamic value}) {
     return copyWith(key: key, value: value);
   }
@@ -32,18 +51,20 @@ class WebStorageItem {
     final _patchMap = _patcher.patchMap;
     return WebStorageItem(
       key: _patchMap.containsKey(WebStorageItem$.key)
-          ? (_patchMap[WebStorageItem$.key] is Function)
-                ? _patchMap[WebStorageItem$.key](this.key)
-                : (_patchMap[WebStorageItem$.key] is Patch)
-                ? _patchMap[WebStorageItem$.key].applyTo(this.key)
-                : _patchMap[WebStorageItem$.key]
+          ? ((_patchMap[WebStorageItem$.key] is Function)
+                    ? _patchMap[WebStorageItem$.key](this.key)
+                    : (_patchMap[WebStorageItem$.key] is Patch)
+                    ? _patchMap[WebStorageItem$.key].applyTo(this.key)
+                    : _patchMap[WebStorageItem$.key])
+                as String?
           : this.key,
       value: _patchMap.containsKey(WebStorageItem$.value)
-          ? (_patchMap[WebStorageItem$.value] is Function)
-                ? _patchMap[WebStorageItem$.value](this.value)
-                : (_patchMap[WebStorageItem$.value] is Patch)
-                ? _patchMap[WebStorageItem$.value].applyTo(this.value)
-                : _patchMap[WebStorageItem$.value]
+          ? ((_patchMap[WebStorageItem$.value] is Function)
+                    ? _patchMap[WebStorageItem$.value](this.value)
+                    : (_patchMap[WebStorageItem$.value] is Patch)
+                    ? _patchMap[WebStorageItem$.value].applyTo(this.value)
+                    : _patchMap[WebStorageItem$.value])
+                as dynamic
           : this.value,
     );
   }
@@ -66,7 +87,8 @@ class WebStorageItem {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$WebStorageItemToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

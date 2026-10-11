@@ -1,0 +1,1 @@
+../../.specify/extensions/bug/.specify-dev/agent-commands/opencode/speckit.bug.fetch.md

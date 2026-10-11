@@ -5,9 +5,76 @@
 //  Created by Lorenzo on 21/10/18.
 //
 
+import CryptoKit
 import Flutter
 import Foundation
 import WebKit
+
+/// Maps a stable identifier string into a stable `UUID` for
+/// `WKWebsiteDataStore(forIdentifier:)`. Accepts three input shapes so the
+/// same Dart field can be fed either a raw UUID string, a stable profile
+/// name, or the 64-char SHA-256 hex the forklift caller used to send
+/// (derived from a profile dir's canonical path). All three are
+/// deterministic — the same identifier always yields the same on-disk
+/// store, which is what makes a per-account session survive app relaunch.
+/// Mirrors the macOS helper 1:1 to keep the Dart-side contract identical
+/// across platforms.
+///
+/// Shape priority: (a) direct UUID string -> (b) 64-char hex legacy path
+/// -> (c) SHA-256 of the UTF-8 bytes (CryptoKit, iOS 13+/macOS 10.15+,
+/// well below the iOS 17+/macOS 14+ floor of the persistent-store API
+/// itself).
+private func persistentUUID(from identifier: String) -> UUID? {
+    let trimmed = identifier.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard !trimmed.isEmpty else { return nil }
+
+    // (a) Direct UUID string ("550e8400-e29b-41d4-a716-446655440000").
+    if let direct = UUID(uuidString: trimmed) {
+        return direct
+    }
+
+    // (b) Legacy 64-char SHA-256 hex path: take the first 32 hex chars
+    // (16 bytes) and treat them as the UUID's raw bytes. Preserves the
+    // on-disk store identifier forklift's Cloaked Chrome profiles already
+    // use, so existing persistent stores keep reopening after the upgrade.
+    let hexSet = CharacterSet(charactersIn: "0123456789abcdefABCDEF")
+    let isHex = trimmed.unicodeScalars.allSatisfy { hexSet.contains($0) }
+    if isHex, trimmed.count >= 32 {
+        let prefix = trimmed.prefix(32)
+        var bytes: [UInt8] = []
+        bytes.reserveCapacity(16)
+        var index = prefix.startIndex
+        while index < prefix.endIndex {
+            let next = prefix.index(index, offsetBy: 2, limitedBy: prefix.endIndex) ?? prefix.endIndex
+            guard let byte = UInt8(String(prefix[index..<next]), radix: 16) else { return nil }
+            bytes.append(byte)
+            index = next
+        }
+        guard bytes.count == 16 else { return nil }
+        return UUID(uuid: (
+            bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7],
+            bytes[8], bytes[9], bytes[10], bytes[11], bytes[12], bytes[13], bytes[14], bytes[15]
+        ))
+    }
+
+    // (c) Any other stable string: SHA-256 the UTF-8 bytes and use the
+    // first 16 bytes as the UUID's raw bytes. Deterministic, isolated,
+    // and survives relaunch — distinct identifiers never collide.
+    // CryptoKit ships with the system on iOS 13+/macOS 10.15+, so this
+    // branch is always available when the iOS 17+ persistent store path
+    // runs.
+    if #available(iOS 13.0, *) {
+        let digest = SHA256.hash(data: Data(trimmed.utf8))
+        let sha = Array(digest)
+        return UUID(uuid: (
+            sha[0],  sha[1],  sha[2],  sha[3],
+            sha[4],  sha[5],  sha[6],  sha[7],
+            sha[8],  sha[9],  sha[10], sha[11],
+            sha[12], sha[13], sha[14], sha[15]
+        ))
+    }
+    return nil
+}
 
 public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     WKNavigationDelegate, WKScriptMessageHandler, UIGestureRecognizerDelegate,
@@ -41,6 +108,19 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     /// process (which can silently drop the navigation). `nil` by default —
     /// no effect on regular web views.
     var firstNavigationCompleted: (() -> Void)?
+
+    // MARK: - WebContent readiness gate (first-load race)
+    //
+    // A navigation issued while the WKWebView WebContent process is still
+    // booting is silently dropped (no didStart/didFinish/didFail — the
+    // navigation simply never happens). Mirror the macOS InAppWebView's gate:
+    // arm via evaluateJavaScript("true") (which WebKit queues until the
+    // WebContent process is fully up) and queue any early load until that
+    // completes, then flush. Without this, a loadData/loadUrl issued from
+    // onWebViewCreated (or the initial load) can be lost and the page never
+    // loads.
+    private var isWebContentReady = false
+    private var pendingFirstLoad: (() -> Void)?
 
 
     private static var sslCertificatesMap: [String: SslCertificate] = [:]  // [URL host name : SslCertificate]
@@ -87,6 +167,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         contextMenu: [String: Any]?, userScripts: [UserScript] = []
     ) {
         super.init(frame: frame, configuration: configuration)
+        // Bug #331 belt-and-braces: pin the root clip at construction time,
+        // independently of prepare(). prepare() re-asserts it on every
+        // on-screen path; this guarantees the root view is clipped from the
+        // moment it exists even if a future construction path skips prepare().
+        clipsToBounds = true
         self.id = id
         self.plugin = plugin
         if let id = id, let registrar = plugin?.registrar {
@@ -111,6 +196,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         panGestureRecognizer = UIPanGestureRecognizer()
         panGestureRecognizer.delegate = self
         panGestureRecognizer.addTarget(self, action: #selector(endDraggingDetected))
+
+        // Arm the WebContent readiness gate so any load issued while the
+        // WebContent process is still booting is queued until it is ready.
+        armWebContentReadinessGate()
     }
 
     override public var frame: CGRect {
@@ -134,6 +223,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         }
     }
 
+    // Bug #331: this path never runs prepare(), so a storyboard-constructed
+    // instance would keep the root view unclipped (the designated initializer
+    // and prepare() both pin clipsToBounds = true, but neither runs here).
+    // Unreachable today — the plugin constructs InAppWebView programmatically;
+    // if this initializer is ever enabled, assert the root clip here too.
     required public init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)!
     }
@@ -474,6 +568,14 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             object: window)
         //        }
 
+        // Bug #331: the WKWebView is the native layer of a Flutter platform
+        // view and must never paint outside the bounds Flutter allocates for
+        // it. UIView.clipsToBounds defaults to NO and WebKit does not
+        // guarantee clipping on the root view either; on Flutter 3.47.x TLHC
+        // compositing a mis-clipped native layer paints over sibling Flutter
+        // content (the reported "rendering layer confusion").
+        clipsToBounds = true
+
         if let settings = settings {
             if settings.transparentBackground {
                 isOpaque = false
@@ -646,7 +748,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
 
         configuration.userContentController.addPluginScript(PROMISE_POLYFILL_JS_PLUGIN_SCRIPT)
         configuration.userContentController.addPluginScript(JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT)
-        configuration.userContentController.addPluginScript(CONSOLE_LOG_JS_PLUGIN_SCRIPT)
+        if settings?.consoleLogEnabled ?? true {
+            configuration.userContentController.addPluginScript(CONSOLE_LOG_JS_PLUGIN_SCRIPT)
+        }
         configuration.userContentController.addPluginScript(PRINT_JS_PLUGIN_SCRIPT)
         configuration.userContentController.addPluginScript(ON_WINDOW_BLUR_EVENT_JS_PLUGIN_SCRIPT)
         configuration.userContentController.addPluginScript(ON_WINDOW_FOCUS_EVENT_JS_PLUGIN_SCRIPT)
@@ -725,11 +829,32 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                     settings.allowFileAccessFromFileURLs, forKey: "allowFileAccessFromFileURLs")
             }
 
+            var dataStoreWasSelected = false
             if #available(iOS 9.0, *) {
+                // Per-instance persistent, isolated WKWebsiteDataStore
+                // (iOS 17+/macOS 14+). Same persistentStoreIdentifier
+                // reopens the same on-disk store across launches; distinct
+                // identifiers yield fully isolated cookies/localStorage/
+                // cache. Mutually exclusive with `incognito` — incognito
+                // is non-persistent (wiped on tear-down) and takes
+                // precedence. Below iOS 17 the persistent path is
+                // unavailable, so we fall through to the shared `.default()`
+                // store (existing behavior). Must be applied here, on the
+                // configuration BEFORE the WKWebView is created —
+                // websiteDataStore is immutable post-init, so a later
+                // `setSettings` cannot change it (see issue #253
+                // acceptance criteria).
                 if settings.incognito {
                     configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+                    dataStoreWasSelected = true
+                } else if #available(iOS 17.0, *),
+                   let id = settings.persistentStoreIdentifier, !id.isEmpty,
+                   let uuid = persistentUUID(from: id) {
+                    configuration.websiteDataStore = WKWebsiteDataStore(forIdentifier: uuid)
+                    dataStoreWasSelected = true
                 } else if settings.cacheEnabled {
                     configuration.websiteDataStore = WKWebsiteDataStore.default()
+                    dataStoreWasSelected = true
                 }
                 if !settings.applicationNameForUserAgent.isEmpty {
                     if let applicationNameForUserAgent = configuration.applicationNameForUserAgent {
@@ -768,8 +893,30 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                     // Set Cookies in iOS 11 and above, initialize websiteDataStore before setting cookies
                     // See also https://forums.developer.apple.com/thread/97194
                     // check if websiteDataStore has not been initialized before
-                    if !settings.incognito && !settings.cacheEnabled {
-                        configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+                    let hasValidPersistentId = settings.persistentStoreIdentifier.map {
+                        persistentUUID(from: $0) != nil
+                    } ?? false
+                    // A persistent store can only be honored on iOS 17+ (the
+                    // `forIdentifier:` selector is unavailable below it). On
+                    // older iOS, `hasValidPersistentId` is meaningless for the
+                    // data store, so skip the short-circuit and fall through to
+                    // the master behavior (nonPersistent) when cacheEnabled is
+                    // false — otherwise per-account isolation is silently lost.
+                    // NOTE: `#available` may only be the direct condition of an
+                    // `if`/`guard`/`while`, so the original boolean-folded form
+                    // (`!hasValidPersistentId || !#available(iOS 17.0, *)`,
+                    // issue #316) is expressed here as nested conditionals with
+                    // an identical truth table.
+                    if !dataStoreWasSelected {
+                        if #available(iOS 17.0, *) {
+                            if !hasValidPersistentId {
+                                configuration.websiteDataStore =
+                                    WKWebsiteDataStore.nonPersistent()
+                            }
+                        } else {
+                            configuration.websiteDataStore =
+                                WKWebsiteDataStore.nonPersistent()
+                        }
                     }
                     for cookie in HTTPCookieStorage.shared.cookies ?? [] {
                         configuration.websiteDataStore.httpCookieStore.setCookie(
@@ -787,6 +934,25 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 configuration.upgradeKnownHostsToHTTPS = settings.upgradeKnownHostsToHTTPS
             }
 
+            // Neither WebAuthn level has an iOS surface to apply to: no iOS
+            // version exposes a webAuthenticationSupport key on WKWebView /
+            // WKWebViewConfiguration — the symbol is absent from every WebKit
+            // header, and the runtime guard below (responds(to:)) is false on
+            // the iOS 26.3 simulator runtime — so the KVC write never runs and
+            // FOR_APP is inert as well as FOR_BROWSER. Passkey ceremonies are
+            // gated by the host app's webcredentials Associated Domains entry
+            // plus apple-app-site-association, not by this setting. Report the
+            // request instead of dropping it silently, matching Android's
+            // behavior when a level cannot be applied
+            // (InAppWebView.java:762-770). Deliberately outside the iOS 16.4
+            // availability block below: the value is unsupported on every iOS
+            // version, so an older OS must report it too.
+            if settings.webAuthenticationSupport == 2 {  // FOR_BROWSER
+                print(
+                    "webAuthenticationSupport=FOR_BROWSER was requested but iOS does not expose it (WKWebView has no webAuthenticationSupport); the value was not applied. Passkey ceremonies on iOS are gated by the host app's webcredentials Associated Domains entry plus apple-app-site-association."
+                )
+            }
+
             if #available(iOS 16.4, *) {
                 if settings.webAuthenticationSupport == 1 {  // FOR_APP
                     // Use KVC to avoid compile-time availability issues with older SDKs
@@ -795,9 +961,31 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                         let webAuthSupport = configuration.perform(selector)?.takeUnretainedValue()
                             as? NSObject
                     {
-                        webAuthSupport.setValue(true, forKey: "boundKeychainForPasskeys")
+                        // Guard the inner key as well: setValue(_:forKey:) raises an
+                        // uncatchable NSUnknownKeyException when the key is missing,
+                        // which would crash the app on an unexpected SDK state.
+                        if webAuthSupport.responds(to: Selector(("boundKeychainForPasskeys"))) {
+                            webAuthSupport.setValue(true, forKey: "boundKeychainForPasskeys")
+                        }
+                    } else {
+                        // FOR_APP is inert wherever WebKit exposes no such key,
+                        // which is every current iOS — the KVC write above never
+                        // runs. Surface it instead of dropping it silently, so a
+                        // caller can tell an inert setting from an unset one
+                        // (issue #352).
+                        print(
+                            "webAuthenticationSupport=FOR_APP was requested but this iOS version's WebKit does not expose WKWebViewConfiguration.webAuthenticationSupport; the value was not applied."
+                        )
                     }
                 }
+            } else if settings.webAuthenticationSupport == 1 {  // FOR_APP
+                // iOS 16.3 and older sit below the availability gate, so the
+                // else inside it never runs there — without this arm a
+                // requested FOR_APP is still dropped without a word
+                // (issue #352).
+                print(
+                    "webAuthenticationSupport=FOR_APP was requested but iOS 16.3 or older does not expose WKWebViewConfiguration.webAuthenticationSupport; the value was not applied."
+                )
             }
         }
 
@@ -1077,42 +1265,51 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     }
 
     public func loadUrl(urlRequest: URLRequest, allowingReadAccessTo: URL?) {
-        isNavigatingWithCustomAction = true
-        let url = urlRequest.url!
+        performLoad { [weak self] in
+            guard let self = self else { return }
+            self.isNavigatingWithCustomAction = true
+            let url = urlRequest.url!
 
-        if #available(iOS 9.0, *), let allowingReadAccessTo = allowingReadAccessTo,
-            url.scheme == "file", allowingReadAccessTo.scheme == "file"
-        {
-            loadFileURL(url, allowingReadAccessTo: allowingReadAccessTo)
-        } else {
-            load(urlRequest)
+            if #available(iOS 9.0, *), let allowingReadAccessTo = allowingReadAccessTo,
+                url.scheme == "file", allowingReadAccessTo.scheme == "file"
+            {
+                self.loadFileURL(url, allowingReadAccessTo: allowingReadAccessTo)
+            } else {
+                self.load(urlRequest)
+            }
         }
     }
 
     public func postUrl(url: URL, postData: Data) {
-        var request = URLRequest(url: url)
+        performLoad { [weak self] in
+            guard let self = self else { return }
+            var request = URLRequest(url: url)
 
-        request.addValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-        request.httpMethod = "POST"
-        request.httpBody = postData
-        load(request)
+            request.addValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+            request.httpMethod = "POST"
+            request.httpBody = postData
+            self.load(request)
+        }
     }
 
     public func loadData(
         data: String, mimeType: String, encoding: String, baseUrl: URL, allowingReadAccessTo: URL?
     ) {
-        if #available(iOS 9.0, *), let allowingReadAccessTo = allowingReadAccessTo,
-            baseUrl.scheme == "file", allowingReadAccessTo.scheme == "file"
-        {
-            loadFileURL(baseUrl, allowingReadAccessTo: allowingReadAccessTo)
-        }
+        performLoad { [weak self] in
+            guard let self = self else { return }
+            if #available(iOS 9.0, *), let allowingReadAccessTo = allowingReadAccessTo,
+                baseUrl.scheme == "file", allowingReadAccessTo.scheme == "file"
+            {
+                self.loadFileURL(baseUrl, allowingReadAccessTo: allowingReadAccessTo)
+            }
 
-        if #available(iOS 9.0, *) {
-            load(
-                data.data(using: .utf8)!, mimeType: mimeType, characterEncodingName: encoding,
-                baseURL: baseUrl)
-        } else {
-            loadHTMLString(data, baseURL: baseUrl)
+            if #available(iOS 9.0, *) {
+                self.load(
+                    data.data(using: .utf8)!, mimeType: mimeType, characterEncodingName: encoding,
+                    baseURL: baseUrl)
+            } else {
+                self.loadHTMLString(data, baseURL: baseUrl)
+            }
         }
     }
 
@@ -1122,6 +1319,135 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             let urlRequest = URLRequest(url: assetURL)
             loadUrl(urlRequest: urlRequest, allowingReadAccessTo: nil)
         }
+    }
+
+    // MARK: - WebContent readiness gate (first-load race)
+
+    private func debugLog(_ msg: String) {
+        print("ZIKZAK_DEBUG: \(msg)")
+    }
+
+    /// Runs a navigation, queuing it until the WebContent process is fully up.
+    ///
+    /// A `load` issued while the WKWebView WebContent process is still booting is
+    /// silently dropped (no didStart/didFinish/didFail — the navigation simply
+    /// never happens). `evaluateJavaScript` is queued by WebKit until the process
+    /// and its default JS context exist, so the readiness gate's completion is the
+    /// exact "process ready" signal. Until then we hold the latest load in
+    /// `pendingFirstLoad`; only the most recent is kept because a newer navigation
+    /// supersedes an earlier one.
+    private func performLoad(_ load: @escaping () -> Void) {
+        debugLog("PERFORM ready=\(isWebContentReady)")
+        if isWebContentReady {
+            load()
+        } else {
+            pendingFirstLoad = load
+        }
+    }
+
+    /// Arms the WebContent readiness gate. Mirrors the macOS InAppWebView and
+    /// `HeadlessInAppWebViewManager.run()`'s process-readiness ping:
+    /// `evaluateJavaScript("true")` is queued by WebKit until the WebContent
+    /// process is fully up, so its completion handler is the exact "process
+    /// ready" signal. Once ready we flush any load queued during init or from
+    /// onWebViewCreated — no timeout constant required.
+    private func armWebContentReadinessGate() {
+        debugLog("ARM gate")
+        self.evaluateJavaScript("true") { [weak self] (_, error) in
+            self?.debugLog("GATE_CB err=\(error?.localizedDescription ?? "nil")")
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.isWebContentReady = true
+                if let pending = self.pendingFirstLoad {
+                    self.pendingFirstLoad = nil
+                    debugLog("GATE_FLUSH")
+                    pending()
+                } else {
+                    debugLog("GATE_NO_PENDING")
+                }
+            }
+        }
+    }
+
+    // MARK: - Content blockers (#349)
+
+    ///Serializes WKContentRuleList compilations: the completion of a stale
+    ///compilation must not re-add rules that a newer settings update removed.
+    private var contentRuleListCompileToken = 0
+
+    ///True while the latest `contentBlockers` compilation is in flight; the
+    ///initial load is held back until it settles.
+    private var isCompilingContentRuleLists = false
+
+    ///The initial load, held while `isCompilingContentRuleLists` is true.
+    private var pendingContentRuleListLoad: (() -> Void)?
+
+    ///Derives the WKContentRuleListStore identifier from the compiled rule
+    ///content (SHA-256 hex). The previous fixed "ContentBlockingRules"
+    ///identifier was recompiled across app launches and webviews against the
+    ///persistent store, and WebKit can fail to deliver that recompilation's
+    ///completion — which silently orphaned the initial load held on it (#349).
+    ///A content-derived identifier gives every distinct ruleset its own store
+    ///slot and identical rulesets a deterministic cache hit.
+    private func contentRuleListIdentifier(forRules blockRules: String?) -> String {
+        let digest = SHA256.hash(data: Data((blockRules ?? "").utf8))
+        return digest.map { String(format: "%02x", $0) }.joined()
+    }
+
+    ///Compiles `contentBlockers` into a WKContentRuleList and adds it to the
+    ///configuration's userContentController (mirrors the macOS #338 funnel).
+    ///Compilation is asynchronous; loads routed through
+    ///`loadAfterContentRuleLists` wait for it to settle — on success AND on
+    ///error, so a compile failure can never orphan the initial navigation.
+    func applyContentBlockers(_ contentBlockers: [[String: [String: Any]]]) {
+        configuration.userContentController.removeAllContentRuleLists()
+        guard !contentBlockers.isEmpty else {
+            return
+        }
+        do {
+            let jsonData = try JSONSerialization.data(
+                withJSONObject: contentBlockers, options: [])
+            let blockRules = String(data: jsonData, encoding: .utf8)
+            contentRuleListCompileToken += 1
+            let token = contentRuleListCompileToken
+            isCompilingContentRuleLists = true
+            WKContentRuleListStore.default().compileContentRuleList(
+                forIdentifier: contentRuleListIdentifier(forRules: blockRules),
+                encodedContentRuleList: blockRules
+            ) { [weak self] (contentRuleList, error) in
+                DispatchQueue.main.async {
+                    guard let self = self,
+                        token == self.contentRuleListCompileToken
+                    else {
+                        return
+                    }
+                    self.isCompilingContentRuleLists = false
+                    if let error = error {
+                        print(error.localizedDescription)
+                    } else if let contentRuleList = contentRuleList {
+                        self.configuration.userContentController.add(contentRuleList)
+                    }
+                    if let pendingLoad = self.pendingContentRuleListLoad {
+                        self.pendingContentRuleListLoad = nil
+                        pendingLoad()
+                    }
+                }
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+
+    ///Runs `load` once any in-flight content-rule compilation has settled, so
+    ///a navigation never starts before the rules it must obey are installed —
+    ///and is never orphaned by a compile error or an undelivered completion
+    ///(#349).
+    func loadAfterContentRuleLists(_ load: @escaping () -> Void) {
+        if isCompilingContentRuleLists {
+            pendingContentRuleListLoad = load
+            return
+        }
+        load()
     }
 
     func setSettings(newSettings: InAppWebViewSettings, newSettingsMap: [String: Any]) {
@@ -1141,6 +1467,18 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                     configuration.userContentController.removeAllUserScripts()
                 }
             }
+        }
+
+        // webAuthenticationSupport is creation-time only: the underlying
+        // WKWebViewConfiguration is immutable after the WKWebView is created,
+        // so a runtime change is a no-op. Surface it instead of silently
+        // dropping it (issue #272).
+        if newSettingsMap["webAuthenticationSupport"] != nil
+            && settings != nil && settings!.webAuthenticationSupport != newSettings.webAuthenticationSupport
+        {
+            print(
+                "webAuthenticationSupport cannot be changed after the WebView has been created (WKWebViewConfiguration is immutable); ignoring the new value"
+            )
         }
 
         if newSettingsMap["transparentBackground"] != nil
@@ -1568,28 +1906,13 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             }
         }
 
+        // #349: the inline compile block (fixed "ContentBlockingRules"
+        // identifier, contentRuleList! force unwrap, error path that could
+        // leave loads held on an undelivered completion) moved into the
+        // shared applyContentBlockers funnel — same machinery as the initial
+        // load and the InAppBrowser.
         if #available(iOS 11.0, *), newSettingsMap["contentBlockers"] != nil {
-            configuration.userContentController.removeAllContentRuleLists()
-            let contentBlockers = newSettings.contentBlockers
-            if contentBlockers.count > 0 {
-                do {
-                    let jsonData = try JSONSerialization.data(
-                        withJSONObject: contentBlockers, options: [])
-                    let blockRules = String(data: jsonData, encoding: .utf8)
-                    WKContentRuleListStore.default().compileContentRuleList(
-                        forIdentifier: "ContentBlockingRules",
-                        encodedContentRuleList: blockRules
-                    ) { (contentRuleList, error) in
-                        if let error = error {
-                            print(error.localizedDescription)
-                            return
-                        }
-                        self.configuration.userContentController.add(contentRuleList!)
-                    }
-                } catch {
-                    print(error.localizedDescription)
-                }
-            }
+            applyContentBlockers(newSettings.contentBlockers)
         }
 
         if #available(iOS 15.0, *) {
@@ -1805,6 +2128,15 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         }
     }
 
+    // Two arms on purpose (#330, #333). WebKit annotates the completion block
+    // `WK_SWIFT_UI_ACTOR` from the iOS 18 / macOS 15 SDKs on, and every Swift 6
+    // toolchain bundles such an SDK, hence the compiler check. The annotated
+    // form on an older SDK stops overriding the superclass (hard build failure,
+    // #330). The plain form on a Swift 6 SDK still compiles, but its block type
+    // no longer matches WebKit's and the first evaluation crashes in
+    // objc_retain with SIGBUS (#332). Upstream flutter_inappwebview carries the
+    // same split.
+#if compiler(>=6.0)
     public override func evaluateJavaScript(
         _ javaScriptString: String,
         completionHandler: (@MainActor @Sendable (Any?, (any Error)?) -> Void)? = nil
@@ -1815,6 +2147,18 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         }
         super.evaluateJavaScript(javaScriptString, completionHandler: completionHandler)
     }
+#else
+    public override func evaluateJavaScript(
+        _ javaScriptString: String,
+        completionHandler: ((Any?, Error?) -> Void)? = nil
+    ) {
+        if let applePayAPIEnabled = settings?.applePayAPIEnabled, applePayAPIEnabled {
+            completionHandler?(nil, nil)
+            return
+        }
+        super.evaluateJavaScript(javaScriptString, completionHandler: completionHandler)
+    }
+#endif
 
     public func evaluateJavaScript(
         _ javaScript: String, frame: WKFrameInfo? = nil, contentWorld: WKContentWorld,
@@ -2239,7 +2583,16 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         }
 
         let validator = URLValidationManager()
-        if let url = navigationAction.request.url, !validator.validateURL(url).allowed {
+        // Unknown custom schemes are handed to the host navigation delegate
+        // instead of being cancelled here, so the classification is computed
+        // once and reused as the default answer below. Re-deriving it from
+        // `validateURL` would run a host-installed custom validator twice per
+        // navigation and could disagree with this gate.
+        let preDelegateDecision: URLValidationManager.PreDelegateDecision =
+            navigationAction.request.url.map {
+                validator.decisionBeforeHostDelegate($0)
+            } ?? .allow
+        if preDelegateDecision == .block {
             decisionHandler(.cancel)
             return
         }
@@ -2254,7 +2607,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         callback.defaultBehaviour = { (response: WKNavigationActionPolicy?) in
             if !decisionHandlerCalled {
                 decisionHandlerCalled = true
-                decisionHandler(.allow)
+                // Fail-closed: the pre-delegate gate lets unknown custom schemes
+                // through so the host can inspect them, so a navigation that no
+                // host policy handled is still cancelled.
+                decisionHandler(preDelegateDecision == .allow ? .allow : .cancel)
             }
         }
         callback.error = { [weak callback] (code: String, message: String?, details: Any?) in

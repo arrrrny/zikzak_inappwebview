@@ -157,13 +157,3 @@ PrintJobAttributes? _attributesFromJson(Object? value) => value == null
 
 Object? _attributesToJson(PrintJobAttributes? attributes) =>
     attributes?.toJson();
-
-PrintJobRenderingQuality? _renderingQualityFromJson(Object? value) {
-  if (value is! int) return null;
-  return value >= 0 && value < PrintJobRenderingQuality.values.length
-      ? PrintJobRenderingQuality.values[value]
-      : null;
-}
-
-Object? _renderingQualityToJson(PrintJobRenderingQuality? quality) =>
-    quality?.index;

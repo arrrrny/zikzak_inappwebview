@@ -2,7 +2,7 @@
 // Exports all enums for easy importing
 // Generated at: 2026-08-15T10:53:32.353732
 
-library enums;
+library;
 
 export 'ajax_request_action.dart';
 export 'ajax_request_event_type.dart';

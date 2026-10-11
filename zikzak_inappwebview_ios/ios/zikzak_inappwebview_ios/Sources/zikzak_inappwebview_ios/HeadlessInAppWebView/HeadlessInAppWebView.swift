@@ -42,7 +42,7 @@ public class HeadlessInAppWebView: Disposable {
                     x: 0.0, y: 0.0, width: UIScreen.main.bounds.width,
                     height: UIScreen.main.bounds.height)
             }
-            if let keyWindow = UIApplication.shared.keyWindow {
+            if let keyWindow = UIApplication.shared.sceneKeyWindow {
                 /// Note: The WKWebView behaves very unreliable when rendering offscreen
                 /// on a device. This is especially true with JavaScript, which simply
                 /// won't be executed sometimes.

@@ -1,0 +1,1 @@
+../../../.specify/extensions/bug/.specify-dev/agent-commands/claude/speckit-bug-issue/SKILL.md

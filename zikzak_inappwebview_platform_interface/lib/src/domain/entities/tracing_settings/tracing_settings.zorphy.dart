@@ -34,6 +34,25 @@ class TracingSettings {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  TracingSettings copyWithField<T>(Field<TracingSettings, T> field, T value) {
+    switch (field.name) {
+      case 'categories':
+        return copyWith(categories: value as List<dynamic>);
+      case 'tracingMode':
+        return copyWith(tracingMode: value as TracingMode?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'TracingSettings has no settable field with this name',
+        );
+    }
+  }
+
   TracingSettings copyWithTracingSettings({
     List<dynamic>? categories,
     TracingMode? tracingMode,
@@ -46,22 +65,24 @@ class TracingSettings {
     final _patchMap = _patcher.patchMap;
     return TracingSettings(
       categories: _patchMap.containsKey(TracingSettings$.categories)
-          ? (_patchMap[TracingSettings$.categories] is Function)
-                ? _patchMap[TracingSettings$.categories](this.categories)
-                : (_patchMap[TracingSettings$.categories] is Patch)
-                ? _patchMap[TracingSettings$.categories].applyTo(
-                    this.categories,
-                  )
-                : _patchMap[TracingSettings$.categories]
+          ? ((_patchMap[TracingSettings$.categories] is Function)
+                    ? _patchMap[TracingSettings$.categories](this.categories)
+                    : (_patchMap[TracingSettings$.categories] is Patch)
+                    ? _patchMap[TracingSettings$.categories].applyTo(
+                        this.categories,
+                      )
+                    : _patchMap[TracingSettings$.categories])
+                as List<dynamic>
           : this.categories,
       tracingMode: _patchMap.containsKey(TracingSettings$.tracingMode)
-          ? (_patchMap[TracingSettings$.tracingMode] is Function)
-                ? _patchMap[TracingSettings$.tracingMode](this.tracingMode)
-                : (_patchMap[TracingSettings$.tracingMode] is Patch)
-                ? _patchMap[TracingSettings$.tracingMode].applyTo(
-                    this.tracingMode,
-                  )
-                : _patchMap[TracingSettings$.tracingMode]
+          ? ((_patchMap[TracingSettings$.tracingMode] is Function)
+                    ? _patchMap[TracingSettings$.tracingMode](this.tracingMode)
+                    : (_patchMap[TracingSettings$.tracingMode] is Patch)
+                    ? _patchMap[TracingSettings$.tracingMode].applyTo(
+                        this.tracingMode,
+                      )
+                    : _patchMap[TracingSettings$.tracingMode])
+                as TracingMode?
           : this.tracingMode,
     );
   }
@@ -89,7 +110,8 @@ class TracingSettings {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$TracingSettingsToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

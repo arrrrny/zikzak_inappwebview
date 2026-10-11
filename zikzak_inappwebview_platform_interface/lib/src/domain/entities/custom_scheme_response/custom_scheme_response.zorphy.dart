@@ -39,6 +39,30 @@ class CustomSchemeResponse {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  CustomSchemeResponse copyWithField<T>(
+    Field<CustomSchemeResponse, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'data':
+        return copyWith(data: value as Uint8List);
+      case 'contentType':
+        return copyWith(contentType: value as String);
+      case 'contentEncoding':
+        return copyWith(contentEncoding: value as String);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'CustomSchemeResponse has no settable field with this name',
+        );
+    }
+  }
+
   CustomSchemeResponse copyWithCustomSchemeResponse({
     Uint8List? data,
     String? contentType,
@@ -58,32 +82,38 @@ class CustomSchemeResponse {
     final _patchMap = _patcher.patchMap;
     return CustomSchemeResponse(
       data: _patchMap.containsKey(CustomSchemeResponse$.data)
-          ? (_patchMap[CustomSchemeResponse$.data] is Function)
-                ? _patchMap[CustomSchemeResponse$.data](this.data)
-                : (_patchMap[CustomSchemeResponse$.data] is Patch)
-                ? _patchMap[CustomSchemeResponse$.data].applyTo(this.data)
-                : _patchMap[CustomSchemeResponse$.data]
+          ? ((_patchMap[CustomSchemeResponse$.data] is Function)
+                    ? _patchMap[CustomSchemeResponse$.data](this.data)
+                    : (_patchMap[CustomSchemeResponse$.data] is Patch)
+                    ? _patchMap[CustomSchemeResponse$.data].applyTo(this.data)
+                    : _patchMap[CustomSchemeResponse$.data])
+                as Uint8List
           : this.data,
       contentType: _patchMap.containsKey(CustomSchemeResponse$.contentType)
-          ? (_patchMap[CustomSchemeResponse$.contentType] is Function)
-                ? _patchMap[CustomSchemeResponse$.contentType](this.contentType)
-                : (_patchMap[CustomSchemeResponse$.contentType] is Patch)
-                ? _patchMap[CustomSchemeResponse$.contentType].applyTo(
-                    this.contentType,
-                  )
-                : _patchMap[CustomSchemeResponse$.contentType]
+          ? ((_patchMap[CustomSchemeResponse$.contentType] is Function)
+                    ? _patchMap[CustomSchemeResponse$.contentType](
+                        this.contentType,
+                      )
+                    : (_patchMap[CustomSchemeResponse$.contentType] is Patch)
+                    ? _patchMap[CustomSchemeResponse$.contentType].applyTo(
+                        this.contentType,
+                      )
+                    : _patchMap[CustomSchemeResponse$.contentType])
+                as String
           : this.contentType,
       contentEncoding:
           _patchMap.containsKey(CustomSchemeResponse$.contentEncoding)
-          ? (_patchMap[CustomSchemeResponse$.contentEncoding] is Function)
-                ? _patchMap[CustomSchemeResponse$.contentEncoding](
-                    this.contentEncoding,
-                  )
-                : (_patchMap[CustomSchemeResponse$.contentEncoding] is Patch)
-                ? _patchMap[CustomSchemeResponse$.contentEncoding].applyTo(
-                    this.contentEncoding,
-                  )
-                : _patchMap[CustomSchemeResponse$.contentEncoding]
+          ? ((_patchMap[CustomSchemeResponse$.contentEncoding] is Function)
+                    ? _patchMap[CustomSchemeResponse$.contentEncoding](
+                        this.contentEncoding,
+                      )
+                    : (_patchMap[CustomSchemeResponse$.contentEncoding]
+                          is Patch)
+                    ? _patchMap[CustomSchemeResponse$.contentEncoding].applyTo(
+                        this.contentEncoding,
+                      )
+                    : _patchMap[CustomSchemeResponse$.contentEncoding])
+                as String
           : this.contentEncoding,
     );
   }
@@ -114,7 +144,8 @@ class CustomSchemeResponse {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$CustomSchemeResponseToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

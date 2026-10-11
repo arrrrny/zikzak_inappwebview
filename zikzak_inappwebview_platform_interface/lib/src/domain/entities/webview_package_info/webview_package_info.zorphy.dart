@@ -26,6 +26,28 @@ class WebViewPackageInfo {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  WebViewPackageInfo copyWithField<T>(
+    Field<WebViewPackageInfo, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'versionName':
+        return copyWith(versionName: value as String?);
+      case 'packageName':
+        return copyWith(packageName: value as String?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'WebViewPackageInfo has no settable field with this name',
+        );
+    }
+  }
+
   WebViewPackageInfo copyWithWebViewPackageInfo({
     String? versionName,
     String? packageName,
@@ -40,22 +62,28 @@ class WebViewPackageInfo {
     final _patchMap = _patcher.patchMap;
     return WebViewPackageInfo(
       versionName: _patchMap.containsKey(WebViewPackageInfo$.versionName)
-          ? (_patchMap[WebViewPackageInfo$.versionName] is Function)
-                ? _patchMap[WebViewPackageInfo$.versionName](this.versionName)
-                : (_patchMap[WebViewPackageInfo$.versionName] is Patch)
-                ? _patchMap[WebViewPackageInfo$.versionName].applyTo(
-                    this.versionName,
-                  )
-                : _patchMap[WebViewPackageInfo$.versionName]
+          ? ((_patchMap[WebViewPackageInfo$.versionName] is Function)
+                    ? _patchMap[WebViewPackageInfo$.versionName](
+                        this.versionName,
+                      )
+                    : (_patchMap[WebViewPackageInfo$.versionName] is Patch)
+                    ? _patchMap[WebViewPackageInfo$.versionName].applyTo(
+                        this.versionName,
+                      )
+                    : _patchMap[WebViewPackageInfo$.versionName])
+                as String?
           : this.versionName,
       packageName: _patchMap.containsKey(WebViewPackageInfo$.packageName)
-          ? (_patchMap[WebViewPackageInfo$.packageName] is Function)
-                ? _patchMap[WebViewPackageInfo$.packageName](this.packageName)
-                : (_patchMap[WebViewPackageInfo$.packageName] is Patch)
-                ? _patchMap[WebViewPackageInfo$.packageName].applyTo(
-                    this.packageName,
-                  )
-                : _patchMap[WebViewPackageInfo$.packageName]
+          ? ((_patchMap[WebViewPackageInfo$.packageName] is Function)
+                    ? _patchMap[WebViewPackageInfo$.packageName](
+                        this.packageName,
+                      )
+                    : (_patchMap[WebViewPackageInfo$.packageName] is Patch)
+                    ? _patchMap[WebViewPackageInfo$.packageName].applyTo(
+                        this.packageName,
+                      )
+                    : _patchMap[WebViewPackageInfo$.packageName])
+                as String?
           : this.packageName,
     );
   }
@@ -83,7 +111,8 @@ class WebViewPackageInfo {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$WebViewPackageInfoToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

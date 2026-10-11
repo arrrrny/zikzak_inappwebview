@@ -648,31 +648,30 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     }
 
     if (result.getType() == WebView.HitTestResult.UNKNOWN_TYPE) {
+      // Reuse the id allocated at the top of this request: allocating a second
+      // id here used to burn one, so the FIRST window.open() popup was
+      // reported to Dart with windowId 2 instead of 1 (issue #362).
+      final int popupWindowId = windowId;
       WebView targetWebView = new WebView(getActivity());
       targetWebView.setWebViewClient(new WebViewClient() {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
-          int windowId = 0;
-          if (plugin != null && plugin.inAppWebViewManager != null) {
-            plugin.inAppWebViewManager.windowAutoincrementId++;
-            windowId = plugin.inAppWebViewManager.windowAutoincrementId;
-          }
           URLRequest request = new URLRequest(url, "GET", null, null, null);
           CreateWindowAction createWindowAction = new CreateWindowAction(
                   request,
                   true,
                   isUserGesture,
                   false,
-                  windowId,
+                  popupWindowId,
                   isDialog
           );
 
-          if (plugin != null && plugin.inAppWebViewManager != null) {
-            plugin.inAppWebViewManager.windowWebViewMessages.put(windowId, resultMsg);
-          }
-
+          // resultMsg has already been dispatched by the sendToTarget() call
+          // below, so the Looper owns it now: re-parking it here would let a
+          // consumer read a recycled message whose obj is null (issue #357).
+          // The popup URL is delivered to Dart through the CreateWindowAction
+          // request instead, so the window can be opened from that URL.
           if (inAppWebView != null && inAppWebView.channelDelegate != null) {
-            final int finalWindowId = windowId;
             inAppWebView.channelDelegate.onCreateWindow(createWindowAction, new WebViewChannelDelegate.CreateWindowCallback() {
               @Override
               public boolean nonNullSuccess(@NonNull Boolean handledByClient) {
@@ -680,16 +679,8 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
               }
 
               @Override
-              public void defaultBehaviour(@Nullable Boolean handledByClient) {
-                if (plugin != null && plugin.inAppWebViewManager != null) {
-                  plugin.inAppWebViewManager.windowWebViewMessages.remove(finalWindowId);
-                }
-              }
-
-              @Override
               public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
                 Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
-                defaultBehaviour(null);
               }
             });
 

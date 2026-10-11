@@ -201,8 +201,12 @@ publish_package() {
     fi
 
     # Analyze the package
+    # Must match the CI gate: compile errors and warnings fail the release,
+    # style-level infos do not (every matrix package has a tolerated info
+    # baseline, and bare `flutter analyze` exits 1 on those, which under
+    # `set -e` would abort the release before the first package ships).
     echo -e "${BLUE}Analyzing package...${NC}"
-    flutter analyze
+    flutter analyze --no-fatal-infos
 
     # Publish with dry-run first
     echo -e "${BLUE}Running dry-run...${NC}"

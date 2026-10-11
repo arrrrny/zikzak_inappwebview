@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
-import 'package:zikzak_inappwebview_platform_interface/src/domain/entities/enums/http_cookie_same_site_policy.dart'
-    show httpCookieSameSitePolicyFromWire, httpCookieSameSitePolicyToWire;
 
 class MacOSCookieManager extends PlatformCookieManager {
   static const MethodChannel _channel = MethodChannel(
@@ -43,6 +41,9 @@ class MacOSCookieManager extends PlatformCookieManager {
       'sameSite',
       () => httpCookieSameSitePolicyToWire(sameSite),
     );
+    if (webViewController != null) {
+      args.putIfAbsent('webViewId', () => webViewController.id);
+    }
 
     return await _channel.invokeMethod<bool>('setCookie', args) ?? false;
   }
@@ -58,6 +59,9 @@ class MacOSCookieManager extends PlatformCookieManager {
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url.toString());
+    if (webViewController != null) {
+      args.putIfAbsent('webViewId', () => webViewController.id);
+    }
     List<dynamic> cookieListMap =
         await _channel.invokeMethod<List>('getCookies', args) ?? [];
     cookieListMap = cookieListMap.cast<Map<dynamic, dynamic>>();
@@ -90,6 +94,9 @@ class MacOSCookieManager extends PlatformCookieManager {
   }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url.toString());
+    if (webViewController != null) {
+      args.putIfAbsent('webViewId', () => webViewController.id);
+    }
     List<dynamic> cookies =
         await _channel.invokeMethod<List>('getCookies', args) ?? [];
     cookies = cookies.cast<Map<dynamic, dynamic>>();
@@ -126,6 +133,9 @@ class MacOSCookieManager extends PlatformCookieManager {
     args.putIfAbsent('name', () => name);
     args.putIfAbsent('domain', () => domain);
     args.putIfAbsent('path', () => path);
+    if (webViewController != null) {
+      args.putIfAbsent('webViewId', () => webViewController.id);
+    }
     return await _channel.invokeMethod<bool>('deleteCookie', args) ?? false;
   }
 
@@ -142,6 +152,9 @@ class MacOSCookieManager extends PlatformCookieManager {
     args.putIfAbsent('url', () => url.toString());
     args.putIfAbsent('domain', () => domain);
     args.putIfAbsent('path', () => path);
+    if (webViewController != null) {
+      args.putIfAbsent('webViewId', () => webViewController.id);
+    }
     return await _channel.invokeMethod<bool>('deleteCookies', args) ?? false;
   }
 

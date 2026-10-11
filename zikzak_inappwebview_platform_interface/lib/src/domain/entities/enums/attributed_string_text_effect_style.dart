@@ -5,7 +5,10 @@ enum AttributedStringTextEffectStyle {
 }
 
 ///AttributedStringTextEffectStyle wire values are strings — lookup by value.
-const _attributedStringTextEffectStyle_wire = ['NONE', 'LETTERPRESS_STYLE'];
+///
+///Wire value matches the pre-migration `@ExchangeableEnum` codegen
+///(`letterpressStyle`), not the Dart enum name.
+const _attributedStringTextEffectStyle_wire = ['letterpressStyle'];
 
 AttributedStringTextEffectStyle? attributedStringTextEffectStyleFromWire(
   Object? value,

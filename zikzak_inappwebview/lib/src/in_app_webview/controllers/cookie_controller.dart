@@ -23,7 +23,7 @@ class CookieController {
       _cookieManager ??= _cookieManagerOverride ?? CookieManager.instance();
 
   Future<WebUri?> _resolveUrl(WebUri? url) async =>
-      url ?? await _controller.getUrl();
+      url ?? await _controller.platform.getUrl();
 
   ///Gets the cookies for [url], or for the WebView's current URL when
   ///[url] is omitted. Returns an empty list when no URL is available.

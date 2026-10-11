@@ -147,15 +147,25 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
 
     prepareView();
 
+    boolean windowTransportWired = false;
     if (windowId != -1) {
       if (webView.plugin != null && webView.plugin.inAppWebViewManager != null) {
-        Message resultMsg = webView.plugin.inAppWebViewManager.windowWebViewMessages.get(windowId);
+        // consume the parked message on lookup: after sendToTarget the Looper
+        // recycles it and obj becomes null, so a second read must not happen
+        // (issue #357).
+        Message resultMsg = webView.plugin.inAppWebViewManager.windowWebViewMessages.remove(windowId);
         if (resultMsg != null) {
-          ((WebView.WebViewTransport) resultMsg.obj).setWebView(webView);
-          resultMsg.sendToTarget();
+          WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
+          if (transport != null) {
+            transport.setWebView(webView);
+            resultMsg.sendToTarget();
+            windowTransportWired = true;
+          }
         }
       }
-    } else {
+    }
+
+    if (!windowTransportWired) {
       String initialFile = b.getString("initialFile");
       Map<String, Object> initialUrlRequest = (Map<String, Object>) b.getSerializable("initialUrlRequest");
       String initialData = b.getString("initialData");

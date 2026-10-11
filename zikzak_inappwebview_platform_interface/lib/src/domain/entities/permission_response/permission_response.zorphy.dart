@@ -20,7 +20,7 @@ class PermissionResponse {
       _$PermissionResponseFromJson(json);
 
   @JsonKey(
-    defaultValue: const [],
+    defaultValue: [],
     toJson: _resourcesToJson,
     fromJson: _resourcesFromJson,
   )
@@ -43,6 +43,28 @@ class PermissionResponse {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  PermissionResponse copyWithField<T>(
+    Field<PermissionResponse, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'resources':
+        return copyWith(resources: value as List<PermissionResourceType>?);
+      case 'action':
+        return copyWith(action: value as PermissionResponseAction?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'PermissionResponse has no settable field with this name',
+        );
+    }
+  }
+
   PermissionResponse copyWithPermissionResponse({
     List<PermissionResourceType>? resources,
     PermissionResponseAction? action,
@@ -57,20 +79,22 @@ class PermissionResponse {
     final _patchMap = _patcher.patchMap;
     return PermissionResponse(
       resources: _patchMap.containsKey(PermissionResponse$.resources)
-          ? (_patchMap[PermissionResponse$.resources] is Function)
-                ? _patchMap[PermissionResponse$.resources](this.resources)
-                : (_patchMap[PermissionResponse$.resources] is Patch)
-                ? _patchMap[PermissionResponse$.resources].applyTo(
-                    this.resources,
-                  )
-                : _patchMap[PermissionResponse$.resources]
+          ? ((_patchMap[PermissionResponse$.resources] is Function)
+                    ? _patchMap[PermissionResponse$.resources](this.resources)
+                    : (_patchMap[PermissionResponse$.resources] is Patch)
+                    ? _patchMap[PermissionResponse$.resources].applyTo(
+                        this.resources,
+                      )
+                    : _patchMap[PermissionResponse$.resources])
+                as List<PermissionResourceType>?
           : this.resources,
       action: _patchMap.containsKey(PermissionResponse$.action)
-          ? (_patchMap[PermissionResponse$.action] is Function)
-                ? _patchMap[PermissionResponse$.action](this.action)
-                : (_patchMap[PermissionResponse$.action] is Patch)
-                ? _patchMap[PermissionResponse$.action].applyTo(this.action)
-                : _patchMap[PermissionResponse$.action]
+          ? ((_patchMap[PermissionResponse$.action] is Function)
+                    ? _patchMap[PermissionResponse$.action](this.action)
+                    : (_patchMap[PermissionResponse$.action] is Patch)
+                    ? _patchMap[PermissionResponse$.action].applyTo(this.action)
+                    : _patchMap[PermissionResponse$.action])
+                as PermissionResponseAction?
           : this.action,
     );
   }
@@ -98,7 +122,8 @@ class PermissionResponse {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$PermissionResponseToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

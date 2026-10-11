@@ -37,6 +37,28 @@ class RenderProcessGoneDetail {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  RenderProcessGoneDetail copyWithField<T>(
+    Field<RenderProcessGoneDetail, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'didCrash':
+        return copyWith(didCrash: value as bool);
+      case 'rendererPriorityAtExit':
+        return copyWith(rendererPriorityAtExit: value as RendererPriority?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'RenderProcessGoneDetail has no settable field with this name',
+        );
+    }
+  }
+
   RenderProcessGoneDetail copyWithRenderProcessGoneDetail({
     bool? didCrash,
     RendererPriority? rendererPriorityAtExit,
@@ -54,26 +76,31 @@ class RenderProcessGoneDetail {
     final _patchMap = _patcher.patchMap;
     return RenderProcessGoneDetail(
       didCrash: _patchMap.containsKey(RenderProcessGoneDetail$.didCrash)
-          ? (_patchMap[RenderProcessGoneDetail$.didCrash] is Function)
-                ? _patchMap[RenderProcessGoneDetail$.didCrash](this.didCrash)
-                : (_patchMap[RenderProcessGoneDetail$.didCrash] is Patch)
-                ? _patchMap[RenderProcessGoneDetail$.didCrash].applyTo(
-                    this.didCrash,
-                  )
-                : _patchMap[RenderProcessGoneDetail$.didCrash]
+          ? ((_patchMap[RenderProcessGoneDetail$.didCrash] is Function)
+                    ? _patchMap[RenderProcessGoneDetail$.didCrash](
+                        this.didCrash,
+                      )
+                    : (_patchMap[RenderProcessGoneDetail$.didCrash] is Patch)
+                    ? _patchMap[RenderProcessGoneDetail$.didCrash].applyTo(
+                        this.didCrash,
+                      )
+                    : _patchMap[RenderProcessGoneDetail$.didCrash])
+                as bool
           : this.didCrash,
       rendererPriorityAtExit:
           _patchMap.containsKey(RenderProcessGoneDetail$.rendererPriorityAtExit)
-          ? (_patchMap[RenderProcessGoneDetail$.rendererPriorityAtExit]
-                    is Function)
-                ? _patchMap[RenderProcessGoneDetail$.rendererPriorityAtExit](
-                    this.rendererPriorityAtExit,
-                  )
-                : (_patchMap[RenderProcessGoneDetail$.rendererPriorityAtExit]
-                      is Patch)
-                ? _patchMap[RenderProcessGoneDetail$.rendererPriorityAtExit]
-                      .applyTo(this.rendererPriorityAtExit)
-                : _patchMap[RenderProcessGoneDetail$.rendererPriorityAtExit]
+          ? ((_patchMap[RenderProcessGoneDetail$.rendererPriorityAtExit]
+                        is Function)
+                    ? _patchMap[RenderProcessGoneDetail$
+                          .rendererPriorityAtExit](this.rendererPriorityAtExit)
+                    : (_patchMap[RenderProcessGoneDetail$
+                              .rendererPriorityAtExit]
+                          is Patch)
+                    ? _patchMap[RenderProcessGoneDetail$.rendererPriorityAtExit]
+                          .applyTo(this.rendererPriorityAtExit)
+                    : _patchMap[RenderProcessGoneDetail$
+                          .rendererPriorityAtExit])
+                as RendererPriority?
           : this.rendererPriorityAtExit,
     );
   }
@@ -101,7 +128,8 @@ class RenderProcessGoneDetail {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$RenderProcessGoneDetailToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

@@ -19,6 +19,21 @@ class TrustedWebActivityDisplayMode {
     return TrustedWebActivityDisplayMode();
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  TrustedWebActivityDisplayMode copyWithField<T>(
+    Field<TrustedWebActivityDisplayMode, T> field,
+    T value,
+  ) {
+    throw ArgumentError.value(
+      field.name,
+      'field',
+      'TrustedWebActivityDisplayMode has no settable fields',
+    );
+  }
+
   TrustedWebActivityDisplayMode copyWithTrustedWebActivityDisplayMode() {
     return copyWith();
   }
@@ -43,7 +58,8 @@ class TrustedWebActivityDisplayMode {
     final Map<String, dynamic> data = _$TrustedWebActivityDisplayModeToJson(
       this,
     );
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

@@ -24,7 +24,7 @@ class X509Extension {
 
   dynamic get value {
     var sub = block?.sub;
-    if (sub != null && sub.length > 0) {
+    if (sub != null && sub.isNotEmpty) {
       ASN1Object? valueBlock;
       try {
         valueBlock = sub.last;
@@ -38,7 +38,7 @@ class X509Extension {
 
   ASN1Object? get valueAsBlock {
     var sub = block?.sub;
-    if (sub != null && sub.length > 0) {
+    if (sub != null && sub.isNotEmpty) {
       ASN1Object? valueBlock;
       try {
         valueBlock = sub.last;
@@ -223,18 +223,18 @@ class AuthorityInfoAccessExtension extends X509Extension {
     }
     var subs = valueAsBlock!.subAtIndex(0)?.sub ?? <ASN1Object>[];
     List<AuthorityInfoAccess> result = <AuthorityInfoAccess>[];
-    subs.forEach((sub) {
+    for (var sub in subs) {
       var oidData = sub.subAtIndex(0)?.encoded;
       var nameBlock = sub.subAtIndex(1);
       if (oidData == null || nameBlock == null) {
-        return;
+        continue;
       }
       var oid = ASN1DERDecoder.decodeOid(contentData: oidData.toList());
       var location = generalName(item: nameBlock);
       if (oid != null && location != null) {
         result.add(AuthorityInfoAccess(method: oid, location: location));
       }
-    });
+    }
     return result;
   }
 
@@ -387,37 +387,37 @@ class CertificatePoliciesExtension extends X509Extension {
     var subs = valueAsBlock!.subAtIndex(0)?.sub ?? <ASN1Object>[];
 
     List<CertificatePolicy> result = <CertificatePolicy>[];
-    subs.forEach((sub) {
+    for (var sub in subs) {
       var data = sub.subAtIndex(0)?.encoded;
       String? oid;
       if (data != null) {
         oid = ASN1DERDecoder.decodeOid(contentData: data.toList());
         if (oid == null) {
-          return;
+          continue;
         }
       } else {
-        return;
+        continue;
       }
 
       List<CertificatePolicyQualifier>? qualifiers;
       var subQualifiers = sub.subAtIndex(1);
       if (subQualifiers != null && subQualifiers.sub != null) {
         qualifiers = <CertificatePolicyQualifier>[];
-        subQualifiers.sub!.forEach((sub) {
+        for (var sub in subQualifiers.sub!) {
           var rawValue = sub.subAtIndex(0)?.encoded;
           String? oid;
           if (rawValue != null) {
             oid = ASN1DERDecoder.decodeOid(contentData: rawValue.toList());
             if (oid == null) {
-              return;
+              continue;
             }
             var value = sub.subAtIndex(1)?.asString;
-            qualifiers!.add(CertificatePolicyQualifier(oid: oid, value: value));
+            qualifiers.add(CertificatePolicyQualifier(oid: oid, value: value));
           }
-        });
+        }
       }
       result.add(CertificatePolicy(oid: oid, qualifiers: qualifiers));
-    });
+    }
     return result;
   }
 
@@ -444,12 +444,12 @@ class CRLDistributionPointsExtension extends X509Extension {
     }
     var subs = valueAsBlock!.subAtIndex(0)?.sub ?? <ASN1Object>[];
     List<String> result = <String>[];
-    subs.forEach((sub) {
+    for (var sub in subs) {
       var asString = sub.asString;
       if (asString != null) {
         result.add(asString);
       }
-    });
+    }
     return result;
   }
 

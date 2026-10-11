@@ -38,6 +38,30 @@ class NavigationResponse {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  NavigationResponse copyWithField<T>(
+    Field<NavigationResponse, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'response':
+        return copyWith(response: value as URLResponse?);
+      case 'isForMainFrame':
+        return copyWith(isForMainFrame: value as bool);
+      case 'canShowMIMEType':
+        return copyWith(canShowMIMEType: value as bool);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'NavigationResponse has no settable field with this name',
+        );
+    }
+  }
+
   NavigationResponse copyWithNavigationResponse({
     URLResponse? response,
     bool? isForMainFrame,
@@ -57,34 +81,39 @@ class NavigationResponse {
     final _patchMap = _patcher.patchMap;
     return NavigationResponse(
       response: _patchMap.containsKey(NavigationResponse$.response)
-          ? (_patchMap[NavigationResponse$.response] is Function)
-                ? _patchMap[NavigationResponse$.response](this.response)
-                : (_patchMap[NavigationResponse$.response] is Patch)
-                ? _patchMap[NavigationResponse$.response].applyTo(this.response)
-                : _patchMap[NavigationResponse$.response]
+          ? ((_patchMap[NavigationResponse$.response] is Function)
+                    ? _patchMap[NavigationResponse$.response](this.response)
+                    : (_patchMap[NavigationResponse$.response] is Patch)
+                    ? _patchMap[NavigationResponse$.response].applyTo(
+                        this.response,
+                      )
+                    : _patchMap[NavigationResponse$.response])
+                as URLResponse?
           : this.response,
       isForMainFrame: _patchMap.containsKey(NavigationResponse$.isForMainFrame)
-          ? (_patchMap[NavigationResponse$.isForMainFrame] is Function)
-                ? _patchMap[NavigationResponse$.isForMainFrame](
-                    this.isForMainFrame,
-                  )
-                : (_patchMap[NavigationResponse$.isForMainFrame] is Patch)
-                ? _patchMap[NavigationResponse$.isForMainFrame].applyTo(
-                    this.isForMainFrame,
-                  )
-                : _patchMap[NavigationResponse$.isForMainFrame]
+          ? ((_patchMap[NavigationResponse$.isForMainFrame] is Function)
+                    ? _patchMap[NavigationResponse$.isForMainFrame](
+                        this.isForMainFrame,
+                      )
+                    : (_patchMap[NavigationResponse$.isForMainFrame] is Patch)
+                    ? _patchMap[NavigationResponse$.isForMainFrame].applyTo(
+                        this.isForMainFrame,
+                      )
+                    : _patchMap[NavigationResponse$.isForMainFrame])
+                as bool
           : this.isForMainFrame,
       canShowMIMEType:
           _patchMap.containsKey(NavigationResponse$.canShowMIMEType)
-          ? (_patchMap[NavigationResponse$.canShowMIMEType] is Function)
-                ? _patchMap[NavigationResponse$.canShowMIMEType](
-                    this.canShowMIMEType,
-                  )
-                : (_patchMap[NavigationResponse$.canShowMIMEType] is Patch)
-                ? _patchMap[NavigationResponse$.canShowMIMEType].applyTo(
-                    this.canShowMIMEType,
-                  )
-                : _patchMap[NavigationResponse$.canShowMIMEType]
+          ? ((_patchMap[NavigationResponse$.canShowMIMEType] is Function)
+                    ? _patchMap[NavigationResponse$.canShowMIMEType](
+                        this.canShowMIMEType,
+                      )
+                    : (_patchMap[NavigationResponse$.canShowMIMEType] is Patch)
+                    ? _patchMap[NavigationResponse$.canShowMIMEType].applyTo(
+                        this.canShowMIMEType,
+                      )
+                    : _patchMap[NavigationResponse$.canShowMIMEType])
+                as bool
           : this.canShowMIMEType,
     );
   }
@@ -119,7 +148,8 @@ class NavigationResponse {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$NavigationResponseToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

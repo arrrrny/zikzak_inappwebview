@@ -13,6 +13,6 @@ public class InAppBrowserNavigationController: UINavigationController {
     deinit {
         tmpWindow?.windowLevel = UIWindow.Level(rawValue: 0.0)
         tmpWindow = nil
-        UIApplication.shared.delegate?.window??.makeKeyAndVisible()
+        UIApplication.shared.sceneKeyWindow?.makeKeyAndVisible()
     }
 }

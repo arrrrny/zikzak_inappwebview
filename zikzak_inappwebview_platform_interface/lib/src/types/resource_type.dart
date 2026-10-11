@@ -39,7 +39,7 @@ class ResourceType {
   static const other = ResourceType._internal('other', 'other');
 
   ///Set of all values of [ResourceType].
-  static final Set<ResourceType> values = [
+  static final Set<ResourceType> values = {
     ResourceType.xhr,
     ResourceType.fetch,
     ResourceType.document,
@@ -49,7 +49,7 @@ class ResourceType {
     ResourceType.font,
     ResourceType.media,
     ResourceType.other,
-  ].toSet();
+  };
 
   ///Gets a possible [ResourceType] instance from [String] value.
   static ResourceType? fromValue(String? value) {

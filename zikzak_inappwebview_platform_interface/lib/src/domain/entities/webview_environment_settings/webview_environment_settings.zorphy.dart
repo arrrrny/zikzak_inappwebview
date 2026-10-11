@@ -44,6 +44,30 @@ class VirtualHostMapping {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  VirtualHostMapping copyWithField<T>(
+    Field<VirtualHostMapping, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'hostName':
+        return copyWith(hostName: value as String);
+      case 'folderPath':
+        return copyWith(folderPath: value as String);
+      case 'accessKind':
+        return copyWith(accessKind: value as HostResourceAccessKind);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'VirtualHostMapping has no settable field with this name',
+        );
+    }
+  }
+
   VirtualHostMapping copyWithVirtualHostMapping({
     String? hostName,
     String? folderPath,
@@ -63,29 +87,34 @@ class VirtualHostMapping {
     final _patchMap = _patcher.patchMap;
     return VirtualHostMapping(
       hostName: _patchMap.containsKey(VirtualHostMapping$.hostName)
-          ? (_patchMap[VirtualHostMapping$.hostName] is Function)
-                ? _patchMap[VirtualHostMapping$.hostName](this.hostName)
-                : (_patchMap[VirtualHostMapping$.hostName] is Patch)
-                ? _patchMap[VirtualHostMapping$.hostName].applyTo(this.hostName)
-                : _patchMap[VirtualHostMapping$.hostName]
+          ? ((_patchMap[VirtualHostMapping$.hostName] is Function)
+                    ? _patchMap[VirtualHostMapping$.hostName](this.hostName)
+                    : (_patchMap[VirtualHostMapping$.hostName] is Patch)
+                    ? _patchMap[VirtualHostMapping$.hostName].applyTo(
+                        this.hostName,
+                      )
+                    : _patchMap[VirtualHostMapping$.hostName])
+                as String
           : this.hostName,
       folderPath: _patchMap.containsKey(VirtualHostMapping$.folderPath)
-          ? (_patchMap[VirtualHostMapping$.folderPath] is Function)
-                ? _patchMap[VirtualHostMapping$.folderPath](this.folderPath)
-                : (_patchMap[VirtualHostMapping$.folderPath] is Patch)
-                ? _patchMap[VirtualHostMapping$.folderPath].applyTo(
-                    this.folderPath,
-                  )
-                : _patchMap[VirtualHostMapping$.folderPath]
+          ? ((_patchMap[VirtualHostMapping$.folderPath] is Function)
+                    ? _patchMap[VirtualHostMapping$.folderPath](this.folderPath)
+                    : (_patchMap[VirtualHostMapping$.folderPath] is Patch)
+                    ? _patchMap[VirtualHostMapping$.folderPath].applyTo(
+                        this.folderPath,
+                      )
+                    : _patchMap[VirtualHostMapping$.folderPath])
+                as String
           : this.folderPath,
       accessKind: _patchMap.containsKey(VirtualHostMapping$.accessKind)
-          ? (_patchMap[VirtualHostMapping$.accessKind] is Function)
-                ? _patchMap[VirtualHostMapping$.accessKind](this.accessKind)
-                : (_patchMap[VirtualHostMapping$.accessKind] is Patch)
-                ? _patchMap[VirtualHostMapping$.accessKind].applyTo(
-                    this.accessKind,
-                  )
-                : _patchMap[VirtualHostMapping$.accessKind]
+          ? ((_patchMap[VirtualHostMapping$.accessKind] is Function)
+                    ? _patchMap[VirtualHostMapping$.accessKind](this.accessKind)
+                    : (_patchMap[VirtualHostMapping$.accessKind] is Patch)
+                    ? _patchMap[VirtualHostMapping$.accessKind].applyTo(
+                        this.accessKind,
+                      )
+                    : _patchMap[VirtualHostMapping$.accessKind])
+                as HostResourceAccessKind
           : this.accessKind,
     );
   }
@@ -116,7 +145,8 @@ class VirtualHostMapping {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$VirtualHostMappingToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {
@@ -299,6 +329,40 @@ class WebViewEnvironmentSettings {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  WebViewEnvironmentSettings copyWithField<T>(
+    Field<WebViewEnvironmentSettings, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'browserExecutableFolder':
+        return copyWith(browserExecutableFolder: value as String?);
+      case 'userDataFolder':
+        return copyWith(userDataFolder: value as String?);
+      case 'additionalBrowserArguments':
+        return copyWith(additionalBrowserArguments: value as String?);
+      case 'allowSingleSignOnUsingOSPrimaryAccount':
+        return copyWith(allowSingleSignOnUsingOSPrimaryAccount: value as bool?);
+      case 'language':
+        return copyWith(language: value as String?);
+      case 'targetCompatibleBrowserVersion':
+        return copyWith(targetCompatibleBrowserVersion: value as String?);
+      case 'virtualHostMappings':
+        return copyWith(
+          virtualHostMappings: value as List<VirtualHostMapping>?,
+        );
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'WebViewEnvironmentSettings has no settable field with this name',
+        );
+    }
+  }
+
   WebViewEnvironmentSettings copyWithWebViewEnvironmentSettings({
     String? browserExecutableFolder,
     String? userDataFolder,
@@ -330,110 +394,123 @@ class WebViewEnvironmentSettings {
           _patchMap.containsKey(
             WebViewEnvironmentSettings$.browserExecutableFolder,
           )
-          ? (_patchMap[WebViewEnvironmentSettings$.browserExecutableFolder]
-                    is Function)
-                ? _patchMap[WebViewEnvironmentSettings$
-                      .browserExecutableFolder](this.browserExecutableFolder)
-                : (_patchMap[WebViewEnvironmentSettings$
-                          .browserExecutableFolder]
-                      is Patch)
-                ? _patchMap[WebViewEnvironmentSettings$.browserExecutableFolder]
-                      .applyTo(this.browserExecutableFolder)
-                : _patchMap[WebViewEnvironmentSettings$.browserExecutableFolder]
+          ? ((_patchMap[WebViewEnvironmentSettings$.browserExecutableFolder]
+                        is Function)
+                    ? _patchMap[WebViewEnvironmentSettings$
+                          .browserExecutableFolder](
+                        this.browserExecutableFolder,
+                      )
+                    : (_patchMap[WebViewEnvironmentSettings$
+                              .browserExecutableFolder]
+                          is Patch)
+                    ? _patchMap[WebViewEnvironmentSettings$
+                              .browserExecutableFolder]
+                          .applyTo(this.browserExecutableFolder)
+                    : _patchMap[WebViewEnvironmentSettings$
+                          .browserExecutableFolder])
+                as String?
           : this.browserExecutableFolder,
       userDataFolder:
           _patchMap.containsKey(WebViewEnvironmentSettings$.userDataFolder)
-          ? (_patchMap[WebViewEnvironmentSettings$.userDataFolder] is Function)
-                ? _patchMap[WebViewEnvironmentSettings$.userDataFolder](
-                    this.userDataFolder,
-                  )
-                : (_patchMap[WebViewEnvironmentSettings$.userDataFolder]
-                      is Patch)
-                ? _patchMap[WebViewEnvironmentSettings$.userDataFolder].applyTo(
-                    this.userDataFolder,
-                  )
-                : _patchMap[WebViewEnvironmentSettings$.userDataFolder]
+          ? ((_patchMap[WebViewEnvironmentSettings$.userDataFolder] is Function)
+                    ? _patchMap[WebViewEnvironmentSettings$.userDataFolder](
+                        this.userDataFolder,
+                      )
+                    : (_patchMap[WebViewEnvironmentSettings$.userDataFolder]
+                          is Patch)
+                    ? _patchMap[WebViewEnvironmentSettings$.userDataFolder]
+                          .applyTo(this.userDataFolder)
+                    : _patchMap[WebViewEnvironmentSettings$.userDataFolder])
+                as String?
           : this.userDataFolder,
       additionalBrowserArguments:
           _patchMap.containsKey(
             WebViewEnvironmentSettings$.additionalBrowserArguments,
           )
-          ? (_patchMap[WebViewEnvironmentSettings$.additionalBrowserArguments]
-                    is Function)
-                ? _patchMap[WebViewEnvironmentSettings$
-                      .additionalBrowserArguments](
-                    this.additionalBrowserArguments,
-                  )
-                : (_patchMap[WebViewEnvironmentSettings$
-                          .additionalBrowserArguments]
-                      is Patch)
-                ? _patchMap[WebViewEnvironmentSettings$
-                          .additionalBrowserArguments]
-                      .applyTo(this.additionalBrowserArguments)
-                : _patchMap[WebViewEnvironmentSettings$
-                      .additionalBrowserArguments]
+          ? ((_patchMap[WebViewEnvironmentSettings$.additionalBrowserArguments]
+                        is Function)
+                    ? _patchMap[WebViewEnvironmentSettings$
+                          .additionalBrowserArguments](
+                        this.additionalBrowserArguments,
+                      )
+                    : (_patchMap[WebViewEnvironmentSettings$
+                              .additionalBrowserArguments]
+                          is Patch)
+                    ? _patchMap[WebViewEnvironmentSettings$
+                              .additionalBrowserArguments]
+                          .applyTo(this.additionalBrowserArguments)
+                    : _patchMap[WebViewEnvironmentSettings$
+                          .additionalBrowserArguments])
+                as String?
           : this.additionalBrowserArguments,
       allowSingleSignOnUsingOSPrimaryAccount:
           _patchMap.containsKey(
             WebViewEnvironmentSettings$.allowSingleSignOnUsingOSPrimaryAccount,
           )
-          ? (_patchMap[WebViewEnvironmentSettings$
-                        .allowSingleSignOnUsingOSPrimaryAccount]
-                    is Function)
-                ? _patchMap[WebViewEnvironmentSettings$
-                      .allowSingleSignOnUsingOSPrimaryAccount](
-                    this.allowSingleSignOnUsingOSPrimaryAccount,
-                  )
-                : (_patchMap[WebViewEnvironmentSettings$
-                          .allowSingleSignOnUsingOSPrimaryAccount]
-                      is Patch)
-                ? _patchMap[WebViewEnvironmentSettings$
-                          .allowSingleSignOnUsingOSPrimaryAccount]
-                      .applyTo(this.allowSingleSignOnUsingOSPrimaryAccount)
-                : _patchMap[WebViewEnvironmentSettings$
-                      .allowSingleSignOnUsingOSPrimaryAccount]
+          ? ((_patchMap[WebViewEnvironmentSettings$
+                            .allowSingleSignOnUsingOSPrimaryAccount]
+                        is Function)
+                    ? _patchMap[WebViewEnvironmentSettings$
+                          .allowSingleSignOnUsingOSPrimaryAccount](
+                        this.allowSingleSignOnUsingOSPrimaryAccount,
+                      )
+                    : (_patchMap[WebViewEnvironmentSettings$
+                              .allowSingleSignOnUsingOSPrimaryAccount]
+                          is Patch)
+                    ? _patchMap[WebViewEnvironmentSettings$
+                              .allowSingleSignOnUsingOSPrimaryAccount]
+                          .applyTo(this.allowSingleSignOnUsingOSPrimaryAccount)
+                    : _patchMap[WebViewEnvironmentSettings$
+                          .allowSingleSignOnUsingOSPrimaryAccount])
+                as bool?
           : this.allowSingleSignOnUsingOSPrimaryAccount,
       language: _patchMap.containsKey(WebViewEnvironmentSettings$.language)
-          ? (_patchMap[WebViewEnvironmentSettings$.language] is Function)
-                ? _patchMap[WebViewEnvironmentSettings$.language](this.language)
-                : (_patchMap[WebViewEnvironmentSettings$.language] is Patch)
-                ? _patchMap[WebViewEnvironmentSettings$.language].applyTo(
-                    this.language,
-                  )
-                : _patchMap[WebViewEnvironmentSettings$.language]
+          ? ((_patchMap[WebViewEnvironmentSettings$.language] is Function)
+                    ? _patchMap[WebViewEnvironmentSettings$.language](
+                        this.language,
+                      )
+                    : (_patchMap[WebViewEnvironmentSettings$.language] is Patch)
+                    ? _patchMap[WebViewEnvironmentSettings$.language].applyTo(
+                        this.language,
+                      )
+                    : _patchMap[WebViewEnvironmentSettings$.language])
+                as String?
           : this.language,
       targetCompatibleBrowserVersion:
           _patchMap.containsKey(
             WebViewEnvironmentSettings$.targetCompatibleBrowserVersion,
           )
-          ? (_patchMap[WebViewEnvironmentSettings$
-                        .targetCompatibleBrowserVersion]
-                    is Function)
-                ? _patchMap[WebViewEnvironmentSettings$
-                      .targetCompatibleBrowserVersion](
-                    this.targetCompatibleBrowserVersion,
-                  )
-                : (_patchMap[WebViewEnvironmentSettings$
-                          .targetCompatibleBrowserVersion]
-                      is Patch)
-                ? _patchMap[WebViewEnvironmentSettings$
-                          .targetCompatibleBrowserVersion]
-                      .applyTo(this.targetCompatibleBrowserVersion)
-                : _patchMap[WebViewEnvironmentSettings$
-                      .targetCompatibleBrowserVersion]
+          ? ((_patchMap[WebViewEnvironmentSettings$
+                            .targetCompatibleBrowserVersion]
+                        is Function)
+                    ? _patchMap[WebViewEnvironmentSettings$
+                          .targetCompatibleBrowserVersion](
+                        this.targetCompatibleBrowserVersion,
+                      )
+                    : (_patchMap[WebViewEnvironmentSettings$
+                              .targetCompatibleBrowserVersion]
+                          is Patch)
+                    ? _patchMap[WebViewEnvironmentSettings$
+                              .targetCompatibleBrowserVersion]
+                          .applyTo(this.targetCompatibleBrowserVersion)
+                    : _patchMap[WebViewEnvironmentSettings$
+                          .targetCompatibleBrowserVersion])
+                as String?
           : this.targetCompatibleBrowserVersion,
       virtualHostMappings:
           _patchMap.containsKey(WebViewEnvironmentSettings$.virtualHostMappings)
-          ? (_patchMap[WebViewEnvironmentSettings$.virtualHostMappings]
-                    is Function)
-                ? _patchMap[WebViewEnvironmentSettings$.virtualHostMappings](
-                    this.virtualHostMappings,
-                  )
-                : (_patchMap[WebViewEnvironmentSettings$.virtualHostMappings]
-                      is Patch)
-                ? _patchMap[WebViewEnvironmentSettings$.virtualHostMappings]
-                      .applyTo(this.virtualHostMappings)
-                : _patchMap[WebViewEnvironmentSettings$.virtualHostMappings]
+          ? ((_patchMap[WebViewEnvironmentSettings$.virtualHostMappings]
+                        is Function)
+                    ? _patchMap[WebViewEnvironmentSettings$
+                          .virtualHostMappings](this.virtualHostMappings)
+                    : (_patchMap[WebViewEnvironmentSettings$
+                              .virtualHostMappings]
+                          is Patch)
+                    ? _patchMap[WebViewEnvironmentSettings$.virtualHostMappings]
+                          .applyTo(this.virtualHostMappings)
+                    : _patchMap[WebViewEnvironmentSettings$
+                          .virtualHostMappings])
+                as List<VirtualHostMapping>?
           : this.virtualHostMappings,
     );
   }
@@ -486,7 +563,8 @@ class WebViewEnvironmentSettings {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$WebViewEnvironmentSettingsToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

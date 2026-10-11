@@ -98,32 +98,44 @@ public class FlutterWebView implements PlatformWebView {
     final String initialFile = (String) params.get("initialFile");
     final Map<String, String> initialData = (Map<String, String>) params.get("initialData");
 
+    boolean windowTransportWired = false;
     if (windowId != null) {
       if (webView.plugin != null && webView.plugin.inAppWebViewManager != null) {
-        Message resultMsg = webView.plugin.inAppWebViewManager.windowWebViewMessages.get(windowId);
+        // consume the parked message on lookup: after sendToTarget the Looper
+        // recycles it and obj becomes null, so a later platform-view creation
+        // for the same windowId must not read it again (issue #357).
+        Message resultMsg = webView.plugin.inAppWebViewManager.windowWebViewMessages.remove(windowId);
         if (resultMsg != null) {
-          ((WebView.WebViewTransport) resultMsg.obj).setWebView(webView);
-          resultMsg.sendToTarget();
-          if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
-            // for some reason, if a WebView is created using a window id,
-            // the initial plugin and user scripts injected
-            // with WebViewCompat.addDocumentStartJavaScript will not be added!
-            // https://github.com/arrrrny/zikzak_inappwebview/issues/1455
-            //
-            // Also, calling the prepareAndAddUserScripts method right after won't work,
-            // so use the View.post method here.
-            webView.post(new Runnable() {
-              @Override
-              public void run() {
-                if (webView != null) {
-                  webView.prepareAndAddUserScripts();
-                }
-              }
-            });
+          WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
+          if (transport != null) {
+            transport.setWebView(webView);
+            resultMsg.sendToTarget();
+            windowTransportWired = true;
           }
         }
       }
-    } else {
+      if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+        // for some reason, if a WebView is created using a window id,
+        // the initial plugin and user scripts injected
+        // with WebViewCompat.addDocumentStartJavaScript will not be added!
+        // https://github.com/arrrrny/zikzak_inappwebview/issues/1455
+        //
+        // Also, calling the prepareAndAddUserScripts method right after won't work,
+        // so use the View.post method here. This must run regardless of whether
+        // the transport wiring above succeeded — the fallback initial load
+        // serves a window-id WebView just the same.
+        webView.post(new Runnable() {
+          @Override
+          public void run() {
+            if (webView != null) {
+              webView.prepareAndAddUserScripts();
+            }
+          }
+        });
+      }
+    }
+
+    if (!windowTransportWired) {
       // Defer the initial load so the JS bridge is registered before
       // the renderer receives the page load. This prevents a race where
       // pages served from cache or sleeping-tab wake-ups could execute

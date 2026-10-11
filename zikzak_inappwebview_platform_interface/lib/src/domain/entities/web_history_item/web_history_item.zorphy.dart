@@ -54,6 +54,33 @@ class WebHistoryItem {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  WebHistoryItem copyWithField<T>(Field<WebHistoryItem, T> field, T value) {
+    switch (field.name) {
+      case 'originalUrl':
+        return copyWith(originalUrl: value as WebUri?);
+      case 'title':
+        return copyWith(title: value as String?);
+      case 'url':
+        return copyWith(url: value as WebUri?);
+      case 'index':
+        return copyWith(index: value as int?);
+      case 'offset':
+        return copyWith(offset: value as int?);
+      case 'entryId':
+        return copyWith(entryId: value as int?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'WebHistoryItem has no settable field with this name',
+        );
+    }
+  }
+
   WebHistoryItem copyWithWebHistoryItem({
     WebUri? originalUrl,
     String? title,
@@ -77,48 +104,54 @@ class WebHistoryItem {
     final _patchMap = _patcher.patchMap;
     return WebHistoryItem(
       originalUrl: _patchMap.containsKey(WebHistoryItem$.originalUrl)
-          ? (_patchMap[WebHistoryItem$.originalUrl] is Function)
-                ? _patchMap[WebHistoryItem$.originalUrl](this.originalUrl)
-                : (_patchMap[WebHistoryItem$.originalUrl] is Patch)
-                ? _patchMap[WebHistoryItem$.originalUrl].applyTo(
-                    this.originalUrl,
-                  )
-                : _patchMap[WebHistoryItem$.originalUrl]
+          ? ((_patchMap[WebHistoryItem$.originalUrl] is Function)
+                    ? _patchMap[WebHistoryItem$.originalUrl](this.originalUrl)
+                    : (_patchMap[WebHistoryItem$.originalUrl] is Patch)
+                    ? _patchMap[WebHistoryItem$.originalUrl].applyTo(
+                        this.originalUrl,
+                      )
+                    : _patchMap[WebHistoryItem$.originalUrl])
+                as WebUri?
           : this.originalUrl,
       title: _patchMap.containsKey(WebHistoryItem$.title)
-          ? (_patchMap[WebHistoryItem$.title] is Function)
-                ? _patchMap[WebHistoryItem$.title](this.title)
-                : (_patchMap[WebHistoryItem$.title] is Patch)
-                ? _patchMap[WebHistoryItem$.title].applyTo(this.title)
-                : _patchMap[WebHistoryItem$.title]
+          ? ((_patchMap[WebHistoryItem$.title] is Function)
+                    ? _patchMap[WebHistoryItem$.title](this.title)
+                    : (_patchMap[WebHistoryItem$.title] is Patch)
+                    ? _patchMap[WebHistoryItem$.title].applyTo(this.title)
+                    : _patchMap[WebHistoryItem$.title])
+                as String?
           : this.title,
       url: _patchMap.containsKey(WebHistoryItem$.url)
-          ? (_patchMap[WebHistoryItem$.url] is Function)
-                ? _patchMap[WebHistoryItem$.url](this.url)
-                : (_patchMap[WebHistoryItem$.url] is Patch)
-                ? _patchMap[WebHistoryItem$.url].applyTo(this.url)
-                : _patchMap[WebHistoryItem$.url]
+          ? ((_patchMap[WebHistoryItem$.url] is Function)
+                    ? _patchMap[WebHistoryItem$.url](this.url)
+                    : (_patchMap[WebHistoryItem$.url] is Patch)
+                    ? _patchMap[WebHistoryItem$.url].applyTo(this.url)
+                    : _patchMap[WebHistoryItem$.url])
+                as WebUri?
           : this.url,
       index: _patchMap.containsKey(WebHistoryItem$.index_)
-          ? (_patchMap[WebHistoryItem$.index_] is Function)
-                ? _patchMap[WebHistoryItem$.index_](this.index)
-                : (_patchMap[WebHistoryItem$.index_] is Patch)
-                ? _patchMap[WebHistoryItem$.index_].applyTo(this.index)
-                : _patchMap[WebHistoryItem$.index_]
+          ? ((_patchMap[WebHistoryItem$.index_] is Function)
+                    ? _patchMap[WebHistoryItem$.index_](this.index)
+                    : (_patchMap[WebHistoryItem$.index_] is Patch)
+                    ? _patchMap[WebHistoryItem$.index_].applyTo(this.index)
+                    : _patchMap[WebHistoryItem$.index_])
+                as int?
           : this.index,
       offset: _patchMap.containsKey(WebHistoryItem$.offset)
-          ? (_patchMap[WebHistoryItem$.offset] is Function)
-                ? _patchMap[WebHistoryItem$.offset](this.offset)
-                : (_patchMap[WebHistoryItem$.offset] is Patch)
-                ? _patchMap[WebHistoryItem$.offset].applyTo(this.offset)
-                : _patchMap[WebHistoryItem$.offset]
+          ? ((_patchMap[WebHistoryItem$.offset] is Function)
+                    ? _patchMap[WebHistoryItem$.offset](this.offset)
+                    : (_patchMap[WebHistoryItem$.offset] is Patch)
+                    ? _patchMap[WebHistoryItem$.offset].applyTo(this.offset)
+                    : _patchMap[WebHistoryItem$.offset])
+                as int?
           : this.offset,
       entryId: _patchMap.containsKey(WebHistoryItem$.entryId)
-          ? (_patchMap[WebHistoryItem$.entryId] is Function)
-                ? _patchMap[WebHistoryItem$.entryId](this.entryId)
-                : (_patchMap[WebHistoryItem$.entryId] is Patch)
-                ? _patchMap[WebHistoryItem$.entryId].applyTo(this.entryId)
-                : _patchMap[WebHistoryItem$.entryId]
+          ? ((_patchMap[WebHistoryItem$.entryId] is Function)
+                    ? _patchMap[WebHistoryItem$.entryId](this.entryId)
+                    : (_patchMap[WebHistoryItem$.entryId] is Patch)
+                    ? _patchMap[WebHistoryItem$.entryId].applyTo(this.entryId)
+                    : _patchMap[WebHistoryItem$.entryId])
+                as int?
           : this.entryId,
     );
   }
@@ -165,7 +198,8 @@ class WebHistoryItem {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$WebHistoryItemToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

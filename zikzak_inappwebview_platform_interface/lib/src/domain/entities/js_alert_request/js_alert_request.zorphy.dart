@@ -34,6 +34,27 @@ class JsAlertRequest {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  JsAlertRequest copyWithField<T>(Field<JsAlertRequest, T> field, T value) {
+    switch (field.name) {
+      case 'url':
+        return copyWith(url: value as WebUri?);
+      case 'message':
+        return copyWith(message: value as String?);
+      case 'isMainFrame':
+        return copyWith(isMainFrame: value as bool?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'JsAlertRequest has no settable field with this name',
+        );
+    }
+  }
+
   JsAlertRequest copyWithJsAlertRequest({
     WebUri? url,
     String? message,
@@ -47,27 +68,30 @@ class JsAlertRequest {
     final _patchMap = _patcher.patchMap;
     return JsAlertRequest(
       url: _patchMap.containsKey(JsAlertRequest$.url)
-          ? (_patchMap[JsAlertRequest$.url] is Function)
-                ? _patchMap[JsAlertRequest$.url](this.url)
-                : (_patchMap[JsAlertRequest$.url] is Patch)
-                ? _patchMap[JsAlertRequest$.url].applyTo(this.url)
-                : _patchMap[JsAlertRequest$.url]
+          ? ((_patchMap[JsAlertRequest$.url] is Function)
+                    ? _patchMap[JsAlertRequest$.url](this.url)
+                    : (_patchMap[JsAlertRequest$.url] is Patch)
+                    ? _patchMap[JsAlertRequest$.url].applyTo(this.url)
+                    : _patchMap[JsAlertRequest$.url])
+                as WebUri?
           : this.url,
       message: _patchMap.containsKey(JsAlertRequest$.message)
-          ? (_patchMap[JsAlertRequest$.message] is Function)
-                ? _patchMap[JsAlertRequest$.message](this.message)
-                : (_patchMap[JsAlertRequest$.message] is Patch)
-                ? _patchMap[JsAlertRequest$.message].applyTo(this.message)
-                : _patchMap[JsAlertRequest$.message]
+          ? ((_patchMap[JsAlertRequest$.message] is Function)
+                    ? _patchMap[JsAlertRequest$.message](this.message)
+                    : (_patchMap[JsAlertRequest$.message] is Patch)
+                    ? _patchMap[JsAlertRequest$.message].applyTo(this.message)
+                    : _patchMap[JsAlertRequest$.message])
+                as String?
           : this.message,
       isMainFrame: _patchMap.containsKey(JsAlertRequest$.isMainFrame)
-          ? (_patchMap[JsAlertRequest$.isMainFrame] is Function)
-                ? _patchMap[JsAlertRequest$.isMainFrame](this.isMainFrame)
-                : (_patchMap[JsAlertRequest$.isMainFrame] is Patch)
-                ? _patchMap[JsAlertRequest$.isMainFrame].applyTo(
-                    this.isMainFrame,
-                  )
-                : _patchMap[JsAlertRequest$.isMainFrame]
+          ? ((_patchMap[JsAlertRequest$.isMainFrame] is Function)
+                    ? _patchMap[JsAlertRequest$.isMainFrame](this.isMainFrame)
+                    : (_patchMap[JsAlertRequest$.isMainFrame] is Patch)
+                    ? _patchMap[JsAlertRequest$.isMainFrame].applyTo(
+                        this.isMainFrame,
+                      )
+                    : _patchMap[JsAlertRequest$.isMainFrame])
+                as bool?
           : this.isMainFrame,
     );
   }
@@ -98,7 +122,8 @@ class JsAlertRequest {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$JsAlertRequestToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

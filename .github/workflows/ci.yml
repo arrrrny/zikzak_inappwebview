@@ -1,0 +1,210 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+
+# Cancel in-progress runs for the same branch/PR.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    name: "analyze: ${{ matrix.package }}"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - zikzak_inappwebview_platform_interface
+          - zikzak_inappwebview_web
+          - zikzak_inappwebview_macos
+          - zikzak_inappwebview_windows
+          - zikzak_inappwebview_linux
+          - zikzak_inappwebview_ios
+          - zikzak_inappwebview
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: flutter pub get
+        working-directory: ${{ matrix.package }}
+        run: flutter pub get
+      - name: flutter analyze
+        working-directory: ${{ matrix.package }}
+        # Errors and warnings still fail the build; style-level infos are
+        # reported but tolerated (see analysis_options.yaml in each package).
+        run: flutter analyze --no-fatal-infos
+
+  test:
+    name: "test: ${{ matrix.package }}"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - zikzak_inappwebview_platform_interface
+          - zikzak_inappwebview_macos
+          - zikzak_inappwebview_windows
+          - zikzak_inappwebview_linux
+          - zikzak_inappwebview_ios
+          - zikzak_inappwebview
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: flutter pub get
+        working-directory: ${{ matrix.package }}
+        run: flutter pub get
+      - name: flutter test
+        working-directory: ${{ matrix.package }}
+        run: flutter test
+
+  test-web:
+    name: "test: zikzak_inappwebview_web"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: flutter pub get
+        working-directory: zikzak_inappwebview_web
+        run: flutter pub get
+      - name: flutter test --platform chrome
+        working-directory: zikzak_inappwebview_web
+        run: flutter test --platform chrome
+
+  # The iOS Swift sources are only compiled by a real iOS build, and only
+  # through a consuming app (the plugin's Package.swift expects the
+  # FlutterFramework package Flutter generates into the app). The example
+  # resolves the platform packages from pub.dev, so the override below is what
+  # makes this job compile *this* checkout — without it the published iOS
+  # package would be compiled instead, which is how the 6.0.0 scope error went
+  # unnoticed.
+  #
+  # This job earns its keep: on its first run it caught
+  # InAppWebView.evaluateJavaScript(_:completionHandler:) failing to override on
+  # the runner's SDK, which is a hard build failure for consumers on older Xcode
+  # (see the two-arm `#if compiler(>=6.0)` override in InAppWebView.swift).
+  #
+  # That override has one arm per toolchain generation, so the example is built
+  # on two runners: macos-14 (Xcode 15, Swift 5.10) compiles the `#else` arm and
+  # macos-15 (Xcode 16, Swift 6) compiles the `#if` arm. A local Xcode 26 only
+  # ever compiles the latter.
+  #
+  # macos-14 is the `#else` arm's only home — macos-15's oldest Xcode is 16.0,
+  # already Swift 6 — and actions/runner-images has announced it goes unsupported
+  # on November 2. When that lands the `#else` arm has no runner left; the
+  # matrix then needs reworking (drop the arm if no supported toolchain still
+  # needs it, or find another pre-Swift-6 toolchain) rather than deleting it
+  # silently.
+  build-ios:
+    name: "build: zikzak_inappwebview_ios (iOS, ${{ matrix.runner }})"
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [macos-14, macos-15]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check the toolchain compiles the arm this job exists for
+        run: |
+          version="$(swift --version 2>&1)"
+          echo "$version"
+          if [ "${{ matrix.runner }}" = "macos-15" ]; then
+            # This runner is here for the `#if compiler(>=6.0)` arm.
+            case "$version" in
+              *"Swift version 6"*) ;;
+              *) echo "::error::macos-15 must run a Swift 6 toolchain"; exit 1 ;;
+            esac
+          else
+            # This runner is here for the `#else` arm. If the image's default
+            # Xcode ever moves to Swift 6, this job would compile the `#if` arm
+            # instead and silently leave `#else` uncovered — the gap #333 exists
+            # to close — so fail instead.
+            case "$version" in
+              *"Swift version 6"*)
+                echo "::error::macos-14 must run a pre-Swift-6 toolchain"; exit 1 ;;
+            esac
+          fi
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: Point the example at this checkout
+        working-directory: zikzak_inappwebview/example
+        run: |
+          cat > pubspec_overrides.yaml <<'YAML'
+          dependency_overrides:
+            zikzak_inappwebview_ios:
+              path: ../../zikzak_inappwebview_ios
+          YAML
+      - name: flutter pub get
+        working-directory: zikzak_inappwebview/example
+        run: flutter pub get
+      - name: flutter build ios --release --no-codesign
+        working-directory: zikzak_inappwebview/example
+        run: flutter build ios --release --no-codesign
+
+  # The macOS Swift sources had no compiling job at all: analyze and test cover
+  # the macOS package's Dart, and its tests are source-contract scans that read
+  # the .swift files as text, so every one of them passes on a Swift file that
+  # does not compile. A macOS build is the only thing that type-checks this
+  # package's 70 Swift files.
+  #
+  # It earns its keep the same way build-ios does. The example resolves the
+  # platform packages from pub.dev, so the override below is what makes this job
+  # compile *this* checkout — without it the published macOS package would be
+  # compiled instead and every regression below would ship green. The
+  # post-`pub get` assertion is what keeps that from silently regressing.
+  #
+  # Why one runner and not the two build-ios uses: build-ios splits because
+  # InAppWebView.swift has a genuine two-arm `#if compiler(>=6.0)` override, so
+  # each runner compiles an arm the other cannot. No macOS source has an
+  # `#if compiler` arm (the only version conditionals are `@available(macOS …)`,
+  # all at or below the package's macOS 12.0 floor and the example's 13.5
+  # deployment target), so a second runner would compile the same arm twice.
+  # macos-14 is deliberately not used: actions/runner-images has announced it
+  # goes unsupported on November 2, and nothing here needs a pre-Swift-6
+  # toolchain.
+  build-macos:
+    name: "build: zikzak_inappwebview_macos (macOS)"
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: Point the example at this checkout
+        working-directory: zikzak_inappwebview/example
+        run: |
+          cat > pubspec_overrides.yaml <<'YAML'
+          dependency_overrides:
+            zikzak_inappwebview_macos:
+              path: ../../zikzak_inappwebview_macos
+          YAML
+      - name: flutter pub get
+        working-directory: zikzak_inappwebview/example
+        run: flutter pub get
+      - name: Assert the build will compile this checkout, not pub.dev
+        working-directory: zikzak_inappwebview/example
+        # Without this, a typo'd or silently-ignored override would leave the
+        # job compiling the published 6.1.0 macOS package and passing forever.
+        run: |
+          resolved="$(awk '
+            /^  zikzak_inappwebview_macos:/ { found = 1; next }
+            found && /source:/ { print $2; exit }
+          ' pubspec.lock)"
+          echo "zikzak_inappwebview_macos resolves to: $resolved"
+          if [ "$resolved" != "path" ]; then
+            echo "::error::zikzak_inappwebview_macos must resolve from path (this checkout), got '$resolved' — this job is compiling the published package"
+            exit 1
+          fi
+      - name: flutter build macos --debug
+        working-directory: zikzak_inappwebview/example
+        run: flutter build macos --debug

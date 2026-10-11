@@ -29,6 +29,27 @@ class WebStorageOrigin {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  WebStorageOrigin copyWithField<T>(Field<WebStorageOrigin, T> field, T value) {
+    switch (field.name) {
+      case 'origin':
+        return copyWith(origin: value as String?);
+      case 'quota':
+        return copyWith(quota: value as int?);
+      case 'usage':
+        return copyWith(usage: value as int?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'WebStorageOrigin has no settable field with this name',
+        );
+    }
+  }
+
   WebStorageOrigin copyWithWebStorageOrigin({
     String? origin,
     int? quota,
@@ -44,25 +65,28 @@ class WebStorageOrigin {
     final _patchMap = _patcher.patchMap;
     return WebStorageOrigin(
       origin: _patchMap.containsKey(WebStorageOrigin$.origin)
-          ? (_patchMap[WebStorageOrigin$.origin] is Function)
-                ? _patchMap[WebStorageOrigin$.origin](this.origin)
-                : (_patchMap[WebStorageOrigin$.origin] is Patch)
-                ? _patchMap[WebStorageOrigin$.origin].applyTo(this.origin)
-                : _patchMap[WebStorageOrigin$.origin]
+          ? ((_patchMap[WebStorageOrigin$.origin] is Function)
+                    ? _patchMap[WebStorageOrigin$.origin](this.origin)
+                    : (_patchMap[WebStorageOrigin$.origin] is Patch)
+                    ? _patchMap[WebStorageOrigin$.origin].applyTo(this.origin)
+                    : _patchMap[WebStorageOrigin$.origin])
+                as String?
           : this.origin,
       quota: _patchMap.containsKey(WebStorageOrigin$.quota)
-          ? (_patchMap[WebStorageOrigin$.quota] is Function)
-                ? _patchMap[WebStorageOrigin$.quota](this.quota)
-                : (_patchMap[WebStorageOrigin$.quota] is Patch)
-                ? _patchMap[WebStorageOrigin$.quota].applyTo(this.quota)
-                : _patchMap[WebStorageOrigin$.quota]
+          ? ((_patchMap[WebStorageOrigin$.quota] is Function)
+                    ? _patchMap[WebStorageOrigin$.quota](this.quota)
+                    : (_patchMap[WebStorageOrigin$.quota] is Patch)
+                    ? _patchMap[WebStorageOrigin$.quota].applyTo(this.quota)
+                    : _patchMap[WebStorageOrigin$.quota])
+                as int?
           : this.quota,
       usage: _patchMap.containsKey(WebStorageOrigin$.usage)
-          ? (_patchMap[WebStorageOrigin$.usage] is Function)
-                ? _patchMap[WebStorageOrigin$.usage](this.usage)
-                : (_patchMap[WebStorageOrigin$.usage] is Patch)
-                ? _patchMap[WebStorageOrigin$.usage].applyTo(this.usage)
-                : _patchMap[WebStorageOrigin$.usage]
+          ? ((_patchMap[WebStorageOrigin$.usage] is Function)
+                    ? _patchMap[WebStorageOrigin$.usage](this.usage)
+                    : (_patchMap[WebStorageOrigin$.usage] is Patch)
+                    ? _patchMap[WebStorageOrigin$.usage].applyTo(this.usage)
+                    : _patchMap[WebStorageOrigin$.usage])
+                as int?
           : this.usage,
     );
   }
@@ -93,7 +117,8 @@ class WebStorageOrigin {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$WebStorageOriginToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

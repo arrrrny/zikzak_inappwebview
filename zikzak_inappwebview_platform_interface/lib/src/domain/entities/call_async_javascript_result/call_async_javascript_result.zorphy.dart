@@ -26,6 +26,28 @@ class CallAsyncJavaScriptResult {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  CallAsyncJavaScriptResult copyWithField<T>(
+    Field<CallAsyncJavaScriptResult, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'value':
+        return copyWith(value: value as dynamic);
+      case 'error':
+        return copyWith(error: value as String?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'CallAsyncJavaScriptResult has no settable field with this name',
+        );
+    }
+  }
+
   CallAsyncJavaScriptResult copyWithCallAsyncJavaScriptResult({
     dynamic value,
     String? error,
@@ -40,22 +62,24 @@ class CallAsyncJavaScriptResult {
     final _patchMap = _patcher.patchMap;
     return CallAsyncJavaScriptResult(
       value: _patchMap.containsKey(CallAsyncJavaScriptResult$.value)
-          ? (_patchMap[CallAsyncJavaScriptResult$.value] is Function)
-                ? _patchMap[CallAsyncJavaScriptResult$.value](this.value)
-                : (_patchMap[CallAsyncJavaScriptResult$.value] is Patch)
-                ? _patchMap[CallAsyncJavaScriptResult$.value].applyTo(
-                    this.value,
-                  )
-                : _patchMap[CallAsyncJavaScriptResult$.value]
+          ? ((_patchMap[CallAsyncJavaScriptResult$.value] is Function)
+                    ? _patchMap[CallAsyncJavaScriptResult$.value](this.value)
+                    : (_patchMap[CallAsyncJavaScriptResult$.value] is Patch)
+                    ? _patchMap[CallAsyncJavaScriptResult$.value].applyTo(
+                        this.value,
+                      )
+                    : _patchMap[CallAsyncJavaScriptResult$.value])
+                as dynamic
           : this.value,
       error: _patchMap.containsKey(CallAsyncJavaScriptResult$.error)
-          ? (_patchMap[CallAsyncJavaScriptResult$.error] is Function)
-                ? _patchMap[CallAsyncJavaScriptResult$.error](this.error)
-                : (_patchMap[CallAsyncJavaScriptResult$.error] is Patch)
-                ? _patchMap[CallAsyncJavaScriptResult$.error].applyTo(
-                    this.error,
-                  )
-                : _patchMap[CallAsyncJavaScriptResult$.error]
+          ? ((_patchMap[CallAsyncJavaScriptResult$.error] is Function)
+                    ? _patchMap[CallAsyncJavaScriptResult$.error](this.error)
+                    : (_patchMap[CallAsyncJavaScriptResult$.error] is Patch)
+                    ? _patchMap[CallAsyncJavaScriptResult$.error].applyTo(
+                        this.error,
+                      )
+                    : _patchMap[CallAsyncJavaScriptResult$.error])
+                as String?
           : this.error,
     );
   }
@@ -83,7 +107,8 @@ class CallAsyncJavaScriptResult {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$CallAsyncJavaScriptResultToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

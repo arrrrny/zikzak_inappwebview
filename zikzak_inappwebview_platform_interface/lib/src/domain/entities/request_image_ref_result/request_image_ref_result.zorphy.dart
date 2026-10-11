@@ -22,6 +22,26 @@ class RequestImageRefResult {
     return RequestImageRefResult(url: url ?? this.url);
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  RequestImageRefResult copyWithField<T>(
+    Field<RequestImageRefResult, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'url':
+        return copyWith(url: value as WebUri?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'RequestImageRefResult has no settable field with this name',
+        );
+    }
+  }
+
   RequestImageRefResult copyWithRequestImageRefResult({WebUri? url}) {
     return copyWith(url: url);
   }
@@ -33,11 +53,12 @@ class RequestImageRefResult {
     final _patchMap = _patcher.patchMap;
     return RequestImageRefResult(
       url: _patchMap.containsKey(RequestImageRefResult$.url)
-          ? (_patchMap[RequestImageRefResult$.url] is Function)
-                ? _patchMap[RequestImageRefResult$.url](this.url)
-                : (_patchMap[RequestImageRefResult$.url] is Patch)
-                ? _patchMap[RequestImageRefResult$.url].applyTo(this.url)
-                : _patchMap[RequestImageRefResult$.url]
+          ? ((_patchMap[RequestImageRefResult$.url] is Function)
+                    ? _patchMap[RequestImageRefResult$.url](this.url)
+                    : (_patchMap[RequestImageRefResult$.url] is Patch)
+                    ? _patchMap[RequestImageRefResult$.url].applyTo(this.url)
+                    : _patchMap[RequestImageRefResult$.url])
+                as WebUri?
           : this.url,
     );
   }
@@ -60,7 +81,8 @@ class RequestImageRefResult {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$RequestImageRefResultToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

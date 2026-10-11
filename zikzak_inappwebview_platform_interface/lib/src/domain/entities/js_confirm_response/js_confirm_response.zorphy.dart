@@ -60,6 +60,34 @@ class JsConfirmResponse {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  JsConfirmResponse copyWithField<T>(
+    Field<JsConfirmResponse, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'message':
+        return copyWith(message: value as String);
+      case 'confirmButtonTitle':
+        return copyWith(confirmButtonTitle: value as String);
+      case 'cancelButtonTitle':
+        return copyWith(cancelButtonTitle: value as String);
+      case 'handledByClient':
+        return copyWith(handledByClient: value as bool);
+      case 'action':
+        return copyWith(action: value as JsConfirmResponseAction?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'JsConfirmResponse has no settable field with this name',
+        );
+    }
+  }
+
   JsConfirmResponse copyWithJsConfirmResponse({
     String? message,
     String? confirmButtonTitle,
@@ -83,53 +111,61 @@ class JsConfirmResponse {
     final _patchMap = _patcher.patchMap;
     return JsConfirmResponse(
       message: _patchMap.containsKey(JsConfirmResponse$.message)
-          ? (_patchMap[JsConfirmResponse$.message] is Function)
-                ? _patchMap[JsConfirmResponse$.message](this.message)
-                : (_patchMap[JsConfirmResponse$.message] is Patch)
-                ? _patchMap[JsConfirmResponse$.message].applyTo(this.message)
-                : _patchMap[JsConfirmResponse$.message]
+          ? ((_patchMap[JsConfirmResponse$.message] is Function)
+                    ? _patchMap[JsConfirmResponse$.message](this.message)
+                    : (_patchMap[JsConfirmResponse$.message] is Patch)
+                    ? _patchMap[JsConfirmResponse$.message].applyTo(
+                        this.message,
+                      )
+                    : _patchMap[JsConfirmResponse$.message])
+                as String
           : this.message,
       confirmButtonTitle:
           _patchMap.containsKey(JsConfirmResponse$.confirmButtonTitle)
-          ? (_patchMap[JsConfirmResponse$.confirmButtonTitle] is Function)
-                ? _patchMap[JsConfirmResponse$.confirmButtonTitle](
-                    this.confirmButtonTitle,
-                  )
-                : (_patchMap[JsConfirmResponse$.confirmButtonTitle] is Patch)
-                ? _patchMap[JsConfirmResponse$.confirmButtonTitle].applyTo(
-                    this.confirmButtonTitle,
-                  )
-                : _patchMap[JsConfirmResponse$.confirmButtonTitle]
+          ? ((_patchMap[JsConfirmResponse$.confirmButtonTitle] is Function)
+                    ? _patchMap[JsConfirmResponse$.confirmButtonTitle](
+                        this.confirmButtonTitle,
+                      )
+                    : (_patchMap[JsConfirmResponse$.confirmButtonTitle]
+                          is Patch)
+                    ? _patchMap[JsConfirmResponse$.confirmButtonTitle].applyTo(
+                        this.confirmButtonTitle,
+                      )
+                    : _patchMap[JsConfirmResponse$.confirmButtonTitle])
+                as String
           : this.confirmButtonTitle,
       cancelButtonTitle:
           _patchMap.containsKey(JsConfirmResponse$.cancelButtonTitle)
-          ? (_patchMap[JsConfirmResponse$.cancelButtonTitle] is Function)
-                ? _patchMap[JsConfirmResponse$.cancelButtonTitle](
-                    this.cancelButtonTitle,
-                  )
-                : (_patchMap[JsConfirmResponse$.cancelButtonTitle] is Patch)
-                ? _patchMap[JsConfirmResponse$.cancelButtonTitle].applyTo(
-                    this.cancelButtonTitle,
-                  )
-                : _patchMap[JsConfirmResponse$.cancelButtonTitle]
+          ? ((_patchMap[JsConfirmResponse$.cancelButtonTitle] is Function)
+                    ? _patchMap[JsConfirmResponse$.cancelButtonTitle](
+                        this.cancelButtonTitle,
+                      )
+                    : (_patchMap[JsConfirmResponse$.cancelButtonTitle] is Patch)
+                    ? _patchMap[JsConfirmResponse$.cancelButtonTitle].applyTo(
+                        this.cancelButtonTitle,
+                      )
+                    : _patchMap[JsConfirmResponse$.cancelButtonTitle])
+                as String
           : this.cancelButtonTitle,
       handledByClient: _patchMap.containsKey(JsConfirmResponse$.handledByClient)
-          ? (_patchMap[JsConfirmResponse$.handledByClient] is Function)
-                ? _patchMap[JsConfirmResponse$.handledByClient](
-                    this.handledByClient,
-                  )
-                : (_patchMap[JsConfirmResponse$.handledByClient] is Patch)
-                ? _patchMap[JsConfirmResponse$.handledByClient].applyTo(
-                    this.handledByClient,
-                  )
-                : _patchMap[JsConfirmResponse$.handledByClient]
+          ? ((_patchMap[JsConfirmResponse$.handledByClient] is Function)
+                    ? _patchMap[JsConfirmResponse$.handledByClient](
+                        this.handledByClient,
+                      )
+                    : (_patchMap[JsConfirmResponse$.handledByClient] is Patch)
+                    ? _patchMap[JsConfirmResponse$.handledByClient].applyTo(
+                        this.handledByClient,
+                      )
+                    : _patchMap[JsConfirmResponse$.handledByClient])
+                as bool
           : this.handledByClient,
       action: _patchMap.containsKey(JsConfirmResponse$.action)
-          ? (_patchMap[JsConfirmResponse$.action] is Function)
-                ? _patchMap[JsConfirmResponse$.action](this.action)
-                : (_patchMap[JsConfirmResponse$.action] is Patch)
-                ? _patchMap[JsConfirmResponse$.action].applyTo(this.action)
-                : _patchMap[JsConfirmResponse$.action]
+          ? ((_patchMap[JsConfirmResponse$.action] is Function)
+                    ? _patchMap[JsConfirmResponse$.action](this.action)
+                    : (_patchMap[JsConfirmResponse$.action] is Patch)
+                    ? _patchMap[JsConfirmResponse$.action].applyTo(this.action)
+                    : _patchMap[JsConfirmResponse$.action])
+                as JsConfirmResponseAction?
           : this.action,
     );
   }
@@ -172,7 +208,8 @@ class JsConfirmResponse {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$JsConfirmResponseToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

@@ -1,0 +1,1 @@
+../../.specify/extensions/git/.specify-dev/agent-commands/opencode/speckit.git.initialize.md

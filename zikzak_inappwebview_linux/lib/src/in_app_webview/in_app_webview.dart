@@ -48,9 +48,6 @@ class _LinuxInAppWebViewState extends State<_LinuxInAppWebView> {
   }
 
   Future<void> _createWebView() async {
-    // Generate a unique ID for the webview.
-    // In MacOS implementation, platform view ID is provided by the platform.
-    // Here we generate it to match our custom create logic.
     var id = DateTime.now().microsecondsSinceEpoch.toString();
 
     try {
@@ -70,11 +67,10 @@ class _LinuxInAppWebViewState extends State<_LinuxInAppWebView> {
         setState(() {
           _textureId = textureId;
         });
-        // Use the ID we generated to create the controller, as the native side used it too.
         _onPlatformViewCreated(id);
       }
     } catch (e) {
-      print("Error creating webview: $e");
+      debugPrint('Error creating webview: $e');
     }
   }
 
@@ -115,11 +111,10 @@ class _LinuxInAppWebViewState extends State<_LinuxInAppWebView> {
     if (_textureId != null) {
       return Texture(textureId: _textureId!);
     }
-    // Return a placeholder or empty container
     return Container(
       color: const Color(0xFFFFFFFF),
       child: const Center(
-        child: Text("Linux InAppWebView (Implemented via Texture/Native)"),
+        child: Text('Linux InAppWebView (Implemented via Texture/Native)'),
       ),
     );
   }

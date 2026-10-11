@@ -27,6 +27,28 @@ class JsBeforeUnloadRequest {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  JsBeforeUnloadRequest copyWithField<T>(
+    Field<JsBeforeUnloadRequest, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'url':
+        return copyWith(url: value as WebUri?);
+      case 'message':
+        return copyWith(message: value as String?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'JsBeforeUnloadRequest has no settable field with this name',
+        );
+    }
+  }
+
   JsBeforeUnloadRequest copyWithJsBeforeUnloadRequest({
     WebUri? url,
     String? message,
@@ -41,20 +63,22 @@ class JsBeforeUnloadRequest {
     final _patchMap = _patcher.patchMap;
     return JsBeforeUnloadRequest(
       url: _patchMap.containsKey(JsBeforeUnloadRequest$.url)
-          ? (_patchMap[JsBeforeUnloadRequest$.url] is Function)
-                ? _patchMap[JsBeforeUnloadRequest$.url](this.url)
-                : (_patchMap[JsBeforeUnloadRequest$.url] is Patch)
-                ? _patchMap[JsBeforeUnloadRequest$.url].applyTo(this.url)
-                : _patchMap[JsBeforeUnloadRequest$.url]
+          ? ((_patchMap[JsBeforeUnloadRequest$.url] is Function)
+                    ? _patchMap[JsBeforeUnloadRequest$.url](this.url)
+                    : (_patchMap[JsBeforeUnloadRequest$.url] is Patch)
+                    ? _patchMap[JsBeforeUnloadRequest$.url].applyTo(this.url)
+                    : _patchMap[JsBeforeUnloadRequest$.url])
+                as WebUri?
           : this.url,
       message: _patchMap.containsKey(JsBeforeUnloadRequest$.message)
-          ? (_patchMap[JsBeforeUnloadRequest$.message] is Function)
-                ? _patchMap[JsBeforeUnloadRequest$.message](this.message)
-                : (_patchMap[JsBeforeUnloadRequest$.message] is Patch)
-                ? _patchMap[JsBeforeUnloadRequest$.message].applyTo(
-                    this.message,
-                  )
-                : _patchMap[JsBeforeUnloadRequest$.message]
+          ? ((_patchMap[JsBeforeUnloadRequest$.message] is Function)
+                    ? _patchMap[JsBeforeUnloadRequest$.message](this.message)
+                    : (_patchMap[JsBeforeUnloadRequest$.message] is Patch)
+                    ? _patchMap[JsBeforeUnloadRequest$.message].applyTo(
+                        this.message,
+                      )
+                    : _patchMap[JsBeforeUnloadRequest$.message])
+                as String?
           : this.message,
     );
   }
@@ -82,7 +106,8 @@ class JsBeforeUnloadRequest {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$JsBeforeUnloadRequestToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

@@ -1,5 +1,7 @@
 installed:
 - agent-context
+- bug
+- spec-stats
 settings:
   auto_execute_hooks: true
 hooks:

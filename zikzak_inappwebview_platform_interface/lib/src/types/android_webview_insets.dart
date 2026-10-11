@@ -56,14 +56,14 @@ class AndroidWebViewInsets {
   );
 
   ///Set of all values of [AndroidWebViewInsets].
-  static final Set<AndroidWebViewInsets> values = [
+  static final Set<AndroidWebViewInsets> values = {
     AndroidWebViewInsets.ime,
     AndroidWebViewInsets.systemBars,
     AndroidWebViewInsets.systemGestures,
     AndroidWebViewInsets.mandatorySystemGestures,
     AndroidWebViewInsets.tappableElement,
     AndroidWebViewInsets.displayCutout,
-  ].toSet();
+  };
 
   ///Gets a possible [AndroidWebViewInsets] instance from [String] value.
   static AndroidWebViewInsets? fromValue(String? value) {

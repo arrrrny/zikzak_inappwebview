@@ -38,6 +38,29 @@ class Favicon {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  Favicon copyWithField<T>(Field<Favicon, T> field, T value) {
+    switch (field.name) {
+      case 'url':
+        return copyWith(url: value as WebUri);
+      case 'rel':
+        return copyWith(rel: value as String?);
+      case 'width':
+        return copyWith(width: value as int?);
+      case 'height':
+        return copyWith(height: value as int?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'Favicon has no settable field with this name',
+        );
+    }
+  }
+
   Favicon copyWithFavicon({WebUri? url, String? rel, int? width, int? height}) {
     return copyWith(url: url, rel: rel, width: width, height: height);
   }
@@ -47,32 +70,36 @@ class Favicon {
     final _patchMap = _patcher.patchMap;
     return Favicon(
       url: _patchMap.containsKey(Favicon$.url)
-          ? (_patchMap[Favicon$.url] is Function)
-                ? _patchMap[Favicon$.url](this.url)
-                : (_patchMap[Favicon$.url] is Patch)
-                ? _patchMap[Favicon$.url].applyTo(this.url)
-                : _patchMap[Favicon$.url]
+          ? ((_patchMap[Favicon$.url] is Function)
+                    ? _patchMap[Favicon$.url](this.url)
+                    : (_patchMap[Favicon$.url] is Patch)
+                    ? _patchMap[Favicon$.url].applyTo(this.url)
+                    : _patchMap[Favicon$.url])
+                as WebUri
           : this.url,
       rel: _patchMap.containsKey(Favicon$.rel)
-          ? (_patchMap[Favicon$.rel] is Function)
-                ? _patchMap[Favicon$.rel](this.rel)
-                : (_patchMap[Favicon$.rel] is Patch)
-                ? _patchMap[Favicon$.rel].applyTo(this.rel)
-                : _patchMap[Favicon$.rel]
+          ? ((_patchMap[Favicon$.rel] is Function)
+                    ? _patchMap[Favicon$.rel](this.rel)
+                    : (_patchMap[Favicon$.rel] is Patch)
+                    ? _patchMap[Favicon$.rel].applyTo(this.rel)
+                    : _patchMap[Favicon$.rel])
+                as String?
           : this.rel,
       width: _patchMap.containsKey(Favicon$.width)
-          ? (_patchMap[Favicon$.width] is Function)
-                ? _patchMap[Favicon$.width](this.width)
-                : (_patchMap[Favicon$.width] is Patch)
-                ? _patchMap[Favicon$.width].applyTo(this.width)
-                : _patchMap[Favicon$.width]
+          ? ((_patchMap[Favicon$.width] is Function)
+                    ? _patchMap[Favicon$.width](this.width)
+                    : (_patchMap[Favicon$.width] is Patch)
+                    ? _patchMap[Favicon$.width].applyTo(this.width)
+                    : _patchMap[Favicon$.width])
+                as int?
           : this.width,
       height: _patchMap.containsKey(Favicon$.height)
-          ? (_patchMap[Favicon$.height] is Function)
-                ? _patchMap[Favicon$.height](this.height)
-                : (_patchMap[Favicon$.height] is Patch)
-                ? _patchMap[Favicon$.height].applyTo(this.height)
-                : _patchMap[Favicon$.height]
+          ? ((_patchMap[Favicon$.height] is Function)
+                    ? _patchMap[Favicon$.height](this.height)
+                    : (_patchMap[Favicon$.height] is Patch)
+                    ? _patchMap[Favicon$.height].applyTo(this.height)
+                    : _patchMap[Favicon$.height])
+                as int?
           : this.height,
     );
   }
@@ -106,7 +133,8 @@ class Favicon {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$FaviconToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

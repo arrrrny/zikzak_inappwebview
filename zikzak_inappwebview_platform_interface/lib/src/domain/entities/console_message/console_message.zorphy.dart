@@ -37,6 +37,25 @@ class ConsoleMessage {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  ConsoleMessage copyWithField<T>(Field<ConsoleMessage, T> field, T value) {
+    switch (field.name) {
+      case 'message':
+        return copyWith(message: value as String?);
+      case 'messageLevel':
+        return copyWith(messageLevel: value as ConsoleMessageLevel?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'ConsoleMessage has no settable field with this name',
+        );
+    }
+  }
+
   ConsoleMessage copyWithConsoleMessage({
     String? message,
     ConsoleMessageLevel? messageLevel,
@@ -49,20 +68,22 @@ class ConsoleMessage {
     final _patchMap = _patcher.patchMap;
     return ConsoleMessage(
       message: _patchMap.containsKey(ConsoleMessage$.message)
-          ? (_patchMap[ConsoleMessage$.message] is Function)
-                ? _patchMap[ConsoleMessage$.message](this.message)
-                : (_patchMap[ConsoleMessage$.message] is Patch)
-                ? _patchMap[ConsoleMessage$.message].applyTo(this.message)
-                : _patchMap[ConsoleMessage$.message]
+          ? ((_patchMap[ConsoleMessage$.message] is Function)
+                    ? _patchMap[ConsoleMessage$.message](this.message)
+                    : (_patchMap[ConsoleMessage$.message] is Patch)
+                    ? _patchMap[ConsoleMessage$.message].applyTo(this.message)
+                    : _patchMap[ConsoleMessage$.message])
+                as String?
           : this.message,
       messageLevel: _patchMap.containsKey(ConsoleMessage$.messageLevel)
-          ? (_patchMap[ConsoleMessage$.messageLevel] is Function)
-                ? _patchMap[ConsoleMessage$.messageLevel](this.messageLevel)
-                : (_patchMap[ConsoleMessage$.messageLevel] is Patch)
-                ? _patchMap[ConsoleMessage$.messageLevel].applyTo(
-                    this.messageLevel,
-                  )
-                : _patchMap[ConsoleMessage$.messageLevel]
+          ? ((_patchMap[ConsoleMessage$.messageLevel] is Function)
+                    ? _patchMap[ConsoleMessage$.messageLevel](this.messageLevel)
+                    : (_patchMap[ConsoleMessage$.messageLevel] is Patch)
+                    ? _patchMap[ConsoleMessage$.messageLevel].applyTo(
+                        this.messageLevel,
+                      )
+                    : _patchMap[ConsoleMessage$.messageLevel])
+                as ConsoleMessageLevel?
           : this.messageLevel,
     );
   }
@@ -90,7 +111,8 @@ class ConsoleMessage {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$ConsoleMessageToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

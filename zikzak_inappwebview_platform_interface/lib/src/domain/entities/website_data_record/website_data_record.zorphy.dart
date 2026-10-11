@@ -33,6 +33,28 @@ class WebsiteDataRecord {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  WebsiteDataRecord copyWithField<T>(
+    Field<WebsiteDataRecord, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'displayName':
+        return copyWith(displayName: value as String?);
+      case 'dataTypes':
+        return copyWith(dataTypes: value as Set<WebsiteDataType>?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'WebsiteDataRecord has no settable field with this name',
+        );
+    }
+  }
+
   WebsiteDataRecord copyWithWebsiteDataRecord({
     String? displayName,
     Set<WebsiteDataType>? dataTypes,
@@ -47,22 +69,26 @@ class WebsiteDataRecord {
     final _patchMap = _patcher.patchMap;
     return WebsiteDataRecord(
       displayName: _patchMap.containsKey(WebsiteDataRecord$.displayName)
-          ? (_patchMap[WebsiteDataRecord$.displayName] is Function)
-                ? _patchMap[WebsiteDataRecord$.displayName](this.displayName)
-                : (_patchMap[WebsiteDataRecord$.displayName] is Patch)
-                ? _patchMap[WebsiteDataRecord$.displayName].applyTo(
-                    this.displayName,
-                  )
-                : _patchMap[WebsiteDataRecord$.displayName]
+          ? ((_patchMap[WebsiteDataRecord$.displayName] is Function)
+                    ? _patchMap[WebsiteDataRecord$.displayName](
+                        this.displayName,
+                      )
+                    : (_patchMap[WebsiteDataRecord$.displayName] is Patch)
+                    ? _patchMap[WebsiteDataRecord$.displayName].applyTo(
+                        this.displayName,
+                      )
+                    : _patchMap[WebsiteDataRecord$.displayName])
+                as String?
           : this.displayName,
       dataTypes: _patchMap.containsKey(WebsiteDataRecord$.dataTypes)
-          ? (_patchMap[WebsiteDataRecord$.dataTypes] is Function)
-                ? _patchMap[WebsiteDataRecord$.dataTypes](this.dataTypes)
-                : (_patchMap[WebsiteDataRecord$.dataTypes] is Patch)
-                ? _patchMap[WebsiteDataRecord$.dataTypes].applyTo(
-                    this.dataTypes,
-                  )
-                : _patchMap[WebsiteDataRecord$.dataTypes]
+          ? ((_patchMap[WebsiteDataRecord$.dataTypes] is Function)
+                    ? _patchMap[WebsiteDataRecord$.dataTypes](this.dataTypes)
+                    : (_patchMap[WebsiteDataRecord$.dataTypes] is Patch)
+                    ? _patchMap[WebsiteDataRecord$.dataTypes].applyTo(
+                        this.dataTypes,
+                      )
+                    : _patchMap[WebsiteDataRecord$.dataTypes])
+                as Set<WebsiteDataType>?
           : this.dataTypes,
     );
   }
@@ -90,7 +116,8 @@ class WebsiteDataRecord {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$WebsiteDataRecordToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

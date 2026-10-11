@@ -49,6 +49,32 @@ class SslCertificateDName {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  SslCertificateDName copyWithField<T>(
+    Field<SslCertificateDName, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'CName':
+        return copyWith(CName: value as String?);
+      case 'DName':
+        return copyWith(DName: value as String?);
+      case 'OName':
+        return copyWith(OName: value as String?);
+      case 'UName':
+        return copyWith(UName: value as String?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'SslCertificateDName has no settable field with this name',
+        );
+    }
+  }
+
   SslCertificateDName copyWithSslCertificateDName({
     String? CName,
     String? DName,
@@ -65,32 +91,36 @@ class SslCertificateDName {
     final _patchMap = _patcher.patchMap;
     return SslCertificateDName(
       CName: _patchMap.containsKey(SslCertificateDName$.CName)
-          ? (_patchMap[SslCertificateDName$.CName] is Function)
-                ? _patchMap[SslCertificateDName$.CName](this.CName)
-                : (_patchMap[SslCertificateDName$.CName] is Patch)
-                ? _patchMap[SslCertificateDName$.CName].applyTo(this.CName)
-                : _patchMap[SslCertificateDName$.CName]
+          ? ((_patchMap[SslCertificateDName$.CName] is Function)
+                    ? _patchMap[SslCertificateDName$.CName](this.CName)
+                    : (_patchMap[SslCertificateDName$.CName] is Patch)
+                    ? _patchMap[SslCertificateDName$.CName].applyTo(this.CName)
+                    : _patchMap[SslCertificateDName$.CName])
+                as String?
           : this.CName,
       DName: _patchMap.containsKey(SslCertificateDName$.DName)
-          ? (_patchMap[SslCertificateDName$.DName] is Function)
-                ? _patchMap[SslCertificateDName$.DName](this.DName)
-                : (_patchMap[SslCertificateDName$.DName] is Patch)
-                ? _patchMap[SslCertificateDName$.DName].applyTo(this.DName)
-                : _patchMap[SslCertificateDName$.DName]
+          ? ((_patchMap[SslCertificateDName$.DName] is Function)
+                    ? _patchMap[SslCertificateDName$.DName](this.DName)
+                    : (_patchMap[SslCertificateDName$.DName] is Patch)
+                    ? _patchMap[SslCertificateDName$.DName].applyTo(this.DName)
+                    : _patchMap[SslCertificateDName$.DName])
+                as String?
           : this.DName,
       OName: _patchMap.containsKey(SslCertificateDName$.OName)
-          ? (_patchMap[SslCertificateDName$.OName] is Function)
-                ? _patchMap[SslCertificateDName$.OName](this.OName)
-                : (_patchMap[SslCertificateDName$.OName] is Patch)
-                ? _patchMap[SslCertificateDName$.OName].applyTo(this.OName)
-                : _patchMap[SslCertificateDName$.OName]
+          ? ((_patchMap[SslCertificateDName$.OName] is Function)
+                    ? _patchMap[SslCertificateDName$.OName](this.OName)
+                    : (_patchMap[SslCertificateDName$.OName] is Patch)
+                    ? _patchMap[SslCertificateDName$.OName].applyTo(this.OName)
+                    : _patchMap[SslCertificateDName$.OName])
+                as String?
           : this.OName,
       UName: _patchMap.containsKey(SslCertificateDName$.UName)
-          ? (_patchMap[SslCertificateDName$.UName] is Function)
-                ? _patchMap[SslCertificateDName$.UName](this.UName)
-                : (_patchMap[SslCertificateDName$.UName] is Patch)
-                ? _patchMap[SslCertificateDName$.UName].applyTo(this.UName)
-                : _patchMap[SslCertificateDName$.UName]
+          ? ((_patchMap[SslCertificateDName$.UName] is Function)
+                    ? _patchMap[SslCertificateDName$.UName](this.UName)
+                    : (_patchMap[SslCertificateDName$.UName] is Patch)
+                    ? _patchMap[SslCertificateDName$.UName].applyTo(this.UName)
+                    : _patchMap[SslCertificateDName$.UName])
+                as String?
           : this.UName,
     );
   }
@@ -124,7 +154,8 @@ class SslCertificateDName {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$SslCertificateDNameToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

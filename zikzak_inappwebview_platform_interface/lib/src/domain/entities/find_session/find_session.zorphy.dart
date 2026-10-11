@@ -39,6 +39,29 @@ class FindSession {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  FindSession copyWithField<T>(Field<FindSession, T> field, T value) {
+    switch (field.name) {
+      case 'resultCount':
+        return copyWith(resultCount: value as int);
+      case 'highlightedResultIndex':
+        return copyWith(highlightedResultIndex: value as int);
+      case 'searchResultDisplayStyle':
+        return copyWith(
+          searchResultDisplayStyle: value as SearchResultDisplayStyle,
+        );
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'FindSession has no settable field with this name',
+        );
+    }
+  }
+
   FindSession copyWithFindSession({
     int? resultCount,
     int? highlightedResultIndex,
@@ -56,35 +79,41 @@ class FindSession {
     final _patchMap = _patcher.patchMap;
     return FindSession(
       resultCount: _patchMap.containsKey(FindSession$.resultCount)
-          ? (_patchMap[FindSession$.resultCount] is Function)
-                ? _patchMap[FindSession$.resultCount](this.resultCount)
-                : (_patchMap[FindSession$.resultCount] is Patch)
-                ? _patchMap[FindSession$.resultCount].applyTo(this.resultCount)
-                : _patchMap[FindSession$.resultCount]
+          ? ((_patchMap[FindSession$.resultCount] is Function)
+                    ? _patchMap[FindSession$.resultCount](this.resultCount)
+                    : (_patchMap[FindSession$.resultCount] is Patch)
+                    ? _patchMap[FindSession$.resultCount].applyTo(
+                        this.resultCount,
+                      )
+                    : _patchMap[FindSession$.resultCount])
+                as int
           : this.resultCount,
       highlightedResultIndex:
           _patchMap.containsKey(FindSession$.highlightedResultIndex)
-          ? (_patchMap[FindSession$.highlightedResultIndex] is Function)
-                ? _patchMap[FindSession$.highlightedResultIndex](
-                    this.highlightedResultIndex,
-                  )
-                : (_patchMap[FindSession$.highlightedResultIndex] is Patch)
-                ? _patchMap[FindSession$.highlightedResultIndex].applyTo(
-                    this.highlightedResultIndex,
-                  )
-                : _patchMap[FindSession$.highlightedResultIndex]
+          ? ((_patchMap[FindSession$.highlightedResultIndex] is Function)
+                    ? _patchMap[FindSession$.highlightedResultIndex](
+                        this.highlightedResultIndex,
+                      )
+                    : (_patchMap[FindSession$.highlightedResultIndex] is Patch)
+                    ? _patchMap[FindSession$.highlightedResultIndex].applyTo(
+                        this.highlightedResultIndex,
+                      )
+                    : _patchMap[FindSession$.highlightedResultIndex])
+                as int
           : this.highlightedResultIndex,
       searchResultDisplayStyle:
           _patchMap.containsKey(FindSession$.searchResultDisplayStyle)
-          ? (_patchMap[FindSession$.searchResultDisplayStyle] is Function)
-                ? _patchMap[FindSession$.searchResultDisplayStyle](
-                    this.searchResultDisplayStyle,
-                  )
-                : (_patchMap[FindSession$.searchResultDisplayStyle] is Patch)
-                ? _patchMap[FindSession$.searchResultDisplayStyle].applyTo(
-                    this.searchResultDisplayStyle,
-                  )
-                : _patchMap[FindSession$.searchResultDisplayStyle]
+          ? ((_patchMap[FindSession$.searchResultDisplayStyle] is Function)
+                    ? _patchMap[FindSession$.searchResultDisplayStyle](
+                        this.searchResultDisplayStyle,
+                      )
+                    : (_patchMap[FindSession$.searchResultDisplayStyle]
+                          is Patch)
+                    ? _patchMap[FindSession$.searchResultDisplayStyle].applyTo(
+                        this.searchResultDisplayStyle,
+                      )
+                    : _patchMap[FindSession$.searchResultDisplayStyle])
+                as SearchResultDisplayStyle
           : this.searchResultDisplayStyle,
     );
   }
@@ -119,7 +148,8 @@ class FindSession {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$FindSessionToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

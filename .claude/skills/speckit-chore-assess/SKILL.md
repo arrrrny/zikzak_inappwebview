@@ -1,0 +1,1 @@
+../../../.specify/extensions/chore/.specify-dev/agent-commands/claude/speckit-chore-assess/SKILL.md

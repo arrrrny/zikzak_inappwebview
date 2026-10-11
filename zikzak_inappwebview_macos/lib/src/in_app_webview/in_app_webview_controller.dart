@@ -223,6 +223,41 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
           params.webviewParams!.onWebContentProcessDidTerminate!(controller);
         }
         break;
+      case 'onDownloadStartRequest':
+        if (params.webviewParams?.onDownloadStartRequest != null) {
+          // Native counterpart ships with issue #339 (iOS parity): the macOS
+          // Swift sources previously had no download chain, so this event
+          // could never arrive. Drop a malformed payload instead of letting
+          // it throw out of the decoder: a non-map payload fails the cast, a
+          // missing or non-String url fails the entity's required url, and an
+          // empty-string url would fire the callback with an empty WebUri.
+          if (call.arguments case final Map<dynamic, dynamic> raw
+              when raw['url'] is String && (raw['url'] as String).isNotEmpty) {
+            DownloadStartRequest? downloadStartRequest;
+            try {
+              downloadStartRequest = DownloadStartRequest.fromJson(
+                raw.cast<String, dynamic>(),
+              );
+            } on Object catch (_) {
+              // A url-shaped payload can still carry a type-mismatched sibling
+              // field (a String `contentLength`, a non-String
+              // `suggestedFilename`). The checked decoder rethrows that as a
+              // `CheckedFromJsonException`, which is an `Exception` rather than
+              // an `Error` — so the `on Error` wrapper in the constructor does
+              // not catch it and it escapes the channel handler entirely.
+              // Catch it around the decode only; the callback stays outside the
+              // try so a listener bug still surfaces.
+            }
+            if (downloadStartRequest == null) {
+              break;
+            }
+            params.webviewParams!.onDownloadStartRequest!(
+              controller,
+              downloadStartRequest,
+            );
+          }
+        }
+        break;
       case 'onJsAlert':
         if (params.webviewParams?.onJsAlert != null) {
           Map<String, dynamic> arguments = call.arguments
@@ -366,45 +401,38 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
         break;
       case 'onScrollChanged':
         if (params.webviewParams?.onScrollChanged != null) {
-          int x = call.arguments['x'];
-          int y = call.arguments['y'];
-          params.webviewParams!.onScrollChanged!(controller, x, y);
-        }
-        break;
-      case 'onOverScrolled':
-        if (params.webviewParams?.onOverScrolled != null) {
-          int x = call.arguments['x'];
-          int y = call.arguments['y'];
-          bool clampedX = call.arguments['clampedX'];
-          bool clampedY = call.arguments['clampedY'];
-          params.webviewParams!.onOverScrolled!(
+          params.webviewParams!.onScrollChanged!(
             controller,
-            x,
-            y,
-            clampedX,
-            clampedY,
-          );
-        }
-        break;
-      case 'onZoomScaleChanged':
-        if (params.webviewParams?.onZoomScaleChanged != null) {
-          double oldScale = call.arguments['oldScale'];
-          double newScale = call.arguments['newScale'];
-          params.webviewParams!.onZoomScaleChanged!(
-            controller,
-            oldScale,
-            newScale,
+            call.arguments['x'] as int? ?? 0,
+            call.arguments['y'] as int? ?? 0,
           );
         }
         break;
       case 'onContentSizeChanged':
         if (params.webviewParams?.onContentSizeChanged != null) {
-          Map oldMap = call.arguments['oldContentSize'];
-          Map newMap = call.arguments['newContentSize'];
+          final old = call.arguments['oldContentSize'] as Map? ?? {};
+          final neu = call.arguments['newContentSize'] as Map? ?? {};
           params.webviewParams!.onContentSizeChanged!(
             controller,
-            Size(oldMap['width'], oldMap['height']),
-            Size(newMap['width'], newMap['height']),
+            Size(
+              (old['width'] as num? ?? 0).toDouble(),
+              (old['height'] as num? ?? 0).toDouble(),
+            ),
+            Size(
+              (neu['width'] as num? ?? 0).toDouble(),
+              (neu['height'] as num? ?? 0).toDouble(),
+            ),
+          );
+        }
+        break;
+      case 'onOverScrolled':
+        if (params.webviewParams?.onOverScrolled != null) {
+          params.webviewParams!.onOverScrolled!(
+            controller,
+            call.arguments['x'] as int? ?? 0,
+            call.arguments['y'] as int? ?? 0,
+            call.arguments['clampedX'] as bool? ?? false,
+            call.arguments['clampedY'] as bool? ?? false,
           );
         }
         break;
@@ -578,6 +606,19 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
     args.putIfAbsent('source', () => source);
     args.putIfAbsent('contentWorld', () => contentWorld?.toMap());
     return await _channel.invokeMethod('evaluateJavascript', args);
+  }
+
+  @override
+  Future<void> pressKey({
+    required String key,
+    required int keyCode,
+    String characters = '',
+  }) async {
+    await _channel.invokeMethod('pressKey', <String, dynamic>{
+      'key': key,
+      'keyCode': keyCode,
+      'characters': characters,
+    });
   }
 
   @override

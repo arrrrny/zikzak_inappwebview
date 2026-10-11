@@ -496,7 +496,11 @@ public class WebViewChannelDelegate: ChannelDelegate {
                         result(pdf)
                     })
             } else {
-                result(nil)
+                result(
+                    FlutterError(
+                        code: "UNSUPPORTED_IOS_VERSION",
+                        message: "createPdf requires iOS 14.0 or later",
+                        details: nil))
             }
             break
         case .createWebArchiveData:

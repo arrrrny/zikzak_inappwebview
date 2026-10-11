@@ -64,6 +64,40 @@ class CSSLinkHtmlTagAttributes {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  CSSLinkHtmlTagAttributes copyWithField<T>(
+    Field<CSSLinkHtmlTagAttributes, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'id':
+        return copyWith(id: value as String?);
+      case 'media':
+        return copyWith(media: value as String?);
+      case 'crossOrigin':
+        return copyWith(crossOrigin: value as CrossOrigin?);
+      case 'integrity':
+        return copyWith(integrity: value as String?);
+      case 'referrerPolicy':
+        return copyWith(referrerPolicy: value as ReferrerPolicy?);
+      case 'disabled':
+        return copyWith(disabled: value as bool?);
+      case 'alternate':
+        return copyWith(alternate: value as bool?);
+      case 'title':
+        return copyWith(title: value as String?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'CSSLinkHtmlTagAttributes has no settable field with this name',
+        );
+    }
+  }
+
   CSSLinkHtmlTagAttributes copyWithCSSLinkHtmlTagAttributes({
     String? id,
     String? media,
@@ -93,75 +127,94 @@ class CSSLinkHtmlTagAttributes {
     final _patchMap = _patcher.patchMap;
     return CSSLinkHtmlTagAttributes(
       id: _patchMap.containsKey(CSSLinkHtmlTagAttributes$.id)
-          ? (_patchMap[CSSLinkHtmlTagAttributes$.id] is Function)
-                ? _patchMap[CSSLinkHtmlTagAttributes$.id](this.id)
-                : (_patchMap[CSSLinkHtmlTagAttributes$.id] is Patch)
-                ? _patchMap[CSSLinkHtmlTagAttributes$.id].applyTo(this.id)
-                : _patchMap[CSSLinkHtmlTagAttributes$.id]
+          ? ((_patchMap[CSSLinkHtmlTagAttributes$.id] is Function)
+                    ? _patchMap[CSSLinkHtmlTagAttributes$.id](this.id)
+                    : (_patchMap[CSSLinkHtmlTagAttributes$.id] is Patch)
+                    ? _patchMap[CSSLinkHtmlTagAttributes$.id].applyTo(this.id)
+                    : _patchMap[CSSLinkHtmlTagAttributes$.id])
+                as String?
           : this.id,
       media: _patchMap.containsKey(CSSLinkHtmlTagAttributes$.media)
-          ? (_patchMap[CSSLinkHtmlTagAttributes$.media] is Function)
-                ? _patchMap[CSSLinkHtmlTagAttributes$.media](this.media)
-                : (_patchMap[CSSLinkHtmlTagAttributes$.media] is Patch)
-                ? _patchMap[CSSLinkHtmlTagAttributes$.media].applyTo(this.media)
-                : _patchMap[CSSLinkHtmlTagAttributes$.media]
+          ? ((_patchMap[CSSLinkHtmlTagAttributes$.media] is Function)
+                    ? _patchMap[CSSLinkHtmlTagAttributes$.media](this.media)
+                    : (_patchMap[CSSLinkHtmlTagAttributes$.media] is Patch)
+                    ? _patchMap[CSSLinkHtmlTagAttributes$.media].applyTo(
+                        this.media,
+                      )
+                    : _patchMap[CSSLinkHtmlTagAttributes$.media])
+                as String?
           : this.media,
       crossOrigin: _patchMap.containsKey(CSSLinkHtmlTagAttributes$.crossOrigin)
-          ? (_patchMap[CSSLinkHtmlTagAttributes$.crossOrigin] is Function)
-                ? _patchMap[CSSLinkHtmlTagAttributes$.crossOrigin](
-                    this.crossOrigin,
-                  )
-                : (_patchMap[CSSLinkHtmlTagAttributes$.crossOrigin] is Patch)
-                ? _patchMap[CSSLinkHtmlTagAttributes$.crossOrigin].applyTo(
-                    this.crossOrigin,
-                  )
-                : _patchMap[CSSLinkHtmlTagAttributes$.crossOrigin]
+          ? ((_patchMap[CSSLinkHtmlTagAttributes$.crossOrigin] is Function)
+                    ? _patchMap[CSSLinkHtmlTagAttributes$.crossOrigin](
+                        this.crossOrigin,
+                      )
+                    : (_patchMap[CSSLinkHtmlTagAttributes$.crossOrigin]
+                          is Patch)
+                    ? _patchMap[CSSLinkHtmlTagAttributes$.crossOrigin].applyTo(
+                        this.crossOrigin,
+                      )
+                    : _patchMap[CSSLinkHtmlTagAttributes$.crossOrigin])
+                as CrossOrigin?
           : this.crossOrigin,
       integrity: _patchMap.containsKey(CSSLinkHtmlTagAttributes$.integrity)
-          ? (_patchMap[CSSLinkHtmlTagAttributes$.integrity] is Function)
-                ? _patchMap[CSSLinkHtmlTagAttributes$.integrity](this.integrity)
-                : (_patchMap[CSSLinkHtmlTagAttributes$.integrity] is Patch)
-                ? _patchMap[CSSLinkHtmlTagAttributes$.integrity].applyTo(
-                    this.integrity,
-                  )
-                : _patchMap[CSSLinkHtmlTagAttributes$.integrity]
+          ? ((_patchMap[CSSLinkHtmlTagAttributes$.integrity] is Function)
+                    ? _patchMap[CSSLinkHtmlTagAttributes$.integrity](
+                        this.integrity,
+                      )
+                    : (_patchMap[CSSLinkHtmlTagAttributes$.integrity] is Patch)
+                    ? _patchMap[CSSLinkHtmlTagAttributes$.integrity].applyTo(
+                        this.integrity,
+                      )
+                    : _patchMap[CSSLinkHtmlTagAttributes$.integrity])
+                as String?
           : this.integrity,
       referrerPolicy:
           _patchMap.containsKey(CSSLinkHtmlTagAttributes$.referrerPolicy)
-          ? (_patchMap[CSSLinkHtmlTagAttributes$.referrerPolicy] is Function)
-                ? _patchMap[CSSLinkHtmlTagAttributes$.referrerPolicy](
-                    this.referrerPolicy,
-                  )
-                : (_patchMap[CSSLinkHtmlTagAttributes$.referrerPolicy] is Patch)
-                ? _patchMap[CSSLinkHtmlTagAttributes$.referrerPolicy].applyTo(
-                    this.referrerPolicy,
-                  )
-                : _patchMap[CSSLinkHtmlTagAttributes$.referrerPolicy]
+          ? ((_patchMap[CSSLinkHtmlTagAttributes$.referrerPolicy] is Function)
+                    ? _patchMap[CSSLinkHtmlTagAttributes$.referrerPolicy](
+                        this.referrerPolicy,
+                      )
+                    : (_patchMap[CSSLinkHtmlTagAttributes$.referrerPolicy]
+                          is Patch)
+                    ? _patchMap[CSSLinkHtmlTagAttributes$.referrerPolicy]
+                          .applyTo(this.referrerPolicy)
+                    : _patchMap[CSSLinkHtmlTagAttributes$.referrerPolicy])
+                as ReferrerPolicy?
           : this.referrerPolicy,
       disabled: _patchMap.containsKey(CSSLinkHtmlTagAttributes$.disabled)
-          ? (_patchMap[CSSLinkHtmlTagAttributes$.disabled] is Function)
-                ? _patchMap[CSSLinkHtmlTagAttributes$.disabled](this.disabled)
-                : (_patchMap[CSSLinkHtmlTagAttributes$.disabled] is Patch)
-                ? _patchMap[CSSLinkHtmlTagAttributes$.disabled].applyTo(
-                    this.disabled,
-                  )
-                : _patchMap[CSSLinkHtmlTagAttributes$.disabled]
+          ? ((_patchMap[CSSLinkHtmlTagAttributes$.disabled] is Function)
+                    ? _patchMap[CSSLinkHtmlTagAttributes$.disabled](
+                        this.disabled,
+                      )
+                    : (_patchMap[CSSLinkHtmlTagAttributes$.disabled] is Patch)
+                    ? _patchMap[CSSLinkHtmlTagAttributes$.disabled].applyTo(
+                        this.disabled,
+                      )
+                    : _patchMap[CSSLinkHtmlTagAttributes$.disabled])
+                as bool?
           : this.disabled,
       alternate: _patchMap.containsKey(CSSLinkHtmlTagAttributes$.alternate)
-          ? (_patchMap[CSSLinkHtmlTagAttributes$.alternate] is Function)
-                ? _patchMap[CSSLinkHtmlTagAttributes$.alternate](this.alternate)
-                : (_patchMap[CSSLinkHtmlTagAttributes$.alternate] is Patch)
-                ? _patchMap[CSSLinkHtmlTagAttributes$.alternate].applyTo(
-                    this.alternate,
-                  )
-                : _patchMap[CSSLinkHtmlTagAttributes$.alternate]
+          ? ((_patchMap[CSSLinkHtmlTagAttributes$.alternate] is Function)
+                    ? _patchMap[CSSLinkHtmlTagAttributes$.alternate](
+                        this.alternate,
+                      )
+                    : (_patchMap[CSSLinkHtmlTagAttributes$.alternate] is Patch)
+                    ? _patchMap[CSSLinkHtmlTagAttributes$.alternate].applyTo(
+                        this.alternate,
+                      )
+                    : _patchMap[CSSLinkHtmlTagAttributes$.alternate])
+                as bool?
           : this.alternate,
       title: _patchMap.containsKey(CSSLinkHtmlTagAttributes$.title)
-          ? (_patchMap[CSSLinkHtmlTagAttributes$.title] is Function)
-                ? _patchMap[CSSLinkHtmlTagAttributes$.title](this.title)
-                : (_patchMap[CSSLinkHtmlTagAttributes$.title] is Patch)
-                ? _patchMap[CSSLinkHtmlTagAttributes$.title].applyTo(this.title)
-                : _patchMap[CSSLinkHtmlTagAttributes$.title]
+          ? ((_patchMap[CSSLinkHtmlTagAttributes$.title] is Function)
+                    ? _patchMap[CSSLinkHtmlTagAttributes$.title](this.title)
+                    : (_patchMap[CSSLinkHtmlTagAttributes$.title] is Patch)
+                    ? _patchMap[CSSLinkHtmlTagAttributes$.title].applyTo(
+                        this.title,
+                      )
+                    : _patchMap[CSSLinkHtmlTagAttributes$.title])
+                as String?
           : this.title,
     );
   }
@@ -216,7 +269,8 @@ class CSSLinkHtmlTagAttributes {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$CSSLinkHtmlTagAttributesToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

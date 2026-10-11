@@ -42,6 +42,29 @@ class Printer {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  Printer copyWithField<T>(Field<Printer, T> field, T value) {
+    switch (field.name) {
+      case 'id':
+        return copyWith(id: value as String?);
+      case 'type':
+        return copyWith(type: value as String?);
+      case 'languageLevel':
+        return copyWith(languageLevel: value as int?);
+      case 'name':
+        return copyWith(name: value as String?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'Printer has no settable field with this name',
+        );
+    }
+  }
+
   Printer copyWithPrinter({
     String? id,
     String? type,
@@ -61,32 +84,38 @@ class Printer {
     final _patchMap = _patcher.patchMap;
     return Printer(
       id: _patchMap.containsKey(Printer$.id)
-          ? (_patchMap[Printer$.id] is Function)
-                ? _patchMap[Printer$.id](this.id)
-                : (_patchMap[Printer$.id] is Patch)
-                ? _patchMap[Printer$.id].applyTo(this.id)
-                : _patchMap[Printer$.id]
+          ? ((_patchMap[Printer$.id] is Function)
+                    ? _patchMap[Printer$.id](this.id)
+                    : (_patchMap[Printer$.id] is Patch)
+                    ? _patchMap[Printer$.id].applyTo(this.id)
+                    : _patchMap[Printer$.id])
+                as String?
           : this.id,
       type: _patchMap.containsKey(Printer$.type)
-          ? (_patchMap[Printer$.type] is Function)
-                ? _patchMap[Printer$.type](this.type)
-                : (_patchMap[Printer$.type] is Patch)
-                ? _patchMap[Printer$.type].applyTo(this.type)
-                : _patchMap[Printer$.type]
+          ? ((_patchMap[Printer$.type] is Function)
+                    ? _patchMap[Printer$.type](this.type)
+                    : (_patchMap[Printer$.type] is Patch)
+                    ? _patchMap[Printer$.type].applyTo(this.type)
+                    : _patchMap[Printer$.type])
+                as String?
           : this.type,
       languageLevel: _patchMap.containsKey(Printer$.languageLevel)
-          ? (_patchMap[Printer$.languageLevel] is Function)
-                ? _patchMap[Printer$.languageLevel](this.languageLevel)
-                : (_patchMap[Printer$.languageLevel] is Patch)
-                ? _patchMap[Printer$.languageLevel].applyTo(this.languageLevel)
-                : _patchMap[Printer$.languageLevel]
+          ? ((_patchMap[Printer$.languageLevel] is Function)
+                    ? _patchMap[Printer$.languageLevel](this.languageLevel)
+                    : (_patchMap[Printer$.languageLevel] is Patch)
+                    ? _patchMap[Printer$.languageLevel].applyTo(
+                        this.languageLevel,
+                      )
+                    : _patchMap[Printer$.languageLevel])
+                as int?
           : this.languageLevel,
       name: _patchMap.containsKey(Printer$.name_)
-          ? (_patchMap[Printer$.name_] is Function)
-                ? _patchMap[Printer$.name_](this.name)
-                : (_patchMap[Printer$.name_] is Patch)
-                ? _patchMap[Printer$.name_].applyTo(this.name)
-                : _patchMap[Printer$.name_]
+          ? ((_patchMap[Printer$.name_] is Function)
+                    ? _patchMap[Printer$.name_](this.name)
+                    : (_patchMap[Printer$.name_] is Patch)
+                    ? _patchMap[Printer$.name_].applyTo(this.name)
+                    : _patchMap[Printer$.name_])
+                as String?
           : this.name,
     );
   }
@@ -120,7 +149,8 @@ class Printer {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$PrinterToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

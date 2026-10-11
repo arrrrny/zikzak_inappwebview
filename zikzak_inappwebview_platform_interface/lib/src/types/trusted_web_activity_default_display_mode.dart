@@ -1,3 +1,5 @@
+import 'package:zorphy_annotation/zorphy_annotation.dart';
+
 import '../domain/entities/trusted_web_activity_display_mode/trusted_web_activity_display_mode.dart';
 
 ///Class that represents the default display mode of a Trusted Web Activity.
@@ -34,6 +36,24 @@ class TrustedWebActivityDefaultDisplayMode
   @override
   TrustedWebActivityDefaultDisplayMode copyWithTrustedWebActivityDisplayMode() {
     return copyWith();
+  }
+
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Required by the Zorphy [TrustedWebActivityDisplayMode] contract, which
+  /// every implementation of the interface must satisfy. The default display
+  /// mode carries no fields, so every [field] name is rejected — the same
+  /// shape the generated base uses for a fieldless value object.
+  @override
+  TrustedWebActivityDefaultDisplayMode copyWithField<T>(
+    Field<TrustedWebActivityDisplayMode, T> field,
+    T value,
+  ) {
+    throw ArgumentError.value(
+      field.name,
+      'field',
+      'TrustedWebActivityDefaultDisplayMode has no settable fields',
+    );
   }
 
   @override

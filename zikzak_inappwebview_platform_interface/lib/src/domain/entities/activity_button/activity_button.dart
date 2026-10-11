@@ -28,6 +28,6 @@ abstract class $ActivityButton {
 }
 
 UIImage _templateImageFromJson(Object? value) =>
-    UIImage.fromJson((value as Map).cast<String, dynamic>())!;
+    UIImage.fromJson((value as Map).cast<String, dynamic>());
 
 Object? _templateImageToJson(UIImage value) => value.toJson();

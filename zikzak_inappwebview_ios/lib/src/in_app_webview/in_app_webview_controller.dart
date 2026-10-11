@@ -35,6 +35,10 @@ import '../web_storage/web_storage.dart';
 
 import 'headless_in_app_webview.dart';
 import '_static_channel.dart';
+import 'modules/ios_navigation_delegate.dart';
+import 'modules/ios_javascript_delegate.dart';
+import 'modules/ios_cookie_delegate.dart';
+import 'modules/ios_settings_delegate.dart';
 
 import '../print_job/main.dart';
 
@@ -113,6 +117,30 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
 
   @override
   late IOSWebStorage webStorage;
+
+  // Domain-specific delegate singletons (issue #229, P3). Lazily
+  // instantiated on first access; forwarding facades over the existing
+  // controller methods — behavior is identical to calling the controller.
+  IOSNavigationDelegate? _navigationDelegate;
+  IOSJavaScriptDelegate? _javaScriptDelegate;
+  IOSCookieDelegate? _cookieDelegate;
+  IOSSettingsDelegate? _settingsDelegate;
+
+  @override
+  IOSNavigationDelegate? get navigationDelegate =>
+      _navigationDelegate ??= IOSNavigationDelegate(this);
+
+  @override
+  IOSJavaScriptDelegate? get javaScriptDelegate =>
+      _javaScriptDelegate ??= IOSJavaScriptDelegate(this);
+
+  @override
+  IOSCookieDelegate? get cookieDelegate =>
+      _cookieDelegate ??= IOSCookieDelegate(this);
+
+  @override
+  IOSSettingsDelegate? get settingsDelegate =>
+      _settingsDelegate ??= IOSSettingsDelegate(this);
 
   IOSInAppWebViewController(PlatformInAppWebViewControllerCreationParams params)
     : super.implementation(

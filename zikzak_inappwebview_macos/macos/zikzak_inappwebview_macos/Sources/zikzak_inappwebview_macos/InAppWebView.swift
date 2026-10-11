@@ -1,8 +1,73 @@
 import Cocoa
+import CryptoKit
 import FlutterMacOS
 import WebKit
 
-public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler, WKUIDelegate, NSMenuDelegate {
+/// Maps a stable identifier string into a stable `UUID` for
+/// `WKWebsiteDataStore(forIdentifier:)`. Accepts three input shapes so the
+/// same Dart field can be fed either a raw UUID string, a stable profile
+/// name, or the 64-char SHA-256 hex the forklift caller used to send
+/// (derived from a profile dir's canonical path). All three are
+/// deterministic — the same identifier always yields the same on-disk
+/// store, which is what makes a per-account session survive app relaunch.
+///
+/// Shape priority: (a) direct UUID string -> (b) 64-char hex legacy path
+/// -> (c) SHA-256 of the UTF-8 bytes (CryptoKit, iOS 13+/macOS 10.15+,
+/// well below the iOS 17+/macOS 14+ floor of the persistent-store API
+/// itself).
+private func persistentUUID(from identifier: String) -> UUID? {
+    let trimmed = identifier.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard !trimmed.isEmpty else { return nil }
+
+    // (a) Direct UUID string ("550e8400-e29b-41d4-a716-446655440000").
+    if let direct = UUID(uuidString: trimmed) {
+        return direct
+    }
+
+    // (b) Legacy 64-char SHA-256 hex path: take the first 32 hex chars
+    // (16 bytes) and treat them as the UUID's raw bytes. Preserves the
+    // on-disk store identifier forklift's Cloaked Chrome profiles already
+    // use, so existing persistent stores keep reopening after the upgrade.
+    let hexSet = CharacterSet(charactersIn: "0123456789abcdefABCDEF")
+    let isHex = trimmed.unicodeScalars.allSatisfy { hexSet.contains($0) }
+    if isHex, trimmed.count >= 32 {
+        let prefix = trimmed.prefix(32)
+        var bytes: [UInt8] = []
+        bytes.reserveCapacity(16)
+        var index = prefix.startIndex
+        while index < prefix.endIndex {
+            let next = prefix.index(index, offsetBy: 2, limitedBy: prefix.endIndex) ?? prefix.endIndex
+            guard let byte = UInt8(String(prefix[index..<next]), radix: 16) else { return nil }
+            bytes.append(byte)
+            index = next
+        }
+        guard bytes.count == 16 else { return nil }
+        return UUID(uuid: (
+            bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7],
+            bytes[8], bytes[9], bytes[10], bytes[11], bytes[12], bytes[13], bytes[14], bytes[15]
+        ))
+    }
+
+    // (c) Any other stable string: SHA-256 the UTF-8 bytes and use the
+    // first 16 bytes as the UUID's raw bytes. Deterministic, isolated,
+    // and survives relaunch — distinct identifiers never collide.
+    // CryptoKit ships with the system on iOS 13+/macOS 10.15+, so this
+    // branch is always available when the iOS 17+/macOS 14+ persistent
+    // store path runs.
+    if #available(macOS 10.15, *) {
+        let digest = SHA256.hash(data: Data(trimmed.utf8))
+        let sha = Array(digest)
+        return UUID(uuid: (
+            sha[0],  sha[1],  sha[2],  sha[3],
+            sha[4],  sha[5],  sha[6],  sha[7],
+            sha[8],  sha[9],  sha[10], sha[11],
+            sha[12], sha[13], sha[14], sha[15]
+        ))
+    }
+    return nil
+}
+
+public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler, DefensivelyDeserializedScriptMessageHandling, WKUIDelegate, NSMenuDelegate, WKDownloadDelegate {
     var channel: FlutterMethodChannel!
     var registrar: FlutterPluginRegistrar? = nil
     var plugin: InAppWebViewFlutterPlugin?
@@ -32,6 +97,13 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     private static var credentialsProposed: [URLCredential] = []
     var channelDelegate: WebViewChannelDelegate?
 
+    /// Issue #358: native WebAuthn/passkey bridge. The injected PasskeysJS
+    /// shim forwards `navigator.credentials.create/get` (publicKey options
+    /// only) here over the `callHandler` channel; this drives the ceremony
+    /// through `ASAuthorizationController`, bypassing WebKit's broken
+    /// in-page mediation (zuraffa_browser#278).
+    var passkeyBridge: PasskeyBridge?
+
     // MARK: - Issue #197 state (method-channel parity with iOS)
 
     /// Active `WebMessageChannel` instances, keyed by id. Populated by
@@ -45,6 +117,19 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     /// port uses (WebKit has no public "pause JS timers" API).
     private var isPausedTimers = false
     private var isPausedTimersCompletionHandler: (() -> Void)?
+
+    // MARK: - WebContent readiness gate (first-load race, issue #197)
+    //
+    // A navigation issued while the WKWebView WebContent XPC process is still
+    // booting is silently dropped (no didStart/didFinish/didFail — the
+    // navigation simply never happens). HeadlessInAppWebViewManager arms an
+    // equivalent gate via evaluateJavaScript("true"), whose completion is the
+    // exact "process ready" signal (evaluateJavaScript is queued until the
+    // WebContent process is fully up). Mirror that here so a loadData/loadUrl/
+    // loadFile/postUrl issued from onWebViewCreated is queued and fired once
+    // the process can actually accept a navigation.
+    private var isWebContentReady = false
+    private var pendingFirstLoad: (() -> Void)?
 
     /// Last right-click location in view coordinates. macOS has no long-press
     /// gesture; right-click is the closest equivalent and is what we use to
@@ -84,6 +169,13 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     ///into a Flutter platform view.
     public var popupWindow: NSWindow?
 
+    ///True when this WebView is hosted inside a `HeadlessInAppWebView`'s
+    ///off-screen window. Used to make that window visible to the window server
+    ///transiently during `takeSnapshot`, which otherwise returns `nil` for a
+    ///view that was never shown (no backing store). Never set for a normal
+    ///on-screen `InAppWebView`, so the real app window is never touched.
+    public var isHeadlessOffscreen: Bool = false
+
     ///The opener webview that created this popup (via [createWebViewWith]),
     ///`nil` for main (non-popup) webviews.
     public weak var opener: InAppWebView?
@@ -95,12 +187,123 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         let userContentController = WKUserContentController()
         configuration.userContentController = userContentController
 
+        // Per-WebView data-store isolation MUST be configured on the
+        // WKWebViewConfiguration BEFORE the WKWebView is created — the
+        // configuration is immutable afterwards. `incognito` gives this
+        // WebView its own `nonPersistent()` store so concurrent accounts
+        // (e.g. multiple logged-in sessions) do not share one cookie jar.
+        // The later `setSettings` attempt to set `websiteDataStore` is a
+        // no-op post-init and must not be relied upon (see the
+        // macos-ios-per-instance-datastore / multi-account-cookies-bleed
+        // assessments).
+        if let args = arguments as? [String: Any] {
+            let settingsMap =
+                (args["initialSettings"] as? [String: Any?])
+                ?? (args["settings"] as? [String: Any?])
+            if let settingsMap = settingsMap {
+                // Persistent, per-account data store keyed by a stable
+                // identifier (derived from `userDataDir` on the Dart side as a
+                // 64-char SHA-256 hex string, mapped to a UUID here). WebKit
+                // keys the on-disk store by that UUID, so cookies/storage stay
+                // isolated per account AND survive app relaunch — the behaviour
+                // forklift's Cloaked Chrome profiles relied on. Requires
+                // macOS 14.0+, hence the availability guard; older runtimes
+                // fall back to the shared store.
+                if #available(macOS 14.0, *),
+                   let id = settingsMap["persistentStoreIdentifier"] as? String,
+                   !id.isEmpty,
+                   let uuid = persistentUUID(from: id) {
+                    let store = WKWebsiteDataStore(forIdentifier: uuid)
+                    // Apply the per-profile proxy (if any) to this custom
+                    // data store — the Dart ProxyController sets it on the
+                    // default store, but WebViews with a persistent identifier
+                    // use a custom store that misses the proxy otherwise.
+                    ProxyManager.applyProxy(forIdentifier: id, to: store)
+                    configuration.websiteDataStore = store
+                } else if let incognito = settingsMap["incognito"] as? Bool,
+                          incognito {
+                    configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+                }
+                // FOR_BROWSER (2) has no macOS surface to apply to:
+                // WKWebViewConfiguration exposes no public
+                // webAuthenticationSupport on any macOS SDK, and the private
+                // WKWebViewWebAuthenticationSupport the FOR_APP path reaches
+                // through KVC carries only boundKeychainForPasskeys — the
+                // app-bound model. macOS runs a passkey ceremony only for a
+                // relying party the host app holds a validated
+                // com.apple.developer.associated-domains (webcredentials) entry
+                // for, so no implementation can honor this value. Report the
+                // request instead of dropping it silently, matching the
+                // creation-time warning this setting already emits in
+                // setSettings. Deliberately outside the macOS 13.3 availability
+                // block below: the value is unsupported on every macOS version,
+                // so an older OS must report it too (issue #351).
+                if let webAuthnSupport = settingsMap["webAuthenticationSupport"] as? Int,
+                   webAuthnSupport == 2 {  // FOR_BROWSER
+                    print(
+                        "webAuthenticationSupport=FOR_BROWSER was requested but macOS does not expose it (WKWebViewConfiguration has no webAuthenticationSupport); the value was not applied. Passkey ceremonies on macOS are gated by the host app's webcredentials Associated Domains entry plus apple-app-site-association."
+                    )
+                }
+                // WebAuthn / passkey support (issue #272).
+                // Mirrors the iOS KVC wiring (PR #131).
+                // Must be set before super.init because the configuration is
+                // immutable afterwards.
+                if #available(macOS 13.3, *) {
+                    if let webAuthnSupport = settingsMap["webAuthenticationSupport"] as? Int,
+                       webAuthnSupport == 1 {  // FOR_APP
+                        let selector = Selector(("webAuthenticationSupport"))
+                        if configuration.responds(to: selector),
+                           let webAuthSupport = configuration.perform(selector)?.takeUnretainedValue()
+                               as? NSObject
+                        {
+                            // Guard the inner key as well: setValue(_:forKey:) raises
+                            // an uncatchable NSUnknownKeyException when the key is
+                            // missing, which would crash the app on an unexpected
+                            // SDK state.
+                            if webAuthSupport.responds(to: Selector(("boundKeychainForPasskeys"))) {
+                                webAuthSupport.setValue(true, forKey: "boundKeychainForPasskeys")
+                            }
+                        } else {
+                            // FOR_APP is inert wherever WebKit exposes no such
+                            // key, which is every current macOS — the KVC write
+                            // above never runs. Surface it instead of dropping
+                            // it silently, so a caller can tell an inert
+                            // setting from an unset one (issue #351).
+                            print(
+                                "webAuthenticationSupport=FOR_APP was requested but this macOS version's WebKit does not expose WKWebViewConfiguration.webAuthenticationSupport; the value was not applied."
+                            )
+                        }
+                    }
+                } else if let webAuthnSupport = settingsMap["webAuthenticationSupport"] as? Int,
+                          webAuthnSupport == 1 {  // FOR_APP
+                    // macOS 13.2 and older sit below the availability gate, so
+                    // the else inside it never runs there — without this arm a
+                    // requested FOR_APP is still dropped without a word
+                    // (issue #351).
+                    print(
+                        "webAuthenticationSupport=FOR_APP was requested but macOS 13.2 or older does not expose WKWebViewConfiguration.webAuthenticationSupport; the value was not applied."
+                    )
+                }
+            }
+        }
+
         self.registrar = registrar
         super.init(frame: .zero, configuration: configuration)
+        // Bug #331 belt-and-braces (macOS parity, issue #337): pin the root
+        // clip at construction time, independently of the on-screen setup
+        // path in FlutterWebViewController. FlutterWebViewController re-asserts
+        // it on every platform-view path; this guarantees the root view is
+        // clipped from the moment it exists even if a future construction
+        // path skips the controller. wantsLayer forces the backing layer to
+        // exist now so the pin cannot be a silent no-op on a view that is
+        // not yet in a layer-backed hierarchy.
+        self.wantsLayer = true
+        self.layer?.masksToBounds = true
         self.plugin = plugin
         self.autoresizingMask = [.width, .height]
         self.navigationDelegate = self
         self.uiDelegate = self
+        self.passkeyBridge = PasskeyBridge(webView: self)
 
         userContentController.add(WeakScriptMessageHandler(delegate: self), name: "consoleHandler")
         userContentController.add(
@@ -124,9 +327,41 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 var originalWarn = console.warn;
                 var originalError = console.error;
 
+                // Sanitize non-cloneable objects (DOMException, etc.) to
+                // prevent WebKit SIGSEGV in CloneDeserializer (#309, #312).
+                // WebKit's SerializedScriptValue crashes on certain native
+                // objects; converting them to strings before postMessage
+                // keeps the bridge safe.
+                function sanitizeForBridge(obj) {
+                    if (obj === null || obj === undefined) return obj;
+                    var t = typeof obj;
+                    if (t === 'string' || t === 'number' || t === 'boolean') return obj;
+                    if (t === 'function') return '[Function]';
+                    if (t === 'symbol') return obj.toString();
+                    if (obj instanceof Error) return obj.toString();
+                    if (obj instanceof DOMException) return obj.toString();
+                    if (obj instanceof RegExp) return obj.toString();
+                    if (obj instanceof Date) return obj.toISOString();
+                    if (typeof Promise !== 'undefined' && obj instanceof Promise) return '[Promise]';
+                    if (typeof WeakMap !== 'undefined' && obj instanceof WeakMap) return '[WeakMap]';
+                    if (typeof WeakSet !== 'undefined' && obj instanceof WeakSet) return '[WeakSet]';
+                    if (Array.isArray(obj)) return obj.map(sanitizeForBridge);
+                    if (t === 'object') {
+                        try {
+                            var sanitized = {};
+                            var keys = Object.keys(obj);
+                            for (var i = 0; i < keys.length; i++) {
+                                try { sanitized[keys[i]] = sanitizeForBridge(obj[keys[i]]); } catch(_) {}
+                            }
+                            return sanitized;
+                        } catch(_) { return String(obj); }
+                    }
+                    return String(obj);
+                }
+
                 function log(level, message) {
                     window.webkit.messageHandlers.consoleHandler.postMessage({
-                        "message": message,
+                        "message": sanitizeForBridge(message),
                         "messageLevel": level
                     });
                 }
@@ -137,14 +372,32 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 console.error = function(message) { log("ERROR", message); if (originalError) originalError.call(console, message); };
             })();
             """
-        let userScript = WKUserScript(
-            source: consoleOverrideScript, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-        userContentController.addUserScript(userScript)
+        // Only inject the console override when consoleLogEnabled is true
+        // (default). Setting it to false stops all console.log/error/warn
+        // forwarding to Dart, reducing bridge traffic and eliminating the
+        // WebKit SIGSEGV vector on non-cloneable objects (#309, #312).
+        if settings?.consoleLogEnabled ?? true {
+            let userScript = WKUserScript(
+                source: consoleOverrideScript, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+            userContentController.addUserScript(userScript)
+        }
 
         let bridgeScript = WKUserScript(
             source: JAVASCRIPT_BRIDGE_JS_SOURCE, injectionTime: .atDocumentStart,
             forMainFrameOnly: false)
         userContentController.addUserScript(bridgeScript)
+
+        // Issue #358: WebAuthn/passkey shim. Injected in every frame at
+        // document start, right after the JS bridge it calls through.
+        // Popup webviews share this configuration, so they get the shim
+        // too; headless webviews are failed fast natively by PasskeyBridge
+        // (isHeadlessOffscreen) rather than by withholding the shim, which
+        // cannot be decided here (the flag is set post-init).
+        let passkeysScript = WKUserScript(
+            source: PASSKEYS_JS_SOURCE, injectionTime: .atDocumentStart,
+            forMainFrameOnly: false)
+        userContentController.addUserScript(passkeysScript)
+
         let printScript = WKUserScript(
             source: PRINT_JS_SOURCE, injectionTime: .atDocumentStart, forMainFrameOnly: true)
         userContentController.addUserScript(printScript)
@@ -199,6 +452,12 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
 
         bindChannels(registrar: registrar, viewId: viewId, channelName: channelName)
 
+        // Arm the WebContent readiness gate: a load issued while the WebContent
+        // XPC process is still booting is silently dropped, so any load that
+        // arrives before the gate opens (here, or from onWebViewCreated) is
+        // queued and fired once evaluateJavaScript("true") completes.
+        armWebContentReadinessGate()
+
         if let args = arguments as? [String: Any] {
             // The initial load is normally fired here, synchronously during
             // construction. Headless webviews pass deferInitialLoad: true so
@@ -206,8 +465,16 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             // BEFORE the first navigation is issued (see makeInitialLoad).
             if !deferInitialLoad {
                 if let initialUrlRequest = args["initialUrlRequest"] as? [String: Any] {
+                    debugLog("INITIAL_LOAD")
                     let request = URLRequest(fromPluginMap: initialUrlRequest)
-                    self.load(request)
+                    self.performLoad { [weak self] in
+                        // #338: hold the load until any content-rule
+                        // compilation kicked off by setSettings below settles,
+                        // so the first navigation cannot outrun the rules.
+                        self?.loadAfterContentRuleLists { [weak self] in
+                            self?.load(request)
+                        }
+                    }
                 }
             }
 
@@ -278,6 +545,15 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     ///`initialFile` and `initialData` (mirrors the iOS port). No-op when the
     ///params carry no initial load.
     func makeInitialLoad(params: [String: Any]) {
+        // #338: hold the initial load until any in-flight content-rule
+        // compilation settles, so the first navigation cannot outrun the
+        // rules (mirrors the iOS initial-load deferral).
+        if isCompilingContentRuleLists {
+            pendingContentRuleListLoad = { [weak self] in
+                self?.makeInitialLoad(params: params)
+            }
+            return
+        }
         let initialUrlRequest = params["initialUrlRequest"] as? [String: Any]
         let initialFile = params["initialFile"] as? String
         let initialData = params["initialData"] as? [String: Any]
@@ -316,6 +592,55 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         }
     }
 
+    // MARK: - WebContent readiness gate (first-load race, issue #197)
+
+    // TEMP DEBUG: print to stderr (captured by flutter test --verbose).
+    private func debugLog(_ msg: String) {
+        print("ZIKZAK_DEBUG: \(msg)")
+    }
+
+    /// Runs a navigation, queuing it until the WebContent process is fully up.
+    ///
+    /// A `load` issued while the WKWebView WebContent XPC process is still
+    /// booting is silently dropped (no didStart / didFinish / didFail — the
+    /// navigation simply never happens). `evaluateJavaScript` is queued by
+    /// WebKit until the process and its default JS context exist, so the
+    /// readiness gate's completion is the exact "process ready" signal. Until
+    /// then we hold the latest load in `pendingFirstLoad`; only the most recent
+    /// is kept because a newer navigation supersedes an earlier one.
+    private func performLoad(_ load: @escaping () -> Void) {
+        debugLog("PERFORM ready=\(isWebContentReady)")
+        if isWebContentReady {
+            load()
+        } else {
+            pendingFirstLoad = load
+        }
+    }
+
+    /// Arms the WebContent readiness gate. Mirrors
+    /// `HeadlessInAppWebViewManager.run()`'s process-readiness ping:
+    /// `evaluateJavaScript("true")` is queued by WebKit until the WebContent
+    /// process is fully up, so its completion handler is the exact "process
+    /// ready" signal. Once ready we flush any load queued during `init` or
+    /// from `onWebViewCreated` — no timeout constant required.
+    private func armWebContentReadinessGate() {
+        debugLog("ARM gate")
+        self.evaluateJavaScript("true") { [weak self] (_, error) in
+            self?.debugLog("GATE_CB err=\(error?.localizedDescription ?? "nil")")
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.isWebContentReady = true
+                if let pending = self.pendingFirstLoad {
+                    self.pendingFirstLoad = nil
+                    debugLog("GATE_FLUSH")
+                    pending()
+                } else {
+                    debugLog("GATE_NO_PENDING")
+                }
+            }
+        }
+    }
+
     ///Initializes a popup webview created by [createWebViewWith].
     ///
     ///The popup shares the source webview's [WKWebViewConfiguration]
@@ -324,6 +649,14 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     ///when the Flutter side creates a platform view for it.
     public override init(frame frameRect: NSRect, configuration: WKWebViewConfiguration) {
         super.init(frame: frameRect, configuration: configuration)
+        // Bug #331 belt-and-braces (macOS parity, issue #337): this
+        // designated initializer does not run the registrar init above, so
+        // popup webviews created through init(frame:configuration:) need
+        // their own root-clip pin. wantsLayer forces the backing layer to
+        // exist now so the pin cannot be a silent no-op on a view that is
+        // not yet in a layer-backed hierarchy.
+        self.wantsLayer = true
+        self.layer?.masksToBounds = true
         self.autoresizingMask = [.width, .height]
         self.navigationDelegate = self
         self.uiDelegate = self
@@ -408,6 +741,10 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             webMessageChannels.removeAll()
             for (_, wml) in webMessageListeners { wml.dispose() }
             webMessageListeners.removeAll()
+            // Cancel any outstanding passkey ceremony so the webview is not
+            // retained by a dangling ASAuthorizationController (#358).
+            passkeyBridge?.cancelCeremony()
+            passkeyBridge = nil
             channel?.setMethodCallHandler(nil)
             findInteractionChannel?.setMethodCallHandler(nil)
             isDisposed = true
@@ -473,7 +810,9 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 let urlRequest = args["urlRequest"] as? [String: Any]
             {
                 let request = URLRequest(fromPluginMap: urlRequest)
-                self.load(request)
+                self.performLoad { [weak self] in
+                    self?.load(request)
+                }
                 result(true)
             } else {
                 result(
@@ -490,7 +829,9 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                     "application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
                 request.httpMethod = "POST"
                 request.httpBody = postData
-                self.load(request)
+                self.performLoad { [weak self] in
+                    self?.load(request)
+                }
                 result(true)
             } else {
                 result(
@@ -503,14 +844,20 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             {
                 let mimeType = args["mimeType"] as? String ?? "text/html"
                 let encoding = args["encoding"] as? String ?? "utf-8"
+                debugLog("LOAD_DATA handle")
                 let baseURL = URL(string: baseUrl)
-                if let dataData = data.data(using: .utf8) {
-                    self.load(
-                        dataData, mimeType: mimeType,
-                        characterEncodingName: encoding, baseURL: baseURL ?? URL(string: "about:blank")!)
-                } else {
-                    self.loadHTMLString(data, baseURL: baseURL)
+                let load = { [weak self] in
+                    guard let self = self else { return }
+                    if let dataData = data.data(using: .utf8) {
+                        self.load(
+                            dataData, mimeType: mimeType,
+                            characterEncodingName: encoding,
+                            baseURL: baseURL ?? URL(string: "about:blank")!)
+                    } else {
+                        self.loadHTMLString(data, baseURL: baseURL)
+                    }
                 }
+                self.performLoad(load)
                 result(true)
             } else {
                 result(
@@ -528,11 +875,15 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 do {
                     let assetURL = try Util.getUrlAsset(
                         registrar: registrar, assetFilePath: assetFilePath)
-                    if assetURL.isFileURL {
-                        self.loadFileURL(
-                            assetURL, allowingReadAccessTo: assetURL.deletingLastPathComponent())
-                    } else {
-                        self.load(URLRequest(url: assetURL))
+                    self.performLoad { [weak self] in
+                        guard let self = self else { return }
+                        if assetURL.isFileURL {
+                            self.loadFileURL(
+                                assetURL,
+                                allowingReadAccessTo: assetURL.deletingLastPathComponent())
+                        } else {
+                            self.load(URLRequest(url: assetURL))
+                        }
                     }
                     result(true)
                 } catch let error as NSError {
@@ -740,7 +1091,25 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                     }
                 }
 
+                // A headless WebView lives in an off-screen window that is
+                // never shown, so it has no backing store and
+                // `takeSnapshot` returns nil. Momentarily order the window to
+                // the front (still at off-screen coordinates → invisible to
+                // the user) so the window server composites it, and force a
+                // post-update capture. We order it back out in the completion
+                // handler once the snapshot is taken.
+                if self.isHeadlessOffscreen {
+                    self.window?.orderFront(nil)
+                    if snapshotConfiguration == nil {
+                        snapshotConfiguration = WKSnapshotConfiguration()
+                    }
+                    snapshotConfiguration?.afterScreenUpdates = true
+                }
+
                 self.takeSnapshot(with: snapshotConfiguration) { (image, error) -> Void in
+                    if self.isHeadlessOffscreen {
+                        self.window?.orderOut(nil)
+                    }
                     var imageData: Data? = nil
                     if let screenshot = image {
                         if let configMap = (call.arguments as? [String: Any])?[
@@ -821,6 +1190,18 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             } else {
                 result(
                     FlutterError(code: "InAppWebView", message: "Invalid arguments", details: nil))
+            }
+        case "pressKey":
+            if let args = call.arguments as? [String: Any],
+               let keyCode = args["keyCode"] as? Int {
+                let characters = (args["characters"] as? String) ?? ""
+                self.pressKey(keyCode: UInt16(keyCode), characters: characters)
+                result(nil)
+            } else {
+                result(FlutterError(
+                    code: "InAppWebView",
+                    message: "pressKey: expected keyCode: Int",
+                    details: nil))
             }
         case "callAsyncJavaScript":
             if let args = call.arguments as? [String: Any],
@@ -1541,6 +1922,18 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     }
 
     func setSettings(newSettings: InAppWebViewSettings, newSettingsMap: [String: Any]) {
+        // webAuthenticationSupport is creation-time only: the underlying
+        // WKWebViewConfiguration is immutable after the WKWebView is created,
+        // so a runtime change is a no-op. Surface it instead of silently
+        // dropping it (issue #272).
+        if newSettingsMap["webAuthenticationSupport"] != nil
+            && settings != nil && settings!.webAuthenticationSupport != newSettings.webAuthenticationSupport
+        {
+            print(
+                "webAuthenticationSupport cannot be changed after the WebView has been created (WKWebViewConfiguration is immutable); ignoring the new value"
+            )
+        }
+
         if newSettingsMap["userAgent"] != nil
             && settings?.userAgent != newSettings.userAgent
             && newSettings.userAgent != ""
@@ -1708,7 +2101,78 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             clearCache()
         }
 
+        // #338: compile `contentBlockers` into a WKContentRuleList and add it
+        // to the WebView configuration, mirroring the iOS updateSettings
+        // branch — without this the setting is decoded but silently inert.
+        if newSettingsMap["contentBlockers"] != nil {
+            applyContentBlockers(newSettings.contentBlockers)
+        }
+
         self.settings = newSettings
+    }
+
+    // MARK: - Content blockers (issue #338)
+
+    ///Serializes WKContentRuleList compilations: the completion of a stale
+    ///compilation must not re-add rules that a newer settings update removed.
+    private var contentRuleListCompileToken = 0
+
+    ///True while the latest `contentBlockers` compilation is in flight; the
+    ///initial load is held back until it settles.
+    private var isCompilingContentRuleLists = false
+
+    ///The initial load, held while `isCompilingContentRuleLists` is true.
+    private var pendingContentRuleListLoad: (() -> Void)?
+
+    ///Compiles `contentBlockers` into a WKContentRuleList and adds it to the
+    ///configuration's userContentController, mirroring the iOS
+    ///updateSettings branch (#338). Compilation is asynchronous; loads routed
+    ///through `loadAfterContentRuleLists` wait for it to settle.
+    func applyContentBlockers(_ contentBlockers: [[String: [String: Any]]]) {
+        configuration.userContentController.removeAllContentRuleLists()
+        guard !contentBlockers.isEmpty else {
+            return
+        }
+        do {
+            let jsonData = try JSONSerialization.data(
+                withJSONObject: contentBlockers, options: [])
+            let blockRules = String(data: jsonData, encoding: .utf8)
+            contentRuleListCompileToken += 1
+            let token = contentRuleListCompileToken
+            isCompilingContentRuleLists = true
+            WKContentRuleListStore.default().compileContentRuleList(
+                forIdentifier: "ContentBlockingRules",
+                encodedContentRuleList: blockRules
+            ) { [weak self] (contentRuleList, error) in
+                DispatchQueue.main.async {
+                    guard let self = self, token == self.contentRuleListCompileToken else {
+                        return
+                    }
+                    self.isCompilingContentRuleLists = false
+                    if let error = error {
+                        print(error.localizedDescription)
+                    } else if let contentRuleList = contentRuleList {
+                        self.configuration.userContentController.add(contentRuleList)
+                    }
+                    if let pendingLoad = self.pendingContentRuleListLoad {
+                        self.pendingContentRuleListLoad = nil
+                        pendingLoad()
+                    }
+                }
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+
+    ///Runs `load` once any in-flight content-rule compilation has settled, so
+    ///a navigation never starts before the rules it must obey are installed.
+    func loadAfterContentRuleLists(_ load: @escaping () -> Void) {
+        if isCompilingContentRuleLists {
+            pendingContentRuleListLoad = load
+            return
+        }
+        load()
     }
 
     func clearCache() {
@@ -1725,6 +2189,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     }
 
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        debugLog("ON_LOAD_STOP url=\(webView.url?.absoluteString ?? "nil")")
         InAppWebView.credentialsProposed = []
         channel?.invokeMethod("onLoadStop", arguments: ["url": webView.url?.absoluteString])
     }
@@ -2050,10 +2515,39 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         }
     }
 
+    // Internal fallback for direct registration. Every zikzak macOS handler is
+    // registered via WeakScriptMessageHandler, which calls the sanitized variant
+    // below after defensively deserializing the body (#309).
     public func userContentController(
         _ userContentController: WKUserContentController, didReceive message: WKScriptMessage
     ) {
-        if message.name == "consoleHandler", let body = message.body as? [String: Any] {
+        let (sanitizedBody, deserializationError) = WeakScriptMessageHandler.defensivelyDeserializeBody(of: message)
+        self.userContentController(
+            userContentController, didReceive: message,
+            sanitizedBody: sanitizedBody, deserializationError: deserializationError)
+    }
+
+    /// #309 — the only body-consuming entry point on macOS. The body arrives
+    /// already deserialized defensively by `WeakScriptMessageHandler`:
+    /// - an ObjC exception boundary contained any WebKit deserialization
+    ///   exception (`deserializationError != nil`), reported to Dart as a
+    ///   normal string error below;
+    /// - non-cloneable values were converted to their string representation,
+    ///   so the Flutter standard message codec can always encode the payload.
+    public func userContentController(
+        _ userContentController: WKUserContentController,
+        didReceive message: WKScriptMessage,
+        sanitizedBody: Any,
+        deserializationError: String?
+    ) {
+        if let deserializationError = deserializationError {
+            // #309 — report as a normal string error instead of crashing.
+            channel?.invokeMethod("onConsoleMessage", arguments: [
+                "message": "[ZikzakInAppWebView] \(deserializationError)",
+                "messageLevel": 3,  // ERROR
+            ])
+        }
+        if message.name == "consoleHandler", let body = sanitizedBody as? [String: Any] {
             var arguments: [String: Any] = [:]
             arguments["message"] = (body["message"] as? String) ?? ""
 
@@ -2077,7 +2571,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             arguments["messageLevel"] = level
             channel?.invokeMethod("onConsoleMessage", arguments: arguments)
         } else if message.name == "callHandler",
-            let bodyString = message.body as? String,
+            let bodyString = sanitizedBody as? String,
             let bodyData = bodyString.data(using: .utf8),
             let body = try? JSONSerialization.jsonObject(with: bodyData) as? [String: Any]
         {
@@ -2097,6 +2591,30 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                             }
                         }
                     }
+                }
+                return
+            }
+            if handlerName == "PasskeyBridge" {
+                // Issue #358: WebAuthn/passkey ceremonies are handled
+                // natively (ASAuthorizationController), never round-tripped
+                // to Dart. The bridge always RESOLVES the JS promise — the
+                // shim converts {"ok": false, error: {name, message}} into
+                // a DOMException so the WebAuthn error names survive.
+                let _callHandlerID = body["_callHandlerID"] as? Int64 ?? 0
+                let args = body["args"] as? String ?? "[]"
+                passkeyBridge?.handleCall(argsJson: args) { [weak self] result in
+                    guard let self = self else { return }
+                    let jsonData =
+                        (try? JSONSerialization.data(withJSONObject: result))
+                        ?? Data("{}".utf8)
+                    let json = String(data: jsonData, encoding: .utf8) ?? "{}"
+                    self.evaluateJavaScript(
+                        """
+                            if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
+                                window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)].resolve(\(json));
+                                delete window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)];
+                            }
+                        """, completionHandler: nil)
                 }
                 return
             }
@@ -2130,17 +2648,21 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                             }
                         """, completionHandler: nil)
                 } else {
-                    var json: String
-                    if let resultData = try? JSONSerialization.data(
-                        withJSONObject: result ?? NSNull(), options: []),
-                        let resultString = String(data: resultData, encoding: .utf8)
-                    {
-                        json = resultString
-                    } else if let simpleResult = result {
-                        json = "\"\(simpleResult)\""
-                    } else {
-                        json = "null"
-                    }
+                    // Dart's callHandler implementation already returns the callback value
+                    // encoded with jsonEncode. Re-encoding this String with
+                    // JSONSerialization crashes for top-level fragments (for example
+                    // null) and would also change the value's JavaScript semantics.
+                    let json = result as? String ?? "null"
+#if DEBUG
+                    let resultType = result.map {
+                        String(describing: type(of: $0))
+                    } ?? "nil"
+                    print(
+                        "[ZikzakInAppWebView][JSBridge] handler=\(handlerName) "
+                            + "resultType=\(resultType) jsonLength=\(json.utf8.count) "
+                            + "fallbackToNull=\(result != nil && !(result is String))"
+                    )
+#endif
                     self.evaluateJavaScript(
                         """
                             if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
@@ -2150,11 +2672,11 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                         """, completionHandler: nil)
                 }
             }
-        } else if message.name == "onFindResultReceived", let body = message.body as? [String: Any]
+        } else if message.name == "onFindResultReceived", let body = sanitizedBody as? [String: Any]
         {
             findInteractionChannel?.invokeMethod("onFindResultReceived", arguments: body)
         } else if message.name == "onWebMessagePortMessageReceived",
-            let body = message.body as? [String: Any],
+            let body = sanitizedBody as? [String: Any],
             let webMessageChannelId = body["webMessageChannelId"] as? String,
             let index = body["index"] as? Int64
         {
@@ -2174,7 +2696,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 wmc.channelDelegate?.onMessage(message: webMessage, index: index)
             }
         } else if message.name == "onWebMessageListenerPostMessageReceived",
-            let body = message.body as? [String: Any],
+            let body = sanitizedBody as? [String: Any],
             let jsObjectName = body["jsObjectName"] as? String
         {
             // WebMessageListener page→Dart message (#197).
@@ -2195,7 +2717,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                     break
                 }
             }
-        } else if message.name == "onScrollChangedReceived", let body = message.body as? [String: Any] {
+        } else if message.name == "onScrollChangedReceived", let body = sanitizedBody as? [String: Any] {
             // onScrollChanged / onContentSizeChanged / onOverScrolled (#197).
             let x = body["x"] as? Int ?? 0
             let y = body["y"] as? Int ?? 0
@@ -2264,6 +2786,40 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         super.rightMouseDown(with: event)
     }
 
+    /// Dispatches a trusted keyDown/keyUp pair to this WebView so React /
+    /// ProseMirror editors (which ignore untrusted, JS-synthesized key events)
+    /// receive a real Enter / Backspace. Called from the Dart side via the
+    /// `pressKey` channel method (Puppeteer `keyboard.press`). Delivering the
+    /// event through the responder's `keyDown:` (not `dispatchEvent`) makes
+    /// WebKit treat it as a trusted, user-initiated key event.
+    func pressKey(keyCode: UInt16, characters: String) {
+        guard let down = NSEvent.keyEvent(
+            with: .keyDown,
+            location: .zero,
+            modifierFlags: [],
+            timestamp: 0,
+            windowNumber: 0,
+            context: nil,
+            characters: characters,
+            charactersIgnoringModifiers: characters,
+            isARepeat: false,
+            keyCode: keyCode
+        ), let up = NSEvent.keyEvent(
+            with: .keyUp,
+            location: .zero,
+            modifierFlags: [],
+            timestamp: 0,
+            windowNumber: 0,
+            context: nil,
+            characters: characters,
+            charactersIgnoringModifiers: characters,
+            isARepeat: false,
+            keyCode: keyCode
+        ) else { return }
+        self.keyDown(with: down)
+        self.keyUp(with: up)
+    }
+
     public func handleFindInteraction(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         switch call.method {
         case "findAll":
@@ -2308,28 +2864,10 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         ]
         // body is skipped for now
 
-        let sourceFrame: [String: Any] = [
-            "isMainFrame": navigationAction.sourceFrame.isMainFrame,
-            "request": [
-                "url": navigationAction.sourceFrame.request.url?.absoluteString ?? ""
-            ],
-            "securityOrigin": [
-                "host": navigationAction.sourceFrame.securityOrigin.host,
-                "port": navigationAction.sourceFrame.securityOrigin.port,
-                "protocol": navigationAction.sourceFrame.securityOrigin.protocol,
-            ],
-        ]
-
-        var targetFrame: [String: Any] = [:]
-        if let target = navigationAction.targetFrame {
-            targetFrame["isMainFrame"] = target.isMainFrame
-            targetFrame["request"] = ["url": target.request.url?.absoluteString ?? ""]
-            targetFrame["securityOrigin"] = [
-                "host": target.securityOrigin.host,
-                "port": target.securityOrigin.port,
-                "protocol": target.securityOrigin.protocol,
-            ]
-        }
+        // KVC-backed read (issue #327 class): the target frame's request and
+        // security origin go through the same nil-safe accessor as
+        // sourceFrame, instead of direct member access.
+        let targetFrame = WKNavigationAction.frameMap(navigationAction.targetFrame)
 
         arguments["navigationAction"] = [
             "request": request,
@@ -2338,7 +2876,9 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 || navigationAction.navigationType == .formSubmitted,
             "isRedirect": false,
             "navigationType": navigationAction.navigationType.rawValue,
-            "sourceFrame": sourceFrame,
+            // KVC-backed read (issue #327): nil when WebKit hands a nil
+            // runtime frame, instead of trapping the unconditional bridge.
+            "sourceFrame": navigationAction.sourceFrameMap(),
             "targetFrame": targetFrame,
         ]
 
@@ -2364,9 +2904,9 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         // (e.g. to block `intent:` or custom schemes) was silently ignored.
         //
         // The Dart handler returns the `NavigationActionPolicy` native int:
-        //   0 = CANCEL, 1 = ALLOW, 2 = DOWNLOAD (iOS 14.5+ only — not yet
-        //   exposed on macOS; treat as CANCEL to honor the user's intent to
-        //   block rather than silently allow).
+        //   0 = CANCEL, 1 = ALLOW, 2 = DOWNLOAD (macOS 11.3+ — hands the
+        //   navigation to WebKit's download pipeline; the WKDownloadDelegate
+        //   methods below dispatch `onDownloadStartRequest`).
         var decisionHandlerCalled = false
         let resolvePolicy: (WKNavigationActionPolicy) -> Void = { policy in
             guard !decisionHandlerCalled else { return }
@@ -2383,10 +2923,13 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 switch action {
                 case 1:
                     policy = .allow
-                case 0, 2:
-                    // 0 = CANCEL; 2 = DOWNLOAD (not supported on macOS yet —
-                    // fall back to CANCEL so we never silently allow a
-                    // navigation the user explicitly tried to block).
+                case 2:
+                    // 2 = DOWNLOAD: honor the user's intent instead of
+                    // silently downgrading to CANCEL (#339).
+                    policy = .download
+                case 0:
+                    // 0 = CANCEL: never silently allow a navigation the
+                    // user explicitly tried to block.
                     policy = .cancel
                 default:
                     policy = .cancel
@@ -2396,6 +2939,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 // macOS. Normalize before comparing.
                 switch action.intValue {
                 case 1: policy = .allow
+                case 2: policy = .download
                 default: policy = .cancel
                 }
             } else {
@@ -2427,7 +2971,137 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             ]
             channel?.invokeMethod("onReceivedHttpError", arguments: arguments)
         }
+
+        // Download detection (#339, mirrors iOS): when the response cannot be
+        // shown by the WebView and `useOnDownloadStart` is enabled, hand the
+        // navigation to WebKit's download pipeline. The WKDownloadDelegate
+        // methods below then dispatch `onDownloadStartRequest` and cancel the
+        // native download so the Dart side can stream the bytes itself.
+        // `WKNavigationResponsePolicy.download` (macOS 11.3+) and
+        // `canShowMIMEType` (macOS 10.15+) are both below the macOS 12.0
+        // platform floor of this package, so no availability guard is needed.
+        if let useOnDownloadStart = settings?.useOnDownloadStart, useOnDownloadStart {
+            if !navigationResponse.canShowMIMEType {
+                decisionHandler(.download)
+                return
+            } else {
+                let mimeType = navigationResponse.response.mimeType
+                if let url = navigationResponse.response.url, navigationResponse.isForMainFrame {
+                    if url.scheme != "file", mimeType != nil, !mimeType!.starts(with: "text/") {
+                        // URLResponse.suggestedFilename is `String?` on macOS,
+                        // so unwrap it first: a nil name is "unknown", which the
+                        // empty check below maps to nil just like "".
+                        let suggestedFilename = navigationResponse.response.suggestedFilename ?? ""
+                        let downloadStartRequest = DownloadStartRequest(
+                            url: url.absoluteString,
+                            userAgent: nil,
+                            contentDisposition: nil,
+                            mimeType: mimeType,
+                            contentLength: navigationResponse.response.expectedContentLength,
+                            suggestedFilename: suggestedFilename.isEmpty
+                                ? nil
+                                : suggestedFilename,
+                            textEncodingName: navigationResponse.response.textEncodingName)
+                        channelDelegate?.onDownloadStartRequest(request: downloadStartRequest)
+                        decisionHandler(.cancel)
+                        return
+                    }
+                }
+            }
+        }
+
         decisionHandler(.allow)
+    }
+
+    // NOTE (#339 review): currently unreachable — WebKit invokes this
+    // destination callback only when the app sets `download.delegate` inside
+    // the `didBecome` handoff, and both handoffs below keep it `nil`
+    // (verbatim iOS-master parity). The `didBecome` handoffs are therefore
+    // the sole dispatch points, and the native download is cancelled by
+    // WebKit's nil-delegate no-destination behavior. Do NOT set
+    // `download.delegate = self` without also moving the dispatch out of the
+    // `didBecome` handoffs into this callback, or the event fires twice.
+    public func download(
+        _ download: WKDownload, decideDestinationUsing response: URLResponse,
+        suggestedFilename: String, completionHandler: @escaping (URL?) -> Void
+    ) {
+        if let url = response.url, let useOnDownloadStart = settings?.useOnDownloadStart,
+            useOnDownloadStart
+        {
+            let downloadStartRequest = DownloadStartRequest(
+                url: url.absoluteString,
+                userAgent: nil,
+                contentDisposition: nil,
+                mimeType: response.mimeType,
+                contentLength: response.expectedContentLength,
+                suggestedFilename: suggestedFilename.isEmpty
+                    ? nil
+                    : suggestedFilename,
+                textEncodingName: response.textEncodingName)
+            channelDelegate?.onDownloadStartRequest(request: downloadStartRequest)
+        }
+        download.delegate = nil
+        // cancel the download — the Dart side owns the bytes (#339)
+        completionHandler(nil)
+    }
+
+    public func webView(
+        _ webView: WKWebView, navigationResponse: WKNavigationResponse,
+        didBecome download: WKDownload
+    ) {
+        let response = navigationResponse.response
+        // Same optional unwrap as the mime-type path above: `String?` on
+        // macOS, and a nil name is "unknown" rather than a blank save name.
+        let suggestedFilename = response.suggestedFilename ?? ""
+        if let url = response.url, let useOnDownloadStart = settings?.useOnDownloadStart,
+            useOnDownloadStart
+        {
+            let downloadStartRequest = DownloadStartRequest(
+                url: url.absoluteString,
+                userAgent: nil,
+                contentDisposition: nil,
+                mimeType: response.mimeType,
+                contentLength: response.expectedContentLength,
+                suggestedFilename: suggestedFilename.isEmpty
+                    ? nil
+                    : suggestedFilename,
+                textEncodingName: response.textEncodingName)
+            channelDelegate?.onDownloadStartRequest(request: downloadStartRequest)
+        }
+        download.delegate = nil
+    }
+
+    // Action-stage download handoff (#339 review): when
+    // `shouldOverrideUrlLoading` resolves `.download` (policy 2), WebKit
+    // invokes THIS `didBecome` variant — not the navigationResponse one
+    // above — and creates the download with no destination. Without this
+    // method nothing dispatched the event on that path and the
+    // delegate-less download was dropped, matching the old `.cancel`.
+    // There is no URLResponse at the action stage, so mime and length are
+    // unknown here (-1 is URLResponse's "unknown length" sentinel); the
+    // filename is derived from the URL path. iOS omits this variant
+    // (upstream-shaped); macOS implements it because its Dart API exposes
+    // policy 2.
+    public func webView(
+        _ webView: WKWebView, navigationAction: WKNavigationAction,
+        didBecome download: WKDownload
+    ) {
+        let request = navigationAction.request
+        if let url = request.url, let useOnDownloadStart = settings?.useOnDownloadStart,
+            useOnDownloadStart
+        {
+            channelDelegate?.onDownloadStartRequest(request: DownloadStartRequest(
+                url: url.absoluteString,
+                userAgent: nil,
+                contentDisposition: nil,
+                mimeType: nil,
+                contentLength: -1,
+                suggestedFilename: url.lastPathComponent.isEmpty
+                    ? nil
+                    : url.lastPathComponent,
+                textEncodingName: nil))
+        }
+        download.delegate = nil
     }
 
     public func webView(
@@ -2479,30 +3153,13 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
 
         // Build the same CreateWindowAction map the iOS implementation sends
         // (see CreateWindowAction.toMap() / WKNavigationAction.toMap()).
-        let sourceFrame: [String: Any]? = {
-            let frame = navigationAction.sourceFrame
-            return [
-                "isMainFrame": frame.isMainFrame,
-                "request": ["url": frame.request.url?.absoluteString ?? ""],
-                "securityOrigin": [
-                    "host": frame.securityOrigin.host,
-                    "port": frame.securityOrigin.port,
-                    "protocol": frame.securityOrigin.protocol,
-                ],
-            ]
-        }()
-        let targetFrame: [String: Any]? = {
-            guard let frame = navigationAction.targetFrame else { return nil }
-            return [
-                "isMainFrame": frame.isMainFrame,
-                "request": ["url": frame.request.url?.absoluteString ?? ""],
-                "securityOrigin": [
-                    "host": frame.securityOrigin.host,
-                    "port": frame.securityOrigin.port,
-                    "protocol": frame.securityOrigin.protocol,
-                ],
-            ]
-        }()
+        // KVC-backed read (issue #327): nil when WebKit hands a nil runtime
+        // frame, instead of trapping the unconditional bridge.
+        let sourceFrame = navigationAction.sourceFrameMap()
+        // KVC-backed read (issue #327 class): the target frame's request and
+        // security origin go through the same nil-safe accessor as
+        // sourceFrame, instead of direct member access.
+        let targetFrame = WKNavigationAction.frameMap(navigationAction.targetFrame)
 
         let createWindowAction: [String: Any?] = [
             "request": navigationAction.request.toMap(),

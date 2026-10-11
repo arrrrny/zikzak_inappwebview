@@ -1,0 +1,1 @@
+../../../.specify/extensions/tdd/.specify-dev/agent-commands/zed/speckit-tdd-setup/SKILL.md

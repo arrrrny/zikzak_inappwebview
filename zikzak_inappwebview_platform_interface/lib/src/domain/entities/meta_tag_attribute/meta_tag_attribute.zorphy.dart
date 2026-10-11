@@ -26,6 +26,25 @@ class MetaTagAttribute {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  MetaTagAttribute copyWithField<T>(Field<MetaTagAttribute, T> field, T value) {
+    switch (field.name) {
+      case 'name':
+        return copyWith(name: value as String?);
+      case 'value':
+        return copyWith(value: value as String?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'MetaTagAttribute has no settable field with this name',
+        );
+    }
+  }
+
   MetaTagAttribute copyWithMetaTagAttribute({String? name, String? value}) {
     return copyWith(name: name, value: value);
   }
@@ -37,18 +56,20 @@ class MetaTagAttribute {
     final _patchMap = _patcher.patchMap;
     return MetaTagAttribute(
       name: _patchMap.containsKey(MetaTagAttribute$.name_)
-          ? (_patchMap[MetaTagAttribute$.name_] is Function)
-                ? _patchMap[MetaTagAttribute$.name_](this.name)
-                : (_patchMap[MetaTagAttribute$.name_] is Patch)
-                ? _patchMap[MetaTagAttribute$.name_].applyTo(this.name)
-                : _patchMap[MetaTagAttribute$.name_]
+          ? ((_patchMap[MetaTagAttribute$.name_] is Function)
+                    ? _patchMap[MetaTagAttribute$.name_](this.name)
+                    : (_patchMap[MetaTagAttribute$.name_] is Patch)
+                    ? _patchMap[MetaTagAttribute$.name_].applyTo(this.name)
+                    : _patchMap[MetaTagAttribute$.name_])
+                as String?
           : this.name,
       value: _patchMap.containsKey(MetaTagAttribute$.value)
-          ? (_patchMap[MetaTagAttribute$.value] is Function)
-                ? _patchMap[MetaTagAttribute$.value](this.value)
-                : (_patchMap[MetaTagAttribute$.value] is Patch)
-                ? _patchMap[MetaTagAttribute$.value].applyTo(this.value)
-                : _patchMap[MetaTagAttribute$.value]
+          ? ((_patchMap[MetaTagAttribute$.value] is Function)
+                    ? _patchMap[MetaTagAttribute$.value](this.value)
+                    : (_patchMap[MetaTagAttribute$.value] is Patch)
+                    ? _patchMap[MetaTagAttribute$.value].applyTo(this.value)
+                    : _patchMap[MetaTagAttribute$.value])
+                as String?
           : this.value,
     );
   }
@@ -73,7 +94,8 @@ class MetaTagAttribute {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$MetaTagAttributeToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

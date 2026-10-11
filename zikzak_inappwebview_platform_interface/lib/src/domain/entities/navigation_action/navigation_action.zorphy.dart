@@ -67,6 +67,37 @@ class NavigationAction {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  NavigationAction copyWithField<T>(Field<NavigationAction, T> field, T value) {
+    switch (field.name) {
+      case 'request':
+        return copyWith(request: value as URLRequest);
+      case 'isForMainFrame':
+        return copyWith(isForMainFrame: value as bool);
+      case 'hasGesture':
+        return copyWith(hasGesture: value as bool?);
+      case 'isRedirect':
+        return copyWith(isRedirect: value as bool?);
+      case 'navigationType':
+        return copyWith(navigationType: value as NavigationType?);
+      case 'sourceFrame':
+        return copyWith(sourceFrame: value as FrameInfo?);
+      case 'targetFrame':
+        return copyWith(targetFrame: value as FrameInfo?);
+      case 'shouldPerformDownload':
+        return copyWith(shouldPerformDownload: value as bool?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'NavigationAction has no settable field with this name',
+        );
+    }
+  }
+
   NavigationAction copyWithNavigationAction({
     URLRequest? request,
     bool? isForMainFrame,
@@ -96,81 +127,89 @@ class NavigationAction {
     final _patchMap = _patcher.patchMap;
     return NavigationAction(
       request: _patchMap.containsKey(NavigationAction$.request)
-          ? (_patchMap[NavigationAction$.request] is Function)
-                ? _patchMap[NavigationAction$.request](this.request)
-                : (_patchMap[NavigationAction$.request] is Patch)
-                ? _patchMap[NavigationAction$.request].applyTo(this.request)
-                : _patchMap[NavigationAction$.request]
+          ? ((_patchMap[NavigationAction$.request] is Function)
+                    ? _patchMap[NavigationAction$.request](this.request)
+                    : (_patchMap[NavigationAction$.request] is Patch)
+                    ? _patchMap[NavigationAction$.request].applyTo(this.request)
+                    : _patchMap[NavigationAction$.request])
+                as URLRequest
           : this.request,
       isForMainFrame: _patchMap.containsKey(NavigationAction$.isForMainFrame)
-          ? (_patchMap[NavigationAction$.isForMainFrame] is Function)
-                ? _patchMap[NavigationAction$.isForMainFrame](
-                    this.isForMainFrame,
-                  )
-                : (_patchMap[NavigationAction$.isForMainFrame] is Patch)
-                ? _patchMap[NavigationAction$.isForMainFrame].applyTo(
-                    this.isForMainFrame,
-                  )
-                : _patchMap[NavigationAction$.isForMainFrame]
+          ? ((_patchMap[NavigationAction$.isForMainFrame] is Function)
+                    ? _patchMap[NavigationAction$.isForMainFrame](
+                        this.isForMainFrame,
+                      )
+                    : (_patchMap[NavigationAction$.isForMainFrame] is Patch)
+                    ? _patchMap[NavigationAction$.isForMainFrame].applyTo(
+                        this.isForMainFrame,
+                      )
+                    : _patchMap[NavigationAction$.isForMainFrame])
+                as bool
           : this.isForMainFrame,
       hasGesture: _patchMap.containsKey(NavigationAction$.hasGesture)
-          ? (_patchMap[NavigationAction$.hasGesture] is Function)
-                ? _patchMap[NavigationAction$.hasGesture](this.hasGesture)
-                : (_patchMap[NavigationAction$.hasGesture] is Patch)
-                ? _patchMap[NavigationAction$.hasGesture].applyTo(
-                    this.hasGesture,
-                  )
-                : _patchMap[NavigationAction$.hasGesture]
+          ? ((_patchMap[NavigationAction$.hasGesture] is Function)
+                    ? _patchMap[NavigationAction$.hasGesture](this.hasGesture)
+                    : (_patchMap[NavigationAction$.hasGesture] is Patch)
+                    ? _patchMap[NavigationAction$.hasGesture].applyTo(
+                        this.hasGesture,
+                      )
+                    : _patchMap[NavigationAction$.hasGesture])
+                as bool?
           : this.hasGesture,
       isRedirect: _patchMap.containsKey(NavigationAction$.isRedirect)
-          ? (_patchMap[NavigationAction$.isRedirect] is Function)
-                ? _patchMap[NavigationAction$.isRedirect](this.isRedirect)
-                : (_patchMap[NavigationAction$.isRedirect] is Patch)
-                ? _patchMap[NavigationAction$.isRedirect].applyTo(
-                    this.isRedirect,
-                  )
-                : _patchMap[NavigationAction$.isRedirect]
+          ? ((_patchMap[NavigationAction$.isRedirect] is Function)
+                    ? _patchMap[NavigationAction$.isRedirect](this.isRedirect)
+                    : (_patchMap[NavigationAction$.isRedirect] is Patch)
+                    ? _patchMap[NavigationAction$.isRedirect].applyTo(
+                        this.isRedirect,
+                      )
+                    : _patchMap[NavigationAction$.isRedirect])
+                as bool?
           : this.isRedirect,
       navigationType: _patchMap.containsKey(NavigationAction$.navigationType)
-          ? (_patchMap[NavigationAction$.navigationType] is Function)
-                ? _patchMap[NavigationAction$.navigationType](
-                    this.navigationType,
-                  )
-                : (_patchMap[NavigationAction$.navigationType] is Patch)
-                ? _patchMap[NavigationAction$.navigationType].applyTo(
-                    this.navigationType,
-                  )
-                : _patchMap[NavigationAction$.navigationType]
+          ? ((_patchMap[NavigationAction$.navigationType] is Function)
+                    ? _patchMap[NavigationAction$.navigationType](
+                        this.navigationType,
+                      )
+                    : (_patchMap[NavigationAction$.navigationType] is Patch)
+                    ? _patchMap[NavigationAction$.navigationType].applyTo(
+                        this.navigationType,
+                      )
+                    : _patchMap[NavigationAction$.navigationType])
+                as NavigationType?
           : this.navigationType,
       sourceFrame: _patchMap.containsKey(NavigationAction$.sourceFrame)
-          ? (_patchMap[NavigationAction$.sourceFrame] is Function)
-                ? _patchMap[NavigationAction$.sourceFrame](this.sourceFrame)
-                : (_patchMap[NavigationAction$.sourceFrame] is Patch)
-                ? _patchMap[NavigationAction$.sourceFrame].applyTo(
-                    this.sourceFrame,
-                  )
-                : _patchMap[NavigationAction$.sourceFrame]
+          ? ((_patchMap[NavigationAction$.sourceFrame] is Function)
+                    ? _patchMap[NavigationAction$.sourceFrame](this.sourceFrame)
+                    : (_patchMap[NavigationAction$.sourceFrame] is Patch)
+                    ? _patchMap[NavigationAction$.sourceFrame].applyTo(
+                        this.sourceFrame,
+                      )
+                    : _patchMap[NavigationAction$.sourceFrame])
+                as FrameInfo?
           : this.sourceFrame,
       targetFrame: _patchMap.containsKey(NavigationAction$.targetFrame)
-          ? (_patchMap[NavigationAction$.targetFrame] is Function)
-                ? _patchMap[NavigationAction$.targetFrame](this.targetFrame)
-                : (_patchMap[NavigationAction$.targetFrame] is Patch)
-                ? _patchMap[NavigationAction$.targetFrame].applyTo(
-                    this.targetFrame,
-                  )
-                : _patchMap[NavigationAction$.targetFrame]
+          ? ((_patchMap[NavigationAction$.targetFrame] is Function)
+                    ? _patchMap[NavigationAction$.targetFrame](this.targetFrame)
+                    : (_patchMap[NavigationAction$.targetFrame] is Patch)
+                    ? _patchMap[NavigationAction$.targetFrame].applyTo(
+                        this.targetFrame,
+                      )
+                    : _patchMap[NavigationAction$.targetFrame])
+                as FrameInfo?
           : this.targetFrame,
       shouldPerformDownload:
           _patchMap.containsKey(NavigationAction$.shouldPerformDownload)
-          ? (_patchMap[NavigationAction$.shouldPerformDownload] is Function)
-                ? _patchMap[NavigationAction$.shouldPerformDownload](
-                    this.shouldPerformDownload,
-                  )
-                : (_patchMap[NavigationAction$.shouldPerformDownload] is Patch)
-                ? _patchMap[NavigationAction$.shouldPerformDownload].applyTo(
-                    this.shouldPerformDownload,
-                  )
-                : _patchMap[NavigationAction$.shouldPerformDownload]
+          ? ((_patchMap[NavigationAction$.shouldPerformDownload] is Function)
+                    ? _patchMap[NavigationAction$.shouldPerformDownload](
+                        this.shouldPerformDownload,
+                      )
+                    : (_patchMap[NavigationAction$.shouldPerformDownload]
+                          is Patch)
+                    ? _patchMap[NavigationAction$.shouldPerformDownload]
+                          .applyTo(this.shouldPerformDownload)
+                    : _patchMap[NavigationAction$.shouldPerformDownload])
+                as bool?
           : this.shouldPerformDownload,
     );
   }
@@ -225,7 +264,8 @@ class NavigationAction {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$NavigationActionToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

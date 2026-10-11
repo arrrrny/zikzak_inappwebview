@@ -31,7 +31,7 @@ abstract class $PermissionRequest {
   ///**NOTE for iOS**: this list will have only 1 element and will be used by the [PermissionResponse.action]
   ///as the resource to consider when applying the corresponding action.
   @JsonKey(
-    defaultValue: const [],
+    defaultValue: [],
     fromJson: _resourcesFromJson,
     toJson: _resourcesToJson,
   )

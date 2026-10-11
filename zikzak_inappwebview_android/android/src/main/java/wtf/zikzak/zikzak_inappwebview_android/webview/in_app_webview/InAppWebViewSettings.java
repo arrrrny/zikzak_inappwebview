@@ -5,6 +5,7 @@ import static android.webkit.WebSettings.LayoutAlgorithm.NORMAL;
 
 import android.annotation.SuppressLint;
 import android.os.Build;
+import android.util.Log;
 import android.view.View;
 import android.webkit.WebSettings;
 import androidx.annotation.NonNull;
@@ -155,6 +156,7 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
     public Boolean stylusHandwritingEnabled = true;
 
     public Boolean dismissDialogues = true;
+    public Boolean consoleLogEnabled = true;
 
     /**
      * Which window insets the WebView should <b>ignore</b> when laying out
@@ -466,6 +468,9 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
                 case "dismissDialogues":
                     dismissDialogues = (Boolean) value;
                     break;
+                case "consoleLogEnabled":
+                    consoleLogEnabled = (Boolean) value;
+                    break;
                 case "insetsForWebContentToIgnore":
                     insetsForWebContentToIgnore = (List<String>) value;
                     break;
@@ -643,6 +648,7 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
         );
         settings.put("stylusHandwritingEnabled", stylusHandwritingEnabled);
         settings.put("dismissDialogues", dismissDialogues);
+        settings.put("consoleLogEnabled", consoleLogEnabled);
         settings.put("insetsForWebContentToIgnore", insetsForWebContentToIgnore);
         return settings;
     }
@@ -950,10 +956,20 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
                     WebViewFeature.WEB_AUTHENTICATION
                 )
             ) {
-                realSettings.put(
-                    "webAuthenticationSupport",
-                    WebSettingsCompat.getWebAuthenticationSupport(settings)
-                );
+                try {
+                    realSettings.put(
+                        "webAuthenticationSupport",
+                        WebSettingsCompat.getWebAuthenticationSupport(settings)
+                    );
+                } catch (RuntimeException e) {
+                    // OEM WebView wrapper incompatibility. Omitting the key makes
+                    // the Dart side parse it as null, which signals "unsupported".
+                    Log.w(
+                        LOG_TAG,
+                        "OEM WebView wrapper incompatible with getWebAuthenticationSupport",
+                        e
+                    );
+                }
             }
             if (
                 WebViewFeature.isFeatureSupported(
@@ -967,20 +983,7 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
                     )
                 );
             }
-            if (
-                WebViewFeature.isFeatureSupported(
-                    WebViewFeature.REQUESTED_WITH_HEADER_ALLOW_LIST
-                )
-            ) {
-                realSettings.put(
-                    "requestedWithHeaderOriginAllowList",
-                    new ArrayList<>(
-                        WebSettingsCompat.getRequestedWithHeaderOriginAllowList(
-                            settings
-                        )
-                    )
-                );
-            }
+
         }
         return realSettings;
     }

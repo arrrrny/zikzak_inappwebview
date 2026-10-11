@@ -35,5 +35,6 @@ class ProxyController {
       platform.setProxyOverride(settings: settings);
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformProxyController.clearProxyOverride}
-  Future<void> clearProxyOverride() => platform.clearProxyOverride();
+  Future<void> clearProxyOverride({String? profileId}) =>
+      platform.clearProxyOverride(profileId: profileId);
 }

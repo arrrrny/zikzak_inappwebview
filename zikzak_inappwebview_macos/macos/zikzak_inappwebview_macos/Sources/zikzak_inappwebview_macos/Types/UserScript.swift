@@ -7,6 +7,11 @@
 //  Dart `addUserScript` API (WKUserContentController itself has no group
 //  concept). See issue #197.
 //
+//  Overrides both WKUserScript designated initializers (including
+//  `init(source:injectionTime:forMainFrameOnly:in:)`), matching iOS: a
+//  subclass that declares its own designated initializers does not inherit
+//  the superclass ones. See issue #317.
+//
 
 import WebKit
 
@@ -29,6 +34,16 @@ public class UserScript: WKUserScript {
     ) {
         super.init(
             source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly)
+    }
+
+    public override init(
+        source: String, injectionTime: WKUserScriptInjectionTime, forMainFrameOnly: Bool,
+        in contentWorld: WKContentWorld
+    ) {
+        super.init(
+            source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly,
+            in: contentWorld)
+        self.contentWorld = contentWorld
     }
 
     public init(

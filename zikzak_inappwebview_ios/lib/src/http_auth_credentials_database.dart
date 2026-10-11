@@ -77,9 +77,7 @@ class IOSHttpAuthCredentialDatabase extends PlatformHttpAuthCredentialDatabase
       var element = URLProtectionSpaceHttpAuthCredentials.fromJson(
         map.cast<String, dynamic>(),
       );
-      if (element != null) {
-        result.add(element);
-      }
+      result.add(element);
     }
     return result;
   }
@@ -98,9 +96,7 @@ class IOSHttpAuthCredentialDatabase extends PlatformHttpAuthCredentialDatabase
     List<URLCredential> credentials = [];
     for (Map<dynamic, dynamic> map in credentialList) {
       var credential = URLCredential.fromJson(map.cast<String, dynamic>());
-      if (credential != null) {
-        credentials.add(credential);
-      }
+      credentials.add(credential);
     }
     return credentials;
   }

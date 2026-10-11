@@ -18,5 +18,37 @@
 	<true />
 	<key>com.apple.security.device.audio-input</key>
 	<true />
+	<!--
+	  Passkeys / WebAuthn in a WKWebView
+
+	  WebAuthn only runs a ceremony for a relying-party origin the host app
+	  holds a validated webcredentials association for. Without it
+	  isUserVerifyingPlatformAuthenticatorAvailable() is false and every ceremony
+	  rejects before a sheet can appear — see INSIGHTS.md for details.
+
+	  To enable passkey support:
+
+	  1. Add the associated-domains entitlement below, replacing the RP host
+	     with the domain the ceremony runs on (must match the WKWebView origin,
+	     not the app bundle id):
+
+	     <key>com.apple.developer.associated-domains</key>
+	     <array>
+	       <string>webcredentials:your-domain.example.com</string>
+	     </array>
+
+	  2. Serve /.well-known/apple-app-site-association on that host, HTTPS,
+	     no redirects, with:
+	     {"webcredentials":{"apps":["TEAMID.BUNDLEID"]}}
+
+	  3. Build from Xcode with Automatic signing so the capability is registered.
+	     Ad-hoc signing is not sufficient — Xcode refuses with
+	     "entitlements that require signing with a development certificate".
+
+	  passkey_demo/server.dart serves this file + the AASA for local testing
+	  when paired with a TLS-terminating tunnel (e.g. cloudflared).
+	  The page also needs a click into the WKWebView before a ceremony can
+	  start — activating the window is not enough. macOS 13.3+.
+	-->
 </dict>
 </plist>

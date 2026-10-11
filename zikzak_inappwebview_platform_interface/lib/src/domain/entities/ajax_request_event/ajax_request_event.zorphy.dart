@@ -43,6 +43,29 @@ class AjaxRequestEvent {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  AjaxRequestEvent copyWithField<T>(Field<AjaxRequestEvent, T> field, T value) {
+    switch (field.name) {
+      case 'type':
+        return copyWith(type: value as AjaxRequestEventType?);
+      case 'lengthComputable':
+        return copyWith(lengthComputable: value as bool?);
+      case 'loaded':
+        return copyWith(loaded: value as int?);
+      case 'total':
+        return copyWith(total: value as int?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'AjaxRequestEvent has no settable field with this name',
+        );
+    }
+  }
+
   AjaxRequestEvent copyWithAjaxRequestEvent({
     AjaxRequestEventType? type,
     bool? lengthComputable,
@@ -64,37 +87,41 @@ class AjaxRequestEvent {
     final _patchMap = _patcher.patchMap;
     return AjaxRequestEvent(
       type: _patchMap.containsKey(AjaxRequestEvent$.type)
-          ? (_patchMap[AjaxRequestEvent$.type] is Function)
-                ? _patchMap[AjaxRequestEvent$.type](this.type)
-                : (_patchMap[AjaxRequestEvent$.type] is Patch)
-                ? _patchMap[AjaxRequestEvent$.type].applyTo(this.type)
-                : _patchMap[AjaxRequestEvent$.type]
+          ? ((_patchMap[AjaxRequestEvent$.type] is Function)
+                    ? _patchMap[AjaxRequestEvent$.type](this.type)
+                    : (_patchMap[AjaxRequestEvent$.type] is Patch)
+                    ? _patchMap[AjaxRequestEvent$.type].applyTo(this.type)
+                    : _patchMap[AjaxRequestEvent$.type])
+                as AjaxRequestEventType?
           : this.type,
       lengthComputable:
           _patchMap.containsKey(AjaxRequestEvent$.lengthComputable)
-          ? (_patchMap[AjaxRequestEvent$.lengthComputable] is Function)
-                ? _patchMap[AjaxRequestEvent$.lengthComputable](
-                    this.lengthComputable,
-                  )
-                : (_patchMap[AjaxRequestEvent$.lengthComputable] is Patch)
-                ? _patchMap[AjaxRequestEvent$.lengthComputable].applyTo(
-                    this.lengthComputable,
-                  )
-                : _patchMap[AjaxRequestEvent$.lengthComputable]
+          ? ((_patchMap[AjaxRequestEvent$.lengthComputable] is Function)
+                    ? _patchMap[AjaxRequestEvent$.lengthComputable](
+                        this.lengthComputable,
+                      )
+                    : (_patchMap[AjaxRequestEvent$.lengthComputable] is Patch)
+                    ? _patchMap[AjaxRequestEvent$.lengthComputable].applyTo(
+                        this.lengthComputable,
+                      )
+                    : _patchMap[AjaxRequestEvent$.lengthComputable])
+                as bool?
           : this.lengthComputable,
       loaded: _patchMap.containsKey(AjaxRequestEvent$.loaded)
-          ? (_patchMap[AjaxRequestEvent$.loaded] is Function)
-                ? _patchMap[AjaxRequestEvent$.loaded](this.loaded)
-                : (_patchMap[AjaxRequestEvent$.loaded] is Patch)
-                ? _patchMap[AjaxRequestEvent$.loaded].applyTo(this.loaded)
-                : _patchMap[AjaxRequestEvent$.loaded]
+          ? ((_patchMap[AjaxRequestEvent$.loaded] is Function)
+                    ? _patchMap[AjaxRequestEvent$.loaded](this.loaded)
+                    : (_patchMap[AjaxRequestEvent$.loaded] is Patch)
+                    ? _patchMap[AjaxRequestEvent$.loaded].applyTo(this.loaded)
+                    : _patchMap[AjaxRequestEvent$.loaded])
+                as int?
           : this.loaded,
       total: _patchMap.containsKey(AjaxRequestEvent$.total)
-          ? (_patchMap[AjaxRequestEvent$.total] is Function)
-                ? _patchMap[AjaxRequestEvent$.total](this.total)
-                : (_patchMap[AjaxRequestEvent$.total] is Patch)
-                ? _patchMap[AjaxRequestEvent$.total].applyTo(this.total)
-                : _patchMap[AjaxRequestEvent$.total]
+          ? ((_patchMap[AjaxRequestEvent$.total] is Function)
+                    ? _patchMap[AjaxRequestEvent$.total](this.total)
+                    : (_patchMap[AjaxRequestEvent$.total] is Patch)
+                    ? _patchMap[AjaxRequestEvent$.total].applyTo(this.total)
+                    : _patchMap[AjaxRequestEvent$.total])
+                as int?
           : this.total,
     );
   }
@@ -133,7 +160,8 @@ class AjaxRequestEvent {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$AjaxRequestEventToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

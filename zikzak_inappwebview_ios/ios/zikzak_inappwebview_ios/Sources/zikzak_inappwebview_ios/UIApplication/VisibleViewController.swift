@@ -10,7 +10,7 @@ import UIKit
 extension UIApplication {
 
     var visibleViewController: UIViewController? {
-        guard let rootViewController = keyWindow?.rootViewController else {
+        guard let rootViewController = sceneKeyWindow?.rootViewController else {
             return nil
         }
         return getVisibleViewController(rootViewController)

@@ -21,6 +21,23 @@ class PrewarmingToken {
     return PrewarmingToken(id: id ?? this.id);
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  PrewarmingToken copyWithField<T>(Field<PrewarmingToken, T> field, T value) {
+    switch (field.name) {
+      case 'id':
+        return copyWith(id: value as String);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'PrewarmingToken has no settable field with this name',
+        );
+    }
+  }
+
   PrewarmingToken copyWithPrewarmingToken({String? id}) {
     return copyWith(id: id);
   }
@@ -30,11 +47,12 @@ class PrewarmingToken {
     final _patchMap = _patcher.patchMap;
     return PrewarmingToken(
       id: _patchMap.containsKey(PrewarmingToken$.id)
-          ? (_patchMap[PrewarmingToken$.id] is Function)
-                ? _patchMap[PrewarmingToken$.id](this.id)
-                : (_patchMap[PrewarmingToken$.id] is Patch)
-                ? _patchMap[PrewarmingToken$.id].applyTo(this.id)
-                : _patchMap[PrewarmingToken$.id]
+          ? ((_patchMap[PrewarmingToken$.id] is Function)
+                    ? _patchMap[PrewarmingToken$.id](this.id)
+                    : (_patchMap[PrewarmingToken$.id] is Patch)
+                    ? _patchMap[PrewarmingToken$.id].applyTo(this.id)
+                    : _patchMap[PrewarmingToken$.id])
+                as String
           : this.id,
     );
   }
@@ -57,7 +75,8 @@ class PrewarmingToken {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$PrewarmingTokenToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

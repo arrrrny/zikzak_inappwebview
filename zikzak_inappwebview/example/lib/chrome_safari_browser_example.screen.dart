@@ -96,22 +96,26 @@ class _ChromeSafariBrowserExampleScreenState
                 isTrustedWebActivity: false,
                 keepAliveEnabled: true,
                 startAnimations: [
-                  AndroidResource.anim(
+                  AndroidResource(
                     name: "slide_in_left",
+                    defType: "anim",
                     defPackage: "android",
                   ),
-                  AndroidResource.anim(
+                  AndroidResource(
                     name: "slide_out_right",
+                    defType: "anim",
                     defPackage: "android",
                   ),
                 ],
                 exitAnimations: [
-                  AndroidResource.anim(
+                  AndroidResource(
                     name: "abc_slide_in_top",
+                    defType: "anim",
                     defPackage: "wtf.zikzak.zikzak_inappwebviewexample",
                   ),
-                  AndroidResource.anim(
+                  AndroidResource(
                     name: "abc_slide_out_top",
+                    defType: "anim",
                     defPackage: "wtf.zikzak.zikzak_inappwebviewexample",
                   ),
                 ],

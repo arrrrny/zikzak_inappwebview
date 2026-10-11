@@ -28,6 +28,26 @@ class ContextMenuSettings {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  ContextMenuSettings copyWithField<T>(
+    Field<ContextMenuSettings, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'hideDefaultSystemContextMenuItems':
+        return copyWith(hideDefaultSystemContextMenuItems: value as bool);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'ContextMenuSettings has no settable field with this name',
+        );
+    }
+  }
+
   ContextMenuSettings copyWithContextMenuSettings({
     bool? hideDefaultSystemContextMenuItems,
   }) {
@@ -46,20 +66,21 @@ class ContextMenuSettings {
           _patchMap.containsKey(
             ContextMenuSettings$.hideDefaultSystemContextMenuItems,
           )
-          ? (_patchMap[ContextMenuSettings$.hideDefaultSystemContextMenuItems]
-                    is Function)
-                ? _patchMap[ContextMenuSettings$
-                      .hideDefaultSystemContextMenuItems](
-                    this.hideDefaultSystemContextMenuItems,
-                  )
-                : (_patchMap[ContextMenuSettings$
-                          .hideDefaultSystemContextMenuItems]
-                      is Patch)
-                ? _patchMap[ContextMenuSettings$
-                          .hideDefaultSystemContextMenuItems]
-                      .applyTo(this.hideDefaultSystemContextMenuItems)
-                : _patchMap[ContextMenuSettings$
-                      .hideDefaultSystemContextMenuItems]
+          ? ((_patchMap[ContextMenuSettings$.hideDefaultSystemContextMenuItems]
+                        is Function)
+                    ? _patchMap[ContextMenuSettings$
+                          .hideDefaultSystemContextMenuItems](
+                        this.hideDefaultSystemContextMenuItems,
+                      )
+                    : (_patchMap[ContextMenuSettings$
+                              .hideDefaultSystemContextMenuItems]
+                          is Patch)
+                    ? _patchMap[ContextMenuSettings$
+                              .hideDefaultSystemContextMenuItems]
+                          .applyTo(this.hideDefaultSystemContextMenuItems)
+                    : _patchMap[ContextMenuSettings$
+                          .hideDefaultSystemContextMenuItems])
+                as bool
           : this.hideDefaultSystemContextMenuItems,
     );
   }
@@ -85,7 +106,8 @@ class ContextMenuSettings {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$ContextMenuSettingsToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

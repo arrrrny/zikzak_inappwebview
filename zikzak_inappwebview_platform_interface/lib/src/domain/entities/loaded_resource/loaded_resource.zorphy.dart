@@ -43,6 +43,29 @@ class LoadedResource {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  LoadedResource copyWithField<T>(Field<LoadedResource, T> field, T value) {
+    switch (field.name) {
+      case 'initiatorType':
+        return copyWith(initiatorType: value as String?);
+      case 'url':
+        return copyWith(url: value as WebUri?);
+      case 'startTime':
+        return copyWith(startTime: value as double?);
+      case 'duration':
+        return copyWith(duration: value as double?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'LoadedResource has no settable field with this name',
+        );
+    }
+  }
+
   LoadedResource copyWithLoadedResource({
     String? initiatorType,
     WebUri? url,
@@ -62,34 +85,42 @@ class LoadedResource {
     final _patchMap = _patcher.patchMap;
     return LoadedResource(
       initiatorType: _patchMap.containsKey(LoadedResource$.initiatorType)
-          ? (_patchMap[LoadedResource$.initiatorType] is Function)
-                ? _patchMap[LoadedResource$.initiatorType](this.initiatorType)
-                : (_patchMap[LoadedResource$.initiatorType] is Patch)
-                ? _patchMap[LoadedResource$.initiatorType].applyTo(
-                    this.initiatorType,
-                  )
-                : _patchMap[LoadedResource$.initiatorType]
+          ? ((_patchMap[LoadedResource$.initiatorType] is Function)
+                    ? _patchMap[LoadedResource$.initiatorType](
+                        this.initiatorType,
+                      )
+                    : (_patchMap[LoadedResource$.initiatorType] is Patch)
+                    ? _patchMap[LoadedResource$.initiatorType].applyTo(
+                        this.initiatorType,
+                      )
+                    : _patchMap[LoadedResource$.initiatorType])
+                as String?
           : this.initiatorType,
       url: _patchMap.containsKey(LoadedResource$.url)
-          ? (_patchMap[LoadedResource$.url] is Function)
-                ? _patchMap[LoadedResource$.url](this.url)
-                : (_patchMap[LoadedResource$.url] is Patch)
-                ? _patchMap[LoadedResource$.url].applyTo(this.url)
-                : _patchMap[LoadedResource$.url]
+          ? ((_patchMap[LoadedResource$.url] is Function)
+                    ? _patchMap[LoadedResource$.url](this.url)
+                    : (_patchMap[LoadedResource$.url] is Patch)
+                    ? _patchMap[LoadedResource$.url].applyTo(this.url)
+                    : _patchMap[LoadedResource$.url])
+                as WebUri?
           : this.url,
       startTime: _patchMap.containsKey(LoadedResource$.startTime)
-          ? (_patchMap[LoadedResource$.startTime] is Function)
-                ? _patchMap[LoadedResource$.startTime](this.startTime)
-                : (_patchMap[LoadedResource$.startTime] is Patch)
-                ? _patchMap[LoadedResource$.startTime].applyTo(this.startTime)
-                : _patchMap[LoadedResource$.startTime]
+          ? ((_patchMap[LoadedResource$.startTime] is Function)
+                    ? _patchMap[LoadedResource$.startTime](this.startTime)
+                    : (_patchMap[LoadedResource$.startTime] is Patch)
+                    ? _patchMap[LoadedResource$.startTime].applyTo(
+                        this.startTime,
+                      )
+                    : _patchMap[LoadedResource$.startTime])
+                as double?
           : this.startTime,
       duration: _patchMap.containsKey(LoadedResource$.duration)
-          ? (_patchMap[LoadedResource$.duration] is Function)
-                ? _patchMap[LoadedResource$.duration](this.duration)
-                : (_patchMap[LoadedResource$.duration] is Patch)
-                ? _patchMap[LoadedResource$.duration].applyTo(this.duration)
-                : _patchMap[LoadedResource$.duration]
+          ? ((_patchMap[LoadedResource$.duration] is Function)
+                    ? _patchMap[LoadedResource$.duration](this.duration)
+                    : (_patchMap[LoadedResource$.duration] is Patch)
+                    ? _patchMap[LoadedResource$.duration].applyTo(this.duration)
+                    : _patchMap[LoadedResource$.duration])
+                as double?
           : this.duration,
     );
   }
@@ -128,7 +159,8 @@ class LoadedResource {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$LoadedResourceToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

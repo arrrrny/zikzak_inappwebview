@@ -68,12 +68,116 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     var shouldPrintBackgrounds = false
     var webAuthenticationSupport = 0
     var dismissDialogues = true
+    /// When `false`, the console override script is not injected and
+    /// console.log/error/warn messages are NOT forwarded to Dart.
+    /// Set to `false` in apps that don't need console messages (e.g.
+    /// zuraffa_browser) to reduce bridge traffic and avoid the
+    /// WebKit SIGSEGV on non-cloneable objects (#309, #312).
+    var consoleLogEnabled = true
 
     override init() {
         super.init()
     }
 
+    // MARK: - Enum wire-name helpers
+    // The Dart surface serializes InAppWebViewSettings enums as String names
+    // (see the generated EnumMaps). Native WebKit exposes them as Int rawValues,
+    // so we translate in both directions.
+    //
+    // Ordering matches the generated EnumMaps exactly:
+    //   UserPreferredContentMode:            RECOMMENDED(0) | MOBILE(1) | DESKTOP(2)
+    //   WKSelectionGranularity:              DYNAMIC(0) | CHARACTER(1)
+    //   ScrollViewContentInsetAdjustmentBehavior: AUTOMATIC(0) | SCROLLABLE_AXES(1) | NEVER(2) | ALWAYS(3)
+    //   WebAuthenticationSupport:           NONE(0) | FOR_APP(1) | FOR_BROWSER(2)
+
+    private func preferredContentModeName(_ rawValue: Int) -> String {
+        switch rawValue {
+        case 1: return "MOBILE"
+        case 2: return "DESKTOP"
+        default: return "RECOMMENDED"
+        }
+    }
+
+    private func selectionGranularityName(_ rawValue: Int) -> String {
+        switch rawValue {
+        case 1: return "CHARACTER"
+        default: return "DYNAMIC"
+        }
+    }
+
+    private func contentInsetAdjustmentBehaviorName(_ rawValue: Int) -> String {
+        switch rawValue {
+        case 1: return "SCROLLABLE_AXES"
+        case 2: return "NEVER"
+        case 3: return "ALWAYS"
+        default: return "AUTOMATIC"
+        }
+    }
+
+    private func webAuthenticationSupportName(_ rawValue: Int) -> String {
+        switch rawValue {
+        case 1: return "FOR_APP"
+        case 2: return "FOR_BROWSER"
+        default: return "NONE"
+        }
+    }
+
+    private func preferredContentModeRawValue(_ name: String?) -> Int {
+        switch name {
+        case "MOBILE": return 1
+        case "DESKTOP": return 2
+        default: return 0
+        }
+    }
+
+    private func selectionGranularityRawValue(_ name: String?) -> Int {
+        switch name {
+        case "CHARACTER": return 1
+        default: return 0
+        }
+    }
+
+    private func contentInsetAdjustmentBehaviorRawValue(_ name: String?) -> Int {
+        switch name {
+        case "SCROLLABLE_AXES": return 1
+        case "NEVER": return 2
+        case "ALWAYS": return 3
+        default: return 0
+        }
+    }
+
+    private func webAuthenticationSupportRawValue(_ name: String?) -> Int {
+        switch name {
+        case "FOR_BROWSER": return 2
+        case "FOR_APP": return 1
+        default: return 0
+        }
+    }
+
     override func parse(settings: [String: Any?]) -> InAppWebViewSettings {
+        var settings = settings  // re-assign to allow removal of untranslatable keys
+        // Translate enum String wire names coming from the Dart surface back to
+        // the Int rawValues the WebKit properties expect. The base ISettings
+        // parse sets properties via KVC `setValue(_:forKey:)`, which throws on a
+        // type mismatch, so a String must be converted to Int before that runs.
+        // Legacy Int values are passed through unchanged.
+        let enumHandlers: [(String, (String?) -> Int)] = [
+            ("preferredContentMode", preferredContentModeRawValue),
+            ("selectionGranularity", selectionGranularityRawValue),
+            ("contentInsetAdjustmentBehavior", contentInsetAdjustmentBehaviorRawValue),
+            ("webAuthenticationSupport", webAuthenticationSupportRawValue),
+        ]
+        for (key, converter) in enumHandlers {
+            if let value = settings[key] {
+                if let name = value as? String {
+                    settings[key] = converter(name)
+                } else if !(value is NSNull), value != nil {
+                    // keep non-String, non-null values (e.g. legacy Int) as-is
+                } else {
+                    settings.removeValue(forKey: key)
+                }
+            }
+        }
         let _ = super.parse(settings: settings)
         return self
     }
@@ -126,8 +230,54 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
                 realSettings["isElementFullscreenEnabled"] =
                     configuration.preferences.isElementFullscreenEnabled
             }
+            // WebAuthn / passkey read-back (issue #272)
+            if #available(macOS 13.3, *) {
+                let selector = Selector(("webAuthenticationSupport"))
+                if configuration.responds(to: selector),
+                   let webAuthSupport = configuration.perform(selector)?.takeUnretainedValue()
+                       as? NSObject,
+                   webAuthSupport.responds(to: Selector(("boundKeychainForPasskeys")))
+                {
+                    // value(forKey:) throws an uncatchable NSUnknownKeyException
+                    // when the key is missing — the responds(to:) guard above keeps
+                    // getRealSettings() crash-proof on unexpected SDK states.
+                    let boundValue =
+                        webAuthSupport.value(forKey: "boundKeychainForPasskeys") as? Bool ?? false
+                    realSettings["webAuthenticationSupport"] = boundValue ? 1 : 0
+                } else {
+                    // realSettings is seeded from toMap(), so a skipped block
+                    // leaves the *requested* level echoed back — a WebView that
+                    // was never actually configured would claim FOR_BROWSER.
+                    // Report the applied level instead: on a runtime without
+                    // the key nothing was applied, so NONE is the only honest
+                    // answer. The creation-time path logs a native warning for
+                    // the dropped request (issue #351).
+                    realSettings["webAuthenticationSupport"] = 0
+                }
+            } else {
+                // macOS 13.2 and older sit below the availability gate, so the
+                // honest else inside it never runs there — realSettings would
+                // echo the requested level out of toMap(). Nothing can be
+                // applied below 13.3, so NONE is the only honest answer
+                // (issue #351).
+                realSettings["webAuthenticationSupport"] = 0
+            }
             // isFindInteractionEnabled is not available on macOS
         }
+
+        // Translate the four enum fields from WebKit Int rawValues back to the
+        // String wire names the Dart surface expects (see the generated
+        // EnumMaps). The Dart `fromMap` rebuilds enums via the EnumMap, so a raw
+        // Int here would fail to round-trip.
+        realSettings["preferredContentMode"] = preferredContentModeName(
+            realSettings["preferredContentMode"] as? Int ?? 0)
+        realSettings["selectionGranularity"] = selectionGranularityName(
+            realSettings["selectionGranularity"] as? Int ?? 0)
+        realSettings["contentInsetAdjustmentBehavior"] = contentInsetAdjustmentBehaviorName(
+            realSettings["contentInsetAdjustmentBehavior"] as? Int ?? 0)
+        realSettings["webAuthenticationSupport"] = webAuthenticationSupportName(
+            realSettings["webAuthenticationSupport"] as? Int ?? 0)
+
         return realSettings
     }
 }

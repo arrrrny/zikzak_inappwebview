@@ -27,6 +27,26 @@ class ServerTrustAuthResponse {
     return ServerTrustAuthResponse(action: action ?? this.action);
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  ServerTrustAuthResponse copyWithField<T>(
+    Field<ServerTrustAuthResponse, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'action':
+        return copyWith(action: value as ServerTrustAuthResponseAction?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'ServerTrustAuthResponse has no settable field with this name',
+        );
+    }
+  }
+
   ServerTrustAuthResponse copyWithServerTrustAuthResponse({
     ServerTrustAuthResponseAction? action,
   }) {
@@ -40,13 +60,14 @@ class ServerTrustAuthResponse {
     final _patchMap = _patcher.patchMap;
     return ServerTrustAuthResponse(
       action: _patchMap.containsKey(ServerTrustAuthResponse$.action)
-          ? (_patchMap[ServerTrustAuthResponse$.action] is Function)
-                ? _patchMap[ServerTrustAuthResponse$.action](this.action)
-                : (_patchMap[ServerTrustAuthResponse$.action] is Patch)
-                ? _patchMap[ServerTrustAuthResponse$.action].applyTo(
-                    this.action,
-                  )
-                : _patchMap[ServerTrustAuthResponse$.action]
+          ? ((_patchMap[ServerTrustAuthResponse$.action] is Function)
+                    ? _patchMap[ServerTrustAuthResponse$.action](this.action)
+                    : (_patchMap[ServerTrustAuthResponse$.action] is Patch)
+                    ? _patchMap[ServerTrustAuthResponse$.action].applyTo(
+                        this.action,
+                      )
+                    : _patchMap[ServerTrustAuthResponse$.action])
+                as ServerTrustAuthResponseAction?
           : this.action,
     );
   }
@@ -69,7 +90,8 @@ class ServerTrustAuthResponse {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$ServerTrustAuthResponseToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

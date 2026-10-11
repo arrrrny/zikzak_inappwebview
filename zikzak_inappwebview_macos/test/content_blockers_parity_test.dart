@@ -1,0 +1,435 @@
+// Bug #338 regression contract (AC1): `InAppWebViewSettings.contentBlockers`
+// was declared and decoded on macOS but never consumed — nothing compiled or
+// added a `WKContentRuleList`, so the setting was silently inert on macOS
+// while the identical setting works on iOS (WKContentRuleListStore.default()
+// .compileContentRuleList + configuration.userContentController.add, in the
+// iOS `updateSettings` branch). WebKit applies content rule lists before a
+// request starts, which is exactly what the issue reports as missing.
+//
+// This test encodes that rule as a source scan so the bug class cannot
+// silently return; it is executable on any host (no Xcode required), the same
+// gate style the package already ships for native parity bugs
+// (swift_sourceframe_kvc_test.dart, user_script_initializer_parity_test.dart).
+//
+// The scan asserts the iOS updateSettings branch shape, mirrored into the
+// macOS `applyContentBlockers` funnel reached from `setSettings`: every
+// creation-time `initialSettings` and runtime `setSettings` call passes
+// through that key branch, and the InAppBrowser override delegates to super —
+// so one funnel covers platform views, the browser and headless webviews, on
+// both creation and update paths (the iOS initial-load controllers reduce to
+// the same calls).
+import 'dart:io';
+
+import 'package:flutter_test/flutter_test.dart';
+
+/// Source text with comments removed, string literals PRESERVED, and all
+/// whitespace runs collapsed to single spaces. Comment stripping handles
+/// Swift block-comment nesting, line comments and triple-quoted strings
+/// (ported from swift_sourceframe_kvc_test.dart's stripSwiftNonCode).
+String stripCommentsKeepStrings(String source) {
+  final out = StringBuffer();
+  var i = 0;
+  var blockDepth = 0;
+  while (i < source.length) {
+    final rest = source.substring(i);
+    if (blockDepth > 0) {
+      if (rest.startsWith('/*')) {
+        blockDepth++;
+        i += 2;
+      } else if (rest.startsWith('*/')) {
+        blockDepth--;
+        i += 2;
+      } else {
+        if (source[i] == '\n') out.write('\n');
+        i++;
+      }
+      continue;
+    }
+    if (rest.startsWith('/*')) {
+      blockDepth++;
+      out.write('  ');
+      i += 2;
+      continue;
+    }
+    if (rest.startsWith('//')) {
+      final end = source.indexOf('\n', i);
+      i = end == -1 ? source.length : end;
+      continue;
+    }
+    if (rest.startsWith('"""')) {
+      final end = source.indexOf('"""', i + 3);
+      out.write(source.substring(i, end == -1 ? source.length : end + 3));
+      i = end == -1 ? source.length : end + 3;
+      continue;
+    }
+    if (source[i] == '"') {
+      // Regular string literal: keep content, skip escapes.
+      out.write('"');
+      var j = i + 1;
+      while (j < source.length) {
+        if (source[j] == r'\') {
+          out.write(source.substring(j, j + 2));
+          j += 2;
+          continue;
+        }
+        out.write(source[j]);
+        if (source[j] == '"') {
+          j++;
+          break;
+        }
+        j++;
+      }
+      i = j;
+      continue;
+    }
+    out.write(source[i]);
+    i++;
+  }
+  return out.toString().replaceAll(RegExp(r'\s+'), ' ');
+}
+
+/// Source text with string literal CONTENTS blanked (quotes kept) so brace
+/// matching cannot be fooled by braces inside strings.
+String blankStringContents(String source) {
+  final out = StringBuffer();
+  var i = 0;
+  var blockDepth = 0;
+  while (i < source.length) {
+    final rest = source.substring(i);
+    if (blockDepth > 0) {
+      if (rest.startsWith('/*')) {
+        blockDepth++;
+        i += 2;
+      } else if (rest.startsWith('*/')) {
+        blockDepth--;
+        i += 2;
+      } else {
+        if (source[i] == '\n') out.write('\n');
+        i++;
+      }
+      continue;
+    }
+    if (rest.startsWith('/*')) {
+      blockDepth++;
+      i += 2;
+      continue;
+    }
+    if (rest.startsWith('//')) {
+      final end = source.indexOf('\n', i);
+      i = end == -1 ? source.length : end;
+      continue;
+    }
+    if (rest.startsWith('"""')) {
+      final end = source.indexOf('"""', i + 3);
+      out.write('""');
+      i = end == -1 ? source.length : end + 3;
+      continue;
+    }
+    if (source[i] == '"') {
+      out.write('""');
+      var j = i + 1;
+      while (j < source.length) {
+        if (source[j] == r'\') {
+          j += 2;
+          continue;
+        }
+        if (source[j] == '"') {
+          j++;
+          break;
+        }
+        j++;
+      }
+      i = j;
+      continue;
+    }
+    out.write(source[i]);
+    i++;
+  }
+  return out.toString();
+}
+
+/// Extracts the body of the function whose declaration matches [signature]
+/// by brace matching on [source] (a comment-stripped, string-blanked text).
+/// Returns null when the declaration is absent.
+String? functionBody(String source, String signature) {
+  final declStart = source.indexOf(signature);
+  if (declStart == -1) return null;
+  final openBrace = source.indexOf('{', declStart + signature.length);
+  if (openBrace == -1) return null;
+  var depth = 0;
+  for (var i = openBrace; i < source.length; i++) {
+    if (source[i] == '{') {
+      depth++;
+    } else if (source[i] == '}') {
+      depth--;
+      if (depth == 0) {
+        return source.substring(openBrace + 1, i);
+      }
+    }
+  }
+  return null;
+}
+
+void main() {
+  final macOSWebViewSwift = File(
+    'macos/zikzak_inappwebview_macos/Sources/zikzak_inappwebview_macos/'
+    'InAppWebView.swift',
+  );
+  final macOSSettingsSwift = File(
+    'macos/zikzak_inappwebview_macos/Sources/zikzak_inappwebview_macos/'
+    'InAppWebViewSettings.swift',
+  );
+  final iOSWebViewSwift = File(
+    '../zikzak_inappwebview_ios/ios/zikzak_inappwebview_ios/Sources/'
+    'zikzak_inappwebview_ios/InAppWebView/InAppWebView.swift',
+  );
+  // The iOS cross-check test is the only gate that needs the sibling package
+  // checkout; without it that one test skips instead of failing the file.
+  final iosCrossCheckSkip = iOSWebViewSwift.existsSync()
+      ? null
+      : 'sibling iOS checkout not present';
+
+  group('native macOS contentBlockers consumption (issue #338)', () {
+    late String macOSCode; // comments stripped, strings kept
+    late String macOSBraces; // comments + string contents stripped
+    late String settingsCode;
+    late String iOSSetSettingsBody;
+    late String iOSApplyContentBlockersBody;
+
+    setUpAll(() {
+      // `flutter test` runs with the package root as the working directory.
+      expect(
+        macOSWebViewSwift.existsSync(),
+        isTrue,
+        reason:
+            'InAppWebView.swift not found relative to package root '
+            '(cwd: ${Directory.current.path})',
+      );
+      expect(settingsCode = macOSSettingsSwift.readAsStringSync(), isNotEmpty);
+      macOSCode = stripCommentsKeepStrings(
+        macOSWebViewSwift.readAsStringSync(),
+      );
+      macOSBraces = blankStringContents(macOSWebViewSwift.readAsStringSync());
+      // The iOS cross-check below is the only gate that needs the sibling
+      // package checkout; when it is absent (standalone package checkout,
+      // sparse clone) that one test is skipped instead of failing the file.
+      if (iOSWebViewSwift.existsSync()) {
+        final iOSCode = stripCommentsKeepStrings(
+          iOSWebViewSwift.readAsStringSync(),
+        );
+        // The issue calls it the "updateSettings branch"; in this tree iOS
+        // funnels both creation and runtime updates through setSettings (same
+        // signature as macOS), and since #349 the contentBlockers key is
+        // delegated to the shared applyContentBlockers funnel (mirroring the
+        // macOS shape this package adopted for #338).
+        iOSSetSettingsBody =
+            functionBody(
+              iOSCode,
+              'func setSettings(newSettings: InAppWebViewSettings, newSettingsMap: [String: Any])',
+            ) ??
+            '';
+        iOSApplyContentBlockersBody =
+            functionBody(
+              iOSCode,
+              'func applyContentBlockers(_ contentBlockers: [[String: [String: Any]]])',
+            ) ??
+            '';
+      }
+    });
+
+    test('InAppWebViewSettings still declares contentBlockers on macOS', () {
+      // The bug report is about a decoded-but-unused setting; this test must
+      // not be satisfiable by deleting the declaration instead of consuming
+      // it. Mirrors the iOS declaration type exactly.
+      expect(
+        RegExp(
+          r'var contentBlockers: \[\[String: \[String: Any\]\]\] = \[\]',
+        ).hasMatch(settingsCode),
+        isTrue,
+        reason:
+            'InAppWebViewSettings.contentBlockers '
+            '([[String: [String: Any]]]) must stay declared on macOS — '
+            'removing it would break the platform-interface contract, not '
+            'fix #338',
+      );
+    });
+
+    test('iOS setSettings branch (the parity target) still consumes '
+        'contentBlockers', () {
+      // If iOS ever stops being the reference implementation, this gate must
+      // be re-derived — it must not silently rot into a trivially-true scan.
+      expect(
+        iOSSetSettingsBody,
+        isNotEmpty,
+        reason:
+            'iOS setSettings must exist for the cross-check to mean '
+            'anything',
+      );
+      expect(
+        iOSSetSettingsBody,
+        contains('newSettingsMap["contentBlockers"]'),
+        reason:
+            'iOS setSettings must react to the contentBlockers key '
+            '(the reference branch for #338)',
+      );
+      // Re-derived for #349: iOS no longer compiles inline in setSettings —
+      // the key is delegated to the shared applyContentBlockers funnel (the
+      // same shape macOS uses), and the compilation itself moved there.
+      expect(
+        iOSSetSettingsBody,
+        contains('applyContentBlockers('),
+        reason:
+            'iOS setSettings must delegate the contentBlockers key to the '
+            'applyContentBlockers funnel (#349 — mirrors the macOS '
+            'setSettings funnel this gate enforces on macOS)',
+      );
+      expect(
+        iOSApplyContentBlockersBody,
+        isNotEmpty,
+        reason:
+            'iOS applyContentBlockers must exist for the cross-check to '
+            'mean anything after the #349 funneling',
+      );
+      expect(
+        iOSApplyContentBlockersBody,
+        contains('WKContentRuleListStore.default().compileContentRuleList('),
+        reason:
+            'iOS must still compile the rule list through '
+            'WKContentRuleListStore.default().compileContentRuleList — the '
+            'reference implementation for #338',
+      );
+    }, skip: iosCrossCheckSkip);
+
+    test('macOS setSettings routes the contentBlockers key to '
+        'applyContentBlockers — #338', () {
+      final body = functionBody(
+        macOSBraces,
+        'func setSettings(newSettings: InAppWebViewSettings, newSettingsMap: [String: Any])',
+      );
+      expect(
+        body,
+        isNotNull,
+        reason:
+            'InAppWebView.setSettings must exist on macOS — it is the '
+            'single funnel for creation-time initialSettings and runtime '
+            'setSettings calls',
+      );
+      // Re-run the key check against the string-kept view (the blanked view
+      // cannot see string literals).
+      final keptBody = functionBody(
+        macOSCode,
+        'func setSettings(newSettings: InAppWebViewSettings, newSettingsMap: [String: Any])',
+      );
+      expect(
+        keptBody,
+        contains('newSettingsMap["contentBlockers"]'),
+        reason:
+            'setSettings must branch on the contentBlockers key like the iOS '
+            'updateSettings branch does — the decoded setting was never '
+            'consumed on macOS (#338)',
+      );
+      expect(
+        keptBody,
+        contains('applyContentBlockers('),
+        reason:
+            'setSettings must delegate the key to applyContentBlockers (the '
+            'token-guarded compile funnel); an inline duplicate of the '
+            'compile chain here would compile and add the rules twice',
+      );
+    });
+
+    test('macOS applyContentBlockers clears stale rule lists before re-applying '
+        '— #338', () {
+      final keptBody = functionBody(
+        macOSCode,
+        'func applyContentBlockers(_ contentBlockers: [[String: [String: Any]]])',
+      )!;
+      expect(
+        keptBody,
+        contains('removeAllContentRuleLists()'),
+        reason:
+            'Stale rule lists must be dropped whenever the contentBlockers '
+            'key arrives (iOS parity: updateSettings calls '
+            'userContentController.removeAllContentRuleLists() before '
+            'compiling), otherwise runtime updates would stack lists',
+      );
+    });
+
+    test('macOS applyContentBlockers serializes and compiles the decoded '
+        'blockers via WKContentRuleListStore — #338', () {
+      final keptBody = functionBody(
+        macOSCode,
+        'func applyContentBlockers(_ contentBlockers: [[String: [String: Any]]])',
+      )!;
+      expect(
+        RegExp(
+          r'JSONSerialization\.data\(\s*withJSONObject:\s*contentBlockers',
+        ).hasMatch(keptBody),
+        isTrue,
+        reason:
+            'The decoded [[String: [String: Any]]] blockers must be '
+            'serialized to the WebKit JSON rule format before compilation',
+      );
+      expect(
+        keptBody,
+        contains('WKContentRuleListStore.default().compileContentRuleList('),
+        reason:
+            'The rule list must be compiled through '
+            'WKContentRuleListStore.default().compileContentRuleList — the '
+            'missing compilation IS bug #338',
+      );
+      expect(
+        keptBody,
+        contains('"ContentBlockingRules"'),
+        reason:
+            'The store identifier must match the iOS branch '
+            '("ContentBlockingRules") so both platforms share one cached '
+            'compilation',
+      );
+    });
+
+    test('macOS applyContentBlockers adds the compiled list to the content '
+        'controller — #338', () {
+      final keptBody = functionBody(
+        macOSCode,
+        'func applyContentBlockers(_ contentBlockers: [[String: [String: Any]]])',
+      )!;
+      expect(
+        keptBody,
+        contains('configuration.userContentController.add(contentRuleList'),
+        reason:
+            'A compiled-but-never-added rule list blocks nothing: the '
+            'completion handler must add it to '
+            'configuration.userContentController (iOS parity)',
+      );
+    });
+
+    test('macOS applyContentBlockers skips compilation for an empty blockers '
+        'list — #338', () {
+      final keptBody = functionBody(
+        macOSCode,
+        'func applyContentBlockers(_ contentBlockers: [[String: [String: Any]]])',
+      )!;
+      // Setting an empty list must CLEAR (removeAll runs on key presence)
+      // without compiling an empty rule set — iOS guards with count > 0.
+      expect(
+        keptBody,
+        contains('guard !contentBlockers.isEmpty'),
+        reason:
+            'The compile block must be guarded by an emptiness check '
+            '(iOS parity): an empty list clears blocking instead of '
+            'compiling an empty rule set',
+      );
+      // A stale completion must not re-add rules a newer settings update
+      // removed: the compile funnel serializes compilations with a token.
+      expect(
+        keptBody,
+        contains('token == self.contentRuleListCompileToken'),
+        reason:
+            'A late completion from a superseded compilation must be dropped '
+            'by the compile token, or an older rule list would be re-added '
+            'after a newer update removed it',
+      );
+    });
+  });
+}

@@ -15,12 +15,11 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 void main() {
   group('ChromeSafariBrowserActionButton', () {
     test('wire is id/icon/description/shouldTint (onClick excluded)', () {
-      var clicked = false;
       final button = ChromeSafariBrowserActionButton(
         id: 1,
         icon: Uint8List.fromList([1, 2]),
         description: 'button',
-        onClick: (url, title) => clicked = true,
+        onClick: (url, title) {},
       );
       final map = button.toMap();
       expect(map['id'], 1);

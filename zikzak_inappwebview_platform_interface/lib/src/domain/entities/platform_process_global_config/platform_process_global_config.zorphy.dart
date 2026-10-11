@@ -32,6 +32,30 @@ class ProcessGlobalConfigSettings {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  ProcessGlobalConfigSettings copyWithField<T>(
+    Field<ProcessGlobalConfigSettings, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'dataDirectorySuffix':
+        return copyWith(dataDirectorySuffix: value as String?);
+      case 'directoryBasePaths':
+        return copyWith(
+          directoryBasePaths: value as ProcessGlobalConfigDirectoryBasePaths?,
+        );
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'ProcessGlobalConfigSettings has no settable field with this name',
+        );
+    }
+  }
+
   ProcessGlobalConfigSettings copyWithProcessGlobalConfigSettings({
     String? dataDirectorySuffix,
     ProcessGlobalConfigDirectoryBasePaths? directoryBasePaths,
@@ -52,29 +76,34 @@ class ProcessGlobalConfigSettings {
           _patchMap.containsKey(
             ProcessGlobalConfigSettings$.dataDirectorySuffix,
           )
-          ? (_patchMap[ProcessGlobalConfigSettings$.dataDirectorySuffix]
-                    is Function)
-                ? _patchMap[ProcessGlobalConfigSettings$.dataDirectorySuffix](
-                    this.dataDirectorySuffix,
-                  )
-                : (_patchMap[ProcessGlobalConfigSettings$.dataDirectorySuffix]
-                      is Patch)
-                ? _patchMap[ProcessGlobalConfigSettings$.dataDirectorySuffix]
-                      .applyTo(this.dataDirectorySuffix)
-                : _patchMap[ProcessGlobalConfigSettings$.dataDirectorySuffix]
+          ? ((_patchMap[ProcessGlobalConfigSettings$.dataDirectorySuffix]
+                        is Function)
+                    ? _patchMap[ProcessGlobalConfigSettings$
+                          .dataDirectorySuffix](this.dataDirectorySuffix)
+                    : (_patchMap[ProcessGlobalConfigSettings$
+                              .dataDirectorySuffix]
+                          is Patch)
+                    ? _patchMap[ProcessGlobalConfigSettings$
+                              .dataDirectorySuffix]
+                          .applyTo(this.dataDirectorySuffix)
+                    : _patchMap[ProcessGlobalConfigSettings$
+                          .dataDirectorySuffix])
+                as String?
           : this.dataDirectorySuffix,
       directoryBasePaths:
           _patchMap.containsKey(ProcessGlobalConfigSettings$.directoryBasePaths)
-          ? (_patchMap[ProcessGlobalConfigSettings$.directoryBasePaths]
-                    is Function)
-                ? _patchMap[ProcessGlobalConfigSettings$.directoryBasePaths](
-                    this.directoryBasePaths,
-                  )
-                : (_patchMap[ProcessGlobalConfigSettings$.directoryBasePaths]
-                      is Patch)
-                ? _patchMap[ProcessGlobalConfigSettings$.directoryBasePaths]
-                      .applyTo(this.directoryBasePaths)
-                : _patchMap[ProcessGlobalConfigSettings$.directoryBasePaths]
+          ? ((_patchMap[ProcessGlobalConfigSettings$.directoryBasePaths]
+                        is Function)
+                    ? _patchMap[ProcessGlobalConfigSettings$
+                          .directoryBasePaths](this.directoryBasePaths)
+                    : (_patchMap[ProcessGlobalConfigSettings$
+                              .directoryBasePaths]
+                          is Patch)
+                    ? _patchMap[ProcessGlobalConfigSettings$.directoryBasePaths]
+                          .applyTo(this.directoryBasePaths)
+                    : _patchMap[ProcessGlobalConfigSettings$
+                          .directoryBasePaths])
+                as ProcessGlobalConfigDirectoryBasePaths?
           : this.directoryBasePaths,
     );
   }
@@ -102,7 +131,8 @@ class ProcessGlobalConfigSettings {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$ProcessGlobalConfigSettingsToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {
@@ -268,6 +298,28 @@ class ProcessGlobalConfigDirectoryBasePaths {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  ProcessGlobalConfigDirectoryBasePaths copyWithField<T>(
+    Field<ProcessGlobalConfigDirectoryBasePaths, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'dataDirectoryBasePath':
+        return copyWith(dataDirectoryBasePath: value as String);
+      case 'cacheDirectoryBasePath':
+        return copyWith(cacheDirectoryBasePath: value as String);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'ProcessGlobalConfigDirectoryBasePaths has no settable field with this name',
+        );
+    }
+  }
+
   ProcessGlobalConfigDirectoryBasePaths
   copyWithProcessGlobalConfigDirectoryBasePaths({
     String? dataDirectoryBasePath,
@@ -290,37 +342,39 @@ class ProcessGlobalConfigDirectoryBasePaths {
           _patchMap.containsKey(
             ProcessGlobalConfigDirectoryBasePaths$.dataDirectoryBasePath,
           )
-          ? (_patchMap[ProcessGlobalConfigDirectoryBasePaths$
-                        .dataDirectoryBasePath]
-                    is Function)
-                ? _patchMap[ProcessGlobalConfigDirectoryBasePaths$
-                      .dataDirectoryBasePath](this.dataDirectoryBasePath)
-                : (_patchMap[ProcessGlobalConfigDirectoryBasePaths$
-                          .dataDirectoryBasePath]
-                      is Patch)
-                ? _patchMap[ProcessGlobalConfigDirectoryBasePaths$
-                          .dataDirectoryBasePath]
-                      .applyTo(this.dataDirectoryBasePath)
-                : _patchMap[ProcessGlobalConfigDirectoryBasePaths$
-                      .dataDirectoryBasePath]
+          ? ((_patchMap[ProcessGlobalConfigDirectoryBasePaths$
+                            .dataDirectoryBasePath]
+                        is Function)
+                    ? _patchMap[ProcessGlobalConfigDirectoryBasePaths$
+                          .dataDirectoryBasePath](this.dataDirectoryBasePath)
+                    : (_patchMap[ProcessGlobalConfigDirectoryBasePaths$
+                              .dataDirectoryBasePath]
+                          is Patch)
+                    ? _patchMap[ProcessGlobalConfigDirectoryBasePaths$
+                              .dataDirectoryBasePath]
+                          .applyTo(this.dataDirectoryBasePath)
+                    : _patchMap[ProcessGlobalConfigDirectoryBasePaths$
+                          .dataDirectoryBasePath])
+                as String
           : this.dataDirectoryBasePath,
       cacheDirectoryBasePath:
           _patchMap.containsKey(
             ProcessGlobalConfigDirectoryBasePaths$.cacheDirectoryBasePath,
           )
-          ? (_patchMap[ProcessGlobalConfigDirectoryBasePaths$
-                        .cacheDirectoryBasePath]
-                    is Function)
-                ? _patchMap[ProcessGlobalConfigDirectoryBasePaths$
-                      .cacheDirectoryBasePath](this.cacheDirectoryBasePath)
-                : (_patchMap[ProcessGlobalConfigDirectoryBasePaths$
-                          .cacheDirectoryBasePath]
-                      is Patch)
-                ? _patchMap[ProcessGlobalConfigDirectoryBasePaths$
-                          .cacheDirectoryBasePath]
-                      .applyTo(this.cacheDirectoryBasePath)
-                : _patchMap[ProcessGlobalConfigDirectoryBasePaths$
-                      .cacheDirectoryBasePath]
+          ? ((_patchMap[ProcessGlobalConfigDirectoryBasePaths$
+                            .cacheDirectoryBasePath]
+                        is Function)
+                    ? _patchMap[ProcessGlobalConfigDirectoryBasePaths$
+                          .cacheDirectoryBasePath](this.cacheDirectoryBasePath)
+                    : (_patchMap[ProcessGlobalConfigDirectoryBasePaths$
+                              .cacheDirectoryBasePath]
+                          is Patch)
+                    ? _patchMap[ProcessGlobalConfigDirectoryBasePaths$
+                              .cacheDirectoryBasePath]
+                          .applyTo(this.cacheDirectoryBasePath)
+                    : _patchMap[ProcessGlobalConfigDirectoryBasePaths$
+                          .cacheDirectoryBasePath])
+                as String
           : this.cacheDirectoryBasePath,
     );
   }
@@ -349,7 +403,8 @@ class ProcessGlobalConfigDirectoryBasePaths {
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data =
         _$ProcessGlobalConfigDirectoryBasePathsToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

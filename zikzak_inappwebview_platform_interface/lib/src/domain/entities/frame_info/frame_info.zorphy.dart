@@ -39,6 +39,27 @@ class FrameInfo {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  FrameInfo copyWithField<T>(Field<FrameInfo, T> field, T value) {
+    switch (field.name) {
+      case 'isMainFrame':
+        return copyWith(isMainFrame: value as bool);
+      case 'request':
+        return copyWith(request: value as URLRequest?);
+      case 'securityOrigin':
+        return copyWith(securityOrigin: value as SecurityOrigin?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'FrameInfo has no settable field with this name',
+        );
+    }
+  }
+
   FrameInfo copyWithFrameInfo({
     bool? isMainFrame,
     URLRequest? request,
@@ -56,27 +77,32 @@ class FrameInfo {
     final _patchMap = _patcher.patchMap;
     return FrameInfo(
       isMainFrame: _patchMap.containsKey(FrameInfo$.isMainFrame)
-          ? (_patchMap[FrameInfo$.isMainFrame] is Function)
-                ? _patchMap[FrameInfo$.isMainFrame](this.isMainFrame)
-                : (_patchMap[FrameInfo$.isMainFrame] is Patch)
-                ? _patchMap[FrameInfo$.isMainFrame].applyTo(this.isMainFrame)
-                : _patchMap[FrameInfo$.isMainFrame]
+          ? ((_patchMap[FrameInfo$.isMainFrame] is Function)
+                    ? _patchMap[FrameInfo$.isMainFrame](this.isMainFrame)
+                    : (_patchMap[FrameInfo$.isMainFrame] is Patch)
+                    ? _patchMap[FrameInfo$.isMainFrame].applyTo(
+                        this.isMainFrame,
+                      )
+                    : _patchMap[FrameInfo$.isMainFrame])
+                as bool
           : this.isMainFrame,
       request: _patchMap.containsKey(FrameInfo$.request)
-          ? (_patchMap[FrameInfo$.request] is Function)
-                ? _patchMap[FrameInfo$.request](this.request)
-                : (_patchMap[FrameInfo$.request] is Patch)
-                ? _patchMap[FrameInfo$.request].applyTo(this.request)
-                : _patchMap[FrameInfo$.request]
+          ? ((_patchMap[FrameInfo$.request] is Function)
+                    ? _patchMap[FrameInfo$.request](this.request)
+                    : (_patchMap[FrameInfo$.request] is Patch)
+                    ? _patchMap[FrameInfo$.request].applyTo(this.request)
+                    : _patchMap[FrameInfo$.request])
+                as URLRequest?
           : this.request,
       securityOrigin: _patchMap.containsKey(FrameInfo$.securityOrigin)
-          ? (_patchMap[FrameInfo$.securityOrigin] is Function)
-                ? _patchMap[FrameInfo$.securityOrigin](this.securityOrigin)
-                : (_patchMap[FrameInfo$.securityOrigin] is Patch)
-                ? _patchMap[FrameInfo$.securityOrigin].applyTo(
-                    this.securityOrigin,
-                  )
-                : _patchMap[FrameInfo$.securityOrigin]
+          ? ((_patchMap[FrameInfo$.securityOrigin] is Function)
+                    ? _patchMap[FrameInfo$.securityOrigin](this.securityOrigin)
+                    : (_patchMap[FrameInfo$.securityOrigin] is Patch)
+                    ? _patchMap[FrameInfo$.securityOrigin].applyTo(
+                        this.securityOrigin,
+                      )
+                    : _patchMap[FrameInfo$.securityOrigin])
+                as SecurityOrigin?
           : this.securityOrigin,
     );
   }
@@ -107,7 +133,8 @@ class FrameInfo {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$FrameInfoToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

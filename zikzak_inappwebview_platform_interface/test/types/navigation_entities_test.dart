@@ -44,27 +44,26 @@ void main() {
       expect(action.navigationType, isNull);
     });
 
-    test('toJson emits nested request map + platform-native navigationType',
-        () {
-      withPlatform(TargetPlatform.iOS, () {
-        final action = NavigationAction(
-          request: URLRequest(url: WebUri('https://example.com')),
-          isForMainFrame: true,
-          navigationType: NavigationType.LINK_ACTIVATED,
-          sourceFrame: FrameInfo(isMainFrame: true),
-        );
-        final map = action.toJson();
-        expect(map['isForMainFrame'], true);
-        expect(
-          (map['request'] as Map)['url'],
-          'https://example.com',
-        );
-        expect(map['navigationType'], 0); // WKNavigationType.linkActivated
-        expect((map['sourceFrame'] as Map)['isMainFrame'], true);
-        expect(map.containsKey('targetFrame'), isTrue);
-        expect(map['targetFrame'], isNull);
-      });
-    });
+    test(
+      'toJson emits nested request map + platform-native navigationType',
+      () {
+        withPlatform(TargetPlatform.iOS, () {
+          final action = NavigationAction(
+            request: URLRequest(url: WebUri('https://example.com')),
+            isForMainFrame: true,
+            navigationType: NavigationType.LINK_ACTIVATED,
+            sourceFrame: FrameInfo(isMainFrame: true),
+          );
+          final map = action.toJson();
+          expect(map['isForMainFrame'], true);
+          expect((map['request'] as Map)['url'], 'https://example.com');
+          expect(map['navigationType'], 0); // WKNavigationType.linkActivated
+          expect((map['sourceFrame'] as Map)['isMainFrame'], true);
+          expect(map.containsKey('targetFrame'), isTrue);
+          expect(map['targetFrame'], isNull);
+        });
+      },
+    );
 
     test('fromJson round-trips with platform-native navigationType', () {
       withPlatform(TargetPlatform.macOS, () {
@@ -102,25 +101,27 @@ void main() {
   });
 
   group('URLRequest', () {
-    test('toJson emits WebUri as string + non-sequential service-type wire',
-        () {
-      final request = URLRequest(
-        url: WebUri('https://example.com'),
-        method: 'GET',
-        headers: {'X-Test': '1'},
-        body: Uint8List.fromList([1, 2, 3]),
-        cachePolicy: URLRequestCachePolicy.RELOAD_IGNORING_LOCAL_CACHE_DATA,
-        networkServiceType: URLRequestNetworkServiceType.VIDEO,
-        attribution: URLRequestAttribution.DEVELOPER,
-      );
-      final map = request.toJson();
-      expect(map['url'], 'https://example.com');
-      expect(map['headers'], {'X-Test': '1'});
-      expect(map['body'], [1, 2, 3]);
-      expect(map['cachePolicy'], 1); // sequential index
-      expect(map['networkServiceType'], 2); // old _value, NOT .index
-      expect(map['attribution'], 0);
-    });
+    test(
+      'toJson emits WebUri as string + non-sequential service-type wire',
+      () {
+        final request = URLRequest(
+          url: WebUri('https://example.com'),
+          method: 'GET',
+          headers: {'X-Test': '1'},
+          body: Uint8List.fromList([1, 2, 3]),
+          cachePolicy: URLRequestCachePolicy.RELOAD_IGNORING_LOCAL_CACHE_DATA,
+          networkServiceType: URLRequestNetworkServiceType.VIDEO,
+          attribution: URLRequestAttribution.DEVELOPER,
+        );
+        final map = request.toJson();
+        expect(map['url'], 'https://example.com');
+        expect(map['headers'], {'X-Test': '1'});
+        expect(map['body'], [1, 2, 3]);
+        expect(map['cachePolicy'], 1); // sequential index
+        expect(map['networkServiceType'], 2); // old _value, NOT .index
+        expect(map['attribution'], 0);
+      },
+    );
 
     test('fromJson round-trips body/headers/WebUri/enums', () {
       final request = URLRequest.fromJson({
@@ -188,7 +189,11 @@ void main() {
       final frame = FrameInfo(
         isMainFrame: true,
         request: URLRequest(url: WebUri('https://example.com')),
-        securityOrigin: SecurityOrigin(host: 'example.com', port: 443, protocol: 'https'),
+        securityOrigin: SecurityOrigin(
+          host: 'example.com',
+          port: 443,
+          protocol: 'https',
+        ),
       );
       final map = frame.toJson();
       expect((map['securityOrigin'] as Map)['host'], 'example.com');

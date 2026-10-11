@@ -26,6 +26,25 @@ class WebHistory {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  WebHistory copyWithField<T>(Field<WebHistory, T> field, T value) {
+    switch (field.name) {
+      case 'list':
+        return copyWith(list: value as List<WebHistoryItem>?);
+      case 'currentIndex':
+        return copyWith(currentIndex: value as int?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'WebHistory has no settable field with this name',
+        );
+    }
+  }
+
   WebHistory copyWithWebHistory({
     List<WebHistoryItem>? list,
     int? currentIndex,
@@ -38,18 +57,22 @@ class WebHistory {
     final _patchMap = _patcher.patchMap;
     return WebHistory(
       list: _patchMap.containsKey(WebHistory$.list)
-          ? (_patchMap[WebHistory$.list] is Function)
-                ? _patchMap[WebHistory$.list](this.list)
-                : (_patchMap[WebHistory$.list] is Patch)
-                ? _patchMap[WebHistory$.list].applyTo(this.list)
-                : _patchMap[WebHistory$.list]
+          ? ((_patchMap[WebHistory$.list] is Function)
+                    ? _patchMap[WebHistory$.list](this.list)
+                    : (_patchMap[WebHistory$.list] is Patch)
+                    ? _patchMap[WebHistory$.list].applyTo(this.list)
+                    : _patchMap[WebHistory$.list])
+                as List<WebHistoryItem>?
           : this.list,
       currentIndex: _patchMap.containsKey(WebHistory$.currentIndex)
-          ? (_patchMap[WebHistory$.currentIndex] is Function)
-                ? _patchMap[WebHistory$.currentIndex](this.currentIndex)
-                : (_patchMap[WebHistory$.currentIndex] is Patch)
-                ? _patchMap[WebHistory$.currentIndex].applyTo(this.currentIndex)
-                : _patchMap[WebHistory$.currentIndex]
+          ? ((_patchMap[WebHistory$.currentIndex] is Function)
+                    ? _patchMap[WebHistory$.currentIndex](this.currentIndex)
+                    : (_patchMap[WebHistory$.currentIndex] is Patch)
+                    ? _patchMap[WebHistory$.currentIndex].applyTo(
+                        this.currentIndex,
+                      )
+                    : _patchMap[WebHistory$.currentIndex])
+                as int?
           : this.currentIndex,
     );
   }
@@ -77,7 +100,8 @@ class WebHistory {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$WebHistoryToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

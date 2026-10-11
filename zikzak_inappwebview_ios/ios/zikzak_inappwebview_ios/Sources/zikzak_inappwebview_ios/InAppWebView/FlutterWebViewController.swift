@@ -119,36 +119,27 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView, Disposable
 
         if windowId == nil {
             if #available(iOS 11.0, *) {
-                webView.configuration.userContentController.removeAllContentRuleLists()
+                // #349: compile through the shared applyContentBlockers
+                // funnel and hold the initial load only until the compilation
+                // SETTLES (success OR error). The previous code issued the
+                // initial navigation from inside the compileContentRuleList
+                // completion, so a compilation error (print + return) or an
+                // undelivered completion silently dropped the first
+                // navigation: blank page, no onLoadStart, no onLoadError.
                 if let contentBlockers = webView.settings?.contentBlockers,
                     contentBlockers.count > 0
                 {
-                    do {
-                        let jsonData = try JSONSerialization.data(
-                            withJSONObject: contentBlockers, options: [])
-                        let blockRules = String(data: jsonData, encoding: .utf8)
-                        WKContentRuleListStore.default().compileContentRuleList(
-                            forIdentifier: "ContentBlockingRules",
-                            encodedContentRuleList: blockRules
-                        ) { (contentRuleList, error) in
-
-                            if let error = error {
-                                print(error.localizedDescription)
-                                return
-                            }
-
-                            let configuration = webView.configuration
-                            configuration.userContentController.add(contentRuleList!)
-
-                            self.load(
-                                initialUrlRequest: initialUrlRequest, initialFile: initialFile,
-                                initialData: initialData)
-                        }
-                        return
-                    } catch {
-                        print(error.localizedDescription)
+                    webView.applyContentBlockers(contentBlockers)
+                    webView.loadAfterContentRuleLists { [weak self] in
+                        self?.load(
+                            initialUrlRequest: initialUrlRequest,
+                            initialFile: initialFile,
+                            initialData: initialData)
                     }
+                    return
                 }
+                webView.configuration.userContentController
+                    .removeAllContentRuleLists()
             }
             load(
                 initialUrlRequest: initialUrlRequest, initialFile: initialFile,

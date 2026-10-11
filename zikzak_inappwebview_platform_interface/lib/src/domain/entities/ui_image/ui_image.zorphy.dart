@@ -30,6 +30,27 @@ class UIImage {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  UIImage copyWithField<T>(Field<UIImage, T> field, T value) {
+    switch (field.name) {
+      case 'name':
+        return copyWith(name: value as String?);
+      case 'systemName':
+        return copyWith(systemName: value as String?);
+      case 'data':
+        return copyWith(data: value as Uint8List?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'UIImage has no settable field with this name',
+        );
+    }
+  }
+
   UIImage copyWithUIImage({String? name, String? systemName, Uint8List? data}) {
     return copyWith(name: name, systemName: systemName, data: data);
   }
@@ -39,25 +60,28 @@ class UIImage {
     final _patchMap = _patcher.patchMap;
     return UIImage(
       name: _patchMap.containsKey(UIImage$.name_)
-          ? (_patchMap[UIImage$.name_] is Function)
-                ? _patchMap[UIImage$.name_](this.name)
-                : (_patchMap[UIImage$.name_] is Patch)
-                ? _patchMap[UIImage$.name_].applyTo(this.name)
-                : _patchMap[UIImage$.name_]
+          ? ((_patchMap[UIImage$.name_] is Function)
+                    ? _patchMap[UIImage$.name_](this.name)
+                    : (_patchMap[UIImage$.name_] is Patch)
+                    ? _patchMap[UIImage$.name_].applyTo(this.name)
+                    : _patchMap[UIImage$.name_])
+                as String?
           : this.name,
       systemName: _patchMap.containsKey(UIImage$.systemName)
-          ? (_patchMap[UIImage$.systemName] is Function)
-                ? _patchMap[UIImage$.systemName](this.systemName)
-                : (_patchMap[UIImage$.systemName] is Patch)
-                ? _patchMap[UIImage$.systemName].applyTo(this.systemName)
-                : _patchMap[UIImage$.systemName]
+          ? ((_patchMap[UIImage$.systemName] is Function)
+                    ? _patchMap[UIImage$.systemName](this.systemName)
+                    : (_patchMap[UIImage$.systemName] is Patch)
+                    ? _patchMap[UIImage$.systemName].applyTo(this.systemName)
+                    : _patchMap[UIImage$.systemName])
+                as String?
           : this.systemName,
       data: _patchMap.containsKey(UIImage$.data)
-          ? (_patchMap[UIImage$.data] is Function)
-                ? _patchMap[UIImage$.data](this.data)
-                : (_patchMap[UIImage$.data] is Patch)
-                ? _patchMap[UIImage$.data].applyTo(this.data)
-                : _patchMap[UIImage$.data]
+          ? ((_patchMap[UIImage$.data] is Function)
+                    ? _patchMap[UIImage$.data](this.data)
+                    : (_patchMap[UIImage$.data] is Patch)
+                    ? _patchMap[UIImage$.data].applyTo(this.data)
+                    : _patchMap[UIImage$.data])
+                as Uint8List?
           : this.data,
     );
   }
@@ -88,7 +112,8 @@ class UIImage {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$UIImageToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

@@ -29,10 +29,10 @@ class IOSProxySettings {
   @JsonKey(defaultValue: false)
   final bool allowFailover;
 
-  @JsonKey(defaultValue: const [])
+  @JsonKey(defaultValue: [])
   final List<String> excludedDomains;
 
-  @JsonKey(defaultValue: const [])
+  @JsonKey(defaultValue: [])
   final List<String> matchDomains;
 
   IOSProxySettings copyWith({
@@ -47,6 +47,29 @@ class IOSProxySettings {
       excludedDomains: excludedDomains ?? this.excludedDomains,
       matchDomains: matchDomains ?? this.matchDomains,
     );
+  }
+
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  IOSProxySettings copyWithField<T>(Field<IOSProxySettings, T> field, T value) {
+    switch (field.name) {
+      case 'proxyUrl':
+        return copyWith(proxyUrl: value as String);
+      case 'allowFailover':
+        return copyWith(allowFailover: value as bool);
+      case 'excludedDomains':
+        return copyWith(excludedDomains: value as List<String>);
+      case 'matchDomains':
+        return copyWith(matchDomains: value as List<String>);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'IOSProxySettings has no settable field with this name',
+        );
+    }
   }
 
   IOSProxySettings copyWithIOSProxySettings({
@@ -70,40 +93,50 @@ class IOSProxySettings {
     final _patchMap = _patcher.patchMap;
     return IOSProxySettings(
       proxyUrl: _patchMap.containsKey(IOSProxySettings$.proxyUrl)
-          ? (_patchMap[IOSProxySettings$.proxyUrl] is Function)
-                ? _patchMap[IOSProxySettings$.proxyUrl](this.proxyUrl)
-                : (_patchMap[IOSProxySettings$.proxyUrl] is Patch)
-                ? _patchMap[IOSProxySettings$.proxyUrl].applyTo(this.proxyUrl)
-                : _patchMap[IOSProxySettings$.proxyUrl]
+          ? ((_patchMap[IOSProxySettings$.proxyUrl] is Function)
+                    ? _patchMap[IOSProxySettings$.proxyUrl](this.proxyUrl)
+                    : (_patchMap[IOSProxySettings$.proxyUrl] is Patch)
+                    ? _patchMap[IOSProxySettings$.proxyUrl].applyTo(
+                        this.proxyUrl,
+                      )
+                    : _patchMap[IOSProxySettings$.proxyUrl])
+                as String
           : this.proxyUrl,
       allowFailover: _patchMap.containsKey(IOSProxySettings$.allowFailover)
-          ? (_patchMap[IOSProxySettings$.allowFailover] is Function)
-                ? _patchMap[IOSProxySettings$.allowFailover](this.allowFailover)
-                : (_patchMap[IOSProxySettings$.allowFailover] is Patch)
-                ? _patchMap[IOSProxySettings$.allowFailover].applyTo(
-                    this.allowFailover,
-                  )
-                : _patchMap[IOSProxySettings$.allowFailover]
+          ? ((_patchMap[IOSProxySettings$.allowFailover] is Function)
+                    ? _patchMap[IOSProxySettings$.allowFailover](
+                        this.allowFailover,
+                      )
+                    : (_patchMap[IOSProxySettings$.allowFailover] is Patch)
+                    ? _patchMap[IOSProxySettings$.allowFailover].applyTo(
+                        this.allowFailover,
+                      )
+                    : _patchMap[IOSProxySettings$.allowFailover])
+                as bool
           : this.allowFailover,
       excludedDomains: _patchMap.containsKey(IOSProxySettings$.excludedDomains)
-          ? (_patchMap[IOSProxySettings$.excludedDomains] is Function)
-                ? _patchMap[IOSProxySettings$.excludedDomains](
-                    this.excludedDomains,
-                  )
-                : (_patchMap[IOSProxySettings$.excludedDomains] is Patch)
-                ? _patchMap[IOSProxySettings$.excludedDomains].applyTo(
-                    this.excludedDomains,
-                  )
-                : _patchMap[IOSProxySettings$.excludedDomains]
+          ? ((_patchMap[IOSProxySettings$.excludedDomains] is Function)
+                    ? _patchMap[IOSProxySettings$.excludedDomains](
+                        this.excludedDomains,
+                      )
+                    : (_patchMap[IOSProxySettings$.excludedDomains] is Patch)
+                    ? _patchMap[IOSProxySettings$.excludedDomains].applyTo(
+                        this.excludedDomains,
+                      )
+                    : _patchMap[IOSProxySettings$.excludedDomains])
+                as List<String>
           : this.excludedDomains,
       matchDomains: _patchMap.containsKey(IOSProxySettings$.matchDomains)
-          ? (_patchMap[IOSProxySettings$.matchDomains] is Function)
-                ? _patchMap[IOSProxySettings$.matchDomains](this.matchDomains)
-                : (_patchMap[IOSProxySettings$.matchDomains] is Patch)
-                ? _patchMap[IOSProxySettings$.matchDomains].applyTo(
-                    this.matchDomains,
-                  )
-                : _patchMap[IOSProxySettings$.matchDomains]
+          ? ((_patchMap[IOSProxySettings$.matchDomains] is Function)
+                    ? _patchMap[IOSProxySettings$.matchDomains](
+                        this.matchDomains,
+                      )
+                    : (_patchMap[IOSProxySettings$.matchDomains] is Patch)
+                    ? _patchMap[IOSProxySettings$.matchDomains].applyTo(
+                        this.matchDomains,
+                      )
+                    : _patchMap[IOSProxySettings$.matchDomains])
+                as List<String>
           : this.matchDomains,
     );
   }
@@ -142,7 +175,8 @@ class IOSProxySettings {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$IOSProxySettingsToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {
@@ -303,13 +337,13 @@ class AndroidProxySettings {
   factory AndroidProxySettings.fromJson(Map<String, dynamic> json) =>
       _$AndroidProxySettingsFromJson(json);
 
-  @JsonKey(defaultValue: const [])
+  @JsonKey(defaultValue: [])
   final List<String> bypassRules;
 
-  @JsonKey(defaultValue: const [])
+  @JsonKey(defaultValue: [])
   final List<String> directs;
 
-  @JsonKey(defaultValue: const [])
+  @JsonKey(defaultValue: [])
   final List<ProxyRule> proxyRules;
 
   final bool? bypassSimpleHostnames;
@@ -338,6 +372,36 @@ class AndroidProxySettings {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  AndroidProxySettings copyWithField<T>(
+    Field<AndroidProxySettings, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'bypassRules':
+        return copyWith(bypassRules: value as List<String>);
+      case 'directs':
+        return copyWith(directs: value as List<String>);
+      case 'proxyRules':
+        return copyWith(proxyRules: value as List<ProxyRule>);
+      case 'bypassSimpleHostnames':
+        return copyWith(bypassSimpleHostnames: value as bool?);
+      case 'removeImplicitRules':
+        return copyWith(removeImplicitRules: value as bool?);
+      case 'reverseBypassEnabled':
+        return copyWith(reverseBypassEnabled: value as bool);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'AndroidProxySettings has no settable field with this name',
+        );
+    }
+  }
+
   AndroidProxySettings copyWithAndroidProxySettings({
     List<String>? bypassRules,
     List<String>? directs,
@@ -363,67 +427,78 @@ class AndroidProxySettings {
     final _patchMap = _patcher.patchMap;
     return AndroidProxySettings(
       bypassRules: _patchMap.containsKey(AndroidProxySettings$.bypassRules)
-          ? (_patchMap[AndroidProxySettings$.bypassRules] is Function)
-                ? _patchMap[AndroidProxySettings$.bypassRules](this.bypassRules)
-                : (_patchMap[AndroidProxySettings$.bypassRules] is Patch)
-                ? _patchMap[AndroidProxySettings$.bypassRules].applyTo(
-                    this.bypassRules,
-                  )
-                : _patchMap[AndroidProxySettings$.bypassRules]
+          ? ((_patchMap[AndroidProxySettings$.bypassRules] is Function)
+                    ? _patchMap[AndroidProxySettings$.bypassRules](
+                        this.bypassRules,
+                      )
+                    : (_patchMap[AndroidProxySettings$.bypassRules] is Patch)
+                    ? _patchMap[AndroidProxySettings$.bypassRules].applyTo(
+                        this.bypassRules,
+                      )
+                    : _patchMap[AndroidProxySettings$.bypassRules])
+                as List<String>
           : this.bypassRules,
       directs: _patchMap.containsKey(AndroidProxySettings$.directs)
-          ? (_patchMap[AndroidProxySettings$.directs] is Function)
-                ? _patchMap[AndroidProxySettings$.directs](this.directs)
-                : (_patchMap[AndroidProxySettings$.directs] is Patch)
-                ? _patchMap[AndroidProxySettings$.directs].applyTo(this.directs)
-                : _patchMap[AndroidProxySettings$.directs]
+          ? ((_patchMap[AndroidProxySettings$.directs] is Function)
+                    ? _patchMap[AndroidProxySettings$.directs](this.directs)
+                    : (_patchMap[AndroidProxySettings$.directs] is Patch)
+                    ? _patchMap[AndroidProxySettings$.directs].applyTo(
+                        this.directs,
+                      )
+                    : _patchMap[AndroidProxySettings$.directs])
+                as List<String>
           : this.directs,
       proxyRules: _patchMap.containsKey(AndroidProxySettings$.proxyRules)
-          ? (_patchMap[AndroidProxySettings$.proxyRules] is Function)
-                ? _patchMap[AndroidProxySettings$.proxyRules](this.proxyRules)
-                : (_patchMap[AndroidProxySettings$.proxyRules] is Patch)
-                ? _patchMap[AndroidProxySettings$.proxyRules].applyTo(
-                    this.proxyRules,
-                  )
-                : _patchMap[AndroidProxySettings$.proxyRules]
+          ? ((_patchMap[AndroidProxySettings$.proxyRules] is Function)
+                    ? _patchMap[AndroidProxySettings$.proxyRules](
+                        this.proxyRules,
+                      )
+                    : (_patchMap[AndroidProxySettings$.proxyRules] is Patch)
+                    ? _patchMap[AndroidProxySettings$.proxyRules].applyTo(
+                        this.proxyRules,
+                      )
+                    : _patchMap[AndroidProxySettings$.proxyRules])
+                as List<ProxyRule>
           : this.proxyRules,
       bypassSimpleHostnames:
           _patchMap.containsKey(AndroidProxySettings$.bypassSimpleHostnames)
-          ? (_patchMap[AndroidProxySettings$.bypassSimpleHostnames] is Function)
-                ? _patchMap[AndroidProxySettings$.bypassSimpleHostnames](
-                    this.bypassSimpleHostnames,
-                  )
-                : (_patchMap[AndroidProxySettings$.bypassSimpleHostnames]
-                      is Patch)
-                ? _patchMap[AndroidProxySettings$.bypassSimpleHostnames]
-                      .applyTo(this.bypassSimpleHostnames)
-                : _patchMap[AndroidProxySettings$.bypassSimpleHostnames]
+          ? ((_patchMap[AndroidProxySettings$.bypassSimpleHostnames]
+                        is Function)
+                    ? _patchMap[AndroidProxySettings$.bypassSimpleHostnames](
+                        this.bypassSimpleHostnames,
+                      )
+                    : (_patchMap[AndroidProxySettings$.bypassSimpleHostnames]
+                          is Patch)
+                    ? _patchMap[AndroidProxySettings$.bypassSimpleHostnames]
+                          .applyTo(this.bypassSimpleHostnames)
+                    : _patchMap[AndroidProxySettings$.bypassSimpleHostnames])
+                as bool?
           : this.bypassSimpleHostnames,
       removeImplicitRules:
           _patchMap.containsKey(AndroidProxySettings$.removeImplicitRules)
-          ? (_patchMap[AndroidProxySettings$.removeImplicitRules] is Function)
-                ? _patchMap[AndroidProxySettings$.removeImplicitRules](
-                    this.removeImplicitRules,
-                  )
-                : (_patchMap[AndroidProxySettings$.removeImplicitRules]
-                      is Patch)
-                ? _patchMap[AndroidProxySettings$.removeImplicitRules].applyTo(
-                    this.removeImplicitRules,
-                  )
-                : _patchMap[AndroidProxySettings$.removeImplicitRules]
+          ? ((_patchMap[AndroidProxySettings$.removeImplicitRules] is Function)
+                    ? _patchMap[AndroidProxySettings$.removeImplicitRules](
+                        this.removeImplicitRules,
+                      )
+                    : (_patchMap[AndroidProxySettings$.removeImplicitRules]
+                          is Patch)
+                    ? _patchMap[AndroidProxySettings$.removeImplicitRules]
+                          .applyTo(this.removeImplicitRules)
+                    : _patchMap[AndroidProxySettings$.removeImplicitRules])
+                as bool?
           : this.removeImplicitRules,
       reverseBypassEnabled:
           _patchMap.containsKey(AndroidProxySettings$.reverseBypassEnabled)
-          ? (_patchMap[AndroidProxySettings$.reverseBypassEnabled] is Function)
-                ? _patchMap[AndroidProxySettings$.reverseBypassEnabled](
-                    this.reverseBypassEnabled,
-                  )
-                : (_patchMap[AndroidProxySettings$.reverseBypassEnabled]
-                      is Patch)
-                ? _patchMap[AndroidProxySettings$.reverseBypassEnabled].applyTo(
-                    this.reverseBypassEnabled,
-                  )
-                : _patchMap[AndroidProxySettings$.reverseBypassEnabled]
+          ? ((_patchMap[AndroidProxySettings$.reverseBypassEnabled] is Function)
+                    ? _patchMap[AndroidProxySettings$.reverseBypassEnabled](
+                        this.reverseBypassEnabled,
+                      )
+                    : (_patchMap[AndroidProxySettings$.reverseBypassEnabled]
+                          is Patch)
+                    ? _patchMap[AndroidProxySettings$.reverseBypassEnabled]
+                          .applyTo(this.reverseBypassEnabled)
+                    : _patchMap[AndroidProxySettings$.reverseBypassEnabled])
+                as bool
           : this.reverseBypassEnabled,
     );
   }
@@ -470,7 +545,8 @@ class AndroidProxySettings {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$AndroidProxySettingsToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

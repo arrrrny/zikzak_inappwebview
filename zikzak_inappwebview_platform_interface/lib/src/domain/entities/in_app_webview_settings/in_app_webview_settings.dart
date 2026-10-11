@@ -8,7 +8,6 @@ import 'package:flutter/widgets.dart';
 import '../../../content_blocker.dart';
 import '../context_menu/context_menu.dart';
 import '../platform_webview_asset_loader/platform_webview_asset_loader.dart';
-import '../platform_webview_feature/platform_webview_feature.dart';
 import '../../../types/android_webview_insets.dart';
 import '../../../types/network_capture_controller.dart';
 import '../../../types/resource_type.dart';
@@ -43,7 +42,7 @@ List<ContentBlocker> _deserializeContentBlockers(
 ) {
   List<ContentBlocker> contentBlockers = [];
   if (contentBlockersMapList != null) {
-    (contentBlockersMapList as List).forEach((contentBlocker) {
+    for (var contentBlocker in (contentBlockersMapList as List)) {
       contentBlockers.add(
         ContentBlocker.fromMap(
           Map<dynamic, Map<dynamic, dynamic>>.from(
@@ -51,7 +50,7 @@ List<ContentBlocker> _deserializeContentBlockers(
           ),
         ),
       );
-    });
+    }
   }
   return contentBlockers;
 }
@@ -119,19 +118,23 @@ abstract class $InAppWebViewSettings {
   bool? get horizontalScrollBarEnabled;
 
   ///List of custom schemes that the WebView must handle. Use the [PlatformWebViewCreationParams.onLoadResourceWithCustomScheme] event to intercept resource requests with custom scheme.
-  @JsonKey(defaultValue: const [])
+  @JsonKey(defaultValue: [])
   List<String>? get resourceCustomSchemes;
 
   ///List of [ContentBlocker] that are a set of rules used to block content in the browser window.
   @JsonKey(
-    defaultValue: const [],
+    defaultValue: [],
     fromJson: _deserializeContentBlockers,
     toJson: _serializeContentBlockers,
   )
   List<ContentBlocker>? get contentBlockers;
 
   ///Sets the content mode that the WebView needs to use when loading and rendering a webpage. The default value is [UserPreferredContentMode.RECOMMENDED].
-  @JsonKey(defaultValue: UserPreferredContentMode.RECOMMENDED)
+  @JsonKey(
+    defaultValue: UserPreferredContentMode.RECOMMENDED,
+    toJson: userPreferredContentModeToWire,
+    fromJson: userPreferredContentModeFromWire,
+  )
   UserPreferredContentMode? get preferredContentMode;
 
   ///Set to `true` to be able to listen at the [PlatformWebViewCreationParams.shouldInterceptAjaxRequest] event.
@@ -165,6 +168,34 @@ abstract class $InAppWebViewSettings {
   ///Set to `true` to open a browser window with incognito mode. The default value is `false`.
   @JsonKey(defaultValue: false)
   bool? get incognito;
+
+  ///Stable identifier for a per-instance, persistent, isolated
+  ///`WKWebsiteDataStore` on iOS 17+ and macOS 14+. When non-null and
+  ///non-empty, the WebView stores cookies, localStorage, IndexedDB and other
+  ///site data at a system location keyed by this identifier, so an account's
+  ///session survives an app relaunch and stays isolated from every other
+  ///account. Null/empty means the default shared store (existing behaviour).
+  ///
+  ///Accepts three input shapes (all deterministic; same identifier reopens
+  ///the same on-disk store):
+  /// * a raw UUID string ("550e8400-e29b-41d4-a716-446655440000"),
+  /// * a 64-char SHA-256 hex string (legacy caller contract; first 32 hex
+  ///   chars are used as the UUID's raw bytes),
+  /// * any other stable string (SHA-256 of its UTF-8 bytes -> first 16
+  ///   bytes used as the UUID's raw bytes).
+  ///
+  ///Mutually exclusive with [incognito]: when both are set, `incognito`
+  ///(non-persistent, wiped on tear-down) takes precedence.
+  ///
+  ///Must be set at construction time — `WKWebViewConfiguration.websiteDataStore`
+  ///is immutable after the `WKWebView` is initialised, so a `setSettings`
+  ///call changing this value has no effect.
+  ///
+  ///Below the iOS 17 / macOS 14 floor, the persistent path is unavailable
+  ///and the WebView falls back to the shared `.default()` store (existing
+  ///behaviour) — no error is surfaced.
+  @JsonKey(includeIfNull: false)
+  String? get persistentStoreIdentifier;
 
   ///Sets whether WebView should use browser caching. The default value is `true`.
   @JsonKey(defaultValue: true)
@@ -248,6 +279,7 @@ abstract class $InAppWebViewSettings {
   bool? get safeBrowsingEnabled;
 
   ///Configures the WebView's behavior when a secure origin attempts to load a resource from an insecure origin.
+  @JsonKey(toJson: mixedContentModeToWire, fromJson: mixedContentModeFromWire)
   MixedContentMode? get mixedContentMode;
 
   ///Enables or disables content URL access within WebView. Content URL access allows WebView to load content from a content provider installed in the system. The default value is `true`.
@@ -269,7 +301,11 @@ abstract class $InAppWebViewSettings {
 
   ///Overrides the way the cache is used. The way the cache is used is based on the navigation type. For a normal page load, the cache is checked and content is re-validated as needed.
   ///When navigating back, content is not revalidated, instead the content is just retrieved from the cache. The default value is [CacheMode.LOAD_DEFAULT].
-  @JsonKey(defaultValue: CacheMode.LOAD_DEFAULT)
+  @JsonKey(
+    defaultValue: CacheMode.LOAD_DEFAULT,
+    toJson: cacheModeToWire,
+    fromJson: cacheModeFromWire,
+  )
   CacheMode? get cacheMode;
 
   ///Sets the cursive font family name. The default value is `"cursive"`.
@@ -289,6 +325,10 @@ abstract class $InAppWebViewSettings {
   String? get defaultTextEncodingName;
 
   ///Disables the action mode menu items according to menuItems flag.
+  @JsonKey(
+    toJson: actionModeMenuItemToWire,
+    fromJson: actionModeMenuItemFromWire,
+  )
   ActionModeMenuItem? get disabledActionModeMenuItems;
 
   ///Sets the fantasy font family name. The default value is `"fantasy"`.
@@ -300,13 +340,19 @@ abstract class $InAppWebViewSettings {
   String? get fixedFontFamily;
 
   ///Set the force dark mode for this WebView. The default value is [ForceDark.OFF].
-  @JsonKey(defaultValue: ForceDark.OFF)
+  @JsonKey(
+    defaultValue: ForceDark.OFF,
+    toJson: forceDarkToWire,
+    fromJson: forceDarkFromWire,
+  )
   ForceDark? get forceDark;
 
   ///Set how WebView content should be darkened.
   ///The default value is [ForceDarkStrategy.PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING].
   @JsonKey(
     defaultValue: ForceDarkStrategy.PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING,
+    toJson: forceDarkStrategyToWire,
+    fromJson: forceDarkStrategyFromWire,
   )
   ForceDarkStrategy? get forceDarkStrategy;
 
@@ -416,7 +462,11 @@ abstract class $InAppWebViewSettings {
   ///Sets the WebView's over-scroll mode.
   ///Setting the over-scroll mode of a WebView will have an effect only if the WebView is capable of scrolling.
   ///The default value is [OverScrollMode.IF_CONTENT_SCROLLS].
-  @JsonKey(defaultValue: OverScrollMode.IF_CONTENT_SCROLLS)
+  @JsonKey(
+    defaultValue: OverScrollMode.IF_CONTENT_SCROLLS,
+    toJson: overScrollModeToWire,
+    fromJson: overScrollModeFromWire,
+  )
   OverScrollMode? get overScrollMode;
 
   ///Informs WebView of the network state.
@@ -429,12 +479,20 @@ abstract class $InAppWebViewSettings {
   ///you can use SCROLLBARS_INSIDE_OVERLAY or SCROLLBARS_INSIDE_INSET. If you want them to appear at the edge of the view, ignoring the padding,
   ///then you can use SCROLLBARS_OUTSIDE_OVERLAY or SCROLLBARS_OUTSIDE_INSET.
   ///The default value is [ScrollBarStyle.SCROLLBARS_INSIDE_OVERLAY].
-  @JsonKey(defaultValue: ScrollBarStyle.SCROLLBARS_INSIDE_OVERLAY)
+  @JsonKey(
+    defaultValue: ScrollBarStyle.SCROLLBARS_INSIDE_OVERLAY,
+    toJson: scrollBarStyleToWire,
+    fromJson: scrollBarStyleFromWire,
+  )
   ScrollBarStyle? get scrollBarStyle;
 
   ///Sets the position of the vertical scroll bar.
   ///The default value is [VerticalScrollbarPosition.SCROLLBAR_POSITION_DEFAULT].
-  @JsonKey(defaultValue: VerticalScrollbarPosition.SCROLLBAR_POSITION_DEFAULT)
+  @JsonKey(
+    defaultValue: VerticalScrollbarPosition.SCROLLBAR_POSITION_DEFAULT,
+    toJson: verticalScrollbarPositionToWire,
+    fromJson: verticalScrollbarPositionFromWire,
+  )
   VerticalScrollbarPosition? get verticalScrollbarPosition;
 
   ///Defines the delay in milliseconds that a scrollbar waits before fade out.
@@ -490,6 +548,67 @@ abstract class $InAppWebViewSettings {
   bool? get paymentRequestEnabled;
 
   ///Sets the Web Authentication support level for the WebView. The default value is [WebAuthenticationSupport.NONE].
+  ///
+  ///Actually applied only on Android (androidx.webkit
+  ///WebViewFeature.WEB_AUTHENTICATION, feature-detected at runtime).
+  ///
+  ///On iOS and macOS the value is **never applied on any OS version**:
+  ///neither platform exposes a `webAuthenticationSupport` key on
+  ///WKWebView / WKWebViewConfiguration. The symbol is absent from every
+  ///WebKit header in the macOS 26.2 SDK, and the runtime guard the apply
+  ///path uses (`responds(to:)`) is false on macOS 15 and on the iOS 26.3
+  ///simulator runtime. Passkey ceremonies inside an Apple WebView are gated
+  ///by the host app's `webcredentials` Associated Domains entitlement plus
+  ///a valid apple-app-site-association file - not by this setting (see
+  ///INSIGHTS.md in the repo).
+  ///
+  ///Other platforms either do not expose a per-WebView WebAuthn toggle
+  ///(Windows/WebView2: WebAuthn is handled by Windows Hello when available)
+  ///or have no public WebAuthn API (Linux/WebKitGTK), so the setting is
+  ///ignored there.
+  ///
+  ///Per-value support matrix (NONE / FOR_APP / FOR_BROWSER by platform):
+  ///
+  ///| Value        | Android | iOS | macOS | Windows | Linux | Web |
+  ///|--------------|---------|-----|-------|---------|-------|-----|
+  ///| `NONE`       | applied | applied | applied | ignored | ignored | ignored |
+  ///| `FOR_APP`    | applied | **never applied** - warns at creation, reads back as `NONE` | **never applied** - warns at creation, reads back as `NONE` | ignored | ignored | ignored |
+  ///| `FOR_BROWSER`| applied | **never applied** - warns at creation, reads back as `NONE` | **never applied** - warns at creation, reads back as `NONE` | ignored | ignored | ignored |
+  ///
+  ///"applied" means the value reaches the platform WebView (Android:
+  ///`WebSettingsCompat.setWebAuthenticationSupport`, feature-detected at
+  ///runtime). "ignored" means no platform code reads the value at all.
+  ///`NONE` counts as applied everywhere because there is nothing to apply.
+  ///
+  ///No Apple platform has a browser-mode WebAuthn surface: Apple gives
+  ///third-party apps no passkey path for arbitrary relying parties inside a
+  ///WebView, so neither non-`NONE` level can be honored there by any
+  ///implementation.
+  ///
+  ///Notes:
+  ///- On iOS and macOS the apply attempt happens only once, at WebView
+  ///  creation (the underlying WKWebViewConfiguration is immutable after
+  ///  init); changing the value later through setSettings is a no-op and
+  ///  logs a native warning.
+  ///- On iOS and macOS, requesting a non-`NONE` level logs a native warning
+  ///  at WebView creation instead of being dropped silently, and
+  ///  getRealSettings reports the APPLIED level only: such a WebView reads
+  ///  back as `NONE`, which means "no passkeys are enabled via this
+  ///  setting", not that the requested level was applied.
+  ///- On Android, getSettings returns `null` for this setting when the
+  ///  installed WebView does not support `WebViewFeature.WEB_AUTHENTICATION`
+  ///  or the OEM WebView wrapper rejects the call.
+  ///- WebAuthn ceremonies require a user gesture (for example a sign-in
+  ///  button tap) inside the WebView.
+  ///- On Android, getSettings returns `null` for this setting when the
+  ///  installed WebView does not support `WebViewFeature.WEB_AUTHENTICATION`
+  ///  or the OEM WebView wrapper rejects the call.
+  ///- WebAuthn ceremonies require a user gesture (for example a sign-in
+  ///  button tap) inside the WebView.
+  @JsonKey(
+    toJson: webAuthenticationSupportToWire,
+    fromJson: webAuthenticationSupportFromWire,
+  )
   WebAuthenticationSupport? get webAuthenticationSupport;
 
   ///Sets whether EnterpriseAuthenticationAppLinkPolicy if set by admin is allowed to have any
@@ -905,6 +1024,15 @@ abstract class $InAppWebViewSettings {
   @JsonKey(defaultValue: false)
   bool? get dismissDialogues;
 
+  ///When `false`, the console override script is not injected and
+  ///console.log/error/warn messages are NOT forwarded to Dart.
+  ///Set to `false` in apps that don't need console messages to reduce
+  ///bridge traffic and avoid WebKit SIGSEGV on non-cloneable objects.
+  ///
+  ///The default value is `true`.
+  @JsonKey(defaultValue: true)
+  bool? get consoleLogEnabled;
+
   ///Which window insets the Android WebView should **ignore** when laying out
   ///web content, so that content can render edge-to-edge behind the status bar,
   ///navigation bar, IME (keyboard), display cutout and/or system-gesture areas.
@@ -971,7 +1099,7 @@ abstract class $InAppWebViewSettings {
   ///Patterns are interpreted according to [networkCaptureUrlPatternType].
   ///
   ///The default value is an empty list (capture all).
-  @JsonKey(defaultValue: const [])
+  @JsonKey(defaultValue: [])
   List<String>? get networkCaptureUrlPatterns;
 
   ///How [networkCaptureUrlPatterns] are interpreted.
@@ -995,7 +1123,7 @@ abstract class $InAppWebViewSettings {
   ///response metadata is still reported; only the body is discarded.
   ///
   ///The default value is an empty list (capture all bodies).
-  @JsonKey(defaultValue: const [])
+  @JsonKey(defaultValue: [])
   List<String>? get networkCaptureMimeTypes;
 
   ///A [NetworkCaptureController] that accumulates all captured

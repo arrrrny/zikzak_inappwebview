@@ -38,6 +38,30 @@ class RequestFocusNodeHrefResult {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  RequestFocusNodeHrefResult copyWithField<T>(
+    Field<RequestFocusNodeHrefResult, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'url':
+        return copyWith(url: value as WebUri?);
+      case 'title':
+        return copyWith(title: value as String?);
+      case 'src':
+        return copyWith(src: value as String?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'RequestFocusNodeHrefResult has no settable field with this name',
+        );
+    }
+  }
+
   RequestFocusNodeHrefResult copyWithRequestFocusNodeHrefResult({
     WebUri? url,
     String? title,
@@ -53,27 +77,34 @@ class RequestFocusNodeHrefResult {
     final _patchMap = _patcher.patchMap;
     return RequestFocusNodeHrefResult(
       url: _patchMap.containsKey(RequestFocusNodeHrefResult$.url)
-          ? (_patchMap[RequestFocusNodeHrefResult$.url] is Function)
-                ? _patchMap[RequestFocusNodeHrefResult$.url](this.url)
-                : (_patchMap[RequestFocusNodeHrefResult$.url] is Patch)
-                ? _patchMap[RequestFocusNodeHrefResult$.url].applyTo(this.url)
-                : _patchMap[RequestFocusNodeHrefResult$.url]
+          ? ((_patchMap[RequestFocusNodeHrefResult$.url] is Function)
+                    ? _patchMap[RequestFocusNodeHrefResult$.url](this.url)
+                    : (_patchMap[RequestFocusNodeHrefResult$.url] is Patch)
+                    ? _patchMap[RequestFocusNodeHrefResult$.url].applyTo(
+                        this.url,
+                      )
+                    : _patchMap[RequestFocusNodeHrefResult$.url])
+                as WebUri?
           : this.url,
       title: _patchMap.containsKey(RequestFocusNodeHrefResult$.title)
-          ? (_patchMap[RequestFocusNodeHrefResult$.title] is Function)
-                ? _patchMap[RequestFocusNodeHrefResult$.title](this.title)
-                : (_patchMap[RequestFocusNodeHrefResult$.title] is Patch)
-                ? _patchMap[RequestFocusNodeHrefResult$.title].applyTo(
-                    this.title,
-                  )
-                : _patchMap[RequestFocusNodeHrefResult$.title]
+          ? ((_patchMap[RequestFocusNodeHrefResult$.title] is Function)
+                    ? _patchMap[RequestFocusNodeHrefResult$.title](this.title)
+                    : (_patchMap[RequestFocusNodeHrefResult$.title] is Patch)
+                    ? _patchMap[RequestFocusNodeHrefResult$.title].applyTo(
+                        this.title,
+                      )
+                    : _patchMap[RequestFocusNodeHrefResult$.title])
+                as String?
           : this.title,
       src: _patchMap.containsKey(RequestFocusNodeHrefResult$.src)
-          ? (_patchMap[RequestFocusNodeHrefResult$.src] is Function)
-                ? _patchMap[RequestFocusNodeHrefResult$.src](this.src)
-                : (_patchMap[RequestFocusNodeHrefResult$.src] is Patch)
-                ? _patchMap[RequestFocusNodeHrefResult$.src].applyTo(this.src)
-                : _patchMap[RequestFocusNodeHrefResult$.src]
+          ? ((_patchMap[RequestFocusNodeHrefResult$.src] is Function)
+                    ? _patchMap[RequestFocusNodeHrefResult$.src](this.src)
+                    : (_patchMap[RequestFocusNodeHrefResult$.src] is Patch)
+                    ? _patchMap[RequestFocusNodeHrefResult$.src].applyTo(
+                        this.src,
+                      )
+                    : _patchMap[RequestFocusNodeHrefResult$.src])
+                as String?
           : this.src,
     );
   }
@@ -104,7 +135,8 @@ class RequestFocusNodeHrefResult {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$RequestFocusNodeHrefResultToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

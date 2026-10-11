@@ -37,6 +37,28 @@ class RendererPriorityPolicy {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  RendererPriorityPolicy copyWithField<T>(
+    Field<RendererPriorityPolicy, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'rendererRequestedPriority':
+        return copyWith(rendererRequestedPriority: value as RendererPriority?);
+      case 'waivedWhenNotVisible':
+        return copyWith(waivedWhenNotVisible: value as bool);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'RendererPriorityPolicy has no settable field with this name',
+        );
+    }
+  }
+
   RendererPriorityPolicy copyWithRendererPriorityPolicy({
     RendererPriority? rendererRequestedPriority,
     bool? waivedWhenNotVisible,
@@ -57,29 +79,35 @@ class RendererPriorityPolicy {
           _patchMap.containsKey(
             RendererPriorityPolicy$.rendererRequestedPriority,
           )
-          ? (_patchMap[RendererPriorityPolicy$.rendererRequestedPriority]
-                    is Function)
-                ? _patchMap[RendererPriorityPolicy$.rendererRequestedPriority](
-                    this.rendererRequestedPriority,
-                  )
-                : (_patchMap[RendererPriorityPolicy$.rendererRequestedPriority]
-                      is Patch)
-                ? _patchMap[RendererPriorityPolicy$.rendererRequestedPriority]
-                      .applyTo(this.rendererRequestedPriority)
-                : _patchMap[RendererPriorityPolicy$.rendererRequestedPriority]
+          ? ((_patchMap[RendererPriorityPolicy$.rendererRequestedPriority]
+                        is Function)
+                    ? _patchMap[RendererPriorityPolicy$
+                          .rendererRequestedPriority](
+                        this.rendererRequestedPriority,
+                      )
+                    : (_patchMap[RendererPriorityPolicy$
+                              .rendererRequestedPriority]
+                          is Patch)
+                    ? _patchMap[RendererPriorityPolicy$
+                              .rendererRequestedPriority]
+                          .applyTo(this.rendererRequestedPriority)
+                    : _patchMap[RendererPriorityPolicy$
+                          .rendererRequestedPriority])
+                as RendererPriority?
           : this.rendererRequestedPriority,
       waivedWhenNotVisible:
           _patchMap.containsKey(RendererPriorityPolicy$.waivedWhenNotVisible)
-          ? (_patchMap[RendererPriorityPolicy$.waivedWhenNotVisible]
-                    is Function)
-                ? _patchMap[RendererPriorityPolicy$.waivedWhenNotVisible](
-                    this.waivedWhenNotVisible,
-                  )
-                : (_patchMap[RendererPriorityPolicy$.waivedWhenNotVisible]
-                      is Patch)
-                ? _patchMap[RendererPriorityPolicy$.waivedWhenNotVisible]
-                      .applyTo(this.waivedWhenNotVisible)
-                : _patchMap[RendererPriorityPolicy$.waivedWhenNotVisible]
+          ? ((_patchMap[RendererPriorityPolicy$.waivedWhenNotVisible]
+                        is Function)
+                    ? _patchMap[RendererPriorityPolicy$.waivedWhenNotVisible](
+                        this.waivedWhenNotVisible,
+                      )
+                    : (_patchMap[RendererPriorityPolicy$.waivedWhenNotVisible]
+                          is Patch)
+                    ? _patchMap[RendererPriorityPolicy$.waivedWhenNotVisible]
+                          .applyTo(this.waivedWhenNotVisible)
+                    : _patchMap[RendererPriorityPolicy$.waivedWhenNotVisible])
+                as bool
           : this.waivedWhenNotVisible,
     );
   }
@@ -110,7 +138,8 @@ class RendererPriorityPolicy {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$RendererPriorityPolicyToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

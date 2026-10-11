@@ -1,0 +1,1 @@
+../../../.specify/extensions/tdd/.specify-dev/agent-commands/claude/speckit-tdd-plan/SKILL.md

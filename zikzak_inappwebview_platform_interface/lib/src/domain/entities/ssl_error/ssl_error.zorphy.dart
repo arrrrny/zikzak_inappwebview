@@ -24,6 +24,25 @@ class SslError {
     return SslError(code: code ?? this.code, message: message ?? this.message);
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  SslError copyWithField<T>(Field<SslError, T> field, T value) {
+    switch (field.name) {
+      case 'code':
+        return copyWith(code: value as SslErrorType?);
+      case 'message':
+        return copyWith(message: value as String?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'SslError has no settable field with this name',
+        );
+    }
+  }
+
   SslError copyWithSslError({SslErrorType? code, String? message}) {
     return copyWith(code: code, message: message);
   }
@@ -33,18 +52,20 @@ class SslError {
     final _patchMap = _patcher.patchMap;
     return SslError(
       code: _patchMap.containsKey(SslError$.code)
-          ? (_patchMap[SslError$.code] is Function)
-                ? _patchMap[SslError$.code](this.code)
-                : (_patchMap[SslError$.code] is Patch)
-                ? _patchMap[SslError$.code].applyTo(this.code)
-                : _patchMap[SslError$.code]
+          ? ((_patchMap[SslError$.code] is Function)
+                    ? _patchMap[SslError$.code](this.code)
+                    : (_patchMap[SslError$.code] is Patch)
+                    ? _patchMap[SslError$.code].applyTo(this.code)
+                    : _patchMap[SslError$.code])
+                as SslErrorType?
           : this.code,
       message: _patchMap.containsKey(SslError$.message)
-          ? (_patchMap[SslError$.message] is Function)
-                ? _patchMap[SslError$.message](this.message)
-                : (_patchMap[SslError$.message] is Patch)
-                ? _patchMap[SslError$.message].applyTo(this.message)
-                : _patchMap[SslError$.message]
+          ? ((_patchMap[SslError$.message] is Function)
+                    ? _patchMap[SslError$.message](this.message)
+                    : (_patchMap[SslError$.message] is Patch)
+                    ? _patchMap[SslError$.message].applyTo(this.message)
+                    : _patchMap[SslError$.message])
+                as String?
           : this.message,
     );
   }
@@ -67,7 +88,8 @@ class SslError {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$SslErrorToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

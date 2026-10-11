@@ -1,0 +1,50 @@
+# GYM artifact — package-level exercises for zikzak_inappwebview.
+# See github.com/arrrrny/gym for the paradigm,
+#     github.com/arrrrny/miki (gym.mjs) for the runner that consumes this file.
+#
+# Mirrors the package-level gym.yaml shape established in
+# github.com/arrrrny/zuraffa (.gym/gym.yaml) so the miki GYM runner can
+# consume this package without code changes (spec 022 / issue #397).
+#
+# A gym is a folder of exercises with two phases:
+#   WARMUP    — mandatory reps that build reflex. No reps, no phase 2.
+#   EXERCISES — graded work that proves the muscle under real load.
+# The gate only lets the proven through. A mis-fire is a DROP CARD.
+name: zikzak_inappwebview
+version: 1.0.0
+warmup:
+  - id: 01-deps
+    name: Resolve the federated plugin dependencies (flutter pub get)
+    command: dart run .gym/warmup/01-deps.dart
+  - id: 02-build
+    name: Compile the plugin (analyze, zero errors)
+    command: dart run .gym/warmup/02-build.dart
+  - id: 03-bridge-smoke
+    name: JS bridge smoke call through the public controller API
+    command: flutter test .gym/warmup/03-bridge-smoke_test.dart
+exercises:
+  - id: js-bridge-round-trip
+    brief: |
+      A genuine dev task (spec 022 / issue #397), not a re-skinned unit
+      test — the headless form of "boot a WebView and drive its JS
+      bridge". Boots an InAppWebViewController on a faked platform (the
+      repo's established platform-interface fake pattern), registers a
+      Dart-side JavaScript handler through the public
+      `JavaScriptController` facade, dispatches a call into it the way
+      the native bridge does (`window.zikzak_inappwebview.callHandler`),
+      and asserts the full message round-trip: the arguments cross the
+      bridge unchanged, the handler's return value crosses back, and the
+      JS evaluation surface (`evaluateJavascript`) records exactly what
+      was sent. Proves the bridge contract an operator actually codes
+      against. Grading is exit-code based (flutter test); the fixture
+      fails the run (and the convention points at a DROP CARD for
+      mis-fires — github.com/arrrrny/drop-card).
+    setup: |
+      Ensure `flutter` is on PATH (the federated plugin and its tests
+      resolve through the Flutter tool; the rep fails fast with a clear
+      setup error when it is not).
+      Run the warmup reps first (.gym/warmup/*).
+      The exercise runs in-process on a faked platform — no emulator, no
+      device, no network. It never mutates the plugin source tree.
+    verifyCommand: flutter test .gym/exercises/js_bridge_round_trip_test.dart
+    evaluate: exit 0 => pass; exit !=0 => fail

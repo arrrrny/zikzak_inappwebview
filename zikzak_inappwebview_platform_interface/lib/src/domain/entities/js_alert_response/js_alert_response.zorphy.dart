@@ -53,6 +53,29 @@ class JsAlertResponse {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  JsAlertResponse copyWithField<T>(Field<JsAlertResponse, T> field, T value) {
+    switch (field.name) {
+      case 'message':
+        return copyWith(message: value as String);
+      case 'confirmButtonTitle':
+        return copyWith(confirmButtonTitle: value as String);
+      case 'handledByClient':
+        return copyWith(handledByClient: value as bool);
+      case 'action':
+        return copyWith(action: value as JsAlertResponseAction?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'JsAlertResponse has no settable field with this name',
+        );
+    }
+  }
+
   JsAlertResponse copyWithJsAlertResponse({
     String? message,
     String? confirmButtonTitle,
@@ -72,41 +95,45 @@ class JsAlertResponse {
     final _patchMap = _patcher.patchMap;
     return JsAlertResponse(
       message: _patchMap.containsKey(JsAlertResponse$.message)
-          ? (_patchMap[JsAlertResponse$.message] is Function)
-                ? _patchMap[JsAlertResponse$.message](this.message)
-                : (_patchMap[JsAlertResponse$.message] is Patch)
-                ? _patchMap[JsAlertResponse$.message].applyTo(this.message)
-                : _patchMap[JsAlertResponse$.message]
+          ? ((_patchMap[JsAlertResponse$.message] is Function)
+                    ? _patchMap[JsAlertResponse$.message](this.message)
+                    : (_patchMap[JsAlertResponse$.message] is Patch)
+                    ? _patchMap[JsAlertResponse$.message].applyTo(this.message)
+                    : _patchMap[JsAlertResponse$.message])
+                as String
           : this.message,
       confirmButtonTitle:
           _patchMap.containsKey(JsAlertResponse$.confirmButtonTitle)
-          ? (_patchMap[JsAlertResponse$.confirmButtonTitle] is Function)
-                ? _patchMap[JsAlertResponse$.confirmButtonTitle](
-                    this.confirmButtonTitle,
-                  )
-                : (_patchMap[JsAlertResponse$.confirmButtonTitle] is Patch)
-                ? _patchMap[JsAlertResponse$.confirmButtonTitle].applyTo(
-                    this.confirmButtonTitle,
-                  )
-                : _patchMap[JsAlertResponse$.confirmButtonTitle]
+          ? ((_patchMap[JsAlertResponse$.confirmButtonTitle] is Function)
+                    ? _patchMap[JsAlertResponse$.confirmButtonTitle](
+                        this.confirmButtonTitle,
+                      )
+                    : (_patchMap[JsAlertResponse$.confirmButtonTitle] is Patch)
+                    ? _patchMap[JsAlertResponse$.confirmButtonTitle].applyTo(
+                        this.confirmButtonTitle,
+                      )
+                    : _patchMap[JsAlertResponse$.confirmButtonTitle])
+                as String
           : this.confirmButtonTitle,
       handledByClient: _patchMap.containsKey(JsAlertResponse$.handledByClient)
-          ? (_patchMap[JsAlertResponse$.handledByClient] is Function)
-                ? _patchMap[JsAlertResponse$.handledByClient](
-                    this.handledByClient,
-                  )
-                : (_patchMap[JsAlertResponse$.handledByClient] is Patch)
-                ? _patchMap[JsAlertResponse$.handledByClient].applyTo(
-                    this.handledByClient,
-                  )
-                : _patchMap[JsAlertResponse$.handledByClient]
+          ? ((_patchMap[JsAlertResponse$.handledByClient] is Function)
+                    ? _patchMap[JsAlertResponse$.handledByClient](
+                        this.handledByClient,
+                      )
+                    : (_patchMap[JsAlertResponse$.handledByClient] is Patch)
+                    ? _patchMap[JsAlertResponse$.handledByClient].applyTo(
+                        this.handledByClient,
+                      )
+                    : _patchMap[JsAlertResponse$.handledByClient])
+                as bool
           : this.handledByClient,
       action: _patchMap.containsKey(JsAlertResponse$.action)
-          ? (_patchMap[JsAlertResponse$.action] is Function)
-                ? _patchMap[JsAlertResponse$.action](this.action)
-                : (_patchMap[JsAlertResponse$.action] is Patch)
-                ? _patchMap[JsAlertResponse$.action].applyTo(this.action)
-                : _patchMap[JsAlertResponse$.action]
+          ? ((_patchMap[JsAlertResponse$.action] is Function)
+                    ? _patchMap[JsAlertResponse$.action](this.action)
+                    : (_patchMap[JsAlertResponse$.action] is Patch)
+                    ? _patchMap[JsAlertResponse$.action].applyTo(this.action)
+                    : _patchMap[JsAlertResponse$.action])
+                as JsAlertResponseAction?
           : this.action,
     );
   }
@@ -145,7 +172,8 @@ class JsAlertResponse {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$JsAlertResponseToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

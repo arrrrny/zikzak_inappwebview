@@ -20,10 +20,7 @@ void main() {
     });
 
     test('toJson emits the fork wire format (int action)', () {
-      final r = JsAlertResponse(
-        message: 'hello',
-        handledByClient: true,
-      );
+      final r = JsAlertResponse(message: 'hello', handledByClient: true);
       expect(r.toJson(), {
         'message': 'hello',
         'confirmButtonTitle': '',

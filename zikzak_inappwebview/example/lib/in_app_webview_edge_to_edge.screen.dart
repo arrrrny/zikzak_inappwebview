@@ -31,19 +31,18 @@ class _InAppWebViewEdgeToEdgeExampleScreenState
   // The insets the WebView should ignore when edge-to-edge is on. These mirror
   // `webview_flutter_android`'s `AndroidWebViewInsets` plus `displayCutout`.
   List<AndroidWebViewInsets> get _ignoredInsets => [
-        AndroidWebViewInsets.systemBars,
-        AndroidWebViewInsets.displayCutout,
-        AndroidWebViewInsets.ime,
-      ];
+    AndroidWebViewInsets.systemBars,
+    AndroidWebViewInsets.displayCutout,
+    AndroidWebViewInsets.ime,
+  ];
 
   InAppWebViewSettings get _settings => InAppWebViewSettings(
-        javaScriptEnabled: true,
-        domStorageEnabled: true,
-        // Tell the WebView to render behind the status bar, navigation bar,
-        // cutout and IME instead of being inset by them.
-        insetsForWebContentToIgnore:
-            _edgeToEdge ? _ignoredInsets : const [],
-      );
+    javaScriptEnabled: true,
+    domStorageEnabled: true,
+    // Tell the WebView to render behind the status bar, navigation bar,
+    // cutout and IME instead of being inset by them.
+    insetsForWebContentToIgnore: _edgeToEdge ? _ignoredInsets : const [],
+  );
 
   Future<void> _toggleEdgeToEdge(bool value) async {
     setState(() => _edgeToEdge = value);
@@ -57,10 +56,7 @@ class _InAppWebViewEdgeToEdgeExampleScreenState
       appBar: AppBar(
         title: const Text('Edge-to-edge WebView'),
         actions: [
-          Switch(
-            value: _edgeToEdge,
-            onChanged: _toggleEdgeToEdge,
-          ),
+          Switch(value: _edgeToEdge, onChanged: _toggleEdgeToEdge),
           const SizedBox(width: 12),
         ],
       ),
@@ -71,17 +67,16 @@ class _InAppWebViewEdgeToEdgeExampleScreenState
             child: Text(
               _edgeToEdge
                   ? 'Edge-to-edge ON: web content renders behind the status '
-                      'bar, navigation bar, cutout and IME.'
+                        'bar, navigation bar, cutout and IME.'
                   : 'Edge-to-edge OFF: the WebView is inset by the system '
-                      'bars / IME (default Android behavior).',
+                        'bars / IME (default Android behavior).',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
           ),
           Expanded(
             child: InAppWebView(
               key: _webViewKey,
-              initialUrlRequest:
-                  URLRequest(url: WebUri('https://flutter.dev')),
+              initialUrlRequest: URLRequest(url: WebUri('https://flutter.dev')),
               initialSettings: _settings,
               onWebViewCreated: (controller) {
                 _webViewController = controller;

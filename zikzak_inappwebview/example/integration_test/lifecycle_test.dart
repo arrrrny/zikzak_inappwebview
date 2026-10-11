@@ -26,6 +26,13 @@ void main() {
       MaterialApp(
         home: Scaffold(
           body: InAppWebView(
+            // A unique key forces the element (and thus the native
+            // AppKitView/AndroidView platform view) to be recreated on every
+            // pump. Without it, reassemble() reuses the existing element via
+            // canUpdate() and onWebViewCreated never fires a second time, which
+            // does not faithfully simulate a hot restart on desktop. This matches
+            // how a real hot restart recreates the widget tree.
+            key: UniqueKey(),
             onWebViewCreated: (c) {
               if (!created.isCompleted) {
                 created.complete(c);
@@ -41,14 +48,15 @@ void main() {
       ),
     );
     final controller = await created.future.timeout(
-      const Duration(seconds: 15),
+      const Duration(seconds: 120),
     );
     await controller.loadData(
       data: '<html><body><h1>lifecycle</h1></body></html>',
     );
     // No onTimeout fallback: a page that never finishes loading must fail
-    // the test instead of being silently swallowed.
-    await pageLoaded.future.timeout(const Duration(seconds: 15));
+    // the test instead of being silently swallowed. Bumped from 15s to 120s
+    // for the slow 2019 Intel Mac (see FirstLoadRaceScreen readiness notes).
+    await pageLoaded.future.timeout(const Duration(seconds: 120));
     await tester.pumpAndSettle();
     return controller;
   }

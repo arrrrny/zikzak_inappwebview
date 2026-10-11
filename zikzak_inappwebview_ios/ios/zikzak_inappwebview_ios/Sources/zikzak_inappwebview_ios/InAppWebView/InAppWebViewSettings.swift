@@ -30,6 +30,12 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     var interceptOnlyAsyncAjaxRequests = true
     var useShouldInterceptFetchRequest = false
     var incognito = false
+    /// Stable identifier for a per-instance persistent WKWebsiteDataStore
+    /// (iOS 17+/macOS 14+). Mirrors the Dart-side field; populated from
+    /// the JSON dict by ISettings.parse via KVC. Mutually exclusive with
+    /// `incognito`; init-time-only — websiteDataStore is immutable after
+    /// the WKWebView is created.
+    var persistentStoreIdentifier: String? = nil
     var cacheEnabled = true
     var transparentBackground = false
     var disableVerticalScroll = false
@@ -92,13 +98,103 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     var shouldPrintBackgrounds = false
     var webAuthenticationSupport = 0
     var dismissDialogues = true
+    var consoleLogEnabled = true
 
     override init() {
         super.init()
     }
 
+    // MARK: - Enum wire-name helpers
+    // The Dart surface serializes InAppWebViewSettings enums as String names
+    // (see the generated EnumMaps). Native WebKit exposes them as Int rawValues,
+    // so we translate in both directions.
+
+    private func preferredContentModeName(_ rawValue: Int) -> String {
+        switch rawValue {
+        case 1: return "MOBILE"
+        case 2: return "DESKTOP"
+        default: return "RECOMMENDED"
+        }
+    }
+
+    private func selectionGranularityName(_ rawValue: Int) -> String {
+        switch rawValue {
+        case 1: return "CHARACTER"
+        default: return "DYNAMIC"
+        }
+    }
+
+    private func contentInsetAdjustmentBehaviorName(_ rawValue: Int) -> String {
+        switch rawValue {
+        case 1: return "SCROLLABLE_AXES"
+        case 2: return "NEVER"
+        case 3: return "ALWAYS"
+        default: return "AUTOMATIC"
+        }
+    }
+
+    private func webAuthenticationSupportName(_ rawValue: Int) -> String {
+        switch rawValue {
+        case 1: return "FOR_APP"
+        case 2: return "FOR_BROWSER"
+        default: return "NONE"
+        }
+    }
+
+    private func preferredContentModeRawValue(_ name: String?) -> Int {
+        switch name {
+        case "MOBILE": return 1
+        case "DESKTOP": return 2
+        default: return 0
+        }
+    }
+
+    private func selectionGranularityRawValue(_ name: String?) -> Int {
+        switch name {
+        case "CHARACTER": return 1
+        default: return 0
+        }
+    }
+
+    private func contentInsetAdjustmentBehaviorRawValue(_ name: String?) -> Int {
+        switch name {
+        case "SCROLLABLE_AXES": return 1
+        case "NEVER": return 2
+        case "ALWAYS": return 3
+        default: return 0
+        }
+    }
+
+    private func webAuthenticationSupportRawValue(_ name: String?) -> Int {
+        switch name {
+        case "FOR_BROWSER": return 2
+        case "FOR_APP": return 1
+        default: return 0
+        }
+    }
+
     override func parse(settings: [String: Any?]) -> InAppWebViewSettings {
         var settings = settings  // re-assing to be able to use removeValue
+        // Translate enum String wire names coming from the Dart surface back to
+        // the Int rawValues the WebKit properties expect. Legacy Int values are
+        // passed through unchanged.
+        let enumHandlers: [(String, (String?) -> Int)] = [
+            ("preferredContentMode", preferredContentModeRawValue),
+            ("selectionGranularity", selectionGranularityRawValue),
+            ("contentInsetAdjustmentBehavior", contentInsetAdjustmentBehaviorRawValue),
+            ("webAuthenticationSupport", webAuthenticationSupportRawValue),
+        ]
+        for (key, converter) in enumHandlers {
+            if let value = settings[key] {
+                if let name = value as? String {
+                    settings[key] = converter(name)
+                } else if !(value is NSNull), value != nil {
+                    // keep non-String, non-null values (e.g. legacy Int) as-is
+                } else {
+                    settings.removeValue(forKey: key)
+                }
+            }
+        }
         if let minimumViewportInsetMap = settings["minimumViewportInset"] as? [String: Double] {
             minimumViewportInset = UIEdgeInsets.fromMap(map: minimumViewportInsetMap)
             settings.removeValue(forKey: "minimumViewportInset")
@@ -220,14 +316,53 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
                 let selector = Selector(("webAuthenticationSupport"))
                 if configuration.responds(to: selector),
                     let webAuthSupport = configuration.perform(selector)?.takeUnretainedValue()
-                        as? NSObject
+                        as? NSObject,
+                    webAuthSupport.responds(to: Selector(("boundKeychainForPasskeys")))
                 {
+                    // value(forKey:) throws an uncatchable NSUnknownKeyException
+                    // when the key is missing — the responds(to:) guard above keeps
+                    // getRealSettings() crash-proof on unexpected SDK states.
                     let boundValue =
                         webAuthSupport.value(forKey: "boundKeychainForPasskeys") as? Bool ?? false
+                    // Reports the APPLIED boundKeychain flag only. No iOS
+                    // version applies either non-NONE level — FOR_APP and
+                    // FOR_BROWSER both fall through — so in practice the else
+                    // arm below is what runs. A read-back of NONE means "no
+                    // passkeys are enabled via this setting", not "FOR_BROWSER
+                    // was requested" (issue #352).
                     realSettings["webAuthenticationSupport"] = boundValue ? 1 : 0
+                } else {
+                    // realSettings is seeded from toMap(), so a skipped mirror
+                    // leaves the *requested* level echoed back — a WebView that
+                    // was never configured would claim FOR_APP or FOR_BROWSER.
+                    // No iOS version applies a non-NONE level, so NONE is the
+                    // only honest answer. The creation-time path logs a native
+                    // warning for the dropped request (issue #352).
+                    realSettings["webAuthenticationSupport"] = 0
                 }
+            } else {
+                // iOS 16.3 and older sit below the availability gate, so the
+                // read-back mirror inside it never runs there — realSettings
+                // would echo the requested level out of toMap(). Nothing can
+                // be applied below 16.4, so NONE is the only honest answer
+                // (issue #352).
+                realSettings["webAuthenticationSupport"] = 0
             }
         }
+
+        // Translate the four enum fields from WebKit Int rawValues back to the
+        // String wire names the Dart surface expects (see the generated
+        // EnumMaps). The Dart `fromMap` rebuilds enums via the EnumMap, so a raw
+        // Int here would fail to round-trip.
+        realSettings["preferredContentMode"] = preferredContentModeName(
+            realSettings["preferredContentMode"] as? Int ?? 0)
+        realSettings["selectionGranularity"] = selectionGranularityName(
+            realSettings["selectionGranularity"] as? Int ?? 0)
+        realSettings["contentInsetAdjustmentBehavior"] = contentInsetAdjustmentBehaviorName(
+            realSettings["contentInsetAdjustmentBehavior"] as? Int ?? 0)
+        realSettings["webAuthenticationSupport"] = webAuthenticationSupportName(
+            realSettings["webAuthenticationSupport"] as? Int ?? 0)
+
         return realSettings
     }
 }

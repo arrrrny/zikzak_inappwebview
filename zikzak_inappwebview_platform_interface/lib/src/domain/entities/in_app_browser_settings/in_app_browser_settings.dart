@@ -52,13 +52,9 @@ class InAppBrowserClassSettings {
     Map<String, dynamic> settings, {
     InAppBrowserClassSettings? instance,
   }) {
-    if (instance == null) {
-      instance = InAppBrowserClassSettings();
-    }
-    instance.browserSettings =
-        InAppBrowserSettings.fromJson(settings) ?? InAppBrowserSettings();
-    instance.webViewSettings =
-        InAppWebViewSettings.fromJson(settings) ?? InAppWebViewSettings();
+    instance ??= InAppBrowserClassSettings();
+    instance.browserSettings = InAppBrowserSettings.fromJson(settings);
+    instance.webViewSettings = InAppWebViewSettings.fromJson(settings);
     return instance;
   }
 

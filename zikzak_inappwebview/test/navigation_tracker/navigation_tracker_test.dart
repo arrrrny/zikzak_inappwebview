@@ -18,20 +18,20 @@ void main() {
     });
 
     test('trigger names match contract', () {
-      expect(
-        UrlCycleTrigger.values.map((e) => e.name),
-        ['loadStart', 'visitedHistory', 'jsHistory', 'redirect', 'userOverride'],
-      );
+      expect(UrlCycleTrigger.values.map((e) => e.name), [
+        'loadStart',
+        'visitedHistory',
+        'jsHistory',
+        'redirect',
+        'userOverride',
+      ]);
     });
   });
 
   group('NavigationTracker', () {
     test('maybeCreate returns a tracker', () {
       expect(NavigationTracker.maybeCreate(), isNotNull);
-      expect(
-        NavigationTracker.maybeCreate(onUrlCycleEntry: (_) {}),
-        isNotNull,
-      );
+      expect(NavigationTracker.maybeCreate(onUrlCycleEntry: (_) {}), isNotNull);
     });
 
     test('mergeUserScripts returns null-safe results', () {
@@ -159,9 +159,7 @@ void main() {
 
     test('handleJsPayload classifies jsHistory and reports main frame', () {
       final seen = <UrlCycleEntry>[];
-      final tracker = NavigationTracker.maybeCreate(
-        onUrlCycleEntry: seen.add,
-      )!;
+      final tracker = NavigationTracker.maybeCreate(onUrlCycleEntry: seen.add)!;
       tracker.handleJsPayload({
         'url': 'https://example.com/spa/route',
         'trigger': 'jsHistory',

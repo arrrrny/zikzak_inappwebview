@@ -32,6 +32,10 @@ import '../web_storage/web_storage.dart';
 
 import 'headless_in_app_webview.dart';
 import '_static_channel.dart';
+import 'modules/android_navigation_delegate.dart';
+import 'modules/android_javascript_delegate.dart';
+import 'modules/android_cookie_delegate.dart';
+import 'modules/android_settings_delegate.dart';
 
 import '../print_job/main.dart';
 
@@ -110,6 +114,30 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
 
   @override
   late AndroidWebStorage webStorage;
+
+  // Domain-specific delegate singletons (issue #229, P3). Lazily
+  // instantiated on first access; forwarding facades over the existing
+  // controller methods — behavior is identical to calling the controller.
+  AndroidNavigationDelegate? _navigationDelegate;
+  AndroidJavaScriptDelegate? _javaScriptDelegate;
+  AndroidCookieDelegate? _cookieDelegate;
+  AndroidSettingsDelegate? _settingsDelegate;
+
+  @override
+  AndroidNavigationDelegate? get navigationDelegate =>
+      _navigationDelegate ??= AndroidNavigationDelegate(this);
+
+  @override
+  AndroidJavaScriptDelegate? get javaScriptDelegate =>
+      _javaScriptDelegate ??= AndroidJavaScriptDelegate(this);
+
+  @override
+  AndroidCookieDelegate? get cookieDelegate =>
+      _cookieDelegate ??= AndroidCookieDelegate(this);
+
+  @override
+  AndroidSettingsDelegate? get settingsDelegate =>
+      _settingsDelegate ??= AndroidSettingsDelegate(this);
 
   AndroidInAppWebViewController(
     PlatformInAppWebViewControllerCreationParams params,

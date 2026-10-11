@@ -20,7 +20,7 @@ class PlatformPullToRefreshControllerCreationParams {
     this.settings,
     this.onRefresh,
   }) {
-    this.settings = this.settings ?? PullToRefreshSettings();
+    settings = settings ?? PullToRefreshSettings();
   }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformPullToRefreshController.settings}

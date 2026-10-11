@@ -1,0 +1,1 @@
+../../../.specify/extensions/spec-stats/.specify-dev/agent-commands/zed/speckit-spec-stats-runs/SKILL.md

@@ -40,6 +40,30 @@ class GeolocationPermissionShowPromptResponse {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  GeolocationPermissionShowPromptResponse copyWithField<T>(
+    Field<GeolocationPermissionShowPromptResponse, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'origin':
+        return copyWith(origin: value as WebUri?);
+      case 'allow':
+        return copyWith(allow: value as bool?);
+      case 'retain':
+        return copyWith(retain: value as bool?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'GeolocationPermissionShowPromptResponse has no settable field with this name',
+        );
+    }
+  }
+
   GeolocationPermissionShowPromptResponse
   copyWithGeolocationPermissionShowPromptResponse({
     WebUri? origin,
@@ -59,42 +83,47 @@ class GeolocationPermissionShowPromptResponse {
     return GeolocationPermissionShowPromptResponse(
       origin:
           _patchMap.containsKey(GeolocationPermissionShowPromptResponse$.origin)
-          ? (_patchMap[GeolocationPermissionShowPromptResponse$.origin]
-                    is Function)
-                ? _patchMap[GeolocationPermissionShowPromptResponse$.origin](
-                    this.origin,
-                  )
-                : (_patchMap[GeolocationPermissionShowPromptResponse$.origin]
-                      is Patch)
-                ? _patchMap[GeolocationPermissionShowPromptResponse$.origin]
-                      .applyTo(this.origin)
-                : _patchMap[GeolocationPermissionShowPromptResponse$.origin]
+          ? ((_patchMap[GeolocationPermissionShowPromptResponse$.origin]
+                        is Function)
+                    ? _patchMap[GeolocationPermissionShowPromptResponse$
+                          .origin](this.origin)
+                    : (_patchMap[GeolocationPermissionShowPromptResponse$
+                              .origin]
+                          is Patch)
+                    ? _patchMap[GeolocationPermissionShowPromptResponse$.origin]
+                          .applyTo(this.origin)
+                    : _patchMap[GeolocationPermissionShowPromptResponse$
+                          .origin])
+                as WebUri?
           : this.origin,
       allow:
           _patchMap.containsKey(GeolocationPermissionShowPromptResponse$.allow)
-          ? (_patchMap[GeolocationPermissionShowPromptResponse$.allow]
-                    is Function)
-                ? _patchMap[GeolocationPermissionShowPromptResponse$.allow](
-                    this.allow,
-                  )
-                : (_patchMap[GeolocationPermissionShowPromptResponse$.allow]
-                      is Patch)
-                ? _patchMap[GeolocationPermissionShowPromptResponse$.allow]
-                      .applyTo(this.allow)
-                : _patchMap[GeolocationPermissionShowPromptResponse$.allow]
+          ? ((_patchMap[GeolocationPermissionShowPromptResponse$.allow]
+                        is Function)
+                    ? _patchMap[GeolocationPermissionShowPromptResponse$.allow](
+                        this.allow,
+                      )
+                    : (_patchMap[GeolocationPermissionShowPromptResponse$.allow]
+                          is Patch)
+                    ? _patchMap[GeolocationPermissionShowPromptResponse$.allow]
+                          .applyTo(this.allow)
+                    : _patchMap[GeolocationPermissionShowPromptResponse$.allow])
+                as bool?
           : this.allow,
       retain:
           _patchMap.containsKey(GeolocationPermissionShowPromptResponse$.retain)
-          ? (_patchMap[GeolocationPermissionShowPromptResponse$.retain]
-                    is Function)
-                ? _patchMap[GeolocationPermissionShowPromptResponse$.retain](
-                    this.retain,
-                  )
-                : (_patchMap[GeolocationPermissionShowPromptResponse$.retain]
-                      is Patch)
-                ? _patchMap[GeolocationPermissionShowPromptResponse$.retain]
-                      .applyTo(this.retain)
-                : _patchMap[GeolocationPermissionShowPromptResponse$.retain]
+          ? ((_patchMap[GeolocationPermissionShowPromptResponse$.retain]
+                        is Function)
+                    ? _patchMap[GeolocationPermissionShowPromptResponse$
+                          .retain](this.retain)
+                    : (_patchMap[GeolocationPermissionShowPromptResponse$
+                              .retain]
+                          is Patch)
+                    ? _patchMap[GeolocationPermissionShowPromptResponse$.retain]
+                          .applyTo(this.retain)
+                    : _patchMap[GeolocationPermissionShowPromptResponse$
+                          .retain])
+                as bool?
           : this.retain,
     );
   }
@@ -126,7 +155,8 @@ class GeolocationPermissionShowPromptResponse {
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data =
         _$GeolocationPermissionShowPromptResponseToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

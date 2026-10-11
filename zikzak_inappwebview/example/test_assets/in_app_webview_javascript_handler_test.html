@@ -9,6 +9,12 @@
     <body>
         <h1>InAppWebViewJavaScriptHandlerTest</h1>
         <script>
+            // Migration note (zikzak_inappwebview fork): the injected JavaScript
+            // bridge global was renamed from `window.flutter_inappwebview`
+            // (upstream flutter_inappwebview) to `window.zikzak_inappwebview`.
+            // Update any existing JS using `window.flutter_inappwebview.callHandler(...)`
+            // to `window.zikzak_inappwebview.callHandler(...)`. The
+            // `flutterInAppWebViewPlatformReady` event name is unchanged.
             window.addEventListener("flutterInAppWebViewPlatformReady", function(event) {
                 window.zikzak_inappwebview.callHandler('handlerFoo').then(function(result) {
                     window.zikzak_inappwebview.callHandler('handlerFooWithArgs', 1, true, ['bar', 5], {foo: 'baz'}, result).then(function(result) {

@@ -8,8 +8,8 @@
 ///generated a thin public wrapper; it is now a plain Dart class with an
 ///identical public API and wire format.
 class AjaxRequestHeaders {
-  Map<String, dynamic> _headers;
-  Map<String, dynamic> _newHeaders = {};
+  final Map<String, dynamic> _headers;
+  final Map<String, dynamic> _newHeaders = {};
 
   AjaxRequestHeaders(this._headers);
 
@@ -24,7 +24,7 @@ class AjaxRequestHeaders {
 
   ///Gets the HTTP headers of the [AjaxRequest].
   Map<String, dynamic> getHeaders() {
-    return this._headers;
+    return _headers;
   }
 
   ///Sets/updates an HTTP header of the [AjaxRequest]. If there is already an existing [header] with the same name, the values are merged into one single request header.

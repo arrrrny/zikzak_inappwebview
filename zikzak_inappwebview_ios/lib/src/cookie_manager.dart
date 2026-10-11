@@ -123,6 +123,10 @@ class IOSCookieManager extends PlatformCookieManager with ChannelController {
       'sameSite',
       () => httpCookieSameSitePolicyToWire(sameSite),
     );
+    final controller = webViewController;
+    if (controller != null) {
+      args.putIfAbsent('webViewId', () => controller.id);
+    }
 
     return await channel?.invokeMethod<bool>('setCookie', args) ?? false;
   }
@@ -206,6 +210,10 @@ class IOSCookieManager extends PlatformCookieManager with ChannelController {
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url.toString());
+    final controller = webViewController;
+    if (controller != null) {
+      args.putIfAbsent('webViewId', () => controller.id);
+    }
     List<dynamic> cookieListMap =
         await channel?.invokeMethod<List>('getCookies', args) ?? [];
     cookieListMap = cookieListMap.cast<Map<dynamic, dynamic>>();
@@ -314,6 +322,10 @@ class IOSCookieManager extends PlatformCookieManager with ChannelController {
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url.toString());
+    final controller = webViewController;
+    if (controller != null) {
+      args.putIfAbsent('webViewId', () => controller.id);
+    }
     List<dynamic> cookies =
         await channel?.invokeMethod<List>('getCookies', args) ?? [];
     cookies = cookies.cast<Map<dynamic, dynamic>>();
@@ -368,6 +380,10 @@ class IOSCookieManager extends PlatformCookieManager with ChannelController {
     args.putIfAbsent('name', () => name);
     args.putIfAbsent('domain', () => domain);
     args.putIfAbsent('path', () => path);
+    final controller = webViewController;
+    if (controller != null) {
+      args.putIfAbsent('webViewId', () => controller.id);
+    }
     return await channel?.invokeMethod<bool>('deleteCookie', args) ?? false;
   }
 
@@ -407,6 +423,10 @@ class IOSCookieManager extends PlatformCookieManager with ChannelController {
     args.putIfAbsent('url', () => url.toString());
     args.putIfAbsent('domain', () => domain);
     args.putIfAbsent('path', () => path);
+    final controller = webViewController;
+    if (controller != null) {
+      args.putIfAbsent('webViewId', () => controller.id);
+    }
     return await channel?.invokeMethod<bool>('deleteCookies', args) ?? false;
   }
 

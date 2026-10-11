@@ -1,0 +1,1 @@
+../../../.specify/extensions/spec-stats/.specify-dev/agent-commands/claude/speckit-spec-stats-open/SKILL.md

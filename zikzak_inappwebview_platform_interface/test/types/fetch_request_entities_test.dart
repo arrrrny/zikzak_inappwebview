@@ -114,7 +114,10 @@ void main() {
         'credentials': {'type': 'password', 'password': 'pw'},
       });
       expect(pw.credentials, isA<FetchRequestPasswordCredential>());
-      expect((pw.credentials! as FetchRequestPasswordCredential).password, 'pw');
+      expect(
+        (pw.credentials! as FetchRequestPasswordCredential).password,
+        'pw',
+      );
 
       expect(
         FetchRequest.fromJson({
@@ -124,10 +127,13 @@ void main() {
       );
     });
 
-    test('int enums keep the old native values (index == old _nativeValue)', () {
-      expect(FetchRequestAction.ABORT.index, 0);
-      expect(FetchRequestAction.PROCEED.index, 1);
-    });
+    test(
+      'int enums keep the old native values (index == old _nativeValue)',
+      () {
+        expect(FetchRequestAction.ABORT.index, 0);
+        expect(FetchRequestAction.PROCEED.index, 1);
+      },
+    );
 
     test('copyWith is available (zorphy addition)', () {
       final r = FetchRequest(method: 'GET');
@@ -141,18 +147,17 @@ void main() {
       final base = FetchRequestCredential(type: 'default');
       expect(base.toMap(), {'type': 'default'});
       expect(base.toJson(), {'type': 'default'});
-      expect(
-        FetchRequestCredential.fromMap({'type': 'x'})?.type,
-        'x',
-      );
+      expect(FetchRequestCredential.fromMap({'type': 'x'})?.type, 'x');
       expect(FetchRequestCredential.fromMap(null), isNull);
 
       final def = FetchRequestCredentialDefault(value: 'v', type: 'default');
       expect(def, isA<FetchRequestCredential>());
       expect(def.toMap(), {'type': 'default', 'value': 'v'});
       expect(
-        FetchRequestCredentialDefault.fromMap({'type': 'd', 'value': 'w'})
-            ?.value,
+        FetchRequestCredentialDefault.fromMap({
+          'type': 'd',
+          'value': 'w',
+        })?.value,
         'w',
       );
 

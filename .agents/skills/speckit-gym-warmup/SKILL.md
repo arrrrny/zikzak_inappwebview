@@ -1,0 +1,1 @@
+../../../.specify/extensions/gym/.specify-dev/agent-commands/zed/speckit-gym-warmup/SKILL.md

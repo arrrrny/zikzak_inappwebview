@@ -30,6 +30,13 @@ public class FlutterWebViewController: NSObject {
         webView.autoresizingMask = [.width, .height]
         webView.frame = container.bounds
         container.addSubview(webView)
+        // Bug #331 (macOS parity, issue #337): this controller is the macOS
+        // prepare()-equivalent setup path for on-screen platform views, so
+        // re-assert the root clip here — the WKWebView is the native layer
+        // of a Flutter platform view and must never paint outside the bounds
+        // Flutter allocates for it. The webview's own initializers already
+        // forced layer-backing (wantsLayer), so the layer exists here.
+        webView.layer?.masksToBounds = true
 
         self.webView = webView
         self.myView = container

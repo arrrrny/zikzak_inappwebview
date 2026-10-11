@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ZikZak Passkey Test</title>
+<style>
+  :root { color-scheme: light dark; }
+  * { box-sizing: border-box; }
+  body {
+    font: 14px/1.5 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+    margin: 0; padding: 24px; background: #f6f6f8; color: #16161a;
+  }
+  @media (prefers-color-scheme: dark) {
+    body { background: #16161a; color: #f6f6f8; }
+    .card { background: #232329 !important; border-color: #34343c !important; }
+    code, pre { background: #16161a !important; }
+    .muted { color: #9a9aa5 !important; }
+  }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  h2 { font-size: 15px; margin: 0 0 10px; }
+  .muted { color: #6b6b76; }
+  .card {
+    background: #fff; border: 1px solid #e2e2e8; border-radius: 10px;
+    padding: 16px; margin-bottom: 16px;
+  }
+  button {
+    font: inherit; font-weight: 600; padding: 10px 16px; border-radius: 8px;
+    border: 1px solid transparent; background: #4f46e5; color: #fff; cursor: pointer;
+    margin: 0 8px 8px 0;
+  }
+  button.secondary { background: transparent; border-color: #c9c9d2; color: inherit; }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  table { border-collapse: collapse; width: 100%; }
+  td { padding: 3px 8px 3px 0; vertical-align: top; }
+  td:first-child { white-space: nowrap; width: 1%; }
+  code {
+    font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+    background: #f2f2f6; padding: 1px 5px; border-radius: 4px; word-break: break-all;
+  }
+  pre {
+    font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+    background: #f2f2f6; padding: 12px; border-radius: 8px;
+    max-height: 320px; overflow: auto; white-space: pre-wrap; word-break: break-word;
+    margin: 0;
+  }
+  .pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+  .ok   { background: #dcfce7; color: #166534; }
+  .bad  { background: #fee2e2; color: #991b1b; }
+  .unk  { background: #e5e7eb; color: #4b5563; }
+  #verdict { font-weight: 700; font-size: 15px; padding: 12px; border-radius: 8px; margin-top: 8px; }
+  #verdict.ok  { background: #dcfce7; color: #166534; }
+  #verdict.bad { background: #fee2e2; color: #991b1b; }
+  #verdict.unk { background: #e5e7eb; color: #4b5563; }
+</style>
+</head>
+<body>
+
+<h1>ZikZak Passkey Test</h1>
+<p class="muted">WebAuthn sign-in inside the <code>InAppWebView</code>.</p>
+
+<div class="card">
+  <h2>Environment</h2>
+  <table id="env"></table>
+</div>
+
+<div class="card">
+  <h2>Passkey</h2>
+  <button id="btnCreate">Create passkey</button>
+  <button id="btnSignin" class="secondary">Sign in with passkey</button>
+  <button id="btnClear" class="secondary">Forget local credential</button>
+  <div id="verdict" class="unk">Not run yet.</div>
+</div>
+
+<div class="card">
+  <h2>Log</h2>
+  <pre id="log">waiting…</pre>
+</div>
+
+<script>
+"use strict";
+
+// ---------------------------------------------------------------------------
+// Reporting: log on-page, to the DOM console (captured by onConsoleMessage),
+// and to Flutter through the injected JS bridge.
+// ---------------------------------------------------------------------------
+const logEl = document.getElementById('log');
+const lines = [];
+
+function log(level, msg) {
+  const stamp = new Date().toISOString().substring(11, 23);
+  const line = `[${stamp}] ${level} ${msg}`;
+  lines.push(line);
+  logEl.textContent = lines.join('\n');
+  logEl.scrollTop = logEl.scrollHeight;
+  try { console.log('passkey-test ' + level + ' ' + msg); } catch (_) {}
+  try {
+    window.zikzak_inappwebview?.callHandler('passkeyEvent', { level, msg });
+  } catch (_) {}
+}
+
+function setVerdict(kind, text) {
+  const el = document.getElementById('verdict');
+  el.className = kind;
+  el.textContent = text;
+}
+
+function row(label, value, kind) {
+  const pill = kind ? ` <span class="pill ${kind}">${kind === 'ok' ? 'yes' : kind === 'bad' ? 'no' : '?'}</span>` : '';
+  return `<tr><td class="muted">${label}</td><td><code>${String(value)}</code>${pill}</td></tr>`;
+}
+
+function b64u(buf) {
+  return btoa(String.fromCharCode(...new Uint8Array(buf)))
+    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+function fromB64u(s) {
+  s = s.replace(/-/g, '+').replace(/_/g, '/');
+  while (s.length % 4) s += '=';
+  return Uint8Array.from(atob(s), c => c.charCodeAt(0));
+}
+function randomBytes(n) {
+  return crypto.getRandomValues(new Uint8Array(n));
+}
+
+// ---------------------------------------------------------------------------
+// Config
+// ---------------------------------------------------------------------------
+// The RP ID must be a registrable domain suffix of (or equal to) this origin's
+// host. Deriving it from location keeps the page working on localhost, on a
+// Cloudflare tunnel hostname, or on a real domain without edits.
+const RP_ID = location.hostname;
+const RP_NAME = 'ZikZak Passkey Test';
+const STORE_KEY = 'zikzak.passkeyTest.credential';
+
+// ---------------------------------------------------------------------------
+// Diagnostics
+// ---------------------------------------------------------------------------
+async function probe() {
+  const rows = [];
+  rows.push(row('origin', location.origin));
+  rows.push(row('rpId', RP_ID));
+  rows.push(row('secure context', String(window.isSecureContext),
+    window.isSecureContext ? 'ok' : 'bad'));
+  rows.push(row('WebAuthn API', String(!!window.PublicKeyCredential),
+    window.PublicKeyCredential ? 'ok' : 'bad'));
+
+  let uvpaa = null, conditional = null;
+  if (window.PublicKeyCredential) {
+    try {
+      uvpaa = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+    } catch (e) {
+      uvpaa = 'threw: ' + e.message;
+    }
+    try {
+      conditional = PublicKeyCredential.isConditionalMediationAvailable
+        ? await PublicKeyCredential.isConditionalMediationAvailable()
+        : 'not implemented';
+    } catch (e) {
+      conditional = 'threw: ' + e.message;
+    }
+  }
+  rows.push(row('platform authenticator (UV)', String(uvpaa),
+    uvpaa === true ? 'ok' : uvpaa === false ? 'bad' : 'unk'));
+  rows.push(row('conditional mediation', String(conditional),
+    conditional === true ? 'ok' : conditional === false ? 'bad' : 'unk'));
+
+  const stored = localStorage.getItem(STORE_KEY);
+  rows.push(row('stored credential', stored ? stored.substring(0, 24) + '…' : '(none)',
+    stored ? 'ok' : 'unk'));
+
+  document.getElementById('env').innerHTML = rows.join('');
+
+  log('INFO', `origin=${location.origin} rpId=${RP_ID} secureContext=${window.isSecureContext}`);
+  log('INFO', `isUserVerifyingPlatformAuthenticatorAvailable=${uvpaa}`);
+  log('INFO', `isConditionalMediationAvailable=${conditional}`);
+  if (stored) log('INFO', `found stored credential ${stored}`);
+
+  if (uvpaa === false) {
+    setVerdict('bad',
+      'Platform authenticator reports unavailable for this RP. ' +
+      'The system passkey sheet cannot be shown for this origin.');
+  }
+  return { uvpaa, conditional };
+}
+
+function reportError(phase, e) {
+  const detail = [
+    `name=${e.name}`,
+    `message=${e.message || '(empty)'}`,
+    `code=${e.code}`,
+  ].join(' ');
+  log('ERROR', `${phase} failed: ${detail}`);
+  setVerdict('bad', `${phase} failed — ${e.name}: ${e.message || '(no message)'}`);
+}
+
+// ---------------------------------------------------------------------------
+// Ceremonies
+// ---------------------------------------------------------------------------
+async function createPasskey() {
+  log('INFO', '--- create() start ---');
+  setVerdict('unk', 'Waiting for the system passkey sheet…');
+  try {
+    const userHandle = randomBytes(16);
+    const cred = await navigator.credentials.create({
+      publicKey: {
+        challenge: randomBytes(32),
+        rp: { id: RP_ID, name: RP_NAME },
+        user: {
+          id: userHandle,
+          name: 'passkey-test@zikzak.dev',
+          displayName: 'ZikZak Passkey Test',
+        },
+        pubKeyCredParams: [
+          { type: 'public-key', alg: -7 },    // ES256
+          { type: 'public-key', alg: -257 },  // RS256
+        ],
+        authenticatorSelection: {
+          authenticatorAttachment: 'platform',
+          residentKey: 'preferred',
+          userVerification: 'preferred',
+        },
+        timeout: 60000,
+        attestation: 'none',
+      },
+    });
+
+    const id = b64u(cred.rawId);
+    localStorage.setItem(STORE_KEY, id);
+    log('OK', `create() resolved. credentialId=${id}`);
+    log('INFO', `type=${cred.type} authenticatorAttachment=${cred.authenticatorAttachment}`);
+    log('INFO', `transports=${(cred.response.getTransports?.() || []).join(',') || '(n/a)'}`);
+    setVerdict('ok', `Passkey created: ${id.substring(0, 24)}…`);
+    await probe();
+  } catch (e) {
+    reportError('create()', e);
+  }
+}
+
+async function signIn() {
+  log('INFO', '--- get() start ---');
+  setVerdict('unk', 'Waiting for the system passkey sheet…');
+  const stored = localStorage.getItem(STORE_KEY);
+  if (!stored) {
+    log('WARN', 'no local credential stored — running a discoverable-credential ceremony');
+  }
+  try {
+    const assertion = await navigator.credentials.get({
+      publicKey: {
+        challenge: randomBytes(32),
+        rpId: RP_ID,
+        allowCredentials: stored
+          ? [{ type: 'public-key', id: fromB64u(stored) }]
+          : [],
+        userVerification: 'preferred',
+        timeout: 60000,
+      },
+    });
+
+    const r = assertion.response;
+    log('OK', `get() resolved. credentialId=${b64u(assertion.rawId)}`);
+    log('OK', `userHandle=${r.userHandle ? b64u(r.userHandle) : '(none)'}`);
+    log('OK', `signature=${r.signature.byteLength} bytes, authenticatorData=${r.authenticatorData.byteLength} bytes`);
+    setVerdict('ok', 'Signed in with passkey. Assertion returned successfully.');
+    await probe();
+  } catch (e) {
+    reportError('get()', e);
+  }
+}
+
+document.getElementById('btnCreate').addEventListener('click', createPasskey);
+document.getElementById('btnSignin').addEventListener('click', signIn);
+document.getElementById('btnClear').addEventListener('click', async () => {
+  localStorage.removeItem(STORE_KEY);
+  log('INFO', 'local credential forgotten (the passkey stays in the keychain)');
+  await probe();
+});
+
+log('INFO', 'page loaded');
+
+// The document must be focused before a ceremony starts, otherwise WebKit
+// rejects it with NotAllowedError("The document is not focused") before the OS
+// is ever consulted.
+async function waitForFocus(timeoutMs = 180000) {
+  const start = Date.now();
+  let lastLog = 0;
+  while (!document.hasFocus() && Date.now() - start < timeoutMs) {
+    if (Date.now() - lastLog > 5000) {
+      lastLog = Date.now();
+      log('INFO', `waiting for document focus... ${Math.round((Date.now() - start) / 1000)}s`);
+    }
+    await new Promise(r => setTimeout(r, 250));
+  }
+  const focused = document.hasFocus();
+  log('INFO', `focus wait finished: hasFocus=${focused} after ${Date.now() - start}ms`);
+  return focused;
+}
+
+// `?auto=create|signin|both` drives a ceremony without a click, so the flow can
+// be checked headlessly. The passkey sheet itself still needs a human finger —
+// that is the point of a passkey — so the page only reports what the platform
+// answers. The second probe matters because the first can land while Apple's
+// CDN is still validating the domain association, in which case the platform
+// authenticator reads as unavailable.
+const auto = new URLSearchParams(location.search).get('auto');
+(async () => {
+  await probe();
+  if (!auto) return;
+  await waitForFocus();
+  log('INFO', `auto=${auto}: re-probing, then running the ceremony`);
+  await new Promise(r => setTimeout(r, 1000));
+  log('INFO', 'auto: second probe');
+  await probe();
+  if (auto === 'create' || auto === 'both') await createPasskey();
+  if (auto === 'signin' || auto === 'both') await signIn();
+})();
+</script>
+</body>
+</html>

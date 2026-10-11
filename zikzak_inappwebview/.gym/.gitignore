@@ -1,0 +1,4 @@
+# Sandbox + drop-card stores used by the zikzak_inappwebview GYM
+# exercises. Wiped between runs; never committed.
+.sandbox/
+.drops/

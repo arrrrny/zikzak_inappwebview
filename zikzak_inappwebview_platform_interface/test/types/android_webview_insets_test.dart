@@ -33,7 +33,10 @@ void main() {
 
     test('equality is by value', () {
       expect(AndroidWebViewInsets.ime, AndroidWebViewInsets.ime);
-      expect(AndroidWebViewInsets.ime == AndroidWebViewInsets.systemBars, isFalse);
+      expect(
+        AndroidWebViewInsets.ime == AndroidWebViewInsets.systemBars,
+        isFalse,
+      );
     });
   });
 
@@ -59,14 +62,11 @@ void main() {
       final back = InAppWebViewSettings.fromJson(
         Map<String, dynamic>.from(map),
       );
-      expect(
-        back.insetsForWebContentToIgnore,
-        [
-          AndroidWebViewInsets.systemBars,
-          AndroidWebViewInsets.ime,
-          AndroidWebViewInsets.displayCutout,
-        ],
-      );
+      expect(back.insetsForWebContentToIgnore, [
+        AndroidWebViewInsets.systemBars,
+        AndroidWebViewInsets.ime,
+        AndroidWebViewInsets.displayCutout,
+      ]);
     });
 
     test('toMap serializes null as absent (null)', () {

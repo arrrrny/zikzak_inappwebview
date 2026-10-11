@@ -1,0 +1,1 @@
+../../.specify/extensions/gh-triage/.specify-dev/agent-commands/opencode/speckit.gh-triage.triage.md

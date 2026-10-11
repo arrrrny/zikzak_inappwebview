@@ -56,6 +56,46 @@ public class URLValidationManager {
         self.customValidator = validator
     }
 
+    /// How the pre-delegate gate classifies a URL before the host application's
+    /// navigation delegate can inspect it.
+    enum PreDelegateDecision {
+        /// Reject the URL without consulting the host delegate.
+        case block
+        /// Unknown custom scheme: hand the URL to the host delegate, which may
+        /// allow it. When no host policy handles the navigation the default
+        /// answer is still a cancellation — see `validateURL`.
+        case deferToHost
+        /// Known-good scheme that passed scheme-specific validation.
+        case allow
+    }
+
+    /// Classifies a URL before the host application's navigation delegate can
+    /// inspect it.
+    ///
+    /// Unknown custom schemes are deliberately not blocked here. Payment,
+    /// authentication, and other app links commonly use private schemes, and
+    /// the host must be able to cancel the WebView navigation and open the URL
+    /// externally. Every other answer comes from the shared scheme policy, so
+    /// this gate and `validateURL` cannot drift apart.
+    ///
+    /// Internal by design: this is the native pre-delegate gate only. Hosts
+    /// shape the policy through `validateURL`, `addSafeScheme`,
+    /// `addBlockedScheme` and `setCustomValidator`.
+    func decisionBeforeHostDelegate(_ url: URL) -> PreDelegateDecision {
+        if let customValidator = customValidator,
+           !customValidator(url).allowed {
+            return .block
+        }
+
+        guard let scheme = url.scheme?.lowercased() else {
+            return .block
+        }
+        if !blockedSchemes.contains(scheme), !safeSchemes.contains(scheme) {
+            return .deferToHost
+        }
+        return validateScheme(url: url, scheme: scheme).allowed ? .allow : .block
+    }
+
     /// Validate a URL
     /// - Parameter url: The URL to validate
     /// - Returns: ValidationResult indicating if URL is safe
@@ -76,6 +116,12 @@ public class URLValidationManager {
             )
         }
 
+        return validateScheme(url: url, scheme: scheme)
+    }
+
+    /// Applies the blocked/safe/unknown scheme policy. Callers run the custom
+    /// validator first, so it is not repeated here.
+    private func validateScheme(url: URL, scheme: String) -> ValidationResult {
         // Check if scheme is explicitly blocked
         if blockedSchemes.contains(scheme) {
             return ValidationResult(

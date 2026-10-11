@@ -106,7 +106,7 @@ public class WebAuthenticationSession: NSObject, ASWebAuthenticationPresentation
     @available(iOS 12.0, *)
     public func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor
     {
-        return UIApplication.shared.windows.first { $0.isKeyWindow } ?? ASPresentationAnchor()
+        return UIApplication.shared.sceneKeyWindow ?? ASPresentationAnchor()
     }
 
     public func dispose() {

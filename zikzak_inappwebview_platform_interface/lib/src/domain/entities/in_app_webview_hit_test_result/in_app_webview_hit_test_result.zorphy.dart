@@ -33,6 +33,28 @@ class InAppWebViewHitTestResult {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  InAppWebViewHitTestResult copyWithField<T>(
+    Field<InAppWebViewHitTestResult, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'type':
+        return copyWith(type: value as InAppWebViewHitTestResultType?);
+      case 'extra':
+        return copyWith(extra: value as String?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'InAppWebViewHitTestResult has no settable field with this name',
+        );
+    }
+  }
+
   InAppWebViewHitTestResult copyWithInAppWebViewHitTestResult({
     InAppWebViewHitTestResultType? type,
     String? extra,
@@ -47,20 +69,24 @@ class InAppWebViewHitTestResult {
     final _patchMap = _patcher.patchMap;
     return InAppWebViewHitTestResult(
       type: _patchMap.containsKey(InAppWebViewHitTestResult$.type)
-          ? (_patchMap[InAppWebViewHitTestResult$.type] is Function)
-                ? _patchMap[InAppWebViewHitTestResult$.type](this.type)
-                : (_patchMap[InAppWebViewHitTestResult$.type] is Patch)
-                ? _patchMap[InAppWebViewHitTestResult$.type].applyTo(this.type)
-                : _patchMap[InAppWebViewHitTestResult$.type]
+          ? ((_patchMap[InAppWebViewHitTestResult$.type] is Function)
+                    ? _patchMap[InAppWebViewHitTestResult$.type](this.type)
+                    : (_patchMap[InAppWebViewHitTestResult$.type] is Patch)
+                    ? _patchMap[InAppWebViewHitTestResult$.type].applyTo(
+                        this.type,
+                      )
+                    : _patchMap[InAppWebViewHitTestResult$.type])
+                as InAppWebViewHitTestResultType?
           : this.type,
       extra: _patchMap.containsKey(InAppWebViewHitTestResult$.extra)
-          ? (_patchMap[InAppWebViewHitTestResult$.extra] is Function)
-                ? _patchMap[InAppWebViewHitTestResult$.extra](this.extra)
-                : (_patchMap[InAppWebViewHitTestResult$.extra] is Patch)
-                ? _patchMap[InAppWebViewHitTestResult$.extra].applyTo(
-                    this.extra,
-                  )
-                : _patchMap[InAppWebViewHitTestResult$.extra]
+          ? ((_patchMap[InAppWebViewHitTestResult$.extra] is Function)
+                    ? _patchMap[InAppWebViewHitTestResult$.extra](this.extra)
+                    : (_patchMap[InAppWebViewHitTestResult$.extra] is Patch)
+                    ? _patchMap[InAppWebViewHitTestResult$.extra].applyTo(
+                        this.extra,
+                      )
+                    : _patchMap[InAppWebViewHitTestResult$.extra])
+                as String?
           : this.extra,
     );
   }
@@ -88,7 +114,8 @@ class InAppWebViewHitTestResult {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$InAppWebViewHitTestResultToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

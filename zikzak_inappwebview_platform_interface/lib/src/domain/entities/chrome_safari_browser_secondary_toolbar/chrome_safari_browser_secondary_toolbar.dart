@@ -28,7 +28,7 @@ class ChromeSafariBrowserSecondaryToolbar {
       return null;
     }
     return ChromeSafariBrowserSecondaryToolbar(
-      layout: AndroidResource.fromJson(map['layout']?.cast<String, dynamic>())!,
+      layout: AndroidResource.fromJson(map['layout']?.cast<String, dynamic>()),
       clickableIDs: (map['clickableIDs'] as List? ?? [])
           .map(
             (e) => ChromeSafariBrowserSecondaryToolbarClickableID.fromMap(
@@ -79,7 +79,7 @@ class ChromeSafariBrowserSecondaryToolbarClickableID {
       return null;
     }
     return ChromeSafariBrowserSecondaryToolbarClickableID(
-      id: AndroidResource.fromJson(map['id']?.cast<String, dynamic>())!,
+      id: AndroidResource.fromJson(map['id']?.cast<String, dynamic>()),
     );
   }
 

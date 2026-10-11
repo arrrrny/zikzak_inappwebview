@@ -37,6 +37,28 @@ class SafeBrowsingResponse {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  SafeBrowsingResponse copyWithField<T>(
+    Field<SafeBrowsingResponse, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'report':
+        return copyWith(report: value as bool?);
+      case 'action':
+        return copyWith(action: value as SafeBrowsingResponseAction?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'SafeBrowsingResponse has no settable field with this name',
+        );
+    }
+  }
+
   SafeBrowsingResponse copyWithSafeBrowsingResponse({
     bool? report,
     SafeBrowsingResponseAction? action,
@@ -51,18 +73,24 @@ class SafeBrowsingResponse {
     final _patchMap = _patcher.patchMap;
     return SafeBrowsingResponse(
       report: _patchMap.containsKey(SafeBrowsingResponse$.report)
-          ? (_patchMap[SafeBrowsingResponse$.report] is Function)
-                ? _patchMap[SafeBrowsingResponse$.report](this.report)
-                : (_patchMap[SafeBrowsingResponse$.report] is Patch)
-                ? _patchMap[SafeBrowsingResponse$.report].applyTo(this.report)
-                : _patchMap[SafeBrowsingResponse$.report]
+          ? ((_patchMap[SafeBrowsingResponse$.report] is Function)
+                    ? _patchMap[SafeBrowsingResponse$.report](this.report)
+                    : (_patchMap[SafeBrowsingResponse$.report] is Patch)
+                    ? _patchMap[SafeBrowsingResponse$.report].applyTo(
+                        this.report,
+                      )
+                    : _patchMap[SafeBrowsingResponse$.report])
+                as bool?
           : this.report,
       action: _patchMap.containsKey(SafeBrowsingResponse$.action)
-          ? (_patchMap[SafeBrowsingResponse$.action] is Function)
-                ? _patchMap[SafeBrowsingResponse$.action](this.action)
-                : (_patchMap[SafeBrowsingResponse$.action] is Patch)
-                ? _patchMap[SafeBrowsingResponse$.action].applyTo(this.action)
-                : _patchMap[SafeBrowsingResponse$.action]
+          ? ((_patchMap[SafeBrowsingResponse$.action] is Function)
+                    ? _patchMap[SafeBrowsingResponse$.action](this.action)
+                    : (_patchMap[SafeBrowsingResponse$.action] is Patch)
+                    ? _patchMap[SafeBrowsingResponse$.action].applyTo(
+                        this.action,
+                      )
+                    : _patchMap[SafeBrowsingResponse$.action])
+                as SafeBrowsingResponseAction?
           : this.action,
     );
   }
@@ -90,7 +118,8 @@ class SafeBrowsingResponse {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$SafeBrowsingResponseToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

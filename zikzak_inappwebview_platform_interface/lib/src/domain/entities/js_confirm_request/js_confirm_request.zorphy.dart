@@ -34,6 +34,27 @@ class JsConfirmRequest {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  JsConfirmRequest copyWithField<T>(Field<JsConfirmRequest, T> field, T value) {
+    switch (field.name) {
+      case 'url':
+        return copyWith(url: value as WebUri?);
+      case 'message':
+        return copyWith(message: value as String?);
+      case 'isMainFrame':
+        return copyWith(isMainFrame: value as bool?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'JsConfirmRequest has no settable field with this name',
+        );
+    }
+  }
+
   JsConfirmRequest copyWithJsConfirmRequest({
     WebUri? url,
     String? message,
@@ -49,27 +70,30 @@ class JsConfirmRequest {
     final _patchMap = _patcher.patchMap;
     return JsConfirmRequest(
       url: _patchMap.containsKey(JsConfirmRequest$.url)
-          ? (_patchMap[JsConfirmRequest$.url] is Function)
-                ? _patchMap[JsConfirmRequest$.url](this.url)
-                : (_patchMap[JsConfirmRequest$.url] is Patch)
-                ? _patchMap[JsConfirmRequest$.url].applyTo(this.url)
-                : _patchMap[JsConfirmRequest$.url]
+          ? ((_patchMap[JsConfirmRequest$.url] is Function)
+                    ? _patchMap[JsConfirmRequest$.url](this.url)
+                    : (_patchMap[JsConfirmRequest$.url] is Patch)
+                    ? _patchMap[JsConfirmRequest$.url].applyTo(this.url)
+                    : _patchMap[JsConfirmRequest$.url])
+                as WebUri?
           : this.url,
       message: _patchMap.containsKey(JsConfirmRequest$.message)
-          ? (_patchMap[JsConfirmRequest$.message] is Function)
-                ? _patchMap[JsConfirmRequest$.message](this.message)
-                : (_patchMap[JsConfirmRequest$.message] is Patch)
-                ? _patchMap[JsConfirmRequest$.message].applyTo(this.message)
-                : _patchMap[JsConfirmRequest$.message]
+          ? ((_patchMap[JsConfirmRequest$.message] is Function)
+                    ? _patchMap[JsConfirmRequest$.message](this.message)
+                    : (_patchMap[JsConfirmRequest$.message] is Patch)
+                    ? _patchMap[JsConfirmRequest$.message].applyTo(this.message)
+                    : _patchMap[JsConfirmRequest$.message])
+                as String?
           : this.message,
       isMainFrame: _patchMap.containsKey(JsConfirmRequest$.isMainFrame)
-          ? (_patchMap[JsConfirmRequest$.isMainFrame] is Function)
-                ? _patchMap[JsConfirmRequest$.isMainFrame](this.isMainFrame)
-                : (_patchMap[JsConfirmRequest$.isMainFrame] is Patch)
-                ? _patchMap[JsConfirmRequest$.isMainFrame].applyTo(
-                    this.isMainFrame,
-                  )
-                : _patchMap[JsConfirmRequest$.isMainFrame]
+          ? ((_patchMap[JsConfirmRequest$.isMainFrame] is Function)
+                    ? _patchMap[JsConfirmRequest$.isMainFrame](this.isMainFrame)
+                    : (_patchMap[JsConfirmRequest$.isMainFrame] is Patch)
+                    ? _patchMap[JsConfirmRequest$.isMainFrame].applyTo(
+                        this.isMainFrame,
+                      )
+                    : _patchMap[JsConfirmRequest$.isMainFrame])
+                as bool?
           : this.isMainFrame,
     );
   }
@@ -100,7 +124,8 @@ class JsConfirmRequest {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$JsConfirmRequestToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

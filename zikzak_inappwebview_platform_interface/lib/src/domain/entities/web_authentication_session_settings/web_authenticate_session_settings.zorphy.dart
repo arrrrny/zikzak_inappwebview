@@ -42,6 +42,28 @@ class WebAuthenticationSessionSettings {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  WebAuthenticationSessionSettings copyWithField<T>(
+    Field<WebAuthenticationSessionSettings, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'prefersEphemeralWebBrowserSession':
+        return copyWith(prefersEphemeralWebBrowserSession: value as bool?);
+      case 'additionalHeaderFields':
+        return copyWith(additionalHeaderFields: value as Map<String, String>?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'WebAuthenticationSessionSettings has no settable field with this name',
+        );
+    }
+  }
+
   WebAuthenticationSessionSettings copyWithWebAuthenticationSessionSettings({
     bool? prefersEphemeralWebBrowserSession,
     Map<String, String>? additionalHeaderFields,
@@ -62,38 +84,41 @@ class WebAuthenticationSessionSettings {
           _patchMap.containsKey(
             WebAuthenticationSessionSettings$.prefersEphemeralWebBrowserSession,
           )
-          ? (_patchMap[WebAuthenticationSessionSettings$
-                        .prefersEphemeralWebBrowserSession]
-                    is Function)
-                ? _patchMap[WebAuthenticationSessionSettings$
-                      .prefersEphemeralWebBrowserSession](
-                    this.prefersEphemeralWebBrowserSession,
-                  )
-                : (_patchMap[WebAuthenticationSessionSettings$
-                          .prefersEphemeralWebBrowserSession]
-                      is Patch)
-                ? _patchMap[WebAuthenticationSessionSettings$
-                          .prefersEphemeralWebBrowserSession]
-                      .applyTo(this.prefersEphemeralWebBrowserSession)
-                : _patchMap[WebAuthenticationSessionSettings$
-                      .prefersEphemeralWebBrowserSession]
+          ? ((_patchMap[WebAuthenticationSessionSettings$
+                            .prefersEphemeralWebBrowserSession]
+                        is Function)
+                    ? _patchMap[WebAuthenticationSessionSettings$
+                          .prefersEphemeralWebBrowserSession](
+                        this.prefersEphemeralWebBrowserSession,
+                      )
+                    : (_patchMap[WebAuthenticationSessionSettings$
+                              .prefersEphemeralWebBrowserSession]
+                          is Patch)
+                    ? _patchMap[WebAuthenticationSessionSettings$
+                              .prefersEphemeralWebBrowserSession]
+                          .applyTo(this.prefersEphemeralWebBrowserSession)
+                    : _patchMap[WebAuthenticationSessionSettings$
+                          .prefersEphemeralWebBrowserSession])
+                as bool?
           : this.prefersEphemeralWebBrowserSession,
       additionalHeaderFields:
           _patchMap.containsKey(
             WebAuthenticationSessionSettings$.additionalHeaderFields,
           )
-          ? (_patchMap[WebAuthenticationSessionSettings$.additionalHeaderFields]
-                    is Function)
-                ? _patchMap[WebAuthenticationSessionSettings$
-                      .additionalHeaderFields](this.additionalHeaderFields)
-                : (_patchMap[WebAuthenticationSessionSettings$
-                          .additionalHeaderFields]
-                      is Patch)
-                ? _patchMap[WebAuthenticationSessionSettings$
-                          .additionalHeaderFields]
-                      .applyTo(this.additionalHeaderFields)
-                : _patchMap[WebAuthenticationSessionSettings$
-                      .additionalHeaderFields]
+          ? ((_patchMap[WebAuthenticationSessionSettings$
+                            .additionalHeaderFields]
+                        is Function)
+                    ? _patchMap[WebAuthenticationSessionSettings$
+                          .additionalHeaderFields](this.additionalHeaderFields)
+                    : (_patchMap[WebAuthenticationSessionSettings$
+                              .additionalHeaderFields]
+                          is Patch)
+                    ? _patchMap[WebAuthenticationSessionSettings$
+                              .additionalHeaderFields]
+                          .applyTo(this.additionalHeaderFields)
+                    : _patchMap[WebAuthenticationSessionSettings$
+                          .additionalHeaderFields])
+                as Map<String, String>?
           : this.additionalHeaderFields,
     );
   }
@@ -127,7 +152,8 @@ class WebAuthenticationSessionSettings {
     final Map<String, dynamic> data = _$WebAuthenticationSessionSettingsToJson(
       this,
     );
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

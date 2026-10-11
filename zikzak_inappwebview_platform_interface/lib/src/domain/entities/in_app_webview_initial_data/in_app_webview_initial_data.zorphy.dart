@@ -52,6 +52,34 @@ class InAppWebViewInitialData {
     );
   }
 
+  /// Returns a copy of this entity with [field] set to [value].
+  ///
+  /// Delegates to [copyWith]: the receiver is never mutated and a
+  /// null [value] keeps the current field value.
+  InAppWebViewInitialData copyWithField<T>(
+    Field<InAppWebViewInitialData, T> field,
+    T value,
+  ) {
+    switch (field.name) {
+      case 'data':
+        return copyWith(data: value as String);
+      case 'mimeType':
+        return copyWith(mimeType: value as String);
+      case 'encoding':
+        return copyWith(encoding: value as String);
+      case 'baseUrl':
+        return copyWith(baseUrl: value as WebUri?);
+      case 'historyUrl':
+        return copyWith(historyUrl: value as WebUri?);
+      default:
+        throw ArgumentError.value(
+          field.name,
+          'field',
+          'InAppWebViewInitialData has no settable field with this name',
+        );
+    }
+  }
+
   InAppWebViewInitialData copyWithInAppWebViewInitialData({
     String? data,
     String? mimeType,
@@ -75,49 +103,60 @@ class InAppWebViewInitialData {
     final _patchMap = _patcher.patchMap;
     return InAppWebViewInitialData(
       data: _patchMap.containsKey(InAppWebViewInitialData$.data)
-          ? (_patchMap[InAppWebViewInitialData$.data] is Function)
-                ? _patchMap[InAppWebViewInitialData$.data](this.data)
-                : (_patchMap[InAppWebViewInitialData$.data] is Patch)
-                ? _patchMap[InAppWebViewInitialData$.data].applyTo(this.data)
-                : _patchMap[InAppWebViewInitialData$.data]
+          ? ((_patchMap[InAppWebViewInitialData$.data] is Function)
+                    ? _patchMap[InAppWebViewInitialData$.data](this.data)
+                    : (_patchMap[InAppWebViewInitialData$.data] is Patch)
+                    ? _patchMap[InAppWebViewInitialData$.data].applyTo(
+                        this.data,
+                      )
+                    : _patchMap[InAppWebViewInitialData$.data])
+                as String
           : this.data,
       mimeType: _patchMap.containsKey(InAppWebViewInitialData$.mimeType)
-          ? (_patchMap[InAppWebViewInitialData$.mimeType] is Function)
-                ? _patchMap[InAppWebViewInitialData$.mimeType](this.mimeType)
-                : (_patchMap[InAppWebViewInitialData$.mimeType] is Patch)
-                ? _patchMap[InAppWebViewInitialData$.mimeType].applyTo(
-                    this.mimeType,
-                  )
-                : _patchMap[InAppWebViewInitialData$.mimeType]
+          ? ((_patchMap[InAppWebViewInitialData$.mimeType] is Function)
+                    ? _patchMap[InAppWebViewInitialData$.mimeType](
+                        this.mimeType,
+                      )
+                    : (_patchMap[InAppWebViewInitialData$.mimeType] is Patch)
+                    ? _patchMap[InAppWebViewInitialData$.mimeType].applyTo(
+                        this.mimeType,
+                      )
+                    : _patchMap[InAppWebViewInitialData$.mimeType])
+                as String
           : this.mimeType,
       encoding: _patchMap.containsKey(InAppWebViewInitialData$.encoding)
-          ? (_patchMap[InAppWebViewInitialData$.encoding] is Function)
-                ? _patchMap[InAppWebViewInitialData$.encoding](this.encoding)
-                : (_patchMap[InAppWebViewInitialData$.encoding] is Patch)
-                ? _patchMap[InAppWebViewInitialData$.encoding].applyTo(
-                    this.encoding,
-                  )
-                : _patchMap[InAppWebViewInitialData$.encoding]
+          ? ((_patchMap[InAppWebViewInitialData$.encoding] is Function)
+                    ? _patchMap[InAppWebViewInitialData$.encoding](
+                        this.encoding,
+                      )
+                    : (_patchMap[InAppWebViewInitialData$.encoding] is Patch)
+                    ? _patchMap[InAppWebViewInitialData$.encoding].applyTo(
+                        this.encoding,
+                      )
+                    : _patchMap[InAppWebViewInitialData$.encoding])
+                as String
           : this.encoding,
       baseUrl: _patchMap.containsKey(InAppWebViewInitialData$.baseUrl)
-          ? (_patchMap[InAppWebViewInitialData$.baseUrl] is Function)
-                ? _patchMap[InAppWebViewInitialData$.baseUrl](this.baseUrl)
-                : (_patchMap[InAppWebViewInitialData$.baseUrl] is Patch)
-                ? _patchMap[InAppWebViewInitialData$.baseUrl].applyTo(
-                    this.baseUrl,
-                  )
-                : _patchMap[InAppWebViewInitialData$.baseUrl]
+          ? ((_patchMap[InAppWebViewInitialData$.baseUrl] is Function)
+                    ? _patchMap[InAppWebViewInitialData$.baseUrl](this.baseUrl)
+                    : (_patchMap[InAppWebViewInitialData$.baseUrl] is Patch)
+                    ? _patchMap[InAppWebViewInitialData$.baseUrl].applyTo(
+                        this.baseUrl,
+                      )
+                    : _patchMap[InAppWebViewInitialData$.baseUrl])
+                as WebUri?
           : this.baseUrl,
       historyUrl: _patchMap.containsKey(InAppWebViewInitialData$.historyUrl)
-          ? (_patchMap[InAppWebViewInitialData$.historyUrl] is Function)
-                ? _patchMap[InAppWebViewInitialData$.historyUrl](
-                    this.historyUrl,
-                  )
-                : (_patchMap[InAppWebViewInitialData$.historyUrl] is Patch)
-                ? _patchMap[InAppWebViewInitialData$.historyUrl].applyTo(
-                    this.historyUrl,
-                  )
-                : _patchMap[InAppWebViewInitialData$.historyUrl]
+          ? ((_patchMap[InAppWebViewInitialData$.historyUrl] is Function)
+                    ? _patchMap[InAppWebViewInitialData$.historyUrl](
+                        this.historyUrl,
+                      )
+                    : (_patchMap[InAppWebViewInitialData$.historyUrl] is Patch)
+                    ? _patchMap[InAppWebViewInitialData$.historyUrl].applyTo(
+                        this.historyUrl,
+                      )
+                    : _patchMap[InAppWebViewInitialData$.historyUrl])
+                as WebUri?
           : this.historyUrl,
     );
   }
@@ -160,7 +199,8 @@ class InAppWebViewInitialData {
 
   Map<String, dynamic> toJsonLean() {
     final Map<String, dynamic> data = _$InAppWebViewInitialDataToJson(this);
-    return _sanitizeJson(data);
+    _sanitizeJson(data);
+    return data;
   }
 
   dynamic _sanitizeJson(dynamic json) {

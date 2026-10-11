@@ -10,7 +10,7 @@ void main() {
         'accessKind': null,
       });
       expect(result, isNotNull);
-      expect(result!.hostName, '');
+      expect(result.hostName, '');
       expect(result.folderPath, '');
       expect(result.accessKind, HostResourceAccessKind.allow);
     });
@@ -18,7 +18,7 @@ void main() {
     test('with empty map returns safe defaults', () {
       final result = VirtualHostMapping.fromJson(<String, dynamic>{});
       expect(result, isNotNull);
-      expect(result!.hostName, '');
+      expect(result.hostName, '');
       expect(result.folderPath, '');
       expect(result.accessKind, HostResourceAccessKind.allow);
     });
@@ -39,7 +39,7 @@ void main() {
         'accessKind': 2,
       });
       expect(result, isNotNull);
-      expect(result!.hostName, 'app.localhost');
+      expect(result.hostName, 'app.localhost');
       expect(result.folderPath, 'C:/assets/web');
       expect(result.accessKind, HostResourceAccessKind.allowCors);
     });
@@ -52,7 +52,7 @@ void main() {
       );
       final restored = VirtualHostMapping.fromJson(mapping.toJson());
       expect(restored, isNotNull);
-      expect(restored!.hostName, mapping.hostName);
+      expect(restored.hostName, mapping.hostName);
       expect(restored.folderPath, mapping.folderPath);
       expect(restored.accessKind, mapping.accessKind);
     });
@@ -96,7 +96,7 @@ void main() {
       );
       final restored = WebViewEnvironmentSettings.fromJson(settings.toJson());
       expect(restored, isNotNull);
-      expect(restored!.virtualHostMappings, hasLength(1));
+      expect(restored.virtualHostMappings, hasLength(1));
       expect(restored.virtualHostMappings!.single.hostName, 'app.localhost');
       expect(
         restored.virtualHostMappings!.single.accessKind,
@@ -109,7 +109,7 @@ void main() {
         'virtualHostMappings': null,
       });
       expect(restored, isNotNull);
-      expect(restored!.virtualHostMappings, isNull);
+      expect(restored.virtualHostMappings, isNull);
     });
   });
 }

@@ -63,6 +63,33 @@ void main() {
     });
   });
 
+  group('callHandler channel contract', () {
+    Future<dynamic> invokeHandler(dynamic callbackResult) {
+      controller.addJavaScriptHandler(
+        handlerName: 'channelContract',
+        callback: (args) async => callbackResult,
+      );
+      return controller.handleMethod(
+        const MethodCall('callHandler', {
+          'handlerName': 'channelContract',
+          'args': '[]',
+        }),
+      );
+    }
+
+    test('returns null as JSON text for the native bridge', () async {
+      expect(await invokeHandler(null), 'null');
+    });
+
+    test('returns strings as JSON text for the native bridge', () async {
+      expect(await invokeHandler('ready'), '"ready"');
+    });
+
+    test('returns objects as JSON text for the native bridge', () async {
+      expect(await invokeHandler({'ready': true}), '{"ready":true}');
+    });
+  });
+
   group('removeJavaScriptHandler', () {
     test('returns null when handler does not exist', () {
       final result = controller.removeJavaScriptHandler(
@@ -129,27 +156,30 @@ void main() {
   });
 
   group('onWebContentProcessDidTerminate', () {
-    test('invokes the callback when the method is dispatched (issue #194)', () async {
-      var invoked = false;
-      final widgetParams = PlatformInAppWebViewWidgetCreationParams(
-        controllerFromPlatform: (c) => c,
-        onWebContentProcessDidTerminate: (c) {
-          invoked = true;
-        },
-      );
-      final controllerParams = PlatformInAppWebViewControllerCreationParams(
-        id: 12345,
-        webviewParams: widgetParams,
-      );
-      final ctl = MacOSInAppWebViewController(controllerParams);
+    test(
+      'invokes the callback when the method is dispatched (issue #194)',
+      () async {
+        var invoked = false;
+        final widgetParams = PlatformInAppWebViewWidgetCreationParams(
+          controllerFromPlatform: (c) => c,
+          onWebContentProcessDidTerminate: (c) {
+            invoked = true;
+          },
+        );
+        final controllerParams = PlatformInAppWebViewControllerCreationParams(
+          id: 12345,
+          webviewParams: widgetParams,
+        );
+        final ctl = MacOSInAppWebViewController(controllerParams);
 
-      await ctl.handleMethod(
-        const MethodCall('onWebContentProcessDidTerminate'),
-      );
+        await ctl.handleMethod(
+          const MethodCall('onWebContentProcessDidTerminate'),
+        );
 
-      expect(invoked, isTrue);
-      ctl.dispose();
-    });
+        expect(invoked, isTrue);
+        ctl.dispose();
+      },
+    );
 
     test('does not throw when no callback is registered', () async {
       // controller in setUp has no onWebContentProcessDidTerminate callback
@@ -266,5 +296,291 @@ void main() {
         );
       },
     );
+  });
+
+  // Regression test for issue #197 / macOS scroll callbacks:
+  // the native side emits onScrollChanged / onContentSizeChanged /
+  // onOverScrolled, but the Dart dispatcher previously had no case arms and
+  // fell through to `default:` throwing UnimplementedError. These tests pin the
+  // Dart-side channel contract so a future refactor cannot silently re-break it.
+  group('scroll callbacks (issue #197)', () {
+    test('onScrollChanged invokes the callback with decoded x/y', () async {
+      int? receivedX;
+      int? receivedY;
+      final widgetParams = PlatformInAppWebViewWidgetCreationParams(
+        controllerFromPlatform: (c) => c,
+        onScrollChanged: (c, x, y) {
+          receivedX = x;
+          receivedY = y;
+        },
+      );
+      final controllerParams = PlatformInAppWebViewControllerCreationParams(
+        id: 11111,
+        webviewParams: widgetParams,
+      );
+      final ctl = MacOSInAppWebViewController(controllerParams);
+      addTearDown(ctl.dispose);
+
+      await ctl.handleMethod(MethodCall('onScrollChanged', {'x': 12, 'y': 34}));
+
+      expect(receivedX, 12);
+      expect(receivedY, 34);
+    });
+
+    test(
+      'onContentSizeChanged invokes the callback with decoded sizes',
+      () async {
+        Size? oldSize;
+        Size? newSize;
+        final widgetParams = PlatformInAppWebViewWidgetCreationParams(
+          controllerFromPlatform: (c) => c,
+          onContentSizeChanged: (c, oldContentSize, newContentSize) {
+            oldSize = oldContentSize;
+            newSize = newContentSize;
+          },
+        );
+        final controllerParams = PlatformInAppWebViewControllerCreationParams(
+          id: 22222,
+          webviewParams: widgetParams,
+        );
+        final ctl = MacOSInAppWebViewController(controllerParams);
+        addTearDown(ctl.dispose);
+
+        await ctl.handleMethod(
+          MethodCall('onContentSizeChanged', {
+            'oldContentSize': {'width': 100.0, 'height': 200.0},
+            'newContentSize': {'width': 300.0, 'height': 400.0},
+          }),
+        );
+
+        expect(oldSize, const Size(100, 200));
+        expect(newSize, const Size(300, 400));
+      },
+    );
+
+    test('onOverScrolled invokes the callback with decoded flags', () async {
+      int? x;
+      int? y;
+      bool? clampedX;
+      bool? clampedY;
+      final widgetParams = PlatformInAppWebViewWidgetCreationParams(
+        controllerFromPlatform: (c) => c,
+        onOverScrolled: (c, xv, yv, cx, cy) {
+          x = xv;
+          y = yv;
+          clampedX = cx;
+          clampedY = cy;
+        },
+      );
+      final controllerParams = PlatformInAppWebViewControllerCreationParams(
+        id: 33333,
+        webviewParams: widgetParams,
+      );
+      final ctl = MacOSInAppWebViewController(controllerParams);
+      addTearDown(ctl.dispose);
+
+      await ctl.handleMethod(
+        MethodCall('onOverScrolled', {
+          'x': 5,
+          'y': 6,
+          'clampedX': true,
+          'clampedY': false,
+        }),
+      );
+
+      expect(x, 5);
+      expect(y, 6);
+      expect(clampedX, isTrue);
+      expect(clampedY, isFalse);
+    });
+
+    test('does not throw when no callback is registered', () async {
+      // controller from setUp has no scroll callbacks wired up.
+      await controller.handleMethod(
+        MethodCall('onScrollChanged', {'x': 0, 'y': 0}),
+      );
+      await controller.handleMethod(
+        MethodCall('onContentSizeChanged', {
+          'oldContentSize': {'width': 0.0, 'height': 0.0},
+          'newContentSize': {'width': 0.0, 'height': 0.0},
+        }),
+      );
+      await controller.handleMethod(
+        MethodCall('onOverScrolled', {
+          'x': 0,
+          'y': 0,
+          'clampedX': false,
+          'clampedY': false,
+        }),
+      );
+      // reaching here without throwing is the assertion: the three case arms
+      // exist and the default throw is no longer hit for these method names.
+    });
+  });
+
+  group('onDownloadStartRequest dispatch (issue #339)', () {
+    test(
+      'routes a native download event to the webview params callback',
+      () async {
+        DownloadStartRequest? received;
+        final widgetParams = PlatformInAppWebViewWidgetCreationParams(
+          controllerFromPlatform: (c) => c,
+          onDownloadStartRequest: (controller, request) {
+            received = request;
+          },
+        );
+        final downloadController = MacOSInAppWebViewController(
+          PlatformInAppWebViewControllerCreationParams(
+            id: 339,
+            webviewParams: widgetParams,
+          ),
+        );
+
+        addTearDown(downloadController.dispose);
+
+        await downloadController.handleMethod(
+          const MethodCall('onDownloadStartRequest', <String, dynamic>{
+            'url': 'https://example.com/report.zip',
+            'userAgent': null,
+            'contentDisposition': 'attachment; filename="report.zip"',
+            'mimeType': 'application/zip',
+            'contentLength': 1234,
+            'suggestedFilename': 'report.zip',
+            'textEncodingName': null,
+          }),
+        );
+
+        expect(received, isNotNull);
+        expect(received!.url, WebUri('https://example.com/report.zip'));
+        expect(received!.userAgent, isNull);
+        expect(
+          received!.contentDisposition,
+          'attachment; filename="report.zip"',
+        );
+        expect(received!.mimeType, 'application/zip');
+        expect(received!.contentLength, 1234);
+        expect(received!.suggestedFilename, 'report.zip');
+        expect(received!.textEncodingName, isNull);
+      },
+    );
+
+    test('does not throw when no callback is registered', () async {
+      // controller from setUp has no download callback wired up.
+      await controller.handleMethod(
+        const MethodCall('onDownloadStartRequest', <String, dynamic>{
+          'url': 'https://example.com/report.zip',
+          'contentLength': 0,
+        }),
+      );
+      // reaching here without throwing is the assertion: the case arm exists
+      // and the default throw is no longer hit for this method name.
+    });
+
+    test('drops a malformed event with a null arguments map', () async {
+      DownloadStartRequest? received;
+      final widgetParams = PlatformInAppWebViewWidgetCreationParams(
+        controllerFromPlatform: (c) => c,
+        onDownloadStartRequest: (controller, request) {
+          received = request;
+        },
+      );
+      final downloadController = MacOSInAppWebViewController(
+        PlatformInAppWebViewControllerCreationParams(
+          id: 340,
+          webviewParams: widgetParams,
+        ),
+      );
+
+      addTearDown(downloadController.dispose);
+
+      // The entity requires a url, so a url-less event is dropped instead of
+      // throwing out of the decoder.
+      await downloadController.handleMethod(
+        const MethodCall('onDownloadStartRequest', null),
+      );
+      await downloadController.handleMethod(
+        const MethodCall('onDownloadStartRequest', <String, dynamic>{}),
+      );
+
+      expect(received, isNull);
+    });
+
+    test('drops a malformed event with a non-map payload or unusable url',
+        () async {
+      DownloadStartRequest? received;
+      final widgetParams = PlatformInAppWebViewWidgetCreationParams(
+        controllerFromPlatform: (c) => c,
+        onDownloadStartRequest: (controller, request) {
+          received = request;
+        },
+      );
+      final downloadController = MacOSInAppWebViewController(
+        PlatformInAppWebViewControllerCreationParams(
+          id: 341,
+          webviewParams: widgetParams,
+        ),
+      );
+
+      addTearDown(downloadController.dispose);
+
+      // A non-map payload fails the guard instead of throwing in the cast;
+      // a non-String url fails the entity's required-url decode; an
+      // empty-string url would fire the callback with an empty WebUri.
+      await downloadController.handleMethod(
+        const MethodCall('onDownloadStartRequest', 'not-a-map'),
+      );
+      await downloadController.handleMethod(
+        const MethodCall('onDownloadStartRequest', <String, dynamic>{
+          'url': 341,
+        }),
+      );
+      await downloadController.handleMethod(
+        const MethodCall('onDownloadStartRequest', <String, dynamic>{
+          'url': '',
+        }),
+      );
+
+      expect(received, isNull);
+    });
+
+    test('drops a well-shaped-url payload with a type-mismatched field',
+        () async {
+      DownloadStartRequest? received;
+      final widgetParams = PlatformInAppWebViewWidgetCreationParams(
+        controllerFromPlatform: (c) => c,
+        onDownloadStartRequest: (controller, request) {
+          received = request;
+        },
+      );
+      final downloadController = MacOSInAppWebViewController(
+        PlatformInAppWebViewControllerCreationParams(
+          id: 342,
+          webviewParams: widgetParams,
+        ),
+      );
+
+      addTearDown(downloadController.dispose);
+
+      // The url guard only inspects `url`, so a payload with a real url but a
+      // type-mismatched sibling field still reaches the generated decoder.
+      // `contentLength` is decoded as `(v as num).toInt()`, and the checked
+      // decoder rethrows the resulting TypeError as a CheckedFromJsonException
+      // — an Exception, not an Error, so the channel wrapper's `on Error` does
+      // not catch it. handleMethod must drop the event rather than propagate.
+      await downloadController.handleMethod(
+        const MethodCall('onDownloadStartRequest', <String, dynamic>{
+          'url': 'https://example.com/f.zip',
+          'contentLength': 'oops',
+        }),
+      );
+      await downloadController.handleMethod(
+        const MethodCall('onDownloadStartRequest', <String, dynamic>{
+          'url': 'https://example.com/f.zip',
+          'suggestedFilename': 342,
+        }),
+      );
+
+      expect(received, isNull);
+    });
   });
 }
