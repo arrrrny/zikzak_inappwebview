@@ -99,6 +99,9 @@ class InAppWebViewWindowsWidget extends PlatformInAppWebViewWidget {
     return _InAppWebViewWindowsWidgetState(params);
   }
 
+  /// Teardown is owned by the `State`, not by this object: the platform
+  /// controller is created asynchronously in `initPlatformState`, and the
+  /// state's own `dispose()` forwards disposal to it on unmount.
   @override
   void dispose({bool isKeepAlive = false}) {}
 
@@ -122,6 +125,16 @@ class _InAppWebViewWindowsWidgetStateImpl
     extends State<_InAppWebViewWindowsWidgetState> {
   final _controller = WebviewController();
   bool _isInitialized = false;
+
+  /// The platform controller created by [initPlatformState], held so this
+  /// state's `dispose()` can forward teardown to it.
+  ///
+  /// [InAppWebViewWindowsController] owns the `url` / `loadingState` /
+  /// `historyChanged` subscriptions, and the raw [WebviewController] they sit
+  /// on never closes its stream controllers. Without this call those listeners
+  /// outlive an unmounted `InAppWebView` and keep the graph alive. Mirrors
+  /// `MacOSInAppWebViewWidget`, which disposes its controller the same way.
+  InAppWebViewWindowsController? _platformController;
 
   /// Native-event subscriptions. `WebviewController.dispose()` never closes
   /// its stream controllers, so these must be cancelled explicitly —
@@ -186,6 +199,13 @@ class _InAppWebViewWindowsWidgetStateImpl
         controllerParams,
         _controller,
       );
+      if (!mounted) {
+        // The state was torn down while the environment was coming up, so
+        // nothing will ever call dispose() on this controller.
+        controller.dispose();
+        return;
+      }
+      _platformController = controller;
       final callbackController =
           // The platform widget wrapper always installs this callback; the
           // `?? controller` fallback only exists so direct platform-object
@@ -284,7 +304,10 @@ class _InAppWebViewWindowsWidgetStateImpl
   @override
   void dispose() {
     _loadingStateSubscription?.cancel();
-    _controller.dispose();
+    // Cancels the url / loadingState / historyChanged subscriptions too, and
+    // disposes the underlying WebviewController when it is initialized.
+    _platformController?.dispose();
+    _platformController = null;
     super.dispose();
   }
 }
