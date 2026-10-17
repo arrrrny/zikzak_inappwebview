@@ -11,6 +11,20 @@ class _FakeController extends PlatformInAppWebViewController {
     : super.implementation(params);
 }
 
+/// Stands in for the app-facing `InAppWebViewController` that
+/// `zikzak_inappwebview` returns from `controllerFromPlatform`.
+///
+/// It *wraps* a platform controller rather than implementing one, which is the
+/// shape the real federated controller has. That distinction is the whole point
+/// of this double: [_FakeController] extends [PlatformInAppWebViewController],
+/// so passing it satisfies a `PlatformInAppWebViewController` parameter and
+/// silently hides the downcast that a real wrapper triggers.
+class _FederatedControllerDouble {
+  _FederatedControllerDouble(this.platform);
+
+  final PlatformInAppWebViewController platform;
+}
+
 void main() {
   group('dispatchLoadingStateChange (windows load events)', () {
     late List<Map<String, Object?>> calls;
@@ -114,6 +128,61 @@ void main() {
         hasLength(2),
         reason: 'one onLoadStart per top-level navigation, not per page visit',
       );
+    });
+  });
+
+  group('dispatchLoadingStateChange (federated controllerFromPlatform)', () {
+    /// Builds params the way `zikzak_inappwebview`'s `InAppWebView` widget does:
+    /// `controllerFromPlatform` converts the platform controller into the
+    /// app-facing one, and the load callbacks receive that wrapper.
+    test('forwards the wrapper verbatim instead of downcasting it', () {
+      final received = <Object?>[];
+      final params = PlatformInAppWebViewWidgetCreationParams(
+        controllerFromPlatform: (platform) =>
+            _FederatedControllerDouble(platform),
+        onLoadStart: (c, url) => received.add(c),
+        onLoadStop: (c, url) => received.add(c),
+        onProgressChanged: (c, progress) => received.add(c),
+      );
+      final platform = _FakeController(
+        PlatformInAppWebViewControllerCreationParams(
+          id: null,
+          webviewParams: params,
+        ),
+      );
+
+      // Exactly what the widget state computes before dispatching a load event.
+      final callbackController = params.controllerFromPlatform!(platform);
+
+      expect(
+        callbackController,
+        isNot(isA<PlatformInAppWebViewController>()),
+        reason:
+            'the federated wrapper is not a platform controller; if this ever '
+            'changes the test stops guarding the downcast it exists for',
+      );
+
+      dispatchLoadingStateChange(
+        state: LoadingState.loading,
+        url: 'https://example.com/',
+        controller: callbackController,
+        params: params,
+      );
+      dispatchLoadingStateChange(
+        state: LoadingState.navigationCompleted,
+        url: 'https://example.com/',
+        controller: callbackController,
+        params: params,
+      );
+
+      // progress 0 + onLoadStart, then progress 100 + onLoadStop. A narrowed
+      // `controller` parameter throws a TypeError on the first dispatch, which
+      // inside a Stream.listen callback becomes an unhandled zone error and
+      // drops every load event.
+      expect(received, hasLength(4));
+      for (final controller in received) {
+        expect(controller, same(callbackController));
+      }
     });
   });
 }
