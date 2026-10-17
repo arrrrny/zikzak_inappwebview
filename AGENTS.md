@@ -41,6 +41,52 @@ zread generate --stdio                                  # (re)generate
 
 ---
 
+## 🌐 `HTTPS_PROXY` — an OPENCODE-ONLY problem. Do not replicate the workaround.
+
+**Read this before you copy `env -u HTTPS_PROXY` out of any doc or commit message in this repo.**
+
+`~/.zshrc` (and `~/.bash_profile`) define the agent CLI as an alias that injects a proxy into *that command's* environment only:
+
+```sh
+alias opencode='HTTPS_PROXY=https://$(head -n1 ~/.secrets/proxy-node-auth)@proxy-node.zuzu.dev NO_PROXY=localhost,127.0.0.1 opencode'
+```
+
+Note "Scoped to the `opencode` command ONLY" in the comment above it. It is **not** an exported login-shell variable — prove it yourself:
+
+```bash
+env -i /bin/zsh -c 'echo "[${HTTPS_PROXY}]"'   # -> []
+```
+
+So `HTTPS_PROXY` is inherited by the processes **opencode** spawns (its Bash tool, and every `flutter`/`dart`/`git`/`curl` under it) and by **nothing else**.
+
+**Why it bites:** Dart pub refuses a proxy URL that carries embedded credentials, so *every* pub operation dies before it starts:
+
+```
+Invalid proxy configuration PROXY proxy:TOKEN@proxy-node.zuzu.dev
+Failed to update packages.                                  # exit 69
+```
+
+That takes down `flutter pub get` — and therefore `flutter analyze`, `flutter test` and `pub publish`, which all resolve dependencies first. It looks like a red build; it is not. It is the proxy.
+
+**The rule — who does what:**
+
+| Where the command runs | Has `HTTPS_PROXY`? | What to do |
+| --- | --- | --- |
+| **Inside opencode** (this file's audience: the Bash tool, `scripts/local_ci.sh`, `scripts/publish.sh`) | yes | Prefix pub-touching commands: `env -u HTTPS_PROXY -u https_proxy bash scripts/publish.sh` |
+| **Kimi**, any other editor/agent, a plain terminal, a CI runner, a human | **no** | **Nothing.** Do not add `env -u …`, do not wrap your commands in it, do not "fix" a script by adding it |
+
+**If you are not opencode:** `env -u HTTPS_PROXY` unsets a variable you never had, so it is a no-op at best. Writing it into scripts, docs or commits — or reporting it as a fix — is cargo-culting a defect that does not exist in your environment. One command settles it:
+
+```bash
+echo "${HTTPS_PROXY:-unset}"    # "unset" -> this section does not apply to you
+```
+
+**Never bake the unset into the repo.** `scripts/local_ci.sh` and `scripts/publish.sh` must stay proxy-agnostic: they cannot know who launched them, and a hard-coded `env -u` would silently mask a genuinely broken proxy for a caller who does have one configured.
+
+The same workaround is quoted in the `6.2.x` `CHANGELOG.md` entries and in `PUBLISH.md`. Those references carry this same opencode-only scope — if you are grepping this repo for `HTTPS_PROXY` because a command failed, the answer is in this section, not in the command you were about to copy.
+
+---
+
 ## 📦 Project Overview
 
 `zikzak_inappwebview` is a **Flutter plugin** (a community fork of `flutter_inappwebview`, API-equivalent to upstream 6.x, published as fork version 4.x/5.x) that provides an inline WebView, a headless WebView, and an in-app browser window across **6 platforms**: Android, iOS, macOS, Web, Windows, Linux.
@@ -50,7 +96,7 @@ It is a **Dart/Flutter monorepo** made of **9 independent pub packages** that fo
 - **License:** Apache License 2.0 (see `LICENSE`). Dart source files do NOT carry per-file Apache headers — don't add them.
 - **Homepage / docs:** https://arrrrny.github.io/zikzak_inappwebview
 - **Pub:** https://pub.dev/packages/zikzak_inappwebview
-- **SDK floor (all packages):** `sdk: >=3.8.0 <4.0.0`, `flutter: >=3.38.6`. Installed toolchain on this machine: Flutter 3.47.1 / Dart 3.13.1.
+- **SDK floor (all packages):** `sdk: >=3.8.0 <4.0.0`, `flutter: >=3.38.6`. Installed toolchain on this machine: Flutter 3.47.7 / Dart 3.13.5.
 
 ### The JavaScript bridge global
 
@@ -176,23 +222,25 @@ cd zikzak_inappwebview/example && flutter test integration_test/<file>.dart -d <
 ### GYM exercises (`.gym/`)
 `zikzak_inappwebview/.gym/gym.yaml` defines a package-level GYM: warmup reps `01-deps` (flutter pub get), `02-build` (analyze), `03-bridge-smoke` (flutter test `.gym/warmup/03-bridge-smoke_test.dart`), plus graded exercises (e.g. `js-bridge-round-trip`) graded by exit code.
 
-### Known repository state — measured on `master` at 2026-10-07, after the `6.2.0` release
+### Known repository state — measured on `master` at 2026-10-17, after the `6.2.1` release
 
-`master` is **green**: the CI matrix passes all 17 jobs, and every number below was reproduced locally on the same commit. Re-measure before leaning on it — this table moves.
+`master` is **green**: the 17-job CI matrix passes, and every number below was reproduced locally on the same commit via `./scripts/local_ci.sh`. Re-measure before leaning on it — this table moves.
 
 | Package | test files | `flutter test` | `flutter analyze` |
 | --- | --- | --- | --- |
 | `zikzak_inappwebview` | 27 | 250 pass — GREEN | 23 infos, 0 warnings, 0 errors |
 | `zikzak_inappwebview_platform_interface` | 38 | 306 pass — GREEN | 77 infos, 0 warnings, 0 errors |
-| `zikzak_inappwebview_macos` | 10 | 101 pass — GREEN | clean |
-| `zikzak_inappwebview_ios` | 7 | 23 pass — GREEN | 192 infos, 0 warnings, 0 errors |
-| `zikzak_inappwebview_windows` | 4 | 24 pass — GREEN | clean |
+| `zikzak_inappwebview_macos` | 11 | 106 pass — GREEN | clean |
+| `zikzak_inappwebview_ios` | 9 | 27 pass — GREEN | 192 infos, 0 warnings, 0 errors |
+| `zikzak_inappwebview_windows` | 6 | 36 pass — GREEN | clean |
 | `zikzak_inappwebview_linux` | 2 | 9 pass — GREEN | 5 infos, 0 warnings, 0 errors |
 | `zikzak_inappwebview_web` | 1 | 1 pass — GREEN, but ONLY with `--platform chrome` | clean |
-| `zikzak_inappwebview_android` | 3 | 12 pass — outside the CI matrix | 197 infos, 0 warnings, 0 errors |
+| `zikzak_inappwebview_android` | 5 | 16 pass — outside the CI matrix | 197 infos, 0 warnings, 0 errors |
 | `zikzak_inappwebview_module` | 1 | 6 pass — outside the CI matrix | clean (`publish_to: none`, never published) |
 
 The remaining infos are style-level and deliberately tolerated (`--no-fatal-infos`). Warnings are **not** tolerated — a new warning in any matrix package is a red build. Note that `zikzak_inappwebview_android` and `zikzak_inappwebview_module` are simply absent from both matrices (`analyze` covers 7 packages, `test` covers 6 plus the `--platform chrome` web job); both are green when measured locally, so their exclusion is not a lint-debt gate. Treat their numbers as unverified-in-CI.
+
+One local-CI step is not reproducible on this machine: `build-ios [runner=macos-14]`'s "Check the toolchain compiles the arm this job exists for" asserts a pre-Swift-6 toolchain, and the local Xcode is Swift 6.x, so it fails by construction (the `macos-15` arm runs the same step and passes). Both Swift builds — `flutter build ios --release --no-codesign` and `flutter build macos --debug` — do run and pass locally, so the Swift sources are genuinely compiled; only that one assertion is skipped in practice.
 
 ### Local-source dependencies (dev mode)
 

@@ -883,7 +883,7 @@ packages:
       path: "../zikzak_inappwebview"
       relative: true
     source: path
-    version: "6.2.0"
+    version: "6.2.1"
   zikzak_inappwebview_android:
     dependency: transitive
     description:

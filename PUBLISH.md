@@ -75,18 +75,27 @@ bash scripts/prepare_for_publish.sh <version> <<< "" && \
 
 ## Notes
 
-- **`HTTPS_PROXY` breaks pub.** When `HTTPS_PROXY` contains embedded credentials
-  (`https://proxy:TOKEN@proxy-node…`), Dart pub rejects it with
-  `Invalid proxy configuration`, and every `flutter pub get` / `pub publish`
-  inside the scripts fails. Direct egress works, so run the pub-touching scripts
-  with the proxy unset:
+- **`HTTPS_PROXY` breaks pub — but ONLY inside an opencode session.** The
+  variable is injected by the `opencode` shell alias, scoped to that command
+  alone; it is **not** exported by the login shell. See the
+  "`HTTPS_PROXY` — an OPENCODE-ONLY problem" section in `AGENTS.md`.
+
+  **If you are opencode** (or scripting a release from inside it), the
+  credential-bearing proxy value makes Dart pub reject every pub operation with
+  `Invalid proxy configuration`, so run the pub-touching scripts with it unset:
 
   ```bash
   env -u HTTPS_PROXY -u https_proxy bash scripts/publish.sh
   ```
 
+  **If you are Kimi, any other agent, a plain terminal or CI, do nothing.** You
+  have no `HTTPS_PROXY` — `env -i /bin/zsh -c 'echo "[${HTTPS_PROXY}]"'` prints
+  `[]` — so `env -u` would unset a variable that never existed and "fix" a
+  problem you do not have. Confirm with `echo "${HTTPS_PROXY:-unset}"` before
+  reaching for the workaround, and do not copy it into scripts or docs.
+
   `prepare_for_publish.sh` and `push_to_master.sh` only use curl/git, so they are
-  unaffected.
+  unaffected either way.
 - **Do NOT finish with `restore_dev_setup.sh`.** It rewrites the intra-repo
   dependencies as `path:` entries under `dependencies:`, which makes every
   publishable package emit `invalid_dependency` — a *warning*, and therefore a
