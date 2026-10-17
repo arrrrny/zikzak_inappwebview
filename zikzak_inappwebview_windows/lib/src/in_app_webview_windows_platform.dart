@@ -61,7 +61,8 @@ class _VirtualHostMappingInfo {
 /// granular progress), and `none` produces no callbacks. Redirects produce
 /// multiple start/stop cycles — one per top-level navigation.
 ///
-/// [controller] is deliberately untyped. The value forwarded to the callbacks
+/// [controller] is deliberately typed as [Object] rather than
+/// [PlatformInAppWebViewController]. The value forwarded to the callbacks
 /// is whatever `params.controllerFromPlatform` returned, and in the federated
 /// plugin that is the app-facing `InAppWebViewController` from
 /// `zikzak_inappwebview`, which *wraps* a [PlatformInAppWebViewController]
@@ -72,12 +73,12 @@ class _VirtualHostMappingInfo {
 /// silently dropped: the webview renders normally while the host waits forever
 /// for an `onLoadStop` that never arrives. The `params` callbacks are typed
 /// `void Function(T, ...)` with `T = dynamic`, so passing the wrapper through
-/// untyped is the contract, not a hole in it.
+/// this parameter is the contract, not a hole in it.
 @visibleForTesting
 void dispatchLoadingStateChange({
   required LoadingState state,
   required String? url,
-  required dynamic controller,
+  required Object controller,
   required PlatformInAppWebViewWidgetCreationParams params,
 }) {
   final uri = url == null ? null : WebUri(url);
