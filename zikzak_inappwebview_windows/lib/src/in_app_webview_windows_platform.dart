@@ -99,6 +99,9 @@ class InAppWebViewWindowsWidget extends PlatformInAppWebViewWidget {
     return _InAppWebViewWindowsWidgetState(params);
   }
 
+  /// Teardown is owned by the `State`, not by this object: the platform
+  /// controller is created asynchronously in `initPlatformState`, and the
+  /// state's own `dispose()` forwards disposal to it on unmount.
   @override
   void dispose({bool isKeepAlive = false}) {}
 
@@ -123,11 +126,20 @@ class _InAppWebViewWindowsWidgetStateImpl
   final _controller = WebviewController();
   bool _isInitialized = false;
 
+  /// The platform controller created by [initPlatformState], held so this
+  /// state's `dispose()` can forward teardown to it.
+  ///
+  /// [InAppWebViewWindowsController] owns the `url` / `loadingState` /
+  /// `historyChanged` subscriptions, and the raw [WebviewController] they sit
+  /// on never closes its stream controllers. Without this call those listeners
+  /// outlive an unmounted `InAppWebView` and keep the graph alive. Mirrors
+  /// `MacOSInAppWebViewWidget`, which disposes its controller the same way.
+  InAppWebViewWindowsController? _platformController;
+
   /// Native-event subscriptions. `WebviewController.dispose()` never closes
   /// its stream controllers, so these must be cancelled explicitly —
   /// otherwise in-flight events can invoke callbacks after this `State` is
   /// unmounted.
-  StreamSubscription<String>? _urlSubscription;
   StreamSubscription<LoadingState>? _loadingStateSubscription;
 
   @override
@@ -187,6 +199,13 @@ class _InAppWebViewWindowsWidgetStateImpl
         controllerParams,
         _controller,
       );
+      if (!mounted) {
+        // The state was torn down while the environment was coming up, so
+        // nothing will ever call dispose() on this controller.
+        controller.dispose();
+        return;
+      }
+      _platformController = controller;
       final callbackController =
           // The platform widget wrapper always installs this callback; the
           // `?? controller` fallback only exists so direct platform-object
@@ -244,13 +263,16 @@ class _InAppWebViewWindowsWidgetStateImpl
       // onLoadStart/onLoadStop is best-effort and may be null or stale when
       // the loadingState event lands before the matching urlChanged event
       // (webview_windows 0.4.0 has no synchronous url getter).
-      String? currentUrl;
-      _urlSubscription = _controller.url.listen((url) => currentUrl = url);
+      //
+      // The URL comes from the controller's own cache rather than a second
+      // subscription here: `WebviewController.url` is single-subscription, and
+      // sharing one cache is what keeps this value and `getUrl()` from drifting
+      // apart.
       _loadingStateSubscription = _controller.loadingState.listen((state) {
         if (!mounted) return;
         dispatchLoadingStateChange(
           state: state,
-          url: currentUrl,
+          url: controller.currentUrl,
           controller: callbackController,
           params: widget.params,
         );
@@ -281,9 +303,11 @@ class _InAppWebViewWindowsWidgetStateImpl
 
   @override
   void dispose() {
-    _urlSubscription?.cancel();
     _loadingStateSubscription?.cancel();
-    _controller.dispose();
+    // Cancels the url / loadingState / historyChanged subscriptions too, and
+    // disposes the underlying WebviewController when it is initialized.
+    _platformController?.dispose();
+    _platformController = null;
     super.dispose();
   }
 }
