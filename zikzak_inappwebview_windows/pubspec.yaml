@@ -18,7 +18,7 @@ flutter:
 dependencies:
   flutter:
     sdk: flutter
-  zikzak_inappwebview_platform_interface: ^6.2.1
+  zikzak_inappwebview_platform_interface: ^6.2.0
   webview_windows: ^0.4.0
   path: ^1.9.0
   path_provider: ^2.1.0
@@ -31,3 +31,6 @@ dev_dependencies:
 # DEV ONLY: resolve intra-repo packages from local source so a single
 # checkout builds against itself. Stripped by scripts/prepare_for_publish.sh
 # before publishing — pub.dev rejects dependency_overrides.
+dependency_overrides:
+  zikzak_inappwebview_platform_interface:
+    path: ../zikzak_inappwebview_platform_interface

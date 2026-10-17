@@ -930,7 +930,7 @@ packages:
       path: "../../zikzak_inappwebview"
       relative: true
     source: path
-    version: "6.2.0"
+    version: "6.2.1"
   zikzak_inappwebview_android:
     dependency: transitive
     description:
@@ -953,7 +953,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "6.2.0"
+    version: "6.2.1"
   zikzak_inappwebview_macos:
     dependency: transitive
     description:
@@ -968,7 +968,7 @@ packages:
       path: "../../zikzak_inappwebview_platform_interface"
       relative: true
     source: path
-    version: "6.2.0"
+    version: "6.2.1"
   zikzak_inappwebview_web:
     dependency: transitive
     description:

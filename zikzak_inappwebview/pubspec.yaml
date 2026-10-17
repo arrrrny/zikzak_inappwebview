@@ -18,13 +18,13 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  zikzak_inappwebview_platform_interface: ^6.2.1
-  zikzak_inappwebview_android: ^6.2.1
-  zikzak_inappwebview_ios: ^6.2.1
-  zikzak_inappwebview_macos: ^6.2.1
-  zikzak_inappwebview_web: ^6.2.1
-  zikzak_inappwebview_windows: ^6.2.1
-  zikzak_inappwebview_linux: ^6.2.1
+  zikzak_inappwebview_platform_interface: ^6.2.0
+  zikzak_inappwebview_android: ^6.2.0
+  zikzak_inappwebview_ios: ^6.2.0
+  zikzak_inappwebview_macos: ^6.2.0
+  zikzak_inappwebview_web: ^6.2.0
+  zikzak_inappwebview_windows: ^6.2.0
+  zikzak_inappwebview_linux: ^6.2.0
   synchronized: ^3.4.1
   # Held below 1.2.0 on purpose (#363): 1.2.0 only widens its `zuraffa`
   # constraint to ^7.0.1, and zuraffa 7.x's CLI subtree
@@ -109,3 +109,18 @@ false_secrets:
 # DEV ONLY: resolve intra-repo packages from local source so a single
 # checkout builds against itself. Stripped by scripts/prepare_for_publish.sh
 # before publishing — pub.dev rejects dependency_overrides.
+dependency_overrides:
+  zikzak_inappwebview_platform_interface:
+    path: ../zikzak_inappwebview_platform_interface
+  zikzak_inappwebview_android:
+    path: ../zikzak_inappwebview_android
+  zikzak_inappwebview_ios:
+    path: ../zikzak_inappwebview_ios
+  zikzak_inappwebview_macos:
+    path: ../zikzak_inappwebview_macos
+  zikzak_inappwebview_web:
+    path: ../zikzak_inappwebview_web
+  zikzak_inappwebview_windows:
+    path: ../zikzak_inappwebview_windows
+  zikzak_inappwebview_linux:
+    path: ../zikzak_inappwebview_linux
