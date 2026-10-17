@@ -37,10 +37,54 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
   /// install it only once.
   bool _isJsBridgeInstalled = false;
 
+  /// Navigation state mirrored off the [WebviewController] event streams.
+  ///
+  /// `webview_windows` publishes the current URL, the loading state and the
+  /// history depth only as events, with no synchronous getter, while the
+  /// platform interface asks for them on demand ([getUrl], [getProgress],
+  /// [canGoBack], [canGoForward]). `url` and `historyChanged` are also
+  /// single-subscription streams, so this controller — the long-lived owner of
+  /// the [WebviewController] — has to be the one listener that caches them.
+  /// `loadingState` is a broadcast stream, so the widget keeps its own
+  /// subscription there for dispatching the load callbacks.
+  String? _currentUrl;
+  int _progress = 0;
+  bool _canGoBack = false;
+  bool _canGoForward = false;
+
+  StreamSubscription<String>? _urlSubscription;
+  StreamSubscription<LoadingState>? _loadingStateSubscription;
+  StreamSubscription<HistoryChanged>? _historyChangedSubscription;
+
   InAppWebViewWindowsController(
     PlatformInAppWebViewControllerCreationParams params,
     this._controller,
-  ) : super.implementation(params);
+  ) : super.implementation(params) {
+    _urlSubscription = _controller.url.listen((url) => _currentUrl = url);
+    _loadingStateSubscription = _controller.loadingState.listen((state) {
+      // webview_windows reports no granular percentage, so mirror the same
+      // 0 -> 100 mapping dispatchLoadingStateChange already reports to
+      // onProgressChanged.
+      _progress = switch (state) {
+        LoadingState.loading => 0,
+        LoadingState.navigationCompleted => 100,
+        LoadingState.none => _progress,
+      };
+    });
+    _historyChangedSubscription = _controller.historyChanged.listen((history) {
+      _canGoBack = history.canGoBack;
+      _canGoForward = history.canGoForward;
+    });
+  }
+
+  /// The most recent URL reported by the `urlChanged` event, or null before the
+  /// first navigation.
+  ///
+  /// The widget reads this instead of subscribing to
+  /// [WebviewController.url] itself: that stream is single-subscription, and
+  /// sharing one cache keeps the URL handed to `onLoadStart`/`onLoadStop` and
+  /// the URL returned by [getUrl] from drifting apart.
+  String? get currentUrl => _currentUrl;
 
   @override
   void addJavaScriptHandler({
@@ -259,10 +303,8 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
 
   @override
   Future<WebUri?> getUrl() async {
-    // Return null as we can't synchronously get the current URL without tracking it
-    // and we don't want to block on the stream.
-    // TODO: Implement URL tracking
-    return null;
+    final url = _currentUrl;
+    return url == null ? null : WebUri(url);
   }
 
   @override
@@ -272,7 +314,7 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
 
   @override
   Future<int?> getProgress() async {
-    return 100; // Placeholder
+    return _progress;
   }
 
   @override
@@ -294,6 +336,16 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
   @override
   Future<void> reload() async {
     await _controller.reload();
+  }
+
+  @override
+  Future<bool> canGoBack() async {
+    return _canGoBack;
+  }
+
+  @override
+  Future<bool> canGoForward() async {
+    return _canGoForward;
   }
 
   @override
@@ -336,6 +388,12 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
   void dispose({bool isKeepAlive = false}) {
     _webMessageSubscription?.cancel();
     _webMessageSubscription = null;
+    _urlSubscription?.cancel();
+    _urlSubscription = null;
+    _loadingStateSubscription?.cancel();
+    _loadingStateSubscription = null;
+    _historyChangedSubscription?.cancel();
+    _historyChangedSubscription = null;
     _javaScriptHandlersMap.clear();
     if (!isKeepAlive) {
       try {

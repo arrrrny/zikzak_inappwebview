@@ -127,7 +127,6 @@ class _InAppWebViewWindowsWidgetStateImpl
   /// its stream controllers, so these must be cancelled explicitly —
   /// otherwise in-flight events can invoke callbacks after this `State` is
   /// unmounted.
-  StreamSubscription<String>? _urlSubscription;
   StreamSubscription<LoadingState>? _loadingStateSubscription;
 
   @override
@@ -244,13 +243,16 @@ class _InAppWebViewWindowsWidgetStateImpl
       // onLoadStart/onLoadStop is best-effort and may be null or stale when
       // the loadingState event lands before the matching urlChanged event
       // (webview_windows 0.4.0 has no synchronous url getter).
-      String? currentUrl;
-      _urlSubscription = _controller.url.listen((url) => currentUrl = url);
+      //
+      // The URL comes from the controller's own cache rather than a second
+      // subscription here: `WebviewController.url` is single-subscription, and
+      // sharing one cache is what keeps this value and `getUrl()` from drifting
+      // apart.
       _loadingStateSubscription = _controller.loadingState.listen((state) {
         if (!mounted) return;
         dispatchLoadingStateChange(
           state: state,
-          url: currentUrl,
+          url: controller.currentUrl,
           controller: callbackController,
           params: widget.params,
         );
@@ -281,7 +283,6 @@ class _InAppWebViewWindowsWidgetStateImpl
 
   @override
   void dispose() {
-    _urlSubscription?.cancel();
     _loadingStateSubscription?.cancel();
     _controller.dispose();
     super.dispose();
