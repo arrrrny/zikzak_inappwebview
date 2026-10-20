@@ -757,8 +757,9 @@ class WebViewEnvironmentSettingsPatch
         (List<dynamic> list) {
           var updatedList = List<VirtualHostMapping>.from(list);
           if (index >= 0 && index < updatedList.length) {
-            updatedList[index] = patch(VirtualHostMappingPatch())
-                .applyTo(updatedList[index] as VirtualHostMapping);
+            updatedList[index] = patch(
+              VirtualHostMappingPatch(),
+            ).applyTo(updatedList[index] as VirtualHostMapping);
           }
           return updatedList;
         };

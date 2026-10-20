@@ -657,8 +657,9 @@ class AndroidProxySettingsPatch
     patchMap[AndroidProxySettings$.proxyRules] = (List<dynamic> list) {
       var updatedList = List<ProxyRule>.from(list);
       if (index >= 0 && index < updatedList.length) {
-        updatedList[index] = patch(ProxyRulePatch())
-            .applyTo(updatedList[index] as ProxyRule);
+        updatedList[index] = patch(
+          ProxyRulePatch(),
+        ).applyTo(updatedList[index] as ProxyRule);
       }
       return updatedList;
     };

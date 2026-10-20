@@ -250,8 +250,9 @@ class IOSCookieManager extends PlatformCookieManager with ChannelController {
       if (javaScriptEnabled) {
         List<String> documentCookies =
             (await webViewController.evaluateJavascript(
-                  source: 'document.cookie',
-                ) as String)
+                      source: 'document.cookie',
+                    )
+                    as String)
                 .split(';')
                 .map((documentCookie) => documentCookie.trim())
                 .toList();
@@ -279,8 +280,9 @@ class IOSCookieManager extends PlatformCookieManager with ChannelController {
 
     List<String> documentCookies =
         (await headlessWebView.webViewController!.evaluateJavascript(
-              source: 'document.cookie',
-            ) as String)
+                  source: 'document.cookie',
+                )
+                as String)
             .split(';')
             .map((documentCookie) => documentCookie.trim())
             .toList();

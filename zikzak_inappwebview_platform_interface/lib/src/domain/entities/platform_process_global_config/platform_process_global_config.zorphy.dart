@@ -221,8 +221,9 @@ class ProcessGlobalConfigSettingsPatch
     patchMap[ProcessGlobalConfigSettings$.directoryBasePaths] =
         (dynamic current) {
           var currentPatch = ProcessGlobalConfigDirectoryBasePathsPatch();
-          return patch(currentPatch)
-              .applyTo(current as ProcessGlobalConfigDirectoryBasePaths);
+          return patch(
+            currentPatch,
+          ).applyTo(current as ProcessGlobalConfigDirectoryBasePaths);
         };
     return this;
   }

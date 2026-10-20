@@ -242,8 +242,9 @@ class URLProtectionSpaceHttpAuthCredentialsPatch
         (List<dynamic> list) {
           var updatedList = List<URLCredential>.from(list);
           if (index >= 0 && index < updatedList.length) {
-            updatedList[index] = patch(URLCredentialPatch())
-                .applyTo(updatedList[index] as URLCredential);
+            updatedList[index] = patch(
+              URLCredentialPatch(),
+            ).applyTo(updatedList[index] as URLCredential);
           }
           return updatedList;
         };

@@ -10,10 +10,8 @@ import '../web_uri.dart';
 import '../domain/entities/web_authentication_session_settings/web_authenticate_session_settings.dart';
 
 ///A completion handler for the [PlatformWebAuthenticationSession].
-typedef WebAuthenticationSessionCompletionHandler = Future<void> Function(
-  WebUri? url,
-  WebAuthenticationSessionError? error,
-)?;
+typedef WebAuthenticationSessionCompletionHandler =
+    Future<void> Function(WebUri? url, WebAuthenticationSessionError? error)?;
 
 /// Object specifying creation parameters for creating a [PlatformWebAuthenticationSession].
 ///

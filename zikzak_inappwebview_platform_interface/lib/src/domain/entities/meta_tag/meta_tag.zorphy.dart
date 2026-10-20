@@ -214,8 +214,9 @@ class MetaTagPatch extends PatchBase<MetaTag, MetaTag$> {
     patchMap[MetaTag$.attrs] = (List<dynamic> list) {
       var updatedList = List<MetaTagAttribute>.from(list);
       if (index >= 0 && index < updatedList.length) {
-        updatedList[index] = patch(MetaTagAttributePatch())
-            .applyTo(updatedList[index] as MetaTagAttribute);
+        updatedList[index] = patch(
+          MetaTagAttributePatch(),
+        ).applyTo(updatedList[index] as MetaTagAttribute);
       }
       return updatedList;
     };
