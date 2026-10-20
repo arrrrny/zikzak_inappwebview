@@ -1,3 +1,9 @@
+## 6.2.2 - 2026-10-20
+
+
+### Bug Fixes
+
+- The `zuraffa_session` cap that 6.2.1 introduced is lifted. 6.2.1 held the dependency at `">=1.1.0 <1.2.0"` so Flutter Web consumers would stop resolving zuraffa 7.x, whose CLI subtree (`lib/src/cli/zfa_executable.dart`, reachable from the public barrel) used 64-bit integer literals that fail dart2js in every Web build (arrrrny/zuraffa#1729). That upstream issue is closed and the fix shipped in zuraffa 7.2.0, where the FNV-1a digest helper is computed with `BigInt` instead of 64-bit integer literals, so the cap is no longer needed and the constraint is `^1.1.0` again — 6.2.2 resolves `zuraffa_session` 1.2.1 and the zuraffa 7.x line. A consumer dart2js build over `package:zuraffa/zuraffa.dart` + `package:zuraffa_session/zuraffa_session.dart` was re-verified against zuraffa 7.2.0 / zuraffa_session 1.2.1 and compiles cleanly. The cap also broke version solving well beyond Web builds: `zuraffa_session` 1.1.x requires `zuraffa: ^6.2.2`, so any app that also needs `zuraffa: ^7.x` could not resolve this package at all — 6.2.1 was unreachable for zuraffa-7 apps while 6.2.0 stayed resolvable, which silently pinned those consumers to the older release. `zuraffa_session` 1.1.0 and 1.2.x carry identical session code; only the `zuraffa` range differs, so widening the constraint changes no behaviour (#369)
 ## 6.2.1 - 2026-10-17
 
 
