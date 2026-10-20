@@ -4,6 +4,7 @@
 // the constructor assert (dev-time validation only) is dropped.
 
 import 'package:zorphy_annotation/zorphy_annotation.dart';
+
 import '../../../web_message/platform_web_message_port.dart';
 
 part 'web_message.zorphy.dart';

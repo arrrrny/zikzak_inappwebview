@@ -3,6 +3,7 @@
 // fork's constructor defaults (report = true, action = SHOW_INTERSTITIAL).
 
 import 'package:zorphy_annotation/zorphy_annotation.dart';
+
 import '../enums/index.dart';
 
 part 'safe_browsing_response.zorphy.dart';

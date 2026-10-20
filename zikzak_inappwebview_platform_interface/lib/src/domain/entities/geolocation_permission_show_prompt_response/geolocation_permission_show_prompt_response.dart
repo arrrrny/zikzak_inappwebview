@@ -7,6 +7,7 @@
 // lib/src/domain/entities).
 
 import 'package:zorphy_annotation/zorphy_annotation.dart';
+
 import '../../../web_uri.dart';
 
 part 'geolocation_permission_show_prompt_response.zorphy.dart';

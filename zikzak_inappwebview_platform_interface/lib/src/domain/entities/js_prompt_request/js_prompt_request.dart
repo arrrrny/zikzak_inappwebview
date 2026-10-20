@@ -2,6 +2,7 @@
 // zikzak_inappwebview: WebUri field glued to the fork's existing class.
 
 import 'package:zorphy_annotation/zorphy_annotation.dart';
+
 import '../../../web_uri.dart';
 
 part 'js_prompt_request.zorphy.dart';

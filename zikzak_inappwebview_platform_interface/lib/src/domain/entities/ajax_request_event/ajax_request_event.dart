@@ -3,6 +3,7 @@
 // ("loadstart", "load", ...) so it needs explicit fromJson/toJson glue.
 
 import 'package:zorphy_annotation/zorphy_annotation.dart';
+
 import '../enums/index.dart';
 
 part 'ajax_request_event.zorphy.dart';

@@ -1,4 +1,5 @@
 import 'package:zorphy_annotation/zorphy_annotation.dart';
+
 import '../../../web_uri.dart';
 
 part 'loaded_resource.zorphy.dart';

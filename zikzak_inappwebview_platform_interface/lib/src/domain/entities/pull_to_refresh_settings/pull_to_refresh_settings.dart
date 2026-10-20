@@ -1,4 +1,5 @@
 import 'package:zorphy_annotation/zorphy_annotation.dart';
+
 import 'dart:ui';
 
 import '../attributed_string/attributed_string.dart';

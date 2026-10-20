@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
@@ -89,9 +90,8 @@ class AndroidServiceWorkerController extends PlatformServiceWorkerController
               .cast<String, dynamic>();
           WebResourceRequest request = WebResourceRequest.fromJson(arguments);
 
-          return (await serviceWorkerClient!.shouldInterceptRequest!(
-            request,
-          ))?.toJson();
+          return (await serviceWorkerClient!.shouldInterceptRequest!(request))
+              ?.toJson();
         }
         break;
       default:

@@ -1,4 +1,5 @@
 import 'package:zorphy_annotation/zorphy_annotation.dart';
+
 import '../enums/renderer_priority.dart';
 
 part 'renderer_priority_policy.zorphy.dart';

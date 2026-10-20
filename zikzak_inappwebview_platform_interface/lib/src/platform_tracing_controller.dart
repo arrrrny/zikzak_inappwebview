@@ -1,6 +1,8 @@
 import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+
 import 'inappwebview_platform.dart';
 import 'domain/entities/enums/tracing_mode.dart';
 import 'domain/entities/tracing_settings/tracing_settings.dart';

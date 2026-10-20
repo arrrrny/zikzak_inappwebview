@@ -3,6 +3,7 @@
 // value == enum name).
 
 import 'package:zorphy_annotation/zorphy_annotation.dart';
+
 import '../enums/index.dart';
 
 part 'web_resource_error.zorphy.dart';

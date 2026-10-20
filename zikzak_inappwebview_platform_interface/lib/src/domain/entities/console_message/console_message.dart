@@ -3,6 +3,7 @@
 // fork's constructor defaults (message = "", messageLevel = LOG).
 
 import 'package:zorphy_annotation/zorphy_annotation.dart';
+
 import '../enums/index.dart';
 
 part 'console_message.zorphy.dart';

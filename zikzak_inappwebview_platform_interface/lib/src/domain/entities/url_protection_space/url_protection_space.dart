@@ -5,7 +5,9 @@
 // glue replicate the old wire.
 
 import 'dart:typed_data';
+
 import 'package:zorphy_annotation/zorphy_annotation.dart';
+
 import '../../../x509_certificate/x509_certificate.dart';
 import '../enums/url_protection_space_proxy_type.dart';
 import '../enums/url_protection_space_authentication_method.dart';

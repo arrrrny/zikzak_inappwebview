@@ -2,6 +2,7 @@
 // for zikzak_inappwebview: int-wire action enum glue + fork defaults.
 
 import 'package:zorphy_annotation/zorphy_annotation.dart';
+
 import '../enums/http_auth_response_action.dart';
 
 part 'http_auth_response.zorphy.dart';

@@ -6,6 +6,7 @@
 library;
 
 import 'package:flutter/foundation.dart';
+
 import 'platform_in_app_localhost_server.dart';
 
 /// Object specifying creation parameters for creating a [DefaultInAppLocalhostServer].

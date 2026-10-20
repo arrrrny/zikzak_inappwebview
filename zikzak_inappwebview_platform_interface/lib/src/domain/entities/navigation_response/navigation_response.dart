@@ -2,6 +2,7 @@
 // for zikzak_inappwebview: sibling-entity (URLResponse) wire glue.
 
 import 'package:zorphy_annotation/zorphy_annotation.dart';
+
 import '../url_response/url_response.dart';
 
 part 'navigation_response.zorphy.dart';

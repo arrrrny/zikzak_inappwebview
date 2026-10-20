@@ -1,13 +1,16 @@
 import 'package:flutter/foundation.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+
 import '../in_app_webview/platform_inappwebview_controller.dart';
 import '../inappwebview_platform.dart';
 import '../types/disposable.dart';
 import '../domain/entities/print_job_info/print_job_info.dart';
 
 ///A completion handler for the [PlatformPrintJobController].
-typedef PrintJobCompletionHandler =
-    Future<void> Function(bool completed, String? error)?;
+typedef PrintJobCompletionHandler = Future<void> Function(
+  bool completed,
+  String? error,
+)?;
 
 /// Object specifying creation parameters for creating a [PlatformPrintJobController].
 ///

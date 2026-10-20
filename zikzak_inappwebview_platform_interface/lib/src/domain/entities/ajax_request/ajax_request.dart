@@ -7,6 +7,7 @@
 // types outside lib/src/domain/entities).
 
 import 'package:zorphy_annotation/zorphy_annotation.dart';
+
 import '../ajax_request_event/ajax_request_event.dart';
 import '../../../types/ajax_request_headers.dart';
 import '../../../web_uri.dart';

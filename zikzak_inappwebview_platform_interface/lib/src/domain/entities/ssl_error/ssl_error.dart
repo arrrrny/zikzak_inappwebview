@@ -3,6 +3,7 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:zorphy_annotation/zorphy_annotation.dart';
+
 import '../enums/ssl_error_type.dart';
 
 part 'ssl_error.zorphy.dart';

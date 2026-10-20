@@ -6,6 +6,7 @@
 // lib/src/domain/entities).
 
 import 'package:zorphy_annotation/zorphy_annotation.dart';
+
 import '../../../web_uri.dart';
 
 part 'web_resource_request.zorphy.dart';

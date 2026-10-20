@@ -1,4 +1,5 @@
 import 'package:zorphy_annotation/zorphy_annotation.dart';
+
 import 'dart:typed_data';
 
 part 'custom_scheme_response.zorphy.dart';

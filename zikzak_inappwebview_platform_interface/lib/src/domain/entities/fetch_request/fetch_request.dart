@@ -9,6 +9,7 @@
 // lib/src/domain/entities).
 
 import 'package:zorphy_annotation/zorphy_annotation.dart';
+
 import '../../../types/fetch_request_credential.dart';
 import '../../../types/fetch_request_credential_default.dart';
 import '../../../types/fetch_request_federated_credential.dart';

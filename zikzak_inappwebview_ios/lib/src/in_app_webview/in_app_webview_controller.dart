@@ -673,9 +673,8 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
               jsAlertRequest,
             ))?.toJson();
           else
-            return (await _inAppBrowserEventHandler!.onJsAlert(
-              jsAlertRequest,
-            ))?.toJson();
+            return (await _inAppBrowserEventHandler!.onJsAlert(jsAlertRequest))
+                ?.toJson();
         }
         break;
       case "onJsConfirm":

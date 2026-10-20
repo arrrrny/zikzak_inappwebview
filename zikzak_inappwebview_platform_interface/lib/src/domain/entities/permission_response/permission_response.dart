@@ -5,6 +5,7 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:zorphy_annotation/zorphy_annotation.dart';
+
 import '../enums/index.dart';
 
 part 'permission_response.zorphy.dart';

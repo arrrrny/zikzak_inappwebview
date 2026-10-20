@@ -3,6 +3,7 @@
 // toMap is replicated by the generated toJson; fork default preserved.
 
 import 'package:zorphy_annotation/zorphy_annotation.dart';
+
 import '../../../web_authentication_session/platform_web_authenticate_session.dart';
 
 part 'web_authenticate_session_settings.zorphy.dart';

@@ -2,6 +2,7 @@
 // zikzak_inappwebview: constructor defaults + int action wire format.
 
 import 'package:zorphy_annotation/zorphy_annotation.dart';
+
 import '../enums/index.dart';
 
 part 'js_alert_response.zorphy.dart';

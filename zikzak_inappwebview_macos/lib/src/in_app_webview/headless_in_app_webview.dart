@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
+
 import '../find_interaction/find_interaction_controller.dart';
 import 'in_app_webview_controller.dart';
 

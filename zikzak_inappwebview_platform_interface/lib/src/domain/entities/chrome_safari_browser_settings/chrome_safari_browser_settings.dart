@@ -7,6 +7,7 @@
 // as hex, displayMode via the polymorphic type-key deserializer.
 
 import 'package:zorphy_annotation/zorphy_annotation.dart';
+
 import 'dart:ui';
 
 import '../../../types/main.dart';
