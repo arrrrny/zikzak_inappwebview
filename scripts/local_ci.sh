@@ -36,9 +36,16 @@
 #     local tool; known no-op actions (checkout/cache/artifacts) are noted; any
 #     other action is skipped by name.
 #   * `container:` jobs run on the host, not in the declared image (noted).
-#   * `strategy.matrix` is expanded as a cross product; `include`/`exclude` are
-#     not modelled, so a job that uses them is skipped with the reason.
+#   * `strategy.matrix` is expanded as a cross product; `include` merges into
+#     every matching combination (or appends a new one when none match) and
+#     `exclude` drops matching combinations, as GitHub does.
 #   * `continue-on-error: true` steps are advisory locally, exactly as in CI.
+#   * A `cargo … --target <triple>` step needs a toolchain that carries that
+#     target's standard library. A rustup toolchain carrying EVERY target of the
+#     step is used for it — through the rustup proxy, so `cargo +<toolchain>`
+#     keeps working; when no local toolchain carries them the step is SKIPPED
+#     with the reason printed — a host fact, not a repo failure. A host with no
+#     rust toolchain at all is a missing TOOLCHAIN: the step FAILS.
 #
 # Exit status: 0 when every executed step passed, 1 otherwise.
 set -euo pipefail
@@ -552,6 +559,319 @@ APT_EQUIVALENTS = {
 }
 
 
+# ------------------------------------------------------- cargo cross targets
+
+# A `cargo … --target <triple>` step needs a toolchain that carries that
+# target's standard library. Homebrew's standalone rust ships no cross targets,
+# so the step dies with "can't find crate for `core`" — a fact about the HOST's
+# toolchain, not about the repository. CI installs a rustup toolchain WITH the
+# target (dtolnay/rust-toolchain), so the local run asks the same question the
+# apt steps ask: is there a local toolchain that can do this? If yes, use it;
+# if no, skip the step with the reason printed — never a red gate that says
+# nothing about the repo.
+# A rust target triple always carries a dash — `wasm32-wasip2`,
+# `x86_64-apple-darwin`, `aarch64-unknown-linux-gnu`. A `--target` value
+# without one is not a rust target at all (it belongs to some other tool that
+# happens to use the same flag), and reading it as a cross target would skip a
+# build that has to run.
+TARGET_TRIPLE_RE = re.compile(r"^[A-Za-z0-9_]+-[A-Za-z0-9_.-]+$")
+
+CARGO_COMMANDS = ("cargo", "rustc")
+
+
+def _strip_comment(line):
+    """`line` without its trailing shell comment.
+
+    A commented-out command asks for nothing: reading its `--target` would
+    skip a step whose real work is still to be done.
+    """
+    out = []
+    quote = None
+    for i, ch in enumerate(line):
+        if quote:
+            out.append(ch)
+            if ch == quote:
+                quote = None
+            continue
+        if ch in ("'", '"'):
+            quote = ch
+            out.append(ch)
+            continue
+        if ch == "#" and (i == 0 or line[i - 1] in " \t;&|()"):
+            break
+        out.append(ch)
+    return "".join(out)
+
+
+def _shell_commands(body):
+    """The individual shell commands in `body`, as argv lists.
+
+    Backslash continuations are joined first, so a `--target` that sits on a
+    line of its own is read together with the cargo command it belongs to.
+    Comments are stripped before the line is split into commands, so a
+    commented-out cargo command names no target.
+    """
+    text = re.sub(r"\\\s*\n", " ", body)
+    commands = []
+    for line in text.split("\n"):
+        line = _strip_comment(line)
+        if not line.strip():
+            continue
+        try:
+            lexer = shlex.shlex(line, posix=True, punctuation_chars=True)
+            lexer.whitespace_split = True
+            lexer.commenters = ""
+            tokens = list(lexer)
+        except ValueError:
+            tokens = line.split()
+        current = []
+        for token in tokens:
+            if token in ("&&", "||", ";", "|", "&"):
+                if current:
+                    commands.append(current)
+                current = []
+            else:
+                current.append(token)
+        if current:
+            commands.append(current)
+    return commands
+
+
+def _leading_assignments(argv, env):
+    """`env` updated with the `NAME=value` words that lead `argv`."""
+    for word in argv:
+        m = re.match(r"^([A-Za-z_][A-Za-z0-9_]*)=(.*)$", word)
+        if not m:
+            break
+        env[m.group(1)] = m.group(2)
+    return env
+
+
+def _expand_word(word, env):
+    """`word` with `$VAR`/`${VAR}` replaced from `env` (unknown names stay)."""
+    def repl(m):
+        return env.get(m.group(1) or m.group(2), m.group(0))
+    return re.sub(r"\$\{([A-Za-z_][A-Za-z0-9_]*)\}|\$([A-Za-z_][A-Za-z0-9_]*)",
+                  repl, word)
+
+
+def _cargo_argv(argv):
+    """The argv of the cargo/rustc command in `argv` (None when there is none).
+
+    Only the command's OWN flags count: a `--target` that belongs to another
+    program on the same line (`cargo build && ./deploy --target staging`) is
+    that program's flag, not a rust cross target.
+    """
+    i = 0
+    while i < len(argv) and re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", argv[i]):
+        i += 1
+    if i >= len(argv):
+        return None
+    command = os.path.basename(argv[i])
+    if command in CARGO_COMMANDS:
+        return argv[i + 1:]
+    if command == "rustup":
+        # `rustup run <toolchain> cargo build …` — the cargo command is in there
+        for j in range(i + 1, len(argv)):
+            if os.path.basename(argv[j]) in CARGO_COMMANDS:
+                return argv[j + 1:]
+    return None
+
+
+def cargo_cross_targets(body):
+    """The cross targets the cargo/rustc commands in `body` ask for."""
+    targets = []
+    env = {}
+    for argv in _shell_commands(body):
+        env = _leading_assignments(argv, env)
+        args = _cargo_argv(argv)
+        if args is None:
+            continue
+        for i, arg in enumerate(args):
+            if arg == "--target" and i + 1 < len(args):
+                value = args[i + 1]
+            elif arg.startswith("--target="):
+                value = arg[len("--target="):]
+            else:
+                continue
+            value = _expand_word(value, env)
+            if not TARGET_TRIPLE_RE.match(value):
+                continue
+            targets.append(value)
+    return list(dict.fromkeys(targets))
+
+
+# The probe runs on every step of every job, so the answers it needs from the
+# host are asked once and remembered: the toolchain on PATH does not change
+# while the gate runs.
+_HOST_CACHE = {}
+
+
+def rustc_exe():
+    """The rustc on PATH (None when there is none)."""
+    if "rustc" not in _HOST_CACHE:
+        _HOST_CACHE["rustc"] = shutil.which("rustc")
+    return _HOST_CACHE["rustc"]
+
+
+def cargo_exe():
+    """The cargo on PATH (None when there is none)."""
+    if "cargo" not in _HOST_CACHE:
+        _HOST_CACHE["cargo"] = shutil.which("cargo")
+    return _HOST_CACHE["cargo"]
+
+
+def rustc_sysroot():
+    """The sysroot of the rustc on PATH (empty when there is none)."""
+    if "sysroot" in _HOST_CACHE:
+        return _HOST_CACHE["sysroot"]
+    exe = rustc_exe()
+    if not exe:
+        _HOST_CACHE["sysroot"] = ""
+        return ""
+    try:
+        out = subprocess.run([exe, "--print", "sysroot"],
+                             capture_output=True, text=True, timeout=60)
+        value = (out.stdout or "").strip().split("\n")[0].strip()
+    except Exception:
+        value = ""
+    _HOST_CACHE["sysroot"] = value
+    return value
+
+
+def carries_target(sysroot, target):
+    """True when `sysroot` holds the standard library for `target`."""
+    if not sysroot:
+        return False
+    return (Path(sysroot) / "lib" / "rustlib" / target / "lib").is_dir()
+
+
+def rustup_home():
+    """The rustup home on this host. RUSTUP_HOME wins, as it does for rustup."""
+    if "rustup_home" in _HOST_CACHE:
+        return _HOST_CACHE["rustup_home"]
+    env = os.environ.get("RUSTUP_HOME")
+    if env:
+        _HOST_CACHE["rustup_home"] = env
+        return env
+    for exe in (shutil.which("rustup"),
+                os.path.expanduser("~/.cargo/bin/rustup")):
+        if not exe or not os.path.exists(exe):
+            continue
+        try:
+            out = subprocess.run([exe, "show", "home"],
+                                 capture_output=True, text=True, timeout=60)
+        except Exception:
+            continue
+        home = (out.stdout or "").strip()
+        if home:
+            _HOST_CACHE["rustup_home"] = home
+            return home
+    default = os.path.expanduser("~/.rustup")
+    value = default if os.path.isdir(default) else ""
+    _HOST_CACHE["rustup_home"] = value
+    return value
+
+
+def rustup_proxy_dir():
+    """The directory holding rustup's PROXY binaries (cargo, rustc, rustup).
+
+    The proxy is what implements `cargo +<toolchain>` and honours
+    RUSTUP_TOOLCHAIN. A toolchain's own `bin` holds the REAL cargo, which
+    knows about neither — putting that on PATH breaks `cargo +<toolchain>`.
+    """
+    if "proxy_dir" in _HOST_CACHE:
+        return _HOST_CACHE["proxy_dir"]
+    value = ""
+    for exe in (shutil.which("rustup"),
+                os.path.expanduser("~/.cargo/bin/rustup")):
+        if not exe or not os.path.exists(exe):
+            continue
+        directory = os.path.dirname(os.path.abspath(exe))
+        if os.path.exists(os.path.join(directory, "cargo")):
+            value = directory
+            break
+    _HOST_CACHE["proxy_dir"] = value
+    return value
+
+
+def rustup_default_toolchain():
+    """The toolchain rustup would pick by default (RUSTUP_TOOLCHAIN wins)."""
+    if "default_toolchain" in _HOST_CACHE:
+        return _HOST_CACHE["default_toolchain"]
+    value = (os.environ.get("RUSTUP_TOOLCHAIN") or "").strip()
+    if not value:
+        home = rustup_home()
+        settings = Path(home) / "settings.toml" if home else None
+        if settings and settings.is_file():
+            found = re.search(r'^\s*default_toolchain\s*=\s*"([^"]+)"',
+                              settings.read_text(errors="replace"), re.M)
+            if found:
+                value = found.group(1)
+    _HOST_CACHE["default_toolchain"] = value
+    return value
+
+
+def toolchain_is(name, wanted):
+    """True when the installed toolchain `name` is the `wanted` one."""
+    if not wanted:
+        return False
+    return name == wanted or name.startswith(wanted + "-")
+
+
+def rustup_toolchains():
+    """(name, root) of every installed rustup toolchain."""
+    home = rustup_home()
+    if not home:
+        return []
+    root = Path(home) / "toolchains"
+    if not root.is_dir():
+        return []
+    return [(t.name, str(t)) for t in sorted(root.iterdir()) if t.is_dir()]
+
+
+def rustup_toolchain_carrying(target):
+    """(name, root) of an installed rustup toolchain that carries `target`."""
+    for name, root in rustup_toolchains():
+        if carries_target(root, target):
+            return name, root
+    return None, None
+
+
+def select_toolchain(targets, pinned=None):
+    """The installed toolchain that carries EVERY target, most specific first.
+
+    The toolchain the workflow pins wins over rustup's default, which wins
+    over "any toolchain that happens to have the target": a local build on a
+    different compiler than CI's is a silent difference, so the choice is
+    made the way CI makes it.
+
+    Returns (name, root, others) — `others` are the other toolchains that
+    carry every target too, so the note can say the choice was not the only
+    possible one.
+    """
+    candidates = rustup_toolchains()
+    if not candidates:
+        return None, None, []
+    default = rustup_default_toolchain()
+
+    def rank(item):
+        name = item[0]
+        if toolchain_is(name, pinned):
+            return 0
+        if toolchain_is(name, default):
+            return 1
+        return 2
+
+    ordered = sorted(candidates, key=rank)
+    carrying = [(name, root) for name, root in ordered
+                if all(carries_target(root, t) for t in targets)]
+    if not carrying:
+        return None, None, []
+    name, root = carrying[0]
+    return name, root, [n for n, _ in carrying[1:]]
+
+
 # -------------------------------------------------------------- toolchain uses
 
 # `uses:` action -> (tool, version-keys, version args). The action is not run;
@@ -581,6 +901,7 @@ NOOP_ACTIONS = ("actions/checkout", "actions/cache", "cache/", "upload-artifact"
 class Outcome:
     def __init__(self):
         self.ran = self.checked = 0
+        self.targets = 0  # verified rust cross targets — counted apart from steps
         self.skipped, self.advisory, self.failed = [], [], []
         self.local_only = []
 
@@ -595,6 +916,7 @@ class Runner:
         self.stopped = False
         self.current_ctx = None
         self.absent_prefixes = ci_absent_prefixes()
+        self.pinned_toolchain = None
 
     # ------------------------------------------------------------ job plumbing
 
@@ -673,6 +995,7 @@ class Runner:
             self.skip_job(label, "steps is not a list")
             return
         self.job_ok = True
+        self.pinned_toolchain = None
         for n, step in enumerate(steps, 1):
             if self.stopped:
                 return
@@ -767,7 +1090,78 @@ class Runner:
                                 "Pass --allow-outside-clone to run it anyway")
                 return
 
+        # A cargo step that builds for a cross target needs a toolchain that
+        # carries that target. Ask the host which one that is BEFORE running
+        # the step: a standalone toolchain that cannot build it is a host fact,
+        # and a red step about it says nothing about the repository. The
+        # verdict comes AFTER the path guards, so a broken working directory
+        # still fails the gate instead of hiding behind a skip about a target.
+        verdict, payload = self.cross_target_verdict(body_expanded)
+        if verdict == "missing_toolchain":
+            self.fail(head, "cargo is NOT installed — this step would fail in CI too",
+                      step)
+            return
+        if verdict == "skip":
+            missing, sysroot = payload
+            names = ", ".join(missing)
+            one = len(missing) == 1
+            if not sysroot:
+                cause = "the rustc on PATH reports no sysroot here"
+            else:
+                paths = ", ".join(f"{sysroot}/lib/rustlib/{t}" for t in missing)
+                cause = (f"the cargo on PATH has no {names} std (no {paths})")
+            if any(rustup_toolchain_carrying(t)[0] for t in missing):
+                carried = ("no single rustup toolchain here carries every "
+                           "target of the step" if one else
+                           "no single rustup toolchain here carries all of them")
+            else:
+                carried = ("no rustup toolchain here has it either" if one
+                           else "no rustup toolchain here has them either")
+            self.skip(head, f"no local toolchain carries the {names} "
+                            f"{'target' if one else 'targets'} ({cause}, and "
+                            f"{carried}). CI installs "
+                            f"{'it' if one else 'them'} with "
+                            f"`rustup target add {' '.join(missing)}` — do the same "
+                            f"locally, or put a rustup-managed cargo first on PATH")
+            return
+        path_prefix = None
+        toolchain_env = None
+        toolchain_note = None
+        if verdict == "override":
+            name, root, sysroot, missing, others = payload
+            names = ", ".join(missing)
+            proxy = rustup_proxy_dir()
+            if proxy:
+                # The PROXY is what implements `cargo +<toolchain>` and honours
+                # RUSTUP_TOOLCHAIN; a toolchain's own `bin` holds the real
+                # cargo, which knows about neither.
+                path_prefix = proxy
+                toolchain_env = name
+                driven = ", driven through the rustup proxy"
+            else:
+                path_prefix = str(Path(root) / "bin")
+                driven = ""
+            if not sysroot:
+                toolchain_note = (f"there is no cargo on PATH here — using the "
+                                  f"rustup toolchain {name}, which carries "
+                                  f"{names}{driven}")
+            else:
+                paths = ", ".join(f"{sysroot}/lib/rustlib/{t}" for t in missing)
+                toolchain_note = (f"the cargo on PATH does not carry {names} "
+                                  f"(no {paths}) — using the rustup toolchain "
+                                  f"{name}, which does{driven}")
+            if others:
+                toolchain_note += f" (also carried by {', '.join(others)})"
+            pinned = self.pinned_toolchain
+            if pinned and not toolchain_is(name, pinned):
+                toolchain_note += (f" — the workflow pins {pinned}, which does "
+                                   f"not carry {names} here")
+
         env = dict(ctx["environ"])
+        if path_prefix:
+            env["PATH"] = path_prefix + os.pathsep + env.get("PATH", "")
+        if toolchain_env:
+            env["RUSTUP_TOOLCHAIN"] = toolchain_env
         env.setdefault("CI", "true")
         env.setdefault("GITHUB_ACTIONS", "true")
         env["GITHUB_WORKSPACE"] = str(ROOT)
@@ -780,7 +1174,8 @@ class Runner:
         if shell not in ("bash", "sh"):
             self.skip(head, f"shell: {shell} (not reproduced locally)")
             return
-        cmd = [shell, "-e", "-c", body_expanded]
+        flags = ["-e", "-o", "pipefail", "-c"] if shell == "bash" else ["-e", "-c"]
+        cmd = [shell, *flags, body_expanded]
 
         if self.args.get("verbose") or self.args.get("plan"):
             where = f" (in {wd})" if wd else ""
@@ -788,6 +1183,8 @@ class Runner:
             print(f"{DIM}$ {body_expanded}{RESET}")
         else:
             print(f"\n{BRIGHT}▶ {head}{RESET}")
+        if toolchain_note:
+            print(f"  {GREEN}✓{RESET} {toolchain_note}")
         if self.args.get("plan"):
             return
 
@@ -883,12 +1280,35 @@ class Runner:
 
         for pattern, tool, version_keys, vargs in TOOLCHAIN_ACTIONS:
             if pattern in uses:
+                if pattern == "rust-toolchain":
+                    self.note_pinned_toolchain(wants)
                 self.assert_toolchain(head, tool, version_keys, vargs, wants, job_wd)
                 return
 
         print(f"\n{YELLOW}▶ {head}{RESET}\n  {YELLOW}SKIP{RESET} action {uses} "
               f"(no local equivalent)")
         self.out.skipped.append(f"{head}: action {uses}")
+
+    def note_pinned_toolchain(self, wants):
+        """Remember the toolchain the workflow pins.
+
+        CI builds with it, so the local build must use it too when it carries
+        the target — a local build on a different compiler than CI's is a
+        silent difference.
+        """
+        raw = wants.get("toolchain")
+        if not raw:
+            return
+        value = str(raw)
+        if has_expr(value):
+            probe = []
+            ctx = getattr(self, "current_ctx", None) or self.base_ctx(None)
+            value = expand(value, ctx, probe)
+            if probe:
+                return
+        value = value.strip()
+        if value:
+            self.pinned_toolchain = value
 
     def assert_toolchain(self, head, tool, version_keys, vargs, wants, job_wd):
         print(f"\n{BRIGHT}▶ {head}{RESET}")
@@ -922,6 +1342,7 @@ class Runner:
             self.out.failed.append(f"{head} ({tool} not installed)")
             print(f"  {RED}✗{RESET} {tool} is NOT installed — this step would fail in CI too")
             return
+        self.report_toolchain_targets(head, tool, wants)
         if not wants_version or wants_version.lower() in ("stable", "beta", "dev",
                                                           "latest", "current"):
             print(f"  {GREEN}✓{RESET} {tool} {got_line} (workflow pins: "
@@ -967,11 +1388,71 @@ class Runner:
                 self.out.advisory.append(f"{head}: {label} not probeable locally")
         return True
 
+    # ------------------------------------------------------- cargo cross target
+
+    def cross_target_verdict(self, body):
+        """What to do with a step that builds for a cargo cross target.
+
+        Every target the step asks for is verified — a step that builds for two
+        targets is only as good as the worst of them.
+
+        "run"      — the toolchain on PATH carries every target.
+        "override" — a rustup toolchain here carries them; the payload is
+                     (name, its root, the cargo-on-PATH sysroot, the targets
+                     the PATH toolchain misses, the other toolchains that
+                     carry them too).
+        "skip"     — no local toolchain carries one of them; the payload is
+                     (the targets that are missing, the cargo-on-PATH sysroot).
+        "missing_toolchain" — there is no rust toolchain here at all; the step
+                     cannot run, and that is a failure, not a missing target.
+        """
+        targets = cargo_cross_targets(body)
+        if not targets:
+            return "run", None
+        if not cargo_exe() and not rustc_exe():
+            return "missing_toolchain", None
+        sysroot = rustc_sysroot()
+        missing = [t for t in targets if not carries_target(sysroot, t)]
+        if not missing:
+            return "run", None
+        name, root, others = select_toolchain(targets, self.pinned_toolchain)
+        if root:
+            return "override", (name, root, sysroot, missing, others)
+        return "skip", (missing, sysroot)
+
+    def report_toolchain_targets(self, head, tool, wants):
+        """A rust-toolchain action installs the targets it names: say whether
+        this host carries them, so a step that needs one is never a surprise."""
+        raw = wants.get("targets")
+        if tool != "cargo" or not raw:
+            return
+        for target in str(raw).replace(",", " ").split():
+            target = target.strip()
+            if not target:
+                continue
+            sysroot = rustc_sysroot()
+            if carries_target(sysroot, target):
+                print(f"  {GREEN}✓{RESET} target {target} is installed locally")
+                self.out.targets += 1
+                continue
+            name, _ = rustup_toolchain_carrying(target)
+            if name:
+                print(f"  {GREEN}✓{RESET} target {target} is installed locally "
+                      f"(rustup toolchain {name}; the cargo on PATH does not "
+                      f"carry it)")
+                self.out.targets += 1
+                continue
+            print(f"  {YELLOW}⚠{RESET} target {target} is NOT installed locally — "
+                  f"steps that build for it are skipped here; install it with "
+                  f"`rustup target add {target}`")
+            self.out.advisory.append(f"{head}: target {target} not installed locally")
+
     # ---------------------------------------------------------------- summary
 
     def summary(self):
         print("\n" + "─" * 64)
         print(f"local_ci: {self.out.ran} step(s) ran, {self.out.checked} checked/pinned, "
+              f"{self.out.targets} target(s) verified, "
               f"{len(self.out.skipped)} skipped, {len(self.out.advisory)} advisory, "
               f"{len(self.out.local_only)} local-only, {len(self.out.failed)} failed")
         for f in self.out.failed:
@@ -1186,9 +1667,9 @@ def expand_matrix(matrix, ctx):
             return None
         targets = [c for c in combos
                    if all(k not in c or c[k] == v for k, v in entry.items())]
-        if targets and all(k in targets[0] for k in entry):
+        if targets:
             for c in targets:
-                c.update(entry)  # a plain override of existing combinations
+                c.update(entry)  # no original value is overwritten — the targets filter already saw to that
         else:
             for c in (targets or [{}]):
                 merged = dict(c)
@@ -1384,6 +1865,7 @@ def do_list():
 
 def run(args):
     explicit = args["workflow"]
+    wf_note = ""  # only the auto-pick path has a heuristic note to print
     if explicit:
         wf = Path(explicit)
         if not wf.is_absolute():
@@ -1420,6 +1902,7 @@ def run(args):
                                  args["event"], str(doc.get("name") or ""),
                                  run_git("rev-parse", "HEAD"))
     runner.runner_temp = tempfile.mkdtemp(prefix="local_ci_")
+    atexit.register(shutil.rmtree, runner.runner_temp, ignore_errors=True)
     if runner.absent_prefixes:
         print(f"  note     : this checkout has {len(runner.absent_prefixes)} "
               "gitignored/untracked path(s) that CI's clean checkout does not "
