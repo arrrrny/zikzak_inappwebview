@@ -20,6 +20,18 @@ import 'package:flutter_test/flutter_test.dart';
 /// storyboard's `<deployment version="…">` attribute: major * 1024 + minor * 64.
 int ibVersion(int major, [int minor = 0]) => major * 1024 + minor * 64;
 
+/// Strips `//` line comments before a floor regex runs, so a commented-out
+/// `.iOS("…")` line can never be mistaken for the real platform declaration.
+/// Same helper as `ios_package_platform_test.dart` (the #316 precedent).
+String stripSwiftLineComments(String source) {
+  final out = StringBuffer();
+  for (final line in source.split('\n')) {
+    final idx = line.indexOf('//');
+    out.writeln(idx == -1 ? line : line.substring(0, idx));
+  }
+  return out.toString();
+}
+
 File locate(String relativePath) {
   var dir = Directory.current;
   for (var hop = 0; hop < 5; hop++) {
@@ -44,19 +56,39 @@ void main() {
         'ios/zikzak_inappwebview_ios/Sources/'
         'zikzak_inappwebview_ios/Storyboards/WebView.storyboard',
       );
-      final match = RegExp(
-        r'<deployment\s+version="(\d+)"\s+identifier="iOS"\s*/>',
+      // Attribute-order tolerant (review finding): match the element first,
+      // then read each attribute separately, so an Interface Builder save that
+      // reorders `version=` / `identifier=` does not fail with a misleading
+      // "element not found" reason.
+      final deployment = RegExp(
+        r'<deployment\b[^>]*/>',
       ).firstMatch(storyboard.readAsStringSync());
-      expect(match, isNotNull,
-          reason: 'No <deployment … identifier="iOS"/> element found in '
-              '${storyboard.path}');
+      expect(deployment, isNotNull,
+          reason: 'No <deployment …/> element found in ${storyboard.path}');
+      final element = deployment!.group(0)!;
+      final identifier = RegExp(
+        r'identifier="([^"]*)"',
+      ).firstMatch(element);
+      expect(identifier?.group(1), 'iOS',
+          reason: 'The <deployment> element in ${storyboard.path} does not '
+              'declare identifier="iOS" — nothing to compare against the '
+              'package iOS floor.');
+      final version = RegExp(
+        r'version="(\d+)"',
+      ).firstMatch(element);
+      expect(version, isNotNull,
+          reason: 'The <deployment> element in ${storyboard.path} declares '
+              'no version="…" attribute.');
 
-      final declared = int.parse(match!.group(1)!);
+      final declared = int.parse(version!.group(1)!);
 
       final packageSwift = locate('ios/zikzak_inappwebview_ios/Package.swift');
+      // Strip Swift line comments before matching (parity with the #316
+      // sibling test) so a commented-out `.iOS("…")` line is never read as
+      // the floor.
       final floor = RegExp(
         r'\.iOS\("(\d+)\.(\d+)"\)',
-      ).firstMatch(packageSwift.readAsStringSync());
+      ).firstMatch(stripSwiftLineComments(packageSwift.readAsStringSync()));
       expect(floor, isNotNull,
           reason: 'No `.iOS("…")` platform declaration found in '
               '${packageSwift.path}');
