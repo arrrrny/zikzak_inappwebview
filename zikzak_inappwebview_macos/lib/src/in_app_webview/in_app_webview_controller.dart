@@ -610,6 +610,26 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
   }
 
   @override
+  Future<CallAsyncJavaScriptResult?> callAsyncJavaScript({
+    required String functionBody,
+    Map<String, dynamic> arguments = const <String, dynamic>{},
+    ContentWorld? contentWorld,
+  }) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('functionBody', () => functionBody);
+    args.putIfAbsent('arguments', () => arguments);
+    args.putIfAbsent('contentWorld', () => contentWorld?.toMap());
+    var data = await _channel.invokeMethod('callAsyncJavaScript', args);
+    if (data == null) {
+      return null;
+    }
+    return CallAsyncJavaScriptResult(
+      value: data["value"],
+      error: data["error"],
+    );
+  }
+
+  @override
   Future<void> pressKey({
     required String key,
     required int keyCode,
