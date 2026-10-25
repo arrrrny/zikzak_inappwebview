@@ -2994,7 +2994,16 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             // download is `Content-Disposition: attachment`.
             let httpResponse = navigationResponse.response as? HTTPURLResponse
             let disposition = httpResponse?.value(forHTTPHeaderField: "Content-Disposition")
-            let isAttachment = disposition?.lowercased().contains("attachment") ?? false
+            // Only the disposition TYPE decides attachment vs inline: the
+            // parameters (`filename=`, `size=`, the RFC 5987 `filename*=`)
+            // are arbitrary text, so `inline; filename="attachment.pdf"`
+            // must still render.
+            let dispositionType = disposition?
+                .split(separator: ";", maxSplits: 1, omittingEmptySubsequences: true)
+                .first?
+                .trimmingCharacters(in: .whitespaces)
+                .lowercased()
+            let isAttachment = dispositionType == "attachment"
             if let url = navigationResponse.response.url,
                 navigationResponse.isForMainFrame,
                 url.scheme != "file",
@@ -3038,10 +3047,14 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         if let url = response.url, let useOnDownloadStart = settings?.useOnDownloadStart,
             useOnDownloadStart
         {
+            // Every response-stage dispatch reports the same header, or the
+            // consumer cannot tell an attachment from an inline render.
+            let disposition = (response as? HTTPURLResponse)?
+                .value(forHTTPHeaderField: "Content-Disposition")
             let downloadStartRequest = DownloadStartRequest(
                 url: url.absoluteString,
                 userAgent: nil,
-                contentDisposition: nil,
+                contentDisposition: disposition,
                 mimeType: response.mimeType,
                 contentLength: response.expectedContentLength,
                 suggestedFilename: suggestedFilename.isEmpty
@@ -3066,10 +3079,16 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         if let url = response.url, let useOnDownloadStart = settings?.useOnDownloadStart,
             useOnDownloadStart
         {
+            // The canonical attachment case (`application/octet-stream`,
+            // `application/zip`) reaches the download pipeline through THIS
+            // handoff, so the header that justified the download has to be
+            // reported here too.
+            let disposition = (response as? HTTPURLResponse)?
+                .value(forHTTPHeaderField: "Content-Disposition")
             let downloadStartRequest = DownloadStartRequest(
                 url: url.absoluteString,
                 userAgent: nil,
-                contentDisposition: nil,
+                contentDisposition: disposition,
                 mimeType: response.mimeType,
                 contentLength: response.expectedContentLength,
                 suggestedFilename: suggestedFilename.isEmpty

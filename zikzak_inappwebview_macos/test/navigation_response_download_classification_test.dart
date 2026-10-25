@@ -274,6 +274,67 @@ void main() {
       },
     );
 
+    test(
+      'the attachment check compares the disposition type, not a substring '
+      'of the whole header value',
+      () {
+        final mimeBranch = bracedBlockAfter(
+          bodyRaw,
+          'if !navigationResponse.canShowMIMEType',
+        );
+        final afterMimeIdx = bodyRaw.indexOf(mimeBranch!) + mimeBranch.length;
+        final displayableRaw = bodyRaw.substring(afterMimeIdx);
+        final displayableCode = stripSwiftNonCode(displayableRaw);
+        expect(
+          displayableCode,
+          isNot(contains('lowercased().contains(')),
+          reason:
+              'substring-matching the value classifies '
+              '`inline; filename="attachment.pdf"` as a download; only the '
+              'type token before the first `;` decides',
+        );
+        expect(
+          displayableRaw,
+          contains('"attachment"'),
+          reason: 'the disposition type must be compared to `attachment`',
+        );
+        expect(
+          displayableRaw,
+          contains('split('),
+          reason:
+              'the type is the token before the first `;`, so the header '
+              'value has to be split on the parameter separator',
+        );
+      },
+    );
+
+    test(
+      'every response-stage dispatch reports the response own content '
+      'disposition',
+      () {
+        final code = stripSwiftNonCode(raw);
+        final nilReports = RegExp(
+          r'contentDisposition:\s*nil',
+        ).allMatches(code).length;
+        expect(
+          nilReports,
+          1,
+          reason:
+              'only the action-stage `didBecome` has no URLResponse; the '
+              'navigationResponse and decideDestinationUsing dispatches must '
+              'report the response\'s Content-Disposition or the app-side '
+              'guard drops the download',
+        );
+        expect(
+          RegExp(r'contentDisposition:\s*disposition').allMatches(code).length,
+          3,
+          reason:
+              'the three response-stage dispatches each report the header '
+              'they read',
+        );
+      },
+    );
+
     test('everything else falls through to decisionHandler(.allow)', () {
       expect(
         bodyCode,
