@@ -242,6 +242,21 @@ abstract class PlatformHeadlessInAppWebView extends PlatformInterface
     );
   }
 
+  ///{@template zikzak_inappwebview_platform_interface.PlatformHeadlessInAppWebView.lastDisposeError}
+  ///The failure the last [dispose] hit, or `null` when disposal succeeded.
+  ///
+  ///Disposal itself never throws (spec 013 FR-004), so a native teardown that
+  ///failed used to be indistinguishable from one that worked. Platform
+  ///implementations record the failure here — and log it — so a caller can
+  ///inspect the outcome after awaiting [dispose].
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
+  ///{@endtemplate}
+  Object? get lastDisposeError => null;
+
   ///{@template zikzak_inappwebview_platform_interface.PlatformHeadlessInAppWebView.dispose}
   ///Disposes the headless WebView.
   ///

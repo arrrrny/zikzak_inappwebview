@@ -5,18 +5,28 @@
 //  Created by ARRRRNY on 10/05/2020.
 //
 
-import UIKit
-
 import Flutter
 import UIKit
 import WebKit
-import UIKit
-import AVFoundation
 
 public class HeadlessInAppWebViewManager: ChannelDelegate {
     static let METHOD_CHANNEL_NAME = "wtf.zikzak/flutter_headless_inappwebview"
+
+    /// Hard ceiling on live headless WebViews (issue #371 R4).
+    ///
+    /// Every headless WebView owns a WebContent process and its own navigation
+    /// queue, so a per-domain scraper that creates one per host used to grow
+    /// without bound until the transport's own navigations stopped committing.
+    /// Creating beyond the cap fails loudly instead of silently growing; the
+    /// Dart-side `HeadlessWebViewRegistry` uses the same platform cap and can
+    /// evict an idle instance before the ceiling is ever reached.
+    static let maxLiveWebViews = 3
+
     var plugin: SwiftFlutterPlugin?
     var webViews: [String: HeadlessInAppWebView?] = [:]
+
+    /// Live ids, oldest registration first — the cap's ordering.
+    private var liveOrder: [String] = []
 
     init(plugin: SwiftFlutterPlugin) {
         super.init(channel: FlutterMethodChannel(name: HeadlessInAppWebViewManager.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar!.messenger()))
@@ -25,14 +35,46 @@ public class HeadlessInAppWebViewManager: ChannelDelegate {
 
     public override func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let arguments = call.arguments as? NSDictionary
-        let id: String = arguments!["id"] as! String
+        // Read the id defensively: this used to force-unwrap both the
+        // arguments dictionary and the id cast, so a shared-channel call
+        // without an id trapped the app instead of returning an error
+        // (issue #371 R2).
+        let id = arguments?["id"] as? String
 
         switch call.method {
             case "run":
-                let params = arguments!["params"] as! [String: Any?]
+                guard let id = id else {
+                    result(FlutterError(code: "headless_invalid_arguments", message: "id is null", details: nil))
+                    return
+                }
+                guard let params = arguments?["params"] as? [String: Any?] else {
+                    result(FlutterError(code: "headless_invalid_arguments", message: "params is null", details: nil))
+                    return
+                }
+                pruneLiveOrder()
+                guard instance(id) != nil || liveOrder.count < HeadlessInAppWebViewManager.maxLiveWebViews else {
+                    result(FlutterError(
+                        code: "headless_cap_exceeded",
+                        message: "headless WebView cap reached",
+                        details: [
+                            "maxLiveWebViews": HeadlessInAppWebViewManager.maxLiveWebViews,
+                            "liveWebViews": liveOrder.count,
+                        ]))
+                    return
+                }
                 run(id: id, params: params) {
                     result(true)
                 }
+                break
+            case "dispose":
+                // The shared manager channel is the one dispose path (issue
+                // #371 R1): it releases the instance, not only its map entry.
+                guard let id = id else {
+                    result(FlutterError(code: "headless_invalid_arguments", message: "id is null", details: nil))
+                    return
+                }
+                dispose(id: id)
+                result(true)
                 break
             default:
                 result(FlutterMethodNotImplemented)
@@ -51,6 +93,7 @@ public class HeadlessInAppWebViewManager: ChannelDelegate {
             params: params as NSDictionary)
         let headlessInAppWebView = HeadlessInAppWebView(plugin: plugin, id: id, flutterWebView: flutterWebView)
         webViews[id] = headlessInAppWebView
+        track(id: id)
 
         headlessInAppWebView.prepare(params: params as NSDictionary)
         headlessInAppWebView.onWebViewCreated()
@@ -82,6 +125,15 @@ public class HeadlessInAppWebViewManager: ChannelDelegate {
         flutterWebView.makeInitialLoad(params: params as NSDictionary)
     }
 
+    /// Releases one headless WebView: the instance is torn down and its map
+    /// entry removed, so nothing is left alive behind a dropped reference.
+    public func dispose(id: String) {
+        let headlessInAppWebView = instance(id)
+        webViews[id] = nil
+        liveOrder.removeAll { $0 == id }
+        headlessInAppWebView?.dispose()
+    }
+
     public override func dispose() {
         super.dispose()
         let headlessWebViews = webViews.values
@@ -89,10 +141,28 @@ public class HeadlessInAppWebViewManager: ChannelDelegate {
             headlessWebView?.dispose()
         }
         webViews.removeAll()
+        liveOrder.removeAll()
+        HeadlessWebViewContainer.shared.dispose()
         plugin = nil
     }
 
     deinit {
         dispose()
+    }
+
+    /// The live instance for [id], or `nil` when the entry is absent or empty.
+    private func instance(_ id: String) -> HeadlessInAppWebView? {
+        return webViews[id] ?? nil
+    }
+
+    private func track(id: String) {
+        liveOrder.removeAll { $0 == id }
+        liveOrder.append(id)
+    }
+
+    /// Drops ids whose instance disposed itself through the per-instance
+    /// channel, so the cap counts live WebViews rather than dead entries.
+    private func pruneLiveOrder() {
+        liveOrder.removeAll { instance($0) == nil }
     }
 }
