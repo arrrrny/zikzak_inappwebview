@@ -5,121 +5,30 @@
 // the error's `userInfo` and were discarded, so a Dart caller had nothing to
 // bisect a failing `page.evaluate` with.
 //
-// The `callAsyncJavaScript` handler in the same file already extracts the
-// message from `userInfo`; the `evaluateJavascript` failure paths must do the
-// same, and carry the full context in `details`.
-//
 // This test encodes that rule as a source scan so the bug class cannot
-// silently return; it is executable on any host (no Xcode required).
-import 'dart:io';
-
+// silently return; it is executable on any host (no Xcode required). The
+// message derivation is shared by both evaluation arms, so the assertions
+// follow it into `javaScriptExceptionMessage(_:)` rather than pinning the
+// chain inside the error builder.
 import 'package:flutter_test/flutter_test.dart';
 
-/// Strips line/block comments and string literals so only real code tokens
-/// are scanned. Ported from the package's swift_sourceframe_kvc_test; handles
-/// Swift block-comment nesting and triple-quoted strings.
-String stripSwiftNonCode(String source) {
-  final out = StringBuffer();
-  var i = 0;
-  var blockDepth = 0;
-  while (i < source.length) {
-    final rest = source.substring(i);
-    if (blockDepth > 0) {
-      if (rest.startsWith('/*')) {
-        blockDepth++;
-        i += 2;
-      } else if (rest.startsWith('*/')) {
-        blockDepth--;
-        i += 2;
-      } else {
-        if (source[i] == '\n') out.write('\n');
-        i++;
-      }
-      continue;
-    }
-    if (rest.startsWith('/*')) {
-      blockDepth++;
-      i += 2;
-      out.write('  ');
-      continue;
-    }
-    if (rest.startsWith('//')) {
-      final end = source.indexOf('\n', i);
-      i = end == -1 ? source.length : end;
-      continue;
-    }
-    if (rest.startsWith('"""')) {
-      final end = source.indexOf('"""', i + 3);
-      i = end == -1 ? source.length : end + 3;
-      out.write('""');
-      continue;
-    }
-    if (source[i] == '"') {
-      var j = i + 1;
-      while (j < source.length) {
-        if (source[j] == r'\') {
-          j += 2;
-          continue;
-        }
-        if (source[j] == '"' || source[j] == '\n') break;
-        j++;
-      }
-      i = j + 1 > source.length ? source.length : j + 1;
-      out.write('""');
-      continue;
-    }
-    out.write(source[i]);
-    i++;
-  }
-  return out.toString();
-}
+import 'support/swift_source.dart';
 
-/// Locates the macOS package root (`macos/zikzak_inappwebview_macos`) relative
-/// to the current working directory, walking up at most a few levels so the
-/// test works when invoked from the package dir or the repo root.
-Directory packageMacosDir() {
-  var dir = Directory.current;
-  for (var hop = 0; hop < 5; hop++) {
-    final candidate = Directory('${dir.path}/macos/zikzak_inappwebview_macos');
-    if (candidate.existsSync()) return candidate;
-    final parent = dir.parent;
-    if (parent.path == dir.path) break;
-    dir = parent;
-  }
-  fail(
-    'Could not locate macos/zikzak_inappwebview_macos under or above '
-    '${Directory.current.path}',
-  );
-}
-
-/// The single Swift source that owns the macOS method-channel switch.
-File sourceFile() {
-  final file = File(
-    '${packageMacosDir().path}/Sources/zikzak_inappwebview_macos/'
-    'InAppWebView.swift',
-  );
-  expect(file.existsSync(), isTrue, reason: 'missing ${file.path}');
-  return file;
-}
-
-/// The `case "evaluateJavascript":` arm of the channel switch — from that case
-/// label up to the next case label at the same indentation.
-///
-/// Located on the RAW source (the case label is a string literal, so a scanner
-/// that strips literals could never find it), then comment/string-stripped for
-/// token assertions.
-String evaluateJavascriptArm(String rawSource) {
-  final label = 'case "evaluateJavascript":';
-  final first = rawSource.indexOf(label);
+/// The RAW slice of one `case "<label>":` arm — from that case label up to
+/// the next case label at the same indentation. For assertions that must see
+/// string-literal keys, which [stripSwiftNonCode] erases.
+String channelArmSlice(String rawSource, String label) {
+  final marker = 'case "$label":';
+  final first = rawSource.indexOf(marker);
   expect(
     first,
     isNot(-1),
-    reason: 'the macOS channel switch has no evaluateJavascript arm',
+    reason: 'the macOS channel switch has no $label arm',
   );
   expect(
-    rawSource.indexOf(label, first + 1),
+    rawSource.indexOf(marker, first + 1),
     -1,
-    reason: 'expected exactly one evaluateJavascript arm',
+    reason: 'expected exactly one $label arm',
   );
   final nextCase = RegExp(
     r'\n {8}case "',
@@ -127,33 +36,26 @@ String evaluateJavascriptArm(String rawSource) {
   final end = nextCase.isEmpty
       ? rawSource.length
       : first + 1 + nextCase.first.start;
-  return stripSwiftNonCode(rawSource.substring(first, end));
+  return rawSource.substring(first, end);
 }
 
-/// The body of a file-private Swift function, brace-balanced. Scanned raw:
-/// the contracts below assert on string-literal keys, which
-/// [stripSwiftNonCode] erases.
-String functionBody(String code, String signature) {
-  final start = code.indexOf(signature);
-  expect(start, isNot(-1), reason: 'missing Swift function `$signature`');
-  final open = code.indexOf('{', start);
-  expect(open, isNot(-1), reason: '`$signature` has no body');
-  var depth = 0;
-  for (var i = open; i < code.length; i++) {
-    if (code[i] == '{') depth++;
-    if (code[i] == '}') {
-      depth--;
-      if (depth == 0) return code.substring(open, i + 1);
-    }
-  }
-  fail('unbalanced braces in `$signature`');
-}
+/// One `case "<label>":` arm of the macOS channel switch, comment/string
+/// stripped (see [channelArmSlice]).
+///
+/// Located on the RAW source (the case label is a string literal, so a scanner
+/// that strips literals could never find it), then stripped for token
+/// assertions.
+String channelArm(String rawSource, String label) =>
+    stripSwiftNonCode(channelArmSlice(rawSource, label));
 
 void main() {
   group('evaluateJavascript JS-exception details (bug #373)', () {
     test('AC1: both failure paths report through the JS-exception builder, not '
         'the bare localizedDescription', () {
-      final arm = evaluateJavascriptArm(sourceFile().readAsStringSync());
+      final arm = channelArm(
+        sourceFile().readAsStringSync(),
+        'evaluateJavascript',
+      );
 
       // The two failure paths the issue names: the WKContentWorld outcome
       // and the plain (value, error) callback.
@@ -184,14 +86,12 @@ void main() {
       );
     }, timeout: const Timeout(Duration(minutes: 2)));
 
-    test('AC2: the builder reads WKJavaScriptExceptionMessage, with the same '
-        'fallback chain callAsyncJavaScript uses', () {
+    test('AC2: the shared message derivation reads '
+        'WKJavaScriptExceptionMessage, with the documented fallback chain', () {
+      final raw = sourceFile().readAsStringSync();
       // The keys are string literals, so the body is scanned raw — a
       // literal-stripping scan could never see them (it would see `""`).
-      final body = functionBody(
-        sourceFile().readAsStringSync(),
-        'func javaScriptExceptionError(',
-      );
+      final body = functionBody(raw, 'func javaScriptExceptionMessage(');
       for (final marker in [
         'WKJavaScriptExceptionMessage',
         'NSLocalizedDescription',
@@ -201,7 +101,7 @@ void main() {
           body.contains(marker),
           isTrue,
           reason:
-              'javaScriptExceptionError must derive its message from '
+              'javaScriptExceptionMessage must derive its message from '
               '$marker, mirroring the callAsyncJavaScript precedent',
         );
       }
@@ -213,6 +113,52 @@ void main() {
         reason:
             'WKJavaScriptExceptionMessage must be tried before the '
             'generic NSLocalizedDescription fallback',
+      );
+      // Every term is coerced, so a non-String userInfo value can never cross
+      // the channel raw.
+      expect(
+        RegExp(
+          r'userInfo\["WKJavaScriptExceptionMessage"\] as\? String',
+        ).hasMatch(body),
+        isTrue,
+        reason:
+            'the exception-message term must be coerced with `as? String`; '
+            'an untyped term crosses the channel as whatever WebKit handed '
+            'over',
+      );
+      expect(
+        functionBody(
+          raw,
+          'func javaScriptExceptionError(',
+        ).contains('javaScriptExceptionMessage('),
+        isTrue,
+        reason:
+            'the evaluateJavascript error builder must reuse the shared '
+            'message derivation instead of re-deriving it',
+      );
+    }, timeout: const Timeout(Duration(minutes: 2)));
+
+    test('AC2b: the callAsyncJavaScript arm reuses the shared message '
+        'derivation instead of keeping its own copy', () {
+      final raw = sourceFile().readAsStringSync();
+      // String-literal keys, so the arm is scanned raw.
+      final arm = channelArmSlice(raw, 'callAsyncJavaScript');
+
+      expect(
+        arm.contains('body["error"] = javaScriptExceptionMessage(error)'),
+        isTrue,
+        reason:
+            'callAsyncJavaScript must route its failure message through '
+            'javaScriptExceptionMessage(error) — the envelope '
+            '`body["error"]` must stay as it is, so the Dart-visible result '
+            'shape does not change',
+      );
+      expect(
+        arm.contains('WKJavaScriptExceptionMessage'),
+        isFalse,
+        reason:
+            'the callAsyncJavaScript arm must not keep a second copy of '
+            'the message chain: two copies in one file drift',
       );
     }, timeout: const Timeout(Duration(minutes: 2)));
 
