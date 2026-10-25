@@ -67,6 +67,39 @@ private func persistentUUID(from identifier: String) -> UUID? {
     return nil
 }
 
+/// Builds the `FlutterError` a failed `evaluateJavascript` reports (#373).
+///
+/// WebKit raises `WKErrorJavaScriptExceptionOccurred` for every thrown JS
+/// exception, and its `localizedDescription` is the generic "A JavaScript
+/// exception occurred" — the exception text and its location live in the
+/// error's `userInfo`. Mirroring the `callAsyncJavaScript` handler, the
+/// message becomes the exception text and `details` carries the location, so
+/// a Dart caller can bisect a failing evaluation. A failure that carries none
+/// of those keys (a transport-level error) keeps the previous shape: the
+/// localized description with `details: nil`.
+private func javaScriptExceptionError(_ error: Error) -> FlutterError {
+    let nsError = error as NSError
+    let userInfo = nsError.userInfo
+    let message =
+        userInfo["WKJavaScriptExceptionMessage"] as? String
+        ?? userInfo["NSLocalizedDescription"] as? String
+        ?? nsError.localizedDescription
+
+    var details: [String: Any] = [:]
+    if let line = userInfo["WKJavaScriptExceptionLineNumber"] {
+        details["WKJavaScriptExceptionLineNumber"] = line
+    }
+    if let column = userInfo["WKJavaScriptExceptionColumnNumber"] {
+        details["WKJavaScriptExceptionColumnNumber"] = column
+    }
+    if let sourceURL = userInfo["WKJavaScriptExceptionSourceURL"] as? URL {
+        details["WKJavaScriptExceptionSourceURL"] = sourceURL.absoluteString
+    }
+
+    return FlutterError(
+        code: "InAppWebView", message: message, details: details.isEmpty ? nil : details)
+}
+
 public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler, DefensivelyDeserializedScriptMessageHandling, WKUIDelegate, NSMenuDelegate, WKDownloadDelegate {
     var channel: FlutterMethodChannel!
     var registrar: FlutterPluginRegistrar? = nil
@@ -1166,19 +1199,13 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                         case .success(let value):
                             result(value ?? NSNull())
                         case .failure(let error):
-                            result(
-                                FlutterError(
-                                    code: "InAppWebView", message: error.localizedDescription,
-                                    details: nil))
+                            result(javaScriptExceptionError(error))
                         }
                     }
                 } else {
                     self.evaluateJavaScript(source) { (value, error) in
                         if let error = error {
-                            result(
-                                FlutterError(
-                                    code: "InAppWebView", message: error.localizedDescription,
-                                    details: nil))
+                            result(javaScriptExceptionError(error))
                         } else {
                             // WKWebView returns nil for undefined/void/Promise results.
                             // Return NSNull() so Dart receives null instead of crashing with
