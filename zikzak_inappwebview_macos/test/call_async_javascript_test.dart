@@ -81,6 +81,12 @@ void main() {
         (args['contentWorld'] as Map).cast<String, dynamic>(),
         equals(contentWorld.toMap()),
       );
+
+      // Default path: no contentWorld given, so the native side must receive null.
+      calls.clear();
+      await controller.callAsyncJavaScript(functionBody: 'return 1;');
+      final bare = (calls.single.arguments as Map).cast<String, dynamic>();
+      expect(bare['contentWorld'], isNull);
     });
 
     test('decodes the native failure as the error string', () async {
@@ -96,6 +102,24 @@ void main() {
       expect(result, isNotNull);
       expect(result!.value, isNull);
       expect(result.error, contains('ReferenceError'));
+    });
+
+    // The mocked channel answers `nativeResponse` directly and never evaluates
+    // `functionBody`, so this pins the Dart-side decode of a string `value`,
+    // not JS promise semantics.
+    test('decodes a string value from the native reply', () async {
+      nativeResponse = <String, dynamic>{
+        'value': 'async-result',
+        'error': null,
+      };
+
+      final result = await controller.callAsyncJavaScript(
+        functionBody: 'return Promise.resolve("async-result");',
+      );
+
+      expect(result, isNotNull);
+      expect(result!.value, 'async-result');
+      expect(result.error, isNull);
     });
 
     test('returns null when the native side answers null', () async {
