@@ -2,6 +2,8 @@ export 'in_app_webview.dart';
 export 'in_app_webview_controller.dart';
 export 'controllers/main.dart';
 export 'headless_in_app_webview.dart';
+export 'headless_webview_registry.dart';
+export 'webview_render_wait.dart';
 export 'network_capture/network_capture_manager.dart'
     show
         NetworkCaptureManager,

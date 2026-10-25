@@ -143,6 +143,8 @@ jobs:
           dependency_overrides:
             zikzak_inappwebview_ios:
               path: ../../zikzak_inappwebview_ios
+            zikzak_inappwebview_platform_interface:
+              path: ../../zikzak_inappwebview_platform_interface
           YAML
       - name: flutter pub get
         working-directory: zikzak_inappwebview/example
@@ -187,6 +189,8 @@ jobs:
           dependency_overrides:
             zikzak_inappwebview_macos:
               path: ../../zikzak_inappwebview_macos
+            zikzak_inappwebview_platform_interface:
+              path: ../../zikzak_inappwebview_platform_interface
           YAML
       - name: flutter pub get
         working-directory: zikzak_inappwebview/example
@@ -195,16 +199,21 @@ jobs:
         working-directory: zikzak_inappwebview/example
         # Without this, a typo'd or silently-ignored override would leave the
         # job compiling the published 6.1.0 macOS package and passing forever.
+        # The platform interface is asserted too: this checkout's Dart calls
+        # into members it adds beyond the published 6.2.2, so building the
+        # example against pub.dev's copy fails on a missing getter.
         run: |
-          resolved="$(awk '
-            /^  zikzak_inappwebview_macos:/ { found = 1; next }
-            found && /source:/ { print $2; exit }
-          ' pubspec.lock)"
-          echo "zikzak_inappwebview_macos resolves to: $resolved"
-          if [ "$resolved" != "path" ]; then
-            echo "::error::zikzak_inappwebview_macos must resolve from path (this checkout), got '$resolved' — this job is compiling the published package"
-            exit 1
-          fi
+          for package in zikzak_inappwebview_macos zikzak_inappwebview_platform_interface; do
+            resolved="$(awk -v pkg="$package" '
+              $0 ~ "^  " pkg ":" { found = 1; next }
+              found && /source:/ { print $2; exit }
+            ' pubspec.lock)"
+            echo "$package resolves to: $resolved"
+            if [ "$resolved" != "path" ]; then
+              echo "::error::$package must resolve from path (this checkout), got '$resolved' — this job is compiling the published package"
+              exit 1
+            fi
+          done
       - name: flutter build macos --debug
         working-directory: zikzak_inappwebview/example
         run: flutter build macos --debug

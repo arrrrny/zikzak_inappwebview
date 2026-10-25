@@ -37,6 +37,12 @@ class HeadlessInAppWebView implements Disposable {
   ///{@macro zikzak_inappwebview_platform_interface.PlatformHeadlessInAppWebView.id}
   String get id => platform.id;
 
+  ///{@macro zikzak_inappwebview_platform_interface.PlatformHeadlessInAppWebView.lastDisposeError}
+  ///
+  /// Read it after `await dispose()`: disposal never throws, so this is the
+  /// only way to tell a real native teardown from one that failed.
+  Object? get lastDisposeError => platform.lastDisposeError;
+
   ///{@macro zikzak_inappwebview_platform_interface.PlatformHeadlessInAppWebView.webViewController}
   InAppWebViewController? get webViewController {
     final webViewControllerPlatform = platform.webViewController;

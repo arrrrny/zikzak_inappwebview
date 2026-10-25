@@ -1,6 +1,6 @@
 package wtf.zikzak.zikzak_inappwebview_android.headless_in_app_webview;
 
-import android.app.Activity;
+import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -55,20 +55,26 @@ public class HeadlessInAppWebView implements Disposable {
           size = new Size2D(-1, -1);
         }
         setSize(size);
-        view.setVisibility(View.INVISIBLE);
+        view.setVisibility(View.VISIBLE);
       }
     }
-    if (plugin != null && plugin.activity != null) {
-      // Add the headless WebView to the view hierarchy.
-      // This way is also possible to take screenshots.
-      ViewGroup contentView = (ViewGroup) plugin.activity.findViewById(android.R.id.content);
-      if (contentView != null) {
-        ViewGroup mainView = (ViewGroup) (contentView).getChildAt(0);
-        if (mainView != null && flutterWebView != null) {
-          View view = flutterWebView.getView();
-          if (view != null) {
-            mainView.addView(view, 0);
-          }
+    if (plugin != null && plugin.headlessInAppWebViewManager != null) {
+      // Host the headless WebView in the dedicated off-screen container
+      // (issue #371 R3). It used to be added at index 0 of the activity's
+      // content view — a child of the app's own Flutter hierarchy — so every
+      // live headless instance rendered inside the app and competed for the
+      // same navigation queue.
+      Context context = plugin.activity != null ? plugin.activity : plugin.applicationContext;
+      View view = flutterWebView != null ? flutterWebView.getView() : null;
+      HeadlessWebViewContainer container = plugin.headlessInAppWebViewManager.container(context);
+      if (container != null && view != null) {
+        if (!container.attach(view, view.getContext())) {
+          // A headless WebView with no host window renders nothing and runs
+          // JavaScript unreliably, so say so instead of presenting as healthy
+          // (issue #371 review).
+          android.util.Log.w(
+              LOG_TAG,
+              "headless WebView " + id + " has no host window; JavaScript may not run");
         }
       }
     }
@@ -136,18 +142,12 @@ public class HeadlessInAppWebView implements Disposable {
       if (headlessInAppWebViewManager != null && headlessInAppWebViewManager.webViews.containsKey(id)) {
         headlessInAppWebViewManager.webViews.put(id, null);
       }
-      Activity activity =  plugin.activity;
-      if (activity != null) {
-        ViewGroup contentView = plugin.activity.findViewById(android.R.id.content);
-        if (contentView != null) {
-          ViewGroup mainView = (ViewGroup) (contentView).getChildAt(0);
-          if (mainView != null && flutterWebView != null) {
-            View view = flutterWebView.getView();
-            if (view != null) {
-              mainView.removeView(flutterWebView.getView());
-            }
-          }
-        }
+      // Detach from whichever container currently hosts the view (issue #371
+      // R3: the dedicated off-screen container, never the activity content
+      // view). Removing by parent keeps this correct for both paths.
+      View view = flutterWebView != null ? flutterWebView.getView() : null;
+      if (view != null && view.getParent() instanceof ViewGroup) {
+        ((ViewGroup) view.getParent()).removeView(view);
       }
     }
     if (flutterWebView != null) {

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
@@ -393,13 +394,22 @@ class IOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
   }
 
   Future<void> _disposeNative() async {
-    // Isolate each teardown step so that a single failure (for example the
-    // native side already being gone) cannot leave the rest undisposed.
+    // The shared manager channel is the ONE dispose path (issue #371 R1): the
+    // native manager routes `dispose` on the id carried in the arguments, so
+    // the per-instance channel is not needed — and was not routable on iOS.
+    //
+    // Each teardown step stays isolated so a single failure cannot leave the
+    // rest undisposed, but a native dispose that failed is recorded and logged
+    // instead of vanishing (spec 013 keeps dispose non-throwing, R6 keeps the
+    // outcome inspectable through [lastDisposeError]).
     try {
-      Map<String, dynamic> args = <String, dynamic>{};
-      await channel?.invokeMethod('dispose', args);
-    } catch (_) {
-      // The native WebView may already be gone; continue local teardown.
+      await _sharedChannel.invokeMethod('dispose', <String, dynamic>{'id': id});
+      _lastDisposeError = null;
+    } catch (error) {
+      _lastDisposeError = error;
+      debugPrint(
+        '[zikzak_inappwebview] $runtimeType($id) native dispose failed: $error',
+      );
     }
     disposeChannel();
     _started = false;
@@ -418,6 +428,15 @@ class IOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
       // Ignore auxiliary controller teardown failures.
     }
   }
+
+  /// The failure the last [dispose] hit, or `null` when it succeeded.
+  ///
+  /// Disposal never throws (spec 013 FR-004), so this is how a caller inspects
+  /// whether the native WebView was actually released (issue #371 R6).
+  Object? _lastDisposeError;
+
+  @override
+  Object? get lastDisposeError => _lastDisposeError;
 }
 
 extension InternalHeadlessInAppWebView on IOSHeadlessInAppWebView {

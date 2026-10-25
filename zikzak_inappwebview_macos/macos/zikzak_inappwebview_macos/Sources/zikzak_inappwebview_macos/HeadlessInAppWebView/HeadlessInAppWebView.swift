@@ -73,7 +73,13 @@ public class HeadlessInAppWebView: NSObject {
         return nil
     }
 
+    /// Guards against re-entrant/duplicate disposal: the manager's shared
+    /// `dispose(id:)` calls back into this method (issue #371 R1).
+    private var disposed = false
+
     public func dispose() {
+        guard !disposed else { return }
+        disposed = true
         channelDelegate?.dispose()
         channelDelegate = nil
         webView?.removeFromSuperview()
@@ -85,8 +91,11 @@ public class HeadlessInAppWebView: NSObject {
         // view and drop the reference instead — ARC deallocates the window.
         offscreenWindow?.contentView = nil
         offscreenWindow = nil
+        // Clear the back-reference first: manager.dispose(id:) tears this
+        // instance down again, and the guard above is the second defence.
+        let manager = self.manager
+        self.manager = nil
         manager?.dispose(id: id)
-        manager = nil
     }
 
     deinit {

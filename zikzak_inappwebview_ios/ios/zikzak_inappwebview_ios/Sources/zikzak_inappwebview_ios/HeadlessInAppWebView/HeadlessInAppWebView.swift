@@ -33,7 +33,7 @@ public class HeadlessInAppWebView: Disposable {
 
     public func prepare(params: NSDictionary) {
         if let view = flutterWebView?.view() {
-            view.alpha = 0.01
+            view.alpha = 1.0
             let initialSize = params["initialSize"] as? [String: Any?]
             if let size = Size2D.fromMap(map: initialSize) {
                 setSize(size: size)
@@ -42,15 +42,17 @@ public class HeadlessInAppWebView: Disposable {
                     x: 0.0, y: 0.0, width: UIScreen.main.bounds.width,
                     height: UIScreen.main.bounds.height)
             }
-            if let keyWindow = UIApplication.shared.sceneKeyWindow {
-                /// Note: The WKWebView behaves very unreliable when rendering offscreen
-                /// on a device. This is especially true with JavaScript, which simply
-                /// won't be executed sometimes.
-                /// So, add the headless WKWebView to the view hierarchy.
-                /// This way is also possible to take screenshots.
-                keyWindow.insertSubview(view, at: 0)
-                keyWindow.sendSubviewToBack(view)
-            }
+            /// Note: the WKWebView behaves very unreliable when rendering
+            /// offscreen on a device. This is especially true with JavaScript,
+            /// which simply won't be executed sometimes.
+            /// So, the headless WKWebView has to live in a real window — but
+            /// NOT in the app's key window (issue #371 R3): parking an
+            /// unbounded number of live WebViews behind the Flutter view made
+            /// them part of the visible hierarchy. `HeadlessWebViewContainer`
+            /// gives them their own off-screen UIWindow on the same scene,
+            /// mirroring what macOS already does with a dedicated NSWindow.
+            let scene = UIApplication.shared.sceneKeyWindow?.windowScene
+            HeadlessWebViewContainer.shared.attach(view, scene: scene)
         }
     }
 
