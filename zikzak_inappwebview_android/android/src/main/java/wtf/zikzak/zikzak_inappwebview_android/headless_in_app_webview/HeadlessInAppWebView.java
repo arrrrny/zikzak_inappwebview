@@ -68,7 +68,14 @@ public class HeadlessInAppWebView implements Disposable {
       View view = flutterWebView != null ? flutterWebView.getView() : null;
       HeadlessWebViewContainer container = plugin.headlessInAppWebViewManager.container(context);
       if (container != null && view != null) {
-        container.attach(view, view.getContext());
+        if (!container.attach(view, view.getContext())) {
+          // A headless WebView with no host window renders nothing and runs
+          // JavaScript unreliably, so say so instead of presenting as healthy
+          // (issue #371 review).
+          android.util.Log.w(
+              LOG_TAG,
+              "headless WebView " + id + " has no host window; JavaScript may not run");
+        }
       }
     }
   }

@@ -110,6 +110,39 @@ void main() {
       },
     );
 
+    test(
+      'cancel during an in-flight probe settles once and keeps the count',
+      () async {
+        // The probe outlives cancel(): the bug was that its late resolution
+        // completed an already-completed future, and the resulting
+        // `Bad state: Future already completed` escaped the unawaited run() as
+        // an unhandled async error (issue #371 review).
+        final controller = _controllerWith((_) async {
+          await Future<void>.delayed(const Duration(milliseconds: 40));
+          return true;
+        });
+
+        final wait = controller.waitForSelector(
+          '#late',
+          timeout: const Duration(seconds: 30),
+          pollInterval: const Duration(milliseconds: 10),
+        );
+        await Future<void>.delayed(const Duration(milliseconds: 5));
+        wait.cancel();
+        final result = await wait.result;
+
+        // Let the in-flight probe resolve after the cancellation.
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+
+        expect(result.status, WebViewRenderStatus.cancelled);
+        expect(
+          result.probeCount,
+          1,
+          reason: 'the cancelled result reports the probes that ran',
+        );
+      },
+    );
+
     test('surfaces a JavaScript failure instead of hanging', () async {
       final controller = _controllerWith(
         (_) async => throw PlatformException(code: 'no_webview'),

@@ -54,8 +54,12 @@ public class HeadlessWebViewContainer {
   private static final String LOG_TAG = "HeadlessWebViewContainer";
 
   @Nullable private final ViewGroup container;
-  @Nullable private final WindowManager windowManager;
-  private final int offscreenOffset;
+  // Not final: the window binding is late (see attach). A container built from
+  // `plugin.applicationContext` before an Activity is bound must be able to
+  // pick up a WindowManager later, instead of freezing itself windowless for
+  // the life of the process (issue #371 review).
+  @Nullable private WindowManager windowManager;
+  private int offscreenOffset;
   private boolean attached = false;
 
   public HeadlessWebViewContainer(@NonNull final Context context) {
@@ -66,9 +70,10 @@ public class HeadlessWebViewContainer {
       this.windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
       this.offscreenOffset = -context.getResources().getDisplayMetrics().widthPixels;
     } else {
-      // No activity window to attach to (a headless run before the activity is
-      // bound). The view is still usable, it simply has no host until one
-      // arrives; never throw here — the WebView itself must still be created.
+      // No activity window to attach to yet (a headless run before the activity
+      // is bound). The first attach() that receives an Activity context binds
+      // the window; never throw here — the WebView itself must still be
+      // created.
       this.windowManager = null;
       this.offscreenOffset = 0;
     }
@@ -89,8 +94,22 @@ public class HeadlessWebViewContainer {
     }
     container.addView(view);
 
-    if (attached || windowManager == null) {
+    if (attached) {
       return attached;
+    }
+    if (windowManager == null && context instanceof Activity) {
+      // Late bind. `prepare()` passes `plugin.applicationContext` whenever the
+      // plugin has no Activity yet, which used to freeze the cached container
+      // windowless for the whole process: every later headless WebView got a
+      // FrameLayout in no window and `attach()` returned false (issue #371
+      // review). The WebView's own context is the Activity's for a WebView
+      // created from one, so this binds on the next attach after the Activity
+      // exists.
+      windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+      offscreenOffset = -context.getResources().getDisplayMetrics().widthPixels;
+    }
+    if (windowManager == null) {
+      return false;
     }
 
     try {

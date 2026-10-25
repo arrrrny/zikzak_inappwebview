@@ -1,15 +1,19 @@
 // Issue #371 — the headless WebView lifecycle contract, iOS side.
 //
-// Two halves, both executable without a device:
+// The Dart half drives the real [IOSHeadlessInAppWebView] against a mocked
+// method channel and asserts that disposal now goes through the SHARED
+// manager channel (the only channel the native manager routes on), and that
+// a failing native dispose is recorded instead of swallowed.
 //
-//  * the Dart half drives the real [IOSHeadlessInAppWebView] against a mocked
-//    method channel and asserts that disposal now goes through the SHARED
-//    manager channel (the only channel the native manager routes on), and that
-//    a failing native dispose is recorded instead of swallowed;
-//  * the Swift half is a source contract over the native manager, because the
-//    behavior it pins (shared-channel `dispose`, no force-unwraps, an
-//    off-screen container, a live-instance cap) only shows up at runtime on a
-//    device the pool does not have.
+// The second group is a SOURCE-SHAPE regression guard, NOT a behavioural
+// contract: it greps the Swift sources for the shapes the fix removed
+// (`as! String`, `arguments!`, `insertSubview(view, at: 0)`). It cannot
+// observe the shared `dispose` case actually running, the cap actually
+// enforcing, or the container actually being reached — this repo already saw
+// 73 green source-contract tests while the macOS package did not compile at
+// all. Behaviour over the Swift sources lives in
+// `example/integration_test/headless_lifecycle_test.dart`, which runs on the
+// iOS Simulator.
 import 'dart:io';
 
 import 'package:flutter/services.dart';

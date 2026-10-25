@@ -21,15 +21,22 @@ public final class HeadlessWebViewContainer {
     private var window: UIWindow?
     private var hostView: UIView?
 
+    /// Views whose `attach` ran before a scene existed. Held weakly: the caller
+    /// owns the WebView, and a disposed one must not keep the container alive.
+    private var pendingViews: [WeakView] = []
+    private var sceneObserver: NSObjectProtocol?
+
     private init() {}
 
     /// Ensures [view] is hosted by the container.
     ///
     /// Returns `false` when no scene is connected yet — the caller still owns a
-    /// ready view, and the next `attach` call retries.
+    /// ready view, and the view is attached as soon as a scene activates
+    /// (`UIScene.didActivateNotification`), or on the next `attach` call.
     @discardableResult
     public func attach(_ view: UIView, scene: UIWindowScene?) -> Bool {
         guard let host = ensureHostView(scene: scene) else {
+            enqueuePending(view)
             return false
         }
         if view.superview !== host {
@@ -40,6 +47,7 @@ public final class HeadlessWebViewContainer {
 
     /// Removes [view] from the container, if it is currently hosted there.
     public func detach(_ view: UIView) {
+        pendingViews.removeAll { $0.view === view }
         if view.superview === hostView {
             view.removeFromSuperview()
         }
@@ -47,10 +55,52 @@ public final class HeadlessWebViewContainer {
 
     /// Tears the container window down. Called when the plugin detaches.
     public func dispose() {
+        removeSceneObserver()
+        pendingViews.removeAll()
         hostView?.subviews.forEach { $0.removeFromSuperview() }
         window?.isHidden = true
         window = nil
         hostView = nil
+    }
+
+    private func enqueuePending(_ view: UIView) {
+        pendingViews.removeAll { $0.view == nil }
+        if !pendingViews.contains(where: { $0.view === view }) {
+            pendingViews.append(WeakView(view))
+        }
+        installSceneObserver()
+    }
+
+    /// Observes the first scene activation so a view attached before any scene
+    /// existed stops waiting. Without this the "next `attach` retries" promise
+    /// was empty: `prepare()` is the only caller and runs once.
+    private func installSceneObserver() {
+        guard sceneObserver == nil else { return }
+        sceneObserver = NotificationCenter.default.addObserver(
+            forName: UIScene.didActivateNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            self?.attachPendingViews()
+        }
+    }
+
+    private func removeSceneObserver() {
+        if let sceneObserver = sceneObserver {
+            NotificationCenter.default.removeObserver(sceneObserver)
+            self.sceneObserver = nil
+        }
+    }
+
+    private func attachPendingViews() {
+        let views = pendingViews.compactMap { $0.view }
+        pendingViews.removeAll()
+        guard let host = ensureHostView(scene: nil) else {
+            pendingViews = views.map { WeakView($0) }
+            return
+        }
+        for view in views where view.superview !== host {
+            host.addSubview(view)
+        }
+        removeSceneObserver()
     }
 
     private func ensureHostView(scene: UIWindowScene?) -> UIView? {
@@ -84,5 +134,14 @@ public final class HeadlessWebViewContainer {
         window = offscreenWindow
         hostView = rootViewController.view
         return hostView
+    }
+}
+
+/// Weak reference holder for [HeadlessWebViewContainer.pendingViews].
+private final class WeakView {
+    weak var view: UIView?
+
+    init(_ view: UIView) {
+        self.view = view
     }
 }

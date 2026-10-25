@@ -13,6 +13,12 @@ class HeadlessWebViewRegistryConfig {
   /// A registration beyond this cap evicts the oldest **idle** instance; when
   /// every live instance is active the registration fails with a
   /// [HeadlessWebViewCapExceededException] instead of silently growing.
+  ///
+  /// There is no platform-independent default on purpose: the native managers
+  /// hard-stop at `3` on iOS/Android and `5` on macOS, so a value picked here
+  /// could promise room the platform then refuses. Use
+  /// [HeadlessWebViewRegistryConfig.platformDefaults] for the platform-aware
+  /// ceilings.
   final int maxLiveInstances;
 
   /// How long an idle instance may stay registered before
@@ -22,9 +28,9 @@ class HeadlessWebViewRegistryConfig {
   final Duration idleTtl;
 
   const HeadlessWebViewRegistryConfig({
-    this.maxLiveInstances = 5,
+    required this.maxLiveInstances,
     this.idleTtl = const Duration(seconds: 300),
-  });
+  }) : assert(maxLiveInstances >= 1, 'a cap of zero can never be satisfied');
 
   /// Platform-aware defaults (iOS/Android `3`, macOS `5`, everything else `8`).
   ///
@@ -163,6 +169,16 @@ class HeadlessWebViewRegistry {
       if (entry != null) {
         await _disposeEntry(oldestIdle, entry);
       }
+      // The eviction is only good enough if it actually released the slot: a
+      // failed native dispose keeps it registered (see [_disposeEntry]), and
+      // registering on top of it would drift the Dart count below the native
+      // one until `run()` dies with `headless_cap_exceeded`.
+      if (_entries.length >= config.maxLiveInstances) {
+        throw HeadlessWebViewCapExceededException(
+          maxLiveInstances: config.maxLiveInstances,
+          liveCount: _entries.length,
+        );
+      }
     }
 
     _entries[webView] = _RegisteredHeadlessWebView(
@@ -241,12 +257,20 @@ class HeadlessWebViewRegistry {
     HeadlessInAppWebView webView,
     _RegisteredHeadlessWebView entry,
   ) async {
-    _entries.remove(webView);
     try {
       await webView.dispose();
+      // `dispose()` is documented as non-throwing: a platform records a failed
+      // teardown in [HeadlessInAppWebView.lastDisposeError] instead. Reading it
+      // here is what keeps the Dart live count honest — a slot whose native
+      // side did not release it stays occupied (issue #371 R4/R6).
+      final error = webView.lastDisposeError;
+      if (error != null) {
+        throw error;
+      }
+      _entries.remove(webView);
     } catch (error) {
-      // dispose() is documented as non-throwing; a platform that still throws
-      // must not abort the teardown of the remaining registrations.
+      // Keep the registration and report it. A platform that still throws must
+      // not abort the teardown of the remaining registrations either.
       debugPrint(
         '[zikzak_inappwebview] headless registry eviction failed: $error',
       );

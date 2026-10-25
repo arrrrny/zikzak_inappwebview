@@ -72,6 +72,10 @@ class WebViewRenderWait {
   final Completer<WebViewRenderResult> _completer;
   bool _cancelled = false;
 
+  /// Probes issued so far. Lives on the wait (not on `_startWait`'s frame) so
+  /// [cancel] can report how many probes ran before the caller intervened.
+  int _probeCount = 0;
+
   /// Completes exactly once with the outcome.
   Future<WebViewRenderResult> get result => _completer.future;
 
@@ -86,10 +90,19 @@ class WebViewRenderWait {
     }
     _cancelled = true;
     _complete(
-      WebViewRenderResult(status: WebViewRenderStatus.cancelled, probeCount: 0),
+      WebViewRenderResult(
+        status: WebViewRenderStatus.cancelled,
+        probeCount: _probeCount,
+      ),
     );
   }
 
+  /// Completes the wait unless it already settled.
+  ///
+  /// EVERY completion must go through here: a probe that resolves after
+  /// [cancel] (or a timeout) would otherwise complete an already-completed
+  /// future and throw `Bad state: Future already completed` out of the
+  /// unawaited `run()`.
   void _complete(WebViewRenderResult result) {
     if (!_completer.isCompleted) {
       _completer.complete(result);
@@ -198,14 +211,13 @@ extension WebViewRenderWaitExtension on InAppWebViewController {
     final completer = Completer<WebViewRenderResult>();
     final wait = WebViewRenderWait._(completer);
     final stopwatch = Stopwatch()..start();
-    var probes = 0;
 
     void completeTimedOut() {
       final state = snapshot?.call();
-      completer.complete(
+      wait._complete(
         WebViewRenderResult(
           status: WebViewRenderStatus.timedOut,
-          probeCount: probes,
+          probeCount: wait._probeCount,
           stableSamples: state?.$1 ?? 0,
           fingerprint: state?.$2,
         ),
@@ -224,7 +236,7 @@ extension WebViewRenderWaitExtension on InAppWebViewController {
             return;
           }
 
-          probes++;
+          wait._probeCount++;
           final bool satisfied;
           try {
             satisfied = await probe().timeout(remaining);
@@ -232,8 +244,13 @@ extension WebViewRenderWaitExtension on InAppWebViewController {
             completeTimedOut();
             return;
           }
+          // The probe may have been in flight when the caller cancelled; its
+          // result is discarded rather than reported.
+          if (wait.isCancelled) {
+            return;
+          }
           if (satisfied) {
-            completer.complete(onSatisfied(probes));
+            wait._complete(onSatisfied(wait._probeCount));
             return;
           }
 
@@ -249,10 +266,10 @@ extension WebViewRenderWaitExtension on InAppWebViewController {
           );
         }
       } catch (error) {
-        completer.complete(
+        wait._complete(
           WebViewRenderResult(
             status: WebViewRenderStatus.failed,
-            probeCount: probes,
+            probeCount: wait._probeCount,
             error: error,
           ),
         );

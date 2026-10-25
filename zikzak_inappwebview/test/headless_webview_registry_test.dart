@@ -6,6 +6,7 @@
 // dispose-all. These tests are behavioural: they drive the real registry
 // against real [HeadlessInAppWebView] wrappers over a fake platform, and assert
 // on the observable platform calls.
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:zikzak_inappwebview/zikzak_inappwebview.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
@@ -23,6 +24,14 @@ class _FakeHeadlessPlatform extends PlatformHeadlessInAppWebView {
   bool ran = false;
   int disposeCount = 0;
 
+  /// When true, [dispose] reports a failure the way the real platform
+  /// implementations do: through [lastDisposeError], not by throwing.
+  bool failDispose = false;
+  Object? _lastDisposeError;
+
+  @override
+  Object? get lastDisposeError => _lastDisposeError;
+
   @override
   Future<void> run() async {
     ran = true;
@@ -35,6 +44,7 @@ class _FakeHeadlessPlatform extends PlatformHeadlessInAppWebView {
   Future<void> dispose({bool isKeepAlive = false}) async {
     disposeCount++;
     ran = false;
+    _lastDisposeError = failDispose ? Exception('native dispose failed') : null;
   }
 }
 
@@ -49,14 +59,40 @@ int _disposeCount(HeadlessInAppWebView webView) =>
 void main() {
   group('HeadlessWebViewRegistry cap (issue #371 R4)', () {
     test('platform defaults cap iOS/Android tighter than desktop', () {
-      final mobile = HeadlessWebViewRegistryConfig.platformDefaults();
-      // The defaults mirror the module pool: 3 on mobile, 5 on macOS, 8 else.
-      expect(mobile.maxLiveInstances, inInclusiveRange(3, 8));
+      addTearDown(() => debugDefaultTargetPlatformOverride = null);
+
+      // Pin each platform explicitly: `inInclusiveRange(3, 8)` used to accept
+      // the desktop value on iOS/Android, which is exactly what this test
+      // claims to prevent.
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
       expect(
-        const HeadlessWebViewRegistryConfig(
-          maxLiveInstances: 2,
-        ).maxLiveInstances,
-        2,
+        HeadlessWebViewRegistryConfig.platformDefaults().maxLiveInstances,
+        3,
+      );
+
+      debugDefaultTargetPlatformOverride = TargetPlatform.android;
+      expect(
+        HeadlessWebViewRegistryConfig.platformDefaults().maxLiveInstances,
+        3,
+      );
+
+      debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
+      expect(
+        HeadlessWebViewRegistryConfig.platformDefaults().maxLiveInstances,
+        5,
+      );
+
+      debugDefaultTargetPlatformOverride = TargetPlatform.linux;
+      expect(
+        HeadlessWebViewRegistryConfig.platformDefaults().maxLiveInstances,
+        8,
+      );
+    });
+
+    test('the config rejects a cap of zero at construction', () {
+      expect(
+        () => HeadlessWebViewRegistryConfig(maxLiveInstances: 0),
+        throwsA(isA<AssertionError>()),
       );
     });
 
@@ -112,6 +148,28 @@ void main() {
         0,
         reason: 'an active instance is never evicted',
       );
+    });
+
+    test('a failed eviction keeps the slot and refuses the registration',
+        () async {
+      final registry = HeadlessWebViewRegistry(
+        config: const HeadlessWebViewRegistryConfig(maxLiveInstances: 1),
+      );
+      final stuck = _webView('stuck');
+      (stuck.platform as _FakeHeadlessPlatform).failDispose = true;
+      await registry.track(stuck);
+
+      final extra = _webView('extra');
+
+      await expectLater(
+        registry.track(extra),
+        throwsA(isA<HeadlessWebViewCapExceededException>()),
+        reason: 'a slot the native side never released is still occupied',
+      );
+      expect(registry.contains(stuck), isTrue);
+      expect(registry.contains(extra), isFalse);
+      expect(registry.liveCount, 1);
+      expect(_disposeCount(stuck), 1);
     });
 
     test('markIdle makes an active instance evictable', () async {
