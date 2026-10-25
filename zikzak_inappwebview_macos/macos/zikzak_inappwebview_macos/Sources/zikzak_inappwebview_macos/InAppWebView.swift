@@ -2984,29 +2984,39 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             if !navigationResponse.canShowMIMEType {
                 decisionHandler(.download)
                 return
-            } else {
-                let mimeType = navigationResponse.response.mimeType
-                if let url = navigationResponse.response.url, navigationResponse.isForMainFrame {
-                    if url.scheme != "file", mimeType != nil, !mimeType!.starts(with: "text/") {
-                        // URLResponse.suggestedFilename is `String?` on macOS,
-                        // so unwrap it first: a nil name is "unknown", which the
-                        // empty check below maps to nil just like "".
-                        let suggestedFilename = navigationResponse.response.suggestedFilename ?? ""
-                        let downloadStartRequest = DownloadStartRequest(
-                            url: url.absoluteString,
-                            userAgent: nil,
-                            contentDisposition: nil,
-                            mimeType: mimeType,
-                            contentLength: navigationResponse.response.expectedContentLength,
-                            suggestedFilename: suggestedFilename.isEmpty
-                                ? nil
-                                : suggestedFilename,
-                            textEncodingName: navigationResponse.response.textEncodingName)
-                        channelDelegate?.onDownloadStartRequest(request: downloadStartRequest)
-                        decisionHandler(.cancel)
-                        return
-                    }
-                }
+            }
+
+            // A response the WebView CAN show must render (#374): WebKit
+            // renders `application/json`, `image/*`, `application/pdf` and
+            // friends, so classifying by the MIME type alone cancelled every
+            // main-frame navigation whose type did not start with `text/`.
+            // The only header that turns a displayable navigation into a
+            // download is `Content-Disposition: attachment`.
+            let httpResponse = navigationResponse.response as? HTTPURLResponse
+            let disposition = httpResponse?.value(forHTTPHeaderField: "Content-Disposition")
+            let isAttachment = disposition?.lowercased().contains("attachment") ?? false
+            if let url = navigationResponse.response.url,
+                navigationResponse.isForMainFrame,
+                url.scheme != "file",
+                isAttachment
+            {
+                // URLResponse.suggestedFilename is `String?` on macOS,
+                // so unwrap it first: a nil name is "unknown", which the
+                // empty check below maps to nil just like "".
+                let suggestedFilename = navigationResponse.response.suggestedFilename ?? ""
+                let downloadStartRequest = DownloadStartRequest(
+                    url: url.absoluteString,
+                    userAgent: nil,
+                    contentDisposition: disposition,
+                    mimeType: navigationResponse.response.mimeType,
+                    contentLength: navigationResponse.response.expectedContentLength,
+                    suggestedFilename: suggestedFilename.isEmpty
+                        ? nil
+                        : suggestedFilename,
+                    textEncodingName: navigationResponse.response.textEncodingName)
+                channelDelegate?.onDownloadStartRequest(request: downloadStartRequest)
+                decisionHandler(.cancel)
+                return
             }
         }
 
