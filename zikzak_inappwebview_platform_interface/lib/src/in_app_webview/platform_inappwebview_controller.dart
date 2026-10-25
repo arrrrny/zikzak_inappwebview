@@ -559,6 +559,20 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///
   ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
   ///
+  ///**Error reporting on macOS**: when the evaluated [source] throws a
+  ///JavaScript exception, the returned [Future] completes with a
+  ///`PlatformException` whose `message` is the exception text itself (for
+  ///example `Error: boom-from-issue-373`), not WebKit's generic
+  ///`A JavaScript exception occurred`. Whenever WebKit reports it, `details`
+  ///is a `Map<String, Object?>` carrying the exception location:
+  ///`WKJavaScriptExceptionLineNumber` (`int`),
+  ///`WKJavaScriptExceptionColumnNumber` (`int`) and
+  ///`WKJavaScriptExceptionSourceURL` (`String`, an absolute URL) — so you can
+  ///locate the throwing script without parsing the message. Other platforms
+  ///keep their existing failure shape; on macOS a transport-level failure
+  ///(no JavaScript exception involved) also keeps the generic message with
+  ///`details: null`.
+  ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.evaluateJavascript](https://developer.android.com/reference/android/webkit/WebView#evaluateJavascript(java.lang.String,%20android.webkit.ValueCallback%3Cjava.lang.String%3E)))
   ///- iOS ([Official API - WKWebView.evaluateJavascript](https://developer.apple.com/documentation/webkit/wkwebview/3656442-evaluatejavascript))

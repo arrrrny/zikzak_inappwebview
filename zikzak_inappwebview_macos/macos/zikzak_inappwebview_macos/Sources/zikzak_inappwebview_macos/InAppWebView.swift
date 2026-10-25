@@ -67,6 +67,56 @@ private func persistentUUID(from identifier: String) -> UUID? {
     return nil
 }
 
+/// The message to report for a failed JavaScript evaluation (#373).
+///
+/// WebKit raises `WKErrorJavaScriptExceptionOccurred` for every thrown JS
+/// exception, and its `localizedDescription` is the generic "A JavaScript
+/// exception occurred" — the exception text lives in the error's `userInfo`.
+/// Both evaluation arms (`evaluateJavascript` and `callAsyncJavaScript`) share
+/// this derivation so they cannot drift, and every term is coerced so a
+/// non-`String` value never crosses the channel raw.
+private func javaScriptExceptionMessage(_ error: Error) -> String {
+    let nsError = error as NSError
+    let userInfo = nsError.userInfo
+    return
+        userInfo["WKJavaScriptExceptionMessage"] as? String
+        ?? userInfo["NSLocalizedDescription"] as? String
+        ?? nsError.localizedDescription
+}
+
+/// Builds the `FlutterError` a failed `evaluateJavascript` reports (#373).
+///
+/// The message is the JS exception text (see `javaScriptExceptionMessage`),
+/// and `details` carries the location WebKit reports, so a Dart caller can
+/// bisect a failing evaluation. The values are coerced so a WebKit shape
+/// change degrades to a missing key instead of a channel-encoder surprise. A
+/// failure that carries none of those keys (a transport-level error) keeps the
+/// previous shape: the localized description with `details: nil`.
+private func javaScriptExceptionError(_ error: Error) -> FlutterError {
+    let nsError = error as NSError
+    let userInfo = nsError.userInfo
+    let message = javaScriptExceptionMessage(error)
+
+    var details: [String: Any] = [:]
+    if let line = userInfo["WKJavaScriptExceptionLineNumber"] as? Int {
+        details["WKJavaScriptExceptionLineNumber"] = line
+    }
+    if let column = userInfo["WKJavaScriptExceptionColumnNumber"] as? Int {
+        details["WKJavaScriptExceptionColumnNumber"] = column
+    }
+    let rawSourceURL = userInfo["WKJavaScriptExceptionSourceURL"]
+    var sourceURL = rawSourceURL as? URL
+    if sourceURL == nil, let urlString = rawSourceURL as? String {
+        sourceURL = URL(string: urlString)
+    }
+    if let sourceURL = sourceURL {
+        details["WKJavaScriptExceptionSourceURL"] = sourceURL.absoluteString
+    }
+
+    return FlutterError(
+        code: "InAppWebView", message: message, details: details.isEmpty ? nil : details)
+}
+
 public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler, DefensivelyDeserializedScriptMessageHandling, WKUIDelegate, NSMenuDelegate, WKDownloadDelegate {
     var channel: FlutterMethodChannel!
     var registrar: FlutterPluginRegistrar? = nil
@@ -1166,19 +1216,13 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                         case .success(let value):
                             result(value ?? NSNull())
                         case .failure(let error):
-                            result(
-                                FlutterError(
-                                    code: "InAppWebView", message: error.localizedDescription,
-                                    details: nil))
+                            result(javaScriptExceptionError(error))
                         }
                     }
                 } else {
                     self.evaluateJavaScript(source) { (value, error) in
                         if let error = error {
-                            result(
-                                FlutterError(
-                                    code: "InAppWebView", message: error.localizedDescription,
-                                    details: nil))
+                            result(javaScriptExceptionError(error))
                         } else {
                             // WKWebView returns nil for undefined/void/Promise results.
                             // Return NSNull() so Dart receives null instead of crashing with
@@ -1224,11 +1268,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                     case .success(let value):
                         body["value"] = value
                     case .failure(let error):
-                        let userInfo = (error as NSError).userInfo
-                        body["error"] =
-                            userInfo["WKJavaScriptExceptionMessage"]
-                            ?? userInfo["NSLocalizedDescription"] as? String
-                            ?? error.localizedDescription
+                        body["error"] = javaScriptExceptionMessage(error)
                     }
                     result(body)
                 }
