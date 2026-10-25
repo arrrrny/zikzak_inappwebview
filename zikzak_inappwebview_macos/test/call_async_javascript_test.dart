@@ -6,13 +6,17 @@ import 'package:zikzak_inappwebview_macos/src/in_app_webview/in_app_webview_cont
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  const channel = MethodChannel('dev.zuzu/zikzak_inappwebview_12345');
+  const channelName = 'dev.zuzu/zikzak_inappwebview_12345';
+  const channel = MethodChannel(channelName);
 
   late MacOSInAppWebViewController controller;
   late List<MethodCall> calls;
+  Object? nativeResponse;
 
   setUp(() {
     calls = <MethodCall>[];
+    nativeResponse = <String, dynamic>{'value': null, 'error': null};
+
     final widgetParams = PlatformInAppWebViewWidgetCreationParams(
       controllerFromPlatform: (c) => c,
     );
@@ -21,65 +25,91 @@ void main() {
       webviewParams: widgetParams,
     );
     controller = MacOSInAppWebViewController(controllerParams);
+
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, (MethodCall call) async {
+          calls.add(call);
+          if (call.method == 'callAsyncJavaScript') {
+            return nativeResponse;
+          }
+          return null;
+        });
   });
 
   tearDown(() {
+    controller.dispose();
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, null);
-    controller.dispose();
   });
 
-  void mockChannel(Object? Function(MethodCall call) handler) {
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(channel, (call) async {
-          calls.add(call);
-          return handler(call);
-        });
-  }
+  group('callAsyncJavaScript (issue #376)', () {
+    test('is implemented instead of falling through to the stub', () async {
+      // The platform-interface default throws UnimplementedError; the macOS
+      // port must override it so macOS callers get a result, not a throw.
+      nativeResponse = <String, dynamic>{'value': 42, 'error': null};
 
-  group('callAsyncJavaScript', () {
-    test('is overridden and does not throw UnimplementedError', () async {
-      mockChannel((call) => null);
+      final result = await controller.callAsyncJavaScript(
+        functionBody: 'return 21 * 2;',
+      );
 
-      await expectLater(
-        controller.callAsyncJavaScript(functionBody: 'return 1;'),
-        completes,
+      expect(result, isNotNull);
+      expect(result!.value, equals(42));
+      expect(result.error, isNull);
+    });
+
+    test('forwards functionBody, arguments and contentWorld', () async {
+      final contentWorld = ContentWorld.world(name: 'forklift');
+      final arguments = <String, dynamic>{
+        'left': 20,
+        'right': 22,
+        'labels': <String>['a', 'b'],
+      };
+
+      await controller.callAsyncJavaScript(
+        functionBody: 'return left + right;',
+        arguments: arguments,
+        contentWorld: contentWorld,
+      );
+
+      expect(calls, hasLength(1));
+      final call = calls.single;
+      expect(call.method, equals('callAsyncJavaScript'));
+      final args = (call.arguments as Map).cast<String, dynamic>();
+      expect(args['functionBody'], equals('return left + right;'));
+      expect(args['arguments'], equals(arguments));
+      expect(
+        (args['contentWorld'] as Map).cast<String, dynamic>(),
+        equals(contentWorld.toMap()),
       );
     });
 
-    test(
-      'forwards functionBody, arguments and contentWorld to the channel',
-      () async {
-        mockChannel((call) => <String, dynamic>{'value': 1, 'error': null});
+    test('decodes the native failure as the error string', () async {
+      nativeResponse = <String, dynamic>{
+        'value': null,
+        'error': 'ReferenceError: Can\'t find variable: nope',
+      };
 
-        await controller.callAsyncJavaScript(
-          functionBody: 'return a + b;',
-          arguments: <String, dynamic>{'a': 1, 'b': 2},
-          contentWorld: ContentWorld.PAGE,
-        );
+      final result = await controller.callAsyncJavaScript(
+        functionBody: 'return nope;',
+      );
 
-        expect(calls, hasLength(1));
-        expect(calls.single.method, 'callAsyncJavaScript');
-        final args = calls.single.arguments as Map;
-        expect(args['functionBody'], 'return a + b;');
-        expect(args['arguments'], <String, dynamic>{'a': 1, 'b': 2});
-        expect(args['contentWorld'], <String, dynamic>{'name': 'page'});
-      },
-    );
+      expect(result, isNotNull);
+      expect(result!.value, isNull);
+      expect(result.error, contains('ReferenceError'));
+    });
 
     test('sends a null contentWorld when none is given', () async {
-      mockChannel((call) => <String, dynamic>{'value': 1, 'error': null});
-
       await controller.callAsyncJavaScript(functionBody: 'return 1;');
 
-      final args = calls.single.arguments as Map;
+      final args = (calls.single.arguments as Map).cast<String, dynamic>();
       expect(args['contentWorld'], isNull);
     });
 
     test('decodes a resolved promise value', () async {
-      mockChannel(
-        (call) => <String, dynamic>{'value': 'async-result', 'error': null},
-      );
+      nativeResponse = <String, dynamic>{
+        'value': 'async-result',
+        'error': null,
+      };
 
       final result = await controller.callAsyncJavaScript(
         functionBody: 'return Promise.resolve("async-result");',
@@ -90,32 +120,11 @@ void main() {
       expect(result.error, isNull);
     });
 
-    test(
-      'surfaces a JS exception as result.error instead of throwing',
-      () async {
-        mockChannel(
-          (call) => <String, dynamic>{
-            'value': null,
-            'error': 'ReferenceError: Can\'t find variable: nope',
-          },
-        );
-
-        final result = await controller.callAsyncJavaScript(
-          functionBody: 'return nope;',
-        );
-
-        expect(result, isNotNull);
-        expect(result!.value, isNull);
-        expect(result.error, 'ReferenceError: Can\'t find variable: nope');
-      },
-    );
-
     test('returns null when the native side answers null', () async {
-      mockChannel((call) => null);
+      nativeResponse = null;
 
       final result = await controller.callAsyncJavaScript(
         functionBody: 'return 1;',
-        contentWorld: ContentWorld.world(name: 'custom'),
       );
 
       expect(result, isNull);
