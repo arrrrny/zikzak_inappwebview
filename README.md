@@ -65,15 +65,11 @@ dependencies:
 
 ### [iOS] Flutter 3.47.x: platform views drop overlapping Flutter content (#331)
 
-On the Flutter 3.47.x stable line, iOS platform views — including `InAppWebView` — can make the Flutter content painted after them vanish from the frame ("rendering layer confusion"): an `AppBar` turns invisible, a modal bottom sheet's footer and the list items below a WebView card are not drawn. Upgrading from 3.44.x to 3.47.2 triggers it; the same app renders correctly on 3.44.x. The artifact shows up when Flutter content is composited over or after a platform view — for example a full-screen WebView body underneath a `showModalBottomSheet` that embeds more WebViews in a `ListView` — and multiple parties report it needs more than one platform view visible at once. It reproduces with Impeller disabled, so it is not an Impeller rasterizer bug.
+On the Flutter 3.47.x stable line, iOS platform views — including `InAppWebView` — can make the Flutter content painted after them vanish from the frame ("rendering layer confusion"): an `AppBar` turns invisible, a modal bottom sheet's footer and the list items below a WebView card are not drawn. Upgrading from 3.44.x to 3.47.2 triggers it; the same app renders correctly on 3.44.x. It reproduces with Impeller disabled, so it is not an Impeller rasterizer bug.
 
-This is an engine regression in Flutter's texture-layer hybrid composition (TLHC) overlay path, tracked upstream in [flutter/flutter#193363](https://github.com/flutter/flutter/issues/193363) (triaged `engine` / `platform-views`, `c: regression`). It is **not a plugin code defect**, and no plugin setting fixes it: the on-device mitigation matrix recorded in [`.specify/bugs/flutter347-platformview-rendering/assessment.md`](.specify/bugs/flutter347-platformview-rendering/assessment.md) leaves the artifact unchanged for every candidate tested — control `UiKitView`, Impeller disabled, an `Opacity(0.99)` snapshot wrap, native `clipsToBounds`, and `PlatformViewLink` construction. The plugin already pins the WKWebView root to its Flutter bounds (`clipsToBounds = true` at view setup), which is correctness hardening against mis-clipped compositing paths, not a fix for this artifact.
+This is an engine regression in Flutter's texture-layer hybrid composition (TLHC) overlay path, tracked upstream in [flutter/flutter#193363](https://github.com/flutter/flutter/issues/193363) (triaged `engine` / `platform-views`, `c: regression`). It is **not a plugin code defect**: the on-device mitigation matrix in [`.specify/bugs/flutter347-platformview-rendering/fix.md`](.specify/bugs/flutter347-platformview-rendering/fix.md) (§ *Mitigation matrix*) leaves the artifact unchanged for every candidate tested.
 
-Workarounds until the engine fix ships in a Flutter stable release:
-
-1. **Stay on the Flutter 3.44.x stable line** if your app overlays platform views with modal routes or can show more than one platform view at once.
-2. **Avoid compositing Flutter content over a live platform view**: dismiss the underlying WebView (or keep it out of the tree) before presenting the sheet, and keep platform views out of lazy lists when possible.
-3. Removing clip wrappers (`ClipRRect`, `Container` with `clipBehavior`) around the platform view has unblocked some layouts reported upstream, but it does not address the root cause and is not guaranteed.
+The symptom, the evidence and the workarounds are documented once, in the package README's [Known Issues section](zikzak_inappwebview/README.md) — that copy is canonical, so read and edit it there.
 
 ## 🚀 Getting Started
 

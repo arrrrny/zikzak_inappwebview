@@ -57,20 +57,31 @@ Conclusion: the engine's TLHC overlay compositing drops Flutter content painted
 after the platform view on the 3.47 line, independent of plugin construction,
 configuration, or rasterizer. No plugin-side rendering fix exists (AC4).
 
-## Cycle 3 — issue resolution: user-facing workaround documentation (2026-10-27, session on `fix/331-flutter-version-upgrade-from-3-44-x-to-3-47-2-causes-renderi` @ `e1c1a555`)
+## Cycle 3 — issue resolution: user-facing workaround documentation (2026-10-27 local, UTC+3 — commit `17426183` authored 2026-10-26T21:34Z; session on `fix/331-flutter-version-upgrade-from-3-44-x-to-3-47-2-causes-renderi` @ `e1c1a555`)
 
 The upstream repair remains open (flutter/flutter#193363, triaged `engine` /
-`platform-views` / `c: regression`; still open with no fix on the 3.47 line as of
-2026-10-27; upstream comments 2026-10-13/16 add two independent confirmations and
-one layout-level observation — a clip wrapper removal unblocking one Google Maps
-layout). The forklift chore for #331 ships the issue's remaining deliverable: the
-workaround guidance as user-facing documentation, then closes the issue as
-resolved-by-documentation + upstream tracking.
+`platform-views` / `c: regression`; still open with no fix on the 3.47 line when
+this cycle ran — 2026-10-27 local, UTC+3; upstream comments 2026-10-13/16 add two
+independent confirmations and one layout-level observation — a clip wrapper
+removal unblocking one Google Maps layout). The forklift chore for #331 ships the
+issue's remaining deliverable: the workaround guidance as user-facing
+documentation.
 
-- Changed (docs-only): `README.md` (+14), `zikzak_inappwebview/README.md` (+14) —
-  a Known Issues section stating the symptom, the engine root cause with the
-  upstream tracker, the on-device matrix conclusion (no plugin-side fix exists),
-  the shipped `clipsToBounds` hardening, and the three workarounds.
+**Disposition — the issue stays OPEN.** An earlier draft of this entry planned to
+close #331 as resolved-by-documentation, which would have contradicted `spec.md`
+AC4 ("the PR must not claim to close the issue"), `fix.md` Status ("this PR must
+not close the issue") and `test.md` § Recommendation ("keep #331 **open**"). The
+records were right and are unchanged: `Closes` resolves an issue as *completed*
+and drops a still-reproducing regression out of triage, so the PR links it with
+`Related to #331` instead, #331 carries the `upstream` label, and the tracking
+continues on flutter/flutter#193363.
+
+- Changed (docs-only): `README.md` (+7) — a short Known Issues summary that
+  points at the canonical copy; `zikzak_inappwebview/README.md` (+14) — the
+  canonical section stating the symptom, the engine root cause with the upstream
+  tracker, the on-device matrix conclusion (no plugin-side fix exists, cited from
+  `fix.md` § *Mitigation matrix*), the shipped `clipsToBounds` hardening, and the
+  three workarounds.
 - No code behaviour touched → no new tests required by the plan.
 - Fresh regression evidence from this session (both suites re-run, `--concurrency=2`):
   - `zikzak_inappwebview_ios`: 77/77 pass (~64 s) — includes the AC2 contract test
@@ -80,8 +91,6 @@ resolved-by-documentation + upstream tracking.
     pre-existing all-info baseline, 0 new.
   - `dart format .` (Dart 3.13.7) re-formats 9 pre-existing test/example files
     (formatter-version drift; not this chore's files — reverted, reported LOW).
-- AC4 note: the "must not close the issue" rule in AC4 scoped the *investigation*
-  PR (#336). This session's PR is the disposition PR the record left open
-  ("maintainer to track upstream / decide on closing as upstream"): it closes
-  #331 explicitly as NOT-fixed-plugin-side / fixed-by-documentation + upstream
-  tracking, claiming no behaviour change.
+- AC4 note: the documented disposition (no plugin-side fix exists, tracked
+  upstream) is stated in the PR body and the Known Issues section, which claim no
+  behaviour change and no closure — AC4 as written is satisfied, not amended.
