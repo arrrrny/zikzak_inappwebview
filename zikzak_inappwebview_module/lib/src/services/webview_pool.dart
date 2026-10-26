@@ -7,6 +7,15 @@ import 'package:zikzak_inappwebview/zikzak_inappwebview.dart';
 import '../models/pool_session.dart';
 import '../ports/webview_session_factory.dart';
 
+/// Creates a ready-to-use [HeadlessInAppWebView] for the given [settings].
+///
+/// The default implementation constructs the headless instance with an
+/// `about:blank` request, applies [settings] as its initial settings
+/// (spec 007 FR-008), and starts it. Tests inject a fake here to drive the
+/// pool without platform channels (spec 007: plain Dart ports + fakes).
+typedef HeadlessWebViewInstanceFactory = Future<HeadlessInAppWebView> Function(
+    InAppWebViewSettings? settings);
+
 /// Pool configuration with platform-aware defaults.
 ///
 /// Spec: 007 (FR-003, FR-008)
@@ -54,6 +63,18 @@ class WebViewPoolConfig {
   }
 }
 
+/// Thrown by [WebViewPool.acquire] when a new instance would exceed the
+/// pool's caps (FR-003) and no idle instance can be evicted (SC-005: the
+/// live cap and the per-domain cap are never exceeded).
+class WebViewPoolExhaustedException implements Exception {
+  final String message;
+
+  WebViewPoolExhaustedException(this.message);
+
+  @override
+  String toString() => 'WebViewPoolExhaustedException: $message';
+}
+
 /// A pooled webview manager that acquires/releases
 /// [HeadlessInAppWebView] instances keyed by session handle.
 ///
@@ -68,6 +89,8 @@ class WebViewPoolConfig {
 /// Spec: 007 (all FRs)
 class WebViewPool implements WebViewSessionFactory {
   final WebViewPoolConfig config;
+
+  final HeadlessWebViewInstanceFactory _instanceFactory;
 
   // Active sessions: sessionId -> PoolSession
   final Map<String, PoolSession> _active = {};
@@ -89,10 +112,25 @@ class WebViewPool implements WebViewSessionFactory {
   // Lifecycle listener for memory-pressure disposal
   AppLifecycleListener? _lifecycleListener;
 
-  WebViewPool({WebViewPoolConfig? config})
-      : config = config ?? WebViewPoolConfig.platformDefaults() {
+  WebViewPool({
+    WebViewPoolConfig? config,
+    HeadlessWebViewInstanceFactory? instanceFactory,
+  })  : config = config ?? WebViewPoolConfig.platformDefaults(),
+        _instanceFactory = instanceFactory ?? _defaultInstanceFactory {
     _startEvictionTimer();
     _startLifecycleListener();
+  }
+
+  /// Default production factory: about:blank headless instance with the
+  /// acquisition settings applied, then started.
+  static Future<HeadlessInAppWebView> _defaultInstanceFactory(
+      InAppWebViewSettings? settings) async {
+    final webview = HeadlessInAppWebView(
+      initialUrlRequest: URLRequest(url: WebUri('about:blank')),
+      initialSettings: settings ?? InAppWebViewSettings(),
+    );
+    await webview.run();
+    return webview;
   }
 
   @override
@@ -127,8 +165,25 @@ class WebViewPool implements WebViewSessionFactory {
       session ??= await _createSession(sessionId, domainHint, etld, settings);
 
       // 5. Register as active
-      // Reused idle sessions retain a stale releasedAt (set on release),
-      // which would make isActive report false for a live, reused session.
+      // A reused idle session is re-issued as a fresh handle over the same
+      // underlying webview: the new sessionId and the current eTLD+1
+      // association are reported by sessions() (FR-006), while warm state
+      // survives because the webview object is unchanged (FR-002).
+      if (session.sessionId != sessionId ||
+          session.etldPlusOne != (etld ?? session.etldPlusOne)) {
+        session = PoolSession(
+          sessionId: sessionId,
+          domainHint: domainHint,
+          etldPlusOne: etld ?? session.etldPlusOne,
+          webview: session.webview,
+          // A reissued handle reports the settings this acquisition asked
+          // for; the native instance keeps the ones it was created with
+          // (initialSettings is not retroactive).
+          settings: settings ?? session.settings,
+        );
+      }
+      // A handle taken back out of the idle pool must read active again
+      // (isActive == releasedAt == null); `_active` may only hold live work.
       session.releasedAt = null;
       _active[sessionId] = session;
       return session;
@@ -200,6 +255,7 @@ class WebViewPool implements WebViewSessionFactory {
     }
     return result;
   }
+
   /// Disposes the pool and releases all resources.
   Future<void> dispose() async {
     _evictionTimer?.cancel();
@@ -231,15 +287,41 @@ class WebViewPool implements WebViewSessionFactory {
     String? etld,
     InAppWebViewSettings? settings,
   ) async {
-    if (liveCount >= config.maxLiveInstances) {
-      await _evictOldestIdle();
+    // FR-003: per-domain cap. This check is pure — it reads state, creates
+    // nothing and needs no room — so it runs BEFORE the max-live eviction
+    // below: a refused acquisition must not first destroy a warm idle
+    // instance (arrrrny/zikzak_inappwebview#390).
+    //
+    // The counter covers active PLUS idle entries for the eTLD+1, because
+    // `maxPerDomain` is documented as an idle-per-domain cap. Domain affinity
+    // drains `_idle[etld]` before creation is reached, so the idle term is
+    // normally zero here; counting it keeps the invariant independent of that
+    // ordering.
+    if (etld != null) {
+      var domainCount = _idle[etld]?.length ?? 0;
+      for (final active in _active.values) {
+        if (active.etldPlusOne == etld) domainCount++;
+      }
+      if (domainCount >= config.maxPerDomain) {
+        throw WebViewPoolExhaustedException(
+            'WebViewPool per-domain cap reached (${config.maxPerDomain} '
+            'instances for $etld)');
+      }
     }
 
-    final webview = HeadlessInAppWebView(
-      initialUrlRequest: URLRequest(url: WebUri('about:blank')),
-      initialSettings: InAppWebViewSettings(),
-    );
-    await webview.run();
+    if (liveCount >= config.maxLiveInstances) {
+      // SC-005: the live cap is never exceeded. Make room by evicting the
+      // oldest idle instance; if nothing is evictable, refuse the
+      // acquisition instead of exceeding the cap.
+      final evicted = await _evictOldestIdle();
+      if (!evicted) {
+        throw WebViewPoolExhaustedException(
+            'WebViewPool live cap reached (${config.maxLiveInstances} '
+            'instances) and no idle instance can be evicted');
+      }
+    }
+
+    final webview = await _instanceFactory(settings);
 
     return PoolSession(
       sessionId: sessionId,
@@ -250,20 +332,41 @@ class WebViewPool implements WebViewSessionFactory {
     );
   }
 
-  Future<void> _evictOldestIdle() async {
-    // Evict from domain idle pools first
-    for (final entries in _idle.values) {
-      if (entries.isNotEmpty) {
-        final oldest = entries.removeAt(0);
-        await oldest.webview.dispose();
-        return;
+  /// Evicts the globally oldest idle instance (spec 007 US3: "the oldest
+  /// idle instance is evicted before any active one").
+  ///
+  /// Returns true if an instance was evicted.
+  Future<bool> _evictOldestIdle() async {
+    PoolSession? oldest;
+    List<PoolSession>? oldestList;
+
+    void consider(List<PoolSession> candidates) {
+      for (final candidate in candidates) {
+        final released = candidate.releasedAt;
+        if (released == null) continue; // never released: not idle
+        if (oldest == null || released.isBefore(oldest!.releasedAt!)) {
+          oldest = candidate;
+          oldestList = candidates;
+        }
       }
     }
-    // Fall back to generic idle
-    if (_genericIdle.isNotEmpty) {
-      final oldest = _genericIdle.removeAt(0);
-      await oldest.webview.dispose();
+
+    for (final entries in _idle.values) {
+      consider(entries);
     }
+    consider(_genericIdle);
+
+    if (oldest == null || oldestList == null) return false;
+
+    oldestList!.remove(oldest);
+    final oldestEtld = oldest!.etldPlusOne;
+    if (oldestEtld != null &&
+        _idle[oldestEtld] != null &&
+        _idle[oldestEtld]!.isEmpty) {
+      _idle.remove(oldestEtld);
+    }
+    await oldest!.webview.dispose();
+    return true;
   }
 
   void _startEvictionTimer() {

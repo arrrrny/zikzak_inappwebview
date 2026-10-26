@@ -4,8 +4,8 @@ loop: outside-in # feature has a real user-visible surface: the WebViewPool publ
 profile: .specify/memory/tdd-profile.md # stack profile the commands must read
 spec_criteria: 18 # acceptance scenarios enumerated in spec.md (US1..US5)
 planned_at: f349d421 # short SHA the list was derived from
-updated_at: f349d421 # short SHA of the last change to this file
-suite_baseline: blocked # umbrella/module blocked: zuraffa pub-cache corruption — run `flutter pub cache repair`
+updated_at: 0183fbe4 # short SHA of the last change to this file
+suite_baseline: green # module package suite 23 passed / 0 failed (18 pool behaviors + 5 pre-existing), fresh resolution
 ---
 
 # Test List: WebViewPool — Mission-Scoped Sessions, Domain Affinity, and Memory-Pressure Disposal
@@ -27,24 +27,24 @@ units beneath it.
 
 | id  | behavior                                                                                              | traces                  | kind    | state    | test |
 | --- | ----------------------------------------------------------------------------------------------------- | ----------------------- | ------- | -------- | ---- |
-| A1  | Acquiring a session with no instance creates a new headless web view and `liveCount` becomes 1        | FR-001, FR-005, FR-006, SC-001 | example | PENDING  |      |
-| A2  | Re-acquiring the same live session returns the same instance and creates no second instance           | FR-005, SC-001          | example | PENDING  |      |
-| A3  | Releasing a live session returns it idle, drops it from `sessions()` active set, and `liveCount` drops | FR-005, FR-006, SC-001  | example | PENDING  |      |
-| A4  | `disposeAll()` with several live sessions disposes every instance and `liveCount` returns to 0        | FR-005, SC-001          | example | PENDING  |      |
-| A5  | Acquiring with an eTLD+1 hint reuses a warm idle instance already scoped to that eTLD+1 (affinity hit) | FR-002, SC-003          | example | PENDING  |      |
+| A1  | Acquiring a session with no instance creates a new headless web view and `liveCount` becomes 1        | FR-001, FR-005, FR-006, SC-001 | example | DONE | zikzak_inappwebview_module/test/webview_pool_test.dart |
+| A2  | Re-acquiring the same live session returns the same instance and creates no second instance           | FR-005, SC-001          | example | DONE | zikzak_inappwebview_module/test/webview_pool_test.dart |
+| A3  | Releasing a live session returns it idle and drops it from the `sessions()` active set; `liveCount` (live + idle, per FR-006/U10) still counts the retained idle instance until eviction/disposal | FR-005, FR-006, SC-001  | example | DONE | zikzak_inappwebview_module/test/webview_pool_test.dart |
+| A4  | `disposeAll()` with several live sessions disposes every instance and `liveCount` returns to 0        | FR-005, SC-001          | example | DONE | zikzak_inappwebview_module/test/webview_pool_test.dart |
+| A5  | Acquiring with an eTLD+1 hint reuses a warm idle instance already scoped to that eTLD+1 (affinity hit) | FR-002, SC-003          | example | DONE | zikzak_inappwebview_module/test/webview_pool_test.dart |
 | A6  | A subsequent affine reuse keeps the prior session's cookie/JS execution context available to the caller | FR-002, SC-003          | example | PENDING  |      |
-| A7  | Acquiring an unknown eTLD+1 reuses any available generic idle instance re-scoped, or creates a new one  | FR-002, SC-003          | example | PENDING  |      |
-| A8  | `sessions()` reports each entry's current eTLD+1 domain association                                    | FR-006, SC-003          | example | PENDING  |      |
+| A7  | Acquiring an unknown eTLD+1 reuses any available generic idle instance re-scoped, or creates a new one  | FR-002, SC-003          | example | DONE | zikzak_inappwebview_module/test/webview_pool_test.dart |
+| A8  | `sessions()` reports each entry's current eTLD+1 domain association                                    | FR-006, SC-003          | example | DONE | zikzak_inappwebview_module/test/webview_pool_test.dart |
 | A9  | An idle instance past its idle TTL is disposed by the eviction sweep and `liveCount` decreases         | FR-003, SC-004, SC-005   | example | PENDING  |      |
-| A10 | An affine acquire past the max-per-domain cap evicts the oldest idle instance of that domain, not exceeding the cap | FR-003, SC-005   | example | PENDING  |      |
+| A10 | An affine acquire at the max-per-domain cap is refused (`WebViewPoolExhaustedException`) without exceeding the cap — affinity-first reuse makes a same-domain idle unreachable at creation time, so eviction of same-domain idle cannot arise | FR-003, SC-005   | example | DONE | zikzak_inappwebview_module/test/webview_pool_test.dart |
 | A11 | A memory-pressure / lifecycle pause disposes idle instances first while an actively-acquired one stays usable | FR-004, SC-004    | example | PENDING  |      |
 | A12 | The effective max-live cap defaults to a platform-appropriate value on each target platform (mobile lower, desktop higher) | FR-003, SC-005 | example | PENDING |  |
-| A13 | K concurrent `acquire` calls for one session create exactly one instance; `liveCount` is 1 for that id  | FR-007, SC-002, SC-006   | example | PENDING  |      |
-| A14 | Concurrent acquisitions across M distinct sessions leave `liveCount` == M with no aliased instances     | FR-007, SC-002, SC-006   | example | PENDING  |      |
+| A13 | K concurrent `acquire` calls for one session create exactly one instance; `liveCount` is 1 for that id  | FR-007, SC-002, SC-006   | example | DONE | zikzak_inappwebview_module/test/webview_pool_test.dart |
+| A14 | Concurrent acquisitions across M distinct sessions leave `liveCount` == M with no aliased instances     | FR-007, SC-002, SC-006   | example | DONE | zikzak_inappwebview_module/test/webview_pool_test.dart |
 | A15 | A high-contention burst completes with no exception/deadlock and introspection stays consistent         | FR-007, SC-006          | example | PENDING  |      |
-| A16 | `acquire` settings with capture filters are applied to the issued instance only                         | FR-008, SC-007          | example | PENDING  |      |
-| A17 | Two sessions with different `InAppWebViewSettings` each retain only their own configuration            | FR-008, SC-007          | example | PENDING  |      |
-| A18 | An `acquire` with no settings override issues an instance using the pool's default base configuration    | FR-008, SC-007          | example | PENDING  |      |
+| A16 | `acquire` settings with capture filters are applied to the issued instance only                         | FR-008, SC-007          | example | DONE | zikzak_inappwebview_module/test/webview_pool_test.dart |
+| A17 | Two sessions with different `InAppWebViewSettings` each retain only their own configuration            | FR-008, SC-007          | example | DONE | zikzak_inappwebview_module/test/webview_pool_test.dart |
+| A18 | An `acquire` with no settings override issues an instance using the pool's default base configuration    | FR-008, SC-007          | example | DONE | zikzak_inappwebview_module/test/webview_pool_test.dart |
 
 ## Inner loop: unit behaviors
 

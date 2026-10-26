@@ -8,20 +8,20 @@
 ## Phase 1: Core WebViewPool Implementation
 
 ### A1: Acquire for new session creates instance, liveCount = 1
-- [ ] T003 [A1]: **Test** - Write acceptance test for A1: acquire new session creates instance, liveCount = 1
-- [ ] T004 [A1]: **Implement** - Implement acquire() to create HeadlessInAppWebView for new sessionId
+- [x] T003 [A1]: **Test** - Write acceptance test for A1: acquire new session creates instance, liveCount = 1
+- [x] T004 [A1]: **Implement** - Implement acquire() to create HeadlessInAppWebView for new sessionId
 
 ### A2: Re-acquire same sessionId returns same instance
-- [ ] T005 [A2]: **Test** - Write acceptance test for A2: re-acquire same sessionId returns same instance
-- [ ] T006 [A2]: **Implement** - Implement sessionId tracking to return existing live instance
+- [x] T005 [A2]: **Test** - Write acceptance test for A2: re-acquire same sessionId returns same instance
+- [x] T006 [A2]: **Implement** - Implement sessionId tracking to return existing live instance
 
 ### A3: Release returns instance to idle, updates liveCount
-- [ ] T007 [A3]: **Test** - Write acceptance test for A3: release moves to idle, updates liveCount
-- [ ] T008 [A3]: **Implement** - Implement release() to move instance from live to idle pool
+- [x] T007 [A3]: **Test** - Write acceptance test for A3: release moves to idle, updates liveCount
+- [x] T008 [A3]: **Implement** - Implement release() to move instance from live to idle pool
 
 ### A4: disposeAll disposes all instances, liveCount = 0
-- [ ] T009 [A4]: **Test** - Write acceptance test for A4: disposeAll clears all pools
-- [ ] T010 [A4]: **Implement** - Implement disposeAll() to dispose all live and idle instances
+- [x] T009 [A4]: **Test** - Write acceptance test for A4: disposeAll clears all pools
+- [x] T010 [A4]: **Implement** - Implement disposeAll() to dispose all live and idle instances
 
 ### U1: Singleton instance consistency
 - [ ] T011 [U1]: **Test** - Write unit test for singleton pattern
@@ -32,50 +32,50 @@
 - [ ] T014 [U2]: **Implement** - Implement InAppWebViewSettings merging in acquire()
 
 ### U3: acquire() returns existing live instance for same sessionId
-- [ ] T015 [U3]: **Test** - Write unit test for sessionId deduplication
-- [ ] T016 [U3]: **Implement** - Implement live session tracking map
+- [x] T015 [U3]: **Test** - Write unit test for sessionId deduplication
+- [x] T016 [U3]: **Implement** - Implement live session tracking map
 
 ### U4: release() moves instance live → idle; sessions() updated
-- [ ] T017 [U4]: **Test** - Write unit test for release state transition
-- [ ] T018 [U4]: **Implement** - Implement live→idle transition and sessions() snapshot
+- [x] T017 [U4]: **Test** - Write unit test for release state transition
+- [x] T018 [U4]: **Implement** - Implement live→idle transition and sessions() snapshot
 
 ### U5: disposeAll() disposes all and clears pools
-- [ ] T019 [U5]: **Test** - Write unit test for disposeAll behavior
-- [ ] T020 [U5]: **Implement** - Implement full pool disposal
+- [x] T019 [U5]: **Test** - Write unit test for disposeAll behavior
+- [x] T020 [U5]: **Implement** - Implement full pool disposal
 
 ### U9: sessions() returns snapshot with sessionId, domain, status
-- [ ] T021 [U9]: **Test** - Write unit test for sessions() introspection
-- [ ] T022 [U9]: **Implement** - Implement sessions() returning consistent snapshot
+- [x] T021 [U9]: **Test** - Write unit test for sessions() introspection
+- [x] T022 [U9]: **Implement** - Implement sessions() returning consistent snapshot
 
 ### U10: liveCount equals live + idle count
-- [ ] T023 [U10]: **Test** - Write unit test for liveCount accuracy
-- [ ] T024 [U10]: **Implement** - Implement liveCount getter
+- [x] T023 [U10]: **Test** - Write unit test for liveCount accuracy
+- [x] T024 [U10]: **Implement** - Implement liveCount getter
 
 ## Phase 2: Domain Affinity
 
 ### A5: Affine acquire reuses warm idle instance (affinity hit)
-- [ ] T025 [A5]: **Test** - Write acceptance test for A5: same eTLD+1 reuses warm instance
-- [ ] T026 [A5]: **Implement** - Implement domain affinity selection logic
+- [x] T025 [A5]: **Test** - Write acceptance test for A5: same eTLD+1 reuses warm instance
+- [x] T026 [A5]: **Implement** - Implement domain affinity selection logic
 
 ### A6: Affine re-acquisition preserves cookie/JS state
 - [ ] T027 [A6]: **Test** - Write acceptance test for A6: state preservation across affine acquire
 - [ ] T028 [A6]: **Implement** - Ensure instance state persists across affine reuse
 
 ### A7: Non-affine acquire reuses generic idle or creates new
-- [ ] T029 [A7]: **Test** - Write acceptance test for A7: non-affine falls back to generic idle
-- [ ] T030 [A7]: **Implement** - Implement generic idle fallback logic
+- [x] T029 [A7]: **Test** - Write acceptance test for A7: non-affine falls back to generic idle
+- [x] T030 [A7]: **Implement** - Implement generic idle fallback logic
 
 ### A8: sessions() reports eTLD+1 domain association
-- [ ] T031 [A8]: **Test** - Write acceptance test for A8: sessions() includes domain
-- [ ] T032 [A8]: **Implement** - Track and report domainHint in sessions()
+- [x] T031 [A8]: **Test** - Write acceptance test for A8: sessions() includes domain
+- [x] T032 [A8]: **Implement** - Track and report domainHint in sessions()
 
 ### U6: Domain affinity selects matching eTLD+1 over generic idle
 - [ ] T033 [U6]: **Test** - Write unit test for affinity selection priority
 - [ ] T034 [U6]: **Implement** - Implement eTLD+1 affinity matching
 
 ### U7: Affine instance retains state for subsequent acquires
-- [ ] T035 [U7]: **Test** - Write unit test for state retention
-- [ ] T036 [U7]: **Implement** - Ensure instance not reset on affine reuse
+- [x] T035 [U7]: **Test** - Write unit test for state retention
+- [x] T036 [U7]: **Implement** - Ensure instance not reset on affine reuse
 
 ### U8: Non-affine acquire re-scopes generic idle to new domain
 - [ ] T037 [U8]: **Test** - Write unit test for generic re-scoping
@@ -112,8 +112,8 @@
 - [ ] T052 [U12]: **Implement** - Implement per-domain instance tracking with LRU
 
 ### U13: Max-live cap blocks or evicts per policy
-- [ ] T053 [U13]: **Test** - Write unit test for max-live enforcement
-- [ ] T054 [U13]: **Implement** - Implement max-live cap enforcement
+- [x] T053 [U13]: **Test** - Write unit test for max-live enforcement
+- [x] T054 [U13]: **Implement** - Implement max-live cap enforcement
 
 ### U14: AppLifecycleListener on pause/memory pressure disposes idle first
 - [ ] T055 [U14]: **Test** - Write unit test for lifecycle hook behavior
@@ -126,20 +126,20 @@
 ## Phase 4: Concurrency Safety
 
 ### A13: Concurrent acquires same sessionId → exactly one instance
-- [ ] T059 [A13]: **Test** - Write acceptance test for A13: concurrent same-session acquire
-- [ ] T060 [A13]: **Implement** - Implement locking for same sessionId acquire
+- [x] T059 [A13]: **Test** - Write acceptance test for A13: concurrent same-session acquire
+- [x] T060 [A13]: **Implement** - Implement locking for same sessionId acquire
 
 ### A14: Concurrent distinct sessions → liveCount = M, no aliasing
-- [ ] T061 [A14]: **Test** - Write acceptance test for A14: concurrent distinct sessions
-- [ ] T062 [A14]: **Implement** - Implement fine-grained locking across sessions
+- [x] T061 [A14]: **Test** - Write acceptance test for A14: concurrent distinct sessions
+- [x] T062 [A14]: **Implement** - Implement fine-grained locking across sessions
 
 ### A15: High-contention burst no exception/deadlock; introspection consistent
 - [ ] T063 [A15]: **Test** - Write acceptance test for A15: contention stress test
 - [ ] T064 [A15]: **Implement** - Ensure lock ordering and consistency
 
 ### U16: Concurrent acquire same sessionId uses locking to prevent duplicates
-- [ ] T065 [U16]: **Test** - Write unit test for acquire locking
-- [ ] T066 [U16]: **Implement** - Implement per-sessionId lock
+- [x] T065 [U16]: **Test** - Write unit test for acquire locking
+- [x] T066 [U16]: **Implement** - Implement per-sessionId lock
 
 ### U17: Concurrent acquire/release distinct sessions uses fine-grained locking
 - [ ] T067 [U17]: **Test** - Write unit test for cross-session locking
@@ -152,16 +152,16 @@
 ## Phase 5: Per-Acquisition Configuration
 
 ### A16: Per-acquisition settings applied to instance only (no bleed)
-- [ ] T071 [A16]: **Test** - Write acceptance test for A16: settings isolation
-- [ ] T072 [A16]: **Implement** - Implement per-instance settings application
+- [x] T071 [A16]: **Test** - Write acceptance test for A16: settings isolation
+- [x] T072 [A16]: **Implement** - Implement per-instance settings application
 
 ### A17: Different sessions retain own configuration
-- [ ] T073 [A17]: **Test** - Write acceptance test for A17: settings don't bleed
-- [ ] T074 [A17]: **Implement** - Ensure independent settings per instance
+- [x] T073 [A17]: **Test** - Write acceptance test for A17: settings don't bleed
+- [x] T074 [A17]: **Implement** - Ensure independent settings per instance
 
 ### A18: No settings override uses pool default base config
-- [ ] T075 [A18]: **Test** - Write acceptance test for A18: default config fallback
-- [ ] T076 [A18]: **Implement** - Implement default base configuration
+- [x] T075 [A18]: **Test** - Write acceptance test for A18: default config fallback
+- [x] T076 [A18]: **Implement** - Implement default base configuration
 
 ### U19: acquire() merges caller settings onto pool defaults per-instance
 - [ ] T077 [U19]: **Test** - Write unit test for settings merge
@@ -232,3 +232,21 @@
 - Inner-loop unit tests (U1–U31) test component behaviors in isolation.
 - Characterization tests (BASELINE) are not needed for this feature as it is greenfield.
 - The two pre-existing compile-broken test files (`headless_dispose_test.dart`, `webview_sessions_test.dart`) are NOT this feature's responsibility and must be resolved separately.
+## Phase 6: TDD remediation
+
+> Appended by /speckit.tdd.verify (2026-10-27, verified_at 93916240, verdict FAIL).
+> Ordered so the HIGH findings come first. Each task names the command that proves it.
+
+- [ ] T081 [R1]: **Fix HIGH finding #1** — replace A18's type-only assertion (`test/webview_pool_test.dart:300`) with concrete default-value assertions so it can fail; prove with `cd zikzak_inappwebview_module && flutter test --plain-name "A18"`.
+- [ ] T082 [R2]: **Fix HIGH finding #2** — pin oldest-first eviction ordering: build a pool with two idles released in a known order and assert the OLDER one is evicted (kills the surviving `evict-arbitrary-not-oldest` mutant); prove with `flutter test --plain-name "evicts the oldest idle"`.
+- [ ] T083 [R3]: **Fix MED finding #3** — split A7 into two tests (cross-domain isolation; generic idle reuse); prove with `flutter test --plain-name "A7"`.
+- [ ] T084 [R4]: **Fix MED finding #4** — drop A3's disposeAll tail (that reason belongs to A4); prove with `flutter test --plain-name "A3"`.
+- [ ] T085 [R5]: **Fix MED finding #5** — correct the header comment's cap values to the built config; prove with `dart analyze zikzak_inappwebview_module/test/webview_pool_test.dart`.
+- [ ] T086 [R6]: **Fix MED finding #6** — use the `same()` matcher at `test/webview_pool_test.dart:213`; prove with `flutter test --plain-name "A13"`.
+- [ ] T087 [R7]: **Fix LOW finding #7** — extract the cap-pool construction into an in-file factory; prove with `flutter test test/webview_pool_test.dart`.
+- [ ] T088 [R8]: Implement A6 (warm cookie/JS state round-trip) on a real rendering surface (integration lane) per its NO_TEST note; prove with the integration run recorded in cycle-log.
+- [ ] T089 [R9]: Add a clock-injection seam to the eviction sweep and implement A9 (idle TTL eviction); prove with `flutter test --plain-name "A9"`.
+- [ ] T090 [R10]: Implement A11 (memory-pressure disposal spares active) with binding-driven lifecycle emulation; prove with `flutter test --plain-name "A11"`.
+- [ ] T091 [R11]: Implement A12 (platform-aware default caps) with a per-platform test lane; prove with `flutter test --plain-name "A12"`.
+- [ ] T092 [R12]: Implement A15 (high-contention burst consistency stress); prove with `flutter test --plain-name "A15"`.
+- [ ] T093 [R13]: Assert FR-010 structurally in a test (module lib has no zuraffa/MCP imports); prove with `flutter test --plain-name "FR-010"`.
