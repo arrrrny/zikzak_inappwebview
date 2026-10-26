@@ -13,7 +13,9 @@ import 'package:flutter_test/flutter_test.dart';
 /// The iOS package tests cannot compile Swift (they read the sources as text
 /// and assert on their shape — `build-ios` CI is the compile gate), so these
 /// tests pin the bridge contract: the shim source, the native bridge source,
-/// the InAppWebView wiring between them, and the no-drift guarantee.
+/// the InAppWebView wiring between them, the no-drift guarantee, and the
+/// `webView()` accessor contract that keeps the iOS release build compiling
+/// (issue #386).
 void main() {
   final bridgeSwift = File(
     'ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/'
@@ -176,6 +178,62 @@ void main() {
         expect(source, contains('cancel()'));
       },
     );
+  });
+
+  group('isHeadlessWebView accessor contract (issue #386)', () {
+    late String source;
+
+    setUpAll(() {
+      expect(
+        bridgeSwift.existsSync(),
+        isTrue,
+        reason:
+            'PasskeyBridge.swift not found relative to package root '
+            '(cwd: ${Directory.current.path})',
+      );
+      source = bridgeSwift.readAsStringSync();
+    });
+
+    test('walks the headless registry via the webView() accessor call', () {
+      // FlutterWebViewController.webView is a method, not a property, so the
+      // registry comparison must use the InAppWebView the accessor returns.
+      final accessor = RegExp(
+        r'flutterWebView\?\.webView\(\)\s*===\s*webView\b',
+      );
+      expect(
+        accessor.hasMatch(source),
+        isTrue,
+        reason:
+            'isHeadlessWebView() must compare against the InAppWebView '
+            'returned by calling webView() (#386)',
+      );
+    });
+
+    test('never uses the webView tear-off as an InAppWebView value', () {
+      // `flutterWebView?.webView` without the call is a `(() ->
+      // InAppWebView?)?` function value; `===` against InAppWebView then has
+      // no single overload and Swift fails the iOS release build with "Type
+      // of expression is ambiguous without a type annotation" anchored at the
+      // preceding optional binding (#386). Only the build-ios job type-checks
+      // this file, so pin the call here where every job runs.
+      //
+      // Line comments are stripped before matching so that documenting this
+      // bug by quoting the tear-off does not turn the pin red, and the
+      // trailing boundary plus the optional space keep it off future members
+      // (`webViewTitle`) and the spaced call (`webView ()`).
+      final code = source
+          .split('\n')
+          .map((line) => line.split('//').first)
+          .join('\n');
+      final tearOff = RegExp(r'flutterWebView\?*\.webView\b(?!\s*\()');
+      expect(
+        tearOff.hasMatch(code),
+        isFalse,
+        reason:
+            'found flutterWebView?.webView used as a value — the accessor '
+            'must be called: webView() (#386)',
+      );
+    });
   });
 
   group('PasskeysJS.swift shim on iOS (issue #384)', () {
