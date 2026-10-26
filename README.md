@@ -61,6 +61,16 @@ dependencies:
 | **Linux**   |                 | Requires WebKitGTK 2.40+  |
 | **Web**     | Any             |                           |
 
+## ⚠️ Known Issues
+
+### [iOS] Flutter 3.47.x: platform views drop overlapping Flutter content (#331)
+
+On the Flutter 3.47.x stable line, iOS platform views — including `InAppWebView` — can make the Flutter content painted after them vanish from the frame ("rendering layer confusion"): an `AppBar` turns invisible, a modal bottom sheet's footer and the list items below a WebView card are not drawn. Upgrading from 3.44.x to 3.47.2 triggers it; the same app renders correctly on 3.44.x. It reproduces with Impeller disabled, so it is not an Impeller rasterizer bug.
+
+This is an engine regression in Flutter's texture-layer hybrid composition (TLHC) overlay path, tracked upstream in [flutter/flutter#193363](https://github.com/flutter/flutter/issues/193363) (triaged `engine` / `platform-views`, `c: regression`). It is **not a plugin code defect**: the on-device mitigation matrix in [`.specify/bugs/flutter347-platformview-rendering/fix.md`](.specify/bugs/flutter347-platformview-rendering/fix.md) (§ *Mitigation matrix*) leaves the artifact unchanged for every candidate tested.
+
+The symptom, the evidence and the workarounds are documented once, in the package README's [Known Issues section](zikzak_inappwebview/README.md) — that copy is canonical, so read and edit it there.
+
 ## 🚀 Getting Started
 
 Check out the [online documentation](https://arrrrny.github.io/zikzak_inappwebview/) for comprehensive guides and examples.
