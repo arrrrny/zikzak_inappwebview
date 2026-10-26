@@ -259,10 +259,11 @@ packages:
   zikzak_inappwebview_platform_interface:
     dependency: "direct main"
     description:
-      path: "../zikzak_inappwebview_platform_interface"
-      relative: true
-    source: path
-    version: "6.2.2"
+      name: zikzak_inappwebview_platform_interface
+      sha256: eb67706d80750e4dcb2e0829736d0eaa2a94eb8011d714d050adc20474986f56
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.3.0"
   zorphy_annotation:
     dependency: transitive
     description:
