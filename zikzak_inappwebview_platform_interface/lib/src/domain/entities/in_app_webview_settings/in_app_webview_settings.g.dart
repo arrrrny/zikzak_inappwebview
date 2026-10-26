@@ -561,6 +561,10 @@ InAppWebViewSettings _$InAppWebViewSettingsFromJson(
       'consoleLogEnabled',
       (v) => v as bool? ?? true,
     ),
+    passkeyBridgeEnabled: $checkedConvert(
+      'passkeyBridgeEnabled',
+      (v) => v as bool? ?? true,
+    ),
     insetsForWebContentToIgnore: $checkedConvert(
       'insetsForWebContentToIgnore',
       (v) => _insetsFromJson(v),
@@ -782,6 +786,7 @@ Map<String, dynamic> _$InAppWebViewSettingsToJson(
   'iframeCsp': instance.iframeCsp,
   'dismissDialogues': instance.dismissDialogues,
   'consoleLogEnabled': instance.consoleLogEnabled,
+  'passkeyBridgeEnabled': instance.passkeyBridgeEnabled,
   'insetsForWebContentToIgnore': _insetsToJson(
     instance.insetsForWebContentToIgnore,
   ),

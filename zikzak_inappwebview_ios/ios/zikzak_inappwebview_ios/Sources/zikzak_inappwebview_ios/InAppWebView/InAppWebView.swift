@@ -86,6 +86,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
 
     var id: Any?  // viewId
     var plugin: SwiftFlutterPlugin?
+
+    // Issue #384: native WebAuthn/passkey bridge (ASAuthorizationController).
+    // Created in prepare() behind the passkeyBridgeEnabled arming gate; the
+    // injected PasskeysJS shim calls through it on the callHandler channel.
+    var passkeyBridge: PasskeyBridge?
     var windowId: Int64?
     var windowCreated = false
     var windowBeforeCreatedCallbacks: [() -> Void] = []
@@ -682,6 +687,22 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             }
         }
 
+        // Issue #384 B2: arm the native passkey bridge unless the consumer
+        // opted out (passkeyBridgeEnabled) or explicitly requested
+        // webAuthenticationSupport NONE. The iOS native default is 0 (NONE)
+        // — see the honest read-back of issue #352 — so only an EXPLICITLY
+        // requested NONE disarms (webAuthenticationSupportExplicitlyRequested);
+        // the unset default keeps the bridge armed. Created BEFORE the
+        // windowId early-return below: window.open children share the
+        // opener's userContentController and their bridge is resolved via
+        // _windowId in the callHandler interception.
+        let passkeysArmed = (settings?.passkeyBridgeEnabled ?? true)
+            && (settings?.webAuthenticationSupportExplicitlyRequested != true
+                || settings?.webAuthenticationSupport != 0)
+        if passkeysArmed {
+            self.passkeyBridge = PasskeyBridge(webView: self)
+        }
+
         prepareAndAddUserScripts()
 
         if windowId != nil {
@@ -748,6 +769,15 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
 
         configuration.userContentController.addPluginScript(PROMISE_POLYFILL_JS_PLUGIN_SCRIPT)
         configuration.userContentController.addPluginScript(JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT)
+        // Issue #384: WebAuthn/passkey shim, injected in every frame at
+        // document start right after the JS bridge it calls through — but
+        // only when the bridge is armed (the same passkeyBridgeEnabled /
+        // webAuthenticationSupport gate that created it in prepare()).
+        // windowId children returned above and inherit the opener's
+        // userContentController, so they ride the opener's shim.
+        if passkeyBridge != nil {
+            configuration.userContentController.addPluginScript(PASSKEYS_JS_PLUGIN_SCRIPT)
+        }
         if settings?.consoleLogEnabled ?? true {
             configuration.userContentController.addPluginScript(CONSOLE_LOG_JS_PLUGIN_SCRIPT)
         }
@@ -3854,6 +3884,42 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 return
             }
 
+            if handlerName == "PasskeyBridge" {
+                // Issue #384: WebAuthn/passkey ceremonies are handled
+                // natively (ASAuthorizationController), never round-tripped
+                // to Dart. The bridge always RESOLVES the JS promise — the
+                // shim converts {"ok": false, error: {name, message}} into
+                // a DOMException so the WebAuthn error names survive.
+                // window.open children share the opener's
+                // userContentController, so their messages arrive here: the
+                // _windowId the shim posts resolves the child webview whose
+                // bridge owns the ceremony (same routing as the console
+                // path above).
+                let _windowId = body["_windowId"] as? Int64
+                var webView = self
+                if let wId = _windowId,
+                    let webViewTransport = plugin?.inAppWebViewManager?.windowWebViews[wId]
+                {
+                    webView = webViewTransport.webView
+                }
+                let _callHandlerID = body["_callHandlerID"] as? Int64 ?? 0
+                let args = body["args"] as? String ?? "[]"
+                webView.passkeyBridge?.handleCall(argsJson: args) { result in
+                    let jsonData =
+                        (try? JSONSerialization.data(withJSONObject: result))
+                        ?? Data("{}".utf8)
+                    let json = String(data: jsonData, encoding: .utf8) ?? "{}"
+                    webView.evaluateJavaScript(
+                        """
+                        if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
+                            window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)].resolve(\(json));
+                            delete window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)];
+                        }
+                        """, completionHandler: nil)
+                }
+                return
+            }
+
             let _callHandlerID = body["_callHandlerID"] as? Int64 ?? 0
             let args = body["args"] as? String ?? ""
 
@@ -4328,6 +4394,12 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
 
     public func dispose() {
         guard !isDisposed else { return }
+
+        // Issue #384: cancel any outstanding passkey ceremony so the
+        // webview is not retained by a dangling ASAuthorizationController
+        // (macOS #358 parity).
+        passkeyBridge?.cancelCeremony()
+        passkeyBridge = nil
         isDisposed = true
 
         channelDelegate?.dispose()

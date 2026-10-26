@@ -153,6 +153,7 @@ class InAppWebViewSettings {
     String? this.iframeCsp,
     bool? dismissDialogues,
     bool? consoleLogEnabled,
+    bool? passkeyBridgeEnabled,
     List<AndroidWebViewInsets>? this.insetsForWebContentToIgnore,
     bool? this.useNetworkCapture,
     int? networkCaptureMaxBodySize,
@@ -288,6 +289,7 @@ class InAppWebViewSettings {
        this.allowBackgroundAudioPlaying = allowBackgroundAudioPlaying ?? false,
        this.dismissDialogues = dismissDialogues ?? false,
        this.consoleLogEnabled = consoleLogEnabled ?? true,
+       this.passkeyBridgeEnabled = passkeyBridgeEnabled ?? true,
        this.networkCaptureMaxBodySize = networkCaptureMaxBodySize ?? 50000,
        this.networkCaptureBodies = networkCaptureBodies ?? true,
        this.networkCaptureBinaryBodies = networkCaptureBinaryBodies ?? false,
@@ -745,6 +747,9 @@ class InAppWebViewSettings {
   @JsonKey(defaultValue: true)
   final bool? consoleLogEnabled;
 
+  @JsonKey(defaultValue: true)
+  final bool? passkeyBridgeEnabled;
+
   @JsonKey(toJson: _insetsToJson, fromJson: _insetsFromJson)
   final List<AndroidWebViewInsets>? insetsForWebContentToIgnore;
 
@@ -917,6 +922,7 @@ class InAppWebViewSettings {
     String? iframeCsp,
     bool? dismissDialogues,
     bool? consoleLogEnabled,
+    bool? passkeyBridgeEnabled,
     List<AndroidWebViewInsets>? insetsForWebContentToIgnore,
     bool? useNetworkCapture,
     int? networkCaptureMaxBodySize,
@@ -1153,6 +1159,7 @@ class InAppWebViewSettings {
       iframeCsp: iframeCsp ?? this.iframeCsp,
       dismissDialogues: dismissDialogues ?? this.dismissDialogues,
       consoleLogEnabled: consoleLogEnabled ?? this.consoleLogEnabled,
+      passkeyBridgeEnabled: passkeyBridgeEnabled ?? this.passkeyBridgeEnabled,
       insetsForWebContentToIgnore:
           insetsForWebContentToIgnore ?? this.insetsForWebContentToIgnore,
       useNetworkCapture: useNetworkCapture ?? this.useNetworkCapture,
@@ -1485,6 +1492,8 @@ class InAppWebViewSettings {
         return copyWith(dismissDialogues: value as bool?);
       case 'consoleLogEnabled':
         return copyWith(consoleLogEnabled: value as bool?);
+      case 'passkeyBridgeEnabled':
+        return copyWith(passkeyBridgeEnabled: value as bool?);
       case 'insetsForWebContentToIgnore':
         return copyWith(
           insetsForWebContentToIgnore: value as List<AndroidWebViewInsets>?,
@@ -1661,6 +1670,7 @@ class InAppWebViewSettings {
     String? iframeCsp,
     bool? dismissDialogues,
     bool? consoleLogEnabled,
+    bool? passkeyBridgeEnabled,
     List<AndroidWebViewInsets>? insetsForWebContentToIgnore,
     bool? useNetworkCapture,
     int? networkCaptureMaxBodySize,
@@ -1818,6 +1828,7 @@ class InAppWebViewSettings {
       iframeCsp: iframeCsp,
       dismissDialogues: dismissDialogues,
       consoleLogEnabled: consoleLogEnabled,
+      passkeyBridgeEnabled: passkeyBridgeEnabled,
       insetsForWebContentToIgnore: insetsForWebContentToIgnore,
       useNetworkCapture: useNetworkCapture,
       networkCaptureMaxBodySize: networkCaptureMaxBodySize,
@@ -3974,6 +3985,19 @@ class InAppWebViewSettings {
                     : _patchMap[InAppWebViewSettings$.consoleLogEnabled])
                 as bool?
           : this.consoleLogEnabled,
+      passkeyBridgeEnabled:
+          _patchMap.containsKey(InAppWebViewSettings$.passkeyBridgeEnabled)
+          ? ((_patchMap[InAppWebViewSettings$.passkeyBridgeEnabled] is Function)
+                    ? _patchMap[InAppWebViewSettings$.passkeyBridgeEnabled](
+                        this.passkeyBridgeEnabled,
+                      )
+                    : (_patchMap[InAppWebViewSettings$.passkeyBridgeEnabled]
+                          is Patch)
+                    ? _patchMap[InAppWebViewSettings$.passkeyBridgeEnabled]
+                          .applyTo(this.passkeyBridgeEnabled)
+                    : _patchMap[InAppWebViewSettings$.passkeyBridgeEnabled])
+                as bool?
+          : this.passkeyBridgeEnabled,
       insetsForWebContentToIgnore:
           _patchMap.containsKey(
             InAppWebViewSettings$.insetsForWebContentToIgnore,
@@ -4309,6 +4333,7 @@ class InAppWebViewSettings {
         iframeCsp == other.iframeCsp &&
         dismissDialogues == other.dismissDialogues &&
         consoleLogEnabled == other.consoleLogEnabled &&
+        passkeyBridgeEnabled == other.passkeyBridgeEnabled &&
         insetsForWebContentToIgnore == other.insetsForWebContentToIgnore &&
         useNetworkCapture == other.useNetworkCapture &&
         networkCaptureMaxBodySize == other.networkCaptureMaxBodySize &&
@@ -4480,6 +4505,7 @@ class InAppWebViewSettings {
         Object.hash(
           this.dismissDialogues,
           this.consoleLogEnabled,
+          this.passkeyBridgeEnabled,
           this.insetsForWebContentToIgnore,
           this.useNetworkCapture,
           this.networkCaptureMaxBodySize,
@@ -4779,6 +4805,8 @@ class InAppWebViewSettings {
         'dismissDialogues: ${dismissDialogues}' +
         ', ' +
         'consoleLogEnabled: ${consoleLogEnabled}' +
+        ', ' +
+        'passkeyBridgeEnabled: ${passkeyBridgeEnabled}' +
         ', ' +
         'insetsForWebContentToIgnore: ${insetsForWebContentToIgnore}' +
         ', ' +
@@ -6973,6 +7001,19 @@ extension InAppWebViewSettingsPropertyHelpers on InAppWebViewSettings {
         (throw StateError('consoleLogEnabled is required but was null'));
   }
 
+  bool get hasPasskeyBridgeEnabled {
+    return this.passkeyBridgeEnabled != null;
+  }
+
+  bool get noPasskeyBridgeEnabled {
+    return this.passkeyBridgeEnabled == null;
+  }
+
+  bool get passkeyBridgeEnabledRequired {
+    return this.passkeyBridgeEnabled ??
+        (throw StateError('passkeyBridgeEnabled is required but was null'));
+  }
+
   List<AndroidWebViewInsets> get insetsForWebContentToIgnoreRequired {
     return this.insetsForWebContentToIgnore ??
         (throw StateError(
@@ -7265,6 +7306,7 @@ enum InAppWebViewSettings$ {
   iframeCsp,
   dismissDialogues,
   consoleLogEnabled,
+  passkeyBridgeEnabled,
   insetsForWebContentToIgnore,
   useNetworkCapture,
   networkCaptureMaxBodySize,
@@ -8062,6 +8104,11 @@ class InAppWebViewSettingsPatch
 
   InAppWebViewSettingsPatch withConsoleLogEnabled(bool? value) {
     patchMap[InAppWebViewSettings$.consoleLogEnabled] = value;
+    return this;
+  }
+
+  InAppWebViewSettingsPatch withPasskeyBridgeEnabled(bool? value) {
+    patchMap[InAppWebViewSettings$.passkeyBridgeEnabled] = value;
     return this;
   }
 
@@ -8877,6 +8924,11 @@ abstract final class InAppWebViewSettingsFields {
     _$consoleLogEnabled,
   );
 
+  static const passkeyBridgeEnabled = Field<InAppWebViewSettings, bool?>(
+    'passkeyBridgeEnabled',
+    _$passkeyBridgeEnabled,
+  );
+
   static const insetsForWebContentToIgnore =
       Field<InAppWebViewSettings, List<AndroidWebViewInsets>?>(
         'insetsForWebContentToIgnore',
@@ -9518,6 +9570,10 @@ abstract final class InAppWebViewSettingsFields {
 
   static bool? _$consoleLogEnabled(InAppWebViewSettings e) {
     return e.consoleLogEnabled;
+  }
+
+  static bool? _$passkeyBridgeEnabled(InAppWebViewSettings e) {
+    return e.passkeyBridgeEnabled;
   }
 
   static List<AndroidWebViewInsets>? _$insetsForWebContentToIgnore(
@@ -10193,6 +10249,10 @@ extension InAppWebViewSettingsCompareE on InAppWebViewSettings {
 
     if (consoleLogEnabled != other.consoleLogEnabled) {
       diff['consoleLogEnabled'] = () => other.consoleLogEnabled;
+    }
+
+    if (passkeyBridgeEnabled != other.passkeyBridgeEnabled) {
+      diff['passkeyBridgeEnabled'] = () => other.passkeyBridgeEnabled;
     }
 
     if (insetsForWebContentToIgnore != other.insetsForWebContentToIgnore) {

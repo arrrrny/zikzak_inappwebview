@@ -99,6 +99,15 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     var webAuthenticationSupport = 0
     var dismissDialogues = true
     var consoleLogEnabled = true
+    // Issue #384 B2: consumer opt-out for the native WebAuthn/passkey
+    // bridge + shim. Defaults to true, preserving the always-on behavior.
+    var passkeyBridgeEnabled = true
+    // Issue #384 B2: iOS's native webAuthenticationSupport defaults to
+    // 0 (NONE) — see the honest read-back of issue #352 — so "NONE
+    // disarms" may only apply to an explicitly REQUESTED NONE, never to
+    // the unset default. parse() records key presence from the creation
+    // map; the bridge arming gate reads it.
+    var webAuthenticationSupportExplicitlyRequested = false
 
     override init() {
         super.init()
@@ -195,6 +204,12 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
                 }
             }
         }
+        // Issue #384 B2: record whether webAuthenticationSupport was
+        // EXPLICITLY present in the creation map — after enum translation,
+        // which removes NSNull entries, so an unset value no longer counts
+        // as requested.
+        webAuthenticationSupportExplicitlyRequested =
+            settings["webAuthenticationSupport"] != nil
         if let minimumViewportInsetMap = settings["minimumViewportInset"] as? [String: Double] {
             minimumViewportInset = UIEdgeInsets.fromMap(map: minimumViewportInsetMap)
             settings.removeValue(forKey: "minimumViewportInset")

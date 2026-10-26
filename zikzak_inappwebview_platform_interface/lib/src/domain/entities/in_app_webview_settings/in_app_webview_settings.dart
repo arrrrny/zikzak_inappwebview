@@ -1034,6 +1034,20 @@ abstract class $InAppWebViewSettings {
   @JsonKey(defaultValue: true)
   bool? get consoleLogEnabled;
 
+  ///When `false`, the WebAuthn/passkey JS shim is not injected and the native
+  ///`PasskeyBridge` is constructed on Apple platforms (issues #358, #384):
+  ///`navigator.credentials` calls keep the platform's own mediation instead
+  ///of the plugin's bridge. Automation hosts and lean embeds that want zero
+  ///interception set this to `false`. An explicitly requested
+  ///`webAuthenticationSupport == NONE` disarms the bridge too. Creation-time
+  ///only on Apple platforms: the shim rides the immutable
+  ///WKWebViewConfiguration, so it cannot be toggled after the WebView exists
+  ///(a runtime change is surfaced, not applied).
+  ///
+  ///The default value is `true`.
+  @JsonKey(defaultValue: true)
+  bool? get passkeyBridgeEnabled;
+
   ///Which window insets the Android WebView should **ignore** when laying out
   ///web content, so that content can render edge-to-edge behind the status bar,
   ///navigation bar, IME (keyboard), display cutout and/or system-gesture areas.
