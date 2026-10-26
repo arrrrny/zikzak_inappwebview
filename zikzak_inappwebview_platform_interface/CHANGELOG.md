@@ -1,3 +1,30 @@
+## 6.3.0 - 2026-10-26
+
+
+### Features
+
+- [Headless] The headless WebView lifecycle is now real (#371, PR #380). `HeadlessInAppWebView` now shares a single dispose across webviews, renders into an off-screen container, enforces the live cap, and waits for the first render before reporting ready.
+
+### Bug Fixes
+
+- [iOS] `useOnDownloadStart` no longer cancels displayable main-frame responses (#382, PR #383). With `useOnDownloadStart` enabled, the `decidePolicyFor navigationResponse` handler cancelled every main-frame response whose MIME type did not start with `text/`, so JSON, image and PDF navigations never rendered even though WebKit reported `canShowMIMEType == true` for them; a response now counts as a download only when WebKit cannot show it or the Content-Disposition type is `attachment`.
+- [macOS] Only responses WebKit cannot display or that the server marks `attachment` reach the download pipeline now (#374, PR #377).
+- [macOS] The `callAsyncJavaScript` controller override is implemented; calls no longer fall through to the platform-interface stub and throw `UnimplementedError` (#375, PR #379).
+- [macOS] `evaluateJavascript` now surfaces the JS exception text and location instead of discarding it (#373, PR #378).
+- [iOS] The WebView storyboard IB deployment target was raised to iOS 15.0 (#372, PR #372).
+
+### Internal
+
+- CI Swift build jobs resolve the platform interface from this checkout instead of pinning pub.dev's 6.2.2; the macOS resolution assertion covers that package too.
+- Restored the `dependency_overrides:` dev setup by hand after the 6.2.2 release.
+
+### Docs
+
+- Standardized AGENTS.md (misfire rule, forklift pool PR rule, /tmp clone rule, test concurrency).
+
+### Style
+
+- Reformatted `lib/` with the resolved language version, as published.
 ## 6.2.2 - 2026-10-20
 
 
