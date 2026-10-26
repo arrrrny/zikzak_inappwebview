@@ -154,6 +154,11 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     /// in-page mediation (zuraffa_browser#278).
     var passkeyBridge: PasskeyBridge?
 
+    /// Issue #384 B2: the arming decision from the creation-time settings
+    /// (passkeyBridgeEnabled, explicit webAuthenticationSupport NONE). The
+    /// shim injection in prepareAndAddUserScripts gates on the same flag.
+    var passkeysBridgeArmed = true
+
     // MARK: - Issue #197 state (method-channel parity with iOS)
 
     /// Active `WebMessageChannel` instances, keyed by id. Populated by
@@ -236,6 +241,9 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         let configuration = WKWebViewConfiguration()
         let userContentController = WKUserContentController()
         configuration.userContentController = userContentController
+        // Issue #384 B2: set inside the creation-map scope below (a property
+        // write would touch self before super.init), consumed after it.
+        var passkeysGateResult = true
 
         // Per-WebView data-store isolation MUST be configured on the
         // WKWebViewConfiguration BEFORE the WKWebView is created — the
@@ -290,8 +298,13 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 // so an older OS must report it too (issue #351).
                 if let webAuthnSupport = settingsMap["webAuthenticationSupport"] as? Int,
                    webAuthnSupport == 2 {  // FOR_BROWSER
+                    // Issue #384 B1: since #359 the injected shim + native
+                    // PasskeyBridge bypass WebKit's mediation entirely, so
+                    // the old Associated Domains / AASA guidance pointed
+                    // integrators at a dead end. FOR_BROWSER stays
+                    // diagnostic: report the request and the actual stance.
                     print(
-                        "webAuthenticationSupport=FOR_BROWSER was requested but macOS does not expose it (WKWebViewConfiguration has no webAuthenticationSupport); the value was not applied. Passkey ceremonies on macOS are gated by the host app's webcredentials Associated Domains entry plus apple-app-site-association."
+                        "webAuthenticationSupport=FOR_BROWSER was requested but macOS does not expose it (WKWebViewConfiguration has no webAuthenticationSupport); the value was not applied. In-page ceremonies ride the unconditional #358 bridge regardless; this setting is diagnostic-only on macOS."
                     )
                 }
                 // WebAuthn / passkey support (issue #272).
@@ -334,6 +347,16 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                         "webAuthenticationSupport=FOR_APP was requested but macOS 13.2 or older does not expose WKWebViewConfiguration.webAuthenticationSupport; the value was not applied."
                     )
                 }
+
+                // Issue #384 B2: consumer opt-out. passkeyBridgeEnabled
+                // defaults to true — an unset value stays armed, preserving
+                // the 6.2.2 always-on behavior. An explicitly requested
+                // webAuthenticationSupport NONE also disarms: the raw
+                // creation-time map only carries the key when the consumer
+                // actually set it, so the unset default never disarms.
+                let passkeysArmed = (settingsMap["passkeyBridgeEnabled"] as? Bool ?? true)
+                    && (settingsMap["webAuthenticationSupport"] as? Int != 0)
+                passkeysGateResult = passkeysArmed
             }
         }
 
@@ -348,12 +371,19 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         // exist now so the pin cannot be a silent no-op on a view that is
         // not yet in a layer-backed hierarchy.
         self.wantsLayer = true
+        // Issue #384 B2: the bridge exists only behind the arming gate
+        // computed from the raw creation-time map above (passkeyBridgeEnabled,
+        // explicit webAuthenticationSupport NONE). Headless webviews are
+        // failed fast natively by PasskeyBridge at ceremony time.
+        passkeysBridgeArmed = passkeysGateResult
+        if passkeysGateResult {
+            self.passkeyBridge = PasskeyBridge(webView: self)
+        }
         self.layer?.masksToBounds = true
         self.plugin = plugin
         self.autoresizingMask = [.width, .height]
         self.navigationDelegate = self
         self.uiDelegate = self
-        self.passkeyBridge = PasskeyBridge(webView: self)
 
         userContentController.add(WeakScriptMessageHandler(delegate: self), name: "consoleHandler")
         userContentController.add(
@@ -443,10 +473,15 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         // too; headless webviews are failed fast natively by PasskeyBridge
         // (isHeadlessOffscreen) rather than by withholding the shim, which
         // cannot be decided here (the flag is set post-init).
-        let passkeysScript = WKUserScript(
-            source: PASSKEYS_JS_SOURCE, injectionTime: .atDocumentStart,
-            forMainFrameOnly: false)
-        userContentController.addUserScript(passkeysScript)
+        // Issue #384 B2: withheld when the consumer opted out or explicitly
+        // requested webAuthenticationSupport NONE — the same passkeysArmed
+        // gate that created the bridge in init.
+        if passkeysBridgeArmed {
+            let passkeysScript = WKUserScript(
+                source: PASSKEYS_JS_SOURCE, injectionTime: .atDocumentStart,
+                forMainFrameOnly: false)
+            userContentController.addUserScript(passkeysScript)
+        }
 
         let printScript = WKUserScript(
             source: PRINT_JS_SOURCE, injectionTime: .atDocumentStart, forMainFrameOnly: true)
@@ -1969,8 +2004,11 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         if newSettingsMap["webAuthenticationSupport"] != nil
             && settings != nil && settings!.webAuthenticationSupport != newSettings.webAuthenticationSupport
         {
+            // Issue #384 B1: same stance as the creation-time warning —
+            // in-page ceremonies ride the unconditional #358 bridge, so a
+            // runtime change can neither re-arm nor disarm the shim.
             print(
-                "webAuthenticationSupport cannot be changed after the WebView has been created (WKWebViewConfiguration is immutable); ignoring the new value"
+                "webAuthenticationSupport cannot be changed after the WebView has been created (WKWebViewConfiguration is immutable); ignoring the new value. In-page ceremonies ride the unconditional #358 bridge regardless; this setting is diagnostic-only on macOS."
             )
         }
 

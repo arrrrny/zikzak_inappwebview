@@ -74,6 +74,10 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     /// zuraffa_browser) to reduce bridge traffic and avoid the
     /// WebKit SIGSEGV on non-cloneable objects (#309, #312).
     var consoleLogEnabled = true
+    // Issue #384 B2: consumer opt-out for the native WebAuthn/passkey
+    // bridge + shim. Defaults to true, preserving the 6.2.2 always-on
+    // behavior; the raw creation-time map carries the switch.
+    var passkeyBridgeEnabled = true
 
     override init() {
         super.init()

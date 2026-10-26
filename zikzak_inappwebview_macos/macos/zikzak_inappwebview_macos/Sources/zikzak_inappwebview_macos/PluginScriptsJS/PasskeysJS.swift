@@ -1,18 +1,22 @@
+//
+//  PasskeysJS.swift
+//  zikzak_inappwebview
+//
+//  GENERATED FILE - do not edit by hand.
+//  Rendered by scripts/generate_passkeys_shim.sh from the canonical
+//  zikzak_inappwebview_platform_interface passkeys_js_source.dart
+//  (issues #358 macOS, #384 iOS). Edit the canonical source and
+//  regenerate; hand edits fail the source-contract drift tests.
+//
 import Foundation
+import WebKit
 
 let PASSKEYS_JS_PLUGIN_SCRIPT_GROUP_NAME = "IN_APP_WEBVIEW_PASSKEYS_JS_PLUGIN_SCRIPT"
 
-/// Issue #358 — WebAuthn/passkey JS shim.
-///
-/// WebKit's in-page WKWebView WebAuthn mediation is broken for entitled
-/// custom-browser apps (zuraffa_browser#278): `navigator.credentials.*`
-/// dies inside ASCAgent ~2 ms after "Allowing request from web browser."
-/// with `AuthorizationError Code=1` and no UI. This shim bypasses WebKit
-/// mediation entirely: `navigator.credentials.create/get` calls carrying
-/// `publicKey` options are forwarded over the plugin's JS-handler channel
-/// to the native `PasskeyBridge` (ASAuthorizationController), and the
-/// result is shaped back into a PublicKeyCredential-quacking object.
-/// Password/OTP credential calls fall through to the platform default.
+/// WebAuthn/passkey JS shim: overrides `navigator.credentials.create/get`
+/// for PublicKeyCredential options and forwards the ceremony over the
+/// plugin's JS-handler channel to the native `PasskeyBridge`
+/// (ASAuthorizationController). Generated - see the file header.
 let PASSKEYS_JS_SOURCE = """
 (function() {
     if (window.__zikzakPasskeysShimInstalled) return;
