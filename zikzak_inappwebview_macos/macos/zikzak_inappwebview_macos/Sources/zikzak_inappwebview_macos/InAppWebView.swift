@@ -384,7 +384,6 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         self.autoresizingMask = [.width, .height]
         self.navigationDelegate = self
         self.uiDelegate = self
-        self.passkeyBridge = PasskeyBridge(webView: self)
 
         userContentController.add(WeakScriptMessageHandler(delegate: self), name: "consoleHandler")
         userContentController.add(

@@ -1035,7 +1035,7 @@ abstract class $InAppWebViewSettings {
   bool? get consoleLogEnabled;
 
   ///When `false`, the WebAuthn/passkey JS shim is not injected and the native
-  ///`PasskeyBridge` is constructed on Apple platforms (issues #358, #384):
+  ///`PasskeyBridge` is not constructed on Apple platforms (issues #358, #384):
   ///`navigator.credentials` calls keep the platform's own mediation instead
   ///of the plugin's bridge. Automation hosts and lean embeds that want zero
   ///interception set this to `false`. An explicitly requested

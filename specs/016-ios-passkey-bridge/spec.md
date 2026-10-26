@@ -100,9 +100,12 @@ macOS.
   ES256+RS256, excludeCredentials/allowCredentials, attestation,
   userVerification; security-key `residentKey` where the OS supports it).
 - **FR-004**: Per-API availability guards at the iOS 15.0 package floor:
-  platform registration/assertion requests under `@available(iOS 16.0, *)`,
-  security-key provider under `@available(iOS 16.0, *)` (mirroring macOS's
-  13.0 guard at its own floor), consent manager (`ASAuthorizationWebBrowserPublicKeyCredentialManager`)
+  the request-building classes and providers run unguarded at the 15.0
+  floor, with each over-floor API carrying its own guard —
+  `ASAuthorizationController.cancel()` under iOS 16.0, the platform
+  registration request's `excludedCredentials` under iOS 17.4, and the
+  security-key `residentKeyPreference` under iOS 17.4 (macOS parity at its
+  own 13.0/14.4 numbers), consent manager (`ASAuthorizationWebBrowserPublicKeyCredentialManager`)
   not consulted in v1 on either platform — the macOS shipped the same
   window/entitlement-agnostic availability probe, and the iOS availability
   numbers for the manager (`isDeviceConfiguredForPasskeys` and friends) must
@@ -128,6 +131,16 @@ macOS.
 - **FR-010**: Conditional mediation (passkey autofill) is tracked as a
   separate milestone issue; the shim keeps reporting
   `isConditionalMediationAvailable → false`.
+
+**Deliberate parity note (iframe permissions-policy):** the shim overrides
+`navigator.credentials` in every frame (`forMainFrameOnly: false`) with no
+`publickey-credentials-create/get` permissions-policy check, so a
+cross-origin iframe can run bridged ceremonies for its own RP where WebKit
+would normally enforce the policy. This matches the shipped 6.2.x macOS shim
+on purpose, and the shim's rp.id registrable-suffix check binds each
+ceremony to the calling frame's origin — capability widens, scope does not.
+Gating on the frame's permissions policy is recorded as a follow-up, not v1
+scope.
 
 ## Success Criteria
 

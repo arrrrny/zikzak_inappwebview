@@ -3904,7 +3904,14 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 }
                 let _callHandlerID = body["_callHandlerID"] as? Int64 ?? 0
                 let args = body["args"] as? String ?? "[]"
-                webView.passkeyBridge?.handleCall(argsJson: args) { result in
+                // A disarmed child (passkeyBridgeEnabled = false or an
+                // explicitly requested webAuthenticationSupport == NONE
+                // withheld its bridge at creation) still inherits the
+                // opener's shim through the shared userContentController, so
+                // its ceremony arrives here against a nil bridge: resolve
+                // the promise with NotAllowedError instead of leaving the
+                // JS caller hanging forever.
+                let resolvePasskeyResult: ([String: Any]) -> Void = { result in
                     let jsonData =
                         (try? JSONSerialization.data(withJSONObject: result))
                         ?? Data("{}".utf8)
@@ -3916,6 +3923,17 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                             delete window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)];
                         }
                         """, completionHandler: nil)
+                }
+                if let bridge = webView.passkeyBridge {
+                    bridge.handleCall(argsJson: args, completion: resolvePasskeyResult)
+                } else {
+                    resolvePasskeyResult(
+                        PasskeyBridge.errorResult(
+                            name: "NotAllowedError",
+                            message:
+                                "The passkey bridge is not available for this webview (passkeyBridgeEnabled = false or webAuthenticationSupport == NONE)."
+                        )
+                    )
                 }
                 return
             }
