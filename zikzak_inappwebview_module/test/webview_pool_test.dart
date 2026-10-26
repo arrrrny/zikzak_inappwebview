@@ -58,7 +58,7 @@ void main() {
       recorder = _Recorder();
       pool = WebViewPool(
         config: const WebViewPoolConfig(
-          maxLiveInstances: 4,
+          maxLiveInstances: 8,
           maxPerDomain: 2,
           idleTtlSeconds: 60,
         ),
@@ -335,52 +335,91 @@ void main() {
         'cap: acquiring past the max-live cap with nothing evictable throws '
         'WebViewPoolExhaustedException (SC-005: cap is never exceeded)',
         () async {
-      await pool.acquire(sessionId: 'm1', domainHint: 'a.org');
-      await pool.acquire(sessionId: 'm2', domainHint: 'b.org');
-      await pool.acquire(sessionId: 'm3', domainHint: 'c.org');
-      await pool.acquire(sessionId: 'm4', domainHint: 'd.org');
-      expect(pool.liveCount, 4);
+      final capRecorder = _Recorder();
+      final capPool = WebViewPool(
+        config: const WebViewPoolConfig(
+          maxLiveInstances: 2,
+          maxPerDomain: 4,
+          idleTtlSeconds: 60,
+        ),
+        instanceFactory: capRecorder.factory,
+      );
+      addTearDown(capPool.dispose);
+
+      await capPool.acquire(sessionId: 'm1', domainHint: 'a.org');
+      await capPool.acquire(sessionId: 'm2', domainHint: 'b.org');
+      expect(capPool.liveCount, 2);
 
       await expectLater(
-        pool.acquire(sessionId: 'm5', domainHint: 'e.org'),
+        capPool.acquire(sessionId: 'm3', domainHint: 'c.org'),
         throwsA(isA<WebViewPoolExhaustedException>()),
       );
 
       // Cap invariant holds after the refused acquisition.
-      expect(pool.liveCount, 4);
+      expect(capPool.liveCount, 2);
+      expect(capRecorder.created, 2);
     });
 
     test(
         'cap: acquiring past the max-live cap evicts the oldest idle '
         'instance instead of exceeding the cap', () async {
-      await pool.acquire(sessionId: 'm1', domainHint: 'a.org');
-      await pool.acquire(sessionId: 'm2', domainHint: 'b.org');
+      final capRecorder = _Recorder();
+      final capPool = WebViewPool(
+        config: const WebViewPoolConfig(
+          maxLiveInstances: 2,
+          maxPerDomain: 4,
+          idleTtlSeconds: 60,
+        ),
+        instanceFactory: capRecorder.factory,
+      );
+      addTearDown(capPool.dispose);
+
+      await capPool.acquire(sessionId: 'm1', domainHint: 'a.org');
+      await capPool.acquire(sessionId: 'm2', domainHint: 'b.org');
 
       // Free one instance back to idle: the pool may evict it to make room.
-      await pool.release('m1');
-      expect(pool.liveCount, 2);
+      await capPool.release('m1');
+      expect(capPool.liveCount, 2);
 
-      await pool.acquire(sessionId: 'm3', domainHint: 'c.org');
+      await capPool.acquire(sessionId: 'm3', domainHint: 'c.org');
 
-      // liveCount never exceeded the cap.
-      expect(pool.liveCount, 2);
-      final active = pool.sessions().map((s) => s.sessionId).toSet();
+      // liveCount never exceeded the cap; the idle instance was disposed.
+      expect(capPool.liveCount, 2);
+      expect(capRecorder.created, 3);
+      final active = capPool.sessions().map((s) => s.sessionId).toSet();
       expect(active, containsAll(<String>['m2', 'm3']));
       expect(active, isNot(contains('m1')));
+      expect(
+        (capRecorder.instances.first as _FakeHeadlessWebView).disposeCount,
+        1,
+      );
     });
 
     test(
         'cap: an affine acquire past the max-per-domain cap throws instead '
         'of exceeding it', () async {
-      await pool.acquire(sessionId: 'm1', domainHint: 'app.example.com');
-      await pool.acquire(sessionId: 'm2', domainHint: 'shop.example.com');
+      final capRecorder = _Recorder();
+      final capPool = WebViewPool(
+        config: const WebViewPoolConfig(
+          maxLiveInstances: 4,
+          maxPerDomain: 2,
+          idleTtlSeconds: 60,
+        ),
+        instanceFactory: capRecorder.factory,
+      );
+      addTearDown(capPool.dispose);
+
+      await capPool.acquire(sessionId: 'm1', domainHint: 'app.example.com');
+      await capPool.acquire(sessionId: 'm2', domainHint: 'shop.example.com');
+      expect(capPool.liveCount, 2);
 
       await expectLater(
-        pool.acquire(sessionId: 'm3', domainHint: 'www.example.com'),
+        capPool.acquire(sessionId: 'm3', domainHint: 'www.example.com'),
         throwsA(isA<WebViewPoolExhaustedException>()),
       );
 
-      expect(pool.liveCount, 2);
+      expect(capPool.liveCount, 2);
+      expect(capRecorder.created, 2);
     });
   });
 }

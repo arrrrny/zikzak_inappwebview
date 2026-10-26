@@ -165,9 +165,20 @@ class WebViewPool implements WebViewSessionFactory {
       session ??= await _createSession(sessionId, domainHint, etld, settings);
 
       // 5. Register as active
-      // Reused idle sessions retain a stale releasedAt (set on release),
-      // which would make isActive report false for a live, reused session.
-      session.releasedAt = null;
+      // A reused idle session is re-issued as a fresh handle over the same
+      // underlying webview: the new sessionId and the current eTLD+1
+      // association are reported by sessions() (FR-006), while warm state
+      // survives because the webview object is unchanged (FR-002).
+      if (session.sessionId != sessionId ||
+          session.etldPlusOne != (etld ?? session.etldPlusOne)) {
+        session = PoolSession(
+          sessionId: sessionId,
+          domainHint: domainHint,
+          etldPlusOne: etld ?? session.etldPlusOne,
+          webview: session.webview,
+          settings: session.settings,
+        );
+      }
       _active[sessionId] = session;
       return session;
     });
@@ -270,7 +281,30 @@ class WebViewPool implements WebViewSessionFactory {
     InAppWebViewSettings? settings,
   ) async {
     if (liveCount >= config.maxLiveInstances) {
-      await _evictOldestIdle();
+      // SC-005: the live cap is never exceeded. Make room by evicting the
+      // oldest idle instance; if nothing is evictable, refuse the
+      // acquisition instead of exceeding the cap.
+      final evicted = await _evictOldestIdle();
+      if (!evicted) {
+        throw WebViewPoolExhaustedException(
+            'WebViewPool live cap reached (${config.maxLiveInstances} '
+            'instances) and no idle instance can be evicted');
+      }
+    }
+
+    // FR-003: per-domain cap. Affinity already preferred a same-domain idle
+    // instance, so reaching creation here with the domain full means the cap
+    // would be exceeded by a new instance.
+    if (etld != null) {
+      var domainCount = 0;
+      for (final active in _active.values) {
+        if (active.etldPlusOne == etld) domainCount++;
+      }
+      if (domainCount >= config.maxPerDomain) {
+        throw WebViewPoolExhaustedException(
+            'WebViewPool per-domain cap reached (${config.maxPerDomain} '
+            'instances for $etld)');
+      }
     }
 
     final webview = await _instanceFactory(settings);
@@ -284,20 +318,41 @@ class WebViewPool implements WebViewSessionFactory {
     );
   }
 
-  Future<void> _evictOldestIdle() async {
-    // Evict from domain idle pools first
-    for (final entries in _idle.values) {
-      if (entries.isNotEmpty) {
-        final oldest = entries.removeAt(0);
-        await oldest.webview.dispose();
-        return;
+  /// Evicts the globally oldest idle instance (spec 007 US3: "the oldest
+  /// idle instance is evicted before any active one").
+  ///
+  /// Returns true if an instance was evicted.
+  Future<bool> _evictOldestIdle() async {
+    PoolSession? oldest;
+    List<PoolSession>? oldestList;
+
+    void consider(List<PoolSession> candidates) {
+      for (final candidate in candidates) {
+        final released = candidate.releasedAt;
+        if (released == null) continue; // never released: not idle
+        if (oldest == null || released.isBefore(oldest!.releasedAt!)) {
+          oldest = candidate;
+          oldestList = candidates;
+        }
       }
     }
-    // Fall back to generic idle
-    if (_genericIdle.isNotEmpty) {
-      final oldest = _genericIdle.removeAt(0);
-      await oldest.webview.dispose();
+
+    for (final entries in _idle.values) {
+      consider(entries);
     }
+    consider(_genericIdle);
+
+    if (oldest == null || oldestList == null) return false;
+
+    oldestList!.remove(oldest);
+    final oldestEtld = oldest!.etldPlusOne;
+    if (oldestEtld != null &&
+        _idle[oldestEtld] != null &&
+        _idle[oldestEtld]!.isEmpty) {
+      _idle.remove(oldestEtld);
+    }
+    await oldest!.webview.dispose();
+    return true;
   }
 
   void _startEvictionTimer() {

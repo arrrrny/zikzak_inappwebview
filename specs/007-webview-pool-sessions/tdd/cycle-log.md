@@ -62,3 +62,26 @@ Append only. Newest last.
     instead of evicting the idle one.
   - cap (per-domain): pool created a 3rd `example.com` instance with
     `maxPerDomain: 2` — FR-003 per-domain cap is not enforced at all.
+
+## Cycle 3 — GREEN (cap enforcement + re-scope introspection)
+
+- recorded: 2026-10-27
+- change (all in `zikzak_inappwebview_module/lib/src/services/webview_pool.dart`):
+  - A reused idle session is re-issued as a fresh `PoolSession` handle over the
+    same underlying webview — `sessions()` now reports the current sessionId and
+    eTLD+1 association (FR-006/A8) while warm state survives (FR-002/A5).
+  - Max-live cap: when full, the globally oldest idle instance is evicted
+    (`_evictOldestIdle` -> `Future<bool>`); if nothing is evictable,
+    `acquire` throws `WebViewPoolExhaustedException` instead of exceeding the
+    cap (SC-005, FR-003).
+  - Max-per-domain cap enforced at creation (FR-003): a domain at its cap
+    refuses further instances with `WebViewPoolExhaustedException` (affinity
+    already preferred same-domain idle instances before creation is reached).
+- test harness refinements (both were test-config bugs, not product bugs):
+  - group pool cap raised to 8 so A14's 6 distinct sessions fit under the cap
+    (cycle 2 had no enforcement, which is why 6 creations passed before);
+  - per-domain cap test uses `maxPerDomain: 2` (two same-eTLD sessions allowed,
+    third refused) instead of 1, matching the scenario it asserts.
+- command: `cd zikzak_inappwebview_module && flutter test --concurrency=2`
+- result: **23 passed, 0 failed** (18 pool behaviors + 5 pre-existing module
+  tests — cassette neighbors unaffected).
