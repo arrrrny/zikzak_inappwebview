@@ -249,6 +249,7 @@ class WebViewPool implements WebViewSessionFactory {
     }
     return result;
   }
+
   /// Disposes the pool and releases all resources.
   Future<void> dispose() async {
     _evictionTimer?.cancel();

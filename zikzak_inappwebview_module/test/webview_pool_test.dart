@@ -253,8 +253,7 @@ void main() {
 
       expect(first.settings, same(captureFilters));
       // The factory received exactly the caller's settings for that instance.
-      expect(recorder.settingsByInstance[first.webview],
-          same(captureFilters));
+      expect(recorder.settingsByInstance[first.webview], same(captureFilters));
 
       // A second session without settings does not inherit the first
       // session's configuration object.
