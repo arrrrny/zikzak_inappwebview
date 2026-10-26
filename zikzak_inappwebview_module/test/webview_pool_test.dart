@@ -2,26 +2,67 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:zikzak_inappwebview/zikzak_inappwebview.dart';
 import 'package:zikzak_inappwebview_module/zikzak_inappwebview_module.dart';
 
+/// A plain-Dart fake [HeadlessInAppWebView] (spec 007 test harness).
+///
+/// The pool only ever touches `dispose()` and `webViewController` on issued
+/// instances; everything else stays unimplemented and fails loudly via
+/// [noSuchMethod] rather than silently passing.
+class _FakeHeadlessWebView implements HeadlessInAppWebView {
+  int disposeCount = 0;
+
+  @override
+  InAppWebViewController? get webViewController => null;
+
+  @override
+  Future<void> dispose({bool isKeepAlive = false}) async {
+    disposeCount++;
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+/// Fake [HeadlessWebViewInstanceFactory]: records every creation call and the
+/// settings it was asked to apply, and hands out fresh fakes.
+class _Recorder {
+  int created = 0;
+  final Map<HeadlessInAppWebView, InAppWebViewSettings?> settingsByInstance =
+      {};
+  final List<HeadlessInAppWebView> instances = [];
+
+  Future<HeadlessInAppWebView> factory(InAppWebViewSettings? settings) async {
+    created++;
+    final webview = _FakeHeadlessWebView();
+    settingsByInstance[webview] = settings;
+    instances.add(webview);
+    return webview;
+  }
+}
+
 /// Spec 007 outer acceptance behaviors for `WebViewPool`.
 ///
 /// Every behavior is driven through the pool's real public entry points
 /// (`acquire` / `release` / `disposeAll` / `liveCount` / `sessions()`), as
-/// required by `specs/007-webview-pool-sessions/tdd/test-list.md`. No MCP and
-/// no zuraffa types are involved (FR-010).
+/// required by `specs/007-webview-pool-sessions/tdd/test-list.md`, with
+/// instance creation injected as a plain Dart fake. No MCP and no zuraffa
+/// types are involved (FR-010).
 ///
-/// The pool runs against a platform-aware cap config sized down for tests:
+/// The pool runs against a cap config sized down for tests:
 /// `maxLiveInstances: 4`, `maxPerDomain: 2`, `idleTtlSeconds: 60`.
 void main() {
   group('WebViewPool acceptance (spec 007)', () {
     late WebViewPool pool;
+    late _Recorder recorder;
 
     setUp(() {
+      recorder = _Recorder();
       pool = WebViewPool(
         config: const WebViewPoolConfig(
           maxLiveInstances: 4,
           maxPerDomain: 2,
           idleTtlSeconds: 60,
         ),
+        instanceFactory: recorder.factory,
       );
     });
 
@@ -37,6 +78,7 @@ void main() {
       );
 
       expect(session.sessionId, 'mission-1');
+      expect(recorder.created, 1);
       expect(pool.liveCount, 1);
     });
 
@@ -53,6 +95,7 @@ void main() {
       );
 
       expect(second, same(first));
+      expect(recorder.created, 1);
       expect(pool.liveCount, 1);
     });
 
@@ -85,6 +128,10 @@ void main() {
 
       expect(pool.liveCount, 0);
       expect(pool.sessions(), isEmpty);
+      // Every issued instance was really disposed, not just dropped.
+      for (final webview in recorder.instances) {
+        expect((webview as _FakeHeadlessWebView).disposeCount, 1);
+      }
     });
 
     test(
@@ -103,6 +150,7 @@ void main() {
 
       // Same underlying headless instance is reissued (same eTLD+1).
       expect(second.webview, same(first.webview));
+      expect(recorder.created, 1);
       expect(pool.liveCount, 1);
     });
 
@@ -164,6 +212,7 @@ void main() {
       for (final session in sessions) {
         expect(identical(session, sessions.first), isTrue);
       }
+      expect(recorder.created, 1);
       expect(pool.liveCount, 1);
     });
 
@@ -203,14 +252,18 @@ void main() {
       );
 
       expect(first.settings, same(captureFilters));
+      // The factory received exactly the caller's settings for that instance.
+      expect(recorder.settingsByInstance[first.webview],
+          same(captureFilters));
 
-      // A second session without settings gets the pool default and does
-      // not inherit the first session's configuration object.
+      // A second session without settings does not inherit the first
+      // session's configuration object.
       final second = await pool.acquire(
         sessionId: 'mission-2',
         domainHint: 'other.org',
       );
       expect(second.settings, isNot(same(captureFilters)));
+      expect(recorder.settingsByInstance[second.webview], isNull);
     });
 
     test(
@@ -233,6 +286,8 @@ void main() {
       expect(a.settings, same(filtersA));
       expect(b.settings, same(filtersB));
       expect(a.settings, isNot(same(b.settings)));
+      expect(recorder.settingsByInstance[a.webview], same(filtersA));
+      expect(recorder.settingsByInstance[b.webview], same(filtersB));
     });
 
     test(
@@ -244,6 +299,7 @@ void main() {
       );
 
       expect(session.settings, isA<InAppWebViewSettings>());
+      expect(recorder.settingsByInstance[session.webview], isNull);
     });
 
     test(
@@ -271,8 +327,60 @@ void main() {
       );
 
       expect(second.webview, isNot(same(first.webview)));
+      expect(recorder.created, 2);
       expect(pool.liveCount, 1);
     });
 
+    test(
+        'cap: acquiring past the max-live cap with nothing evictable throws '
+        'WebViewPoolExhaustedException (SC-005: cap is never exceeded)',
+        () async {
+      await pool.acquire(sessionId: 'm1', domainHint: 'a.org');
+      await pool.acquire(sessionId: 'm2', domainHint: 'b.org');
+      await pool.acquire(sessionId: 'm3', domainHint: 'c.org');
+      await pool.acquire(sessionId: 'm4', domainHint: 'd.org');
+      expect(pool.liveCount, 4);
+
+      await expectLater(
+        pool.acquire(sessionId: 'm5', domainHint: 'e.org'),
+        throwsA(isA<WebViewPoolExhaustedException>()),
+      );
+
+      // Cap invariant holds after the refused acquisition.
+      expect(pool.liveCount, 4);
+    });
+
+    test(
+        'cap: acquiring past the max-live cap evicts the oldest idle '
+        'instance instead of exceeding the cap', () async {
+      await pool.acquire(sessionId: 'm1', domainHint: 'a.org');
+      await pool.acquire(sessionId: 'm2', domainHint: 'b.org');
+
+      // Free one instance back to idle: the pool may evict it to make room.
+      await pool.release('m1');
+      expect(pool.liveCount, 2);
+
+      await pool.acquire(sessionId: 'm3', domainHint: 'c.org');
+
+      // liveCount never exceeded the cap.
+      expect(pool.liveCount, 2);
+      final active = pool.sessions().map((s) => s.sessionId).toSet();
+      expect(active, containsAll(<String>['m2', 'm3']));
+      expect(active, isNot(contains('m1')));
+    });
+
+    test(
+        'cap: an affine acquire past the max-per-domain cap throws instead '
+        'of exceeding it', () async {
+      await pool.acquire(sessionId: 'm1', domainHint: 'app.example.com');
+      await pool.acquire(sessionId: 'm2', domainHint: 'shop.example.com');
+
+      await expectLater(
+        pool.acquire(sessionId: 'm3', domainHint: 'www.example.com'),
+        throwsA(isA<WebViewPoolExhaustedException>()),
+      );
+
+      expect(pool.liveCount, 2);
+    });
   });
 }

@@ -7,6 +7,15 @@ import 'package:zikzak_inappwebview/zikzak_inappwebview.dart';
 import '../models/pool_session.dart';
 import '../ports/webview_session_factory.dart';
 
+/// Creates a ready-to-use [HeadlessInAppWebView] for the given [settings].
+///
+/// The default implementation constructs the headless instance with an
+/// `about:blank` request, applies [settings] as its initial settings
+/// (spec 007 FR-008), and starts it. Tests inject a fake here to drive the
+/// pool without platform channels (spec 007: plain Dart ports + fakes).
+typedef HeadlessWebViewInstanceFactory = Future<HeadlessInAppWebView> Function(
+    InAppWebViewSettings? settings);
+
 /// Pool configuration with platform-aware defaults.
 ///
 /// Spec: 007 (FR-003, FR-008)
@@ -54,6 +63,18 @@ class WebViewPoolConfig {
   }
 }
 
+/// Thrown by [WebViewPool.acquire] when a new instance would exceed the
+/// pool's caps (FR-003) and no idle instance can be evicted (SC-005: the
+/// live cap and the per-domain cap are never exceeded).
+class WebViewPoolExhaustedException implements Exception {
+  final String message;
+
+  WebViewPoolExhaustedException(this.message);
+
+  @override
+  String toString() => 'WebViewPoolExhaustedException: $message';
+}
+
 /// A pooled webview manager that acquires/releases
 /// [HeadlessInAppWebView] instances keyed by session handle.
 ///
@@ -68,6 +89,8 @@ class WebViewPoolConfig {
 /// Spec: 007 (all FRs)
 class WebViewPool implements WebViewSessionFactory {
   final WebViewPoolConfig config;
+
+  final HeadlessWebViewInstanceFactory _instanceFactory;
 
   // Active sessions: sessionId -> PoolSession
   final Map<String, PoolSession> _active = {};
@@ -89,10 +112,25 @@ class WebViewPool implements WebViewSessionFactory {
   // Lifecycle listener for memory-pressure disposal
   AppLifecycleListener? _lifecycleListener;
 
-  WebViewPool({WebViewPoolConfig? config})
-      : config = config ?? WebViewPoolConfig.platformDefaults() {
+  WebViewPool({
+    WebViewPoolConfig? config,
+    HeadlessWebViewInstanceFactory? instanceFactory,
+  })  : config = config ?? WebViewPoolConfig.platformDefaults(),
+        _instanceFactory = instanceFactory ?? _defaultInstanceFactory {
     _startEvictionTimer();
     _startLifecycleListener();
+  }
+
+  /// Default production factory: about:blank headless instance with the
+  /// acquisition settings applied, then started.
+  static Future<HeadlessInAppWebView> _defaultInstanceFactory(
+      InAppWebViewSettings? settings) async {
+    final webview = HeadlessInAppWebView(
+      initialUrlRequest: URLRequest(url: WebUri('about:blank')),
+      initialSettings: settings ?? InAppWebViewSettings(),
+    );
+    await webview.run();
+    return webview;
   }
 
   @override
@@ -235,11 +273,7 @@ class WebViewPool implements WebViewSessionFactory {
       await _evictOldestIdle();
     }
 
-    final webview = HeadlessInAppWebView(
-      initialUrlRequest: URLRequest(url: WebUri('about:blank')),
-      initialSettings: InAppWebViewSettings(),
-    );
-    await webview.run();
+    final webview = await _instanceFactory(settings);
 
     return PoolSession(
       sessionId: sessionId,

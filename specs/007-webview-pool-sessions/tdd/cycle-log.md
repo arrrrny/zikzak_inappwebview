@@ -36,3 +36,29 @@ Append only. Newest last.
 - cap behaviors (SC-005) are intentionally not in this cycle's file: they reference the
   `WebViewPoolExhaustedException` type the fix introduces; their red is recorded in
   cycle 2 once the seam lets them reach the cap logic.
+
+## Cycle 2 — GREEN (seam) + RED (caps, re-scope introspection)
+
+- recorded: 2026-10-27
+- change: `WebViewPool` gains an optional `HeadlessWebViewInstanceFactory`
+  (constructor param); the default factory preserves the previous creation
+  behavior (about:blank + `run()`) but now applies the caller's
+  `InAppWebViewSettings` to the issued instance (FR-008). Tests inject a
+  plain-Dart fake factory (`_Recorder` + `_FakeHeadlessWebView`), unblocking
+  the pool for fake-driven testing (the pre-zuraffa#389 pull-forward path).
+- command: `cd zikzak_inappwebview_module && flutter test --concurrency=2 test/webview_pool_test.dart`
+- result: **13 passed, 4 failed**
+- green: A1, A2, A3, A4, A5, A7, A13, A14, A16, A17, A18, both edges —
+  the cycle-1 red reason is gone (creation seam injectable).
+- red (behavioral, right reason):
+  - A8: `Expected: 'example.com' / Actual: <null>` — a reused idle
+    `PoolSession` keeps its stale domain association, so `sessions()` cannot
+    report the current eTLD+1 (FR-006) for re-scoped instances.
+  - cap (nothing evictable): acquire past `maxLiveInstances` succeeded and
+    emitted a `PoolSession` instead of throwing — SC-005 violated
+    (`WebViewPoolExhaustedException` never thrown; the type exists but no
+    code throws it yet).
+  - cap (evict oldest idle): pool created a 3rd instance (liveCount 3 > cap 2)
+    instead of evicting the idle one.
+  - cap (per-domain): pool created a 3rd `example.com` instance with
+    `maxPerDomain: 2` — FR-003 per-domain cap is not enforced at all.
