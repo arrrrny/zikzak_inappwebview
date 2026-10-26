@@ -232,3 +232,21 @@
 - Inner-loop unit tests (U1–U31) test component behaviors in isolation.
 - Characterization tests (BASELINE) are not needed for this feature as it is greenfield.
 - The two pre-existing compile-broken test files (`headless_dispose_test.dart`, `webview_sessions_test.dart`) are NOT this feature's responsibility and must be resolved separately.
+## Phase 6: TDD remediation
+
+> Appended by /speckit.tdd.verify (2026-10-27, verified_at 93916240, verdict FAIL).
+> Ordered so the HIGH findings come first. Each task names the command that proves it.
+
+- [ ] T081 [R1]: **Fix HIGH finding #1** — replace A18's type-only assertion (`test/webview_pool_test.dart:300`) with concrete default-value assertions so it can fail; prove with `cd zikzak_inappwebview_module && flutter test --plain-name "A18"`.
+- [ ] T082 [R2]: **Fix HIGH finding #2** — pin oldest-first eviction ordering: build a pool with two idles released in a known order and assert the OLDER one is evicted (kills the surviving `evict-arbitrary-not-oldest` mutant); prove with `flutter test --plain-name "evicts the oldest idle"`.
+- [ ] T083 [R3]: **Fix MED finding #3** — split A7 into two tests (cross-domain isolation; generic idle reuse); prove with `flutter test --plain-name "A7"`.
+- [ ] T084 [R4]: **Fix MED finding #4** — drop A3's disposeAll tail (that reason belongs to A4); prove with `flutter test --plain-name "A3"`.
+- [ ] T085 [R5]: **Fix MED finding #5** — correct the header comment's cap values to the built config; prove with `dart analyze zikzak_inappwebview_module/test/webview_pool_test.dart`.
+- [ ] T086 [R6]: **Fix MED finding #6** — use the `same()` matcher at `test/webview_pool_test.dart:213`; prove with `flutter test --plain-name "A13"`.
+- [ ] T087 [R7]: **Fix LOW finding #7** — extract the cap-pool construction into an in-file factory; prove with `flutter test test/webview_pool_test.dart`.
+- [ ] T088 [R8]: Implement A6 (warm cookie/JS state round-trip) on a real rendering surface (integration lane) per its NO_TEST note; prove with the integration run recorded in cycle-log.
+- [ ] T089 [R9]: Add a clock-injection seam to the eviction sweep and implement A9 (idle TTL eviction); prove with `flutter test --plain-name "A9"`.
+- [ ] T090 [R10]: Implement A11 (memory-pressure disposal spares active) with binding-driven lifecycle emulation; prove with `flutter test --plain-name "A11"`.
+- [ ] T091 [R11]: Implement A12 (platform-aware default caps) with a per-platform test lane; prove with `flutter test --plain-name "A12"`.
+- [ ] T092 [R12]: Implement A15 (high-contention burst consistency stress); prove with `flutter test --plain-name "A15"`.
+- [ ] T093 [R13]: Assert FR-010 structurally in a test (module lib has no zuraffa/MCP imports); prove with `flutter test --plain-name "FR-010"`.
