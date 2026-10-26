@@ -84,7 +84,10 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
         }
         for (_, headlessWebView) in headlessInAppWebViewManager.webViews {
             guard let headlessWebView = headlessWebView else { continue }
-            if headlessWebView.flutterWebView?.webView === webView {
+            // `webView()` is a method on FlutterWebViewController, not a
+            // property: without the call this is a function value and `===`
+            // against `InAppWebView` is ambiguous (#386).
+            if headlessWebView.flutterWebView?.webView() === webView {
                 return true
             }
         }
