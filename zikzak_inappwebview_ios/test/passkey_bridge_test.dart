@@ -216,9 +216,18 @@ void main() {
       // of expression is ambiguous without a type annotation" anchored at the
       // preceding optional binding (#386). Only the build-ios job type-checks
       // this file, so pin the call here where every job runs.
-      final tearOff = RegExp(r'flutterWebView\?*\.webView(?!\()');
+      //
+      // Line comments are stripped before matching so that documenting this
+      // bug by quoting the tear-off does not turn the pin red, and the
+      // trailing boundary plus the optional space keep it off future members
+      // (`webViewTitle`) and the spaced call (`webView ()`).
+      final code = source
+          .split('\n')
+          .map((line) => line.split('//').first)
+          .join('\n');
+      final tearOff = RegExp(r'flutterWebView\?*\.webView\b(?!\s*\()');
       expect(
-        tearOff.hasMatch(source),
+        tearOff.hasMatch(code),
         isFalse,
         reason:
             'found flutterWebView?.webView used as a value — the accessor '
