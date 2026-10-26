@@ -176,9 +176,15 @@ class WebViewPool implements WebViewSessionFactory {
           domainHint: domainHint,
           etldPlusOne: etld ?? session.etldPlusOne,
           webview: session.webview,
-          settings: session.settings,
+          // A reissued handle reports the settings this acquisition asked
+          // for; the native instance keeps the ones it was created with
+          // (initialSettings is not retroactive).
+          settings: settings ?? session.settings,
         );
       }
+      // A handle taken back out of the idle pool must read active again
+      // (isActive == releasedAt == null); `_active` may only hold live work.
+      session.releasedAt = null;
       _active[sessionId] = session;
       return session;
     });
@@ -281,6 +287,28 @@ class WebViewPool implements WebViewSessionFactory {
     String? etld,
     InAppWebViewSettings? settings,
   ) async {
+    // FR-003: per-domain cap. This check is pure — it reads state, creates
+    // nothing and needs no room — so it runs BEFORE the max-live eviction
+    // below: a refused acquisition must not first destroy a warm idle
+    // instance (arrrrny/zikzak_inappwebview#390).
+    //
+    // The counter covers active PLUS idle entries for the eTLD+1, because
+    // `maxPerDomain` is documented as an idle-per-domain cap. Domain affinity
+    // drains `_idle[etld]` before creation is reached, so the idle term is
+    // normally zero here; counting it keeps the invariant independent of that
+    // ordering.
+    if (etld != null) {
+      var domainCount = _idle[etld]?.length ?? 0;
+      for (final active in _active.values) {
+        if (active.etldPlusOne == etld) domainCount++;
+      }
+      if (domainCount >= config.maxPerDomain) {
+        throw WebViewPoolExhaustedException(
+            'WebViewPool per-domain cap reached (${config.maxPerDomain} '
+            'instances for $etld)');
+      }
+    }
+
     if (liveCount >= config.maxLiveInstances) {
       // SC-005: the live cap is never exceeded. Make room by evicting the
       // oldest idle instance; if nothing is evictable, refuse the
@@ -290,21 +318,6 @@ class WebViewPool implements WebViewSessionFactory {
         throw WebViewPoolExhaustedException(
             'WebViewPool live cap reached (${config.maxLiveInstances} '
             'instances) and no idle instance can be evicted');
-      }
-    }
-
-    // FR-003: per-domain cap. Affinity already preferred a same-domain idle
-    // instance, so reaching creation here with the domain full means the cap
-    // would be exceeded by a new instance.
-    if (etld != null) {
-      var domainCount = 0;
-      for (final active in _active.values) {
-        if (active.etldPlusOne == etld) domainCount++;
-      }
-      if (domainCount >= config.maxPerDomain) {
-        throw WebViewPoolExhaustedException(
-            'WebViewPool per-domain cap reached (${config.maxPerDomain} '
-            'instances for $etld)');
       }
     }
 

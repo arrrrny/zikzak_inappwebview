@@ -47,8 +47,10 @@ class _Recorder {
 /// instance creation injected as a plain Dart fake. No MCP and no zuraffa
 /// types are involved (FR-010).
 ///
-/// The pool runs against a cap config sized down for tests:
-/// `maxLiveInstances: 4`, `maxPerDomain: 2`, `idleTtlSeconds: 60`.
+/// The pool runs against a cap config sized for tests:
+/// `maxLiveInstances: 8` (raised so A14's six concurrent sessions fit under
+/// the cap), `maxPerDomain: 2`, `idleTtlSeconds: 60`. Each cap test below
+/// builds its own smaller pool instead of lowering this one.
 void main() {
   group('WebViewPool acceptance (spec 007)', () {
     late WebViewPool pool;
@@ -69,6 +71,25 @@ void main() {
     tearDown(() async {
       await pool.dispose();
     });
+
+    /// Builds a pool with its own smaller caps and fake recorder, so each cap
+    /// test states its boundary instead of depending on the group config.
+    (WebViewPool, _Recorder) buildCapPool({
+      int maxLiveInstances = 2,
+      int maxPerDomain = 4,
+    }) {
+      final capRecorder = _Recorder();
+      final capPool = WebViewPool(
+        config: WebViewPoolConfig(
+          maxLiveInstances: maxLiveInstances,
+          maxPerDomain: maxPerDomain,
+          idleTtlSeconds: 60,
+        ),
+        instanceFactory: capRecorder.factory,
+      );
+      addTearDown(capPool.dispose);
+      return (capPool, capRecorder);
+    }
 
     test('A1: acquiring a session with no instance creates one, liveCount 1',
         () async {
@@ -155,6 +176,37 @@ void main() {
     });
 
     test(
+        'A5b: releasing and re-acquiring the same sessionId for the same '
+        'eTLD+1 reuses the warm instance, which stays active', () async {
+      final first = await pool.acquire(
+        sessionId: 'mission-1',
+        domainHint: 'shop.example.com',
+      );
+      await pool.release('mission-1');
+
+      final second = await pool.acquire(
+        sessionId: 'mission-1',
+        domainHint: 'shop.example.com',
+      );
+
+      expect(second, same(first));
+      expect(second.isActive, isTrue);
+      expect(recorder.created, 1);
+      expect(pool.liveCount, 1);
+
+      // A further acquire must take that same live session, not build a
+      // duplicate behind it (the stale releasedAt did exactly that and left
+      // the first instance tracked by nobody).
+      final third = await pool.acquire(
+        sessionId: 'mission-1',
+        domainHint: 'shop.example.com',
+      );
+      expect(third, same(first));
+      expect(recorder.created, 1);
+      expect(pool.liveCount, 1);
+    });
+
+    test(
         'A7: acquiring an unknown eTLD+1 creates a new instance instead of '
         'reusing a domain-scoped idle one, and a generic idle instance is '
         'reused for a non-affine acquisition', () async {
@@ -210,7 +262,7 @@ void main() {
 
       expect(sessions, hasLength(10));
       for (final session in sessions) {
-        expect(identical(session, sessions.first), isTrue);
+        expect(session, same(sessions.first));
       }
       expect(recorder.created, 1);
       expect(pool.liveCount, 1);
@@ -266,6 +318,36 @@ void main() {
     });
 
     test(
+        'A16b: a warm reuse carries the new acquisition\'s settings into the '
+        'handle while the native instance keeps its initial settings',
+        () async {
+      final filtersA = InAppWebViewSettings(javaScriptEnabled: false);
+      final filtersB = InAppWebViewSettings(javaScriptEnabled: true);
+
+      final first = await pool.acquire(
+        sessionId: 'mission-1',
+        domainHint: 'shop.example.com',
+        settings: filtersA,
+      );
+      await pool.release('mission-1');
+
+      final second = await pool.acquire(
+        sessionId: 'mission-2',
+        domainHint: 'app.example.com',
+        settings: filtersB,
+      );
+
+      // Same warm webview, but the handle reports whatever this caller asked
+      // for (FR-008: no configuration bleed between callers).
+      expect(second.webview, same(first.webview));
+      expect(second.settings, same(filtersB));
+      // initialSettings is not retroactive: the factory only ever saw the
+      // first acquisition's object.
+      expect(recorder.settingsByInstance[second.webview], same(filtersA));
+      expect(recorder.created, 1);
+    });
+
+    test(
         'A17: two sessions with different settings each retain only their '
         'own configuration', () async {
       final filtersA = InAppWebViewSettings(javaScriptEnabled: false);
@@ -298,6 +380,10 @@ void main() {
       );
 
       expect(session.settings, isA<InAppWebViewSettings>());
+      // The pool's base configuration, not an empty/unknown object.
+      expect(session.settings.javaScriptEnabled, isTrue);
+      // The factory was not handed a caller object: the pool base config
+      // applies.
       expect(recorder.settingsByInstance[session.webview], isNull);
     });
 
@@ -334,16 +420,7 @@ void main() {
         'cap: acquiring past the max-live cap with nothing evictable throws '
         'WebViewPoolExhaustedException (SC-005: cap is never exceeded)',
         () async {
-      final capRecorder = _Recorder();
-      final capPool = WebViewPool(
-        config: const WebViewPoolConfig(
-          maxLiveInstances: 2,
-          maxPerDomain: 4,
-          idleTtlSeconds: 60,
-        ),
-        instanceFactory: capRecorder.factory,
-      );
-      addTearDown(capPool.dispose);
+      final (capPool, capRecorder) = buildCapPool();
 
       await capPool.acquire(sessionId: 'm1', domainHint: 'a.org');
       await capPool.acquire(sessionId: 'm2', domainHint: 'b.org');
@@ -362,16 +439,7 @@ void main() {
     test(
         'cap: acquiring past the max-live cap evicts the oldest idle '
         'instance instead of exceeding the cap', () async {
-      final capRecorder = _Recorder();
-      final capPool = WebViewPool(
-        config: const WebViewPoolConfig(
-          maxLiveInstances: 2,
-          maxPerDomain: 4,
-          idleTtlSeconds: 60,
-        ),
-        instanceFactory: capRecorder.factory,
-      );
-      addTearDown(capPool.dispose);
+      final (capPool, capRecorder) = buildCapPool();
 
       await capPool.acquire(sessionId: 'm1', domainHint: 'a.org');
       await capPool.acquire(sessionId: 'm2', domainHint: 'b.org');
@@ -395,18 +463,37 @@ void main() {
     });
 
     test(
+        'cap: evicting for room disposes the OLDEST idle instance and leaves '
+        'the younger idle one warm (US3)', () async {
+      final (capPool, capRecorder) = buildCapPool();
+
+      await capPool.acquire(sessionId: 'm1', domainHint: 'a.org');
+      await capPool.release('m1');
+      // Live 2: a.org idle, b.org active.
+      await capPool.acquire(sessionId: 'm2', domainHint: 'b.org');
+      await capPool.release('m2');
+      // Two idle candidates now, a.org released before b.org.
+      expect(capPool.liveCount, 2);
+
+      await capPool.acquire(sessionId: 'm3', domainHint: 'c.org');
+
+      // The first-released (a.org) instance pays; b.org's stays warm.
+      expect(
+        (capRecorder.instances[0] as _FakeHeadlessWebView).disposeCount,
+        1,
+      );
+      expect(
+        (capRecorder.instances[1] as _FakeHeadlessWebView).disposeCount,
+        0,
+      );
+      expect(capPool.liveCount, 2);
+    });
+
+    test(
         'cap: an affine acquire past the max-per-domain cap throws instead '
         'of exceeding it', () async {
-      final capRecorder = _Recorder();
-      final capPool = WebViewPool(
-        config: const WebViewPoolConfig(
-          maxLiveInstances: 4,
-          maxPerDomain: 2,
-          idleTtlSeconds: 60,
-        ),
-        instanceFactory: capRecorder.factory,
-      );
-      addTearDown(capPool.dispose);
+      final (capPool, capRecorder) =
+          buildCapPool(maxLiveInstances: 4, maxPerDomain: 2);
 
       await capPool.acquire(sessionId: 'm1', domainHint: 'app.example.com');
       await capPool.acquire(sessionId: 'm2', domainHint: 'shop.example.com');
@@ -419,6 +506,32 @@ void main() {
 
       expect(capPool.liveCount, 2);
       expect(capRecorder.created, 2);
+    });
+
+    test(
+        'cap: a refused per-domain acquire is side-effect free — no idle '
+        'instance is disposed and liveCount is unchanged', () async {
+      final (capPool, capRecorder) =
+          buildCapPool(maxLiveInstances: 2, maxPerDomain: 1);
+
+      await capPool.acquire(sessionId: 'm1', domainHint: 'a.org');
+      await capPool.acquire(sessionId: 'm2', domainHint: 'b.org');
+      // b.org goes idle while the live cap is full.
+      await capPool.release('m2');
+      expect(capPool.liveCount, 2);
+
+      // Same eTLD+1 as m1: refused, and the request needs no room, so the
+      // warm b.org instance must survive it.
+      await expectLater(
+        capPool.acquire(sessionId: 'm3', domainHint: 'www.a.org'),
+        throwsA(isA<WebViewPoolExhaustedException>()),
+      );
+
+      expect(capPool.liveCount, 2);
+      expect(capRecorder.created, 2);
+      for (final instance in capRecorder.instances) {
+        expect((instance as _FakeHeadlessWebView).disposeCount, 0);
+      }
     });
   });
 }
