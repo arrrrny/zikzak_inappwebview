@@ -56,3 +56,32 @@ exact repro + auto-open/auto-scroll + red-background variant).
 Conclusion: the engine's TLHC overlay compositing drops Flutter content painted
 after the platform view on the 3.47 line, independent of plugin construction,
 configuration, or rasterizer. No plugin-side rendering fix exists (AC4).
+
+## Cycle 3 — issue resolution: user-facing workaround documentation (2026-10-27, session on `fix/331-flutter-version-upgrade-from-3-44-x-to-3-47-2-causes-renderi` @ `e1c1a555`)
+
+The upstream repair remains open (flutter/flutter#193363, triaged `engine` /
+`platform-views` / `c: regression`; still open with no fix on the 3.47 line as of
+2026-10-27; upstream comments 2026-10-13/16 add two independent confirmations and
+one layout-level observation — a clip wrapper removal unblocking one Google Maps
+layout). The forklift chore for #331 ships the issue's remaining deliverable: the
+workaround guidance as user-facing documentation, then closes the issue as
+resolved-by-documentation + upstream tracking.
+
+- Changed (docs-only): `README.md` (+14), `zikzak_inappwebview/README.md` (+14) —
+  a Known Issues section stating the symptom, the engine root cause with the
+  upstream tracker, the on-device matrix conclusion (no plugin-side fix exists),
+  the shipped `clipsToBounds` hardening, and the three workarounds.
+- No code behaviour touched → no new tests required by the plan.
+- Fresh regression evidence from this session (both suites re-run, `--concurrency=2`):
+  - `zikzak_inappwebview_ios`: 77/77 pass (~64 s) — includes the AC2 contract test
+    `swift_platform_view_clipping_test.dart`.
+  - `zikzak_inappwebview` (umbrella): 269/269 pass (~20 s).
+  - `dart analyze`: umbrella 23 issues; iOS 192 issues — the exact recorded
+    pre-existing all-info baseline, 0 new.
+  - `dart format .` (Dart 3.13.7) re-formats 9 pre-existing test/example files
+    (formatter-version drift; not this chore's files — reverted, reported LOW).
+- AC4 note: the "must not close the issue" rule in AC4 scoped the *investigation*
+  PR (#336). This session's PR is the disposition PR the record left open
+  ("maintainer to track upstream / decide on closing as upstream"): it closes
+  #331 explicitly as NOT-fixed-plugin-side / fixed-by-documentation + upstream
+  tracking, claiming no behaviour change.
