@@ -118,8 +118,19 @@ class ProxySettings {
   generateCompareTo: true,
 )
 abstract class $IOSProxySettings {
-  ///Proxy is a string in the format `[scheme://]host[:port]`.
+  ///Proxy is a string in the format `[scheme://]host:port`.
   ///Scheme is optional, if present must be `HTTP`, `HTTPS` or [SOCKS](https://tools.ietf.org/html/rfc1928) and defaults to `HTTP`.
+  ///An explicit port is required.
+  ///
+  ///Support matrix (iOS 17.0+ / macOS 14.0+):
+  ///- `http://` (default): plaintext `CONNECT` to the proxy — no TLS to the proxy itself.
+  ///- `https://`: `CONNECT` over TLS — the proxy's certificate is validated by the system.
+  ///- `socks`/`socks5`: SOCKS v5, no TLS to the proxy.
+  ///
+  ///Credentials may be embedded as `user:pass@host:port`; they are
+  ///percent-decoded and applied as proxy authentication. Without them, a
+  ///proxy that requires authentication rejects the tunnel (407) and loads
+  ///fail without a surfaced error.
   @JsonKey(defaultValue: '')
   String get proxyUrl;
 

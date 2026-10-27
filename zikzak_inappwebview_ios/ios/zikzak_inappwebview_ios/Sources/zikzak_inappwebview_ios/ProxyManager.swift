@@ -85,10 +85,34 @@ public class ProxyManager: ChannelDelegate {
             throw ProxyConfigurationError.unsupportedProxyScheme
         }
 
-        var proxyConfiguration =
-            isSocksProxy
-            ? ProxyConfiguration(socksv5Proxy: endpoint)
-            : ProxyConfiguration(httpCONNECTProxy: endpoint)
+        // TLS to the proxy itself only when the URL scheme is https://:
+        // NWProtocolTLS.Options() makes Network.framework negotiate TLS with
+        // the proxy endpoint (its certificate is validated against the system
+        // trust store; the hostname endpoint supplies the TLS peer name)
+        // instead of sending a plaintext CONNECT that a TLS-only proxy resets.
+        let isTlsProxy = schemeType == "HTTPS"
+
+        var proxyConfiguration: ProxyConfiguration
+        if isSocksProxy {
+            proxyConfiguration = ProxyConfiguration(socksv5Proxy: endpoint)
+        } else {
+            proxyConfiguration = ProxyConfiguration(
+                httpCONNECTProxy: endpoint,
+                tlsOptions: isTlsProxy ? NWProtocolTLS.Options() : nil)
+        }
+
+        // Credentials travel only in the URL (ProxySettings has no
+        // username/password fields). URLComponents' `user`/`password`
+        // accessors already return percent-decoded values, so they are passed
+        // through as-is — a second decoding pass would corrupt credentials
+        // containing a literal `%`. Without this, an authenticated proxy
+        // answers 407 Proxy Authentication Required and pages silently never
+        // load.
+        if let user = components.user, !user.isEmpty {
+            proxyConfiguration.applyCredential(
+                username: user,
+                password: components.password ?? "")
+        }
 
         proxyConfiguration.allowFailover = settings.allowFailover
         proxyConfiguration.excludedDomains = settings.excludedDomains
@@ -163,7 +187,7 @@ public class ProxyManager: ChannelDelegate {
             case .invalidProxyUrl:
                 return "Proxy URL must include a valid host and port."
             case .unsupportedProxyScheme:
-                return "Proxy URL scheme must be HTTP, HTTPS, SOCKS, or SOCKS5."
+                return "Proxy URL scheme must be HTTP, HTTPS, SOCKS, or SOCKS5. http:// sends a plaintext CONNECT; https:// negotiates TLS with the proxy (its certificate is validated); SOCKS/SOCKS5 uses SOCKS v5 without TLS. Credentials in the URL (user:pass@) are percent-decoded and applied as proxy authentication."
             }
         }
     }
