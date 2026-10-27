@@ -128,9 +128,15 @@ abstract class $IOSProxySettings {
   ///- `socks`/`socks5`: SOCKS v5, no TLS to the proxy.
   ///
   ///Credentials may be embedded as `user:pass@host:port`; they are
-  ///percent-decoded and applied as proxy authentication. Without them, a
-  ///proxy that requires authentication rejects the tunnel (407) and loads
-  ///fail without a surfaced error.
+  ///percent-decoded and applied as proxy authentication on every scheme:
+  ///`http`/`https` proxies use them for `CONNECT` authentication, and
+  ///`socks`/`socks5` uses SOCKS v5's username/password sub-negotiation
+  ///(RFC 1929). Without them, a proxy that requires authentication rejects
+  ///the tunnel (407) and loads fail without a surfaced error.
+  ///
+  ///The URL carries the proxy password in clear text:
+  ///`IOSProxySettings.toJson()` serializes it verbatim, so do not log or
+  ///persist this object's JSON.
   @JsonKey(defaultValue: '')
   String get proxyUrl;
 

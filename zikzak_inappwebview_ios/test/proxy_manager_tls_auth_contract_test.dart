@@ -18,8 +18,8 @@ import 'package:flutter_test/flutter_test.dart';
 /// Strips line comments and (nested) block comments so comment prose that
 /// mentions the same tokens cannot satisfy the contracts below. String
 /// literal contents are KEPT: the scheme gate `== "HTTPS"` is itself a string
-/// literal the contracts must be able to see. ProxyManager.swift contains no
-/// triple-quoted strings.
+/// literal the contracts must be able to see. Triple-quoted literals are
+/// copied whole, through their closing delimiter.
 String stripSwiftComments(String source) {
   final out = StringBuffer();
   var i = 0;
@@ -50,6 +50,16 @@ String stripSwiftComments(String source) {
     if (rest.startsWith('//')) {
       final end = source.indexOf('\n', i);
       i = end == -1 ? source.length : end;
+      continue;
+    }
+    if (rest.startsWith('"""')) {
+      // Multi-line literal: copy it whole, through the closing delimiter.
+      // Escapes inside are copied verbatim — no contract inspects a
+      // triple-quoted string's contents.
+      final close = source.indexOf('"""', i + 3);
+      final end = close == -1 ? source.length : close + 3;
+      out.write(source.substring(i, end));
+      i = end;
       continue;
     }
     if (source[i] == '"') {
@@ -108,8 +118,10 @@ int braceDepthAt(String code, int index) {
 }
 
 /// Locates the iOS package root (`ios/zikzak_inappwebview_ios`) relative to
-/// the current working directory, walking up so the test works when invoked
-/// from the package dir or the repo root.
+/// the current working directory, walking up so the test also resolves when
+/// invoked from a subdirectory of the package. The repo root is not covered:
+/// it has no `pubspec.yaml` (so `flutter test` cannot run there) and its
+/// `ios/` path does not exist.
 Directory packageDir() {
   const marker = 'ios/zikzak_inappwebview_ios';
   var dir = Directory.current;

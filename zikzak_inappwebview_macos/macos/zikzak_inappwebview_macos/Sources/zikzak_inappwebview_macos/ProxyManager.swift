@@ -130,6 +130,12 @@ public class ProxyManager: ChannelDelegate {
         // containing a literal `%`. Without this, an authenticated proxy
         // answers 407 Proxy Authentication Required and pages silently never
         // load.
+        //
+        // Both proxy legs consume them: the HTTP CONNECT leg uses them as
+        // proxy authentication, and the socksv5 leg performs SOCKS5's
+        // username/password sub-negotiation (RFC 1929). The SOCKS5 hop was
+        // verified against a local SOCKS5 listener, which saw the greeting
+        // offer method 0x02 and then received these exact values.
         if let user = components.user, !user.isEmpty {
             proxyConfiguration.applyCredential(
                 username: user,
@@ -210,7 +216,14 @@ public class ProxyManager: ChannelDelegate {
             case .invalidProxyUrl:
                 return "Proxy URL must include a valid host and port."
             case .unsupportedProxyScheme:
-                return "Proxy URL scheme must be HTTP, HTTPS, SOCKS, or SOCKS5. http:// sends a plaintext CONNECT; https:// negotiates TLS with the proxy (its certificate is validated); SOCKS/SOCKS5 uses SOCKS v5 without TLS. Credentials in the URL (user:pass@) are percent-decoded and applied as proxy authentication."
+                return """
+                    Proxy URL scheme must be HTTP, HTTPS, SOCKS, or SOCKS5.
+                    http:// sends a plaintext CONNECT; https:// negotiates TLS
+                    with the proxy (its certificate is validated).
+                    SOCKS/SOCKS5 uses SOCKS v5 without TLS. Credentials in the
+                    URL (user:pass@) are percent-decoded and applied as proxy
+                    authentication.
+                    """
             }
         }
     }
