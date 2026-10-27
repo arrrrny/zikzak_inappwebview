@@ -1,3 +1,54 @@
+## 6.3.1 - 2026-10-27
+
+### Features
+
+- [iOS] WebAuthn / passkey ceremonies now work on iOS — the macOS passkey bridge (#358) is ported (#384, PR #385). `navigator.credentials.create` / `.get` with `publicKey` options are intercepted by an injected `PasskeysJS` shim (installed as a `WKUserScript` at `documentStart` in every frame) and forwarded over the plugin's JS-handler channel to a native `PasskeyBridge.swift` driving `ASAuthorizationController`, which hands a WebAuthn-shaped `PublicKeyCredential` back to JS. Per-API availability guards are measured from the SDK headers against the package's iOS 15.0 floor: platform and security-key provider/request classes are iOS 15.0, `ASAuthorizationController.cancel()` is iOS 16.0, platform-registration `excludedCredentials` and security-key `residentKeyPreference` are iOS 17.4 (macOS 13.5 / 14.4 parity). Headless detection consults the `HeadlessInAppWebViewManager` registry instead of `window == nil`, because iOS headless webviews live in a real off-screen `UIWindow` (#371); `window.open` children resolve their bridge from the `_windowId` they post through, sharing the opener's user content controller; errors map to the same `DOMException`s as macOS (`NotAllowedError` for user cancel / timeout / no credentials, `TypeError` for malformed options, `SecurityError` for a non-domain `rpId`); headless webviews fail fast with `NotAllowedError` and non-`publicKey` credentials fall through to the platform default. Device-gated acceptance (webauthn.io ceremonies, consent prompts) stays recorded as open verification debt on the issue, per the spec
+- [iOS/macOS] New `InAppWebViewSettings.passkeyBridgeEnabled` (default `true`) is an explicit consumer opt-out: it gates bridge creation AND shim injection on both platforms, and an explicitly requested `webAuthenticationSupport == NONE` disarms as well. iOS records `webAuthenticationSupportExplicitlyRequested` in `parse()` because its native default is `NONE` (the honest read-back of #352) — only an explicit request disarms there; macOS reads the raw creation-time map, where key presence is the explicitness signal (#384)
+
+### Bug Fixes
+
+- [iOS/macOS] `ProxyController` `https://` proxies no longer connect in cleartext, and proxy URL credentials are no longer dropped (#387, PR #391). `resolveProxyConfiguration` mapped both `HTTP` and `HTTPS` to a plain `httpCONNECTProxy` with no `tlsOptions:`, so a TLS-only proxy received a plaintext `CONNECT` and reset the connection; and `components.user` / `components.password` were never read and `applyCredential` was never called, so an authenticated proxy answered `407 Proxy Authentication Required` and pages silently never loaded even though `setProxyOverride` returned `true`. An `https://` proxy now builds the CONNECT configuration with `tlsOptions: NWProtocolTLS.Options()` (initializer is iOS 17.0+ / macOS 14.0+, the same availability scope as the existing `ProxyConfiguration` usage); `http://` and `socks5://` keep `nil`. URL userinfo is now applied via `applyCredential(username:password:)` iff `components.user` is non-empty, passed through *without* an extra `removingPercentEncoding` pass — `URLComponents.user` / `.password` already return percent-decoded values, and a second pass would corrupt credentials containing a literal `%`. The `UNSUPPORTED_PROXY_SCHEME` diagnostic now states the real per-scheme TLS/auth support matrix, and the same matrix is documented on `IOSProxySettings.proxyUrl` (consumed by iOS and macOS alike); the explicit-port requirement is kept and now stated in the docs
+- [iOS] The passkey bridge compiles against older SDKs again (#386, PR #388). The headless check in `PasskeyBridge` touched a `webView` property that only exists on newer SDKs; it now calls the `webView()` accessor contract, which the new `passkey_bridge_test` pins
+
+### Docs
+
+- The READMEs gain a ⚠️ Known Issues entry for the Flutter 3.47.x platform-view rendering artifact (overlaid WebView + Bottom Sheet / WebView-in-ListView: AppBar, sheet footer and list items below a WebView card vanish from the frame). Investigation on iPhone 17/16e simulators with Flutter 3.47.4/3.47.5 left the artifact unchanged for every plugin-side candidate — control `UiKitView`, Impeller disabled, `Opacity(0.99)` snapshot wrap, native `clipsToBounds`, `PlatformViewLink` construction — so this is an engine TLHC overlay-compositing regression (flutter/flutter#193363, still open), not a plugin defect; the plugin-side hardening (`clipsToBounds = true` pinned on the WKWebView root) already shipped via #336 in 6.1.0. The canonical copy is the package README (pub.dev-facing, GitHub-absolute links), with a pointer from the root README; no rendering fix is claimed and #331 stays open with the `upstream` label (#331, PR #389)
+
+### Internal
+
+- The canonical passkey JS shim body is now single-sourced in the platform interface (`lib/src/web_authentication/passkeys_js_source.dart`); `scripts/generate_passkeys_shim.sh` renders both native `PasskeysJS.swift` copies from it, and the iOS suite pins the three copies byte-identical, so the shims cannot drift (#384)
+- `WebViewPool` (dev-only `zikzak_inappwebview_module`, not published) gains an optional `HeadlessWebViewInstanceFactory` seam (default factory preserves the previous about:blank + `run()` behavior and now applies the caller's `InAppWebViewSettings`), the max-live / max-per-domain caps are actually enforced (max-live evicts the globally oldest idle instance or throws the new `WebViewPoolExhaustedException`; max-per-domain at creation — previously the pool silently created instances past both caps), and reused idle sessions are re-issued as fresh `PoolSession` handles over the same webview so `sessions()` reports current sessionId/eTLD+1 while warm state survives. Plugin core untouched; 18 new acceptance behaviors, 13/18 proven test-first with the remainder filed as remediation tasks (#264, PR #390)
+- Every fix above is guarded by host-runnable tests: `passkey_bridge_test` (iOS, including a Swift availability-usage checker over the new guards), `passkey_opt_out_test` (macOS), `passkey_bridge_setting_test` (platform interface), and `proxy_manager_tls_auth_contract_test` (iOS + macOS, 5 tests each). The Swift ones read the `.swift` files as text — `build-ios` / `build-macos` remain the layer that proves compilation. Swift compile gates from this checkout's example app both pass: `flutter build ios --release --no-codesign` and `flutter build macos --debug`
+
+---
+
+## 6.3.0 - 2026-10-26
+
+### Features
+
+- [Headless] The headless WebView lifecycle is now real (#371, PR #380). `HeadlessInAppWebView` now shares a single dispose across webviews, renders into an off-screen container, enforces the live cap, and waits for the first render before reporting ready.
+
+### Bug Fixes
+
+- [iOS] `useOnDownloadStart` no longer cancels displayable main-frame responses (#382, PR #383). With `useOnDownloadStart` enabled, the `decidePolicyFor navigationResponse` handler cancelled every main-frame response whose MIME type did not start with `text/`, so JSON, image and PDF navigations never rendered even though WebKit reported `canShowMIMEType == true` for them; a response now counts as a download only when WebKit cannot show it or the Content-Disposition type is `attachment`.
+- [macOS] Only responses WebKit cannot display or that the server marks `attachment` reach the download pipeline now (#374, PR #377).
+- [macOS] The `callAsyncJavaScript` controller override is implemented; calls no longer fall through to the platform-interface stub and throw `UnimplementedError` (#375, PR #379).
+- [macOS] `evaluateJavascript` now surfaces the JS exception text and location instead of discarding it (#373, PR #378).
+- [iOS] The WebView storyboard IB deployment target was raised to iOS 15.0 (#372, PR #372).
+
+### Internal
+
+- CI Swift build jobs resolve the platform interface from this checkout instead of pinning pub.dev's 6.2.2; the macOS resolution assertion covers that package too.
+- Restored the `dependency_overrides:` dev setup by hand after the 6.2.2 release.
+
+### Docs
+
+- Standardized AGENTS.md (misfire rule, forklift pool PR rule, /tmp clone rule, test concurrency).
+
+### Style
+
+- Reformatted `lib/` with the resolved language version, as published.
+
 ## 6.2.2 - 2026-10-20
 
 ### Bug Fixes

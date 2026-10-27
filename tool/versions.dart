@@ -12,7 +12,7 @@ library;
 ///
 /// Every package in the monorepo ships the same version number.
 /// Update once here; the prepare_for_publish.sh script propagates it.
-const String packageVersion = '6.2.2';
+const String packageVersion = '6.3.1';
 
 /// Key third-party dependency versions that appear in README installation
 /// snippets and should stay in sync across the project.
