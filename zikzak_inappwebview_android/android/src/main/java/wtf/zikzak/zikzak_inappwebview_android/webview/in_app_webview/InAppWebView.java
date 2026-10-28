@@ -460,22 +460,34 @@ public final class InAppWebView
         post(new Runnable() {
             @Override
             public void run() {
-                javaScriptBridgeInterface = new JavaScriptBridgeInterface(InAppWebView.this);
-                addJavascriptInterface(
-                    javaScriptBridgeInterface,
-                    JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME
-                );
-                if (
-                    windowId == null ||
-                    !WebViewFeature.isFeatureSupported(
-                        WebViewFeature.DOCUMENT_START_SCRIPT
-                    )
-                ) {
-                    // for some reason, if a WebView is created using a window id,
-                    // the initial plugin and user scripts injected
-                    // with WebViewCompat.addDocumentStartJavaScript will not be added!
-                    // https://github.com/arrrrny/zikzak_inappwebview/issues/1455
-                    prepareAndAddUserScripts();
+                try {
+                    javaScriptBridgeInterface = new JavaScriptBridgeInterface(InAppWebView.this);
+                    addJavascriptInterface(
+                        javaScriptBridgeInterface,
+                        JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME
+                    );
+                    if (
+                        windowId == null ||
+                        !WebViewFeature.isFeatureSupported(
+                            WebViewFeature.DOCUMENT_START_SCRIPT
+                        )
+                    ) {
+                        // for some reason, if a WebView is created using a window id,
+                        // the initial plugin and user scripts injected
+                        // with WebViewCompat.addDocumentStartJavaScript will not be added!
+                        // https://github.com/arrrrny/zikzak_inappwebview/issues/1455
+                        prepareAndAddUserScripts();
+                    }
+                } catch (RuntimeException e) {
+                    // WebViewCompat.addDocumentStartJavaScript can throw
+                    // "Must be started before we block!" when Chromium's browser
+                    // process has not finished starting on release cold starts
+                    // (see pichillilorenzo/flutter_inappwebview#2843). This runs
+                    // from the main Looper, so an uncaught throw here would crash
+                    // the whole app; log instead.
+                    Log.e(LOG_TAG,
+                            "Exception while registering the JavaScript bridge interface and user scripts.",
+                            e);
                 }
             }
         });
@@ -3870,9 +3882,13 @@ public final class InAppWebView
         // STEP 11: Remove all views
         removeAllViews();
 
-        // STEP 12: Clear cache and history
+        // STEP 12: Clear history.
+        // Do NOT clear the WebView cache here: the WebView HTTP cache is
+        // per-application, so wiping it on every disposal (including each
+        // short-lived headless WebView) empties the disk cache shared by all
+        // other WebViews in the app. Cache clearing is available explicitly
+        // via clearAllCache().
         clearHistory();
-        clearCache(true);
 
         // STEP 13: Clear plugin reference
         plugin = null;
