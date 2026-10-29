@@ -80,6 +80,101 @@ jobs:
         working-directory: zikzak_inappwebview_web
         run: flutter test --platform chrome
 
+  # Resolution guard for the declared Flutter floor (#393): the floor in every
+  # pubspec.yaml is only honest if a minimal consumer actually resolves on it.
+  # Transitive constraints can exceed what the oldest supported Flutter pins —
+  # every zuraffa 7.x needs `meta ^1.19.0`, while Flutter pins `meta` exactly
+  # up to 3.44.x — and pub then reports a solver failure that blames this
+  # package and suggests downgrading to 5.x, instead of naming the real
+  # minimum. This job resolves the issue's exact repro — a minimal app whose
+  # only deps are flutter, equatable ^3.0.0, and this checkout via path — on
+  # the Flutter version the pubspecs declare. The pin below and the
+  # `flutter:` floor must move together; the job name carries the version so
+  # a stale pairing is visible on the checks list.
+  resolve-floor:
+    name: "resolve: minimal consumer on Flutter 3.47.0 (declared floor)"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.0
+      - name: Write the minimal consumer probe
+        run: |
+          mkdir -p .consumer-probe
+          cat > .consumer-probe/pubspec.yaml <<'YAML'
+          name: consumer_probe
+          publish_to: none
+          environment:
+            # Flutter 3.47.0 ships Dart 3.13.0 (official releases JSON).
+            sdk: ">=3.13.0 <4.0.0"
+            flutter: ">=3.47.0"
+          dependencies:
+            flutter:
+              sdk: flutter
+            # The #393 repro: equatable ^3 was unresolvable for as long as
+            # zuraffa's nocterm dependency (equatable ^2) could enter the
+            # consumer graph.
+            equatable: ^3.0.0
+            zikzak_inappwebview: ^6.3.1
+          # The checkout is wired in through root-level overrides, the same
+          # pattern the build-ios/build-macos jobs use: overrides apply to the
+          # whole graph, so the path packages' own hosted `^6.3.1` constraints
+          # on each other resolve to this checkout too. Direct `path:` entries
+          # under `dependencies:` cannot do that — the first probe draft tried
+          # and pub rejected the graph ("zikzak_inappwebview_linux from path
+          # depends on zikzak_inappwebview_platform_interface from hosted",
+          # one package may not mix sources).
+          dependency_overrides:
+            zikzak_inappwebview:
+              path: ../zikzak_inappwebview
+            zikzak_inappwebview_platform_interface:
+              path: ../zikzak_inappwebview_platform_interface
+            zikzak_inappwebview_android:
+              path: ../zikzak_inappwebview_android
+            zikzak_inappwebview_ios:
+              path: ../zikzak_inappwebview_ios
+            zikzak_inappwebview_macos:
+              path: ../zikzak_inappwebview_macos
+            zikzak_inappwebview_web:
+              path: ../zikzak_inappwebview_web
+            zikzak_inappwebview_windows:
+              path: ../zikzak_inappwebview_windows
+            zikzak_inappwebview_linux:
+              path: ../zikzak_inappwebview_linux
+          YAML
+      - name: flutter pub get
+        working-directory: .consumer-probe
+        run: flutter pub get
+      - name: Assert the probe resolved this checkout and the nocterm-free zuraffa
+        working-directory: .consumer-probe
+        # A typo'd path or a silently-ignored override would leave the job
+        # resolving the published package and passing forever (same guard as
+        # build-macos), and a zuraffa resolution outside 7.x means the
+        # nocterm/equatable-^2 graph is reachable again.
+        run: |
+          for package in zikzak_inappwebview zikzak_inappwebview_platform_interface; do
+            resolved="$(awk -v pkg="$package" '
+              $0 ~ "^  " pkg ":" { found = 1; next }
+              found && /source:/ { print $2; exit }
+            ' pubspec.lock)"
+            echo "$package resolves to: $resolved"
+            if [ "$resolved" != "path" ]; then
+              echo "::error::$package must resolve from path (this checkout), got '$resolved'"
+              exit 1
+            fi
+          done
+          zuraffa="$(awk '
+            $0 ~ "^  zuraffa:" { found = 1; next }
+            found && /version:/ { print $2; exit }
+          ' pubspec.lock | tr -d '"')"
+          echo "zuraffa resolves to: $zuraffa"
+          case "$zuraffa" in
+            7.*) ;;
+            *) echo "::error::expected a zuraffa 7.x resolution (nocterm-free line), got '$zuraffa'"; exit 1 ;;
+          esac
+
   # The iOS Swift sources are only compiled by a real iOS build, and only
   # through a consuming app (the plugin's Package.swift expects the
   # FlutterFramework package Flutter generates into the app). The example

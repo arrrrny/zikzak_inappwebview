@@ -13,7 +13,7 @@ topics:
 
 environment:
   sdk: ">=3.8.0 <4.0.0"
-  flutter: ">=3.38.6"
+  flutter: ">=3.47.0"
 
 dependencies:
   flutter:
@@ -26,20 +26,23 @@ dependencies:
   zikzak_inappwebview_windows: ^6.3.1
   zikzak_inappwebview_linux: ^6.3.1
   synchronized: ^3.4.1
-  # The cap at "<1.2.0" that shipped with 6.2.1 is lifted: it existed only
-  # because zuraffa 7.x's CLI subtree (lib/src/cli/zfa_executable.dart,
-  # reachable from the public barrel) used 64-bit integer literals that fail
-  # dart2js in every Flutter Web build (arrrrny/zuraffa#1729). That issue is
-  # closed and the fix shipped in zuraffa 7.2.0, where the digest helper is
-  # BigInt-based. A consumer dart2js build over `package:zuraffa/zuraffa.dart`
-  # + `package:zuraffa_session/zuraffa_session.dart` was re-verified against
-  # zuraffa 7.2.0 / zuraffa_session 1.2.1 and compiles cleanly.
-  # The old cap was also a plain version-solving hazard: 1.1.x requires
-  # `zuraffa: ^6.2.2`, so any app that also needs `zuraffa: ^7.x` could not
-  # resolve this package at all (6.2.1 was unreachable for zuraffa-7 apps).
-  # 1.1.0 and 1.2.x carry identical session code; only the `zuraffa` range
-  # differs, so widening is safe.
-  zuraffa_session: ^1.1.0
+  # Floor 1.2.1 is the first zuraffa_session on the zuraffa-7 line: it removes
+  # the last path where a consumer's graph could still land on zuraffa 6.x,
+  # whose nocterm dependency drags in `equatable ^2` (breaking equatable ^3
+  # apps on any Flutter) and an `analyzer`/`meta` pair no Flutter <=3.44
+  # release can satisfy (#393). The open top admits the fleet realignment:
+  # zuraffa_session 7.3.0 (published 2026-10-29) is dep-identical to 1.2.1
+  # except `zuraffa: ^7.0.1` -> `^7.3.0`, and 1.1.0/1.2.x/7.3.0 all carry the
+  # same session code, so the range stays wide. The floor also means the
+  # package now requires Flutter >=3.47.0 in practice: every zuraffa 7.x needs
+  # `meta ^1.19.0` and Flutter pins `meta` exactly up to 3.44.x, so the floor
+  # declared above IS the real minimum (the resolve-floor CI job pins it).
+  # History: 6.2.1 capped this at "<1.2.0" because zuraffa 7.x's CLI subtree
+  # used 64-bit integer literals that fail dart2js in every Flutter Web build
+  # (arrrrny/zuraffa#1729); fixed in zuraffa 7.2.0 (BigInt-based digest), and
+  # a consumer dart2js build over `package:zuraffa/zuraffa.dart` +
+  # `package:zuraffa_session/zuraffa_session.dart` compiles cleanly.
+  zuraffa_session: ">=1.2.1 <8.0.0"
 
 dev_dependencies:
   flutter_test:
