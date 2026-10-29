@@ -128,7 +128,17 @@ public class FlutterWebView implements PlatformWebView {
           @Override
           public void run() {
             if (webView != null) {
-              webView.prepareAndAddUserScripts();
+              try {
+                webView.prepareAndAddUserScripts();
+              } catch (RuntimeException e) {
+                // Source generation in updateContentWorldsCreatorScript() runs
+                // outside its inner guards, so a throw can escape
+                // prepareAndAddUserScripts(). This runs from the main Looper,
+                // where an uncaught throw would crash the whole app; log instead.
+                Log.e(LOG_TAG,
+                        "Exception while preparing and adding user scripts for a window-id WebView.",
+                        e);
+              }
             }
           }
         });
