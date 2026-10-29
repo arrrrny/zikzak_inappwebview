@@ -552,10 +552,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 object: nil)
         }
 
-        // Issue #395: KVO observer for fullscreenState on iOS 16.0+ is the
-        // primary fullscreen enter/exit path. It can miss fires on some iOS
-        // versions, so the UIWindow visibility notifications below stay as
-        // the fallback for iframe-based video fullscreen like YouTube.
+        // Issue #395: KVO observer for fullscreenState on iOS 16.0+. As of
+        // iOS 26, KVO for fullscreenState doesn't reliably fire, so the
+        // UIWindow visibility notifications below serve as the primary
+        // fullscreen detection mechanism — including iframe-based video
+        // fullscreen like YouTube. They are not dead code; do not remove.
         if #available(iOS 16.0, *) {
             addObserver(self,
                 forKeyPath: #keyPath(WKWebView.fullscreenState),
@@ -1130,9 +1131,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 }
             }
         }
-        // Issue #395: fullscreenState KVO on iOS 16+ — the primary fullscreen
-        // enter/exit path, guarded with inFullscreen so it cannot double-fire
-        // with the UIWindow notification fallback below.
+        // Issue #395: fullscreenState KVO on iOS 16+ — a direct enter/exit
+        // path that can miss fires on some iOS versions (notably iOS 26),
+        // guarded with inFullscreen so it cannot double-fire with the
+        // primary UIWindow notification path below.
         if #available(iOS 16.0, *) {
             if keyPath == #keyPath(WKWebView.fullscreenState) {
                 if fullscreenState == .enteringFullscreen && !inFullscreen {
@@ -3760,18 +3762,28 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     //    }
 
     /// Determines if the window notification is likely for a fullscreen
-    /// video/media presentation that originated from THIS specific WebView
-    /// instance. Uses heuristics based on public window properties rather
-    /// than private class names to avoid App Store rejection under Guideline
-    /// 2.5.1 (see pichillilorenzo/flutter_inappwebview#2754); ported from
-    /// upstream v6.2.0-beta.3.
+    /// video/media presentation. Uses heuristics based on public window
+    /// properties rather than private class names to avoid App Store
+    /// rejection under Guideline 2.5.1 (see
+    /// pichillilorenzo/flutter_inappwebview#2754); ported from upstream
+    /// v6.2.0-beta.3.
     ///
     /// The `windowLevel >= .normal` requirement also rejects the headless
     /// host window, which sits at level `normal - 1`
     /// (HeadlessWebViewContainer.swift), so a headless run can no longer
     /// surface as `onEnterFullscreen`.
+    ///
+    /// Known limitation, inherited from upstream: the visibility observers
+    /// are registered with `object: nil`, so a qualifying window is only
+    /// attributed to the shared `windowScene`, never to the WebView that
+    /// presented it. When several webviews live in one scene, each of them
+    /// fires `onEnterFullscreen` for another instance's fullscreen media
+    /// and stays `inFullscreen` until that window hides. Attributing the
+    /// window per-webview would need an iOS 16+ `fullscreenState != .none`
+    /// gate on the notification-enter path, which has not been verified
+    /// against the iframe-fullscreen fallback on device yet.
     private func isFullscreenMediaWindow(_ notificationObject: AnyObject?) -> Bool {
-        guard let fullscreenWindow = notificationObject as? UIWindow else {
+        guard let candidateWindow = notificationObject as? UIWindow else {
             return false
         }
 
@@ -3783,23 +3795,26 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         // Check if the fullscreen window is in the same window scene as our WebView (iOS 13+)
         // This helps ensure the fullscreen event is related to our app/scene
         if #available(iOS 13.0, *) {
-            if fullscreenWindow.windowScene != myWindow.windowScene {
+            if candidateWindow.windowScene != myWindow.windowScene {
                 return false
             }
         }
 
-        let screenBounds = UIScreen.main.bounds
-        let windowFrame = fullscreenWindow.frame
+        // The scene's screen, not UIScreen.main (deprecated since iOS 16 and
+        // wrong in multi-scene / external-display setups): the candidate is
+        // already guaranteed to share this WebView's windowScene.
+        let screenBounds = myWindow.windowScene?.screen.bounds ?? UIScreen.main.bounds
+        let windowFrame = candidateWindow.frame
 
         // Check if the window is full screen or close to it (allowing small margins)
         let isFullScreenSize = windowFrame.width >= screenBounds.width * 0.9 &&
                                windowFrame.height >= screenBounds.height * 0.9
 
         // Fullscreen video windows typically have an elevated window level
-        let hasElevatedWindowLevel = fullscreenWindow.windowLevel >= .normal
+        let hasElevatedWindowLevel = candidateWindow.windowLevel >= .normal
 
         // Exclude obvious non-media windows by checking type description
-        let windowTypeDescription = NSStringFromClass(type(of: fullscreenWindow))
+        let windowTypeDescription = NSStringFromClass(type(of: candidateWindow))
         let isLikelySystemWindow = windowTypeDescription.contains("Keyboard") ||
                                    windowTypeDescription.contains("TextEffects") ||
                                    windowTypeDescription.contains("Alert") ||

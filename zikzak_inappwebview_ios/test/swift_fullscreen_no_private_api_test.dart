@@ -12,11 +12,12 @@
 // level `normal - 1` — and its class name does not look like a keyboard,
 // text-effects, alert, status-bar or accessibility window.
 //
-// `WKWebView.fullscreenState` is observed via KVO on iOS 16+ as the primary
-// enter/exit path, the UIWindow visibility notifications stay as the
-// fallback, the window that entered fullscreen is tracked so the exit event
-// fires for it, and enter/exit are guarded with `inFullscreen` so the KVO and
-// notification paths cannot double-fire.
+// `WKWebView.fullscreenState` is observed via KVO on iOS 16+, but as of
+// iOS 26 that KVO doesn't reliably fire: the UIWindow visibility
+// notifications are the primary detection mechanism, the window that
+// entered fullscreen is tracked so the exit event fires for it, and
+// enter/exit are guarded with `inFullscreen` so the KVO and notification
+// paths cannot double-fire.
 //
 // This test encodes those rules as a source scan; it is executable on any
 // host (no Xcode required), mirroring the swift_uiscene_window_api_test.dart
@@ -36,8 +37,10 @@ Map<String, String> swiftSources() {
   return out;
 }
 
-/// Strips line/block comments and string literals so only real code tokens
-/// are scanned. Block comments nest, matching Swift's grammar.
+/// Strips line/block comments and every Swift string literal form — plain
+/// single-line `"…"`, raw `#"…"#` (any hash count), and the multi-line
+/// `"""…"""` and `#"""…"""#` variants — so only real code tokens are
+/// scanned. Block comments nest, matching Swift's grammar.
 String stripSwiftNonCode(String source) {
   final out = StringBuffer();
   var i = 0;
@@ -63,13 +66,48 @@ String stripSwiftNonCode(String source) {
       while (i < source.length && source[i] != '\n') {
         i++;
       }
-    } else if (source[i] == '"') {
-      // Skip a string literal; `\\` escapes the next character.
-      i++;
-      while (i < source.length && source[i] != '"') {
-        i += source[i] == '\\' ? 2 : 1;
+    } else if (source[i] == '#') {
+      // Raw string literal: `#"…"#` / `##"…"##`, including the multi-line
+      // `#"""…"""#` forms. The hash count fixes the closing delimiter, so
+      // bare quotes inside cannot terminate the literal and `\` has no
+      // escape meaning; a `#` that opens no string (e.g. `#available`,
+      // `#keyPath`) passes through as code.
+      var hashes = 0;
+      while (i + hashes < source.length && source[i + hashes] == '#') {
+        hashes++;
       }
-      i++;
+      final afterHashes = i + hashes;
+      if (afterHashes < source.length && source[afterHashes] == '"') {
+        final multiline = source.startsWith('"""', afterHashes);
+        final closer = '${multiline ? '"""' : '"'}${'#' * hashes}';
+        i = afterHashes + (multiline ? 3 : 1);
+        while (i < source.length && !source.startsWith(closer, i)) {
+          if (source[i] == '\n') out.write('\n');
+          i++;
+        }
+        if (i < source.length) i += closer.length;
+      } else {
+        out.write(source[i]);
+        i++;
+      }
+    } else if (source[i] == '"') {
+      if (source.startsWith('"""', i)) {
+        // Multi-line literal: the next `"""` closes it.
+        i += 3;
+        while (i < source.length && !source.startsWith('"""', i)) {
+          if (source[i] == '\n') out.write('\n');
+          i++;
+        }
+        if (i < source.length) i += 3;
+      } else {
+        // Skip a single-line string literal; `\\` escapes the next
+        // character.
+        i++;
+        while (i < source.length && source[i] != '"') {
+          i += source[i] == '\\' ? 2 : 1;
+        }
+        i++;
+      }
     } else {
       out.write(source[i]);
       i++;
@@ -152,7 +190,7 @@ void main() {
           code,
           contains(
               'addObserver(self,\n                forKeyPath: #keyPath(WKWebView.fullscreenState)'),
-          reason: 'the KVO observer is the primary enter/exit path on iOS 16+');
+          reason: 'the fullscreenState KVO observer is registered on iOS 16+');
       expect(code, contains('removeObserver(self, forKeyPath: #keyPath(WKWebView.fullscreenState))'),
           reason: 'dispose() must unregister the observer');
       expect(code, contains('.enteringFullscreen'));
@@ -188,6 +226,35 @@ void main() {
       expect(code, contains('UIWindow.didBecomeHiddenNotification'));
       expect(code, contains('func onEnterFullscreen(_ notification: Notification)'));
       expect(code, contains('func onExitFullscreen(_ notification: Notification)'));
+    });
+  });
+
+  group('the source scanner handles every Swift literal form', () {
+    test(
+        'forbidden tokens inside raw and multi-line literals are not '
+        'scanned as code', () {
+      expect(stripSwiftNonCode('let s = #"PGHostedWindow"#'),
+          isNot(contains('PGHostedWindow')),
+          reason: 'raw string literals are content, not API references');
+      expect(stripSwiftNonCode('let s = ##"PGHostedWindow"##'),
+          isNot(contains('PGHostedWindow')),
+          reason: 'the hash count fixes the raw-string closing delimiter');
+      expect(stripSwiftNonCode('let s = #"" quoted "#'),
+          isNot(contains('#"" quoted')),
+          reason: 'bare quotes cannot terminate a raw string literal');
+      expect(stripSwiftNonCode('let s = """\n  PGHostedWindow\n  """'),
+          isNot(contains('PGHostedWindow')),
+          reason: 'multi-line string literals are content, not API '
+              'references');
+    });
+
+    test('forbidden tokens in real code are still scanned', () {
+      expect(stripSwiftNonCode('NSClassFromString("PGHostedWindow")'),
+          contains('NSClassFromString'),
+          reason: 'a genuine private-API reference must keep failing the '
+              'contract');
+      expect(stripSwiftNonCode('let c = PGHostedWindow.self'),
+          contains('PGHostedWindow'));
     });
   });
 }
