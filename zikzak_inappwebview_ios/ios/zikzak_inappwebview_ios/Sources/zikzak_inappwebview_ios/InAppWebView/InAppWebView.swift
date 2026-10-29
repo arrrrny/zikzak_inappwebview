@@ -1307,9 +1307,30 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     }
 
     public func loadUrl(urlRequest: URLRequest, allowingReadAccessTo: URL?) {
+        loadUrl(
+            urlRequest: urlRequest,
+            allowingReadAccessTo: allowingReadAccessTo,
+            overridingNavigationPolicy: true
+        )
+    }
+
+    /// Issue #394: `overridingNavigationPolicy: false` lets the load go
+    /// through `decidePolicyFor` (URLValidationManager + the Dart
+    /// `shouldOverrideUrlLoading`) normally. The `createWebViewWith` fallback
+    /// — loading a `window.open` popup in this WebView when the host does not
+    /// handle `onCreateWindow` — uses it, so the popup is not silently exempt
+    /// from the host's navigation policy (6.1.5 behaved that way). The
+    /// Dart-facing entry points keep `true`: a load initiated from Dart must
+    /// not re-trigger the app's own policy (issue #132).
+    func loadUrl(
+        urlRequest: URLRequest, allowingReadAccessTo: URL?,
+        overridingNavigationPolicy: Bool
+    ) {
         performLoad { [weak self] in
             guard let self = self else { return }
-            self.isNavigatingWithCustomAction = true
+            if overridingNavigationPolicy {
+                self.isNavigatingWithCustomAction = true
+            }
             let url = urlRequest.url!
 
             if #available(iOS 9.0, *), let allowingReadAccessTo = allowingReadAccessTo,
@@ -3566,7 +3587,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             if inAppWebViewManager?.windowWebViews[windowId] != nil {
                 inAppWebViewManager?.windowWebViews.removeValue(forKey: windowId)
             }
-            self?.loadUrl(urlRequest: navigationAction.request, allowingReadAccessTo: nil)
+            self?.loadUrl(urlRequest: navigationAction.request, allowingReadAccessTo: nil, overridingNavigationPolicy: false)
             semaphore.signal()
         }
         callback.error = { [weak callback] (code: String, message: String?, details: Any?) in
