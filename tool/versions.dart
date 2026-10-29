@@ -12,12 +12,12 @@ library;
 ///
 /// Every package in the monorepo ships the same version number.
 /// Update once here; the prepare_for_publish.sh script propagates it.
-const String packageVersion = '6.3.1';
+const String packageVersion = '6.3.2';
 
 /// Key third-party dependency versions that appear in README installation
 /// snippets and should stay in sync across the project.
 const String zorphyVersion = '2.4.3';
 const String zorphyAnnotationVersion = '2.4.3';
-const String zuraffaVersion = '7.2.0';
-const String zuraffaFlutterVersion = '7.2.0';
-const String zuraffaSessionVersion = '1.2.1';
+const String zuraffaVersion = '7.3.0';
+const String zuraffaFlutterVersion = '7.3.0';
+const String zuraffaSessionVersion = '7.3.0';
