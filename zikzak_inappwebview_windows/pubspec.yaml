@@ -4,8 +4,8 @@ version: 6.3.1
 homepage: https://github.com/arrrrny/zikzak_inappwebview
 
 environment:
-  sdk: ">=3.8.0 <4.0.0"
-  flutter: ">=3.38.6"
+  sdk: ">=3.12.0 <4.0.0"
+  flutter: ">=3.44.0"
 
 flutter:
   plugin:
@@ -22,6 +22,11 @@ dependencies:
   webview_windows: ^0.4.0
   path: ^1.9.0
   path_provider: ^2.1.0
+  # Standalone Material design system (issue #392): the windows facade renders
+  # a Material spinner on top of the core widgets while the WebView2 backend
+  # initializes. pkg:material_ui is the decoupled home of the framework's
+  # material library, which is frozen in Flutter and will be removed.
+  material_ui: ^1.0.0
 
 dev_dependencies:
   flutter_test:

@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart' show kDebugMode, visibleForTesting;
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart'
+    show debugPrint, kDebugMode, visibleForTesting;
 import 'package:flutter/services.dart' show PlatformException;
+import 'package:flutter/widgets.dart';
+import 'package:material_ui/material_ui.dart' show CircularProgressIndicator;
 
 import 'package:path_provider/path_provider.dart';
 import 'package:webview_windows/webview_windows.dart';
