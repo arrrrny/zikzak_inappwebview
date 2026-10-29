@@ -466,6 +466,16 @@ public final class InAppWebView
                         javaScriptBridgeInterface,
                         JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME
                     );
+                } catch (RuntimeException e) {
+                    // This runs from the main Looper, so an uncaught throw here
+                    // would crash the whole app; log instead. Kept separate from
+                    // the script registration below so a programming error behind
+                    // the bridge is visible as its own failure class.
+                    Log.e(LOG_TAG,
+                            "Exception while registering the JavaScript bridge interface.",
+                            e);
+                }
+                try {
                     if (
                         windowId == null ||
                         !WebViewFeature.isFeatureSupported(
@@ -486,7 +496,7 @@ public final class InAppWebView
                     // from the main Looper, so an uncaught throw here would crash
                     // the whole app; log instead.
                     Log.e(LOG_TAG,
-                            "Exception while registering the JavaScript bridge interface and user scripts.",
+                            "Exception while preparing and adding user scripts.",
                             e);
                 }
             }

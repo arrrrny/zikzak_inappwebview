@@ -227,9 +227,12 @@ public class UserContentController implements Disposable {
         // WebViewCompat.addDocumentStartJavaScript can throw
         // "Must be started before we block!" when Chromium's browser process
         // has not finished starting (see pichillilorenzo/flutter_inappwebview#2843).
-        // Log and leave the script out of scriptHandlerMap so a later add can retry.
+        // Log and leave the script out of scriptHandlerMap. Nothing re-registers
+        // a script whose add failed here (prepareAndAddUserScripts runs only
+        // once per WebView), so the script stays unregistered until it is
+        // removed and re-added.
         Log.e(LOG_TAG,
-                "Failed to add the document-start script for a user-only script; it will be retried on a later add.",
+                "Failed to add the document-start script for a user-only script; not registered; remove and re-add the script to retry.",
                 e);
       }
     }
@@ -307,9 +310,12 @@ public class UserContentController implements Disposable {
         // WebViewCompat.addDocumentStartJavaScript can throw
         // "Must be started before we block!" when Chromium's browser process
         // has not finished starting (see pichillilorenzo/flutter_inappwebview#2843).
-        // Log and leave the script out of scriptHandlerMap so a later add can retry.
+        // Log and leave the script out of scriptHandlerMap. Nothing re-registers
+        // a script whose add failed here (prepareAndAddUserScripts runs only
+        // once per WebView), so the script stays unregistered until it is
+        // removed and re-added.
         Log.e(LOG_TAG,
-                "Failed to add the document-start script for a plugin script; it will be retried on a later add.",
+                "Failed to add the document-start script for a plugin script; not registered; remove and re-add the script to retry.",
                 e);
       }
     }

@@ -32,19 +32,67 @@ const _viewPath =
 final _tryPattern = RegExp(r'\btry\s*\{');
 final _catchPattern = RegExp(r'catch\s*\(\s*RuntimeException');
 
+/// Replaces the contents of Java comments, string literals and char literals
+/// with spaces, preserving length so indices still map 1:1 onto [source].
+/// Brace counting on raw Java text would mis-balance on a `{`/`}` inside a
+/// comment or a string literal (e.g. a log message like "expected {foo}").
+String _maskedForBraces(String source) {
+  final out = StringBuffer();
+  var i = 0;
+  void skip(int count) {
+    out.write(' ' * count);
+    i += count;
+  }
+
+  while (i < source.length) {
+    final c = source[i];
+    if (c == '/' && i + 1 < source.length && source[i + 1] == '/') {
+      final end = source.indexOf('\n', i);
+      skip((end < 0 ? source.length : end) - i);
+      continue;
+    }
+    if (c == '/' && i + 1 < source.length && source[i + 1] == '*') {
+      final end = source.indexOf('*/', i + 2);
+      skip((end < 0 ? source.length : end + 2) - i);
+      continue;
+    }
+    if (c == '"' || c == "'") {
+      var j = i + 1;
+      while (j < source.length) {
+        if (source[j] == r'\') {
+          j += 2;
+        } else if (source[j] == c) {
+          j += 1;
+          break;
+        } else {
+          j += 1;
+        }
+      }
+      skip(j - i);
+      continue;
+    }
+    out.write(c);
+    i++;
+  }
+  return out.toString();
+}
+
 /// Returns the brace-balanced block that opens at the first `{` at or after
-/// the first match of [start] in [source], starting from [from].
+/// the first match of [start] in [source], starting from [from]. Brace
+/// counting runs on a comment/literal-masked copy; the returned text is the
+/// original source.
 String _block(String source, Pattern start, {int from = 0}) {
-  final declIndex = source.indexOf(start, from);
+  final mask = _maskedForBraces(source);
+  final declIndex = mask.indexOf(start, from);
   if (declIndex < 0) {
     fail('pattern not found: $start');
   }
-  final open = source.indexOf('{', declIndex);
+  final open = mask.indexOf('{', declIndex);
   var depth = 0;
-  for (var i = open; i < source.length; i++) {
-    if (source[i] == '{') {
+  for (var i = open; i < mask.length; i++) {
+    if (mask[i] == '{') {
       depth++;
-    } else if (source[i] == '}') {
+    } else if (mask[i] == '}') {
       depth--;
       if (depth == 0) {
         return source.substring(declIndex, i + 1);
@@ -147,10 +195,18 @@ void main() {
       );
       final runnable = runnables.single;
       expect(runnable, contains('addJavascriptInterface('));
-      final tryBlock = _block(runnable, _tryPattern);
-      expect(tryBlock, contains('addJavascriptInterface('));
-      expect(tryBlock, contains('prepareAndAddUserScripts()'));
-      expect(_catchPattern.hasMatch(runnable), isTrue);
+      // The bridge registration and the script preparation are guarded by
+      // separate try/catch (RuntimeException) blocks so the two failure
+      // classes stay distinguishable in the logs.
+      final bridgeTry = _block(runnable, _tryPattern);
+      expect(bridgeTry, contains('addJavascriptInterface('));
+      final scriptsTry = _block(
+        runnable,
+        _tryPattern,
+        from: runnable.indexOf(bridgeTry) + bridgeTry.length,
+      );
+      expect(scriptsTry, contains('prepareAndAddUserScripts()'));
+      expect(_catchPattern.allMatches(runnable), hasLength(2));
       final catchBlock = _block(runnable, _catchPattern);
       expect(catchBlock, contains('Log.e('));
     });
