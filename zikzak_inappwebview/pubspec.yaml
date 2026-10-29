@@ -1,6 +1,6 @@
 name: zikzak_inappwebview
 description: A Flutter plugin that allows you to add an inline webview, to use an headless webview, and to open an in-app browser window.
-version: 6.3.1
+version: 6.3.2
 homepage: https://arrrrny.github.io/zikzak_inappwebview
 repository: https://github.com/arrrrny/zikzak_inappwebview
 issue_tracker: https://github.com/arrrrny/zikzak_inappwebview/issues
@@ -18,28 +18,26 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  zikzak_inappwebview_platform_interface: ^6.3.1
-  zikzak_inappwebview_android: ^6.3.1
-  zikzak_inappwebview_ios: ^6.3.1
-  zikzak_inappwebview_macos: ^6.3.1
-  zikzak_inappwebview_web: ^6.3.1
-  zikzak_inappwebview_windows: ^6.3.1
-  zikzak_inappwebview_linux: ^6.3.1
+  zikzak_inappwebview_platform_interface: ^6.3.2
+  zikzak_inappwebview_android: ^6.3.2
+  zikzak_inappwebview_ios: ^6.3.2
+  zikzak_inappwebview_macos: ^6.3.2
+  zikzak_inappwebview_web: ^6.3.2
+  zikzak_inappwebview_windows: ^6.3.2
+  zikzak_inappwebview_linux: ^6.3.2
   synchronized: ^3.4.1
-  # The cap at "<1.2.0" that shipped with 6.2.1 is lifted: it existed only
-  # because zuraffa 7.x's CLI subtree (lib/src/cli/zfa_executable.dart,
-  # reachable from the public barrel) used 64-bit integer literals that fail
-  # dart2js in every Flutter Web build (arrrrny/zuraffa#1729). That issue is
-  # closed and the fix shipped in zuraffa 7.2.0, where the digest helper is
-  # BigInt-based. A consumer dart2js build over `package:zuraffa/zuraffa.dart`
-  # + `package:zuraffa_session/zuraffa_session.dart` was re-verified against
-  # zuraffa 7.2.0 / zuraffa_session 1.2.1 and compiles cleanly.
-  # The old cap was also a plain version-solving hazard: 1.1.x requires
-  # `zuraffa: ^6.2.2`, so any app that also needs `zuraffa: ^7.x` could not
-  # resolve this package at all (6.2.1 was unreachable for zuraffa-7 apps).
-  # 1.1.0 and 1.2.x carry identical session code; only the `zuraffa` range
-  # differs, so widening is safe.
-  zuraffa_session: ^1.1.0
+  # 6.3.2 rides the unified zuraffa family line: zuraffa_session 7.3.0 keeps
+  # the SessionPort/PortableSession contract this package codes against (the
+  # 1.x → 7.x jump was the family's version-line unification, not an API
+  # break), so the constraint moves from ^1.1.0 to ^7.3.0, matching the
+  # family's cross-package pins. History: the original "<1.2.0" cap (6.2.1)
+  # existed because zuraffa 7.x's CLI subtree used 64-bit integer literals
+  # that fail dart2js in every Flutter Web build (arrrrny/zuraffa#1729); the
+  # fix shipped in zuraffa 7.2.0 (BigInt digest helper) and the dart2js
+  # consumer build over `package:zuraffa/zuraffa.dart` +
+  # `package:zuraffa_session/zuraffa_session.dart` was re-verified — refresh
+  # that check against zuraffa_session 7.3.0 when touching Web builds.
+  zuraffa_session: ^7.3.0
 
 dev_dependencies:
   flutter_test:
@@ -108,18 +106,3 @@ false_secrets:
   - /test_node_server/*.pfx
 
 
-dependency_overrides:
-  zikzak_inappwebview_platform_interface:
-    path: ../zikzak_inappwebview_platform_interface
-  zikzak_inappwebview_android:
-    path: ../zikzak_inappwebview_android
-  zikzak_inappwebview_ios:
-    path: ../zikzak_inappwebview_ios
-  zikzak_inappwebview_macos:
-    path: ../zikzak_inappwebview_macos
-  zikzak_inappwebview_web:
-    path: ../zikzak_inappwebview_web
-  zikzak_inappwebview_windows:
-    path: ../zikzak_inappwebview_windows
-  zikzak_inappwebview_linux:
-    path: ../zikzak_inappwebview_linux

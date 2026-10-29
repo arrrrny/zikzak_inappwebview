@@ -1,3 +1,7 @@
+## 6.3.2 - 2026-10-29
+
+Version-line release alongside `zikzak_inappwebview` 6.3.2 — no code changes; the family re-publishes together so the root package's `zuraffa_session: ^7.3.0` constraint resolves against a coherent set.
+
 ## 6.3.1 - 2026-10-27
 
 

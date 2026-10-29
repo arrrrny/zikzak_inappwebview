@@ -1,3 +1,9 @@
+## 6.3.2 - 2026-10-29
+
+### Dependencies
+
+- The whole fleet rides the unified zuraffa family line: `zuraffa_session` moves from `^1.1.0` to `^7.3.0`. The `SessionPort` / `PortableSession` contract this package codes against is unchanged (the 1.x → 7.x jump was the family's version-line unification, not an API break), and the package resolves and analyzes clean against published zuraffa_session 7.3.0. This release unblocks every consumer app that also declares `zuraffa_session: ^7.3.0` — 6.3.1's `^1.1.0` range made the two constraints mutually unsatisfiable.
+
 ## 6.3.1 - 2026-10-27
 
 ### Features
