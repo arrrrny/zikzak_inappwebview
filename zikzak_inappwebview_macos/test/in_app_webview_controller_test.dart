@@ -583,4 +583,31 @@ void main() {
       expect(received, isNull);
     });
   });
+
+  group('reloadFromOrigin (issue #397)', () {
+    test(
+        'invokes the reloadFromOrigin method-channel call instead of throwing '
+        'UnimplementedError', () async {
+      final calls = <MethodCall>[];
+      const channel = MethodChannel('dev.zuzu/zikzak_inappwebview_12345');
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, (call) async {
+        calls.add(call);
+        return null;
+      });
+      addTearDown(() {
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(channel, null);
+      });
+
+      // The platform-interface default throws UnimplementedError before any
+      // method-channel call; the macOS override must reach the native
+      // dispatch case (InAppWebView.swift case "reloadFromOrigin"), which
+      // calls the official WKWebView.reloadFromOrigin().
+      await controller.reloadFromOrigin();
+
+      expect(calls, hasLength(1));
+      expect(calls.single.method, 'reloadFromOrigin');
+    });
+  });
 }
