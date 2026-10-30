@@ -163,6 +163,16 @@ class LinuxHeadlessInAppWebViewCreationParams
 
 class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     with ChannelController {
+  /// This view's channel-suffix id.
+  ///
+  /// Without this override the [PlatformHeadlessInAppWebView.id] getter throws
+  /// `UnimplementedError` the moment `_init()` builds the per-instance
+  /// `MethodChannel('wtf.zikzak/flutter_headless_inappwebview_$id')`, so
+  /// `run()` could never start a headless WebView. Mirrors the macOS
+  /// implementation (`MacOSHeadlessInAppWebView.id`).
+  @override
+  late final String id;
+
   bool _started = false;
   bool _running = false;
 
@@ -193,7 +203,9 @@ class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
             : LinuxHeadlessInAppWebViewCreationParams.fromPlatformHeadlessInAppWebViewCreationParams(
                 params,
               ),
-      );
+      ) {
+    id = IdGenerator.generate();
+  }
 
   @override
   LinuxInAppWebViewController? get webViewController => _webViewController;
