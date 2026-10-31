@@ -17,14 +17,13 @@ makes the declared floor the true one.
   (fleet-wide floor by convention). Flutter 3.47.0 ships Dart 3.13.0 (official
   releases JSON). `sdk:` floors stay at `>=3.8.0 <4.0.0` — the `flutter:` line
   is the enforceable floor for plugin consumers.
-- **`zuraffa_session: ^1.1.0` → `">=1.2.1 <8.0.0"`** in the umbrella: the
-  floor is the first version on the zuraffa-7 line (nocterm-free — the
-  equatable-^3 conflict from #393 section 1 can no longer enter any consumer
-  graph), and the open top admits the fleet realignment (`zuraffa_session
-  7.3.0`, published 2026-10-29, dep-identical to 1.2.1 except
-  `zuraffa: ^7.3.0`). Fresh resolution lands on `zuraffa_session 7.3.0 →
-  zuraffa 7.3.0`; the zuraffa-6 CLI subtree drops out of consumer locks
-  (~580 fewer lines across the example + module locks).
+- **`zuraffa_session: ^7.3.0`** in the umbrella (already carried by master
+  through the 6.3.2 release prep, 858083e, kept through 6.3.3): the unified
+  zuraffa family line is nocterm-free, so the equatable-^3 conflict from #393
+  section 1 can no longer enter any consumer graph. The branch originally
+  proposed widening the constraint to `">=1.2.1 <8.0.0"`; while this PR sat
+  open, master adopted `^7.3.0`, and the merge resolved to master's narrower
+  form — the merged diff therefore carries no `zuraffa_session` change.
 - **New `resolve-floor` CI job (18th)**: pins `flutter-version: 3.47.0` and
   resolves a minimal consumer app — the issue's exact repro, `equatable:
   ^3.0.0` + this checkout via root `dependency_overrides` — then asserts the
@@ -34,7 +33,11 @@ makes the declared floor the true one.
 - **Dev-only `zikzak_inappwebview_module`** aligned: `flutter >=3.47.0`,
   `sdk >=3.8.0`, `flutter_lints ^6.0.0`.
 - **AGENTS.md**: SDK-floor line and CI matrix description updated.
-- Tracked `pubspec.lock` files refreshed by `flutter pub get`.
+- Tracked `pubspec.lock` `sdks:` footers refreshed to `flutter: ">=3.47.0"`
+  (example, macos, web, windows; the module lock additionally picks up
+  `flutter_lints 6.0.0`/`analyzer 14.6.0` from its dev-dep alignment — the
+  example + module locks are otherwise line-identical to master, the merge
+  having adopted master's `zuraffa_session 7.3.0` resolution).
 - Spec-kit chore records under `.specify/chores/393-flutter-floor-bump/`
   (assessment, issue linkage, implement report).
 

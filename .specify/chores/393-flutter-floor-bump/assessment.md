@@ -66,7 +66,7 @@ No other constitution principles apply (template placeholders).
 
 ## Affected Paths
 
-- `zikzak_inappwebview/pubspec.yaml:16` — `flutter: ">=3.38.6"` → `">=3.47.0"`; `zuraffa_session: ^1.1.0` → `">=1.2.1 <8.0.0"` (comment rewrite)
+- `zikzak_inappwebview/pubspec.yaml:16` — `flutter: ">=3.38.6"` → `">=3.47.0"`; `zuraffa_session` widened to `">=1.2.1 <8.0.0"` (comment rewrite) — **superseded by the master merge**: master adopted `zuraffa_session: ^7.3.0` (6.3.2 release prep, 858083e) while this branch sat open, and the merge resolved the conflict to master's form, so the merged PR ships the floor bump only
 - `zikzak_inappwebview_platform_interface/pubspec.yaml:16` — flutter floor
 - `zikzak_inappwebview_android/pubspec.yaml:16` — flutter floor
 - `zikzak_inappwebview_ios/pubspec.yaml:16` — flutter floor
@@ -77,8 +77,7 @@ No other constitution principles apply (template placeholders).
 - `zikzak_inappwebview_module/pubspec.yaml` — floors aligned (`sdk >=3.8.0`, `flutter >=3.47.0`), `flutter_lints ^5.0.0` → `^6.0.0` (dev-only, not published)
 - `.github/workflows/ci.yml` — new `resolve-floor` job
 - `AGENTS.md:181` + the CI matrix description — floor and job-count docs
-- tracked `pubspec.lock` files (`zikzak_inappwebview/example`, `_macos`, `_web`, `_windows`, `_linux/example`, `_module`) — refreshed by `flutter pub get`
-
+- tracked `pubspec.lock` files (`zikzak_inappwebview/example`, `_macos`, `_web`, `_windows`, `_linux/example`, `_module`) — refreshed by `flutter pub get` (at the merged head only the `sdks:` footers actually differ from master; `_linux/example` still carries a stale `>=3.38.6` footer — see the review finding, fixed in this fixes round)
 ## Proposed Approach
 
 **Preferred**: Raise `flutter:` to `>=3.47.0` in all 8 publishable packages
@@ -101,7 +100,10 @@ documents that the pin must move together with the pubspec floor.
 **Alternatives**:
 - `zuraffa_session: ^7.3.0` — maximally current, but breaks consumers that pin
   `zuraffa_session: ^1.x` themselves; the widened range is strictly more
-  compatible with identical resolution today.
+  compatible with identical resolution today. **(Post-merge outcome: the
+  merge shipped exactly this — master adopted `^7.3.0` in 6.3.2 — so the
+  "breaks consumers" concern was resolved by the maintainer's own fleet
+  move.)**
 - Raise `sdk:` to `>=3.13.0` too — more "honest" but churns 9 files for no
   enforceable benefit (flutter line already gates), and risks contradicting
   the fleet if a future Flutter 3.47.x patch shipped a lower Dart.

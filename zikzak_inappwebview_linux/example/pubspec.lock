@@ -763,4 +763,4 @@ packages:
     version: "7.3.0"
 sdks:
   dart: ">=3.13.0 <4.0.0"
-  flutter: ">=3.38.6"
+  flutter: ">=3.47.0"

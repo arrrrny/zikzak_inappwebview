@@ -10,19 +10,19 @@
 Every publishable package now declares the real minimum — `flutter: >=3.47.0` —
 so pub reports "requires Flutter >=3.47.0" on 3.38–3.44 instead of a solver
 failure that suggests downgrading to 5.x (#393 comment 6493010108); the
-umbrella's `zuraffa_session` constraint moved to `">=1.2.1 <8.0.0"` (first
-zuraffa-7 line as the floor, the fleet-realigned 7.3.0 admitted — resolution
-now deterministically lands on the nocterm-free zuraffa 7.3.0 and drops the
-zuraffa-6 CLI subtree from consumer graphs); and a new `resolve-floor` CI job
+umbrella's `zuraffa_session` constraint stays at master's `^7.3.0` (the
+branch's proposed `">=1.2.1 <8.0.0"` widening was resolved away in the master
+merge — the 6.3.2 release prep had adopted `^7.3.0`, the fleet-realigned
+nocterm-free line, so the merged diff carries no `zuraffa_session` change);
+and a new `resolve-floor` CI job
 resolves a minimal consumer (the issue's exact repro: `equatable: ^3.0.0` +
 this checkout) on the declared floor, asserting path resolution and a zuraffa
 7.x result. No Dart, Java, or Swift source changed.
-
 ## Changes
 
 | File | Change | Notes |
 |------|--------|-------|
-| `zikzak_inappwebview/pubspec.yaml` | modified | floor `>=3.38.6`→`>=3.47.0`; `zuraffa_session: ^1.1.0`→`">=1.2.1 <8.0.0"` with rewritten comment (history kept: 6.2.1 cap, dart2js fix in zuraffa 7.2.0) |
+| `zikzak_inappwebview/pubspec.yaml` | modified | floor `>=3.38.6`→`>=3.47.0` only — the branch's `zuraffa_session` widening was resolved to master's `^7.3.0` in the merge commit (comment untouched from master's 6.3.2 form) |
 | `zikzak_inappwebview_platform_interface/pubspec.yaml` | modified | floor → `>=3.47.0` |
 | `zikzak_inappwebview_android/pubspec.yaml` | modified | floor → `>=3.47.0` |
 | `zikzak_inappwebview_ios/pubspec.yaml` | modified | floor → `>=3.47.0` |
@@ -33,10 +33,9 @@ this checkout) on the declared floor, asserting path resolution and a zuraffa
 | `zikzak_inappwebview_module/pubspec.yaml` | modified | dev-only alignment: `sdk >=3.8.0`, `flutter >=3.47.0`, `flutter_lints ^5.0.0`→`^6.0.0` |
 | `.github/workflows/ci.yml` | modified | new `resolve-floor` job (18th): pins `flutter-version: 3.47.0`, writes `.consumer-probe` (equatable ^3.0.0 + root `dependency_overrides` to all 8 checkout packages), `flutter pub get`, asserts path sources + zuraffa 7.x |
 | `AGENTS.md` | modified | SDK-floor line (181) now `flutter: >=3.47.0` with the meta-pin rationale; CI section (358) describes the 18-job matrix incl. `resolve-floor` |
-| `zikzak_inappwebview/example/pubspec.lock` | modified | refreshed: zuraffa-6 CLI-tree transitive deps dropped (−~270 lines), analyzer 14.1.0→14.6.0, zuraffa_session 7.3.0 |
-| `zikzak_inappwebview_module/pubspec.lock` | modified | refreshed: same shrinkage (−~310 lines) |
-| `zikzak_inappwebview_macos|_web|_windows/pubspec.lock` | modified | 1-line resolution refreshes |
-
+| `zikzak_inappwebview/example/pubspec.lock` | modified | `sdks:` footer only: `flutter ">=3.44.0"`→`">=3.47.0"` (master's merge had already adopted the `zuraffa_session 7.3.0` resolution, so no dep lines differ) |
+| `zikzak_inappwebview_module/pubspec.lock` | modified | refreshed: `flutter_lints 5.1.1→6.1.0`, `analyzer 5.0.0→6.0.0` (from the dev-dep alignment), `sdks:` footer → `>=3.47.0` |
+| `zikzak_inappwebview_macos|_web|_windows/pubspec.lock` | modified | 1-line `sdks:` footer refreshes |
 Deliberately unchanged: `sdk:` floors (`>=3.8.0 <4.0.0` — the `flutter:` line
 is the enforceable floor for plugin consumers and every Flutter ≥3.47.0 ships
 Dart ≥3.13.0), all other direct-dependency ranges (each caret already admits
