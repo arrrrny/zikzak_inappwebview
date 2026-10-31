@@ -20,6 +20,10 @@ dependencies:
     sdk: flutter
   zikzak_inappwebview_platform_interface: ^6.3.3
 
+dependency_overrides:
+  zikzak_inappwebview_platform_interface:
+    path: ../zikzak_inappwebview_platform_interface
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
