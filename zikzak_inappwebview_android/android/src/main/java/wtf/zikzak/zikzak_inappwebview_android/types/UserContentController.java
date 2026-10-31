@@ -2,6 +2,7 @@ package wtf.zikzak.zikzak_inappwebview_android.types;
 
 import android.annotation.SuppressLint;
 import android.text.TextUtils;
+import android.util.Log;
 import android.webkit.WebView;
 
 import androidx.annotation.NonNull;
@@ -184,13 +185,25 @@ public class UserContentController implements Disposable {
         contentWorldsCreatorScript.remove();
       }
       if (!source.isEmpty() && webView != null) {
-        contentWorldsCreatorScript = WebViewCompat.addDocumentStartJavaScript(
-                webView,
-                source,
-                new HashSet<String>() {{
-                  add("*");
-                }}
-        );
+        try {
+          contentWorldsCreatorScript = WebViewCompat.addDocumentStartJavaScript(
+                  webView,
+                  source,
+                  new HashSet<String>() {{
+                    add("*");
+                  }}
+          );
+        } catch (RuntimeException e) {
+          // On release cold starts Chromium's browser process may not have
+          // finished starting yet, and WebViewCompat.addDocumentStartJavaScript
+          // throws "Must be started before we block!". An uncaught throw here
+          // (this method runs from the main Looper) would crash the app, so
+          // log instead and release the handler so a later add can retry.
+          contentWorldsCreatorScript = null;
+          Log.e(LOG_TAG,
+                  "Failed to add the content worlds creator document-start script; it will be retried on a later add.",
+                  e);
+        }
       }
     }
   }
@@ -203,12 +216,25 @@ public class UserContentController implements Disposable {
     this.updateContentWorldsCreatorScript();
     if (webView != null && userOnlyScript.getInjectionTime() == UserScriptInjectionTime.AT_DOCUMENT_START
             && WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
-      ScriptHandler scriptHandler = WebViewCompat.addDocumentStartJavaScript(
-              webView,
-              wrapSourceCodeInContentWorld(userOnlyScript.getContentWorld(), userOnlyScript.getSource()),
-              userOnlyScript.getAllowedOriginRules()
-      );
-      this.scriptHandlerMap.put(userOnlyScript, scriptHandler);
+      try {
+        ScriptHandler scriptHandler = WebViewCompat.addDocumentStartJavaScript(
+                webView,
+                wrapSourceCodeInContentWorld(userOnlyScript.getContentWorld(), userOnlyScript.getSource()),
+                userOnlyScript.getAllowedOriginRules()
+        );
+        this.scriptHandlerMap.put(userOnlyScript, scriptHandler);
+      } catch (RuntimeException e) {
+        // WebViewCompat.addDocumentStartJavaScript can throw
+        // "Must be started before we block!" when Chromium's browser process
+        // has not finished starting (see pichillilorenzo/flutter_inappwebview#2843).
+        // Log and leave the script out of scriptHandlerMap. Nothing re-registers
+        // a script whose add failed here (prepareAndAddUserScripts runs only
+        // once per WebView), so the script stays unregistered until it is
+        // removed and re-added.
+        Log.e(LOG_TAG,
+                "Failed to add the document-start script for a user-only script; not registered; remove and re-add the script to retry.",
+                e);
+      }
     }
     return this.userOnlyScripts.get(userOnlyScript.getInjectionTime()).add(userOnlyScript);
   }
@@ -273,12 +299,25 @@ public class UserContentController implements Disposable {
     this.updateContentWorldsCreatorScript();
     if (webView != null && pluginScript.getInjectionTime() == UserScriptInjectionTime.AT_DOCUMENT_START
             && WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
-      ScriptHandler scriptHandler = WebViewCompat.addDocumentStartJavaScript(
-              webView,
-              wrapSourceCodeInContentWorld(pluginScript.getContentWorld(), pluginScript.getSource()),
-              pluginScript.getAllowedOriginRules()
-      );
-      this.scriptHandlerMap.put(pluginScript, scriptHandler);
+      try {
+        ScriptHandler scriptHandler = WebViewCompat.addDocumentStartJavaScript(
+                webView,
+                wrapSourceCodeInContentWorld(pluginScript.getContentWorld(), pluginScript.getSource()),
+                pluginScript.getAllowedOriginRules()
+        );
+        this.scriptHandlerMap.put(pluginScript, scriptHandler);
+      } catch (RuntimeException e) {
+        // WebViewCompat.addDocumentStartJavaScript can throw
+        // "Must be started before we block!" when Chromium's browser process
+        // has not finished starting (see pichillilorenzo/flutter_inappwebview#2843).
+        // Log and leave the script out of scriptHandlerMap. Nothing re-registers
+        // a script whose add failed here (prepareAndAddUserScripts runs only
+        // once per WebView), so the script stays unregistered until it is
+        // removed and re-added.
+        Log.e(LOG_TAG,
+                "Failed to add the document-start script for a plugin script; not registered; remove and re-add the script to retry.",
+                e);
+      }
     }
     return this.pluginScripts.get(pluginScript.getInjectionTime()).add(pluginScript);
   }

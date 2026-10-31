@@ -1,6 +1,6 @@
 name: zikzak_inappwebview
 description: A Flutter plugin that allows you to add an inline webview, to use an headless webview, and to open an in-app browser window.
-version: 6.3.1
+version: 6.3.3
 homepage: https://arrrrny.github.io/zikzak_inappwebview
 repository: https://github.com/arrrrny/zikzak_inappwebview
 issue_tracker: https://github.com/arrrrny/zikzak_inappwebview/issues
@@ -18,31 +18,26 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  zikzak_inappwebview_platform_interface: ^6.3.1
-  zikzak_inappwebview_android: ^6.3.1
-  zikzak_inappwebview_ios: ^6.3.1
-  zikzak_inappwebview_macos: ^6.3.1
-  zikzak_inappwebview_web: ^6.3.1
-  zikzak_inappwebview_windows: ^6.3.1
-  zikzak_inappwebview_linux: ^6.3.1
+  zikzak_inappwebview_platform_interface: ^6.3.3
+  zikzak_inappwebview_android: ^6.3.3
+  zikzak_inappwebview_ios: ^6.3.3
+  zikzak_inappwebview_macos: ^6.3.3
+  zikzak_inappwebview_web: ^6.3.3
+  zikzak_inappwebview_windows: ^6.3.3
+  zikzak_inappwebview_linux: ^6.3.3
   synchronized: ^3.4.1
-  # Floor 1.2.1 is the first zuraffa_session on the zuraffa-7 line: it removes
-  # the last path where a consumer's graph could still land on zuraffa 6.x,
-  # whose nocterm dependency drags in `equatable ^2` (breaking equatable ^3
-  # apps on any Flutter) and an `analyzer`/`meta` pair no Flutter <=3.44
-  # release can satisfy (#393). The open top admits the fleet realignment:
-  # zuraffa_session 7.3.0 (published 2026-10-29) is dep-identical to 1.2.1
-  # except `zuraffa: ^7.0.1` -> `^7.3.0`, and 1.1.0/1.2.x/7.3.0 all carry the
-  # same session code, so the range stays wide. The floor also means the
-  # package now requires Flutter >=3.47.0 in practice: every zuraffa 7.x needs
-  # `meta ^1.19.0` and Flutter pins `meta` exactly up to 3.44.x, so the floor
-  # declared above IS the real minimum (the resolve-floor CI job pins it).
-  # History: 6.2.1 capped this at "<1.2.0" because zuraffa 7.x's CLI subtree
-  # used 64-bit integer literals that fail dart2js in every Flutter Web build
-  # (arrrrny/zuraffa#1729); fixed in zuraffa 7.2.0 (BigInt-based digest), and
-  # a consumer dart2js build over `package:zuraffa/zuraffa.dart` +
-  # `package:zuraffa_session/zuraffa_session.dart` compiles cleanly.
-  zuraffa_session: ">=1.2.1 <8.0.0"
+  # 6.3.2 rides the unified zuraffa family line: zuraffa_session 7.3.0 keeps
+  # the SessionPort/PortableSession contract this package codes against (the
+  # 1.x → 7.x jump was the family's version-line unification, not an API
+  # break), so the constraint moves from ^1.1.0 to ^7.3.0, matching the
+  # family's cross-package pins. History: the original "<1.2.0" cap (6.2.1)
+  # existed because zuraffa 7.x's CLI subtree used 64-bit integer literals
+  # that fail dart2js in every Flutter Web build (arrrrny/zuraffa#1729); the
+  # fix shipped in zuraffa 7.2.0 (BigInt digest helper) and the dart2js
+  # consumer build over `package:zuraffa/zuraffa.dart` +
+  # `package:zuraffa_session/zuraffa_session.dart` was re-verified — refresh
+  # that check against zuraffa_session 7.3.0 when touching Web builds.
+  zuraffa_session: ^7.3.0
 
 dev_dependencies:
   flutter_test:
@@ -110,7 +105,6 @@ false_secrets:
   - /test_node_server/*.pem
   - /test_node_server/*.pfx
 
-
 dependency_overrides:
   zikzak_inappwebview_platform_interface:
     path: ../zikzak_inappwebview_platform_interface
@@ -126,3 +120,5 @@ dependency_overrides:
     path: ../zikzak_inappwebview_windows
   zikzak_inappwebview_linux:
     path: ../zikzak_inappwebview_linux
+
+

@@ -569,6 +569,11 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
   }
 
   @override
+  Future<void> reloadFromOrigin() async {
+    await _channel.invokeMethod('reloadFromOrigin');
+  }
+
+  @override
   Future<void> goBack() async {
     await _channel.invokeMethod('goBack');
   }

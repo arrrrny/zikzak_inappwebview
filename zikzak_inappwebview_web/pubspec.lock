@@ -275,7 +275,7 @@ packages:
       path: "../zikzak_inappwebview_platform_interface"
       relative: true
     source: path
-    version: "6.3.1"
+    version: "6.3.3"
   zorphy_annotation:
     dependency: transitive
     description:

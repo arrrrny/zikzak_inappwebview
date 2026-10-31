@@ -25,7 +25,7 @@ dependencies:
     # the parent directory to use the current plugin's version.
     path: ../
 
-  zikzak_inappwebview_platform_interface: ^6.3.1
+  zikzak_inappwebview_platform_interface: ^6.3.3
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -85,7 +85,6 @@ flutter:
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
 
-
 dependency_overrides:
   zikzak_inappwebview:
     path: ../../zikzak_inappwebview
@@ -93,3 +92,5 @@ dependency_overrides:
     path: ../
   zikzak_inappwebview_platform_interface:
     path: ../../zikzak_inappwebview_platform_interface
+
+

@@ -163,6 +163,9 @@ class LinuxHeadlessInAppWebViewCreationParams
 
 class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     with ChannelController {
+  @override
+  late final String id;
+
   bool _started = false;
   bool _running = false;
 
@@ -193,7 +196,9 @@ class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
             : LinuxHeadlessInAppWebViewCreationParams.fromPlatformHeadlessInAppWebViewCreationParams(
                 params,
               ),
-      );
+      ) {
+    id = IdGenerator.generate();
+  }
 
   @override
   LinuxInAppWebViewController? get webViewController => _webViewController;
