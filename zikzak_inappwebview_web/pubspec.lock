@@ -50,7 +50,7 @@ packages:
     source: hosted
     version: "3.0.7"
   cupertino_ui:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: cupertino_ui
       sha256: e003b87afde18cb396ec15928c7894063d64af04462c68df9a1404c461316dd2
