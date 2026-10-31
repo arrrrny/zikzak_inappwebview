@@ -332,7 +332,7 @@ Every publishable package resolves its intra-repo dependencies through `dependen
 
 Doc staleness to be aware of:
 - `.specify/memory/tdd-profile.md` claims 10 umbrella test files / 112 tests and a green baseline — the umbrella now has 27 files / 250 tests. Treat it as partially outdated.
-- Every package is at `6.3.2`, and README installation snippets match.
+- Every package is at `6.3.3`, and README installation snippets match.
 
 ---
 

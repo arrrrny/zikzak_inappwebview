@@ -66,7 +66,7 @@ Add `zikzak_inappwebview` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  zikzak_inappwebview: ^6.3.2
+  zikzak_inappwebview: ^6.3.3
 ```
 
 ## Requirements
