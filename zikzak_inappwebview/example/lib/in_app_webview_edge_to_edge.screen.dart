@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:zikzak_inappwebview/zikzak_inappwebview.dart';
 
 /// Example demonstrating the Android `insetsForWebContentToIgnore` setting —

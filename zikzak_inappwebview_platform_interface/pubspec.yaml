@@ -18,6 +18,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  material_ui: ^1.9.0
+  cupertino_ui: ^1.1.5
   plugin_platform_interface: ^2.1.8
 
   json_annotation: ^4.12.0
