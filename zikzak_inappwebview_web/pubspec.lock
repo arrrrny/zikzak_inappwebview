@@ -301,10 +301,11 @@ packages:
   zikzak_inappwebview_platform_interface:
     dependency: "direct main"
     description:
-      path: "../zikzak_inappwebview_platform_interface"
-      relative: true
-    source: path
-    version: "6.3.3"
+      name: zikzak_inappwebview_platform_interface
+      sha256: "50ba4e17cb032b395c7cf1d7903d48cf9fa5402a43a8c3b7d5821350c6c606cb"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.3.4"
   zorphy_annotation:
     dependency: transitive
     description:

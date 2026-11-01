@@ -10,19 +10,22 @@ import 'secret_redactor.dart';
 const String kNetworkCaptureHandlerName = '__zikzakNetworkCapture__';
 
 ///Signature of the `onNetworkRequest` event.
-typedef NetworkRequestCallback =
-    void Function(InAppWebViewController controller, NetworkRequest request);
+typedef NetworkRequestCallback = void Function(
+  InAppWebViewController controller,
+  NetworkRequest request,
+);
 
 ///Signature of the `onNetworkResponse` event.
-typedef NetworkResponseCallback =
-    void Function(InAppWebViewController controller, NetworkResponse response);
+typedef NetworkResponseCallback = void Function(
+  InAppWebViewController controller,
+  NetworkResponse response,
+);
 
 ///Signature of the `onNetworkLoadingFinished` event.
-typedef NetworkResponseBodyCallback =
-    void Function(
-      InAppWebViewController controller,
-      NetworkResponseBody responseBody,
-    );
+typedef NetworkResponseBodyCallback = void Function(
+  InAppWebViewController controller,
+  NetworkResponseBody responseBody,
+);
 
 ///Dart-side engine of the Network Capture API.
 ///
@@ -182,8 +185,7 @@ class NetworkCaptureManager {
   Future<void> _flushPageQueue(InAppWebViewController controller) async {
     try {
       await controller.evaluateJavascript(
-        source:
-            'window.__zikzakNetworkCapture__ && window.__zikzakNetworkCapture__.ready ? window.__zikzakNetworkCapture__.ready() : 0;',
+        source: 'window.__zikzakNetworkCapture__ && window.__zikzakNetworkCapture__.ready ? window.__zikzakNetworkCapture__.ready() : 0;',
       );
     } catch (_) {
       // The page may not exist yet or navigation may have aborted.

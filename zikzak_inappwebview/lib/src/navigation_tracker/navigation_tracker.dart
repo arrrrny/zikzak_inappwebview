@@ -193,8 +193,7 @@ class NavigationTracker {
     if (controller == null) return;
     try {
       await controller.evaluateJavascript(
-        source:
-            'window.__zikzakNavigationTracker__ && window.__zikzakNavigationTracker__.ready ? window.__zikzakNavigationTracker__.ready() : 0;',
+        source: 'window.__zikzakNavigationTracker__ && window.__zikzakNavigationTracker__.ready ? window.__zikzakNavigationTracker__.ready() : 0;',
       );
     } catch (_) {
       // The page may not exist yet or navigation may have aborted.

@@ -399,8 +399,7 @@ class RecipeRecorder {
     if (controller == null) return;
     try {
       await controller.evaluateJavascript(
-        source:
-            'window.__zikzakRecipeTap__ && window.__zikzakRecipeTap__.ready ? window.__zikzakRecipeTap__.ready() : 0;',
+        source: 'window.__zikzakRecipeTap__ && window.__zikzakRecipeTap__.ready ? window.__zikzakRecipeTap__.ready() : 0;',
       );
     } catch (_) {
       // The page may not exist yet or navigation may have aborted.

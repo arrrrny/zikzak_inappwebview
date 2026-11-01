@@ -1,5 +1,7 @@
 import 'dart:async';
+
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
+
 import 'dispose_lifecycle.dart';
 
 ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppLocalhostServer}

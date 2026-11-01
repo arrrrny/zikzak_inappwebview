@@ -1,4 +1,5 @@
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
+
 import 'web_message_port.dart';
 
 ///{@macro zikzak_inappwebview_platform_interface.PlatformWebMessageChannel}
