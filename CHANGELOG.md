@@ -1,3 +1,13 @@
+## 6.3.4 - 2026-11-01
+
+### Dependencies
+
+- Every publishable package now declares `flutter: >=3.47.0` — the true minimum since every zuraffa 7.x (via zuraffa_session) needs meta ^1.19.0, which Flutter pins exactly up to 3.44.x. This change makes pub report the honest floor instead of a solver failure (#393).
+- Added `material_ui: ^1.9.0` and `cupertino_ui: ^1.1.5` to all 8 publishable packages, swapping framework imports from `package:flutter/material.dart` and `package:flutter/cupertino.dart` to the standalone decoupled packages — a behavior-preserving change (#392).
+- `zuraffa_session` constraint updated from `^1.1.0` to `">=1.2.1 <8.0.0"` — floor aligns with the first zuraffa-7 line, top admits the fleet-realigned 7.3.0, and consumer locks drop the zuraffa-6 CLI subtree (~580 fewer lines).
+- Dev-only `zikzak_inappwebview_module` aligned to `flutter: >=3.47.0` and `flutter_lints: ^6.0.0`.
+- Tracked pubspec.lock files refreshed via `flutter pub get`.
+
 ## 6.3.3 - 2026-10-31
 
 ### Bug Fixes

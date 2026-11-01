@@ -1,6 +1,6 @@
 name: zikzak_inappwebview_android
 description: Android implementation of the zikzak_inappwebview plugin.
-version: 6.3.3
+version: 6.3.4
 homepage: https://inappwebview.dev/
 repository: https://github.com/arrrrny/zikzak_inappwebview/tree/master/zikzak_inappwebview_android
 issue_tracker: https://github.com/arrrrny/zikzak_inappwebview/issues
@@ -19,11 +19,7 @@ dependencies:
   flutter:
     sdk: flutter
   material_ui: ^1.9.0
-  zikzak_inappwebview_platform_interface: ^6.3.3
-
-dependency_overrides:
-  zikzak_inappwebview_platform_interface:
-    path: ../zikzak_inappwebview_platform_interface
+  zikzak_inappwebview_platform_interface: ^6.3.4
 
 dev_dependencies:
   flutter_test:

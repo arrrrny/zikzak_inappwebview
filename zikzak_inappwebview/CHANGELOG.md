@@ -1,3 +1,7 @@
+## 6.3.4 - 2026-11-01
+
+* fix: address review comments on #406
+
 ## 6.3.3 - 2026-10-31
 
 ### Bug Fixes

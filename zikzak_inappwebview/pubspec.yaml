@@ -1,6 +1,6 @@
 name: zikzak_inappwebview
 description: A Flutter plugin that allows you to add an inline webview, to use an headless webview, and to open an in-app browser window.
-version: 6.3.3
+version: 6.3.4
 homepage: https://arrrrny.github.io/zikzak_inappwebview
 repository: https://github.com/arrrrny/zikzak_inappwebview
 issue_tracker: https://github.com/arrrrny/zikzak_inappwebview/issues
@@ -19,13 +19,13 @@ dependencies:
   flutter:
     sdk: flutter
   material_ui: ^1.9.0
-  zikzak_inappwebview_platform_interface: ^6.3.3
-  zikzak_inappwebview_android: ^6.3.3
-  zikzak_inappwebview_ios: ^6.3.3
-  zikzak_inappwebview_macos: ^6.3.3
-  zikzak_inappwebview_web: ^6.3.3
-  zikzak_inappwebview_windows: ^6.3.3
-  zikzak_inappwebview_linux: ^6.3.3
+  zikzak_inappwebview_platform_interface: ^6.3.4
+  zikzak_inappwebview_android: ^6.3.4
+  zikzak_inappwebview_ios: ^6.3.4
+  zikzak_inappwebview_macos: ^6.3.4
+  zikzak_inappwebview_web: ^6.3.4
+  zikzak_inappwebview_windows: ^6.3.4
+  zikzak_inappwebview_linux: ^6.3.4
   synchronized: ^3.4.1
   # 6.3.2 rides the unified zuraffa family line: zuraffa_session 7.3.0 keeps
   # the SessionPort/PortableSession contract this package codes against (the
@@ -105,21 +105,4 @@ flutter:
 false_secrets:
   - /test_node_server/*.pem
   - /test_node_server/*.pfx
-
-dependency_overrides:
-  zikzak_inappwebview_platform_interface:
-    path: ../zikzak_inappwebview_platform_interface
-  zikzak_inappwebview_android:
-    path: ../zikzak_inappwebview_android
-  zikzak_inappwebview_ios:
-    path: ../zikzak_inappwebview_ios
-  zikzak_inappwebview_macos:
-    path: ../zikzak_inappwebview_macos
-  zikzak_inappwebview_web:
-    path: ../zikzak_inappwebview_web
-  zikzak_inappwebview_windows:
-    path: ../zikzak_inappwebview_windows
-  zikzak_inappwebview_linux:
-    path: ../zikzak_inappwebview_linux
-
 
