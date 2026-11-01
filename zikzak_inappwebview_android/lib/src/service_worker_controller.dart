@@ -90,9 +90,8 @@ class AndroidServiceWorkerController extends PlatformServiceWorkerController
               .cast<String, dynamic>();
           WebResourceRequest request = WebResourceRequest.fromJson(arguments);
 
-          return (await serviceWorkerClient!.shouldInterceptRequest!(
-            request,
-          ))?.toJson();
+          return (await serviceWorkerClient!.shouldInterceptRequest!(request))
+              ?.toJson();
         }
         break;
       default:

@@ -102,9 +102,8 @@ class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
         path = _documentRoot + path;
 
         try {
-          body = (await rootBundle.load(
-            Uri.decodeFull(path),
-          )).buffer.asUint8List();
+          body = (await rootBundle.load(Uri.decodeFull(path))).buffer
+              .asUint8List();
         } catch (e) {
           print(Uri.decodeFull(path));
           print(e.toString());

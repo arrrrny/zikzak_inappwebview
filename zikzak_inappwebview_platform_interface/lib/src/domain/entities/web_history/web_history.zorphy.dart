@@ -169,9 +169,8 @@ class WebHistoryPatch extends PatchBase<WebHistory, WebHistory$> {
     patchMap[WebHistory$.list] = (List<dynamic> list) {
       var updatedList = List<WebHistoryItem>.from(list);
       if (index >= 0 && index < updatedList.length) {
-        updatedList[index] = patch(
-          WebHistoryItemPatch(),
-        ).applyTo(updatedList[index] as WebHistoryItem);
+        updatedList[index] = patch(WebHistoryItemPatch())
+            .applyTo(updatedList[index] as WebHistoryItem);
       }
       return updatedList;
     };
