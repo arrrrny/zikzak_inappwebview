@@ -103,94 +103,107 @@ List<File> swiftFilesUnder(Directory root) {
 
 void main() {
   group('open panel delegate contract (issue #408)', () {
-    test(
-      'AC1: the WKUIDelegate implements runOpenPanelWith with the WebKit '
-      'signature',
-      () {
-        final macosDir = packageMacosDir();
-        final sourcesDir = Directory('${macosDir.path}/Sources');
-        expect(sourcesDir.existsSync(), isTrue,
-            reason: 'Swift sources dir missing: ${sourcesDir.path}');
+    test('AC1: the WKUIDelegate implements runOpenPanelWith with the WebKit '
+        'signature', () {
+      final macosDir = packageMacosDir();
+      final sourcesDir = Directory('${macosDir.path}/Sources');
+      expect(
+        sourcesDir.existsSync(),
+        isTrue,
+        reason: 'Swift sources dir missing: ${sourcesDir.path}',
+      );
 
-        final implementations = <String>[];
-        final signature = RegExp(
-            r'runOpenPanelWith\s+parameters:\s*WKOpenPanelParameters');
-        for (final file in swiftFilesUnder(sourcesDir)) {
-          final code = stripSwiftNonCode(file.readAsStringSync());
-          if (signature.hasMatch(code)) implementations.add(file.path);
-        }
+      final implementations = <String>[];
+      final signature = RegExp(
+        r'runOpenPanelWith\s+parameters:\s*WKOpenPanelParameters',
+      );
+      for (final file in swiftFilesUnder(sourcesDir)) {
+        final code = stripSwiftNonCode(file.readAsStringSync());
+        if (signature.hasMatch(code)) implementations.add(file.path);
+      }
 
-        expect(implementations, hasLength(1),
-            reason:
-                'WKWebView asks its UI delegate to run the open panel on '
-                '<input type="file"> activations; without exactly one '
-                'runOpenPanelWith implementation WebKit gets no answer and '
-                'silently drops the activation — every file input on every '
-                'site stays dead (issue #408). Expected it in InAppWebView.swift '
-                'next to the JS-dialog panel implementations.');
-      },
-      timeout: const Timeout(Duration(minutes: 2)),
-    );
+      expect(
+        implementations,
+        hasLength(1),
+        reason:
+            'WKWebView asks its UI delegate to run the open panel on '
+            '<input type="file"> activations; without exactly one '
+            'runOpenPanelWith implementation WebKit gets no answer and '
+            'silently drops the activation — every file input on every '
+            'site stays dead (issue #408). Expected it in InAppWebView.swift '
+            'next to the JS-dialog panel implementations.',
+      );
+    }, timeout: const Timeout(Duration(minutes: 2)));
 
-    test(
-      'AC2: the panel is a real NSOpenPanel driven by the page parameters '
-      '(multiple / webkitdirectory)',
-      () {
-        final macosDir = packageMacosDir();
-        final sourcesDir = Directory('${macosDir.path}/Sources');
-        final code = swiftFilesUnder(sourcesDir)
-            .map((f) => stripSwiftNonCode(f.readAsStringSync()))
-            .firstWhere((c) => c.contains('runOpenPanelWith'));
+    test('AC2: the panel is a real NSOpenPanel driven by the page parameters '
+        '(multiple / webkitdirectory)', () {
+      final macosDir = packageMacosDir();
+      final sourcesDir = Directory('${macosDir.path}/Sources');
+      final code = swiftFilesUnder(sourcesDir)
+          .map((f) => stripSwiftNonCode(f.readAsStringSync()))
+          .firstWhere((c) => c.contains('runOpenPanelWith'));
 
-        expect(code.contains('NSOpenPanel()'), isTrue,
-            reason:
-                'the implementation must present a real NSOpenPanel — the '
-                'macOS open panel users expect when a site activates a file '
-                'input (issue #408)');
-        expect(code.contains('openPanel.allowsMultipleSelection = '
-            'parameters.allowsMultipleSelection'), isTrue,
-            reason:
-                'the input\'s `multiple` attribute must map to the panel\'s '
-                'allowsMultipleSelection');
-        expect(code.contains('openPanel.canChooseFiles = true'), isTrue,
-            reason: 'file uploads pick files, not directories, by default');
-        expect(code.contains(
-            'openPanel.canChooseDirectories = parameters.allowsDirectories'),
-            isTrue,
-            reason:
-                'webkitdirectory inputs must map to the panel\'s '
-                'allowsDirectories');
-      },
-      timeout: const Timeout(Duration(minutes: 2)),
-    );
+      expect(
+        code.contains('NSOpenPanel()'),
+        isTrue,
+        reason:
+            'the implementation must present a real NSOpenPanel — the '
+            'macOS open panel users expect when a site activates a file '
+            'input (issue #408)',
+      );
+      expect(
+        code.contains(
+          'openPanel.allowsMultipleSelection = '
+          'parameters.allowsMultipleSelection',
+        ),
+        isTrue,
+        reason:
+            'the input\'s `multiple` attribute must map to the panel\'s '
+            'allowsMultipleSelection',
+      );
+      expect(
+        code.contains('openPanel.canChooseFiles = true'),
+        isTrue,
+        reason: 'file uploads pick files, not directories, by default',
+      );
+      expect(
+        code.contains(
+          'openPanel.canChooseDirectories = parameters.allowsDirectories',
+        ),
+        isTrue,
+        reason:
+            'webkitdirectory inputs must map to the panel\'s '
+            'allowsDirectories',
+      );
+    }, timeout: const Timeout(Duration(minutes: 2)));
 
-    test(
-      'AC3: the completion handler fires exactly once — chosen URLs on OK, '
-      'empty on cancel',
-      () {
-        final macosDir = packageMacosDir();
-        final sourcesDir = Directory('${macosDir.path}/Sources');
-        final code = swiftFilesUnder(sourcesDir)
-            .map((f) => stripSwiftNonCode(f.readAsStringSync()))
-            .firstWhere((c) => c.contains('runOpenPanelWith'));
+    test('AC3: the completion handler fires exactly once — chosen URLs on OK, '
+        'empty on cancel', () {
+      final macosDir = packageMacosDir();
+      final sourcesDir = Directory('${macosDir.path}/Sources');
+      final code = swiftFilesUnder(sourcesDir)
+          .map((f) => stripSwiftNonCode(f.readAsStringSync()))
+          .firstWhere((c) => c.contains('runOpenPanelWith'));
 
-        expect(code.contains('completionHandler(openPanel.urls)'), isTrue,
-            reason:
-                'a picked selection must reach WebKit via the completion '
-                'handler, or the input stays empty even after the user '
-                'confirms (issue #408)');
-        expect(
-            RegExp(
-              r'else\s*\{\s*completionHandler\(\[\]\)',
-              multiLine: true,
-            ).hasMatch(code),
-            isTrue,
-            reason:
-                'cancel/dismiss must complete with an empty selection so '
-                'WebKit is never left waiting on an unanswered picker');
-      },
-      timeout: const Timeout(Duration(minutes: 2)),
-    );
+      expect(
+        code.contains('completionHandler(openPanel.urls)'),
+        isTrue,
+        reason:
+            'a picked selection must reach WebKit via the completion '
+            'handler, or the input stays empty even after the user '
+            'confirms (issue #408)',
+      );
+      expect(
+        RegExp(
+          r'else\s*\{\s*completionHandler\(\[\]\)',
+          multiLine: true,
+        ).hasMatch(code),
+        isTrue,
+        reason:
+            'cancel/dismiss must complete with an empty selection so '
+            'WebKit is never left waiting on an unanswered picker',
+      );
+    }, timeout: const Timeout(Duration(minutes: 2)));
 
     test(
       'AC4: headless webviews fail fast instead of surfacing a GUI panel',
@@ -201,12 +214,15 @@ void main() {
             .map((f) => stripSwiftNonCode(f.readAsStringSync()))
             .firstWhere((c) => c.contains('runOpenPanelWith'));
 
-        expect(code.contains('if isHeadlessOffscreen'), isTrue,
-            reason:
-                'a headless webview has no user to pick files: it must cancel '
-                'with an empty selection instead of surfacing a GUI panel '
-                'from an automation context (mirrors the PasskeyBridge '
-                'headless handling)');
+        expect(
+          code.contains('if isHeadlessOffscreen'),
+          isTrue,
+          reason:
+              'a headless webview has no user to pick files: it must cancel '
+              'with an empty selection instead of surfacing a GUI panel '
+              'from an automation context (mirrors the PasskeyBridge '
+              'headless handling)',
+        );
       },
       timeout: const Timeout(Duration(minutes: 2)),
     );
