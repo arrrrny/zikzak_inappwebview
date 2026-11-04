@@ -3454,6 +3454,52 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         }
     }
 
+    // MARK: - File open panel (WKUIDelegate)
+    //
+    // Completes the WKUIDelegate panel family: WKWebView answers an
+    // <input type="file"> activation by asking its UI delegate to run an open
+    // panel (webView:runOpenPanelWith:initiatedByFrame:completionHandler:).
+    // This class implemented the JS-dialog half (runJavaScriptAlertPanelWithMessage
+    // / ...ConfirmPanel / ...TextInputPanel above) but never the open panel, so
+    // WebKit got no answer and silently dropped the activation — every
+    // <input type="file"> on every site was dead (no panel, no event, the
+    // input stayed empty; TikTok Studio upload did nothing). See issue #408.
+    //
+    // The panel parameters come straight from the page: allowsMultipleSelection
+    // mirrors the input's `multiple` attribute and allowsDirectories its
+    // webkitdirectory, files-only otherwise. The completion handler fires
+    // exactly once — the chosen URLs on OK, [] on cancel/dismiss — so WebKit
+    // is never left waiting on an unanswered picker.
+    //
+    // Sandboxed embedding apps need the
+    // com.apple.security.files.user-selected.read-write entitlement for
+    // NSOpenPanel; without the sandbox the panel simply works.
+    //
+    // Headless webviews have no user to pick files: fail fast with an empty
+    // selection instead of surfacing a GUI panel from an automation context
+    // (mirrors the PasskeyBridge headless handling). Programmatic file
+    // attachment does not route through this delegate method.
+    public func webView(
+        _ webView: WKWebView, runOpenPanelWith parameters: WKOpenPanelParameters,
+        initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping ([URL]?) -> Void
+    ) {
+        if isHeadlessOffscreen {
+            completionHandler([])
+            return
+        }
+        let openPanel = NSOpenPanel()
+        openPanel.canChooseFiles = true
+        openPanel.canChooseDirectories = parameters.allowsDirectories
+        openPanel.allowsMultipleSelection = parameters.allowsMultipleSelection
+        openPanel.begin { response in
+            if response == .OK, !openPanel.urls.isEmpty {
+                completionHandler(openPanel.urls)
+            } else {
+                completionHandler([])
+            }
+        }
+    }
+
     // MARK: - Media capture / device orientation permission (macOS 12+)
     //
     // Ports the iOS WKUIDelegate implementation

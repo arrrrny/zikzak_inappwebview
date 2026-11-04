@@ -1,3 +1,9 @@
+## Unreleased
+
+### Bug Fixes
+
+- [macOS] File inputs work — an `<input type="file">` activation now presents the macOS open panel. The macOS `InAppWebView` implemented the JS-dialog half of the WKUIDelegate panel family (`runJavaScriptAlertPanelWithMessage` / `...ConfirmPanel` / `...TextInputPanel`) but never `webView(_:runOpenPanelWith:initiatedByFrame:completionHandler:)`, so WebKit asked, got no answer, and silently dropped the activation: no panel, no event, the input stayed empty — every file upload from every site was dead (TikTok Studio upload did nothing) (#408). The delegate now presents a real `NSOpenPanel` mapped from the page's parameters (`allowsMultipleSelection` ← the input's `multiple` attribute, `allowsDirectories` ← `webkitdirectory`, files-only otherwise) and always completes exactly once — chosen URLs on OK, `[]` on cancel/dismiss — so WebKit is never left waiting on an unanswered picker. Headless webviews fail fast with an empty selection instead of surfacing a GUI panel from an automation context (mirrors the PasskeyBridge headless handling). Sandboxed embedding apps need the `com.apple.security.files.user-selected.read-write` entitlement; without the sandbox the panel simply works
+
 ## 6.3.4 - 2026-11-01
 
 * fix: address review comments on #406
