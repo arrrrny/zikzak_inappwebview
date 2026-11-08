@@ -188,24 +188,33 @@ jobs:
   # the runner's SDK, which is a hard build failure for consumers on older Xcode
   # (see the two-arm `#if compiler(>=6.0)` override in InAppWebView.swift).
   #
-  # That override has one arm per toolchain generation, so the example is built
-  # on two runners: macos-14 (Xcode 15, Swift 5.10) compiles the `#else` arm and
-  # macos-15 (Xcode 16, Swift 6) compiles the `#if` arm. A local Xcode 26 only
-  # ever compiles the latter.
+  # That override has one arm per toolchain generation, and this job used to be
+  # built on two runners: macos-14 (Xcode 15, Swift 5.10) compiled the `#else`
+  # arm and macos-15 (Xcode 16, Swift 6) compiles the `#if` arm. A local Xcode 26
+  # only ever compiles the latter.
   #
-  # macos-14 is the `#else` arm's only home — macos-15's oldest Xcode is 16.0,
-  # already Swift 6 — and actions/runner-images has announced it goes unsupported
-  # on November 2. When that lands the `#else` arm has no runner left; the
-  # matrix then needs reworking (drop the arm if no supported toolchain still
-  # needs it, or find another pre-Swift-6 toolchain) rather than deleting it
-  # silently.
+  # macos-14 was the `#else` arm's only home, and actions/runner-images retired
+  # every macOS 14 image on November 2, 2026 (#412). The leg then stopped
+  # starting at all — `The configuration 'macos-14-arm64-us-default' is not
+  # supported`, cancelled at 0s with no steps run — which read as a red build on
+  # every PR. There is no hosted pre-Swift-6 runner left to move it to: macOS 13
+  # is gone from the image list, macOS 15 and 26 ship Xcode 16+ (already
+  # Swift 6), and macOS 14 Intel images survive only in Azure DevOps.
+  #
+  # So the runner is dropped and the arm is KEPT. `Package.swift` declares
+  # `swift-tools-version: 5.9`, so Xcode 15 consumers are still supported and
+  # the `#else` arm is still what they compile; deleting it would silently drop
+  # them. The consequence is an explicit coverage gap, not a silent one: CI now
+  # compiles the `#if` arm only. Re-close it by pointing this matrix at a
+  # self-hosted or pinned pre-Swift-6 toolchain — add the runner back here, the
+  # toolchain assertion below already covers the `#else` branch.
   build-ios:
     name: "build: zikzak_inappwebview_ios (iOS, ${{ matrix.runner }})"
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
       matrix:
-        runner: [macos-14, macos-15]
+        runner: [macos-15]
     steps:
       - uses: actions/checkout@v4
       - name: Check the toolchain compiles the arm this job exists for
@@ -219,13 +228,14 @@ jobs:
               *) echo "::error::macos-15 must run a Swift 6 toolchain"; exit 1 ;;
             esac
           else
-            # This runner is here for the `#else` arm. If the image's default
-            # Xcode ever moves to Swift 6, this job would compile the `#if` arm
-            # instead and silently leave `#else` uncovered — the gap #333 exists
-            # to close — so fail instead.
+            # A pre-Swift-6 runner would be here for the `#else` arm (none is
+            # configured today — see the comment above build-ios). If such an
+            # image's default Xcode ever moves to Swift 6, this job would
+            # compile the `#if` arm instead and silently leave `#else`
+            # uncovered — the gap #333 exists to close — so fail instead.
             case "$version" in
               *"Swift version 6"*)
-                echo "::error::macos-14 must run a pre-Swift-6 toolchain"; exit 1 ;;
+                echo "::error::${{ matrix.runner }} must run a pre-Swift-6 toolchain"; exit 1 ;;
             esac
           fi
       - uses: subosito/flutter-action@v2
@@ -266,8 +276,8 @@ jobs:
   # `#if compiler` arm (the only version conditionals are `@available(macOS …)`,
   # all at or below the package's macOS 12.0 floor and the example's 13.5
   # deployment target), so a second runner would compile the same arm twice.
-  # macos-14 is deliberately not used: actions/runner-images has announced it
-  # goes unsupported on November 2, and nothing here needs a pre-Swift-6
+  # macos-14 is deliberately not used: actions/runner-images retired every
+  # macOS 14 image on 2026-11-02 (#412), and nothing here needs a pre-Swift-6
   # toolchain.
   build-macos:
     name: "build: zikzak_inappwebview_macos (macOS)"
