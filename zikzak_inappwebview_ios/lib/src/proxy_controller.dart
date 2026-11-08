@@ -1,8 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
-class IosProxyControllerCreationParams
-    extends PlatformProxyControllerCreationParams {
+class IosProxyControllerCreationParams extends PlatformProxyControllerCreationParams {
   /// Creates a new [IosProxyControllerCreationParams] instance.
   const IosProxyControllerCreationParams(
     // This parameter prevents breaking changes later.
@@ -18,19 +17,14 @@ class IosProxyControllerCreationParams
   }
 }
 
-class IosProxyController extends PlatformProxyController
-    with ChannelController {
+class IosProxyController extends PlatformProxyController with ChannelController {
   IosProxyController(PlatformProxyControllerCreationParams params)
     : super.implementation(
         params is IosProxyControllerCreationParams
             ? params
-            : IosProxyControllerCreationParams.fromPlatformProxyControllerCreationParams(
-                params,
-              ),
+            : IosProxyControllerCreationParams.fromPlatformProxyControllerCreationParams(params),
       ) {
-    channel = const MethodChannel(
-      'wtf.zikzak/zikzak_inappwebview_proxycontroller',
-    );
+    channel = const MethodChannel('wtf.zikzak/zikzak_inappwebview_proxycontroller');
     handler = _handleMethod;
     initMethodCallHandler();
   }
@@ -42,24 +36,30 @@ class IosProxyController extends PlatformProxyController
   }
 
   static IosProxyController _init() {
-    _instance = IosProxyController(
-      IosProxyControllerCreationParams(
-        const PlatformProxyControllerCreationParams(),
-      ),
-    );
+    _instance = IosProxyController(IosProxyControllerCreationParams(const PlatformProxyControllerCreationParams()));
     return _instance!;
   }
 
   @override
   Future<void> setProxyOverride({required ProxySettings settings}) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("settings", () => settings.iOSProxySettings?.toJson());
+    final args = <String, dynamic>{'settings': settings.iOSProxySettings?.toJson()};
+    // Per-profile proxies (issue #410 / consumer FR-007): the profileId keys
+    // the native registry the WebView factory consults when a persistent
+    // WKWebsiteDataStore is created — without it the configuration only ever
+    // reaches the default store, and isolated profiles egress directly.
+    if (settings.profileId != null) {
+      args['profileId'] = settings.profileId;
+    }
     await channel?.invokeMethod('setProxyOverride', args);
   }
 
   @override
   Future<void> clearProxyOverride({String? profileId}) async {
-    await channel?.invokeMethod('clearProxyOverride');
+    final args = <String, dynamic>{};
+    if (profileId != null) {
+      args['profileId'] = profileId;
+    }
+    await channel?.invokeMethod('clearProxyOverride', args);
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {}

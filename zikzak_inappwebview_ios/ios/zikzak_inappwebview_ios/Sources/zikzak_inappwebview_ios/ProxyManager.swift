@@ -15,6 +15,14 @@ public class ProxyManager: ChannelDelegate {
 
     private var plugin: SwiftFlutterPlugin?
 
+    /// Per-profile proxy configurations keyed by persistentStoreIdentifier
+    /// (issue #410, mirrors the macOS ProxyManager). When a WebView is
+    /// created with a custom data store, the proxy for its identifier is
+    /// applied to that data store by `applyProxy(forIdentifier:to:)` —
+    /// without the registry the configuration only ever reached the default
+    /// store, and isolated profiles egressed directly.
+    static var profileProxies: [String: ProxyConfiguration] = [:]
+
     init(plugin: SwiftFlutterPlugin) {
         super.init(
             channel: FlutterMethodChannel(
@@ -29,10 +37,13 @@ public class ProxyManager: ChannelDelegate {
         case "setProxyOverride":
             if let args = arguments?["settings"] as? [String: Any] {
                 let settings = ProxySettings.fromMap(args)
+                let profileId = arguments?["profileId"] as? String
                 do {
                     let proxyConfiguration = try resolveProxyConfiguration(settings)
-                    let websiteDataStore = WKWebsiteDataStore.default()
-                    websiteDataStore.proxyConfigurations = [proxyConfiguration]
+                    if let pid = profileId, !pid.isEmpty {
+                        ProxyManager.profileProxies[pid] = proxyConfiguration
+                    }
+                    WKWebsiteDataStore.default().proxyConfigurations = [proxyConfiguration]
                     result(true)
                 } catch let error as ProxyConfigurationError {
                     result(FlutterError(code: error.code, message: error.message, details: nil))
@@ -48,6 +59,12 @@ public class ProxyManager: ChannelDelegate {
                 break
             }
         case "clearProxyOverride":
+            if let args = arguments as? [String: Any],
+               let profileId = args["profileId"] as? String {
+                ProxyManager.profileProxies.removeValue(forKey: profileId)
+            } else {
+                ProxyManager.profileProxies.removeAll()
+            }
             WKWebsiteDataStore.default().proxyConfigurations = []
             result(true)
             break
@@ -55,6 +72,14 @@ public class ProxyManager: ChannelDelegate {
             result(FlutterMethodNotImplemented)
             break
         }
+    }
+
+    /// Applies the stored proxy configuration for [identifier] to [dataStore].
+    /// Called by the WebView factory when a custom data store is created
+    /// (mirrors the macOS port; issue #410).
+    public static func applyProxy(forIdentifier identifier: String, to dataStore: WKWebsiteDataStore) {
+        guard let config = profileProxies[identifier] else { return }
+        dataStore.proxyConfigurations = [config]
     }
 
     private func resolveProxyConfiguration(_ settings: ProxySettings) throws -> ProxyConfiguration {
@@ -161,7 +186,7 @@ public class ProxyManager: ChannelDelegate {
                 !labelValue.hasSuffix("-"),
                 labelValue.range(
                     of: "^[A-Za-z0-9-]+$", options: NSString.CompareOptions.regularExpression)
-                    != nil
+                != nil
             else {
                 return false
             }

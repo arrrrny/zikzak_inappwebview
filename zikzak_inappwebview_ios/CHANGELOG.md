@@ -1,3 +1,7 @@
+## Unreleased
+
+- [iOS] Per-profile proxy configurations reach persistent data stores (#410). The iOS `ProxyController` dropped `ProxySettings.profileId` entirely — the Dart side never put it on the method channel and the native `ProxyManager` never read it — so the resolved `ProxyConfiguration` only ever reached `WKWebsiteDataStore.default()`. Every WebView created with a `persistentStoreIdentifier` (the consumer's per-profile `WKWebsiteDataStore`s) egressed directly: enabling a global, managed, or per-profile proxy on iOS routed no traffic for isolated profiles. The port now mirrors the macOS design exactly: the Dart `IosProxyController` forwards `profileId` on `setProxyOverride` and `clearProxyOverride`, the native `ProxyManager` keeps the static `profileProxies` registry (a `profileId`-scoped clear removes only that entry; a bare clear wipes the registry), the persistent-store creation site in `InAppWebView.swift` applies the registry via the new `ProxyManager.applyProxy(forIdentifier:to:)` before assigning `configuration.websiteDataStore`, and a host-runnable source-contract test (`ios_proxy_profile_registry_contract_test`) pins the whole chain so the defect class cannot silently return. `build-ios` CI remains the compile gate.
+
 ## 6.3.4 - 2026-11-01
 
 * fix: address review comments on #406
