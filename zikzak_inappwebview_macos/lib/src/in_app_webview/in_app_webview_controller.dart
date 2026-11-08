@@ -634,6 +634,51 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
     );
   }
 
+  // Issue #416: the inject-* trio. The native handlers already ship
+  // (InAppWebView.swift cases "injectCSSCode" ~1325, "injectCSSFileFromUrl"
+  // ~1333, "injectJavascriptFileFromUrl" ~1313 — the exact iOS approach via
+  // injectDeferredObject), but the Dart controller never overrode the
+  // platform-interface stubs, so every call threw UnimplementedError before
+  // reaching the channel. Same failure class as #375/#376 (callAsyncJavaScript)
+  // and #397 (reloadFromOrigin). Argument encoding mirrors the iOS/Android
+  // controllers byte for byte.
+  @override
+  Future<void> injectCSSCode({required String source}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('source', () => source);
+    await _channel.invokeMethod('injectCSSCode', args);
+  }
+
+  @override
+  Future<void> injectCSSFileFromUrl({
+    required WebUri urlFile,
+    CSSLinkHtmlTagAttributes? cssLinkHtmlTagAttributes,
+  }) async {
+    assert(urlFile.toString().isNotEmpty);
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('urlFile', () => urlFile.toString());
+    args.putIfAbsent(
+      'cssLinkHtmlTagAttributes',
+      () => cssLinkHtmlTagAttributes?.toJson(),
+    );
+    await _channel.invokeMethod('injectCSSFileFromUrl', args);
+  }
+
+  @override
+  Future<void> injectJavascriptFileFromUrl({
+    required WebUri urlFile,
+    ScriptHtmlTagAttributes? scriptHtmlTagAttributes,
+  }) async {
+    assert(urlFile.toString().isNotEmpty);
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('urlFile', () => urlFile.toString());
+    args.putIfAbsent(
+      'scriptHtmlTagAttributes',
+      () => scriptHtmlTagAttributes?.toMap(),
+    );
+    await _channel.invokeMethod('injectJavascriptFileFromUrl', args);
+  }
+
   @override
   Future<void> pressKey({
     required String key,
