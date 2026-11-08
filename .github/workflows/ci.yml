@@ -270,9 +270,9 @@ jobs:
   # compiled instead and every regression below would ship green. The
   # post-`pub get` assertion is what keeps that from silently regressing.
   #
-  # Why one runner and not the two build-ios uses: build-ios splits because
+  # Why one runner, not the two build-ios once used: build-ios split because
   # InAppWebView.swift has a genuine two-arm `#if compiler(>=6.0)` override, so
-  # each runner compiles an arm the other cannot. No macOS source has an
+  # each runner compiled an arm the other could not. No macOS source has an
   # `#if compiler` arm (the only version conditionals are `@available(macOS …)`,
   # all at or below the package's macOS 12.0 floor and the example's 13.5
   # deployment target), so a second runner would compile the same arm twice.
