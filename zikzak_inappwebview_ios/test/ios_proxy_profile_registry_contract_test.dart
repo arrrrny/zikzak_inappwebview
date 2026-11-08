@@ -14,6 +14,12 @@
 // source scans (Dart + Swift) so they are executable on any host (no Xcode
 // required). They prove code *shape*, never that it compiles — the
 // build-ios CI job remains the layer that type-checks these sources.
+//
+// NOTE ON FAILURES: these are PIN tests, not behavior tests. An assertion
+// that fails after a semantic-preserving refactor (a renamed local, a map
+// written as a literal) means the SPELLING moved, not that the fix broke.
+// Re-read the scanned function before "fixing" the test by pasting the new
+// spelling back — the behavior the pin exists for is the thing to preserve.
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -72,7 +78,9 @@ String stripSwiftComments(String source) {
         if (source[j] == '"' || source[j] == '\n') break;
         j++;
       }
-      final end = (j < source.length && source[j] == '"') ? j + 1 : source.length;
+      final end = (j < source.length && source[j] == '"')
+          ? j + 1
+          : source.length;
       out.write(source.substring(i, end));
       i = end;
       continue;
@@ -106,6 +114,15 @@ String functionBody(String code, int start) {
   return '';
 }
 
+/// Returns the text of the `switch` case starting at [start], up to the next
+/// `case "` marker (or the end of the source). [functionBody] stops at the
+/// first `{`, which for a case body is the first `if`/`do` block — not the
+/// whole case, so it cannot prove anything about the branches after it.
+String caseSpan(String code, int start) {
+  final next = code.indexOf('case "', start + 1);
+  return code.substring(start, next == -1 ? code.length : next);
+}
+
 /// Locates the iOS package root (`ios/zikzak_inappwebview_ios`) relative to
 /// the current working directory, walking up so the test also resolves when
 /// invoked from a subdirectory of the package (ported from
@@ -137,26 +154,43 @@ void main() {
 
     setUpAll(() {
       final pkg = packageDir().path;
-      dartController = stripDartComments(File('$pkg/../../lib/src/proxy_controller.dart').readAsStringSync());
-      proxyManager = readStripped('$pkg/Sources/zikzak_inappwebview_ios/ProxyManager.swift');
-      inAppWebView = readStripped('$pkg/Sources/zikzak_inappwebview_ios/InAppWebView/InAppWebView.swift');
-    });
-
-    test('Dart IosProxyController.setProxyOverride forwards settings.profileId', () {
-      final start = dartController.indexOf('setProxyOverride');
-      expect(start, greaterThanOrEqualTo(0), reason: 'setProxyOverride not found');
-      final bodyStart = dartController.indexOf("async", start);
-      final body = functionBody(dartController, bodyStart);
-      expect(
-        body,
-        contains("args['profileId'] = settings.profileId"),
-        reason: 'the profileId must cross the method channel — without it the native registry can never be keyed (issue #410)',
+      dartController = stripDartComments(
+        File('$pkg/../../lib/src/proxy_controller.dart').readAsStringSync(),
+      );
+      proxyManager = readStripped(
+        '$pkg/Sources/zikzak_inappwebview_ios/ProxyManager.swift',
+      );
+      inAppWebView = readStripped(
+        '$pkg/Sources/zikzak_inappwebview_ios/InAppWebView/InAppWebView.swift',
       );
     });
 
+    test(
+      'Dart IosProxyController.setProxyOverride forwards settings.profileId',
+      () {
+        final start = dartController.indexOf('setProxyOverride');
+        expect(
+          start,
+          greaterThanOrEqualTo(0),
+          reason: 'setProxyOverride not found',
+        );
+        final bodyStart = dartController.indexOf("async", start);
+        final body = functionBody(dartController, bodyStart);
+        expect(
+          body,
+          contains("args['profileId'] = settings.profileId"),
+          reason: 'the profileId must cross the method channel — without it the native registry can never be keyed (issue #410)',
+        );
+      },
+    );
+
     test('Dart IosProxyController.clearProxyOverride forwards the profileId argument', () {
       final start = dartController.indexOf('clearProxyOverride');
-      expect(start, greaterThanOrEqualTo(0), reason: 'clearProxyOverride not found');
+      expect(
+        start,
+        greaterThanOrEqualTo(0),
+        reason: 'clearProxyOverride not found',
+      );
       final bodyStart = dartController.indexOf("async", start);
       final body = functionBody(dartController, bodyStart);
       expect(
@@ -180,7 +214,8 @@ void main() {
       expect(
         proxyManager,
         contains('arguments?["profileId"] as? String'),
-        reason: 'the native side must read the profileId the Dart controller sends',
+        reason:
+            'the native side must read the profileId the Dart controller sends',
       );
       expect(
         proxyManager,
@@ -189,40 +224,133 @@ void main() {
       );
     });
 
-    test('Swift ProxyManager scopes clears to the profile and exposes applyProxy', () {
+    test(
+      'Swift ProxyManager scopes clears to the profile and exposes applyProxy',
+      () {
+        final clearStart = proxyManager.indexOf('case "clearProxyOverride"');
+        expect(
+          clearStart,
+          greaterThanOrEqualTo(0),
+          reason: 'clearProxyOverride case not found',
+        );
+        final clearBody = caseSpan(proxyManager, clearStart);
+        expect(
+          clearBody,
+          contains('profileProxies.removeValue(forKey:'),
+          reason: 'clearing one profile must not wipe the other profiles\' routes (issue #410)',
+        );
+        expect(
+          clearBody,
+          contains('ProxyManager.profileProxies.removeAll()'),
+          reason: 'a global clear (no profileId) must wipe the whole registry (issue #410)',
+        );
+        expect(
+          proxyManager,
+          contains(
+            'static func applyProxy(forIdentifier identifier: String, to dataStore: WKWebsiteDataStore)',
+          ),
+          reason: 'the WebView factory needs the macOS-style application seam (issue #410)',
+        );
+        expect(
+          proxyManager,
+          contains('dataStore.proxyConfigurations = [config]'),
+          reason: 'applyProxy must write the stored configuration onto the custom data store',
+        );
+      },
+    );
+
+    test('a per-profile set never writes the shared store', () {
+      final setStart = proxyManager.indexOf('case "setProxyOverride"');
       expect(
-        proxyManager,
-        contains('ProxyManager.profileProxies.removeValue(forKey: profileId)'),
-        reason: 'clearing one profile must not wipe the other profiles\' routes (issue #410)',
+        setStart,
+        greaterThanOrEqualTo(0),
+        reason: 'setProxyOverride case not found',
+      );
+      final setBody = caseSpan(proxyManager, setStart);
+      expect(
+        setBody,
+        contains(
+          'WKWebsiteDataStore.default().proxyConfigurations = [proxyConfiguration]',
+        ),
+        reason: 'the identifier-less (shared) set is the only one that may write the default store',
+      );
+      // The default-store write must sit in the ELSE branch of the profileId
+      // test, never on the common path: an unconditional write is exactly the
+      // leak this pins against.
+      final elseIndex = setBody.indexOf('} else {');
+      expect(
+        elseIndex,
+        greaterThanOrEqualTo(0),
+        reason: 'the shared/default branch is missing',
       );
       expect(
-        proxyManager,
-        contains('ProxyManager.profileProxies.removeAll()'),
-        reason: 'a global clear (no profileId) must wipe the whole registry (issue #410)',
-      );
-      expect(
-        proxyManager,
-        contains('static func applyProxy(forIdentifier identifier: String, to dataStore: WKWebsiteDataStore)'),
-        reason: 'the WebView factory needs the macOS-style application seam (issue #410)',
-      );
-      expect(
-        proxyManager,
-        contains('dataStore.proxyConfigurations = [config]'),
-        reason: 'applyProxy must write the stored configuration onto the custom data store',
+        setBody.indexOf('WKWebsiteDataStore.default().proxyConfigurations'),
+        greaterThan(elseIndex),
+        reason: 'a per-profile set must not stamp its route onto the shared store (issue #410)',
       );
     });
 
-    test('the persistent-store creation site applies the registry to the store', () {
+    test('registry keys are canonicalised the way persistentUUID trims', () {
       expect(
-        inAppWebView,
-        contains('ProxyManager.applyProxy(forIdentifier: id, to: store)'),
-        reason: 'a WebView created with a persistentStoreIdentifier must receive its profile\'s proxy at data-store creation — this is the exact line that was missing (issue #410)',
+        proxyManager,
+        contains('trimmingCharacters(in: .whitespacesAndNewlines)'),
+        reason: 'a padded profileId must address the same entry as a padded persistentStoreIdentifier',
+      );
+      final applyStart = proxyManager.indexOf(
+        'static func applyProxy(forIdentifier',
       );
       expect(
-        inAppWebView,
-        contains('configuration.websiteDataStore = store'),
-        reason: 'the proxied store must be the one assigned to the configuration',
+        applyStart,
+        greaterThanOrEqualTo(0),
+        reason: 'applyProxy not found',
+      );
+      final applyBody = functionBody(proxyManager, applyStart);
+      expect(
+        applyBody,
+        contains('registryKey('),
+        reason: 'the lookup key must go through the same canonicalisation as the store path',
       );
     });
+
+    test('live stores of a profile receive a new override immediately', () {
+      expect(
+        proxyManager,
+        contains('private static var liveStores'),
+        reason: 'a toggle must reach data stores that already exist, not only future ones (issue #410)',
+      );
+      final applyStart = proxyManager.indexOf(
+        'static func applyProxy(forIdentifier',
+      );
+      final applyBody = functionBody(proxyManager, applyStart);
+      expect(
+        applyBody,
+        contains('registerLiveStore('),
+        reason: 'applyProxy is the only place a store is created for a profile — it must register it',
+      );
+      final setStart = proxyManager.indexOf('case "setProxyOverride"');
+      final setBody = caseSpan(proxyManager, setStart);
+      expect(
+        setBody,
+        contains('applyProxyToLiveStores('),
+        reason: 'setProxyOverride must push the configuration onto the profile\'s live stores',
+      );
+    });
+
+    test(
+      'the persistent-store creation site applies the registry to the store',
+      () {
+        expect(
+          inAppWebView,
+          contains('ProxyManager.applyProxy(forIdentifier: id, to: store)'),
+          reason: 'a WebView created with a persistentStoreIdentifier must receive its profile\'s proxy at data-store creation — this is the exact line that was missing (issue #410)',
+        );
+        expect(
+          inAppWebView,
+          contains('configuration.websiteDataStore = store'),
+          reason:
+              'the proxied store must be the one assigned to the configuration',
+        );
+      },
+    );
   });
 }

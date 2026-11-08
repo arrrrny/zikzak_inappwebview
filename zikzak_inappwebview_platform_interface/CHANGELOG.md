@@ -1,3 +1,7 @@
+## Unreleased
+
+- [iOS] `ProxySettings.profileId` documents how the per-profile proxy is applied: at the profile's `WKWebsiteDataStore` creation, and re-applied to every live store when the override is set. WebKit applies `proxyConfigurations` only to web content processes created after the write, so a page already loading keeps its previous route until its process is recreated — a consumer wanting an immediate switch reloads or recreates the tab. The identifier is trimmed, matching `persistentStoreIdentifier` (#410).
+
 ## 6.3.4 - 2026-11-01
 
 * fix: address review comments on #406

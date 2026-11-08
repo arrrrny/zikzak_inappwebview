@@ -103,6 +103,15 @@ class ProxySettings {
 
   /// Optional profile identifier — when set, the proxy is stored per-profile
   /// and applied to the WKWebsiteDataStore with that persistent identifier.
+  ///
+  /// On iOS the configuration is applied when the profile's data store is
+  /// created, and re-applied to every live store of that profile when the
+  /// override is set. WebKit applies `proxyConfigurations` only to web
+  /// content processes created after the write, so a page that is already
+  /// loading keeps its previous route until its process is recreated — a
+  /// consumer that wants an immediate switch must reload (or recreate) the
+  /// tab. The identifier is trimmed, matching how
+  /// `persistentStoreIdentifier` is canonicalised.
   String? profileId;
 
   ProxySettings({
