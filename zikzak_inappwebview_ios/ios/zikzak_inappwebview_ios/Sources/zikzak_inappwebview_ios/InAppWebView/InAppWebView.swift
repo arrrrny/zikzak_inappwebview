@@ -885,7 +885,14 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 } else if #available(iOS 17.0, *),
                    let id = settings.persistentStoreIdentifier, !id.isEmpty,
                    let uuid = persistentUUID(from: id) {
-                    configuration.websiteDataStore = WKWebsiteDataStore(forIdentifier: uuid)
+                    let store = WKWebsiteDataStore(forIdentifier: uuid)
+                    // Apply the per-profile proxy (if any) to this custom
+                    // data store — the Dart ProxyController sets the
+                    // registry entry, but WebViews with a persistent
+                    // identifier use a custom store that misses the
+                    // proxy otherwise (issue #410, mirrors macOS).
+                    ProxyManager.applyProxy(forIdentifier: id, to: store)
+                    configuration.websiteDataStore = store
                     dataStoreWasSelected = true
                 } else if settings.cacheEnabled {
                     configuration.websiteDataStore = WKWebsiteDataStore.default()
