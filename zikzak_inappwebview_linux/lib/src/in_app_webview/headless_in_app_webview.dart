@@ -1,28 +1,43 @@
-import 'dart:async';
+import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
-
+import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 import '../find_interaction/find_interaction_controller.dart';
+import '../webview_environment/webview_environment.dart';
 import 'in_app_webview_controller.dart';
 
+/// Object specifying creation parameters for creating a [LinuxHeadlessInAppWebView].
+///
+/// When adding additional fields make sure they can be null or have a default
+/// value to avoid breaking changes. See [PlatformHeadlessInAppWebViewCreationParams] for
+/// more information.
+@immutable
 class LinuxHeadlessInAppWebViewCreationParams
     extends PlatformHeadlessInAppWebViewCreationParams {
+  /// Creates a new [LinuxHeadlessInAppWebViewCreationParams] instance.
   LinuxHeadlessInAppWebViewCreationParams({
     super.controllerFromPlatform,
     super.initialSize,
     super.windowId,
+    this.webViewEnvironment,
     super.onWebViewCreated,
     super.onLoadStart,
     super.onLoadStop,
+    @Deprecated('Use onReceivedError instead') super.onLoadError,
     super.onReceivedError,
+    @Deprecated("Use onReceivedHttpError instead") super.onLoadHttpError,
     super.onReceivedHttpError,
     super.onProgressChanged,
     super.onConsoleMessage,
     super.shouldOverrideUrlLoading,
     super.onLoadResource,
     super.onScrollChanged,
-    super.onDownloadStartRequest,
+    @Deprecated('Use onDownloadStarting instead') super.onDownloadStart,
+    @Deprecated('Use onDownloadStarting instead') super.onDownloadStartRequest,
+    super.onDownloadStarting,
+    @Deprecated('Use onLoadResourceWithCustomScheme instead')
+    super.onLoadResourceCustomScheme,
     super.onLoadResourceWithCustomScheme,
     super.onCreateWindow,
     super.onCloseWindow,
@@ -32,11 +47,14 @@ class LinuxHeadlessInAppWebViewCreationParams
     super.onReceivedHttpAuthRequest,
     super.onReceivedServerTrustAuthRequest,
     super.onReceivedClientCertRequest,
+    @Deprecated('Use FindInteractionController.onFindResultReceived instead')
+    super.onFindResultReceived,
     super.shouldInterceptAjaxRequest,
     super.onAjaxReadyStateChange,
     super.onAjaxProgress,
     super.shouldInterceptFetchRequest,
     super.onUpdateVisitedHistory,
+    @Deprecated("Use onPrintRequest instead") super.onPrint,
     super.onPrintRequest,
     super.onLongPressHitTestResult,
     super.onEnterFullscreen,
@@ -47,24 +65,58 @@ class LinuxHeadlessInAppWebViewCreationParams
     super.onWindowBlur,
     super.onOverScrolled,
     super.onZoomScaleChanged,
+    @Deprecated('Use onSafeBrowsingHit instead') super.androidOnSafeBrowsingHit,
     super.onSafeBrowsingHit,
+    @Deprecated('Use onPermissionRequest instead')
+    super.androidOnPermissionRequest,
     super.onPermissionRequest,
+    @Deprecated('Use onGeolocationPermissionsShowPrompt instead')
+    super.androidOnGeolocationPermissionsShowPrompt,
     super.onGeolocationPermissionsShowPrompt,
+    @Deprecated('Use onGeolocationPermissionsHidePrompt instead')
+    super.androidOnGeolocationPermissionsHidePrompt,
     super.onGeolocationPermissionsHidePrompt,
+    @Deprecated('Use shouldInterceptRequest instead')
+    super.androidShouldInterceptRequest,
     super.shouldInterceptRequest,
+    @Deprecated('Use onRenderProcessGone instead')
+    super.androidOnRenderProcessGone,
     super.onRenderProcessGone,
+    @Deprecated('Use onRenderProcessResponsive instead')
+    super.androidOnRenderProcessResponsive,
     super.onRenderProcessResponsive,
+    @Deprecated('Use onRenderProcessUnresponsive instead')
+    super.androidOnRenderProcessUnresponsive,
     super.onRenderProcessUnresponsive,
+    @Deprecated('Use onFormResubmission instead')
+    super.androidOnFormResubmission,
     super.onFormResubmission,
+    @Deprecated('Use onZoomScaleChanged instead') super.androidOnScaleChanged,
+    @Deprecated('Use onReceivedIcon instead') super.androidOnReceivedIcon,
     super.onReceivedIcon,
+    @Deprecated('Use onReceivedTouchIconUrl instead')
+    super.androidOnReceivedTouchIconUrl,
     super.onReceivedTouchIconUrl,
+    @Deprecated('Use onJsBeforeUnload instead') super.androidOnJsBeforeUnload,
     super.onJsBeforeUnload,
+    @Deprecated('Use onReceivedLoginRequest instead')
+    super.androidOnReceivedLoginRequest,
     super.onReceivedLoginRequest,
     super.onPermissionRequestCanceled,
     super.onRequestFocus,
+    @Deprecated('Use onWebContentProcessDidTerminate instead')
+    super.iosOnWebContentProcessDidTerminate,
     super.onWebContentProcessDidTerminate,
+    @Deprecated(
+      'Use onDidReceiveServerRedirectForProvisionalNavigation instead',
+    )
+    super.iosOnDidReceiveServerRedirectForProvisionalNavigation,
     super.onDidReceiveServerRedirectForProvisionalNavigation,
+    @Deprecated('Use onNavigationResponse instead')
+    super.iosOnNavigationResponse,
     super.onNavigationResponse,
+    @Deprecated('Use shouldAllowDeprecatedTLS instead')
+    super.iosShouldAllowDeprecatedTLS,
     super.shouldAllowDeprecatedTLS,
     super.onCameraCaptureStateChanged,
     super.onMicrophoneCaptureStateChanged,
@@ -72,6 +124,7 @@ class LinuxHeadlessInAppWebViewCreationParams
     super.initialUrlRequest,
     super.initialFile,
     super.initialData,
+    @Deprecated('Use initialSettings instead') super.initialOptions,
     super.initialSettings,
     super.contextMenu,
     super.initialUserScripts,
@@ -79,23 +132,31 @@ class LinuxHeadlessInAppWebViewCreationParams
     this.findInteractionController,
   });
 
+  /// Creates a [LinuxHeadlessInAppWebViewCreationParams] instance based on [PlatformHeadlessInAppWebViewCreationParams].
   LinuxHeadlessInAppWebViewCreationParams.fromPlatformHeadlessInAppWebViewCreationParams(
     PlatformHeadlessInAppWebViewCreationParams params,
   ) : this(
         controllerFromPlatform: params.controllerFromPlatform,
         initialSize: params.initialSize,
         windowId: params.windowId,
+        webViewEnvironment:
+            params.webViewEnvironment as LinuxWebViewEnvironment?,
         onWebViewCreated: params.onWebViewCreated,
         onLoadStart: params.onLoadStart,
         onLoadStop: params.onLoadStop,
+        onLoadError: params.onLoadError,
         onReceivedError: params.onReceivedError,
+        onLoadHttpError: params.onLoadHttpError,
         onReceivedHttpError: params.onReceivedHttpError,
         onProgressChanged: params.onProgressChanged,
         onConsoleMessage: params.onConsoleMessage,
         shouldOverrideUrlLoading: params.shouldOverrideUrlLoading,
         onLoadResource: params.onLoadResource,
         onScrollChanged: params.onScrollChanged,
+        onDownloadStart: params.onDownloadStart,
         onDownloadStartRequest: params.onDownloadStartRequest,
+        onDownloadStarting: params.onDownloadStarting,
+        onLoadResourceCustomScheme: params.onLoadResourceCustomScheme,
         onLoadResourceWithCustomScheme: params.onLoadResourceWithCustomScheme,
         onCreateWindow: params.onCreateWindow,
         onCloseWindow: params.onCloseWindow,
@@ -106,11 +167,13 @@ class LinuxHeadlessInAppWebViewCreationParams
         onReceivedServerTrustAuthRequest:
             params.onReceivedServerTrustAuthRequest,
         onReceivedClientCertRequest: params.onReceivedClientCertRequest,
+        onFindResultReceived: params.onFindResultReceived,
         shouldInterceptAjaxRequest: params.shouldInterceptAjaxRequest,
         onAjaxReadyStateChange: params.onAjaxReadyStateChange,
         onAjaxProgress: params.onAjaxProgress,
         shouldInterceptFetchRequest: params.shouldInterceptFetchRequest,
         onUpdateVisitedHistory: params.onUpdateVisitedHistory,
+        onPrint: params.onPrint,
         onPrintRequest: params.onPrintRequest,
         onLongPressHitTestResult: params.onLongPressHitTestResult,
         onEnterFullscreen: params.onEnterFullscreen,
@@ -121,27 +184,51 @@ class LinuxHeadlessInAppWebViewCreationParams
         onWindowBlur: params.onWindowBlur,
         onOverScrolled: params.onOverScrolled,
         onZoomScaleChanged: params.onZoomScaleChanged,
+        androidOnSafeBrowsingHit: params.androidOnSafeBrowsingHit,
         onSafeBrowsingHit: params.onSafeBrowsingHit,
+        androidOnPermissionRequest: params.androidOnPermissionRequest,
         onPermissionRequest: params.onPermissionRequest,
+        androidOnGeolocationPermissionsShowPrompt:
+            params.androidOnGeolocationPermissionsShowPrompt,
         onGeolocationPermissionsShowPrompt:
             params.onGeolocationPermissionsShowPrompt,
+        androidOnGeolocationPermissionsHidePrompt:
+            params.androidOnGeolocationPermissionsHidePrompt,
         onGeolocationPermissionsHidePrompt:
             params.onGeolocationPermissionsHidePrompt,
+        androidShouldInterceptRequest: params.androidShouldInterceptRequest,
         shouldInterceptRequest: params.shouldInterceptRequest,
+        androidOnRenderProcessGone: params.androidOnRenderProcessGone,
         onRenderProcessGone: params.onRenderProcessGone,
+        androidOnRenderProcessResponsive:
+            params.androidOnRenderProcessResponsive,
         onRenderProcessResponsive: params.onRenderProcessResponsive,
+        androidOnRenderProcessUnresponsive:
+            params.androidOnRenderProcessUnresponsive,
         onRenderProcessUnresponsive: params.onRenderProcessUnresponsive,
+        androidOnFormResubmission: params.androidOnFormResubmission,
         onFormResubmission: params.onFormResubmission,
+        androidOnScaleChanged: params.androidOnScaleChanged,
+        androidOnReceivedIcon: params.androidOnReceivedIcon,
         onReceivedIcon: params.onReceivedIcon,
+        androidOnReceivedTouchIconUrl: params.androidOnReceivedTouchIconUrl,
         onReceivedTouchIconUrl: params.onReceivedTouchIconUrl,
+        androidOnJsBeforeUnload: params.androidOnJsBeforeUnload,
         onJsBeforeUnload: params.onJsBeforeUnload,
+        androidOnReceivedLoginRequest: params.androidOnReceivedLoginRequest,
         onReceivedLoginRequest: params.onReceivedLoginRequest,
         onPermissionRequestCanceled: params.onPermissionRequestCanceled,
         onRequestFocus: params.onRequestFocus,
+        iosOnWebContentProcessDidTerminate:
+            params.iosOnWebContentProcessDidTerminate,
         onWebContentProcessDidTerminate: params.onWebContentProcessDidTerminate,
+        iosOnDidReceiveServerRedirectForProvisionalNavigation:
+            params.iosOnDidReceiveServerRedirectForProvisionalNavigation,
         onDidReceiveServerRedirectForProvisionalNavigation:
             params.onDidReceiveServerRedirectForProvisionalNavigation,
+        iosOnNavigationResponse: params.iosOnNavigationResponse,
         onNavigationResponse: params.onNavigationResponse,
+        iosShouldAllowDeprecatedTLS: params.iosShouldAllowDeprecatedTLS,
         shouldAllowDeprecatedTLS: params.shouldAllowDeprecatedTLS,
         onCameraCaptureStateChanged: params.onCameraCaptureStateChanged,
         onMicrophoneCaptureStateChanged: params.onMicrophoneCaptureStateChanged,
@@ -149,6 +236,7 @@ class LinuxHeadlessInAppWebViewCreationParams
         initialUrlRequest: params.initialUrlRequest,
         initialFile: params.initialFile,
         initialData: params.initialData,
+        initialOptions: params.initialOptions,
         initialSettings: params.initialSettings,
         contextMenu: params.contextMenu,
         initialUserScripts: params.initialUserScripts,
@@ -158,9 +246,13 @@ class LinuxHeadlessInAppWebViewCreationParams
       );
 
   @override
+  final LinuxWebViewEnvironment? webViewEnvironment;
+
+  @override
   final LinuxFindInteractionController? findInteractionController;
 }
 
+///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView}
 class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     with ChannelController {
   @override
@@ -169,26 +261,13 @@ class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
   bool _started = false;
   bool _running = false;
 
-  /// Tracks whether [dispose] has been called.
-  ///
-  /// Kept separate from [_running] so that a [dispose] call issued while
-  /// [run] is still in flight is not silently ignored.
-  bool _disposed = false;
-
-  /// Completes when an in-flight [run] finishes, including the deferred
-  /// native teardown it performs when [dispose] was called mid-startup.
-  ///
-  /// [dispose] waits on this so that `await dispose()` only returns once
-  /// the native side has been fully released. `null` when no [run] is in
-  /// flight.
-  Completer<void>? _runCompleter;
-
-  static const MethodChannel _sharedChannel = MethodChannel(
-    'wtf.zikzak/flutter_headless_inappwebview',
+  static const MethodChannel _sharedChannel = const MethodChannel(
+    'com.pichillilorenzo/flutter_headless_inappwebview',
   );
 
   LinuxInAppWebViewController? _webViewController;
 
+  /// Constructs a [LinuxHeadlessInAppWebView].
   LinuxHeadlessInAppWebView(PlatformHeadlessInAppWebViewCreationParams params)
     : super.implementation(
         params is LinuxHeadlessInAppWebViewCreationParams
@@ -200,10 +279,16 @@ class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     id = IdGenerator.generate();
   }
 
+  static final LinuxHeadlessInAppWebView _staticValue =
+      LinuxHeadlessInAppWebView(LinuxHeadlessInAppWebViewCreationParams());
+
+  factory LinuxHeadlessInAppWebView.static() {
+    return _staticValue;
+  }
+
   @override
   LinuxInAppWebViewController? get webViewController => _webViewController;
 
-  dynamic get controllerFromPlatform => _controllerFromPlatform;
   dynamic _controllerFromPlatform;
 
   LinuxHeadlessInAppWebViewCreationParams get _linuxParams =>
@@ -211,22 +296,16 @@ class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
 
   void _init() {
     _webViewController = LinuxInAppWebViewController(
-      PlatformInAppWebViewControllerCreationParams(
-        id: id,
-        webviewParams: params,
-      ),
+      LinuxInAppWebViewControllerCreationParams(id: id, webviewParams: params),
     );
     _controllerFromPlatform =
         params.controllerFromPlatform?.call(_webViewController!) ??
         _webViewController!;
-    if (_linuxParams.findInteractionController != null) {
-      _linuxParams.findInteractionController!.channel = MethodChannel(
-        'wtf.zikzak/zikzak_inappwebview_find_interaction_$id',
-      );
-      _linuxParams.findInteractionController!.setupMethodHandler();
-    }
-
-    channel = MethodChannel('wtf.zikzak/flutter_headless_inappwebview_$id');
+    // Initialize the find interaction controller with the same ID
+    _linuxParams.findInteractionController?.init(id);
+    channel = MethodChannel(
+      'com.pichillilorenzo/flutter_headless_inappwebview_$id',
+    );
     handler = _handleMethod;
     initMethodCallHandler();
   }
@@ -246,95 +325,91 @@ class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
 
   @override
   Future<void> run() async {
-    if (_started || _disposed) {
+    if (_started) {
       return;
     }
     _started = true;
     _init();
 
-    var initialSettings = params.initialSettings ?? InAppWebViewSettings();
-    initialSettings = _inferInitialSettings(initialSettings);
+    final initialSettings = params.initialSettings ?? InAppWebViewSettings();
+    _inferInitialSettings(initialSettings);
 
     Map<String, dynamic> settingsMap =
-        (params.initialSettings != null ? initialSettings.toJson() : null) ??
-        initialSettings.toJson();
-
-    Map<String, dynamic> pullToRefreshSettings = PullToRefreshSettings(
-      enabled: false,
-    ).toJson();
-
-    Map<String, dynamic> findInteractionSettings =
-        _linuxParams.findInteractionController?.onFindResultReceived != null
-        ? {}
-        : {};
+        (params.initialSettings != null ? initialSettings.toMap() : null) ??
+        // ignore: deprecated_member_use_from_same_package
+        params.initialOptions?.toMap() ??
+        initialSettings.toMap();
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('id', () => id);
     args.putIfAbsent(
       'params',
       () => <String, dynamic>{
-        'initialUrlRequest': params.initialUrlRequest?.toJson(),
+        'initialUrlRequest': params.initialUrlRequest?.toMap(),
         'initialFile': params.initialFile,
-        'initialData': params.initialData?.toJson(),
+        'initialData': params.initialData?.toMap(),
         'initialSettings': settingsMap,
-        'contextMenu': params.contextMenu?.toJson() ?? {},
+        'contextMenu': params.contextMenu?.toMap() ?? {},
         'windowId': params.windowId,
         'initialUserScripts':
-            params.initialUserScripts?.map((e) => e.toJson()).toList() ?? [],
-        'pullToRefreshSettings': pullToRefreshSettings,
-        'findInteractionSettings': findInteractionSettings,
-        'initialSize': params.initialSize.toJson(),
+            params.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
+        'initialSize': params.initialSize.toMap(),
+        'webViewEnvironmentId': params.webViewEnvironment?.id,
       },
     );
-    final runCompleter = Completer<void>();
-    _runCompleter = runCompleter;
     try {
       await _sharedChannel.invokeMethod('run', args);
       _running = true;
-      if (_disposed) {
-        // dispose() was called while the native WebView was still starting:
-        // tear it down now that the native side exists.
-        await _disposeNative();
-      }
-    } finally {
-      // Unblock a dispose() call waiting for this in-flight run().
-      runCompleter.complete();
-      if (identical(_runCompleter, runCompleter)) {
-        _runCompleter = null;
-      }
+    } catch (e) {
+      _running = false;
+      _started = false;
+      rethrow;
     }
   }
 
-  InAppWebViewSettings _inferInitialSettings(InAppWebViewSettings settings) {
-    var inferred = settings;
+  void _inferInitialSettings(InAppWebViewSettings settings) {
     if (params.shouldOverrideUrlLoading != null &&
         settings.useShouldOverrideUrlLoading == null) {
-      inferred = inferred.copyWith(useShouldOverrideUrlLoading: true);
+      settings.useShouldOverrideUrlLoading = true;
     }
     if (params.onLoadResource != null && settings.useOnLoadResource == null) {
-      inferred = inferred.copyWith(useOnLoadResource: true);
+      settings.useOnLoadResource = true;
     }
-    if (params.onDownloadStartRequest != null &&
+    if ((params.onDownloadStartRequest != null ||
+            params.onDownloadStarting != null) &&
         settings.useOnDownloadStart == null) {
-      inferred = inferred.copyWith(useOnDownloadStart: true);
+      settings.useOnDownloadStart = true;
     }
-    if (params.shouldInterceptAjaxRequest != null &&
-        settings.useShouldInterceptAjaxRequest == null) {
-      inferred = inferred.copyWith(useShouldInterceptAjaxRequest: true);
+    if ((params.shouldInterceptAjaxRequest != null ||
+        params.onAjaxProgress != null ||
+        params.onAjaxReadyStateChange != null)) {
+      if (settings.useShouldInterceptAjaxRequest == null) {
+        settings.useShouldInterceptAjaxRequest = true;
+      }
+      if (params.onAjaxReadyStateChange != null &&
+          settings.useOnAjaxReadyStateChange == null) {
+        settings.useOnAjaxReadyStateChange = true;
+      }
+      if (params.onAjaxProgress != null && settings.useOnAjaxProgress == null) {
+        settings.useOnAjaxProgress = true;
+      }
     }
     if (params.shouldInterceptFetchRequest != null &&
         settings.useShouldInterceptFetchRequest == null) {
-      inferred = inferred.copyWith(useShouldInterceptFetchRequest: true);
+      settings.useShouldInterceptFetchRequest = true;
+    }
+    if (params.shouldInterceptRequest != null &&
+        settings.useShouldInterceptRequest == null) {
+      settings.useShouldInterceptRequest = true;
     }
     if (params.onRenderProcessGone != null &&
         settings.useOnRenderProcessGone == null) {
-      inferred = inferred.copyWith(useOnRenderProcessGone: true);
+      settings.useOnRenderProcessGone = true;
     }
     if (params.onNavigationResponse != null &&
         settings.useOnNavigationResponse == null) {
-      inferred = inferred.copyWith(useOnNavigationResponse: true);
+      settings.useOnNavigationResponse = true;
     }
-    return inferred;
   }
 
   @override
@@ -349,7 +424,7 @@ class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     }
 
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('size', () => size.toJson());
+    args.putIfAbsent('size', () => size.toMap());
     await channel?.invokeMethod('setSize', args);
   }
 
@@ -360,51 +435,36 @@ class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     }
 
     Map<String, dynamic> args = <String, dynamic>{};
-    Map<String, dynamic> sizeMap = (await channel?.invokeMethod(
+    Map<String, dynamic>? sizeMap = (await channel?.invokeMethod(
       'getSize',
       args,
     ))?.cast<String, dynamic>();
+    if (sizeMap == null) {
+      return null;
+    }
     return MapSize.fromMap(sizeMap);
   }
 
   @override
-  Future<void> dispose({bool isKeepAlive = false}) async {
-    if (_disposed) {
-      return;
-    }
-    _disposed = true;
+  Future<void> dispose() async {
     if (!_running) {
-      // run() has not completed yet (or was never called). If it is still
-      // in flight, wait for it: run() performs the native cleanup itself
-      // once the native side is up. Otherwise there is nothing to release.
-      await _runCompleter?.future;
       return;
     }
-    await _disposeNative();
-  }
-
-  Future<void> _disposeNative() async {
-    // Isolate each teardown step so that a single failure (for example the
-    // native side already being gone) cannot leave the rest undisposed.
-    try {
-      await _sharedChannel.invokeMethod('dispose', <String, dynamic>{'id': id});
-    } catch (_) {
-      // The native WebView may already be gone; continue local teardown.
-    }
+    Map<String, dynamic> args = <String, dynamic>{};
+    await channel?.invokeMethod('dispose', args);
     disposeChannel();
     _started = false;
     _running = false;
-    try {
-      _webViewController?.dispose();
-    } catch (_) {
-      // Ignore controller teardown failures.
-    }
+    _webViewController?.dispose();
     _webViewController = null;
     _controllerFromPlatform = null;
-    try {
-      _linuxParams.findInteractionController?.dispose();
-    } catch (_) {
-      // Ignore auxiliary controller teardown failures.
-    }
+    _linuxParams.findInteractionController?.dispose();
+  }
+}
+
+extension InternalHeadlessInAppWebView on LinuxHeadlessInAppWebView {
+  Future<void> internalDispose() async {
+    _started = false;
+    _running = false;
   }
 }

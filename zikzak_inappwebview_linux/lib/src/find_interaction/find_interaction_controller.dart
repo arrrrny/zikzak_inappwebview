@@ -1,11 +1,67 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
+import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
+/// Object specifying creation parameters for creating a [LinuxFindInteractionController].
+///
+/// When adding additional fields make sure they can be null or have a default
+/// value to avoid breaking changes. See [PlatformFindInteractionControllerCreationParams] for
+/// more information.
+@immutable
+class LinuxFindInteractionControllerCreationParams
+    extends PlatformFindInteractionControllerCreationParams {
+  /// Creates a new [LinuxFindInteractionControllerCreationParams] instance.
+  const LinuxFindInteractionControllerCreationParams({
+    super.onFindResultReceived,
+  });
+
+  /// Creates a [LinuxFindInteractionControllerCreationParams] instance based on [PlatformFindInteractionControllerCreationParams].
+  factory LinuxFindInteractionControllerCreationParams.fromPlatformFindInteractionControllerCreationParams(
+    PlatformFindInteractionControllerCreationParams params,
+  ) {
+    return LinuxFindInteractionControllerCreationParams(
+      onFindResultReceived: params.onFindResultReceived,
+    );
+  }
+}
+
+/// Implementation of [PlatformFindInteractionController] for Linux.
 class LinuxFindInteractionController extends PlatformFindInteractionController
     with ChannelController {
-  LinuxFindInteractionController(super.params) : super.implementation();
+  /// Creates a new [LinuxFindInteractionController].
+  LinuxFindInteractionController(
+    PlatformFindInteractionControllerCreationParams params,
+  ) : super.implementation(
+        params is LinuxFindInteractionControllerCreationParams
+            ? params
+            : LinuxFindInteractionControllerCreationParams.fromPlatformFindInteractionControllerCreationParams(
+                params,
+              ),
+      );
+
+  static final LinuxFindInteractionController _staticValue =
+      LinuxFindInteractionController(
+        LinuxFindInteractionControllerCreationParams(),
+      );
+
+  /// Provide static access.
+  factory LinuxFindInteractionController.static() {
+    return _staticValue;
+  }
+
+  _debugLog(String method, dynamic args) {
+    debugLog(
+      className: this.runtimeType.toString(),
+      debugLoggingSettings:
+          PlatformFindInteractionController.debugLoggingSettings,
+      method: method,
+      args: args,
+    );
+  }
 
   Future<dynamic> _handleMethod(MethodCall call) async {
+    _debugLog(call.method, call.arguments);
+
     switch (call.method) {
       case "onFindResultReceived":
         if (onFindResultReceived != null) {
@@ -26,6 +82,7 @@ class LinuxFindInteractionController extends PlatformFindInteractionController
     return null;
   }
 
+  ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.findAll}
   @override
   Future<void> findAll({String? find}) async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -33,6 +90,7 @@ class LinuxFindInteractionController extends PlatformFindInteractionController
     await channel?.invokeMethod('findAll', args);
   }
 
+  ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.findNext}
   @override
   Future<void> findNext({bool forward = true}) async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -40,12 +98,14 @@ class LinuxFindInteractionController extends PlatformFindInteractionController
     await channel?.invokeMethod('findNext', args);
   }
 
+  ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.clearMatches}
   @override
   Future<void> clearMatches() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await channel?.invokeMethod('clearMatches', args);
   }
 
+  ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.setSearchText}
   @override
   Future<void> setSearchText(String? searchText) async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -53,37 +113,36 @@ class LinuxFindInteractionController extends PlatformFindInteractionController
     await channel?.invokeMethod('setSearchText', args);
   }
 
+  ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.getSearchText}
   @override
   Future<String?> getSearchText() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await channel?.invokeMethod<String?>('getSearchText', args);
   }
 
-  @override
-  Future<bool?> isFindNavigatorVisible() async {
-    return false;
-  }
-
-  @override
-  Future<void> updateResultCount() async {}
-
-  @override
-  Future<void> presentFindNavigator() async {}
-
-  @override
-  Future<void> dismissFindNavigator() async {}
-
+  ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.getActiveFindSession}
   @override
   Future<FindSession?> getActiveFindSession() async {
-    return null;
+    Map<String, dynamic> args = <String, dynamic>{};
+    Map<String, dynamic>? result = (await channel?.invokeMethod(
+      'getActiveFindSession',
+      args,
+    ))?.cast<String, dynamic>();
+    return FindSession.fromMap(result);
   }
 
+  ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.dispose}
   @override
   void dispose({bool isKeepAlive = false}) {
-    disposeChannel();
+    disposeChannel(removeMethodCallHandler: !isKeepAlive);
   }
+}
 
-  void setupMethodHandler() {
+extension InternalFindInteractionController on LinuxFindInteractionController {
+  void init(dynamic id) {
+    channel = MethodChannel(
+      'com.pichillilorenzo/flutter_inappwebview_find_interaction_$id',
+    );
     handler = _handleMethod;
     initMethodCallHandler();
   }
