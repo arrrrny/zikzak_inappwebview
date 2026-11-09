@@ -1,5 +1,5 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_CUSTOM_PLATFORM_VIEW_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_CUSTOM_PLATFORM_VIEW_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_PLUGIN_CUSTOM_PLATFORM_VIEW_H_
+#define ZIKZAK_INAPPWEBVIEW_PLUGIN_CUSTOM_PLATFORM_VIEW_H_
 
 #include <flutter_linux/flutter_linux.h>
 
@@ -9,7 +9,7 @@
 #include "in_app_webview.h"
 #include "inappwebview_egl_texture.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 using WebViewType = InAppWebView;
 
@@ -59,6 +59,6 @@ class CustomPlatformView {
   void EmitCursorChanged(const std::string& cursor_name);
 };
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_CUSTOM_PLATFORM_VIEW_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_CUSTOM_PLATFORM_VIEW_H_

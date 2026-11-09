@@ -1,5 +1,5 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_CREDENTIAL_DATABASE_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_CREDENTIAL_DATABASE_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_PLUGIN_CREDENTIAL_DATABASE_H_
+#define ZIKZAK_INAPPWEBVIEW_PLUGIN_CREDENTIAL_DATABASE_H_
 
 #include <flutter_linux/flutter_linux.h>
 #include <libsecret/secret.h>
@@ -13,7 +13,7 @@
 
 #include "types/channel_delegate.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 class PluginInstance;
 
@@ -55,13 +55,13 @@ struct Credential {
  * Credentials are stored in the system keyring (gnome-keyring, KDE Wallet, etc.)
  * using the Secret Service D-Bus API.
  *
- * Schema: com.pichillilorenzo.flutter_inappwebview.HttpAuth
+ * Schema: wtf.zikzak.zikzak_inappwebview.HttpAuth
  * Attributes: appId, host, port, protocol, realm, username
  */
 class CredentialDatabase : public ChannelDelegate {
  public:
   static constexpr const char* METHOD_CHANNEL_NAME =
-      "com.pichillilorenzo/flutter_inappwebview_credential_database";
+      "wtf.zikzak/zikzak_inappwebview_credential_database";
 
   explicit CredentialDatabase(PluginInstance* plugin);
   ~CredentialDatabase() override;
@@ -124,6 +124,6 @@ class CredentialDatabase : public ChannelDelegate {
   std::string app_id_;
 };
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_CREDENTIAL_DATABASE_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_CREDENTIAL_DATABASE_H_

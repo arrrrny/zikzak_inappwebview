@@ -158,10 +158,10 @@ class CustomPlatformViewController
     ))!;
 
     _methodChannel = MethodChannel(
-      'com.pichillilorenzo/custom_platform_view_$_textureId',
+      'wtf.zikzak/custom_platform_view_$_textureId',
     );
     _eventChannel = EventChannel(
-      'com.pichillilorenzo/custom_platform_view_${_textureId}_events',
+      'wtf.zikzak/custom_platform_view_${_textureId}_events',
     );
     _eventStreamSubscription = _eventChannel.receiveBroadcastStream().listen((
       event,
@@ -409,7 +409,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
       autofocus: true,
       focusNode: _focusNode,
       canRequestFocus: true,
-      debugLabel: "flutter_inappwebview_linux_custom_platform_view",
+      debugLabel: "zikzak_inappwebview_linux_custom_platform_view",
       onFocusChange: (focused) {
         // Notify the native webview when focus changes.
         // This is important for proper text input handling - without this,

@@ -6,7 +6,7 @@
 #include "../utils/log.h"
 #include "in_app_browser.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 InAppBrowserChannelDelegate::InAppBrowserChannelDelegate(InAppBrowser* browser,
                                                          FlBinaryMessenger* messenger,
@@ -95,4 +95,4 @@ void InAppBrowserChannelDelegate::onExit() const {
   invokeMethod("onExit", nullptr);
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

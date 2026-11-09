@@ -10,7 +10,7 @@
 #include "../webview_environment.h"
 #include "in_app_browser_manager.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 // Convert color from #AARRGGBB (Flutter format) to rgba(r,g,b,a) (GTK CSS format)
 // Flutter uses #AARRGGBB, but GTK CSS expects #RRGGBB, #RRGGBBAA, or rgba()
@@ -1414,4 +1414,4 @@ void InAppBrowser::OnCursorChanged(const std::string& cursorName) {
   gdk_window_set_cursor(gdkWindow, currentCursor_);
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

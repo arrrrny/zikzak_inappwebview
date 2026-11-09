@@ -2,7 +2,7 @@
 
 #include "../utils/flutter.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 ShowFileChooserResponse::ShowFileChooserResponse()
     : handledByClient(false), filePaths(std::nullopt) {}
@@ -33,4 +33,4 @@ FlValue* ShowFileChooserResponse::toFlValue() const {
   });
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

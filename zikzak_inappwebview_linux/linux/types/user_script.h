@@ -1,5 +1,5 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_USER_SCRIPT_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_USER_SCRIPT_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_PLUGIN_USER_SCRIPT_H_
+#define ZIKZAK_INAPPWEBVIEW_PLUGIN_USER_SCRIPT_H_
 
 #include <flutter_linux/flutter_linux.h>
 
@@ -10,7 +10,7 @@
 
 #include "content_world.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 enum class UserScriptInjectionTime {
   atDocumentStart = 0,
@@ -41,6 +41,6 @@ class UserScript {
   bool operator==(const UserScript& other) const;
 };
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_USER_SCRIPT_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_USER_SCRIPT_H_

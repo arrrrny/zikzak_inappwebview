@@ -1,5 +1,5 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_IN_APP_BROWSER_SETTINGS_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_IN_APP_BROWSER_SETTINGS_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_PLUGIN_IN_APP_BROWSER_SETTINGS_H_
+#define ZIKZAK_INAPPWEBVIEW_PLUGIN_IN_APP_BROWSER_SETTINGS_H_
 
 #include <flutter_linux/flutter_linux.h>
 
@@ -7,7 +7,7 @@
 #include <optional>
 #include <string>
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 class InAppBrowser;
 
@@ -78,6 +78,6 @@ class InAppBrowserSettings {
   FlValue* getRealSettings(const InAppBrowser* browser) const;
 };
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_IN_APP_BROWSER_SETTINGS_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_IN_APP_BROWSER_SETTINGS_H_

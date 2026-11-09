@@ -1,12 +1,12 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_UTIL_MAP_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_UTIL_MAP_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_PLUGIN_UTIL_MAP_H_
+#define ZIKZAK_INAPPWEBVIEW_PLUGIN_UTIL_MAP_H_
 
 #include <algorithm>
 #include <iterator>
 #include <map>
 #include <optional>
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 template <typename T, typename U = void>
 struct is_mappish_impl : std::false_type {};
@@ -37,6 +37,6 @@ static inline std::optional<T> map_at_optional(const std::map<K, T>& map, const 
   return itr != map.end() ? std::make_optional(itr->second) : std::nullopt;
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_UTIL_MAP_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_UTIL_MAP_H_

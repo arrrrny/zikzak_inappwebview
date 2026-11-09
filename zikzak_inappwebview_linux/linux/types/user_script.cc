@@ -2,7 +2,7 @@
 
 #include "../utils/flutter.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 UserScript::UserScript(const std::optional<std::string>& groupName, const std::string& source,
                        UserScriptInjectionTime injectionTime, bool forMainFrameOnly,
@@ -55,4 +55,4 @@ bool UserScript::operator==(const UserScript& other) const {
          injectionTime == other.injectionTime && forMainFrameOnly == other.forMainFrameOnly;
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

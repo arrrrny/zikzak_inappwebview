@@ -4,7 +4,7 @@
 
 #include "../utils/flutter.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 HitTestResult HitTestResult::fromWebKitHitTestResult(void* hit_test_result_ptr) {
   if (hit_test_result_ptr == nullptr) {
@@ -52,4 +52,4 @@ FlValue* HitTestResult::toFlValue() const {
   });
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

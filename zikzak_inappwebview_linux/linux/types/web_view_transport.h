@@ -1,5 +1,5 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_WEB_VIEW_TRANSPORT_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_WEB_VIEW_TRANSPORT_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_PLUGIN_WEB_VIEW_TRANSPORT_H_
+#define ZIKZAK_INAPPWEBVIEW_PLUGIN_WEB_VIEW_TRANSPORT_H_
 
 #include <wpe/webkit.h>
 
@@ -7,7 +7,7 @@
 #include <optional>
 #include <string>
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 class InAppWebView;
 
@@ -31,6 +31,6 @@ struct WebViewTransport {
   ~WebViewTransport() = default;
 };
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_WEB_VIEW_TRANSPORT_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_WEB_VIEW_TRANSPORT_H_

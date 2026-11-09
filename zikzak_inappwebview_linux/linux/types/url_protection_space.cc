@@ -2,7 +2,7 @@
 
 #include "../utils/flutter.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 // Convert HttpAuthScheme to the string values expected by the platform interface
 static std::optional<std::string> authSchemeToString(HttpAuthScheme scheme) {
@@ -77,4 +77,4 @@ HttpAuthScheme URLProtectionSpace::fromWebKitScheme(WebKitAuthenticationScheme s
   }
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

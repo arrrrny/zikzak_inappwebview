@@ -1,5 +1,5 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_LOG_UTIL_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_LOG_UTIL_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_PLUGIN_LOG_UTIL_H_
+#define ZIKZAK_INAPPWEBVIEW_PLUGIN_LOG_UTIL_H_
 
 #include <glib.h>
 
@@ -9,7 +9,7 @@
 
 #include "string.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 template <typename T>
 static inline void debugLog(const std::basic_string<T>& msg, const bool& isError = false,
@@ -17,17 +17,17 @@ static inline void debugLog(const std::basic_string<T>& msg, const bool& isError
 #ifndef NDEBUG
   std::basic_string<T> debugMsg = msg;
   if (!filename.empty() && line > 0) {
-    auto filenameSplit = split(filename, std::string{"/flutter_inappwebview_linux/"});
+    auto filenameSplit = split(filename, std::string{"/zikzak_inappwebview_linux/"});
     std::string reduceFilenamePath =
-        filenameSplit.size() > 0 ? "flutter_inappwebview_linux/" + filenameSplit.back() : filename;
+        filenameSplit.size() > 0 ? "zikzak_inappwebview_linux/" + filenameSplit.back() : filename;
     debugMsg = reduceFilenamePath + "(" + std::to_string(line) + "): " + debugMsg;
   }
 
   // Use g_message for GLib-based logging
   if (isError) {
-    g_warning("[flutter_inappwebview] %s", std::string(debugMsg).c_str());
+    g_warning("[zikzak_inappwebview] %s", std::string(debugMsg).c_str());
   } else {
-    g_message("[flutter_inappwebview] %s", std::string(debugMsg).c_str());
+    g_message("[zikzak_inappwebview] %s", std::string(debugMsg).c_str());
   }
 #endif
 }
@@ -97,7 +97,7 @@ static inline void failedLog(GError** error, const std::string& filename = "",
   }
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
 #ifndef NDEBUG
 #define debugLog(value) debugLog(value, false, __FILE__, __LINE__)
@@ -107,4 +107,4 @@ static inline void failedLog(GError** error, const std::string& filename = "",
 #define failedLog(error) failedLog(error, __FILE__, __LINE__)
 #endif
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_LOG_UTIL_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_LOG_UTIL_H_

@@ -5,8 +5,8 @@
 // epoxy_get_proc_address which ASSERTS that a context must be current,
 // causing a catch-22 situation when we need to check if a context exists.
 
-#ifndef FLUTTER_INAPPWEBVIEW_LINUX_UTILS_GL_CONTEXT_H_
-#define FLUTTER_INAPPWEBVIEW_LINUX_UTILS_GL_CONTEXT_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_LINUX_UTILS_GL_CONTEXT_H_
+#define ZIKZAK_INAPPWEBVIEW_LINUX_UTILS_GL_CONTEXT_H_
 
 #include <dlfcn.h>
 #include <glib.h>
@@ -17,7 +17,7 @@
 #define EGL_NO_CONTEXT nullptr
 #endif
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 /**
  * Check if we have a current EGL or GLX context.
@@ -83,6 +83,6 @@ inline bool HasCurrentGLContext() {
   return false;
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
-#endif  // FLUTTER_INAPPWEBVIEW_LINUX_UTILS_GL_CONTEXT_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_LINUX_UTILS_GL_CONTEXT_H_

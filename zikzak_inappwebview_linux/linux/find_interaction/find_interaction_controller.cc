@@ -4,7 +4,7 @@
 #include "../in_app_webview/in_app_webview.h"
 #include "../utils/log.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 FindInteractionController::FindInteractionController(InAppWebView* webView)
     : webView_(webView) {
@@ -150,4 +150,4 @@ void FindInteractionController::dispose() {
   searchText_ = std::nullopt;
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

@@ -1,5 +1,5 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_UTIL_VECTOR_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_UTIL_VECTOR_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_PLUGIN_UTIL_VECTOR_H_
+#define ZIKZAK_INAPPWEBVIEW_PLUGIN_UTIL_VECTOR_H_
 
 #include <algorithm>
 #include <functional>
@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 template <typename T = void, typename = void>
 struct is_vector_impl : std::false_type {};
@@ -87,6 +87,6 @@ static inline auto functional_map(const std::optional<T>& iterable, Func&& func)
   return functional_map(iterable.value(), std::forward<Func>(func));
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_UTIL_VECTOR_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_UTIL_VECTOR_H_

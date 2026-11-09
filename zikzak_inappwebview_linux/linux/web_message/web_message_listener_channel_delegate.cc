@@ -7,7 +7,7 @@
 #include "../utils/log.h"
 #include "web_message_listener.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 namespace {
 // Helper to compare method names
@@ -192,4 +192,4 @@ void WebMessageListenerChannelDelegate::dispose() {
   webMessageListener_ = nullptr;
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

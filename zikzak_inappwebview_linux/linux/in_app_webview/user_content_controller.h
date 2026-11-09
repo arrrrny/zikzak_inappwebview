@@ -1,5 +1,5 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_USER_CONTENT_CONTROLLER_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_USER_CONTENT_CONTROLLER_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_PLUGIN_USER_CONTENT_CONTROLLER_H_
+#define ZIKZAK_INAPPWEBVIEW_PLUGIN_USER_CONTENT_CONTROLLER_H_
 
 // WPE WebKit User Content Controller
 //
@@ -19,7 +19,7 @@
 
 #include <jsc/jsc.h>
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 // Script message handler callback type
 // Third parameter is the JSCContext* of the frame that sent the message (for iframe support)
@@ -88,6 +88,6 @@ class UserContentController {
                                                    gpointer user_data);
 };
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_USER_CONTENT_CONTROLLER_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_USER_CONTENT_CONTROLLER_H_

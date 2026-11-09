@@ -6,7 +6,7 @@
 #include "utils/flutter.h"
 #include "utils/log.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 namespace {
 // Helper to compare method names
@@ -23,7 +23,7 @@ WebStorageManager::WebStorageManager(PluginInstance* plugin)
   // Create the method channel
   channel_ = fl_method_channel_new(
       messenger,
-      "com.pichillilorenzo/flutter_inappwebview_webstoragemanager",
+      "wtf.zikzak/zikzak_inappwebview_webstoragemanager",
       FL_METHOD_CODEC(fl_standard_method_codec_new()));
 
   // Set the method call handler
@@ -370,4 +370,4 @@ void WebStorageManager::removeDataModifiedSince(FlMethodCall* method_call) {
       method_call);
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

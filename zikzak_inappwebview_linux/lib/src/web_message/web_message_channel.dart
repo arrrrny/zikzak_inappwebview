@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
+import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 import 'web_message_port.dart';
 
 /// Object specifying creation parameters for creating a [LinuxWebMessageChannel].
@@ -37,7 +37,7 @@ class LinuxWebMessageChannelCreationParams
   }
 }
 
-///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannel}
+///{@macro zikzak_inappwebview_platform_interface.PlatformWebMessageChannel}
 class LinuxWebMessageChannel extends PlatformWebMessageChannel
     with ChannelController {
   /// Constructs a [LinuxWebMessageChannel].
@@ -50,7 +50,7 @@ class LinuxWebMessageChannel extends PlatformWebMessageChannel
               ),
       ) {
     channel = MethodChannel(
-      'com.pichillilorenzo/flutter_inappwebview_web_message_channel_${params.id}',
+      'wtf.zikzak/zikzak_inappwebview_web_message_channel_${params.id}',
     );
     handler = _handleMethod;
     initMethodCallHandler();

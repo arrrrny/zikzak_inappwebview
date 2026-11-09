@@ -2,7 +2,7 @@
 
 #include "../utils/flutter.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 PermissionRequest::PermissionRequest(const std::optional<std::string>& origin,
                                      const std::vector<PermissionResourceType>& resourceTypes)
@@ -53,4 +53,4 @@ std::vector<PermissionResourceType> PermissionRequest::getResourceTypes(
   return types;
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

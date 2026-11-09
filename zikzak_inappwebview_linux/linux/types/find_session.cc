@@ -2,7 +2,7 @@
 
 #include "../utils/flutter.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 FindSession::FindSession(int resultCount, int highlightedResultIndex)
     : resultCount(resultCount), highlightedResultIndex(highlightedResultIndex) {}
@@ -18,4 +18,4 @@ FlValue* FindSession::toFlValue() const {
   });
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

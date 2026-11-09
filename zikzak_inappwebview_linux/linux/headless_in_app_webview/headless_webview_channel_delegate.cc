@@ -6,7 +6,7 @@
 #include "../utils/log.h"
 #include "headless_in_app_webview.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 HeadlessWebViewChannelDelegate::HeadlessWebViewChannelDelegate(
     HeadlessInAppWebView* headlessWebView,
@@ -82,4 +82,4 @@ void HeadlessWebViewChannelDelegate::onWebViewCreated() const {
   invokeMethod("onWebViewCreated", args);
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

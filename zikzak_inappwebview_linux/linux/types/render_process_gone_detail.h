@@ -1,12 +1,12 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_RENDER_PROCESS_GONE_DETAIL_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_RENDER_PROCESS_GONE_DETAIL_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_PLUGIN_RENDER_PROCESS_GONE_DETAIL_H_
+#define ZIKZAK_INAPPWEBVIEW_PLUGIN_RENDER_PROCESS_GONE_DETAIL_H_
 
 #include <flutter_linux/flutter_linux.h>
 #include <wpe/webkit.h>
 
 #include <optional>
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 /**
  * RenderProcessGoneDetail - Provides details about why the web process terminated.
@@ -37,6 +37,6 @@ class RenderProcessGoneDetail {
   // so rendererPriorityAtExit is always null for Linux.
 };
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_RENDER_PROCESS_GONE_DETAIL_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_RENDER_PROCESS_GONE_DETAIL_H_

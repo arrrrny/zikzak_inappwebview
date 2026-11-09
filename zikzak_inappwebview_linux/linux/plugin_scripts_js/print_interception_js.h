@@ -1,5 +1,5 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_PRINT_INTERCEPTION_JS_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_PRINT_INTERCEPTION_JS_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_PLUGIN_PRINT_INTERCEPTION_JS_H_
+#define ZIKZAK_INAPPWEBVIEW_PLUGIN_PRINT_INTERCEPTION_JS_H_
 
 #include <memory>
 #include <optional>
@@ -9,7 +9,7 @@
 #include "../types/plugin_script.h"
 #include "javascript_bridge_js.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 /**
  * JavaScript for intercepting window.print() calls.
@@ -88,6 +88,6 @@ class PrintInterceptionJS {
   }
 };
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_PRINT_INTERCEPTION_JS_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_PRINT_INTERCEPTION_JS_H_

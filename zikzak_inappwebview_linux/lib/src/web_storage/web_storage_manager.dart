@@ -1,5 +1,5 @@
 import 'package:flutter/services.dart';
-import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
+import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
 /// Object specifying creation parameters for creating a [LinuxWebStorageManager].
 ///
@@ -25,7 +25,7 @@ class LinuxWebStorageManagerCreationParams
 /// to manage website data.
 class LinuxWebStorageManager extends PlatformWebStorageManager {
   static const MethodChannel _channel = MethodChannel(
-    'com.pichillilorenzo/flutter_inappwebview_webstoragemanager',
+    'wtf.zikzak/zikzak_inappwebview_webstoragemanager',
   );
 
   /// Constructs a [LinuxWebStorageManager].

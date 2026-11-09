@@ -1,5 +1,5 @@
 import 'package:flutter/services.dart';
-import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
+import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
 /// Object specifying creation parameters for creating a [LinuxCookieManager].
 ///
@@ -22,7 +22,7 @@ class LinuxCookieManagerCreationParams
 /// Implementation of [PlatformCookieManager] for Linux using WebKitGTK.
 class LinuxCookieManager extends PlatformCookieManager {
   static const MethodChannel _channel = MethodChannel(
-    'com.pichillilorenzo/flutter_inappwebview_cookiemanager',
+    'wtf.zikzak/zikzak_inappwebview_cookiemanager',
   );
 
   /// Constructs a [LinuxCookieManager].

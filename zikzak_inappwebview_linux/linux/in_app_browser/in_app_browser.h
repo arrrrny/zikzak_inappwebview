@@ -1,5 +1,5 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_IN_APP_BROWSER_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_IN_APP_BROWSER_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_PLUGIN_IN_APP_BROWSER_H_
+#define ZIKZAK_INAPPWEBVIEW_PLUGIN_IN_APP_BROWSER_H_
 
 #include <flutter_linux/flutter_linux.h>
 #include <gtk/gtk.h>
@@ -15,7 +15,7 @@
 #include "in_app_browser_channel_delegate.h"
 #include "in_app_browser_settings.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 class InAppBrowserManager;
 class PluginInstance;
@@ -55,7 +55,7 @@ struct InAppBrowserCreationParams {
 class InAppBrowser {
  public:
   static constexpr const char* METHOD_CHANNEL_NAME_PREFIX =
-      "com.pichillilorenzo/flutter_inappbrowser_";
+      "wtf.zikzak/zikzak_inappbrowser_";
 
   /// Create an InAppBrowser with the given parameters
   /// @param manager The manager that owns this browser
@@ -230,6 +230,6 @@ class InAppBrowser {
   void cleanup();
 };
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_IN_APP_BROWSER_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_IN_APP_BROWSER_H_

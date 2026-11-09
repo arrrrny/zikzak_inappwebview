@@ -1,5 +1,5 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_SIMD_CONVERT_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_SIMD_CONVERT_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_PLUGIN_SIMD_CONVERT_H_
+#define ZIKZAK_INAPPWEBVIEW_PLUGIN_SIMD_CONVERT_H_
 
 #include <algorithm>
 #include <cstddef>
@@ -21,7 +21,7 @@
 #endif
 #endif
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 /**
  * Convert Cairo ARGB32 premultiplied (native-endian) to Flutter RGBA8888.
@@ -291,6 +291,6 @@ inline void FastMemcpy(void* dst, const void* src, size_t size) {
 #endif
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_SIMD_CONVERT_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_SIMD_CONVERT_H_

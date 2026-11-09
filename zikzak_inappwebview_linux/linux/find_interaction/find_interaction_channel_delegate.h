@@ -1,5 +1,5 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_FIND_INTERACTION_CHANNEL_DELEGATE_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_FIND_INTERACTION_CHANNEL_DELEGATE_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_PLUGIN_FIND_INTERACTION_CHANNEL_DELEGATE_H_
+#define ZIKZAK_INAPPWEBVIEW_PLUGIN_FIND_INTERACTION_CHANNEL_DELEGATE_H_
 
 #include <flutter_linux/flutter_linux.h>
 
@@ -8,7 +8,7 @@
 
 #include "../types/channel_delegate.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 class FindInteractionController;
 
@@ -29,6 +29,6 @@ class FindInteractionChannelDelegate : public ChannelDelegate {
   FindInteractionController* findInteractionController_;
 };
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_FIND_INTERACTION_CHANNEL_DELEGATE_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_FIND_INTERACTION_CHANNEL_DELEGATE_H_

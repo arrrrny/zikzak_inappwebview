@@ -10,7 +10,7 @@
 #include <wpe/wpe-platform.h>
 #endif
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 InAppWebViewSettings::InAppWebViewSettings() {
   // Default constructor - all defaults are set in the header
@@ -624,4 +624,4 @@ InAppWebViewSettings::~InAppWebViewSettings() {
   }
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

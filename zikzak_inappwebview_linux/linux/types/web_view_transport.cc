@@ -2,7 +2,7 @@
 
 #include "../in_app_webview/in_app_webview.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 WebKitWebView* WebViewTransport::getWebKitWebView() const {
   if (inAppWebView) {
@@ -11,4 +11,4 @@ WebKitWebView* WebViewTransport::getWebKitWebView() const {
   return nullptr;
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

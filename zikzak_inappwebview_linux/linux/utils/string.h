@@ -1,5 +1,5 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_UTIL_STRING_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_UTIL_STRING_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_PLUGIN_UTIL_STRING_H_
+#define ZIKZAK_INAPPWEBVIEW_PLUGIN_UTIL_STRING_H_
 
 #include <algorithm>
 #include <cctype>
@@ -10,7 +10,7 @@
 #include <string_view>
 #include <vector>
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 template <typename T>
 struct is_string : std::false_type {};
@@ -181,6 +181,6 @@ static inline std::string trim(const std::string& str) {
   return str.substr(first, (last - first + 1));
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_UTIL_STRING_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_UTIL_STRING_H_

@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
+import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
 /// Object specifying creation parameters for creating a [LinuxWebViewEnvironment].
 ///
@@ -33,7 +33,7 @@ class LinuxWebViewEnvironment extends PlatformWebViewEnvironment
     with ChannelController {
   /// Static method channel for WebViewEnvironment operations.
   static final MethodChannel _staticChannel = MethodChannel(
-    'com.pichillilorenzo/flutter_webview_environment',
+    'wtf.zikzak/flutter_webview_environment',
   );
 
   @override
@@ -80,7 +80,7 @@ class LinuxWebViewEnvironment extends PlatformWebViewEnvironment
     }
   }
 
-  /// {@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.create}
+  /// {@macro zikzak_inappwebview_platform_interface.PlatformWebViewEnvironment.create}
   ///
   /// On Linux, this creates a new WebKitWebContext instance.
   @override
@@ -99,14 +99,14 @@ class LinuxWebViewEnvironment extends PlatformWebViewEnvironment
     await _staticChannel.invokeMethod('create', args);
 
     env.channel = MethodChannel(
-      'com.pichillilorenzo/flutter_webview_environment_${env.id}',
+      'wtf.zikzak/flutter_webview_environment_${env.id}',
     );
     env.handler = env.handleMethod;
     env.initMethodCallHandler();
     return env;
   }
 
-  /// {@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getAvailableVersion}
+  /// {@macro zikzak_inappwebview_platform_interface.PlatformWebViewEnvironment.getAvailableVersion}
   ///
   /// On Linux, this returns the WPE WebKit version (e.g., "2.42.0").
   ///
@@ -117,13 +117,13 @@ class LinuxWebViewEnvironment extends PlatformWebViewEnvironment
     return await _staticChannel.invokeMethod<String>('getAvailableVersion');
   }
 
-  /// {@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.isSpellCheckingEnabled}
+  /// {@macro zikzak_inappwebview_platform_interface.PlatformWebViewEnvironment.isSpellCheckingEnabled}
   @override
   Future<bool> isSpellCheckingEnabled() async {
     return await channel?.invokeMethod<bool>('isSpellCheckingEnabled') ?? false;
   }
 
-  /// {@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getSpellCheckingLanguages}
+  /// {@macro zikzak_inappwebview_platform_interface.PlatformWebViewEnvironment.getSpellCheckingLanguages}
   @override
   Future<List<String>> getSpellCheckingLanguages() async {
     final result = await channel?.invokeMethod<List>(
@@ -132,14 +132,14 @@ class LinuxWebViewEnvironment extends PlatformWebViewEnvironment
     return result?.cast<String>() ?? [];
   }
 
-  /// {@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getCacheModel}
+  /// {@macro zikzak_inappwebview_platform_interface.PlatformWebViewEnvironment.getCacheModel}
   @override
   Future<CacheModel?> getCacheModel() async {
     final result = await channel?.invokeMethod<int>('getCacheModel');
     return CacheModel.fromNativeValue(result);
   }
 
-  /// {@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.isAutomationAllowed}
+  /// {@macro zikzak_inappwebview_platform_interface.PlatformWebViewEnvironment.isAutomationAllowed}
   @override
   Future<bool> isAutomationAllowed() async {
     return await channel?.invokeMethod<bool>('isAutomationAllowed') ?? false;

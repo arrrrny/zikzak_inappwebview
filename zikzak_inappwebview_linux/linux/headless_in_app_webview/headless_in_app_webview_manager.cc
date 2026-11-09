@@ -2,7 +2,7 @@
 
 #include <cstring>
 
-#include "../flutter_inappwebview_linux_plugin_private.h"
+#include "../zikzak_inappwebview_linux_plugin_private.h"
 #include "../plugin_instance.h"
 #include "../in_app_webview/in_app_webview_settings.h"
 #include "../types/url_request.h"
@@ -10,7 +10,7 @@
 #include "../utils/log.h"
 #include "../webview_environment.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 HeadlessInAppWebViewManager::HeadlessInAppWebViewManager(PluginInstance* plugin)
     : plugin_(plugin), registrar_(plugin->registrar()) {
@@ -187,4 +187,4 @@ void HeadlessInAppWebViewManager::Run(FlMethodCall* method_call) {
   fl_method_call_respond_success(method_call, result, nullptr);
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

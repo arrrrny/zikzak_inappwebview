@@ -11,12 +11,12 @@
 
 using json = nlohmann::json;
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 ContentBlockerHandler::ContentBlockerHandler(WebKitUserContentManager* content_manager)
     : content_manager_(content_manager),
       filter_store_(nullptr),
-      filter_identifier_("flutter_inappwebview_content_rules") {
+      filter_identifier_("zikzak_inappwebview_content_rules") {
   if (content_manager_ == nullptr) {
     errorLog("ContentBlockerHandler: content_manager is null");
     return;
@@ -29,9 +29,9 @@ ContentBlockerHandler::ContentBlockerHandler(WebKitUserContentManager* content_m
   // Use XDG cache directory or fallback to /tmp
   const char* xdg_cache = g_get_user_cache_dir();
   if (xdg_cache != nullptr) {
-    store_path_ = std::string(xdg_cache) + "/flutter_inappwebview/" + app_id + "/content_filters";
+    store_path_ = std::string(xdg_cache) + "/zikzak_inappwebview/" + app_id + "/content_filters";
   } else {
-    store_path_ = "/tmp/flutter_inappwebview/" + app_id + "/content_filters";
+    store_path_ = "/tmp/zikzak_inappwebview/" + app_id + "/content_filters";
   }
 
   // Ensure directory exists
@@ -349,4 +349,4 @@ void ContentBlockerHandler::onFilterCompiled(GObject* source, GAsyncResult* resu
   if (callback) callback(true);
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

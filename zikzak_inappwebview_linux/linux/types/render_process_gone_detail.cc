@@ -2,7 +2,7 @@
 
 #include "../utils/flutter.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 RenderProcessGoneDetail::RenderProcessGoneDetail(WebKitWebProcessTerminationReason reason) {
   // Map WPE WebKit termination reasons to didCrash:
@@ -29,4 +29,4 @@ FlValue* RenderProcessGoneDetail::toFlValue() const {
   });
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

@@ -1,10 +1,10 @@
-#ifndef FLUTTER_INAPPWEBVIEW_LINUX_PLUGIN_INSTANCE_H_
-#define FLUTTER_INAPPWEBVIEW_LINUX_PLUGIN_INSTANCE_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_LINUX_PLUGIN_INSTANCE_H_
+#define ZIKZAK_INAPPWEBVIEW_LINUX_PLUGIN_INSTANCE_H_
 
 #include <flutter_linux/flutter_linux.h>
 #include <gtk/gtk.h>
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 // Forward declarations
 class InAppWebViewManager;
@@ -17,7 +17,7 @@ class WebStorageManager;
 class WebViewEnvironment;
 
 /// Plugin instance - provides access to all managers
-/// This is the C++ equivalent of FlutterInappwebviewWindowsPlugin
+/// This is the C++ equivalent of ZikzakInappwebviewWindowsPlugin
 /// 
 /// Following the Windows pattern, this class provides a way to pass
 /// the plugin instance to all managers and components without using
@@ -62,6 +62,6 @@ private:
   FlView* fl_view_ = nullptr;        // Cached during plugin registration
 };
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
-#endif  // FLUTTER_INAPPWEBVIEW_LINUX_PLUGIN_INSTANCE_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_LINUX_PLUGIN_INSTANCE_H_

@@ -1,5 +1,5 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_WEBVIEW_ENVIRONMENT_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_WEBVIEW_ENVIRONMENT_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_PLUGIN_WEBVIEW_ENVIRONMENT_H_
+#define ZIKZAK_INAPPWEBVIEW_PLUGIN_WEBVIEW_ENVIRONMENT_H_
 
 #include <flutter_linux/flutter_linux.h>
 #include <wpe/webkit.h>
@@ -11,7 +11,7 @@
 
 #include "types/channel_delegate.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 class PluginInstance;
 
@@ -51,7 +51,7 @@ class WebViewEnvironmentInstanceChannelDelegate : public ChannelDelegate {
 class WebViewEnvironment : public ChannelDelegate {
  public:
   static constexpr const char* METHOD_CHANNEL_NAME =
-      "com.pichillilorenzo/flutter_webview_environment";
+      "wtf.zikzak/flutter_webview_environment";
 
   WebViewEnvironment(PluginInstance* plugin);
   ~WebViewEnvironment() override;
@@ -96,6 +96,6 @@ class WebViewEnvironment : public ChannelDelegate {
   WebViewEnvironmentInstanceChannelDelegate* getInstance(const std::string& id) const;
 };
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_WEBVIEW_ENVIRONMENT_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_WEBVIEW_ENVIRONMENT_H_

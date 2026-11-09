@@ -1,5 +1,5 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_PERMISSION_REQUEST_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_PERMISSION_REQUEST_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_PLUGIN_PERMISSION_REQUEST_H_
+#define ZIKZAK_INAPPWEBVIEW_PLUGIN_PERMISSION_REQUEST_H_
 
 #include <flutter_linux/flutter_linux.h>
 #include <wpe/webkit.h>
@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 /**
  * Permission resource types that can be requested.
@@ -49,6 +49,6 @@ class PermissionRequest {
   static std::vector<PermissionResourceType> getResourceTypes(WebKitPermissionRequest* request);
 };
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_PERMISSION_REQUEST_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_PERMISSION_REQUEST_H_

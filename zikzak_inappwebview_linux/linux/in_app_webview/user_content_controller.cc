@@ -12,7 +12,7 @@
 
 #include "../utils/log.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 using json = nlohmann::json;
 
@@ -448,4 +448,4 @@ gboolean UserContentController::onScriptMessageWithReplyReceived(
   return FALSE;
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

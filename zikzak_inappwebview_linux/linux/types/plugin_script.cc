@@ -1,6 +1,6 @@
 #include "plugin_script.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 PluginScript::PluginScript(const std::string& groupName, const std::string& source,
                            UserScriptInjectionTime injectionTime, bool forMainFrameOnly,
@@ -19,4 +19,4 @@ bool PluginScript::operator==(const PluginScript& other) const {
          messageHandlerNames == other.messageHandlerNames;
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

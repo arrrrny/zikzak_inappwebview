@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
+import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
 import '../find_interaction/find_interaction_controller.dart';
 import '../webview_environment/webview_environment.dart';
@@ -198,11 +198,11 @@ class LinuxInAppWebViewWidgetCreationParams
   final LinuxWebViewEnvironment? webViewEnvironment;
 }
 
-///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewWidget}
+///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewWidget}
 class LinuxInAppWebViewWidget extends PlatformInAppWebViewWidget {
   /// Constructs a [LinuxInAppWebViewWidget].
   ///
-  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewWidget}
+  ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewWidget}
   LinuxInAppWebViewWidget(PlatformInAppWebViewWidgetCreationParams params)
     : super.implementation(
         params is LinuxInAppWebViewWidgetCreationParams

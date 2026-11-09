@@ -1,5 +1,5 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_INAPPWEBVIEW_TEXTURE_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_INAPPWEBVIEW_TEXTURE_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_PLUGIN_INAPPWEBVIEW_TEXTURE_H_
+#define ZIKZAK_INAPPWEBVIEW_PLUGIN_INAPPWEBVIEW_TEXTURE_H_
 
 #include <flutter_linux/flutter_linux.h>
 
@@ -12,14 +12,14 @@ G_DECLARE_FINAL_TYPE(InAppWebViewTexture, inappwebview_texture, INAPPWEBVIEW, TE
                      FlPixelBufferTexture)
 
 // Forward declaration
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 class InAppWebView;
 using WebViewType = InAppWebView;
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
 // Create a new InAppWebViewTexture
-InAppWebViewTexture* inappwebview_texture_new(flutter_inappwebview_plugin::WebViewType* webview);
+InAppWebViewTexture* inappwebview_texture_new(zikzak_inappwebview::WebViewType* webview);
 
 G_END_DECLS
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_INAPPWEBVIEW_TEXTURE_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_INAPPWEBVIEW_TEXTURE_H_

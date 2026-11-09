@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
+import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
 import 'web_message_channel.dart';
 
@@ -29,7 +29,7 @@ class LinuxWebMessagePortCreationParams
   }
 }
 
-///{@macro flutter_inappwebview_platform_interface.PlatformWebMessagePort}
+///{@macro zikzak_inappwebview_platform_interface.PlatformWebMessagePort}
 class LinuxWebMessagePort extends PlatformWebMessagePort {
   WebMessageCallback? _onMessage;
   late LinuxWebMessageChannel _webMessageChannel;

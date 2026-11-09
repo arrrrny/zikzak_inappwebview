@@ -1,5 +1,5 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_IN_APP_WEBVIEW_SETTINGS_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_IN_APP_WEBVIEW_SETTINGS_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_PLUGIN_IN_APP_WEBVIEW_SETTINGS_H_
+#define ZIKZAK_INAPPWEBVIEW_PLUGIN_IN_APP_WEBVIEW_SETTINGS_H_
 
 #include <flutter_linux/flutter_linux.h>
 #include <wpe/webkit.h>
@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 class InAppWebView;
 
@@ -185,6 +185,6 @@ class InAppWebViewSettings {
   FlValue* getRealSettings(const InAppWebView* inAppWebView) const;
 };
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_IN_APP_WEBVIEW_SETTINGS_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_IN_APP_WEBVIEW_SETTINGS_H_

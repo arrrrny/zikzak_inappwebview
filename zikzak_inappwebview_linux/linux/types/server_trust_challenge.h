@@ -1,5 +1,5 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_SERVER_TRUST_CHALLENGE_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_SERVER_TRUST_CHALLENGE_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_PLUGIN_SERVER_TRUST_CHALLENGE_H_
+#define ZIKZAK_INAPPWEBVIEW_PLUGIN_SERVER_TRUST_CHALLENGE_H_
 
 #include <flutter_linux/flutter_linux.h>
 #include <gio/gio.h>
@@ -12,7 +12,7 @@
 
 #include "ssl_certificate.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 /**
  * SSL Error type - maps to Dart's SslErrorType.
@@ -85,6 +85,6 @@ class ServerTrustChallenge {
       const std::string& failingUri, GTlsCertificate* certificate, GTlsCertificateFlags errors);
 };
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_SERVER_TRUST_CHALLENGE_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_SERVER_TRUST_CHALLENGE_H_

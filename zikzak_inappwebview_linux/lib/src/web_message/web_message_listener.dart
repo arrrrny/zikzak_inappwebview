@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
+import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
 /// Object specifying creation parameters for creating a [LinuxWebMessageListener].
 ///
@@ -37,7 +37,7 @@ class LinuxWebMessageListenerCreationParams
   }
 }
 
-///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageListener}
+///{@macro zikzak_inappwebview_platform_interface.PlatformWebMessageListener}
 class LinuxWebMessageListener extends PlatformWebMessageListener
     with ChannelController {
   /// Constructs a [LinuxWebMessageListener].
@@ -54,7 +54,7 @@ class LinuxWebMessageListener extends PlatformWebMessageListener
       "allowedOriginRules cannot contain empty strings",
     );
     channel = MethodChannel(
-      'com.pichillilorenzo/flutter_inappwebview_web_message_listener_${_id}_${params.jsObjectName}',
+      'wtf.zikzak/zikzak_inappwebview_web_message_listener_${_id}_${params.jsObjectName}',
     );
     handler = _handleMethod;
     initMethodCallHandler();
@@ -157,7 +157,7 @@ class LinuxJavaScriptReplyProxyCreationParams
   }
 }
 
-///{@macro flutter_inappwebview_platform_interface.JavaScriptReplyProxy}
+///{@macro zikzak_inappwebview_platform_interface.JavaScriptReplyProxy}
 class LinuxJavaScriptReplyProxy extends PlatformJavaScriptReplyProxy {
   /// Constructs a [LinuxWebMessageListener].
   LinuxJavaScriptReplyProxy(PlatformJavaScriptReplyProxyCreationParams params)

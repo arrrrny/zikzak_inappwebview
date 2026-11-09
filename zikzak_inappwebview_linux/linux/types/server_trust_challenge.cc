@@ -6,7 +6,7 @@
 #include "../utils/flutter.h"
 #include "../utils/uri.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 // === SslError ===
 
@@ -171,4 +171,4 @@ std::unique_ptr<ServerTrustChallenge> ServerTrustChallenge::fromTlsError(
   return std::make_unique<ServerTrustChallenge>(protectionSpace);
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

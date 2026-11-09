@@ -15,7 +15,7 @@
 #include "utils/log.h"
 #include "utils/util.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 using json = nlohmann::json;
 
@@ -29,7 +29,7 @@ bool string_equals(const gchar* a, const char* b) {
 
 const SecretSchema* CredentialDatabase::getSchema() {
   static const SecretSchema schema = {
-    "com.pichillilorenzo.flutter_inappwebview.HttpAuth",
+    "wtf.zikzak.zikzak_inappwebview.HttpAuth",
       SECRET_SCHEMA_NONE,
       {
       {"appId", SECRET_SCHEMA_ATTRIBUTE_STRING},
@@ -166,7 +166,7 @@ std::string CredentialDatabase::getIndexPath(const std::string& app_id) {
     }
   }
 
-  std::string dir = base_dir + "/flutter_inappwebview";
+  std::string dir = base_dir + "/zikzak_inappwebview";
   mkdir(dir.c_str(), 0700);
 
   std::string app_dir = dir + "/" + app_id;
@@ -591,4 +591,4 @@ void CredentialDatabase::clearAllAuthCredentials() {
   unlink(index_path_.c_str());
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

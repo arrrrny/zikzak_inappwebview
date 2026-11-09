@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
+import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
 /// Object specifying creation parameters for creating a [LinuxFindInteractionController].
 ///
@@ -82,7 +82,7 @@ class LinuxFindInteractionController extends PlatformFindInteractionController
     return null;
   }
 
-  ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.findAll}
+  ///{@macro zikzak_inappwebview_platform_interface.PlatformFindInteractionController.findAll}
   @override
   Future<void> findAll({String? find}) async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -90,7 +90,7 @@ class LinuxFindInteractionController extends PlatformFindInteractionController
     await channel?.invokeMethod('findAll', args);
   }
 
-  ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.findNext}
+  ///{@macro zikzak_inappwebview_platform_interface.PlatformFindInteractionController.findNext}
   @override
   Future<void> findNext({bool forward = true}) async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -98,14 +98,14 @@ class LinuxFindInteractionController extends PlatformFindInteractionController
     await channel?.invokeMethod('findNext', args);
   }
 
-  ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.clearMatches}
+  ///{@macro zikzak_inappwebview_platform_interface.PlatformFindInteractionController.clearMatches}
   @override
   Future<void> clearMatches() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await channel?.invokeMethod('clearMatches', args);
   }
 
-  ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.setSearchText}
+  ///{@macro zikzak_inappwebview_platform_interface.PlatformFindInteractionController.setSearchText}
   @override
   Future<void> setSearchText(String? searchText) async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -113,14 +113,14 @@ class LinuxFindInteractionController extends PlatformFindInteractionController
     await channel?.invokeMethod('setSearchText', args);
   }
 
-  ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.getSearchText}
+  ///{@macro zikzak_inappwebview_platform_interface.PlatformFindInteractionController.getSearchText}
   @override
   Future<String?> getSearchText() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await channel?.invokeMethod<String?>('getSearchText', args);
   }
 
-  ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.getActiveFindSession}
+  ///{@macro zikzak_inappwebview_platform_interface.PlatformFindInteractionController.getActiveFindSession}
   @override
   Future<FindSession?> getActiveFindSession() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -131,7 +131,7 @@ class LinuxFindInteractionController extends PlatformFindInteractionController
     return FindSession.fromMap(result);
   }
 
-  ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.dispose}
+  ///{@macro zikzak_inappwebview_platform_interface.PlatformFindInteractionController.dispose}
   @override
   void dispose({bool isKeepAlive = false}) {
     disposeChannel(removeMethodCallHandler: !isKeepAlive);
@@ -141,7 +141,7 @@ class LinuxFindInteractionController extends PlatformFindInteractionController
 extension InternalFindInteractionController on LinuxFindInteractionController {
   void init(dynamic id) {
     channel = MethodChannel(
-      'com.pichillilorenzo/flutter_inappwebview_find_interaction_$id',
+      'wtf.zikzak/zikzak_inappwebview_find_interaction_$id',
     );
     handler = _handleMethod;
     initMethodCallHandler();

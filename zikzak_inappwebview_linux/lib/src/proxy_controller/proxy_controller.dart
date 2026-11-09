@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
+import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
 /// Object specifying creation parameters for creating a [LinuxProxyController].
 ///
@@ -25,13 +25,13 @@ class LinuxProxyControllerCreationParams
   }
 }
 
-///{@macro flutter_inappwebview_platform_interface.PlatformProxyController}
+///{@macro zikzak_inappwebview_platform_interface.PlatformProxyController}
 ///
 /// Linux implementation of [PlatformProxyController] using WPE WebKit's
 /// [WebKitNetworkProxySettings](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/struct.NetworkProxySettings.html).
 class LinuxProxyController extends PlatformProxyController {
   static const MethodChannel _channel = MethodChannel(
-    'com.pichillilorenzo/flutter_inappwebview_proxycontroller',
+    'wtf.zikzak/zikzak_inappwebview_proxycontroller',
   );
 
   /// Creates a new [LinuxProxyController].

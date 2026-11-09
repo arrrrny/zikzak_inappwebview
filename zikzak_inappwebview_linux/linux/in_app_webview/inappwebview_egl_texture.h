@@ -1,5 +1,5 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_INAPPWEBVIEW_EGL_TEXTURE_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_INAPPWEBVIEW_EGL_TEXTURE_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_PLUGIN_INAPPWEBVIEW_EGL_TEXTURE_H_
+#define ZIKZAK_INAPPWEBVIEW_PLUGIN_INAPPWEBVIEW_EGL_TEXTURE_H_
 
 #include <flutter_linux/flutter_linux.h>
 
@@ -26,10 +26,10 @@ G_DECLARE_FINAL_TYPE(InAppWebViewEGLTexture, inappwebview_egl_texture, INAPPWEBV
                      FlTextureGL)
 
 // Forward declaration
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 class InAppWebView;
 using WebViewType = InAppWebView;
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
 /**
  * Creates a new InAppWebViewEGLTexture.
@@ -41,7 +41,7 @@ using WebViewType = InAppWebView;
  * @return A new InAppWebViewEGLTexture instance.
  */
 InAppWebViewEGLTexture* inappwebview_egl_texture_new(
-    flutter_inappwebview_plugin::WebViewType* webview);
+    zikzak_inappwebview::WebViewType* webview);
 
 /**
  * Updates the texture with a new EGL image.
@@ -61,4 +61,4 @@ void inappwebview_egl_texture_set_egl_image(InAppWebViewEGLTexture* self,
 
 G_END_DECLS
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_INAPPWEBVIEW_EGL_TEXTURE_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_INAPPWEBVIEW_EGL_TEXTURE_H_

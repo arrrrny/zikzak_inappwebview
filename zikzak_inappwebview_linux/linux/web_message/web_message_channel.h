@@ -1,5 +1,5 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_WEB_MESSAGE_CHANNEL_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_WEB_MESSAGE_CHANNEL_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_PLUGIN_WEB_MESSAGE_CHANNEL_H_
+#define ZIKZAK_INAPPWEBVIEW_PLUGIN_WEB_MESSAGE_CHANNEL_H_
 
 #include <flutter_linux/flutter_linux.h>
 
@@ -8,7 +8,7 @@
 
 #include "../types/channel_delegate.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 class InAppWebView;
 
@@ -22,7 +22,7 @@ class InAppWebView;
 class WebMessageChannel : public ChannelDelegate {
  public:
   static constexpr const char* METHOD_CHANNEL_NAME_PREFIX =
-      "com.pichillilorenzo/flutter_inappwebview_web_message_channel_";
+      "wtf.zikzak/zikzak_inappwebview_web_message_channel_";
 
   WebMessageChannel(FlBinaryMessenger* messenger, const std::string& channelId,
                     InAppWebView* webView);
@@ -53,6 +53,6 @@ class WebMessageChannel : public ChannelDelegate {
   InAppWebView* webView_;  // Weak reference - InAppWebView owns WebMessageChannels
 };
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_WEB_MESSAGE_CHANNEL_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_WEB_MESSAGE_CHANNEL_H_

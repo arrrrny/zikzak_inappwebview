@@ -2,7 +2,7 @@
 
 #include "../utils/flutter.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 CustomSchemeResponse::CustomSchemeResponse()
     : contentType("application/octet-stream"), contentEncoding("utf-8") {}
@@ -25,4 +25,4 @@ FlValue* CustomSchemeResponse::toFlValue() const {
   });
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

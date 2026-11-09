@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
+import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
 /// Object specifying creation parameters for creating a [LinuxHttpAuthCredentialDatabase].
 ///
@@ -26,11 +26,11 @@ class LinuxHttpAuthCredentialDatabaseCreationParams
   }
 }
 
-///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase}
+///{@macro zikzak_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase}
 ///
 /// This implementation delegates to native C++ code which uses libsecret for secure storage.
 /// Passwords are stored in the system keyring (gnome-keyring, KDE Wallet, etc.).
-/// A JSON index file at ~/.local/share/flutter_inappwebview/<appId>/credential_index.json
+/// A JSON index file at ~/.local/share/zikzak_inappwebview/<appId>/credential_index.json
 /// is used to enumerate stored credentials (contains only usernames, not passwords).
 ///
 /// The native `appId` is resolved from `GApplication.application_id` when available.
@@ -38,7 +38,7 @@ class LinuxHttpAuthCredentialDatabaseCreationParams
 class LinuxHttpAuthCredentialDatabase
     extends PlatformHttpAuthCredentialDatabase {
   static const MethodChannel _channel = MethodChannel(
-    'com.pichillilorenzo/flutter_inappwebview_credential_database',
+    'wtf.zikzak/zikzak_inappwebview_credential_database',
   );
 
   /// Creates a new [LinuxHttpAuthCredentialDatabase].

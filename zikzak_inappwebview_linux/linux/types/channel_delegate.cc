@@ -2,7 +2,7 @@
 
 #include <cstring>
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 ChannelDelegate::ChannelDelegate(FlBinaryMessenger* messenger, const std::string& name)
     : messenger_(messenger) {
@@ -57,4 +57,4 @@ void ChannelDelegate::unregisterMethodCallHandler() {
   }
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

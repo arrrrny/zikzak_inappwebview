@@ -1,5 +1,5 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_CONTENT_BLOCKER_HANDLER_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_CONTENT_BLOCKER_HANDLER_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_PLUGIN_CONTENT_BLOCKER_HANDLER_H_
+#define ZIKZAK_INAPPWEBVIEW_PLUGIN_CONTENT_BLOCKER_HANDLER_H_
 
 #include <flutter_linux/flutter_linux.h>
 #include <wpe/webkit.h>
@@ -8,7 +8,7 @@
 #include <memory>
 #include <string>
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 class InAppWebView;
 
@@ -97,6 +97,6 @@ class ContentBlockerHandler {
   };
 };
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_CONTENT_BLOCKER_HANDLER_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_CONTENT_BLOCKER_HANDLER_H_

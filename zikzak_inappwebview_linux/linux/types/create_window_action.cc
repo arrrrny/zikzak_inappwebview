@@ -2,7 +2,7 @@
 
 #include "../utils/flutter.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 WindowFeatures::WindowFeatures(WebKitWindowProperties* properties) {
   if (properties == nullptr) {
@@ -84,4 +84,4 @@ FlValue* CreateWindowAction::toFlValue() const {
   });
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

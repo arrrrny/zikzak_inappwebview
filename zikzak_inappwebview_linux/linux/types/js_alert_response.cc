@@ -2,7 +2,7 @@
 
 #include "../utils/flutter.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 JsAlertResponse::JsAlertResponse()
     : handledByClient(false), action(JsAlertResponseAction::CONFIRM) {}
@@ -19,4 +19,4 @@ JsAlertResponse::JsAlertResponse(FlValue* map)
   message = get_optional_fl_map_value<std::string>(map, "message");
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

@@ -2,7 +2,7 @@
 
 #include "../utils/flutter.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 // Static member initialization
 std::shared_ptr<ContentWorld> ContentWorld::pageWorld_;
@@ -47,4 +47,4 @@ std::shared_ptr<ContentWorld> ContentWorld::world(const std::string& name) {
   return std::make_shared<ContentWorld>(name);
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

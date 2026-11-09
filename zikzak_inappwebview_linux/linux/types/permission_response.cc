@@ -2,7 +2,7 @@
 
 #include "../utils/flutter.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 PermissionResponse::PermissionResponse() : action(PermissionResponseAction::DENY) {}
 
@@ -26,4 +26,4 @@ PermissionResponse::PermissionResponse(FlValue* map) : action(PermissionResponse
   }
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

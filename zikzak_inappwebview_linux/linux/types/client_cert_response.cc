@@ -2,7 +2,7 @@
 
 #include "../utils/flutter.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 ClientCertResponse::ClientCertResponse()
     : action(ClientCertResponseAction::CANCEL), selectedCertificate(-1) {}
@@ -59,4 +59,4 @@ std::optional<ClientCertResponse> ClientCertResponse::fromFlValue(FlValue* value
   return std::nullopt;
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

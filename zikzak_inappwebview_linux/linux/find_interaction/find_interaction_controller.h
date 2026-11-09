@@ -1,5 +1,5 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_FIND_INTERACTION_CONTROLLER_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_FIND_INTERACTION_CONTROLLER_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_PLUGIN_FIND_INTERACTION_CONTROLLER_H_
+#define ZIKZAK_INAPPWEBVIEW_PLUGIN_FIND_INTERACTION_CONTROLLER_H_
 
 #include <flutter_linux/flutter_linux.h>
 #include <wpe/webkit.h>
@@ -10,7 +10,7 @@
 
 #include "../types/find_session.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 class InAppWebView;
 class FindInteractionChannelDelegate;
@@ -18,7 +18,7 @@ class FindInteractionChannelDelegate;
 class FindInteractionController {
  public:
   static constexpr const char* METHOD_CHANNEL_NAME_PREFIX =
-      "com.pichillilorenzo/flutter_inappwebview_find_interaction_";
+      "wtf.zikzak/zikzak_inappwebview_find_interaction_";
 
   FindInteractionController(InAppWebView* webView);
   ~FindInteractionController();
@@ -54,6 +54,6 @@ class FindInteractionController {
   gulong failed_to_find_text_handler_id_ = 0;
 };
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_FIND_INTERACTION_CONTROLLER_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_FIND_INTERACTION_CONTROLLER_H_

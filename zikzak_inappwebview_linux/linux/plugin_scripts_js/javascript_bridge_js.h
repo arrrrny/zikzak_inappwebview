@@ -1,5 +1,5 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_JAVASCRIPT_BRIDGE_JS_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_JAVASCRIPT_BRIDGE_JS_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_PLUGIN_JAVASCRIPT_BRIDGE_JS_H_
+#define ZIKZAK_INAPPWEBVIEW_PLUGIN_JAVASCRIPT_BRIDGE_JS_H_
 
 #include <memory>
 #include <optional>
@@ -9,7 +9,7 @@
 #include "../types/plugin_script.h"
 #include "../utils/string.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 // Forward declaration to avoid circular dependency
 class WindowIdJS;
@@ -37,7 +37,7 @@ class JavaScriptBridgeJS {
 
   /**
    * Returns the JavaScript variable name for the window ID.
-   * Match iOS WindowIdJS: "window._flutter_inappwebview_windowId"
+   * Match iOS WindowIdJS: "window._zikzak_inappwebview_windowId"
    */
   static std::string WINDOW_ID_VARIABLE_JS_SOURCE() {
     return "window._" + get_JAVASCRIPT_BRIDGE_NAME() + "_windowId";
@@ -45,7 +45,7 @@ class JavaScriptBridgeJS {
 
   /**
    * JavaScript source code for the bridge.
-   * This code sets up window.flutter_inappwebview.callHandler() function
+   * This code sets up window.zikzak_inappwebview.callHandler() function
    * which communicates with native code via webkit.messageHandlers.
    *
    * Matches iOS JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_JS_SOURCE()
@@ -132,9 +132,9 @@ window.)JS" +
   }
 
  private:
-  inline static std::string _JAVASCRIPT_BRIDGE_NAME = "flutter_inappwebview";
+  inline static std::string _JAVASCRIPT_BRIDGE_NAME = "zikzak_inappwebview";
 };
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_JAVASCRIPT_BRIDGE_JS_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_JAVASCRIPT_BRIDGE_JS_H_

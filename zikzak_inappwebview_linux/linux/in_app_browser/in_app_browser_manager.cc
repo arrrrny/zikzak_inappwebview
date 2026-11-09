@@ -12,7 +12,7 @@
 #include "../utils/flutter.h"
 #include "../utils/log.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 InAppBrowserManager::InAppBrowserManager(PluginInstance* plugin) : plugin_(plugin) {
   // Validate plugin
@@ -231,4 +231,4 @@ InAppBrowser* InAppBrowserManager::getBrowser(const std::string& id) {
   return nullptr;
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

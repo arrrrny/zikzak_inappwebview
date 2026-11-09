@@ -2,7 +2,7 @@
 
 #include "../utils/flutter.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 WebResourceResponse::WebResourceResponse(
     const std::optional<std::string>& contentType,
@@ -36,4 +36,4 @@ FlValue* WebResourceResponse::toFlValue() const {
   });
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

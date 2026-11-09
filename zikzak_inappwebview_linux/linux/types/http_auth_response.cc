@@ -2,7 +2,7 @@
 
 #include "../utils/flutter.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 HttpAuthResponse::HttpAuthResponse()
     : action(HttpAuthResponseAction::CANCEL), permanentPersistence(false) {}
@@ -22,4 +22,4 @@ HttpAuthResponse::HttpAuthResponse(FlValue* map)
   permanentPersistence = get_fl_map_value(map, "permanentPersistence", false);
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

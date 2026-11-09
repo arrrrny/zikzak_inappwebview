@@ -1,11 +1,11 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_WEB_MESSAGE_CHANNEL_JS_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_WEB_MESSAGE_CHANNEL_JS_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_PLUGIN_WEB_MESSAGE_CHANNEL_JS_H_
+#define ZIKZAK_INAPPWEBVIEW_PLUGIN_WEB_MESSAGE_CHANNEL_JS_H_
 
 #include <string>
 
 #include "javascript_bridge_js.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 /**
  * JavaScript support for WebMessageChannel.
@@ -18,7 +18,7 @@ class WebMessageChannelJS {
  public:
   /**
    * Returns the JavaScript variable name for storing WebMessageChannels.
-   * Example: "window.flutter_inappwebview._webMessageChannels"
+   * Example: "window.zikzak_inappwebview._webMessageChannels"
    */
   static std::string WEB_MESSAGE_CHANNELS_VARIABLE_NAME() {
     return "window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() +
@@ -145,6 +145,6 @@ class WebMessageChannelJS {
   }
 };
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_WEB_MESSAGE_CHANNEL_JS_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_WEB_MESSAGE_CHANNEL_JS_H_

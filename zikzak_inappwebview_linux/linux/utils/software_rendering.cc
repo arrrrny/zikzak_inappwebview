@@ -11,7 +11,7 @@
 
 #include "log.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 namespace {
 
@@ -146,7 +146,7 @@ bool HasProblematicGpuDriver() {
 
 bool ShouldUseSoftwareRendering() {
   // Check user override: skip detection
-  const char* skip_check = getenv("FLUTTER_INAPPWEBVIEW_SKIP_DMABUF_CHECK");
+  const char* skip_check = getenv("ZIKZAK_INAPPWEBVIEW_SKIP_DMABUF_CHECK");
   if (skip_check && (strcmp(skip_check, "1") == 0 || strcasecmp(skip_check, "true") == 0)) {
     return false;
   }
@@ -197,4 +197,4 @@ bool ApplySoftwareRenderingIfNeeded() {
   return false;
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

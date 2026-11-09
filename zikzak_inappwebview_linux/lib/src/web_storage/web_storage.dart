@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
+import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
 import '../in_app_webview/in_app_webview_controller.dart';
 
@@ -29,7 +29,7 @@ class LinuxWebStorageCreationParams extends PlatformWebStorageCreationParams {
   }
 }
 
-///{@macro flutter_inappwebview_platform_interface.PlatformWebStorage}
+///{@macro zikzak_inappwebview_platform_interface.PlatformWebStorage}
 class LinuxWebStorage extends PlatformWebStorage {
   /// Constructs a [LinuxWebStorage].
   LinuxWebStorage(PlatformWebStorageCreationParams params)
@@ -79,7 +79,7 @@ class LinuxStorageCreationParams extends PlatformStorageCreationParams {
   }
 }
 
-///{@macro flutter_inappwebview_platform_interface.PlatformStorage}
+///{@macro zikzak_inappwebview_platform_interface.PlatformStorage}
 abstract mixin class LinuxStorage implements PlatformStorage {
   @override
   LinuxInAppWebViewController? controller;
@@ -218,7 +218,7 @@ class LinuxLocalStorageCreationParams extends PlatformLocalStorageCreationParams
   }
 }
 
-///{@macro flutter_inappwebview_platform_interface.PlatformLocalStorage}
+///{@macro zikzak_inappwebview_platform_interface.PlatformLocalStorage}
 class LinuxLocalStorage extends PlatformLocalStorage with LinuxStorage {
   /// Constructs a [LinuxLocalStorage].
   LinuxLocalStorage(PlatformLocalStorageCreationParams params)
@@ -271,7 +271,7 @@ class LinuxSessionStorageCreationParams
   }
 }
 
-///{@macro flutter_inappwebview_platform_interface.PlatformSessionStorage}
+///{@macro zikzak_inappwebview_platform_interface.PlatformSessionStorage}
 class LinuxSessionStorage extends PlatformSessionStorage with LinuxStorage {
   /// Constructs a [LinuxSessionStorage].
   LinuxSessionStorage(PlatformSessionStorageCreationParams params)

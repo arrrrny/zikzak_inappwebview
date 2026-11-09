@@ -1,5 +1,5 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_WEB_MESSAGE_LISTENER_CHANNEL_DELEGATE_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_WEB_MESSAGE_LISTENER_CHANNEL_DELEGATE_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_PLUGIN_WEB_MESSAGE_LISTENER_CHANNEL_DELEGATE_H_
+#define ZIKZAK_INAPPWEBVIEW_PLUGIN_WEB_MESSAGE_LISTENER_CHANNEL_DELEGATE_H_
 
 #include <flutter_linux/flutter_linux.h>
 
@@ -8,7 +8,7 @@
 
 #include "../types/channel_delegate.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 class WebMessageListener;
 
@@ -20,7 +20,7 @@ class WebMessageListener;
  *
  * This follows the federated plugin pattern matching iOS/Android:
  * - Dedicated MethodChannel per WebMessageListener instance
- * - Channel name: com.pichillilorenzo/flutter_inappwebview_web_message_listener_{id}_{jsObjectName}
+ * - Channel name: wtf.zikzak/zikzak_inappwebview_web_message_listener_{id}_{jsObjectName}
  */
 class WebMessageListenerChannelDelegate : public ChannelDelegate {
  public:
@@ -56,6 +56,6 @@ class WebMessageListenerChannelDelegate : public ChannelDelegate {
   WebMessageListener* webMessageListener_;
 };
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_WEB_MESSAGE_LISTENER_CHANNEL_DELEGATE_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_WEB_MESSAGE_LISTENER_CHANNEL_DELEGATE_H_

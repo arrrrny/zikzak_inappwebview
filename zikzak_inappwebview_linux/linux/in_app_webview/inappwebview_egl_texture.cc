@@ -9,7 +9,7 @@
 
 // Use the shared HasCurrentGLContext from gl_context.h
 static gboolean has_current_gl_context() {
-  return flutter_inappwebview_plugin::HasCurrentGLContext() ? TRUE : FALSE;
+  return zikzak_inappwebview::HasCurrentGLContext() ? TRUE : FALSE;
 }
 
 /**
@@ -35,7 +35,7 @@ struct _InAppWebViewEGLTexture {
   FlTextureGL parent_instance;
 
   // Reference to the webview (not owned)
-  flutter_inappwebview_plugin::WebViewType* webview;
+  zikzak_inappwebview::WebViewType* webview;
 
   // The GL texture bound to the current EGL image
   GLuint texture_id;
@@ -93,10 +93,10 @@ static gboolean check_egl_image_extension(InAppWebViewEGLTexture* self) {
   }
 
   if (self->extension_available) {
-    flutter_inappwebview_plugin::debugLog(
+    zikzak_inappwebview::debugLog(
         "InAppWebViewEGLTexture: GL_OES_EGL_image extension available - zero-copy enabled");
   } else {
-    flutter_inappwebview_plugin::debugLog(
+    zikzak_inappwebview::debugLog(
         "InAppWebViewEGLTexture: GL_OES_EGL_image extension NOT available - falling back to "
         "pixel buffer");
   }
@@ -189,7 +189,7 @@ static gboolean inappwebview_egl_texture_populate(FlTextureGL* texture, uint32_t
     if (required_size > 0 && buf_width > 0 && buf_height > 0) {
       static bool first_fallback = true;
       if (first_fallback) {
-        flutter_inappwebview_plugin::debugLog(
+        zikzak_inappwebview::debugLog(
             "InAppWebViewEGLTexture: using pixel buffer fallback (SHM mode), size=" +
             std::to_string(buf_width) + "x" + std::to_string(buf_height));
         first_fallback = false;
@@ -319,11 +319,11 @@ static void inappwebview_egl_texture_init(InAppWebViewEGLTexture* self) {
 }
 
 InAppWebViewEGLTexture* inappwebview_egl_texture_new(
-    flutter_inappwebview_plugin::WebViewType* webview) {
+    zikzak_inappwebview::WebViewType* webview) {
   InAppWebViewEGLTexture* self =
       INAPPWEBVIEW_EGL_TEXTURE(g_object_new(INAPPWEBVIEW_TYPE_EGL_TEXTURE, nullptr));
   self->webview = webview;
-  flutter_inappwebview_plugin::debugLog("InAppWebViewEGLTexture: created (zero-copy mode)");
+  zikzak_inappwebview::debugLog("InAppWebViewEGLTexture: created (zero-copy mode)");
   return self;
 }
 

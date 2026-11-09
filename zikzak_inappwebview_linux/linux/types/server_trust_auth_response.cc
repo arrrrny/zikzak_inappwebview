@@ -2,7 +2,7 @@
 
 #include "../utils/flutter.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 ServerTrustAuthResponse::ServerTrustAuthResponse(ServerTrustAuthResponseAction action)
     : action(action) {}
@@ -37,4 +37,4 @@ std::optional<ServerTrustAuthResponse> ServerTrustAuthResponse::fromFlValue(FlVa
   return ServerTrustAuthResponse(action);
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

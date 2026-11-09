@@ -64,7 +64,7 @@
 #include "../types/web_resource_request.h"
 #include "../types/web_view_transport.h"
 #include "../credential_database.h"
-#include "../flutter_inappwebview_linux_plugin_private.h"
+#include "../zikzak_inappwebview_linux_plugin_private.h"
 #include "../plugin_instance.h"
 #include "../utils/flutter.h"
 #include "../utils/gl_context.h"
@@ -81,7 +81,7 @@
 using json = nlohmann::json;
 
 // Forward declaration of InAppWebView for FileChooserContext
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 class InAppWebView;
 }
 
@@ -90,11 +90,11 @@ class InAppWebView;
 struct FileChooserContext {
   WebKitFileChooserRequest* request;
   bool selectMultiple;
-  flutter_inappwebview_plugin::InAppWebView* webview;  // Pointer to webview for tracking active dialog
+  zikzak_inappwebview::InAppWebView* webview;  // Pointer to webview for tracking active dialog
   gulong response_handler_id;  // Signal handler ID for cleanup
   
   FileChooserContext(WebKitFileChooserRequest* req, bool multi, 
-                     flutter_inappwebview_plugin::InAppWebView* wv)
+                     zikzak_inappwebview::InAppWebView* wv)
       : request(req), selectMultiple(multi), webview(wv), response_handler_id(0) {
     g_object_ref(request);
   }
@@ -122,7 +122,7 @@ static void wpe_export_shm_buffer_callback(void* data, struct wpe_fdo_shm_export
 }
 #endif
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 namespace {
 
@@ -1022,7 +1022,7 @@ void InAppWebView::PrepareAndAddUserScripts() {
 
   // === Add Console Log Interception Script ===
   // Note: Console log is always for main frame only to avoid issues
-  // (see https://github.com/pichillilorenzo/flutter_inappwebview/issues/1738)
+  // (see https://github.com/pichillilorenzo/zikzak_inappwebview/issues/1738)
   auto consoleLogScript = ConsoleLogJS::CONSOLE_LOG_JS_PLUGIN_SCRIPT(pluginScriptsOriginAllowList);
   user_content_controller_->addPluginScript(std::move(consoleLogScript));
 
@@ -1159,7 +1159,7 @@ void InAppWebView::UpdateMonitorRefreshRate() {
     return;
   }
 
-  int refresh_rate_mhz = flutter_inappwebview_linux_plugin_get_monitor_refresh_rate_for_window(gtk_window_);
+  int refresh_rate_mhz = zikzak_inappwebview_linux_plugin_get_monitor_refresh_rate_for_window(gtk_window_);
   if (refresh_rate_mhz > 0) {
     uint32_t new_rate = static_cast<uint32_t>(refresh_rate_mhz);
     // Only update if the rate has actually changed
@@ -7981,7 +7981,7 @@ void InAppWebView::OnCustomSchemeRequest(WebKitURISchemeRequest* request, gpoint
   self->channel_delegate_->onLoadResourceWithCustomScheme(webResourceRequest, std::move(callback));
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
 #ifdef HAVE_WPE_BACKEND_LEGACY
 // C-style callback implementation for WPE FDO EGL export
@@ -7989,12 +7989,12 @@ void InAppWebView::OnCustomSchemeRequest(WebKitURISchemeRequest* request, gpoint
 extern "C" {
 static void wpe_export_fdo_egl_image_callback(void* data,
                                               struct wpe_fdo_egl_exported_image* image) {
-  auto* self = static_cast<flutter_inappwebview_plugin::InAppWebView*>(data);
+  auto* self = static_cast<zikzak_inappwebview::InAppWebView*>(data);
   self->OnExportDmaBuf(image);
 }
 
 static void wpe_export_shm_buffer_callback(void* data, struct wpe_fdo_shm_exported_buffer* buffer) {
-  auto* self = static_cast<flutter_inappwebview_plugin::InAppWebView*>(data);
+  auto* self = static_cast<zikzak_inappwebview::InAppWebView*>(data);
   self->OnExportShmBuffer(buffer);
 }
 }

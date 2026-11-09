@@ -4,12 +4,12 @@
 cmake_minimum_required(VERSION 3.10)
 
 # Project-level configuration.
-set(PROJECT_NAME "flutter_inappwebview_linux")
+set(PROJECT_NAME "zikzak_inappwebview_linux")
 project(${PROJECT_NAME} LANGUAGES CXX C)
 
 # This value is used when generating builds using this plugin, so it must
 # not be changed.
-set(PLUGIN_NAME "flutter_inappwebview_linux_plugin")
+set(PLUGIN_NAME "zikzak_inappwebview_linux_plugin")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -41,22 +41,22 @@ pkg_check_modules(EPOXY REQUIRED IMPORTED_TARGET epoxy)
 # GTK is still needed for GDK (display access, event handling)
 pkg_check_modules(GTK REQUIRED IMPORTED_TARGET gtk+-3.0)
 
-message(STATUS "flutter_inappwebview_linux: Using WPE WebKit backend")
+message(STATUS "zikzak_inappwebview_linux: Using WPE WebKit backend")
 
 # Try wpe-webkit-2.0 first (newer API), fall back to wpe-webkit-1.1, then wpe-webkit-1.0
 pkg_check_modules(WPE_WEBKIT QUIET IMPORTED_TARGET wpe-webkit-2.0)
 if(NOT WPE_WEBKIT_FOUND)
   pkg_check_modules(WPE_WEBKIT QUIET IMPORTED_TARGET wpe-webkit-1.1)
   if(WPE_WEBKIT_FOUND)
-    message(STATUS "flutter_inappwebview_linux: Found wpe-webkit-1.1 (${WPE_WEBKIT_VERSION})")
+    message(STATUS "zikzak_inappwebview_linux: Found wpe-webkit-1.1 (${WPE_WEBKIT_VERSION})")
   else()
     pkg_check_modules(WPE_WEBKIT QUIET IMPORTED_TARGET wpe-webkit-1.0)
     if(WPE_WEBKIT_FOUND)
-      message(STATUS "flutter_inappwebview_linux: Found wpe-webkit-1.0 (${WPE_WEBKIT_VERSION})")
+      message(STATUS "zikzak_inappwebview_linux: Found wpe-webkit-1.0 (${WPE_WEBKIT_VERSION})")
     endif()
   endif()
 else()
-  message(STATUS "flutter_inappwebview_linux: Found wpe-webkit-2.0 (${WPE_WEBKIT_VERSION})")
+  message(STATUS "zikzak_inappwebview_linux: Found wpe-webkit-2.0 (${WPE_WEBKIT_VERSION})")
 endif()
 
 if(NOT WPE_WEBKIT_FOUND)
@@ -87,14 +87,14 @@ if(WPE_PLATFORM_FOUND AND WPE_PLATFORM_HEADLESS_FOUND)
   " WEBKIT_HAS_WPE_PLATFORM_API)
   
   if(WEBKIT_HAS_WPE_PLATFORM_API)
-    message(STATUS "flutter_inappwebview_linux: Found wpe-platform-2.0 (WPEPlatform API - DEFAULT)")
-    message(STATUS "flutter_inappwebview_linux: Found wpe-platform-headless-2.0")
-    message(STATUS "flutter_inappwebview_linux: WebKit has WPEPlatform API support (webkit_web_view_get_wpe_view)")
+    message(STATUS "zikzak_inappwebview_linux: Found wpe-platform-2.0 (WPEPlatform API - DEFAULT)")
+    message(STATUS "zikzak_inappwebview_linux: Found wpe-platform-headless-2.0")
+    message(STATUS "zikzak_inappwebview_linux: WebKit has WPEPlatform API support (webkit_web_view_get_wpe_view)")
     set(HAVE_WPE_PLATFORM ON)
     add_compile_definitions(HAVE_WPE_PLATFORM=1)
   else()
-    message(STATUS "flutter_inappwebview_linux: wpe-platform-2.0 pkg-config found, but WebKit lacks WPEPlatform API")
-    message(STATUS "flutter_inappwebview_linux: WebKit was likely built without WPEPlatform support, falling back to legacy FDO")
+    message(STATUS "zikzak_inappwebview_linux: wpe-platform-2.0 pkg-config found, but WebKit lacks WPEPlatform API")
+    message(STATUS "zikzak_inappwebview_linux: WebKit was likely built without WPEPlatform support, falling back to legacy FDO")
   endif()
 endif()
 
@@ -103,11 +103,11 @@ endif()
 # WPEPlatform and WPEBackend-FDO are mutually exclusive at compile time
 pkg_check_modules(WPE_FDO QUIET IMPORTED_TARGET wpebackend-fdo-1.0)
 if(WPE_FDO_FOUND AND NOT HAVE_WPE_PLATFORM)
-  message(STATUS "flutter_inappwebview_linux: Found wpebackend-fdo-1.0 (Legacy FDO API)")
+  message(STATUS "zikzak_inappwebview_linux: Found wpebackend-fdo-1.0 (Legacy FDO API)")
   set(HAVE_WPE_FDO ON)
   add_compile_definitions(HAVE_WPE_BACKEND_LEGACY=1)
 elseif(WPE_FDO_FOUND AND HAVE_WPE_PLATFORM)
-  message(STATUS "flutter_inappwebview_linux: wpebackend-fdo-1.0 available but not used (WPEPlatform preferred)")
+  message(STATUS "zikzak_inappwebview_linux: wpebackend-fdo-1.0 available but not used (WPEPlatform preferred)")
 endif()
 
 # Require at least one backend
@@ -127,7 +127,7 @@ endif()
 
 # Check for libsecret for secure credential storage
 pkg_check_modules(LIBSECRET REQUIRED IMPORTED_TARGET libsecret-1)
-message(STATUS "flutter_inappwebview_linux: Found libsecret-1 (${LIBSECRET_VERSION})")
+message(STATUS "zikzak_inappwebview_linux: Found libsecret-1 (${LIBSECRET_VERSION})")
 
 # Find wayland-server for SHM buffer handling
 pkg_check_modules(WAYLAND_SERVER REQUIRED IMPORTED_TARGET wayland-server)
@@ -137,18 +137,18 @@ pkg_check_modules(WAYLAND_SERVER REQUIRED IMPORTED_TARGET wayland-server)
 include(CheckCXXCompilerFlag)
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|arm64|ARM64")
   # ARM64: NEON is always available
-  message(STATUS "flutter_inappwebview_linux: ARM64 detected, NEON enabled")
+  message(STATUS "zikzak_inappwebview_linux: ARM64 detected, NEON enabled")
 elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64|amd64")
   # x86_64: Check for SSSE3 support
   check_cxx_compiler_flag("-mssse3" COMPILER_SUPPORTS_SSSE3)
   if(COMPILER_SUPPORTS_SSSE3)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mssse3")
-    message(STATUS "flutter_inappwebview_linux: x86_64 with SSSE3 enabled")
+    message(STATUS "zikzak_inappwebview_linux: x86_64 with SSSE3 enabled")
   else()
     check_cxx_compiler_flag("-msse2" COMPILER_SUPPORTS_SSE2)
     if(COMPILER_SUPPORTS_SSE2)
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse2")
-      message(STATUS "flutter_inappwebview_linux: x86_64 with SSE2 enabled")
+      message(STATUS "zikzak_inappwebview_linux: x86_64 with SSE2 enabled")
     endif()
   endif()
 endif()
@@ -165,11 +165,11 @@ set(JSON_BuildTests OFF CACHE INTERNAL "")
 FetchContent_MakeAvailable(nlohmann_json)
 # Suppress deprecated literal operator warnings from nlohmann_json
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-literal-operator")
-message(STATUS "flutter_inappwebview_linux: nlohmann/json ${NLOHMANN_JSON_VERSION} configured")
+message(STATUS "zikzak_inappwebview_linux: nlohmann/json ${NLOHMANN_JSON_VERSION} configured")
 
 # Plugin source files
 list(APPEND PLUGIN_SOURCES
-  "flutter_inappwebview_linux_plugin.cc"
+  "zikzak_inappwebview_linux_plugin.cc"
   "plugin_instance.cc"
   "cookie_manager.cc"
   "credential_database.cc"
@@ -315,12 +315,12 @@ function(find_and_add_library LIB_NAME SEARCH_PATHS OUT_LIST)
       if(EXISTS "${REAL_LIB}")
         list(APPEND ${OUT_LIST} "${REAL_LIB}")
         set(${OUT_LIST} ${${OUT_LIST}} PARENT_SCOPE)
-        message(STATUS "flutter_inappwebview_linux: Will bundle ${REAL_LIB}")
+        message(STATUS "zikzak_inappwebview_linux: Will bundle ${REAL_LIB}")
         return()
       endif()
     endif()
   endforeach()
-  message(WARNING "flutter_inappwebview_linux: Could not find ${LIB_NAME} to bundle")
+  message(WARNING "zikzak_inappwebview_linux: Could not find ${LIB_NAME} to bundle")
 endfunction()
 
 # Get library directories from pkg-config
@@ -360,13 +360,13 @@ endif()
 # Also need to create symlinks for the sonames that the libraries expect
 # This will be handled at install time in the example CMakeLists.txt
 
-set(flutter_inappwebview_linux_bundled_libraries
+set(zikzak_inappwebview_linux_bundled_libraries
   ${WPE_BUNDLED_LIBS}
   PARENT_SCOPE
 )
 
 # Export library info for downstream use
-set(FLUTTER_INAPPWEBVIEW_WPE_LIBS ${WPE_BUNDLED_LIBS} CACHE INTERNAL "WPE libraries to bundle")
+set(ZIKZAK_INAPPWEBVIEW_WPE_LIBS ${WPE_BUNDLED_LIBS} CACHE INTERNAL "WPE libraries to bundle")
 
 # === Tests ===
 # These unit tests can be run from a terminal after building the example.
@@ -397,7 +397,7 @@ FetchContent_MakeAvailable(googletest)
 # The plugin's exported API is not very useful for unit testing, so build the
 # sources directly into the test binary rather than using the shared library.
 add_executable(${TEST_RUNNER}
-  test/flutter_inappwebview_linux_plugin_test.cc
+  test/zikzak_inappwebview_linux_plugin_test.cc
   ${PLUGIN_SOURCES}
 )
 apply_standard_settings(${TEST_RUNNER})

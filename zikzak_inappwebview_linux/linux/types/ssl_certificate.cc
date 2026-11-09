@@ -2,7 +2,7 @@
 
 #include "../utils/flutter.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 SslCertificate::SslCertificate(const std::optional<std::vector<uint8_t>>& x509Certificate)
     : x509Certificate(x509Certificate) {}
@@ -16,4 +16,4 @@ FlValue* SslCertificate::toFlValue() const {
   });
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

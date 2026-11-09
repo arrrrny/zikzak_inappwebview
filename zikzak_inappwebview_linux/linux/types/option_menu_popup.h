@@ -1,5 +1,5 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_OPTION_MENU_POPUP_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_OPTION_MENU_POPUP_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_PLUGIN_OPTION_MENU_POPUP_H_
+#define ZIKZAK_INAPPWEBVIEW_PLUGIN_OPTION_MENU_POPUP_H_
 
 #include <gtk/gtk.h>
 
@@ -10,7 +10,7 @@
 // Forward declaration of WebKitOptionMenu to avoid including webkit headers
 typedef struct _WebKitOptionMenu WebKitOptionMenu;
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 /// A custom popup for HTML <select> option menus using Cairo drawing.
 /// This avoids focus issues with GtkMenu by using a GTK_WINDOW_POPUP
@@ -106,6 +106,6 @@ class OptionMenuPopup {
   std::function<void()> dismissed_callback_;
 };
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_OPTION_MENU_POPUP_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_OPTION_MENU_POPUP_H_

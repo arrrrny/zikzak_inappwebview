@@ -1,5 +1,5 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_WEB_MESSAGE_LISTENER_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_WEB_MESSAGE_LISTENER_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_PLUGIN_WEB_MESSAGE_LISTENER_H_
+#define ZIKZAK_INAPPWEBVIEW_PLUGIN_WEB_MESSAGE_LISTENER_H_
 
 #include <flutter_linux/flutter_linux.h>
 
@@ -7,7 +7,7 @@
 #include <set>
 #include <string>
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 class InAppWebView;
 class WebMessageListenerChannelDelegate;
@@ -20,7 +20,7 @@ class WebMessageListenerChannelDelegate;
  * callbacks are routed through a dedicated channel (not the main WebView channel).
  *
  * Channel name pattern:
- *   com.pichillilorenzo/flutter_inappwebview_web_message_listener_{id}_{jsObjectName}
+ *   wtf.zikzak/zikzak_inappwebview_web_message_listener_{id}_{jsObjectName}
  *
  * This matches the iOS/Android architecture where:
  * - WebMessageListener is a native class with its own channelDelegate
@@ -30,7 +30,7 @@ class WebMessageListenerChannelDelegate;
 class WebMessageListener {
  public:
   static constexpr const char* METHOD_CHANNEL_NAME_PREFIX =
-      "com.pichillilorenzo/flutter_inappwebview_web_message_listener_";
+      "wtf.zikzak/zikzak_inappwebview_web_message_listener_";
 
   /**
    * Create a WebMessageListener from a Flutter map value.
@@ -102,6 +102,6 @@ class WebMessageListener {
   std::unique_ptr<WebMessageListenerChannelDelegate> channelDelegate_;
 };
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_WEB_MESSAGE_LISTENER_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_WEB_MESSAGE_LISTENER_H_

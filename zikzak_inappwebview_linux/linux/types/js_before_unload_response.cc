@@ -2,7 +2,7 @@
 
 #include "../utils/flutter.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 JsBeforeUnloadResponse::JsBeforeUnloadResponse()
     : handledByClient(false), shouldAllowNavigation(true) {}
@@ -20,4 +20,4 @@ JsBeforeUnloadResponse::JsBeforeUnloadResponse(FlValue* map)
   message = get_optional_fl_map_value<std::string>(map, "message");
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

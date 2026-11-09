@@ -1,5 +1,5 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_IN_APP_BROWSER_MANAGER_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_IN_APP_BROWSER_MANAGER_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_PLUGIN_IN_APP_BROWSER_MANAGER_H_
+#define ZIKZAK_INAPPWEBVIEW_PLUGIN_IN_APP_BROWSER_MANAGER_H_
 
 #include <flutter_linux/flutter_linux.h>
 
@@ -9,7 +9,7 @@
 
 #include "in_app_browser.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 class PluginInstance;
 
@@ -20,7 +20,7 @@ class PluginInstance;
 class InAppBrowserManager {
  public:
   static constexpr const char* METHOD_CHANNEL_NAME =
-      "com.pichillilorenzo/flutter_inappbrowser";
+      "wtf.zikzak/zikzak_inappbrowser";
 
   /// Create the manager
   /// @param plugin The plugin instance
@@ -71,6 +71,6 @@ class InAppBrowserManager {
   void HandleMethodCallImpl(FlMethodCall* method_call);
 };
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_IN_APP_BROWSER_MANAGER_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_IN_APP_BROWSER_MANAGER_H_

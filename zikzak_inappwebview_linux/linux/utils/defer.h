@@ -1,10 +1,10 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_UTIL_DEFER_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_UTIL_DEFER_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_PLUGIN_UTIL_DEFER_H_
+#define ZIKZAK_INAPPWEBVIEW_PLUGIN_UTIL_DEFER_H_
 
 #include <functional>
 #include <memory>
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 // Utility to defer cleanup operations using RAII
 static inline std::shared_ptr<void> defer(void* handle,
@@ -43,6 +43,6 @@ ScopeGuard<Func> make_scope_guard(Func&& func) {
   return ScopeGuard<Func>(std::forward<Func>(func));
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_UTIL_DEFER_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_UTIL_DEFER_H_

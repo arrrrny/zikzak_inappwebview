@@ -1,5 +1,5 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_INTERCEPT_FETCH_REQUEST_JS_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_INTERCEPT_FETCH_REQUEST_JS_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_PLUGIN_INTERCEPT_FETCH_REQUEST_JS_H_
+#define ZIKZAK_INAPPWEBVIEW_PLUGIN_INTERCEPT_FETCH_REQUEST_JS_H_
 
 #include <memory>
 #include <optional>
@@ -10,7 +10,7 @@
 #include "javascript_bridge_js.h"
 #include "intercept_ajax_request_js.h"  // For JAVASCRIPT_UTIL_VAR_NAME
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 /**
  * JavaScript for intercepting fetch() requests.
@@ -211,6 +211,6 @@ if (typeof )JS" + utilVarName + R"JS( === 'undefined') {
   }
 };
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_INTERCEPT_FETCH_REQUEST_JS_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_INTERCEPT_FETCH_REQUEST_JS_H_

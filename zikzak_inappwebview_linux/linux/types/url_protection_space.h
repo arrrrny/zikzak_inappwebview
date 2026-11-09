@@ -1,5 +1,5 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_URL_PROTECTION_SPACE_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_URL_PROTECTION_SPACE_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_PLUGIN_URL_PROTECTION_SPACE_H_
+#define ZIKZAK_INAPPWEBVIEW_PLUGIN_URL_PROTECTION_SPACE_H_
 
 #include <flutter_linux/flutter_linux.h>
 #include <wpe/webkit.h>
@@ -8,7 +8,7 @@
 #include <optional>
 #include <string>
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 /**
  * HTTP authentication scheme types.
@@ -48,6 +48,6 @@ class URLProtectionSpace {
   static HttpAuthScheme fromWebKitScheme(WebKitAuthenticationScheme scheme);
 };
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_URL_PROTECTION_SPACE_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_URL_PROTECTION_SPACE_H_

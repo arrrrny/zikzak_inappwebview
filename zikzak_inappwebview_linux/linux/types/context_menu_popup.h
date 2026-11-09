@@ -1,5 +1,5 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_CONTEXT_MENU_POPUP_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_CONTEXT_MENU_POPUP_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_PLUGIN_CONTEXT_MENU_POPUP_H_
+#define ZIKZAK_INAPPWEBVIEW_PLUGIN_CONTEXT_MENU_POPUP_H_
 
 #include <cairo.h>
 #include <gtk/gtk.h>
@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 // Constants for menu rendering
 constexpr int MENU_VERTICAL_PADDING = 8;
@@ -94,6 +94,6 @@ class ContextMenuPopup {
   MenuDismissedCallback dismissed_callback_;
 };
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_CONTEXT_MENU_POPUP_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_CONTEXT_MENU_POPUP_H_

@@ -2,7 +2,7 @@
 
 #include "../utils/flutter.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 WebResourceError::WebResourceError(const std::string& description, int64_t type)
     : description(description), type(type) {}
@@ -18,4 +18,4 @@ FlValue* WebResourceError::toFlValue() const {
   });
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

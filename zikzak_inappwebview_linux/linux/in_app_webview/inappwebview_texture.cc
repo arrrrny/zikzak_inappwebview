@@ -8,7 +8,7 @@
 // Private structure
 struct _InAppWebViewTexture {
   FlPixelBufferTexture parent_instance;
-  flutter_inappwebview_plugin::WebViewType* webview;
+  zikzak_inappwebview::WebViewType* webview;
   // Default buffer for when no content is available
   uint8_t default_buffer[4];  // 1x1 RGBA pixel
 
@@ -98,10 +98,10 @@ static void inappwebview_texture_init(InAppWebViewTexture* self) {
   self->staging_buffer_size = 0;
 }
 
-InAppWebViewTexture* inappwebview_texture_new(flutter_inappwebview_plugin::WebViewType* webview) {
+InAppWebViewTexture* inappwebview_texture_new(zikzak_inappwebview::WebViewType* webview) {
   InAppWebViewTexture* self =
       INAPPWEBVIEW_TEXTURE(g_object_new(INAPPWEBVIEW_TYPE_TEXTURE, nullptr));
   self->webview = webview;
-  flutter_inappwebview_plugin::debugLog("InAppWebViewTexture: created");
+  zikzak_inappwebview::debugLog("InAppWebViewTexture: created");
   return self;
 }

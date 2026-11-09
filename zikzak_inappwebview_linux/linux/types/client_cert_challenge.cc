@@ -2,7 +2,7 @@
 
 #include "../utils/flutter.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 ClientCertChallenge::ClientCertChallenge(const URLProtectionSpace& protectionSpace, bool isProxy)
     : protectionSpace(protectionSpace), isProxy(isProxy) {}
@@ -42,4 +42,4 @@ FlValue* ClientCertChallenge::toFlValue() const {
   });
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

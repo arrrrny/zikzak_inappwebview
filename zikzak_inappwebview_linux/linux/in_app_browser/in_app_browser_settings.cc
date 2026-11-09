@@ -6,7 +6,7 @@
 #include "../utils/log.h"
 #include "in_app_browser.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 namespace {
 
@@ -124,4 +124,4 @@ FlValue* InAppBrowserSettings::getRealSettings(const InAppBrowser* browser) cons
   return settingsMap;
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

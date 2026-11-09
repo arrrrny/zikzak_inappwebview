@@ -3,7 +3,7 @@ import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
+import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
 import '../find_interaction/find_interaction_controller.dart';
 import '../in_app_webview/in_app_webview_controller.dart';
@@ -51,7 +51,7 @@ class LinuxInAppBrowserCreationParams
   final LinuxWebViewEnvironment? webViewEnvironment;
 }
 
-///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser}
+///{@macro zikzak_inappwebview_platform_interface.PlatformInAppBrowser}
 class LinuxInAppBrowser extends PlatformInAppBrowser with ChannelController {
   @override
   final String id = IdGenerator.generate();
@@ -81,7 +81,7 @@ class LinuxInAppBrowser extends PlatformInAppBrowser with ChannelController {
       params as LinuxInAppBrowserCreationParams;
 
   static const MethodChannel _staticChannel = const MethodChannel(
-    'com.pichillilorenzo/flutter_inappbrowser',
+    'wtf.zikzak/zikzak_inappbrowser',
   );
 
   ContextMenu? _contextMenu;
@@ -99,7 +99,7 @@ class LinuxInAppBrowser extends PlatformInAppBrowser with ChannelController {
   }
 
   _init() {
-    channel = MethodChannel('com.pichillilorenzo/flutter_inappbrowser_$id');
+    channel = MethodChannel('wtf.zikzak/zikzak_inappbrowser_$id');
     handler = _handleMethod;
     initMethodCallHandler();
 

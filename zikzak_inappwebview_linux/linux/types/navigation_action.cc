@@ -2,7 +2,7 @@
 
 #include "../utils/flutter.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 NavigationAction::NavigationAction(std::shared_ptr<URLRequest> request, bool isForMainFrame,
                                    const std::optional<bool>& isRedirect,
@@ -21,4 +21,4 @@ FlValue* NavigationAction::toFlValue() const {
   });
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

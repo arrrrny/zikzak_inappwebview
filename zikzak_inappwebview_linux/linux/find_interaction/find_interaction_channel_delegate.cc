@@ -5,7 +5,7 @@
 #include "find_interaction_controller.h"
 #include "../utils/flutter.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 FindInteractionChannelDelegate::FindInteractionChannelDelegate(
     FindInteractionController* controller, FlBinaryMessenger* messenger,
@@ -111,4 +111,4 @@ void FindInteractionChannelDelegate::onFindResultReceived(
   invokeMethod("onFindResultReceived", args);
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

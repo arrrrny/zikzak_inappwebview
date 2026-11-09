@@ -1,12 +1,12 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_UUID_UTIL_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_UUID_UTIL_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_PLUGIN_UUID_UTIL_H_
+#define ZIKZAK_INAPPWEBVIEW_PLUGIN_UUID_UTIL_H_
 
 #include <iomanip>
 #include <random>
 #include <sstream>
 #include <string>
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 // Generate a UUID v4 string using standard C++ random
 static inline std::string get_uuid() {
@@ -29,6 +29,6 @@ static inline std::string get_uuid() {
   return oss.str();
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_UUID_UTIL_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_UUID_UTIL_H_

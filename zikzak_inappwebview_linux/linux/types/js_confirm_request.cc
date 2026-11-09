@@ -2,7 +2,7 @@
 
 #include "../utils/flutter.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 JsConfirmRequest::JsConfirmRequest(const std::optional<std::string>& url,
                                    const std::string& message, bool isMainFrame)
@@ -16,4 +16,4 @@ FlValue* JsConfirmRequest::toFlValue() const {
   });
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

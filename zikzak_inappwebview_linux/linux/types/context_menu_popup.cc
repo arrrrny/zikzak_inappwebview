@@ -8,7 +8,7 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 ContextMenuPopup::ContextMenuPopup(GtkWindow* parent_window) : parent_window_(parent_window) {
   // Create a popup window
@@ -487,4 +487,4 @@ void ContextMenuPopup::OnUnrealize(GtkWidget* widget, gpointer user_data) {
   self->visible_ = false;
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

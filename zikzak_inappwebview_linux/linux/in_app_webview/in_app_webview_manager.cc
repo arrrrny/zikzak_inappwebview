@@ -3,7 +3,7 @@
 #include <cstring>
 #include <set>
 
-#include "../flutter_inappwebview_linux_plugin_private.h"
+#include "../zikzak_inappwebview_linux_plugin_private.h"
 #include "../plugin_instance.h"
 #include "../plugin_scripts_js/javascript_bridge_js.h"
 #include "../types/context_menu.h"
@@ -13,7 +13,7 @@
 #include "in_app_webview.h"
 #include "in_app_webview_settings.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 InAppWebViewManager::InAppWebViewManager(PluginInstance* plugin)
     : plugin_(plugin), registrar_(plugin->registrar()) {
@@ -381,4 +381,4 @@ void InAppWebViewManager::DisposeKeepAlive(const std::string& keepAliveId) {
   }
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

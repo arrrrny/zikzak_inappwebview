@@ -2,7 +2,7 @@
 
 #include "../utils/flutter.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 // === DownloadStartResponse ===
 
@@ -20,4 +20,4 @@ DownloadStartResponse::DownloadStartResponse(FlValue* map)
   destinationPath = get_optional_fl_map_value<std::string>(map, "destinationPath");
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

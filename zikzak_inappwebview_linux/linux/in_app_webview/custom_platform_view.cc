@@ -9,13 +9,13 @@
 #include "inappwebview_egl_texture.h"
 #include "inappwebview_texture.h"
 
-namespace flutter_inappwebview_plugin {
+namespace zikzak_inappwebview {
 
 namespace {
 // Check if GL textures should be used (enabled by default, can be disabled)
-// Disable with FLUTTER_INAPPWEBVIEW_LINUX_DISABLE_GL=1 to force software rendering.
+// Disable with ZIKZAK_INAPPWEBVIEW_LINUX_DISABLE_GL=1 to force software rendering.
 bool UseGLTextureEnvOverride() {
-  if (g_getenv("FLUTTER_INAPPWEBVIEW_LINUX_DISABLE_GL") != nullptr) {
+  if (g_getenv("ZIKZAK_INAPPWEBVIEW_LINUX_DISABLE_GL") != nullptr) {
     return false;
   }
   return true;
@@ -157,7 +157,7 @@ CustomPlatformView::CustomPlatformView(FlBinaryMessenger* messenger,
 
   // Create method channel for platform view operations
   std::string method_channel_name =
-      "com.pichillilorenzo/custom_platform_view_" + std::to_string(texture_id_);
+      "wtf.zikzak/custom_platform_view_" + std::to_string(texture_id_);
   g_autoptr(FlStandardMethodCodec) codec = fl_standard_method_codec_new();
   method_channel_ =
       fl_method_channel_new(messenger, method_channel_name.c_str(), FL_METHOD_CODEC(codec));
@@ -167,7 +167,7 @@ CustomPlatformView::CustomPlatformView(FlBinaryMessenger* messenger,
 
   // Create event channel for cursor changes, etc.
   std::string event_channel_name =
-      "com.pichillilorenzo/custom_platform_view_" + std::to_string(texture_id_) + "_events";
+      "wtf.zikzak/custom_platform_view_" + std::to_string(texture_id_) + "_events";
   g_autoptr(FlStandardMethodCodec) event_codec = fl_standard_method_codec_new();
   event_channel_ =
       fl_event_channel_new(messenger, event_channel_name.c_str(), FL_METHOD_CODEC(event_codec));
@@ -626,4 +626,4 @@ void CustomPlatformView::EmitCursorChanged(const std::string& cursor_name) {
   fl_event_channel_send(event_channel_, event, nullptr, nullptr);
 }
 
-}  // namespace flutter_inappwebview_plugin
+}  // namespace zikzak_inappwebview

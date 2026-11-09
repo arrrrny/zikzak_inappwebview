@@ -1,4 +1,4 @@
-import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
+import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
 import 'cookie_manager/cookie_manager.dart';
 import 'find_interaction/find_interaction_controller.dart';
@@ -25,7 +25,7 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Creates a new [LinuxInAppWebViewController].
   ///
   /// This function should only be called by the app-facing package.
-  /// Look at using [InAppWebViewController] in `flutter_inappwebview` instead.
+  /// Look at using [InAppWebViewController] in `zikzak_inappwebview` instead.
   @override
   LinuxInAppWebViewController createPlatformInAppWebViewController(
     PlatformInAppWebViewControllerCreationParams params,
@@ -36,7 +36,7 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Creates a new empty [LinuxInAppWebViewController] to access static methods.
   ///
   /// This function should only be called by the app-facing package.
-  /// Look at using [InAppWebViewController] in `flutter_inappwebview` instead.
+  /// Look at using [InAppWebViewController] in `zikzak_inappwebview` instead.
   @override
   LinuxInAppWebViewController createPlatformInAppWebViewControllerStatic() {
     return LinuxInAppWebViewController.static();
@@ -45,7 +45,7 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Creates a new [LinuxInAppWebViewWidget].
   ///
   /// This function should only be called by the app-facing package.
-  /// Look at using [InAppWebView] in `flutter_inappwebview` instead.
+  /// Look at using [InAppWebView] in `zikzak_inappwebview` instead.
   @override
   LinuxInAppWebViewWidget createPlatformInAppWebViewWidget(
     PlatformInAppWebViewWidgetCreationParams params,
@@ -56,7 +56,7 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Creates a new empty [LinuxInAppWebViewWidget] to access static methods.
   ///
   /// This function should only be called by the app-facing package.
-  /// Look at using [InAppWebView] in `flutter_inappwebview` instead.
+  /// Look at using [InAppWebView] in `zikzak_inappwebview` instead.
   @override
   LinuxInAppWebViewWidget createPlatformInAppWebViewWidgetStatic() {
     return LinuxInAppWebViewWidget.static();
@@ -260,7 +260,7 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Creates a new [LinuxWebStorage].
   ///
   /// This function should only be called by the app-facing package.
-  /// Look at using [WebStorage] in `flutter_inappwebview` instead.
+  /// Look at using [WebStorage] in `zikzak_inappwebview` instead.
   @override
   LinuxWebStorage createPlatformWebStorage(
     PlatformWebStorageCreationParams params,
@@ -271,7 +271,7 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Creates a new empty [LinuxWebStorage] to access static methods.
   ///
   /// This function should only be called by the app-facing package.
-  /// Look at using [WebStorage] in `flutter_inappwebview` instead.
+  /// Look at using [WebStorage] in `zikzak_inappwebview` instead.
   @override
   LinuxWebStorage createPlatformWebStorageStatic() {
     return LinuxWebStorage(
@@ -285,7 +285,7 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Creates a new [LinuxLocalStorage].
   ///
   /// This function should only be called by the app-facing package.
-  /// Look at using [LocalStorage] in `flutter_inappwebview` instead.
+  /// Look at using [LocalStorage] in `zikzak_inappwebview` instead.
   @override
   LinuxLocalStorage createPlatformLocalStorage(
     PlatformLocalStorageCreationParams params,
@@ -296,7 +296,7 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Creates a new empty [LinuxLocalStorage] to access static methods.
   ///
   /// This function should only be called by the app-facing package.
-  /// Look at using [LocalStorage] in `flutter_inappwebview` instead.
+  /// Look at using [LocalStorage] in `zikzak_inappwebview` instead.
   @override
   LinuxLocalStorage createPlatformLocalStorageStatic() {
     return LinuxLocalStorage.defaultStorage(controller: null);
@@ -305,7 +305,7 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Creates a new [LinuxSessionStorage].
   ///
   /// This function should only be called by the app-facing package.
-  /// Look at using [SessionStorage] in `flutter_inappwebview` instead.
+  /// Look at using [SessionStorage] in `zikzak_inappwebview` instead.
   @override
   LinuxSessionStorage createPlatformSessionStorage(
     PlatformSessionStorageCreationParams params,
@@ -316,7 +316,7 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Creates a new empty [LinuxSessionStorage] to access static methods.
   ///
   /// This function should only be called by the app-facing package.
-  /// Look at using [SessionStorage] in `flutter_inappwebview` instead.
+  /// Look at using [SessionStorage] in `zikzak_inappwebview` instead.
   @override
   LinuxSessionStorage createPlatformSessionStorageStatic() {
     return LinuxSessionStorage.defaultStorage(controller: null);
@@ -364,7 +364,7 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Creates a new [DefaultInAppLocalhostServer].
   ///
   /// This function should only be called by the app-facing package.
-  /// Look at using [InAppLocalhostServer] in `flutter_inappwebview` instead.
+  /// Look at using [InAppLocalhostServer] in `zikzak_inappwebview` instead.
   @override
   DefaultInAppLocalhostServer createPlatformInAppLocalhostServer(
     PlatformInAppLocalhostServerCreationParams params,
@@ -375,7 +375,7 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Creates a new empty [DefaultInAppLocalhostServer] to access static methods.
   ///
   /// This function should only be called by the app-facing package.
-  /// Look at using [InAppLocalhostServer] in `flutter_inappwebview` instead.
+  /// Look at using [InAppLocalhostServer] in `zikzak_inappwebview` instead.
   @override
   DefaultInAppLocalhostServer createPlatformInAppLocalhostServerStatic() {
     return DefaultInAppLocalhostServer.static();
@@ -384,7 +384,7 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Creates a new empty [PlatformWebViewFeature] to access static methods.
   ///
   /// This function should only be called by the app-facing package.
-  /// Look at using [WebViewFeature] in `flutter_inappwebview` instead
+  /// Look at using [WebViewFeature] in `zikzak_inappwebview` instead
   @override
   PlatformWebViewFeature createPlatformWebViewFeatureStatic() {
     return _PlatformWebViewFeature.static();
