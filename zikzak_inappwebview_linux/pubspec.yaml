@@ -1,5 +1,5 @@
 name: zikzak_inappwebview_linux
-description: Linux implementation of the zikzak_inappwebview plugin.
+description: Linux implementation of the zikzak_inappwebview plugin, built on WPE WebKit.
 version: 6.3.4
 homepage: https://inappwebview.dev/
 repository: https://github.com/arrrrny/zikzak_inappwebview/tree/master/zikzak_inappwebview_linux

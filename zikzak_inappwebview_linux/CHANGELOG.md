@@ -1,3 +1,28 @@
+## Unreleased
+
+### Breaking
+
+- [Linux] The Linux implementation is now built on WPE WebKit instead of WebKitGTK, based on flutter_inappwebview_linux 0.1.0-beta.1 by Lorenzo Pichilli and contributors (Apache-2.0; see `NOTICE`). Building requires WPE WebKit >= 2.50 with `wpe-platform-2.0`, `wpe-platform-headless-2.0` and `wpe-1.0` (see the README, including building it from source on Ubuntu 24.04) and CMake >= 3.12. WebKitGTK is no longer used.
+
+### New behaviour
+
+- [Linux] Pointer, keyboard, scroll and cursor input, window resize, HiDPI scaling, IME and dead keys, popups (`<select>`, context menus), cookies (`LinuxCookieManager`) and disposal (disposing a widget releases its native webview; `dispose` does not throw).
+- [Linux] The Dart layer implements zikzak's platform interface (`zikzak_inappwebview_platform_interface` ^6.3.4); `pressKey` is implemented.
+- [Linux] 15 Linux-only methods on `LinuxInAppWebViewController`, reached with `controller.platform as LinuxInAppWebViewController`: `requestFocus`, `requestPointerLock`, `isVisible`, `setVisible`, `getScreenScale`, `setScreenScale`, `setTargetRefreshRate`, `requestEnterFullscreen`, `requestExitFullscreen`, `isMuted`, `setMuted`, `isPlayingAudio`, `saveState`, `restoreState`, `terminateWebProcess`.
+- [Linux] Channel names use the zikzak prefix (`wtf.zikzak/...`, `zikzak_inappwebview`, `zikzak_inappbrowser`; the headless channel keeps `flutter_headless_inappwebview`). The JavaScript bridge is `window.zikzak_inappwebview`.
+- [Linux] When a non-system WPE prefix is found through `PKG_CONFIG_PATH`, its `lib` directory is recorded as an rpath.
+- [Linux] Native info logs follow `PlatformInAppWebViewController.debugLoggingSettings.enabled` (sent with every webview, headless webview and `InAppBrowser` creation); native errors always print, release builds included. See README "Logging".
+
+### Known gaps
+
+- [Linux] Apps cannot supply files for `<input type="file">` themselves: zikzak's platform interface has no file-chooser callback (upstream's `onShowFileChooser`). The Linux port leaves the request to native, which shows its GTK file chooser.
+- [Linux] `createPdf` returns `null` (WPE has no print-to-PDF API).
+- [Linux] `URLProtectionSpace` authentication-method strings and `ClientCertChallenge.isProxy` are lost; `PermissionRequest` resources for geolocation, notifications, device info and pointer lock arrive as an empty list.
+- [Linux] `WebViewEnvironment` is not supported: `createPlatformWebViewEnvironment` is not overridden and throws the interface's `UnimplementedError`.
+- [Linux] 24 upstream-only controller methods are not exposed (spec 017, FR-6). Three upstream-only settings (`allowModalDialogs`, `enable2DCanvasAcceleration`, `enableEncryptedMedia`) use WPE's native defaults.
+- [Linux] `requestFocus` has no `FocusDirection` parameter. `pressKey` ignores `keyCode` and sends upper-case letters without Shift.
+- [Linux] `onAjaxReadyStateChange` / `onAjaxProgress` enable native Ajax interception automatically when set (for `InAppBrowser`, whenever `useShouldInterceptAjaxRequest` is true).
+
 ## 6.3.4 - 2026-11-01
 
 * fix: address review comments on #406
