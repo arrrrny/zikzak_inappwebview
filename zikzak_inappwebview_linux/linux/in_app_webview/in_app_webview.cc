@@ -447,18 +447,9 @@ InAppWebView::~InAppWebView() {
   {
     std::lock_guard<std::mutex> lock(wpe_buffer_mutex_);
     
-    // Clean up EGL image first (while display is still valid)
-    if (current_egl_image_ != nullptr && egl_display_ != nullptr) {
-      static PFNEGLDESTROYIMAGEKHRPROC eglDestroyImageKHR = nullptr;
-      if (eglDestroyImageKHR == nullptr) {
-        eglDestroyImageKHR = (PFNEGLDESTROYIMAGEKHRPROC)eglGetProcAddress("eglDestroyImageKHR");
-      }
-      if (eglDestroyImageKHR != nullptr) {
-        eglDestroyImageKHR(static_cast<EGLDisplay>(egl_display_), 
-                           static_cast<EGLImageKHR>(current_egl_image_));
-      }
-      current_egl_image_ = nullptr;
-    }
+    // The EGL image is owned by current_buffer_ (see OnWpePlatformBufferRendered)
+    // and destroyed with it; only drop our reference.
+    current_egl_image_ = nullptr;
     
     // Release pending buffer back to WPE
     if (current_buffer_ != nullptr && wpe_view_ != nullptr) {
@@ -1263,18 +1254,12 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
     // This ensures the EGL image's backing memory stays valid until we have a new frame
     previous_buffer = current_buffer_;
     
-    // Destroy previous EGL image if we created one
-    if (current_egl_image_ != nullptr && egl_display_ != nullptr) {
-      static PFNEGLDESTROYIMAGEKHRPROC eglDestroyImageKHR = nullptr;
-      if (eglDestroyImageKHR == nullptr) {
-        eglDestroyImageKHR = (PFNEGLDESTROYIMAGEKHRPROC)eglGetProcAddress("eglDestroyImageKHR");
-      }
-      if (eglDestroyImageKHR != nullptr) {
-        eglDestroyImageKHR(static_cast<EGLDisplay>(egl_display_), 
-                           static_cast<EGLImageKHR>(current_egl_image_));
-      }
-      current_egl_image_ = nullptr;
-    }
+    // The EGL image belongs to its WPEBuffer: wpe_buffer_import_to_egl_image()
+    // is (transfer none) and caches the image for the buffer's lifetime, and
+    // WPE reuses buffers. Destroying it here would make WPE return a dead
+    // image for the recycled buffer, so binding it fails and Flutter keeps
+    // showing stale frames. Only drop our reference.
+    current_egl_image_ = nullptr;
     
     // Check buffer type to determine best rendering path
     bool is_dma_buf = WPE_IS_BUFFER_DMA_BUF(buffer);
