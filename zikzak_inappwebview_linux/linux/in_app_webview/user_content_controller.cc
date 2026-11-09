@@ -16,6 +16,68 @@ namespace zikzak_inappwebview {
 
 using json = nlohmann::json;
 
+namespace {
+// Converts the platform's allowedOriginRules (Android-style rules of the form
+// scheme://host[:port], host optionally starting with "*.", and "*" meaning
+// every origin) into WebKit user-script URL patterns.
+//
+// Returns nullptr when every origin is allowed (either the rules are absent
+// or contain the "*" wildcard). When rules were specified but none of them
+// is usable, a pattern that cannot match any URL is returned so the script
+// is injected nowhere (fail closed). The caller frees the array and its
+// strings with g_free.
+gchar** convertAllowedOriginRulesToAllowList(const std::vector<std::string>& rules) {
+  bool allowAll = false;
+  std::vector<std::string> patterns;
+  for (const auto& rule : rules) {
+    if (rule == "*") {
+      allowAll = true;
+      break;
+    }
+    if (rule.empty()) {
+      continue;
+    }
+    // Treat "https://example.com" and "https://example.com/*" the same:
+    // WebKit's URL patterns match the page path against the glob after the
+    // host, so an entry without a path must gain "/*" to match anything.
+    std::string pattern = rule;
+    if (pattern.size() >= 2 && pattern.compare(pattern.size() - 2, 2, "/*") == 0) {
+      pattern.erase(pattern.size() - 2);
+    }
+    if (pattern.find("://") == std::string::npos) {
+      debugLog("UserContentController: ignoring unparseable allowedOriginRule: " + rule);
+      continue;
+    }
+    patterns.push_back(pattern + "/*");
+  }
+
+  if (allowAll || (patterns.empty() && rules.empty())) {
+    return nullptr;
+  }
+  if (patterns.empty()) {
+    // Rules were given but none parsed; inject nowhere rather than everywhere.
+    patterns.push_back("wtf-zikzak-no-origin://none/*");
+  }
+
+  gchar** allow_list = g_new(gchar*, patterns.size() + 1);
+  for (size_t i = 0; i < patterns.size(); ++i) {
+    allow_list[i] = g_strdup(patterns[i].c_str());
+  }
+  allow_list[patterns.size()] = nullptr;
+  return allow_list;
+}
+
+void freeAllowList(gchar** allow_list) {
+  if (allow_list == nullptr) {
+    return;
+  }
+  for (gchar** entry = allow_list; *entry != nullptr; ++entry) {
+    g_free(*entry);
+  }
+  g_free(allow_list);
+}
+}  // namespace
+
 UserContentController::UserContentController(WebKitWebView* webview) : webview_(webview) {
   if (webview_ != nullptr) {
     content_manager_ = webkit_web_view_get_user_content_manager(webview_);
@@ -315,10 +377,19 @@ WebKitUserScript* UserContentController::createWebKitUserScript(
                                                ? WEBKIT_USER_CONTENT_INJECT_TOP_FRAME
                                                : WEBKIT_USER_CONTENT_INJECT_ALL_FRAMES;
 
-  return webkit_user_script_new(userScript->source.c_str(), frames, webkitTime,
-                                nullptr,  // allow_list
-                                nullptr   // block_list
+  // Honor allowedOriginRules (nullptr allow_list = inject everywhere).
+  gchar** allow_list = nullptr;
+  if (userScript->allowedOriginRules.has_value()) {
+    allow_list = convertAllowedOriginRulesToAllowList(*userScript->allowedOriginRules);
+  }
+
+  WebKitUserScript* script = webkit_user_script_new(userScript->source.c_str(), frames, webkitTime,
+                                                    allow_list,  // allow_list
+                                                    nullptr      // block_list
   );
+  // webkit_user_script_new copies the list, so it can be released here.
+  freeAllowList(allow_list);
+  return script;
 }
 
 void UserContentController::rebuildScripts() {

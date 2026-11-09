@@ -29,7 +29,11 @@ namespace zikzak_inappwebview {
  * On little-endian systems, Cairo ARGB32 is stored as BGRA in memory.
  * Flutter expects RGBA (R at lowest address).
  *
- * This function also un-premultiplies alpha when necessary.
+ * The premultiplied alpha of the source is preserved as-is: every path
+ * (SIMD and scalar) performs the same channel swap so translucent frames
+ * stay consistent across row-chunk boundaries. WPE's SHM data and
+ * Flutter's texture expectation are both premultiplied, so no
+ * un-premultiplication happens here.
  *
  * @param src Source buffer in Cairo ARGB32 format
  * @param dst Destination buffer for RGBA8888 format
@@ -83,17 +87,12 @@ inline void ConvertARGB32ToRGBA(const uint8_t* src, uint8_t* dst, int width, int
       uint8_t r = px[2];
       uint8_t a = px[3];
 
-      // Un-premultiply if needed
-      if (a != 0 && a != 255) {
-        r = static_cast<uint8_t>(std::min(255, (r * 255) / a));
-        g = static_cast<uint8_t>(std::min(255, (g * 255) / a));
-        b = static_cast<uint8_t>(std::min(255, (b * 255) / a));
-      }
-
+      // Same contract as the SIMD path above: no un-premultiplication,
+      // alpha preserved (a == 0 stays fully transparent).
       out[0] = r;
       out[1] = g;
       out[2] = b;
-      out[3] = a == 0 ? 255 : a;  // Make fully transparent pixels opaque
+      out[3] = a;
     }
   }
 
@@ -128,16 +127,12 @@ inline void ConvertARGB32ToRGBA(const uint8_t* src, uint8_t* dst, int width, int
       uint8_t r = px[2];
       uint8_t a = px[3];
 
-      if (a != 0 && a != 255) {
-        r = static_cast<uint8_t>(std::min(255, (r * 255) / a));
-        g = static_cast<uint8_t>(std::min(255, (g * 255) / a));
-        b = static_cast<uint8_t>(std::min(255, (b * 255) / a));
-      }
-
+      // Same contract as the SIMD path above: no un-premultiplication,
+      // alpha preserved.
       out[0] = r;
       out[1] = g;
       out[2] = b;
-      out[3] = a == 0 ? 255 : a;
+      out[3] = a;
     }
   }
 
@@ -181,16 +176,12 @@ inline void ConvertARGB32ToRGBA(const uint8_t* src, uint8_t* dst, int width, int
       uint8_t r = px[2];
       uint8_t a = px[3];
 
-      if (a != 0 && a != 255) {
-        r = static_cast<uint8_t>(std::min(255, (r * 255) / a));
-        g = static_cast<uint8_t>(std::min(255, (g * 255) / a));
-        b = static_cast<uint8_t>(std::min(255, (b * 255) / a));
-      }
-
+      // Same contract as the SIMD path above: no un-premultiplication,
+      // alpha preserved.
       out[0] = r;
       out[1] = g;
       out[2] = b;
-      out[3] = a == 0 ? 255 : a;
+      out[3] = a;
     }
   }
 
@@ -213,16 +204,12 @@ inline void ConvertARGB32ToRGBA(const uint8_t* src, uint8_t* dst, int width, int
 
         size_t idx = (x + i) * 4;
 
-        if (a != 0 && a != 255) {
-          r = static_cast<uint8_t>(std::min(255, (r * 255) / a));
-          g = static_cast<uint8_t>(std::min(255, (g * 255) / a));
-          b = static_cast<uint8_t>(std::min(255, (b * 255) / a));
-        }
-
+        // Same contract as the SIMD path above: no un-premultiplication,
+        // alpha preserved.
         dst_row[idx + 0] = r;
         dst_row[idx + 1] = g;
         dst_row[idx + 2] = b;
-        dst_row[idx + 3] = a == 0 ? 255 : a;
+        dst_row[idx + 3] = a;
       }
     }
 
@@ -236,16 +223,12 @@ inline void ConvertARGB32ToRGBA(const uint8_t* src, uint8_t* dst, int width, int
 
       size_t idx = x * 4;
 
-      if (a != 0 && a != 255) {
-        r = static_cast<uint8_t>(std::min(255, (r * 255) / a));
-        g = static_cast<uint8_t>(std::min(255, (g * 255) / a));
-        b = static_cast<uint8_t>(std::min(255, (b * 255) / a));
-      }
-
+      // Same contract as the SIMD path above: no un-premultiplication,
+      // alpha preserved.
       dst_row[idx + 0] = r;
       dst_row[idx + 1] = g;
       dst_row[idx + 2] = b;
-      dst_row[idx + 3] = a == 0 ? 255 : a;
+      dst_row[idx + 3] = a;
     }
   }
 #endif

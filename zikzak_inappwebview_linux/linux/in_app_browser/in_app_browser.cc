@@ -92,7 +92,7 @@ InAppBrowser::InAppBrowser(InAppBrowserManager* manager, FlBinaryMessenger* mess
   }
 
   // Load initial content (async, WebView needs time to initialize)
-  g_idle_add(
+  browserCreatedIdleId_ = g_idle_add(
       [](gpointer user_data) -> gboolean {
         auto* browser = static_cast<InAppBrowser*>(user_data);
         if (browser && !browser->destroyed_) {
@@ -121,6 +121,39 @@ void InAppBrowser::cleanup() {
   if (frameSourceId_ != 0) {
     g_source_remove(frameSourceId_);
     frameSourceId_ = 0;
+  }
+
+  // Cancel the browser-created idle notification before this object can die
+  if (browserCreatedIdleId_ != 0) {
+    g_source_remove(browserCreatedIdleId_);
+    browserCreatedIdleId_ = 0;
+  }
+
+  // Disconnect every signal handler that was connected with `this`. GTK3
+  // destroys the child widgets AFTER the toplevel's "destroy" handlers have
+  // run (and OnWindowDestroy erases this browser), so the map/unmap/focus/
+  // input handlers on the drawing area, GL area and toolbar widgets would
+  // otherwise fire on freed memory during window teardown.
+  if (window_ != nullptr) {
+    g_signal_handlers_disconnect_by_data(window_, this);
+  }
+  if (drawingArea_ != nullptr) {
+    g_signal_handlers_disconnect_by_data(drawingArea_, this);
+  }
+  if (glArea_ != nullptr) {
+    g_signal_handlers_disconnect_by_data(glArea_, this);
+  }
+  if (backButton_ != nullptr) {
+    g_signal_handlers_disconnect_by_data(backButton_, this);
+  }
+  if (forwardButton_ != nullptr) {
+    g_signal_handlers_disconnect_by_data(forwardButton_, this);
+  }
+  if (reloadButton_ != nullptr) {
+    g_signal_handlers_disconnect_by_data(reloadButton_, this);
+  }
+  if (urlEntry_ != nullptr) {
+    g_signal_handlers_disconnect_by_data(urlEntry_, this);
   }
 
   // Clean up cursor

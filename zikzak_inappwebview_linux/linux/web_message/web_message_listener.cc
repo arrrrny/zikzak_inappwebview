@@ -180,12 +180,18 @@ void WebMessageListener::onPostMessage(const std::string* messageData,
     }
   }
 
-  // Check if this origin is allowed (unless origin is empty/about:blank)
-  if (!sourceOrigin.empty() && sourceOrigin != "null") {
-    if (!isOriginAllowed(scheme, host, port)) {
-      debugLog("WebMessageListener: Origin not allowed: " + sourceOrigin);
-      return;
-    }
+  // Enforce the origin allowlist fail-closed: empty/"null" (opaque) origins
+  // and unparseable origin strings never match any rule, so they are denied
+  // even when the rules contain the "*" wildcard — matching Android/iOS,
+  // where an opaque origin cannot post into a listener.
+  bool originParseable = sourceOrigin.find("://") != std::string::npos;
+  if (sourceOrigin.empty() || sourceOrigin == "null" || !originParseable) {
+    debugLog("WebMessageListener: blocking message from opaque/unparseable origin: " + sourceOrigin);
+    return;
+  }
+  if (!isOriginAllowed(scheme, host, port)) {
+    debugLog("WebMessageListener: Origin not allowed: " + sourceOrigin);
+    return;
   }
 
   // Invoke the callback on the Dart side via the dedicated channel

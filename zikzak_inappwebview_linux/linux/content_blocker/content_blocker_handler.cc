@@ -49,6 +49,14 @@ ContentBlockerHandler::ContentBlockerHandler(WebKitUserContentManager* content_m
 }
 
 ContentBlockerHandler::~ContentBlockerHandler() {
+  // Detach in-flight compile contexts first: their completion callback fires
+  // later (WebKit's filter-store worker) and must not dereference this freed
+  // handler. The contexts themselves are owned (and freed) by the callback.
+  for (auto* context : pending_compiles_) {
+    context->handler = nullptr;
+  }
+  pending_compiles_.clear();
+
   removeAllFilters();
 
   if (filter_store_ != nullptr) {
@@ -197,6 +205,22 @@ std::string ContentBlockerHandler::convertToJsonString(FlValue* contentBlockers)
         }
       }
 
+      // load-context (array) - top-frame vs third-frame loads; dropping it
+      // would broaden the rule to both contexts
+      FlValue* loadContext = fl_value_lookup_string(triggerValue, "load-context");
+      if (loadContext != nullptr && fl_value_get_type(loadContext) == FL_VALUE_TYPE_LIST) {
+        json contexts = json::array();
+        for (size_t j = 0; j < fl_value_get_length(loadContext); j++) {
+          FlValue* context = fl_value_get_list_value(loadContext, j);
+          if (fl_value_get_type(context) == FL_VALUE_TYPE_STRING) {
+            contexts.push_back(fl_value_get_string(context));
+          }
+        }
+        if (!contexts.empty()) {
+          trigger["load-context"] = contexts;
+        }
+      }
+
       // if-top-url (array)
       FlValue* ifTopUrl = fl_value_lookup_string(triggerValue, "if-top-url");
       if (ifTopUrl != nullptr && fl_value_get_type(ifTopUrl) == FL_VALUE_TYPE_LIST) {
@@ -296,6 +320,7 @@ void ContentBlockerHandler::compileContentBlockers(const std::string& jsonSource
 
   // Create context for async callback
   auto* context = new CompileContext{this, std::move(callback)};
+  pending_compiles_.insert(context);
 
   // Start async compilation
   webkit_user_content_filter_store_save(filter_store_, filter_identifier_.c_str(), sourceBytes,
@@ -312,8 +337,13 @@ void ContentBlockerHandler::onFilterCompiled(GObject* source, GAsyncResult* resu
     return;
   }
 
+  // `handler` is null when the ContentBlockerHandler was destroyed while the
+  // compile was in flight; the context is still ours to consume and free.
   auto* handler = context->handler;
   auto callback = std::move(context->callback);
+  if (handler != nullptr) {
+    handler->pending_compiles_.erase(context);
+  }
   delete context;
 
   if (handler == nullptr || handler->filter_store_ == nullptr) {

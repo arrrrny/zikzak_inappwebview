@@ -6,6 +6,7 @@
 
 #include <functional>
 #include <memory>
+#include <set>
 #include <string>
 
 namespace zikzak_inappwebview {
@@ -95,6 +96,11 @@ class ContentBlockerHandler {
     ContentBlockerHandler* handler;
     std::function<void(bool)> callback;
   };
+
+  // In-flight compile contexts. The destructor nulls each context's handler
+  // pointer (without freeing it — the completion callback owns the context)
+  // so onFilterCompiled can never touch a freed handler.
+  std::set<CompileContext*> pending_compiles_;
 };
 
 }  // namespace zikzak_inappwebview

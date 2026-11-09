@@ -139,6 +139,7 @@ class InAppBrowser {
   std::shared_ptr<InAppWebView> webView_;
   GtkWidget* drawingArea_ = nullptr;
   guint frameSourceId_ = 0;
+  guint browserCreatedIdleId_ = 0;  // g_idle_add source for the onBrowserCreated notification
   GdkCursor* currentCursor_ = nullptr;
 
   // GPU rendering with GtkGLArea (zero-copy EGL texture path)
