@@ -7,6 +7,7 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 
 import '../find_interaction/find_interaction_controller.dart';
 import '../in_app_webview/in_app_webview_controller.dart';
+import '../util/debug_logging.dart';
 import '../util/wire.dart';
 
 /// Object specifying creation parameters for creating a [LinuxInAppBrowser].
@@ -184,6 +185,7 @@ class LinuxInAppBrowser extends PlatformInAppBrowser with ChannelController {
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('id', () => id);
+    args.putIfAbsent(debugLoggingEnabledArg, () => nativeDebugLoggingEnabled);
     args.putIfAbsent('settings', () => initialSettings);
     args.putIfAbsent('contextMenu', () => contextMenu?.toMap() ?? {});
     args.putIfAbsent('windowId', () => windowId);

@@ -87,6 +87,7 @@ void InAppBrowserManager::HandleMethodCallImpl(FlMethodCall* method_call) {
   FlValue* args = fl_method_call_get_args(method_call);
 
   if (strcmp(method, "open") == 0) {
+    applyDebugLoggingSetting(args);
     createInAppBrowser(args);
     fl_method_call_respond_success(method_call, fl_value_new_bool(true), nullptr);
     return;

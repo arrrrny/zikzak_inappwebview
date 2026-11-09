@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 
+#include "log.h"
 #include "map.h"
 #include "util.h"
 #include "vector.h"
@@ -383,6 +384,16 @@ static inline FlValue* fl_value_lookup_string_safe(FlValue* map, const char* key
 
 static inline FlValue* get_fl_map_value_raw(FlValue* map, const char* key) {
   return fl_value_lookup_string_safe(map, key);
+}
+
+/// Applies the `debugLoggingEnabled` flag the Dart side sends with every
+/// webview, headless webview and InAppBrowser creation call (see
+/// lib/src/util/debug_logging.dart). Leaves the flag unchanged when the key
+/// is absent.
+static inline void applyDebugLoggingSetting(FlValue* args) {
+  if (auto enabled = get_optional_fl_map_value<bool>(args, "debugLoggingEnabled")) {
+    setDebugLoggingEnabled(enabled.value());
+  }
 }
 
 }  // namespace zikzak_inappwebview

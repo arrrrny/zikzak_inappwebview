@@ -342,6 +342,7 @@ FetchContent_MakeAvailable(googletest)
 # sources directly into the test binary rather than using the shared library.
 add_executable(${TEST_RUNNER}
   test/zikzak_inappwebview_linux_plugin_test.cc
+  test/log_test.cc
   ${PLUGIN_SOURCES}
 )
 apply_standard_settings(${TEST_RUNNER})

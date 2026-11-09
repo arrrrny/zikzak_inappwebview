@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 import '../find_interaction/find_interaction_controller.dart';
+import '../util/debug_logging.dart';
 import '../util/wire.dart';
 import 'in_app_webview_controller.dart';
 
@@ -273,6 +274,7 @@ class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('id', () => id);
+    args.putIfAbsent(debugLoggingEnabledArg, () => nativeDebugLoggingEnabled);
     args.putIfAbsent(
       'params',
       () => <String, dynamic>{

@@ -71,6 +71,7 @@ void HeadlessInAppWebViewManager::HandleMethodCallImpl(FlMethodCall* method_call
   const gchar* method = fl_method_call_get_name(method_call);
 
   if (strcmp(method, "run") == 0) {
+    applyDebugLoggingSetting(fl_method_call_get_args(method_call));
     Run(method_call);
     return;
   }

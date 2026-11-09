@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
 import '../find_interaction/find_interaction_controller.dart';
+import '../util/debug_logging.dart';
 import '../util/wire.dart';
 import 'in_app_webview_controller.dart';
 import 'custom_platform_view.dart';
@@ -228,6 +229,7 @@ class LinuxInAppWebViewWidget extends PlatformInAppWebViewWidget {
     return CustomPlatformView(
       onPlatformViewCreated: _onPlatformViewCreated,
       creationParams: <String, dynamic>{
+        debugLoggingEnabledArg: nativeDebugLoggingEnabled,
         'initialUrlRequest': params.initialUrlRequest?.toJson(),
         'initialFile': params.initialFile,
         'initialData': params.initialData?.toJson(),

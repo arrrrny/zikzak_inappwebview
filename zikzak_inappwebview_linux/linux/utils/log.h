@@ -3,6 +3,7 @@
 
 #include <glib.h>
 
+#include <atomic>
 #include <iostream>
 #include <string>
 #include <type_traits>
@@ -11,10 +12,36 @@
 
 namespace zikzak_inappwebview {
 
+/// Process-wide switch for info logs, set from the Dart side's
+/// PlatformInAppWebViewController.debugLoggingSettings.enabled with every
+/// webview, headless webview and InAppBrowser creation call (see
+/// applyDebugLoggingSetting). Until the first such call it mirrors that
+/// setting's default: on in debug builds, off in release builds.
+inline std::atomic<bool>& debugLoggingFlag() {
+#ifdef NDEBUG
+  static std::atomic<bool> flag{false};
+#else
+  static std::atomic<bool> flag{true};
+#endif
+  return flag;
+}
+
+static inline void setDebugLoggingEnabled(bool enabled) {
+  debugLoggingFlag().store(enabled, std::memory_order_relaxed);
+}
+
+static inline bool isDebugLoggingEnabled() {
+  return debugLoggingFlag().load(std::memory_order_relaxed);
+}
+
+/// Info logs follow isDebugLoggingEnabled(); errors (isError) are always
+/// printed, in release builds too.
 template <typename T>
 static inline void debugLog(const std::basic_string<T>& msg, const bool& isError = false,
                             const std::string& filename = "", const int& line = 0) {
-#ifndef NDEBUG
+  if (!isError && !isDebugLoggingEnabled()) {
+    return;
+  }
   std::basic_string<T> debugMsg = msg;
   if (!filename.empty() && line > 0) {
     auto filenameSplit = split(filename, std::string{"/zikzak_inappwebview_linux/"});
@@ -29,7 +56,6 @@ static inline void debugLog(const std::basic_string<T>& msg, const bool& isError
   } else {
     g_message("[zikzak_inappwebview] %s", std::string(debugMsg).c_str());
   }
-#endif
 }
 
 static inline void debugLog(const char* msg, const bool& isError = false,

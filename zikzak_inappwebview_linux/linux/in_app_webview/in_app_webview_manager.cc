@@ -65,6 +65,7 @@ void InAppWebViewManager::HandleMethodCallImpl(FlMethodCall* method_call) {
   const gchar* method = fl_method_call_get_name(method_call);
 
   if (strcmp(method, "createInAppWebView") == 0) {
+    applyDebugLoggingSetting(fl_method_call_get_args(method_call));
     CreateInAppWebView(method_call);
     return;
   }
