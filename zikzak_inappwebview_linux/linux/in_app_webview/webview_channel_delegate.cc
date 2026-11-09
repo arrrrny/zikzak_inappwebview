@@ -534,8 +534,13 @@ void WebViewChannelDelegate::HandleMethodCall(FlMethodCall* method_call) {
 
   if (string_equals(methodName, "injectJavascriptFileFromUrl")) {
     std::string urlFile = get_fl_map_value<std::string>(args, "urlFile", "");
+    std::string scriptId = "";
+    FlValue* attributes = get_fl_map_value_raw(args, "scriptHtmlTagAttributes");
+    if (attributes != nullptr && fl_value_get_type(attributes) == FL_VALUE_TYPE_MAP) {
+      scriptId = get_fl_map_value<std::string>(attributes, "id", "");
+    }
     if (!urlFile.empty()) {
-      webView->injectJavascriptFileFromUrl(urlFile);
+      webView->injectJavascriptFileFromUrl(urlFile, scriptId);
     }
     g_autoptr(FlValue) result = fl_value_new_bool(true);
     fl_method_call_respond_success(method_call, result, nullptr);
@@ -848,12 +853,13 @@ void WebViewChannelDelegate::HandleMethodCall(FlMethodCall* method_call) {
   if (string_equals(methodName, "addWebMessageListener")) {
     FlValue* listener_value = get_fl_map_value_raw(args, "webMessageListener");
     if (listener_value != nullptr && fl_value_get_type(listener_value) == FL_VALUE_TYPE_MAP) {
+      std::string listenerId = get_fl_map_value<std::string>(listener_value, "id", "");
       std::string jsObjectName = get_fl_map_value<std::string>(listener_value, "jsObjectName", "");
-      std::vector<std::string> allowedOriginRules = 
+      std::vector<std::string> allowedOriginRules =
           get_fl_map_value<std::vector<std::string>>(listener_value, "allowedOriginRules", std::vector<std::string>());
-      
+
       if (!jsObjectName.empty()) {
-        webView->addWebMessageListener(jsObjectName, allowedOriginRules);
+        webView->addWebMessageListener(listenerId, jsObjectName, allowedOriginRules);
       }
     }
     g_autoptr(FlValue) result = fl_value_new_bool(true);

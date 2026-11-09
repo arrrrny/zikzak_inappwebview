@@ -152,10 +152,23 @@ class CustomPlatformViewController
     if (_isDisposed) {
       return;
     }
-    _textureId = (await _pluginChannel.invokeMethod<int>(
-      'createInAppWebView',
-      arguments,
-    ))!;
+    int? textureId;
+    try {
+      textureId = await _pluginChannel.invokeMethod<int>(
+        'createInAppWebView',
+        arguments,
+      );
+    } catch (e) {
+      // Complete the future (with the error) so dispose() never hangs on it.
+      _creatingCompleter.completeError(e);
+      rethrow;
+    }
+    if (textureId == null) {
+      final error = StateError('createInAppWebView returned no texture id');
+      _creatingCompleter.completeError(error);
+      throw error;
+    }
+    _textureId = textureId;
 
     _methodChannel = MethodChannel(
       'wtf.zikzak/custom_platform_view_$_textureId',
@@ -187,7 +200,11 @@ class CustomPlatformViewController
 
   @override
   Future<void> dispose() async {
-    await _creatingCompleter.future;
+    // A failed createInAppWebView completes the future with an error; swallow
+    // it here so teardown still runs (subscription cancelled, native disposed).
+    try {
+      await _creatingCompleter.future;
+    } catch (_) {}
     if (!_isDisposed) {
       _isDisposed = true;
       await _eventStreamSubscription?.cancel();
@@ -610,7 +627,9 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
                   }
                 },
                 onPointerPanZoomUpdate: (ev) {
-                  _controller._setScrollDelta(ev.panDelta.dx, ev.panDelta.dy);
+                  // Negate like the PointerScrollEvent path above: WPE scroll
+                  // events use the opposite sign of Flutter's trackpad panDelta.
+                  _controller._setScrollDelta(-ev.panDelta.dx, -ev.panDelta.dy);
                 },
                 child: MouseRegion(
                   cursor: _cursor,

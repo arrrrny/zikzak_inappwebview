@@ -22,6 +22,7 @@
 - [Linux] 24 upstream-only controller methods are not exposed (spec 017, FR-6). Three upstream-only settings (`allowModalDialogs`, `enable2DCanvasAcceleration`, `enableEncryptedMedia`) use WPE's native defaults.
 - [Linux] `requestFocus` has no `FocusDirection` parameter. `pressKey` ignores `keyCode` and sends upper-case letters without Shift.
 - [Linux] `onAjaxReadyStateChange` / `onAjaxProgress` enable native Ajax interception automatically when set (for `InAppBrowser`, whenever `useShouldInterceptAjaxRequest` is true).
+- [Linux] `onReceivedIcon` reports an empty `Uint8List`; the favicon URL is available on `LinuxInAppWebViewController.lastReceivedIconUrl` for apps to fetch the icon themselves.
 
 ## 6.3.4 - 2026-11-01
 

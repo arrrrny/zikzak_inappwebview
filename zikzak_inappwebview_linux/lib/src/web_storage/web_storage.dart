@@ -92,7 +92,9 @@ abstract mixin class LinuxStorage implements PlatformStorage {
     window.$webStorageType.length;
     """,
     );
-    return result != null ? int.parse(json.decode(result)) : null;
+    // evaluateJavascript already JSON-decodes the result, so a length arrives
+    // as int (a String would only appear from a legacy native build).
+    return result is int ? result : (result is String ? int.tryParse(result) : null);
   }
 
   @override
@@ -101,7 +103,7 @@ abstract mixin class LinuxStorage implements PlatformStorage {
     await controller?.evaluateJavascript(
       source:
           """
-    window.$webStorageType.setItem("$key", ${value is String ? encodedValue : "JSON.stringify($encodedValue)"});
+    window.$webStorageType.setItem(${json.encode(key)}, ${value is String ? encodedValue : "JSON.stringify($encodedValue)"});
     """,
     );
   }
@@ -111,7 +113,7 @@ abstract mixin class LinuxStorage implements PlatformStorage {
     var itemValue = await controller?.evaluateJavascript(
       source:
           """
-    window.$webStorageType.getItem("$key");
+    window.$webStorageType.getItem(${json.encode(key)});
     """,
     );
 
@@ -133,7 +135,7 @@ abstract mixin class LinuxStorage implements PlatformStorage {
     await controller?.evaluateJavascript(
       source:
           """
-    window.$webStorageType.removeItem("$key");
+    window.$webStorageType.removeItem(${json.encode(key)});
     """,
     );
   }
@@ -192,7 +194,13 @@ abstract mixin class LinuxStorage implements PlatformStorage {
     window.$webStorageType.key($index);
     """,
     );
-    return result != null ? json.decode(result) : null;
+    // evaluateJavascript already JSON-decodes the result; a null/missing
+    // result means no key exists at [index] (the platform interface promises
+    // a non-null String, so there is nothing valid to return).
+    if (result is String) {
+      return result;
+    }
+    throw StateError('No key found at index $index in $webStorageType');
   }
 
   @override
@@ -230,7 +238,11 @@ class LinuxLocalStorage extends PlatformLocalStorage with LinuxStorage {
             : LinuxLocalStorageCreationParams.fromPlatformLocalStorageCreationParams(
                 params,
               ),
-      );
+      ) {
+    // Store the back-reference in the mixin field so LinuxStorage.dispose()
+    // can actually release it (reads must not go through params.controller).
+    controller = this.params.controller as LinuxInAppWebViewController?;
+  }
 
   /// Default storage
   factory LinuxLocalStorage.defaultStorage({
@@ -247,10 +259,6 @@ class LinuxLocalStorage extends PlatformLocalStorage with LinuxStorage {
       ),
     );
   }
-
-  @override
-  LinuxInAppWebViewController? get controller =>
-      params.controller as LinuxInAppWebViewController?;
 }
 
 /// Object specifying creation parameters for creating a [LinuxSessionStorage].
@@ -283,7 +291,11 @@ class LinuxSessionStorage extends PlatformSessionStorage with LinuxStorage {
             : LinuxSessionStorageCreationParams.fromPlatformSessionStorageCreationParams(
                 params,
               ),
-      );
+      ) {
+    // Store the back-reference in the mixin field so LinuxStorage.dispose()
+    // can actually release it (reads must not go through params.controller).
+    controller = this.params.controller as LinuxInAppWebViewController?;
+  }
 
   /// Default storage
   factory LinuxSessionStorage.defaultStorage({
@@ -300,8 +312,4 @@ class LinuxSessionStorage extends PlatformSessionStorage with LinuxStorage {
       ),
     );
   }
-
-  @override
-  LinuxInAppWebViewController? get controller =>
-      params.controller as LinuxInAppWebViewController?;
 }

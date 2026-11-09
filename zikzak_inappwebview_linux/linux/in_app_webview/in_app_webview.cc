@@ -2046,15 +2046,45 @@ void InAppWebView::callAsyncJavaScript(
       cb_data);
 }
 
-void InAppWebView::injectJavascriptFileFromUrl(const std::string& urlFile) {
+void InAppWebView::injectJavascriptFileFromUrl(const std::string& urlFile, const std::string& scriptId) {
+  std::string escapedUrlFile = urlFile;
+  {
+    size_t pos = 0;
+    while ((pos = escapedUrlFile.find('\'', pos)) != std::string::npos) {
+      escapedUrlFile.replace(pos, 1, "\\'");
+      pos += 2;
+    }
+  }
+  std::string escapedScriptId = scriptId;
+  {
+    size_t pos = 0;
+    while ((pos = escapedScriptId.find('\'', pos)) != std::string::npos) {
+      escapedScriptId.replace(pos, 1, "\\'");
+      pos += 2;
+    }
+  }
   std::string script =
       "(function() {"
       "  var script = document.createElement('script');"
       "  script.src = '" +
-      urlFile +
+      escapedUrlFile +
       "';"
-      "  document.head.appendChild(script);"
-      "})();";
+      "  document.head.appendChild(script);";
+  if (!scriptId.empty()) {
+    const std::string& bridgeName = JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME();
+    script +=
+        "  script.onload = function() {"
+        "    if (window." + bridgeName + " != null) {"
+        "      window." + bridgeName + ".callHandler('onInjectedScriptLoaded', '" + escapedScriptId + "');"
+        "    }"
+        "  };"
+        "  script.onerror = function() {"
+        "    if (window." + bridgeName + " != null) {"
+        "      window." + bridgeName + ".callHandler('onInjectedScriptError', '" + escapedScriptId + "');"
+        "    }"
+        "  };";
+  }
+  script += "})();";
   evaluateJavascript(script, std::nullopt, nullptr);
 }
 
@@ -2124,16 +2154,22 @@ void InAppWebView::removeAllUserScripts() {
 
 // === Web Message Listener ===
 
-void InAppWebView::addWebMessageListener(const std::string& jsObjectName,
+void InAppWebView::addWebMessageListener(const std::string& id,
+                                          const std::string& jsObjectName,
                                           const std::vector<std::string>& allowedOriginRules) {
   if (webview_ == nullptr || jsObjectName.empty() || messenger_ == nullptr) {
     return;
   }
 
-  // Generate a unique ID for this listener
-  static int64_t listener_counter = 0;
-  std::string listenerId = std::to_string(g_get_monotonic_time()) + "_" +
-                           std::to_string(++listener_counter);
+  // Use the Dart-side listener id so the native channel name matches the
+  // MethodChannel the Dart WebMessageListener registered its handler on;
+  // only fall back to a generated id when Dart did not send one.
+  std::string listenerId = id;
+  if (listenerId.empty()) {
+    static int64_t listener_counter = 0;
+    listenerId = std::to_string(g_get_monotonic_time()) + "_" +
+                 std::to_string(++listener_counter);
+  }
 
   // Create the native WebMessageListener with its dedicated channel
   // This follows the federated plugin pattern

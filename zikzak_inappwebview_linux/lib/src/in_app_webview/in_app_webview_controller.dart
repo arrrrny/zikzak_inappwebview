@@ -81,6 +81,12 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
   final Set<LinuxWebMessageChannel> _webMessageChannels = {};
   Map<String, ScriptHtmlTagAttributes> _injectedScriptsFromURL = {};
 
+  /// The URL of the most recent favicon reported through `onReceivedIcon`.
+  ///
+  /// The Linux port does not deliver icon bytes yet — the callback receives an
+  /// empty [Uint8List]; use this URL to fetch the icon yourself.
+  String? lastReceivedIconUrl;
+
   // static map that contains the properties to be saved and restored for keep alive feature
   static final Map<InAppWebViewKeepAlive, InAppWebViewControllerKeepAliveProps?>
   _keepAliveMap = {};
@@ -687,6 +693,9 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
           // This could be enhanced to download the favicon
           String? faviconUrl = call.arguments["url"];
           if (faviconUrl != null) {
+            // The Linux port has no icon bytes to deliver yet; keep the URL so
+            // apps can fetch the icon themselves (see lastReceivedIconUrl).
+            lastReceivedIconUrl = faviconUrl;
             // Create a placeholder Uint8List since we don't have the actual icon
             // The favicon URL could be used to download the icon if needed
             if (webviewParams != null && webviewParams!.onReceivedIcon != null) {
@@ -1080,44 +1089,11 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
               onErrorCallback();
             }
             return null;
-          case "onWebMessageListenerPostMessageReceived":
-            Map<String, dynamic> arguments = handlerArgs[0]
-                .cast<String, dynamic>();
-            String jsObjectName = arguments["jsObjectName"];
-            // Find the corresponding web message listener
-            for (var listener in _webMessageListeners) {
-              if (listener.params.jsObjectName == jsObjectName) {
-                // Forward to the listener's channel
-                WebMessage? message = webMessageFromWire(arguments["message"]);
-                String? sourceOrigin = arguments["sourceOrigin"];
-                bool isMainFrame = arguments["isMainFrame"] ?? true;
-                // Call the listener's onPostMessage callback via channel
-                listener.channel?.invokeMethod("onPostMessage", {
-                  "message": message?.toJson(),
-                  "sourceOrigin": sourceOrigin,
-                  "isMainFrame": isMainFrame,
-                });
-                break;
-              }
-            }
-            return null;
-          case "onWebMessagePortMessageReceived":
-            Map<String, dynamic> arguments = handlerArgs[0]
-                .cast<String, dynamic>();
-            String webMessageChannelId = arguments["webMessageChannelId"];
-            int index = arguments["index"];
-            // Find the channel and forward the message
-            for (var webMessageChannel in _webMessageChannels) {
-              if (webMessageChannel.id == webMessageChannelId) {
-                WebMessage? message = webMessageFromWire(arguments["message"]);
-                webMessageChannel.internalChannel?.invokeMethod("onMessage", {
-                  "index": index,
-                  "message": message?.toJson(),
-                });
-                break;
-              }
-            }
-            return null;
+          // Web-message events ("onWebMessageListenerPostMessageReceived" /
+          // "onWebMessagePortMessageReceived") are intercepted natively and
+          // dispatched on the listener/channel MethodChannels themselves;
+          // forwarding them here would invoke Dart->native in the wrong
+          // direction (MissingPluginException).
         }
 
         if (_javaScriptHandlersMap.containsKey(handlerName)) {
@@ -1323,6 +1299,13 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
     required WebUri urlFile,
     ScriptHtmlTagAttributes? scriptHtmlTagAttributes,
   }) async {
+    assert(urlFile.toString().isNotEmpty);
+    // Register the attributes so the onInjectedScriptLoaded/onInjectedScriptError
+    // events native emits for this id can find their callbacks (mirrors iOS).
+    var id = scriptHtmlTagAttributes?.id;
+    if (scriptHtmlTagAttributes != null && id != null) {
+      _injectedScriptsFromURL[id] = scriptHtmlTagAttributes;
+    }
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('urlFile', () => urlFile.toString());
     args.putIfAbsent(
@@ -1521,7 +1504,8 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
     bool animated = false,
   }) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('zoomFactor', () => zoomFactor);
+    // Native reads 'zoomScale' (webview_channel_delegate.cc setZoomScale).
+    args.putIfAbsent('zoomScale', () => zoomFactor);
     await channel?.invokeMethod('setZoomScale', args);
   }
 

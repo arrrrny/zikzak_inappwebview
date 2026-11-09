@@ -189,7 +189,7 @@ class InAppWebView {
       const std::vector<std::string>& argumentKeys,
       const std::optional<std::string>& worldName,
       std::function<void(const std::string&)> callback);
-  void injectJavascriptFileFromUrl(const std::string& urlFile);
+  void injectJavascriptFileFromUrl(const std::string& urlFile, const std::string& scriptId = "");
   void injectCSSCode(const std::string& source);
   void injectCSSFileFromUrl(const std::string& urlFile);
 
@@ -200,7 +200,8 @@ class InAppWebView {
   void removeAllUserScripts();
 
   // Web Message Listener
-  void addWebMessageListener(const std::string& jsObjectName,
+  void addWebMessageListener(const std::string& id,
+                              const std::string& jsObjectName,
                               const std::vector<std::string>& allowedOriginRules);
 
   // Web Message Channel
