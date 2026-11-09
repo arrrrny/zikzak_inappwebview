@@ -83,7 +83,29 @@ using json = nlohmann::json;
 // Forward declaration of InAppWebView for FileChooserContext
 namespace zikzak_inappwebview {
 class InAppWebView;
+
+// Frees the heap-allocated DateDialogContext owned by an open date picker
+// (defined next to the struct; the destructor runs before that point).
+void DestroyDateDialogContext(void* context);
+
+// Defined with the other date-dialog callbacks below; the destructor
+// disconnects the dialog's response handler by this function.
+static void OnDateDialogResponse(GtkDialog* dialog, gint response_id, gpointer user_data);
+
+// Process-wide registry for custom URI scheme handlers. WebKit has no
+// unregister API and schemes are registered on the SHARED WebKitWebContext
+// (which outlives individual webviews), so the static handler resolves the
+// owning view through this registry instead of the raw user_data pointer.
+std::mutex g_custom_scheme_registry_mutex;
+std::map<std::pair<WebKitWebContext*, std::string>, InAppWebView*>
+    g_custom_scheme_registry;
+
+InAppWebView* LookupCustomSchemeOwner(WebKitWebContext* context, const std::string& scheme) {
+  std::lock_guard<std::mutex> lock(g_custom_scheme_registry_mutex);
+  auto it = g_custom_scheme_registry.find({context, scheme});
+  return it != g_custom_scheme_registry.end() ? it->second : nullptr;
 }
+}  // namespace zikzak_inappwebview
 
 // Context data for non-blocking file chooser dialog
 // Defined early because HideFileChooser() needs access to members
@@ -367,6 +389,88 @@ InAppWebView::~InAppWebView() {
   // captured guard instead of touching this freed object.
   is_disposing_.store(true);
   lifetime_flag_->store(false);
+
+  // Drop this view from the custom scheme registry: the scheme handler
+  // stays registered on the shared WebKitWebContext (no unregister API),
+  // and the static handler must not find a dangling owner here.
+  {
+    std::lock_guard<std::mutex> lock(g_custom_scheme_registry_mutex);
+    for (auto it = g_custom_scheme_registry.begin();
+         it != g_custom_scheme_registry.end();) {
+      if (it->second == this) {
+        it = g_custom_scheme_registry.erase(it);
+      } else {
+        ++it;
+      }
+    }
+  }
+
+  // Close the active GTK dialogs: they are transient to the Flutter
+  // GtkWindow, which outlives this webview, and their "response" handlers
+  // dereference this — after dispose, clicking OK/Cancel would run on freed
+  // memory. Cleanup mirrors what the response handlers do (destroy + unref)
+  // and deletes the contexts the handlers would have owned.
+  if (active_color_dialog_ != nullptr) {
+    g_signal_handlers_disconnect_by_data(active_color_dialog_, this);
+    gtk_widget_destroy(active_color_dialog_);
+    g_object_unref(active_color_dialog_);
+    active_color_dialog_ = nullptr;
+  }
+  if (pending_color_reply_ != nullptr) {
+    webkit_script_message_reply_unref(pending_color_reply_);
+    pending_color_reply_ = nullptr;
+  }
+  if (active_date_dialog_ != nullptr) {
+    // The date dialog's handlers use the heap-allocated DateDialogContext;
+    // disconnect the response handler and free the context here since the
+    // handler that would delete it can no longer run.
+    g_signal_handlers_disconnect_matched(active_date_dialog_, G_SIGNAL_MATCH_FUNC, 0, 0, nullptr,
+                                         G_CALLBACK(OnDateDialogResponse), nullptr);
+    DestroyDateDialogContext(date_dialog_context_);
+    date_dialog_context_ = nullptr;
+    gtk_widget_destroy(active_date_dialog_);
+    g_object_unref(active_date_dialog_);
+    active_date_dialog_ = nullptr;
+  }
+  if (pending_date_reply_ != nullptr) {
+    webkit_script_message_reply_unref(pending_date_reply_);
+    pending_date_reply_ = nullptr;
+  }
+  if (active_file_dialog_ != nullptr) {
+    if (file_chooser_context_ != nullptr) {
+      auto* context = static_cast<FileChooserContext*>(file_chooser_context_);
+      if (context->response_handler_id != 0) {
+        g_signal_handler_disconnect(active_file_dialog_, context->response_handler_id);
+        context->response_handler_id = 0;
+      }
+      delete context;
+      file_chooser_context_ = nullptr;
+    }
+    gtk_widget_destroy(active_file_dialog_);
+    g_object_unref(active_file_dialog_);
+    active_file_dialog_ = nullptr;
+  }
+
+  // Release the pending WebKit objects whose deferred handlers would have
+  // unref'd them; only pending_policy_decisions_ was cleaned up before.
+  for (auto& pair : pending_script_dialogs_) {
+    if (pair.second) {
+      webkit_script_dialog_unref(pair.second);
+    }
+  }
+  pending_script_dialogs_.clear();
+  for (auto& pair : pending_permission_requests_) {
+    if (pair.second) {
+      g_object_unref(pair.second);
+    }
+  }
+  pending_permission_requests_.clear();
+  for (auto& pair : pending_auth_requests_) {
+    if (pair.second) {
+      g_object_unref(pair.second);
+    }
+  }
+  pending_auth_requests_.clear();
 
   CleanupMonitorChangeHandlers();
 
@@ -5707,6 +5811,10 @@ struct DateDialogContext {
   bool hasMin, hasMax;
 };
 
+void DestroyDateDialogContext(void* context) {
+  delete static_cast<DateDialogContext*>(context);
+}
+
 // Helper to compare dates
 static int CompareDates(int y1, int m1, int d1, int y2, int m2, int d2) {
   if (y1 != y2) return y1 - y2;
@@ -5765,6 +5873,7 @@ static void OnDateDialogResponse(GtkDialog* dialog, gint response_id, gpointer u
   // Helper lambda for cleanup
   auto cleanup = [&]() {
     delete ctx;
+    self->date_dialog_context_ = nullptr;
     gtk_widget_destroy(GTK_WIDGET(dialog));
     g_object_unref(dialog);
     self->active_date_dialog_ = nullptr;
@@ -5848,8 +5957,11 @@ void InAppWebView::ShowDatePicker(const std::string& inputType, const std::strin
     gtk_widget_destroy(active_date_dialog_);
     g_object_unref(active_date_dialog_);
     active_date_dialog_ = nullptr;
+    // Its context dies with the dialog (the response handler will not run).
+    delete static_cast<DateDialogContext*>(date_dialog_context_);
+    date_dialog_context_ = nullptr;
   }
-  
+
   pending_date_input_value_ = value;
   pending_date_input_type_ = inputType;
   pending_date_input_min_ = min;
@@ -5895,6 +6007,7 @@ void InAppWebView::ShowDatePicker(const std::string& inputType, const std::strin
   ctx->hourSpin = nullptr;
   ctx->minuteSpin = nullptr;
   ctx->dialog = dialog;
+  date_dialog_context_ = ctx;
   
   // Parse min/max constraints
   ctx->hasMin = ParseIsoDate(min, &ctx->minYear, &ctx->minMonth, &ctx->minDay, &ctx->minHour, &ctx->minMinute);
@@ -7996,15 +8109,37 @@ void InAppWebView::RegisterCustomSchemes() {
       continue;
     }
 
-    // Register the custom URI scheme with the web context
+    // Register the custom URI scheme with the web context and record this
+    // view as the handler's owner (a later registration for the same
+    // (context, scheme) replaces it, matching WebKit's own behavior).
+    {
+      std::lock_guard<std::mutex> lock(g_custom_scheme_registry_mutex);
+      g_custom_scheme_registry[{context, scheme}] = this;
+    }
     webkit_web_context_register_uri_scheme(
         context, scheme.c_str(), InAppWebView::OnCustomSchemeRequest, this, nullptr);
   }
 }
 
 void InAppWebView::OnCustomSchemeRequest(WebKitURISchemeRequest* request, gpointer user_data) {
-  auto* self = static_cast<InAppWebView*>(user_data);
-  if (self == nullptr || self->webview_ == nullptr || self->channel_delegate_ == nullptr) {
+  (void)user_data;  // ownership is resolved through the registry below
+
+  // Resolve the owning webview: the registration lives on the shared
+  // WebKitWebContext, so `user_data` can be dangling after the registering
+  // view is disposed (or point at a view that no longer owns the scheme).
+  InAppWebView* self = nullptr;
+  WebKitWebView* requesting_view = webkit_uri_scheme_request_get_web_view(request);
+  const gchar* request_uri = webkit_uri_scheme_request_get_uri(request);
+  if (requesting_view != nullptr && request_uri != nullptr) {
+    std::string uri_str(request_uri);
+    size_t scheme_end = uri_str.find("://");
+    if (scheme_end != std::string::npos && scheme_end > 0) {
+      std::string scheme = uri_str.substr(0, scheme_end);
+      self = LookupCustomSchemeOwner(webkit_web_view_get_context(requesting_view), scheme);
+    }
+  }
+  if (self == nullptr || self->is_disposing_.load() || self->webview_ == nullptr ||
+      self->channel_delegate_ == nullptr) {
     // Finish with error if we can't handle it
     g_autoptr(GError) error =
         g_error_new(G_IO_ERROR, G_IO_ERROR_FAILED, "WebView not available");

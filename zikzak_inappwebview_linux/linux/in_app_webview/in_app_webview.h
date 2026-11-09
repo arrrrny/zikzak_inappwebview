@@ -705,6 +705,7 @@ class InAppWebView {
   std::string pending_date_input_min_;       // Min constraint
   std::string pending_date_input_max_;       // Max constraint
   GtkWidget* active_date_dialog_ = nullptr;  // Active date picker dialog
+  void* date_dialog_context_ = nullptr;       // Opaque DateDialogContext (for cleanup)
   int64_t date_dialog_show_time_ = 0;        // Time when dialog was shown
   WebKitScriptMessageReply* pending_date_reply_ = nullptr;  // WebKit reply for Promise resolution
 
