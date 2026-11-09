@@ -31,7 +31,7 @@ set(NLOHMANN_JSON_VERSION "3.11.3")
 #   - wpe-platform-2.0 (preferred) OR wpebackend-fdo-1.0 (fallback)
 #   - libwpe-1.0
 #
-# See WPE_BACKEND.md for installation instructions.
+# See README.md (then WPE_BACKEND.md) for installation instructions.
 
 find_package(PkgConfig REQUIRED)
 
@@ -61,7 +61,7 @@ endif()
 
 if(NOT WPE_WEBKIT_FOUND)
   message(FATAL_ERROR "WPE WebKit not found. Please install libwpewebkit-1.0-dev (Ubuntu/Debian) or wpe-webkit package.\n"
-                      "See WPE_BACKEND.md or https://wpewebkit.org/about/get-wpe.html")
+                      "See the package README (zikzak_inappwebview_linux/README.md), then WPE_BACKEND.md or https://wpewebkit.org/about/get-wpe.html")
 endif()
 
 # === WPE Platform API Detection (NEW - default) ===
@@ -76,7 +76,9 @@ if(WPE_PLATFORM_FOUND AND WPE_PLATFORM_HEADLESS_FOUND)
   # This happens when WPE WebKit is rebuilt without WPEPlatform support
   include(CheckCXXSourceCompiles)
   set(CMAKE_REQUIRED_INCLUDES ${WPE_WEBKIT_INCLUDE_DIRS} ${WPE_PLATFORM_INCLUDE_DIRS})
-  set(CMAKE_REQUIRED_LIBRARIES ${WPE_WEBKIT_LIBRARIES} ${WPE_PLATFORM_LIBRARIES})
+  # Full library paths, so the check also links when WPE is installed in a
+  # prefix the linker does not search by default (e.g. ~/.local/opt/wpe).
+  set(CMAKE_REQUIRED_LIBRARIES ${WPE_WEBKIT_LINK_LIBRARIES} ${WPE_PLATFORM_LINK_LIBRARIES})
   check_cxx_source_compiles("
     #include <wpe/webkit.h>
     int main() {
@@ -116,7 +118,7 @@ if(NOT HAVE_WPE_PLATFORM AND NOT HAVE_WPE_FDO)
                       "Please install one of:\n"
                       "  - WPE WebKit 2.40+ with WPEPlatform support (recommended)\n"
                       "  - wpebackend-fdo-1.0-dev (legacy fallback)\n"
-                      "See WPE_BACKEND.md for installation instructions.")
+                      "See the package README (zikzak_inappwebview_linux/README.md), then WPE_BACKEND.md.")
 endif()
 
 # Check for libwpe
@@ -256,9 +258,8 @@ set_target_properties(${PLUGIN_NAME} PROPERTIES
   CXX_VISIBILITY_PRESET hidden)
 target_compile_definitions(${PLUGIN_NAME} PRIVATE FLUTTER_PLUGIN_IMPL)
 
-# Set RPATH so the plugin loads bundled WPE libraries from the same directory.
-# $ORIGIN refers to the directory containing the plugin shared library.
-# This eliminates the need for LD_LIBRARY_PATH or launcher scripts.
+# RUNPATH: $ORIGIN (the plugin's own directory) plus the WPE prefix lib dir
+# (appended below), so no LD_LIBRARY_PATH or launcher script is needed.
 set_target_properties(${PLUGIN_NAME} PROPERTIES
   INSTALL_RPATH "$ORIGIN"
   BUILD_RPATH "$ORIGIN"
@@ -277,6 +278,16 @@ target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::GTK)
 target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::EPOXY)
 target_link_libraries(${PLUGIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::WPE_WEBKIT)
+
+# When WPE comes from a non-system prefix, add its library directory to the
+# plugin's runtime path, so the bundle runs without LD_LIBRARY_PATH, and pass
+# it to the app's link as -rpath-link, so that link finds WPE's libraries.
+pkg_get_variable(WPE_WEBKIT_LIBDIR wpe-webkit-2.0 libdir)
+if(WPE_WEBKIT_LIBDIR AND NOT WPE_WEBKIT_LIBDIR MATCHES "^/usr/lib")
+  set_property(TARGET ${PLUGIN_NAME} APPEND PROPERTY BUILD_RPATH "${WPE_WEBKIT_LIBDIR}")
+  set_property(TARGET ${PLUGIN_NAME} APPEND PROPERTY INSTALL_RPATH "${WPE_WEBKIT_LIBDIR}")
+  target_link_options(${PLUGIN_NAME} INTERFACE "LINKER:-rpath-link,${WPE_WEBKIT_LIBDIR}")
+endif()
 target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::LIBWPE)
 target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::WAYLAND_SERVER)
 target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::LIBSECRET)
@@ -293,80 +304,13 @@ if(HAVE_WPE_FDO)
 endif()
 
 # === Library Bundling ===
-# Collect WPE libraries to bundle with the application
-# This ensures the app can run without setting LD_LIBRARY_PATH
-
-set(WPE_BUNDLED_LIBS "")
-
-# Helper function to find and add real shared library files (resolving symlinks)
-function(find_and_add_library LIB_NAME SEARCH_PATHS OUT_LIST)
-  foreach(SEARCH_PATH ${SEARCH_PATHS})
-    # Look for the versioned .so file (e.g., libwpe-1.0.so.1.10.0)
-    file(GLOB LIB_FILES "${SEARCH_PATH}/${LIB_NAME}.so.*.*.*")
-    if(NOT LIB_FILES)
-      # Try less specific pattern (e.g., libwpe-1.0.so.1)
-      file(GLOB LIB_FILES "${SEARCH_PATH}/${LIB_NAME}.so.*")
-    endif()
-    if(LIB_FILES)
-      # Get the first matching file
-      list(GET LIB_FILES 0 LIB_FILE)
-      # Resolve symlinks to get the real file
-      get_filename_component(REAL_LIB "${LIB_FILE}" REALPATH)
-      if(EXISTS "${REAL_LIB}")
-        list(APPEND ${OUT_LIST} "${REAL_LIB}")
-        set(${OUT_LIST} ${${OUT_LIST}} PARENT_SCOPE)
-        message(STATUS "zikzak_inappwebview_linux: Will bundle ${REAL_LIB}")
-        return()
-      endif()
-    endif()
-  endforeach()
-  message(WARNING "zikzak_inappwebview_linux: Could not find ${LIB_NAME} to bundle")
-endfunction()
-
-# Get library directories from pkg-config
-set(WPE_LIB_DIRS "")
-if(WPE_WEBKIT_LIBRARY_DIRS)
-  list(APPEND WPE_LIB_DIRS ${WPE_WEBKIT_LIBRARY_DIRS})
-endif()
-if(LIBWPE_LIBRARY_DIRS)
-  list(APPEND WPE_LIB_DIRS ${LIBWPE_LIBRARY_DIRS})
-endif()
-if(HAVE_WPE_FDO AND WPE_FDO_LIBRARY_DIRS)
-  list(APPEND WPE_LIB_DIRS ${WPE_FDO_LIBRARY_DIRS})
-endif()
-# Add common paths as fallback
-list(APPEND WPE_LIB_DIRS 
-  "/usr/local/lib"
-  "/usr/local/lib/${CMAKE_LIBRARY_ARCHITECTURE}"
-  "/usr/lib"
-  "/usr/lib/${CMAKE_LIBRARY_ARCHITECTURE}"
-)
-list(REMOVE_DUPLICATES WPE_LIB_DIRS)
-
-# Find WPE WebKit library
-find_and_add_library("libWPEWebKit-2.0" "${WPE_LIB_DIRS}" WPE_BUNDLED_LIBS)
-
-# Find libwpe library  
-find_and_add_library("libwpe-1.0" "${WPE_LIB_DIRS}" WPE_BUNDLED_LIBS)
-
-# WPEPlatform is built into libWPEWebKit-2.0 on modern builds, so there are
-# no separate libWPEPlatform*.so files to bundle.
-
-# Find WPE Backend FDO library (legacy fallback)
-if(HAVE_WPE_FDO)
-  find_and_add_library("libWPEBackend-fdo-1.0" "${WPE_LIB_DIRS}" WPE_BUNDLED_LIBS)
-endif()
-
-# Also need to create symlinks for the sonames that the libraries expect
-# This will be handled at install time in the example CMakeLists.txt
-
+# WPE WebKit is deliberately not bundled: the plugin links against the WPE
+# install (see the RUNPATH above) and WPE's helper processes load from there
+# too. Shipping WPE with an app is out of scope (spec 017).
 set(zikzak_inappwebview_linux_bundled_libraries
-  ${WPE_BUNDLED_LIBS}
+  ""
   PARENT_SCOPE
 )
-
-# Export library info for downstream use
-set(ZIKZAK_INAPPWEBVIEW_WPE_LIBS ${WPE_BUNDLED_LIBS} CACHE INTERNAL "WPE libraries to bundle")
 
 # === Tests ===
 # These unit tests can be run from a terminal after building the example.
