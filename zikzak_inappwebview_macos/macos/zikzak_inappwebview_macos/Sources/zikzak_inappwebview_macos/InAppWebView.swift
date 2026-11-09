@@ -3454,6 +3454,69 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         }
     }
 
+    // MARK: - Open panel / <input type="file"> chooser (WKUIDelegate)
+
+    // WKWebView never opens a file picker by itself: for a page's
+    // <input type="file"> activation it asks its UI delegate for one via
+    // webView(_:runOpenPanelWith:...). Without the method WebKit drops the
+    // activation — the completion handler is never called, no panel ever
+    // appears, and file uploads are impossible in every embedding app
+    // (issue #408).
+    //
+    // The panel presentation sits behind the `openPanelPresenter` seam so
+    // CI (and hosts that want their own picker, e.g. a Puppeteer-parity
+    // waitForFileChooser) can substitute a fixed-URL picker; the real
+    // NSOpenPanel is the default when no presenter is registered.
+    // WKOpenPanelParameters does not carry the input's `accept` types, so
+    // no type filter is applied — matching WebKit's own contract.
+    //
+    // NSOpenPanel-granted access is exactly the user-selected read path
+    // (`com.apple.security.files.user-selected.read-write`), so no
+    // entitlement change is needed in consuming apps.
+
+    /// Injectable picker seam (issue #408): substitutes the NSOpenPanel
+    /// presentation. Receives the WebKit parameters and MUST call the
+    /// handler with the picked URLs, or nil on cancel.
+    ///
+    /// WebKit invokes the delegate on the MAIN thread; a custom presenter
+    /// must likewise call the handler on the main thread.
+    public var openPanelPresenter: ((WKOpenPanelParameters, @escaping ([URL]?) -> Void) -> Void)?
+
+    public func webView(
+        _ webView: WKWebView, runOpenPanelWith parameters: WKOpenPanelParameters,
+        initiatedByFrame frame: WKFrameInfo,
+        completionHandler: @escaping ([URL]?) -> Void
+    ) {
+        if let presenter = openPanelPresenter {
+            presenter(parameters, completionHandler)
+            return
+        }
+
+        let panel = NSOpenPanel()
+        panel.canChooseFiles = true
+        panel.canChooseDirectories = false
+        panel.allowsMultipleSelection = parameters.allowsMultipleSelection
+        panel.resolvesAliases = true
+
+        let finish: (NSApplication.ModalResponse) -> Void = { response in
+            if response == .OK, !panel.urls.isEmpty {
+                let urls = panel.urls
+                completionHandler(urls)
+            } else {
+                completionHandler(nil)
+            }
+        }
+
+        if let window = self.window {
+            // Sheet-modal relative to the webview's window, as a native
+            // app presents its file pickers.
+            panel.beginSheetModal(for: window, completionHandler: finish)
+        } else {
+            // Windowless (headless) embedding: fall back to app-modal.
+            finish(panel.runModal())
+        }
+    }
+
     // MARK: - Media capture / device orientation permission (macOS 12+)
     //
     // Ports the iOS WKUIDelegate implementation
