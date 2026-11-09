@@ -860,18 +860,18 @@ packages:
     dependency: transitive
     description:
       name: zuraffa
-      sha256: a55ac206b2c1d6f57cdf3345a4cd2aee094781b88faf1149f70e74f50c857254
+      sha256: d7c0d3e2380b2e2e330efdda1362dfcf89ee229ee5bf00d1e41cba39742b08c4
       url: "https://pub.dev"
     source: hosted
-    version: "7.3.0"
+    version: "7.3.8"
   zuraffa_session:
     dependency: transitive
     description:
       name: zuraffa_session
-      sha256: "1e9edea9259c2e04f0e802d17e123635d4c9c1c5ef32e62bfe12ef73180a7643"
+      sha256: ee3b57e78c64351959f1919beb660447154b7cdb2ea32abac0f1de3de1b62a5a
       url: "https://pub.dev"
     source: hosted
-    version: "7.3.0"
+    version: "7.3.8"
 sdks:
   dart: ">=3.13.0 <4.0.0"
   flutter: ">=3.47.0"
