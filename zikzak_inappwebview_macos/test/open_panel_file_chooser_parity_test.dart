@@ -81,18 +81,6 @@ String? functionBodyContaining(String strippedSource, String marker) {
   );
 }
 
-/// Like [functionBodyContaining] but searches the RAW source (needed when
-/// the marker only appears inside a string literal, e.g.
-/// `invokeMethod("shouldOverrideUrlLoading", ...)`). Braces inside string
-/// literals and comments are skipped during matching.
-String? functionBodyContainingRaw(String rawSource, String marker) {
-  final idx = rawSource.indexOf(marker);
-  if (idx == -1) return null;
-  var braceStart = rawSource.indexOf('{', idx);
-  if (braceStart == -1) return null;
-  return bracedBlockFrom(source: rawSource, braceStart: braceStart);
-}
-
 /// Brace-matches the block starting at [braceStart], skipping Swift string
 /// literals (incl. triple-quoted), line comments and (nested) block comments.
 String? bracedBlockFrom({required String source, required int braceStart}) {
@@ -225,6 +213,13 @@ void main() {
           body,
           contains('canChooseFiles = true'),
           reason: 'a file input picks files',
+        );
+        expect(
+          body,
+          contains('canChooseDirectories = false'),
+          reason:
+              'a file input must not pick directories — the other half of '
+              'the mapping this AC pins',
         );
       },
     );

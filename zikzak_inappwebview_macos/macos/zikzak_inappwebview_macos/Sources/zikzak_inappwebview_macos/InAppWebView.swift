@@ -3477,6 +3477,9 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     /// Injectable picker seam (issue #408): substitutes the NSOpenPanel
     /// presentation. Receives the WebKit parameters and MUST call the
     /// handler with the picked URLs, or nil on cancel.
+    ///
+    /// WebKit invokes the delegate on the MAIN thread; a custom presenter
+    /// must likewise call the handler on the main thread.
     public var openPanelPresenter: ((WKOpenPanelParameters, @escaping ([URL]?) -> Void) -> Void)?
 
     public func webView(
@@ -3496,7 +3499,8 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         panel.resolvesAliases = true
 
         let finish: (NSApplication.ModalResponse) -> Void = { response in
-            if response == .OK, let urls = panel.urls, !urls.isEmpty {
+            if response == .OK, !panel.urls.isEmpty {
+                let urls = panel.urls
                 completionHandler(urls)
             } else {
                 completionHandler(nil)
