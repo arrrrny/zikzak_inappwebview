@@ -7,7 +7,7 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 
 import '../find_interaction/find_interaction_controller.dart';
 import '../in_app_webview/in_app_webview_controller.dart';
-import '../webview_environment/webview_environment.dart';
+import '../util/wire.dart';
 
 /// Object specifying creation parameters for creating a [LinuxInAppBrowser].
 ///
@@ -17,13 +17,12 @@ import '../webview_environment/webview_environment.dart';
 class LinuxInAppBrowserCreationParams
     extends PlatformInAppBrowserCreationParams {
   /// Creates a new [LinuxInAppBrowserCreationParams] instance.
-  LinuxInAppBrowserCreationParams({
+  const LinuxInAppBrowserCreationParams({
     super.contextMenu,
     super.pullToRefreshController,
-    this.findInteractionController,
+    LinuxFindInteractionController? super.findInteractionController,
     super.initialUserScripts,
     super.windowId,
-    this.webViewEnvironment,
   });
 
   /// Creates a [LinuxInAppBrowserCreationParams] instance based on [PlatformInAppBrowserCreationParams].
@@ -39,16 +38,12 @@ class LinuxInAppBrowserCreationParams
           params.findInteractionController as LinuxFindInteractionController?,
       initialUserScripts: params.initialUserScripts,
       windowId: params.windowId,
-      webViewEnvironment:
-          params.webViewEnvironment as LinuxWebViewEnvironment?,
     );
   }
 
   @override
-  final LinuxFindInteractionController? findInteractionController;
-
-  @override
-  final LinuxWebViewEnvironment? webViewEnvironment;
+  LinuxFindInteractionController? get findInteractionController =>
+      super.findInteractionController as LinuxFindInteractionController?;
 }
 
 ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppBrowser}
@@ -80,7 +75,7 @@ class LinuxInAppBrowser extends PlatformInAppBrowser with ChannelController {
   LinuxInAppBrowserCreationParams get _linuxParams =>
       params as LinuxInAppBrowserCreationParams;
 
-  static const MethodChannel _staticChannel = const MethodChannel(
+  static const MethodChannel _staticChannel = MethodChannel(
     'wtf.zikzak/zikzak_inappbrowser',
   );
 
@@ -89,7 +84,7 @@ class LinuxInAppBrowser extends PlatformInAppBrowser with ChannelController {
   @override
   ContextMenu? get contextMenu => _contextMenu;
 
-  Map<int, InAppBrowserMenuItem> _menuItems = HashMap();
+  final Map<int, InAppBrowserMenuItem> _menuItems = HashMap();
   bool _isOpened = false;
   LinuxInAppWebViewController? _webViewController;
 
@@ -98,7 +93,7 @@ class LinuxInAppBrowser extends PlatformInAppBrowser with ChannelController {
     return _isOpened ? _webViewController : null;
   }
 
-  _init() {
+  void _init() {
     channel = MethodChannel('wtf.zikzak/zikzak_inappbrowser_$id');
     handler = _handleMethod;
     initMethodCallHandler();
@@ -107,14 +102,14 @@ class LinuxInAppBrowser extends PlatformInAppBrowser with ChannelController {
       LinuxInAppWebViewControllerCreationParams(id: id),
       channel!,
       this,
-      this.initialUserScripts,
+      initialUserScripts,
     );
     _linuxParams.findInteractionController?.init(id);
   }
 
-  _debugLog(String method, dynamic args) {
+  void _debugLog(String method, dynamic args) {
     debugLog(
-      className: this.runtimeType.toString(),
+      className: runtimeType.toString(),
       id: id,
       debugLoggingSettings: PlatformInAppBrowser.debugLoggingSettings,
       method: method,
@@ -131,9 +126,9 @@ class LinuxInAppBrowser extends PlatformInAppBrowser with ChannelController {
       case "onMenuItemClicked":
         _debugLog(call.method, call.arguments);
         int id = call.arguments["id"].toInt();
-        if (this._menuItems[id] != null) {
-          if (this._menuItems[id]?.onClick != null) {
-            this._menuItems[id]?.onClick!();
+        if (_menuItems[id] != null) {
+          if (_menuItems[id]?.onClick != null) {
+            _menuItems[id]?.onClick!();
           }
         }
         break;
@@ -153,23 +148,34 @@ class LinuxInAppBrowser extends PlatformInAppBrowser with ChannelController {
     }
   }
 
+  /// The browser's events are methods of [eventHandler], so whether the app
+  /// handles `onAjaxReadyStateChange` / `onAjaxProgress` cannot be detected:
+  /// both are enabled whenever the app enables Ajax interception.
+  static Map<String, dynamic> _settingsToWire(
+    InAppBrowserClassSettings settings,
+  ) {
+    final ajax = settings.webViewSettings.useShouldInterceptAjaxRequest == true;
+    return withAjaxEventFlags(
+      inAppBrowserClassSettingsToWire(settings),
+      onReadyStateChange: ajax,
+      onProgress: ajax,
+    );
+  }
+
   Map<String, dynamic> _prepareOpenRequest({
-    @Deprecated('Use settings instead') InAppBrowserClassOptions? options,
     InAppBrowserClassSettings? settings,
   }) {
     assert(!_isOpened, 'The browser is already opened.');
     _isOpened = true;
     _init();
 
-    var initialSettings =
-        settings?.toMap() ??
-        options?.toMap() ??
-        InAppBrowserClassSettings().toMap();
+    var initialSettings = _settingsToWire(
+      settings ?? InAppBrowserClassSettings(),
+    );
 
     Map<String, dynamic> pullToRefreshSettings =
-        pullToRefreshController?.settings.toMap() ??
-        pullToRefreshController?.options.toMap() ??
-        PullToRefreshSettings(enabled: false).toMap();
+        pullToRefreshController?.settings?.toJson() ??
+        PullToRefreshSettings(enabled: false).toJson();
 
     List<Map<String, dynamic>> menuItemList = [];
     _menuItems.forEach((key, value) {
@@ -183,47 +189,33 @@ class LinuxInAppBrowser extends PlatformInAppBrowser with ChannelController {
     args.putIfAbsent('windowId', () => windowId);
     args.putIfAbsent(
       'initialUserScripts',
-      () => initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
+      () => initialUserScripts?.map(userScriptToWire).toList() ?? [],
     );
     args.putIfAbsent('pullToRefreshSettings', () => pullToRefreshSettings);
     args.putIfAbsent('menuItems', () => menuItemList);
-    args.putIfAbsent(
-      'webViewEnvironmentId',
-      () => _linuxParams.webViewEnvironment?.id,
-    );
     return args;
   }
 
   @override
   Future<void> openUrlRequest({
     required URLRequest urlRequest,
-    // ignore: deprecated_member_use_from_same_package
-    @Deprecated('Use settings instead') InAppBrowserClassOptions? options,
     InAppBrowserClassSettings? settings,
   }) async {
     assert(urlRequest.url != null && urlRequest.url.toString().isNotEmpty);
 
-    Map<String, dynamic> args = _prepareOpenRequest(
-      options: options,
-      settings: settings,
-    );
-    args.putIfAbsent('urlRequest', () => urlRequest.toMap());
+    Map<String, dynamic> args = _prepareOpenRequest(settings: settings);
+    args.putIfAbsent('urlRequest', () => urlRequest.toJson());
     await _staticChannel.invokeMethod('open', args);
   }
 
   @override
   Future<void> openFile({
     required String assetFilePath,
-    // ignore: deprecated_member_use_from_same_package
-    @Deprecated('Use settings instead') InAppBrowserClassOptions? options,
     InAppBrowserClassSettings? settings,
   }) async {
     assert(assetFilePath.isNotEmpty);
 
-    Map<String, dynamic> args = _prepareOpenRequest(
-      options: options,
-      settings: settings,
-    );
+    Map<String, dynamic> args = _prepareOpenRequest(settings: settings);
     args.putIfAbsent('assetFilePath', () => assetFilePath);
     await _staticChannel.invokeMethod('open', args);
   }
@@ -234,23 +226,17 @@ class LinuxInAppBrowser extends PlatformInAppBrowser with ChannelController {
     String mimeType = "text/html",
     String encoding = "utf8",
     WebUri? baseUrl,
-    @Deprecated("Use historyUrl instead") Uri? androidHistoryUrl,
     WebUri? historyUrl,
-    // ignore: deprecated_member_use_from_same_package
-    @Deprecated('Use settings instead') InAppBrowserClassOptions? options,
     InAppBrowserClassSettings? settings,
   }) async {
-    Map<String, dynamic> args = _prepareOpenRequest(
-      options: options,
-      settings: settings,
-    );
+    Map<String, dynamic> args = _prepareOpenRequest(settings: settings);
     args.putIfAbsent('data', () => data);
     args.putIfAbsent('mimeType', () => mimeType);
     args.putIfAbsent('encoding', () => encoding);
     args.putIfAbsent('baseUrl', () => baseUrl?.toString() ?? "about:blank");
     args.putIfAbsent(
       'historyUrl',
-      () => (historyUrl ?? androidHistoryUrl)?.toString() ?? "about:blank",
+      () => historyUrl?.toString() ?? "about:blank",
     );
     await _staticChannel.invokeMethod('open', args);
   }
@@ -271,9 +257,9 @@ class LinuxInAppBrowser extends PlatformInAppBrowser with ChannelController {
 
   @override
   void addMenuItems(List<InAppBrowserMenuItem> menuItems) {
-    menuItems.forEach((menuItem) {
+    for (var menuItem in menuItems) {
       _menuItems[menuItem.id] = menuItem;
-    });
+    }
   }
 
   @override
@@ -331,41 +317,13 @@ class LinuxInAppBrowser extends PlatformInAppBrowser with ChannelController {
   }
 
   @override
-  @Deprecated('Use setSettings instead')
-  Future<void> setOptions({required InAppBrowserClassOptions options}) async {
-    assert(_isOpened, 'The browser is not opened.');
-
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('settings', () => options.toMap());
-    await channel?.invokeMethod('setSettings', args);
-  }
-
-  @override
-  @Deprecated('Use getSettings instead')
-  Future<InAppBrowserClassOptions?> getOptions() async {
-    assert(_isOpened, 'The browser is not opened.');
-    Map<String, dynamic> args = <String, dynamic>{};
-
-    Map<dynamic, dynamic>? options = await channel?.invokeMethod(
-      'getSettings',
-      args,
-    );
-    if (options != null) {
-      options = options.cast<String, dynamic>();
-      return InAppBrowserClassOptions.fromMap(options as Map<String, dynamic>);
-    }
-
-    return null;
-  }
-
-  @override
   Future<void> setSettings({
     required InAppBrowserClassSettings settings,
   }) async {
     assert(_isOpened, 'The browser is not opened.');
 
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('settings', () => settings.toMap());
+    args.putIfAbsent('settings', () => _settingsToWire(settings));
     await channel?.invokeMethod('setSettings', args);
   }
 
@@ -375,29 +333,19 @@ class LinuxInAppBrowser extends PlatformInAppBrowser with ChannelController {
 
     Map<String, dynamic> args = <String, dynamic>{};
 
-    Map<dynamic, dynamic>? settings = await channel?.invokeMethod(
-      'getSettings',
-      args,
-    );
-    if (settings != null) {
-      settings = settings.cast<String, dynamic>();
-      return InAppBrowserClassSettings.fromMap(
-        settings as Map<String, dynamic>,
-      );
-    }
-
-    return null;
+    final settings = await channel?.invokeMethod('getSettings', args);
+    return inAppBrowserClassSettingsFromWire(settings);
   }
 
   @override
   bool isOpened() {
-    return this._isOpened;
+    return _isOpened;
   }
 
   @override
   @mustCallSuper
-  void dispose() {
-    super.dispose();
+  void dispose({bool isKeepAlive = false}) {
+    super.dispose(isKeepAlive: isKeepAlive);
     disposeChannel();
     _webViewController?.dispose();
     _webViewController = null;

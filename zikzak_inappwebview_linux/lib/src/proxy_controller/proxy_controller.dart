@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
+import '../util/wire.dart';
+
 /// Object specifying creation parameters for creating a [LinuxProxyController].
 ///
 /// When adding additional fields make sure they can be null or have a default
@@ -74,13 +76,19 @@ class LinuxProxyController extends PlatformProxyController {
   @override
   Future<void> setProxyOverride({required ProxySettings settings}) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("settings", () => settings.toMap());
+    args.putIfAbsent("settings", () => proxySettingsToWire(settings));
     await _channel.invokeMethod('setProxyOverride', args);
   }
 
+  /// [profileId] is not used on Linux: WPE has one proxy configuration per
+  /// network session.
   @override
-  Future<void> clearProxyOverride() async {
+  Future<void> clearProxyOverride({String? profileId}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     await _channel.invokeMethod('clearProxyOverride', args);
   }
+
+  /// The controller is a singleton on a static channel; nothing to release.
+  @override
+  void dispose({bool isKeepAlive = false}) {}
 }

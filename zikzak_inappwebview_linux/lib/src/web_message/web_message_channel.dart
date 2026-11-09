@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
+
+import '../util/wire.dart';
 import 'web_message_port.dart';
 
 /// Object specifying creation parameters for creating a [LinuxWebMessageChannel].
@@ -95,11 +97,7 @@ class LinuxWebMessageChannel extends PlatformWebMessageChannel
         int index = call.arguments["index"];
         var port = index == 0 ? _linuxPort1 : _linuxPort2;
         if (port.onMessage != null) {
-          WebMessage? message = call.arguments["message"] != null
-              ? WebMessage.fromMap(
-                  call.arguments["message"].cast<String, dynamic>(),
-                )
-              : null;
+          WebMessage? message = webMessageFromWire(call.arguments["message"]);
           port.onMessage!(message);
         }
         break;
@@ -115,7 +113,7 @@ class LinuxWebMessageChannel extends PlatformWebMessageChannel
   }
 
   @override
-  void dispose() {
+  void dispose({bool isKeepAlive = false}) {
     disposeChannel();
   }
 

@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
+import '../util/wire.dart';
+
 /// Object specifying creation parameters for creating a [LinuxWebMessageListener].
 ///
 /// When adding additional fields make sure they can be null or have a default
@@ -12,7 +14,7 @@ class LinuxWebMessageListenerCreationParams
     extends PlatformWebMessageListenerCreationParams {
   /// Creates a new [LinuxWebMessageListenerCreationParams] instance.
   const LinuxWebMessageListenerCreationParams({
-    required this.allowedOriginRules,
+    required Set<String> super.allowedOriginRules,
     required super.jsObjectName,
     super.onPostMessage,
   });
@@ -22,14 +24,14 @@ class LinuxWebMessageListenerCreationParams
     PlatformWebMessageListenerCreationParams params,
   ) {
     return LinuxWebMessageListenerCreationParams(
-      allowedOriginRules: params.allowedOriginRules ?? Set.from(["*"]),
+      allowedOriginRules: params.allowedOriginRules ?? {"*"},
       jsObjectName: params.jsObjectName,
       onPostMessage: params.onPostMessage,
     );
   }
 
   @override
-  final Set<String> allowedOriginRules;
+  Set<String> get allowedOriginRules => super.allowedOriginRules!;
 
   @override
   String toString() {
@@ -50,7 +52,7 @@ class LinuxWebMessageListener extends PlatformWebMessageListener
               ),
       ) {
     assert(
-      !this._linuxParams.allowedOriginRules.contains(""),
+      !_linuxParams.allowedOriginRules.contains(""),
       "allowedOriginRules cannot contain empty strings",
     );
     channel = MethodChannel(
@@ -63,7 +65,7 @@ class LinuxWebMessageListener extends PlatformWebMessageListener
   static final LinuxWebMessageListener _staticValue = LinuxWebMessageListener(
     LinuxWebMessageListenerCreationParams(
       jsObjectName: '',
-      allowedOriginRules: Set.from(["*"]),
+      allowedOriginRules: {"*"},
     ),
   );
 
@@ -83,19 +85,13 @@ class LinuxWebMessageListener extends PlatformWebMessageListener
   Future<dynamic> _handleMethod(MethodCall call) async {
     switch (call.method) {
       case "onPostMessage":
-        if (_replyProxy == null) {
-          _replyProxy = LinuxJavaScriptReplyProxy(
+        _replyProxy ??= LinuxJavaScriptReplyProxy(
             PlatformJavaScriptReplyProxyCreationParams(
               webMessageListener: this,
             ),
           );
-        }
         if (onPostMessage != null) {
-          WebMessage? message = call.arguments["message"] != null
-              ? WebMessage.fromMap(
-                  call.arguments["message"].cast<String, dynamic>(),
-                )
-              : null;
+          WebMessage? message = webMessageFromWire(call.arguments["message"]);
           WebUri? sourceOrigin = call.arguments["sourceOrigin"] != null
               ? WebUri(call.arguments["sourceOrigin"])
               : null;
@@ -110,7 +106,7 @@ class LinuxWebMessageListener extends PlatformWebMessageListener
   }
 
   @override
-  void dispose() {
+  void dispose({bool isKeepAlive = false}) {
     disposeChannel();
   }
 
@@ -125,12 +121,12 @@ class LinuxWebMessageListener extends PlatformWebMessageListener
 
   @override
   Map<String, dynamic> toJson() {
-    return this.toMap();
+    return toMap();
   }
 
   @override
   String toString() {
-    return 'LinuxWebMessageListener{id: ${_id}, jsObjectName: ${params.jsObjectName}, allowedOriginRules: ${params.allowedOriginRules}, replyProxy: $_replyProxy}';
+    return 'LinuxWebMessageListener{id: $_id, jsObjectName: ${params.jsObjectName}, allowedOriginRules: ${params.allowedOriginRules}, replyProxy: $_replyProxy}';
   }
 }
 
@@ -157,7 +153,7 @@ class LinuxJavaScriptReplyProxyCreationParams
   }
 }
 
-///{@macro zikzak_inappwebview_platform_interface.JavaScriptReplyProxy}
+///{@macro zikzak_inappwebview_platform_interface.PlatformJavaScriptReplyProxy}
 class LinuxJavaScriptReplyProxy extends PlatformJavaScriptReplyProxy {
   /// Constructs a [LinuxWebMessageListener].
   LinuxJavaScriptReplyProxy(PlatformJavaScriptReplyProxyCreationParams params)
@@ -175,7 +171,7 @@ class LinuxJavaScriptReplyProxy extends PlatformJavaScriptReplyProxy {
   @override
   Future<void> postMessage(WebMessage message) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('message', () => message.toMap());
+    args.putIfAbsent('message', () => message.toJson());
     await _linuxWebMessageListener.channel?.invokeMethod('postMessage', args);
   }
 

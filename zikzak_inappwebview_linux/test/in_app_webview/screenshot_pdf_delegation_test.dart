@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:zikzak_inappwebview_linux/src/in_app_webview/in_app_webview_controller.dart';
+import 'package:zikzak_inappwebview_linux/src/util/wire.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
 /// Behavioral tests for spec 001 (Screenshot and PDF Export) on the Linux
@@ -13,12 +16,12 @@ import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platf
 /// and returns a configurable value, mirroring the Android delegation test in
 /// `zikzak_inappwebview_android/test/in_app_webview/android_screenshot_pdf_delegation_test.dart`.
 ///
-/// The controller builds its own private `_channel` from `params.id`, so the
+/// The controller builds its own `channel` from `params.id`, so the
 /// mock is registered on that exact channel name after construction. Because
 /// [TestDefaultBinaryMessenger] mock handlers take precedence over a channel's
 /// `setMethodCallHandler`, the outgoing `invokeMethod` calls are captured.
 
-const String _kChannelName = 'dev.zuzu/zikzak_inappwebview_0';
+const String _kChannelName = 'wtf.zikzak/zikzak_inappwebview_0';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -78,7 +81,7 @@ void main() {
     );
 
     test(
-      'U26 takeScreenshot delegates to channel with screenshotConfiguration.toJson()',
+      'U26 takeScreenshot delegates to channel with the screenshotConfiguration wire map',
       () async {
         final controller = newController();
         final config = ScreenshotConfiguration();
@@ -97,11 +100,31 @@ void main() {
         );
         expect(
           calls.single.arguments['screenshotConfiguration'],
-          equals(config.toJson()),
-          reason: 'screenshotConfiguration must be forwarded as its JSON map',
+          equals(screenshotConfigurationToWire(config)),
+          reason: 'screenshotConfiguration must be forwarded as its wire map',
+        );
+        expect(
+          (calls.single.arguments['screenshotConfiguration'] as Map)
+              .containsKey('compressFormat'),
+          isFalse,
+          reason: 'native never reads compressFormat (tool/wire_parity)',
         );
       },
     );
+
+    test('U28 native answers createPdf instead of not-implemented', () {
+      // WPE has no print-to-PDF API: the native delegate must still handle
+      // the method (answering null), or Dart gets MissingPluginException.
+      // Read as text; the native build proves compilation.
+      final source = File(
+        'linux/in_app_webview/webview_channel_delegate.cc',
+      ).readAsStringSync();
+      final branch = RegExp(
+        r'string_equals\(methodName, "createPdf"\)\) \{\s*'
+        r'fl_method_call_respond_success\(method_call, nullptr, nullptr\);',
+      );
+      expect(branch.hasMatch(source), isTrue);
+    });
 
     test('U27 overrides return the channel Uint8List or null', () async {
       final controller = newController();

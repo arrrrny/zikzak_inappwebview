@@ -106,7 +106,7 @@ PointerButton _getButton(int value) {
   }
 }
 
-const MethodChannel _pluginChannel = IN_APP_WEBVIEW_STATIC_CHANNEL;
+const MethodChannel _pluginChannel = inAppWebViewStaticChannel;
 
 class CustomFlutterViewControllerValue {
   const CustomFlutterViewControllerValue({required this.isInitialized});
@@ -125,7 +125,7 @@ class CustomFlutterViewControllerValue {
 /// Controls a WebView and provides streams for various change events.
 class CustomPlatformViewController
     extends ValueNotifier<CustomFlutterViewControllerValue> {
-  Completer<void> _creatingCompleter = Completer<void>();
+  final Completer<void> _creatingCompleter = Completer<void>();
   int _textureId = 0;
   bool _isDisposed = false;
 
@@ -349,11 +349,11 @@ class CustomPlatformView extends StatefulWidget {
     this.onPlatformViewCreated,
     this.scaleFactor,
     this.filterQuality = FilterQuality.none,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
-  _CustomPlatformViewState createState() => _CustomPlatformViewState();
+  State<CustomPlatformView> createState() => _CustomPlatformViewState();
 }
 
 class _CustomPlatformViewState extends State<CustomPlatformView> {
@@ -444,14 +444,18 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
     // Build modifiers bitmask matching WPE's wpe_input_modifier enum:
     // Control = bit 0, Shift = bit 1, Alt = bit 2, Meta = bit 3
     int modifiers = 0;
-    if (HardwareKeyboard.instance.isControlPressed)
+    if (HardwareKeyboard.instance.isControlPressed) {
       modifiers |= 1; // wpe_input_keyboard_modifier_control
-    if (HardwareKeyboard.instance.isShiftPressed)
+    }
+    if (HardwareKeyboard.instance.isShiftPressed) {
       modifiers |= 2; // wpe_input_keyboard_modifier_shift
-    if (HardwareKeyboard.instance.isAltPressed)
+    }
+    if (HardwareKeyboard.instance.isAltPressed) {
       modifiers |= 4; // wpe_input_keyboard_modifier_alt
-    if (HardwareKeyboard.instance.isMetaPressed)
+    }
+    if (HardwareKeyboard.instance.isMetaPressed) {
       modifiers |= 8; // wpe_input_keyboard_modifier_meta
+    }
 
     // For Ctrl/Meta combinations, don't send the character
     final hasControlOrMeta = (modifiers & 0x9) != 0; // Ctrl=1 or Meta=8
@@ -662,13 +666,10 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
   void _reportSurfaceSize() async {
     final box = _key.currentContext?.findRenderObject() as RenderBox?;
     if (box != null) {
+      final scaleFactor =
+          widget.scaleFactor ?? View.of(context).devicePixelRatio;
       await _controller.ready;
-      unawaited(
-        _controller._setSize(
-          box.size,
-          widget.scaleFactor ?? window.devicePixelRatio,
-        ),
-      );
+      unawaited(_controller._setSize(box.size, scaleFactor));
 
       // Also report the texture offset (position within the window)
       final globalPosition = box.localToGlobal(Offset.zero);

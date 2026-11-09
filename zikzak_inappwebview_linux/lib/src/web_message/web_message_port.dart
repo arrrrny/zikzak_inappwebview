@@ -59,7 +59,7 @@ class LinuxWebMessagePort extends PlatformWebMessagePort {
   Future<void> postMessage(WebMessage message) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('index', () => params.index);
-    args.putIfAbsent('message', () => message.toMap());
+    args.putIfAbsent('message', () => message.toJson());
     await _webMessageChannel.internalChannel?.invokeMethod('postMessage', args);
   }
 
@@ -71,7 +71,7 @@ class LinuxWebMessagePort extends PlatformWebMessagePort {
   }
 
   @override
-  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
+  Map<String, dynamic> toMap() {
     return {
       "index": params.index,
       "webMessageChannelId": _webMessageChannel.params.id,

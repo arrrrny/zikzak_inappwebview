@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
+import '../util/wire.dart';
+
 /// Object specifying creation parameters for creating a [LinuxFindInteractionController].
 ///
 /// When adding additional fields make sure they can be null or have a default
@@ -49,9 +51,9 @@ class LinuxFindInteractionController extends PlatformFindInteractionController
     return _staticValue;
   }
 
-  _debugLog(String method, dynamic args) {
+  void _debugLog(String method, dynamic args) {
     debugLog(
-      className: this.runtimeType.toString(),
+      className: runtimeType.toString(),
       debugLoggingSettings:
           PlatformFindInteractionController.debugLoggingSettings,
       method: method,
@@ -124,11 +126,8 @@ class LinuxFindInteractionController extends PlatformFindInteractionController
   @override
   Future<FindSession?> getActiveFindSession() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    Map<String, dynamic>? result = (await channel?.invokeMethod(
-      'getActiveFindSession',
-      args,
-    ))?.cast<String, dynamic>();
-    return FindSession.fromMap(result);
+    final result = await channel?.invokeMethod('getActiveFindSession', args);
+    return findSessionFromWire(result);
   }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformFindInteractionController.dispose}

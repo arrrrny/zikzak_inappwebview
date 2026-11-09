@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
+import 'util/wire.dart';
+
 /// Object specifying creation parameters for creating a [LinuxHttpAuthCredentialDatabase].
 ///
 /// When adding additional fields make sure they can be null or have a default
@@ -30,7 +32,7 @@ class LinuxHttpAuthCredentialDatabaseCreationParams
 ///
 /// This implementation delegates to native C++ code which uses libsecret for secure storage.
 /// Passwords are stored in the system keyring (gnome-keyring, KDE Wallet, etc.).
-/// A JSON index file at ~/.local/share/zikzak_inappwebview/<appId>/credential_index.json
+/// A JSON index file at `${XDG_DATA_HOME:-~/.local/share}/zikzak_inappwebview/<appId>/credential_index.json`
 /// is used to enumerate stored credentials (contains only usernames, not passwords).
 ///
 /// The native `appId` is resolved from `GApplication.application_id` when available.
@@ -88,8 +90,9 @@ class LinuxHttpAuthCredentialDatabase
     List<URLProtectionSpaceHttpAuthCredentials> result = [];
 
     for (final Map<dynamic, dynamic> map in allCredentials) {
-      final element = URLProtectionSpaceHttpAuthCredentials.fromMap(
-        map.cast<String, dynamic>(),
+      final element = fromWire(
+        map,
+        URLProtectionSpaceHttpAuthCredentials.fromJson,
       );
       if (element != null) {
         result.add(element);
@@ -114,7 +117,7 @@ class LinuxHttpAuthCredentialDatabase
 
     List<URLCredential> credentials = [];
     for (final Map<dynamic, dynamic> map in credentialList) {
-      final credential = URLCredential.fromMap(map.cast<String, dynamic>());
+      final credential = fromWire(map, URLCredential.fromJson);
       if (credential != null) {
         credentials.add(credential);
       }
@@ -174,7 +177,8 @@ class LinuxHttpAuthCredentialDatabase
 
   /// Disposes of any resources used by this database.
   /// Nothing to dispose - native side manages its own lifecycle.
-  void dispose() {
+  @override
+  void dispose({bool isKeepAlive = false}) {
     // Nothing to dispose
   }
 }

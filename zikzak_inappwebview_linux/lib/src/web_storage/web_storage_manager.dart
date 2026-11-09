@@ -180,4 +180,8 @@ class LinuxWebStorageManager extends PlatformWebStorageManager {
       'timestamp': timestamp,
     });
   }
+
+  /// The manager is a singleton on a static channel; nothing to release.
+  @override
+  void dispose({bool isKeepAlive = false}) {}
 }

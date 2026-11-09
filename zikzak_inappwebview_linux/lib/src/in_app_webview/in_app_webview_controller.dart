@@ -2,7 +2,6 @@ import 'dart:collection';
 import 'dart:convert';
 import 'dart:core';
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:developer' as developer;
 
 import 'package:flutter/foundation.dart';
@@ -10,10 +9,32 @@ import 'package:flutter/services.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
 import '../in_app_browser/in_app_browser.dart';
+import '../util/wire.dart';
 import '../web_message/web_message_channel.dart';
 import '../web_message/web_message_listener.dart';
 import '../web_storage/web_storage.dart';
 import '_static_channel.dart';
+
+/// Handler names the plugin's own JavaScript uses on the bridge (upstream's
+/// `kJavaScriptHandlerForbiddenNames`; zikzak's interface has no such list).
+const _javaScriptHandlerForbiddenNames = <String>[
+  "onLoadResource",
+  "onConsoleMessage",
+  "shouldInterceptAjaxRequest",
+  "onAjaxReadyStateChange",
+  "onAjaxProgress",
+  "shouldInterceptFetchRequest",
+  "onPrintRequest",
+  "onWindowFocus",
+  "onWindowBlur",
+  "callAsyncJavaScript",
+  "evaluateJavaScriptWithContentWorld",
+  "onFindResultReceived",
+  "onCallAsyncJavaScriptResultBelowIOS14Received",
+  "onWebMessagePortMessageReceived",
+  "onWebMessageListenerPostMessageReceived",
+  "onScrollChanged",
+];
 
 /// Object specifying creation parameters for creating a [LinuxInAppWebViewController].
 ///
@@ -46,17 +67,18 @@ class LinuxInAppWebViewControllerCreationParams
 /// can be obtained by setting the [InAppWebView.onWebViewCreated] callback.
 class LinuxInAppWebViewController extends PlatformInAppWebViewController
     with ChannelController {
-  static final MethodChannel _staticChannel = IN_APP_WEBVIEW_STATIC_CHANNEL;
+  static final MethodChannel _staticChannel = inAppWebViewStaticChannel;
 
   // List of properties to be saved and restored for keep alive feature
-  Map<String, Function> _javaScriptHandlersMap = HashMap<String, Function>();
+  Map<String, JavaScriptHandlerCallback> _javaScriptHandlersMap =
+      HashMap<String, JavaScriptHandlerCallback>();
   Map<UserScriptInjectionTime, List<UserScript>> _userScripts = {
     UserScriptInjectionTime.AT_DOCUMENT_START: <UserScript>[],
     UserScriptInjectionTime.AT_DOCUMENT_END: <UserScript>[],
   };
-  Set<LinuxWebMessageListener> _webMessageListeners = Set();
-  Set<String> _webMessageListenerObjNames = Set();
-  Set<LinuxWebMessageChannel> _webMessageChannels = Set();
+  final Set<LinuxWebMessageListener> _webMessageListeners = {};
+  Set<String> _webMessageListenerObjNames = {};
+  final Set<LinuxWebMessageChannel> _webMessageChannels = {};
   Map<String, ScriptHtmlTagAttributes> _injectedScriptsFromURL = {};
 
   // static map that contains the properties to be saved and restored for keep alive feature
@@ -91,18 +113,18 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
       for (final userScript in initialUserScripts) {
         if (userScript.injectionTime ==
             UserScriptInjectionTime.AT_DOCUMENT_START) {
-          this._userScripts[UserScriptInjectionTime.AT_DOCUMENT_START]?.add(
+          _userScripts[UserScriptInjectionTime.AT_DOCUMENT_START]?.add(
             userScript,
           );
         } else {
-          this._userScripts[UserScriptInjectionTime.AT_DOCUMENT_END]?.add(
+          _userScripts[UserScriptInjectionTime.AT_DOCUMENT_END]?.add(
             userScript,
           );
         }
       }
     }
 
-    this._init(params);
+    _init(params);
   }
 
   static final LinuxInAppWebViewController _staticValue =
@@ -127,23 +149,23 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
               ),
       ) {
     this.channel = channel;
-    this._inAppBrowser = inAppBrowser;
+    _inAppBrowser = inAppBrowser;
 
     if (initialUserScripts != null) {
       for (final userScript in initialUserScripts) {
         if (userScript.injectionTime ==
             UserScriptInjectionTime.AT_DOCUMENT_START) {
-          this._userScripts[UserScriptInjectionTime.AT_DOCUMENT_START]?.add(
+          _userScripts[UserScriptInjectionTime.AT_DOCUMENT_START]?.add(
             userScript,
           );
         } else {
-          this._userScripts[UserScriptInjectionTime.AT_DOCUMENT_END]?.add(
+          _userScripts[UserScriptInjectionTime.AT_DOCUMENT_END]?.add(
             userScript,
           );
         }
       }
     }
-    this._init(params);
+    _init(params);
   }
 
   void _init(PlatformInAppWebViewControllerCreationParams params) {
@@ -182,9 +204,9 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
     }
   }
 
-  _debugLog(String method, dynamic args) {
+  void _debugLog(String method, dynamic args) {
     debugLog(
-      className: this.runtimeType.toString(),
+      className: runtimeType.toString(),
       name: _inAppBrowser == null
           ? "WebView"
           : _inAppBrowser.runtimeType.toString(),
@@ -208,10 +230,11 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           String? url = call.arguments["url"];
           WebUri? uri = url != null ? WebUri(url) : null;
-          if (webviewParams != null && webviewParams!.onLoadStart != null)
+          if (webviewParams != null && webviewParams!.onLoadStart != null) {
             webviewParams!.onLoadStart!(_controllerFromPlatform, uri);
-          else
+          } else {
             _inAppBrowserEventHandler!.onLoadStart(uri);
+          }
         }
         break;
       case "onLoadStop":
@@ -219,10 +242,11 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           String? url = call.arguments["url"];
           WebUri? uri = url != null ? WebUri(url) : null;
-          if (webviewParams != null && webviewParams!.onLoadStop != null)
+          if (webviewParams != null && webviewParams!.onLoadStop != null) {
             webviewParams!.onLoadStop!(_controllerFromPlatform, uri);
-          else
+          } else {
             _inAppBrowserEventHandler!.onLoadStop(uri);
+          }
         }
         break;
       case "shouldOverrideUrlLoading":
@@ -231,19 +255,18 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          NavigationAction navigationAction = NavigationAction.fromMap(
-            arguments,
-          )!;
+          NavigationAction navigationAction = fromWire(arguments, NavigationAction.fromJson)!;
 
           if (webviewParams != null &&
-              webviewParams!.shouldOverrideUrlLoading != null)
+              webviewParams!.shouldOverrideUrlLoading != null) {
             return (await webviewParams!.shouldOverrideUrlLoading!(
               _controllerFromPlatform,
               navigationAction,
-            ))?.toNativeValue();
+            ))?.index;
+          }
           return (await _inAppBrowserEventHandler!.shouldOverrideUrlLoading(
             navigationAction,
-          ))?.toNativeValue();
+          ))?.index;
         }
         break;
       case "onProgressChanged":
@@ -251,13 +274,14 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
                 webviewParams!.onProgressChanged != null) ||
             _inAppBrowserEventHandler != null) {
           int progress = call.arguments["progress"];
-          if (webviewParams != null && webviewParams!.onProgressChanged != null)
+          if (webviewParams != null && webviewParams!.onProgressChanged != null) {
             webviewParams!.onProgressChanged!(
               _controllerFromPlatform,
               progress,
             );
-          else
+          } else {
             _inAppBrowserEventHandler!.onProgressChanged(progress);
+          }
         }
         break;
       case "onConsoleMessage":
@@ -266,14 +290,15 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          ConsoleMessage consoleMessage = ConsoleMessage.fromMap(arguments)!;
-          if (webviewParams != null && webviewParams!.onConsoleMessage != null)
+          ConsoleMessage consoleMessage = fromWire(arguments, ConsoleMessage.fromJson)!;
+          if (webviewParams != null && webviewParams!.onConsoleMessage != null) {
             webviewParams!.onConsoleMessage!(
               _controllerFromPlatform,
               consoleMessage,
             );
-          else
+          } else {
             _inAppBrowserEventHandler!.onConsoleMessage(consoleMessage);
+          }
         }
         break;
       case "onLoadResource":
@@ -281,21 +306,23 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          LoadedResource resource = LoadedResource.fromMap(arguments)!;
-          if (webviewParams != null && webviewParams!.onLoadResource != null)
+          LoadedResource resource = fromWire(arguments, LoadedResource.fromJson)!;
+          if (webviewParams != null && webviewParams!.onLoadResource != null) {
             webviewParams!.onLoadResource!(_controllerFromPlatform, resource);
-          else
+          } else {
             _inAppBrowserEventHandler!.onLoadResource(resource);
+          }
         }
         break;
       case "onTitleChanged":
         if ((webviewParams != null && webviewParams!.onTitleChanged != null) ||
             _inAppBrowserEventHandler != null) {
           String? title = call.arguments["title"];
-          if (webviewParams != null && webviewParams!.onTitleChanged != null)
+          if (webviewParams != null && webviewParams!.onTitleChanged != null) {
             webviewParams!.onTitleChanged!(_controllerFromPlatform, title);
-          else
+          } else {
             _inAppBrowserEventHandler!.onTitleChanged(title);
+          }
         }
         break;
       case "onUpdateVisitedHistory":
@@ -306,100 +333,64 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
           WebUri? uri = url != null ? WebUri(url) : null;
           bool? isReload = call.arguments["isReload"];
           if (webviewParams != null &&
-              webviewParams!.onUpdateVisitedHistory != null)
+              webviewParams!.onUpdateVisitedHistory != null) {
             webviewParams!.onUpdateVisitedHistory!(
               _controllerFromPlatform,
               uri,
               isReload,
             );
-          else
+          } else {
             _inAppBrowserEventHandler!.onUpdateVisitedHistory(uri, isReload);
+          }
         }
         break;
       case "onReceivedError":
-        if ((webviewParams != null &&
-                (webviewParams!.onReceivedError != null ||
-                    // ignore: deprecated_member_use_from_same_package
-                    webviewParams!.onLoadError != null)) ||
+        if ((webviewParams != null && webviewParams!.onReceivedError != null) ||
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          WebResourceRequest request = WebResourceRequest.fromMap(
-            arguments["request"]?.cast<String, dynamic>(),
+          WebResourceRequest request = fromWire(
+            arguments["request"],
+            WebResourceRequest.fromJson,
           )!;
-          WebResourceError error = WebResourceError.fromMap(
-            arguments["error"]?.cast<String, dynamic>(),
+          WebResourceError error = webResourceErrorFromWire(
+            arguments["error"],
           )!;
-          var isForMainFrame = request.isForMainFrame ?? false;
 
-          if (webviewParams != null) {
-            if (webviewParams!.onReceivedError != null)
-              webviewParams!.onReceivedError!(
-                _controllerFromPlatform,
-                request,
-                error,
-              );
-            else if (isForMainFrame) {
-              // ignore: deprecated_member_use_from_same_package
-              webviewParams!.onLoadError!(
-                _controllerFromPlatform,
-                request.url,
-                error.type.toNativeValue() ?? -1,
-                error.description,
-              );
-            }
+          if (webviewParams != null && webviewParams!.onReceivedError != null) {
+            webviewParams!.onReceivedError!(
+              _controllerFromPlatform,
+              request,
+              error,
+            );
           } else {
-            if (isForMainFrame) {
-              _inAppBrowserEventHandler!.onLoadError(
-                request.url,
-                error.type.toNativeValue() ?? -1,
-                error.description,
-              );
-            }
             _inAppBrowserEventHandler!.onReceivedError(request, error);
           }
         }
         break;
       case "onReceivedHttpError":
         if ((webviewParams != null &&
-                (webviewParams!.onReceivedHttpError != null ||
-                    // ignore: deprecated_member_use_from_same_package
-                    webviewParams!.onLoadHttpError != null)) ||
+                webviewParams!.onReceivedHttpError != null) ||
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          WebResourceRequest request = WebResourceRequest.fromMap(
-            arguments["request"]?.cast<String, dynamic>(),
+          WebResourceRequest request = fromWire(
+            arguments["request"],
+            WebResourceRequest.fromJson,
           )!;
-          WebResourceResponse errorResponse = WebResourceResponse.fromMap(
-            arguments["errorResponse"]?.cast<String, dynamic>(),
+          WebResourceResponse errorResponse = fromWire(
+            arguments["errorResponse"],
+            WebResourceResponse.fromJson,
           )!;
-          var isForMainFrame = request.isForMainFrame ?? false;
 
-          if (webviewParams != null) {
-            if (webviewParams!.onReceivedHttpError != null)
-              webviewParams!.onReceivedHttpError!(
-                _controllerFromPlatform,
-                request,
-                errorResponse,
-              );
-            else if (isForMainFrame) {
-              // ignore: deprecated_member_use_from_same_package
-              webviewParams!.onLoadHttpError!(
-                _controllerFromPlatform,
-                request.url,
-                errorResponse.statusCode ?? -1,
-                errorResponse.reasonPhrase ?? '',
-              );
-            }
+          if (webviewParams != null &&
+              webviewParams!.onReceivedHttpError != null) {
+            webviewParams!.onReceivedHttpError!(
+              _controllerFromPlatform,
+              request,
+              errorResponse,
+            );
           } else {
-            if (isForMainFrame) {
-              _inAppBrowserEventHandler!.onLoadHttpError(
-                request.url,
-                errorResponse.statusCode ?? -1,
-                errorResponse.reasonPhrase ?? '',
-              );
-            }
             _inAppBrowserEventHandler!.onReceivedHttpError(
               request,
               errorResponse,
@@ -414,10 +405,11 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
           String? url = call.arguments["url"];
           WebUri? uri = url != null ? WebUri(url) : null;
           if (webviewParams != null &&
-              webviewParams!.onPageCommitVisible != null)
+              webviewParams!.onPageCommitVisible != null) {
             webviewParams!.onPageCommitVisible!(_controllerFromPlatform, uri);
-          else
+          } else {
             _inAppBrowserEventHandler!.onPageCommitVisible(uri);
+          }
         }
         break;
       case "onZoomScaleChanged":
@@ -427,14 +419,15 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
           double oldScale = call.arguments["oldScale"];
           double newScale = call.arguments["newScale"];
           if (webviewParams != null &&
-              webviewParams!.onZoomScaleChanged != null)
+              webviewParams!.onZoomScaleChanged != null) {
             webviewParams!.onZoomScaleChanged!(
               _controllerFromPlatform,
               oldScale,
               newScale,
             );
-          else
+          } else {
             _inAppBrowserEventHandler!.onZoomScaleChanged(oldScale, newScale);
+          }
         }
         break;
       case "onScrollChanged":
@@ -442,36 +435,37 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           int x = call.arguments["x"];
           int y = call.arguments["y"];
-          if (webviewParams != null && webviewParams!.onScrollChanged != null)
+          if (webviewParams != null && webviewParams!.onScrollChanged != null) {
             webviewParams!.onScrollChanged!(_controllerFromPlatform, x, y);
-          else
+          } else {
             _inAppBrowserEventHandler!.onScrollChanged(x, y);
+          }
         }
         break;
       case "onCloseWindow":
-        if (webviewParams != null && webviewParams!.onCloseWindow != null)
+        if (webviewParams != null && webviewParams!.onCloseWindow != null) {
           webviewParams!.onCloseWindow!(_controllerFromPlatform);
-        else if (_inAppBrowserEventHandler != null)
+        } else if (_inAppBrowserEventHandler != null) {
           _inAppBrowserEventHandler!.onCloseWindow();
+        }
         break;
       case "onCreateWindow":
         if ((webviewParams != null && webviewParams!.onCreateWindow != null) ||
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          CreateWindowAction createWindowAction = CreateWindowAction.fromMap(
-            arguments,
-          )!;
+          CreateWindowAction createWindowAction = fromWire(arguments, CreateWindowAction.fromJson)!;
 
-          if (webviewParams != null && webviewParams!.onCreateWindow != null)
+          if (webviewParams != null && webviewParams!.onCreateWindow != null) {
             return await webviewParams!.onCreateWindow!(
               _controllerFromPlatform,
               createWindowAction,
             );
-          else
+          } else {
             return await _inAppBrowserEventHandler!.onCreateWindow(
               createWindowAction,
             );
+          }
         }
         return false;
       case "onJsAlert":
@@ -479,17 +473,18 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          JsAlertRequest jsAlertRequest = JsAlertRequest.fromMap(arguments)!;
+          JsAlertRequest jsAlertRequest = fromWire(arguments, JsAlertRequest.fromJson)!;
 
-          if (webviewParams != null && webviewParams!.onJsAlert != null)
+          if (webviewParams != null && webviewParams!.onJsAlert != null) {
             return (await webviewParams!.onJsAlert!(
               _controllerFromPlatform,
               jsAlertRequest,
-            ))?.toMap();
-          else
+            ))?.toJson();
+          } else {
             return (await _inAppBrowserEventHandler!.onJsAlert(
               jsAlertRequest,
-            ))?.toMap();
+            ))?.toJson();
+          }
         }
         return null;
       case "onJsConfirm":
@@ -497,19 +492,18 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          JsConfirmRequest jsConfirmRequest = JsConfirmRequest.fromMap(
-            arguments,
-          )!;
+          JsConfirmRequest jsConfirmRequest = fromWire(arguments, JsConfirmRequest.fromJson)!;
 
-          if (webviewParams != null && webviewParams!.onJsConfirm != null)
+          if (webviewParams != null && webviewParams!.onJsConfirm != null) {
             return (await webviewParams!.onJsConfirm!(
               _controllerFromPlatform,
               jsConfirmRequest,
-            ))?.toMap();
-          else
+            ))?.toJson();
+          } else {
             return (await _inAppBrowserEventHandler!.onJsConfirm(
               jsConfirmRequest,
-            ))?.toMap();
+            ))?.toJson();
+          }
         }
         return null;
       case "onJsPrompt":
@@ -517,17 +511,18 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          JsPromptRequest jsPromptRequest = JsPromptRequest.fromMap(arguments)!;
+          JsPromptRequest jsPromptRequest = fromWire(arguments, JsPromptRequest.fromJson)!;
 
-          if (webviewParams != null && webviewParams!.onJsPrompt != null)
+          if (webviewParams != null && webviewParams!.onJsPrompt != null) {
             return (await webviewParams!.onJsPrompt!(
               _controllerFromPlatform,
               jsPromptRequest,
-            ))?.toMap();
-          else
+            ))?.toJson();
+          } else {
             return (await _inAppBrowserEventHandler!.onJsPrompt(
               jsPromptRequest,
-            ))?.toMap();
+            ))?.toJson();
+          }
         }
         return null;
       case "onJsBeforeUnload":
@@ -537,17 +532,18 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
           JsBeforeUnloadRequest jsBeforeUnloadRequest =
-              JsBeforeUnloadRequest.fromMap(arguments)!;
+              fromWire(arguments, JsBeforeUnloadRequest.fromJson)!;
 
-          if (webviewParams != null && webviewParams!.onJsBeforeUnload != null)
+          if (webviewParams != null && webviewParams!.onJsBeforeUnload != null) {
             return (await webviewParams!.onJsBeforeUnload!(
               _controllerFromPlatform,
               jsBeforeUnloadRequest,
-            ))?.toMap();
-          else
+            ))?.toJson();
+          } else {
             return (await _inAppBrowserEventHandler!.onJsBeforeUnload(
               jsBeforeUnloadRequest,
-            ))?.toMap();
+            ))?.toJson();
+          }
         }
         return null;
       case "onPermissionRequest":
@@ -556,20 +552,21 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          PermissionRequest permissionRequest = PermissionRequest.fromMap(
+          PermissionRequest permissionRequest = permissionRequestFromWire(
             arguments,
           )!;
 
           if (webviewParams != null &&
-              webviewParams!.onPermissionRequest != null)
+              webviewParams!.onPermissionRequest != null) {
             return (await webviewParams!.onPermissionRequest!(
               _controllerFromPlatform,
               permissionRequest,
-            ))?.toMap();
-          else
+            ))?.toJson();
+          } else {
             return (await _inAppBrowserEventHandler!.onPermissionRequest(
               permissionRequest,
-            ))?.toMap();
+            ))?.toJson();
+          }
         }
         return null;
       case "onReceivedHttpAuthRequest":
@@ -579,18 +576,19 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
           HttpAuthenticationChallenge challenge =
-              HttpAuthenticationChallenge.fromMap(arguments)!;
+              HttpAuthenticationChallenge.fromMap(wireMap(arguments))!;
 
           if (webviewParams != null &&
-              webviewParams!.onReceivedHttpAuthRequest != null)
+              webviewParams!.onReceivedHttpAuthRequest != null) {
             return (await webviewParams!.onReceivedHttpAuthRequest!(
               _controllerFromPlatform,
               challenge,
-            ))?.toMap();
-          else
+            ))?.toJson();
+          } else {
             return (await _inAppBrowserEventHandler!.onReceivedHttpAuthRequest(
               challenge,
-            ))?.toMap();
+            ))?.toJson();
+          }
         }
         return null;
       case "onReceivedServerTrustAuthRequest":
@@ -600,19 +598,20 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
           ServerTrustChallenge challenge = ServerTrustChallenge.fromMap(
-            arguments,
+            wireMap(arguments),
           )!;
 
           if (webviewParams != null &&
-              webviewParams!.onReceivedServerTrustAuthRequest != null)
+              webviewParams!.onReceivedServerTrustAuthRequest != null) {
             return (await webviewParams!.onReceivedServerTrustAuthRequest!(
               _controllerFromPlatform,
               challenge,
-            ))?.toMap();
-          else
+            ))?.toJson();
+          } else {
             return (await _inAppBrowserEventHandler!
                     .onReceivedServerTrustAuthRequest(challenge))
-                ?.toMap();
+                ?.toJson();
+          }
         }
         return null;
       case "onReceivedClientCertRequest":
@@ -621,74 +620,65 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
+          // zikzak's ClientCertChallenge has no isProxy field: native's isProxy
+          // is not available to the app.
           ClientCertChallenge challenge = ClientCertChallenge.fromMap(
-            arguments,
+            wireMap(arguments),
           )!;
 
+          ClientCertResponse? response;
           if (webviewParams != null &&
-              webviewParams!.onReceivedClientCertRequest != null)
-            return (await webviewParams!.onReceivedClientCertRequest!(
+              webviewParams!.onReceivedClientCertRequest != null) {
+            response = await webviewParams!.onReceivedClientCertRequest!(
               _controllerFromPlatform,
               challenge,
-            ))?.toMap();
-          else
-            return (await _inAppBrowserEventHandler!
-                    .onReceivedClientCertRequest(challenge))
-                ?.toMap();
+            );
+          } else {
+            response = await _inAppBrowserEventHandler!
+                .onReceivedClientCertRequest(challenge);
+          }
+          return response != null ? clientCertResponseToWire(response) : null;
         }
         return null;
       case "onDownloadStarting":
         if ((webviewParams != null &&
-                (webviewParams!.onDownloadStart != null ||
-                    webviewParams!.onDownloadStartRequest != null ||
-                    webviewParams!.onDownloadStarting != null)) ||
+                webviewParams!.onDownloadStartRequest != null) ||
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          DownloadStartRequest downloadStartRequest =
-              DownloadStartRequest.fromMap(arguments)!;
+          DownloadStartRequest downloadStartRequest = fromWire(
+            arguments,
+            DownloadStartRequest.fromJson,
+          )!;
 
-          if (webviewParams != null) {
-            if (webviewParams!.onDownloadStarting != null)
-              return (await webviewParams!.onDownloadStarting!(
-                _controllerFromPlatform,
-                downloadStartRequest,
-              ))?.toMap();
-            else if (webviewParams!.onDownloadStartRequest != null)
-              webviewParams!.onDownloadStartRequest!(
-                _controllerFromPlatform,
-                downloadStartRequest,
-              );
-            else {
-              webviewParams!.onDownloadStart!(
-                _controllerFromPlatform,
-                downloadStartRequest.url,
-              );
-            }
-          } else {
-            _inAppBrowserEventHandler!.onDownloadStart(
-              downloadStartRequest.url,
+          if (webviewParams != null &&
+              webviewParams!.onDownloadStartRequest != null) {
+            webviewParams!.onDownloadStartRequest!(
+              _controllerFromPlatform,
+              downloadStartRequest,
             );
+          } else {
             _inAppBrowserEventHandler!.onDownloadStartRequest(
               downloadStartRequest,
             );
-            return (await _inAppBrowserEventHandler!.onDownloadStarting(
-              downloadStartRequest,
-            ))?.toMap();
           }
         }
+        // zikzak's onDownloadStartRequest returns nothing: native applies its
+        // default (the download is cancelled; the app downloads the URL).
         return null;
       case "onEnterFullscreen":
-        if (webviewParams != null && webviewParams!.onEnterFullscreen != null)
+        if (webviewParams != null && webviewParams!.onEnterFullscreen != null) {
           webviewParams!.onEnterFullscreen!(_controllerFromPlatform);
-        else if (_inAppBrowserEventHandler != null)
+        } else if (_inAppBrowserEventHandler != null) {
           _inAppBrowserEventHandler!.onEnterFullscreen();
+        }
         break;
       case "onExitFullscreen":
-        if (webviewParams != null && webviewParams!.onExitFullscreen != null)
+        if (webviewParams != null && webviewParams!.onExitFullscreen != null) {
           webviewParams!.onExitFullscreen!(_controllerFromPlatform);
-        else if (_inAppBrowserEventHandler != null)
+        } else if (_inAppBrowserEventHandler != null) {
           _inAppBrowserEventHandler!.onExitFullscreen();
+        }
         break;
       case "onReceivedIcon":
         if ((webviewParams != null && webviewParams!.onReceivedIcon != null) ||
@@ -699,13 +689,14 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
           if (faviconUrl != null) {
             // Create a placeholder Uint8List since we don't have the actual icon
             // The favicon URL could be used to download the icon if needed
-            if (webviewParams != null && webviewParams!.onReceivedIcon != null)
+            if (webviewParams != null && webviewParams!.onReceivedIcon != null) {
               webviewParams!.onReceivedIcon!(
                 _controllerFromPlatform,
                 Uint8List(0),
               );
-            else
+            } else {
               _inAppBrowserEventHandler!.onReceivedIcon(Uint8List(0));
+            }
           }
         }
         break;
@@ -722,7 +713,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
           InAppWebViewHitTestResult hitTestResult =
-              InAppWebViewHitTestResult.fromMap(arguments)!;
+              fromWire(arguments, InAppWebViewHitTestResult.fromJson)!;
           contextMenu.onCreateContextMenu!(hitTestResult);
         }
         break;
@@ -783,17 +774,16 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          RenderProcessGoneDetail detail = RenderProcessGoneDetail.fromMap(
-            arguments,
-          )!;
+          RenderProcessGoneDetail detail = fromWire(arguments, RenderProcessGoneDetail.fromJson)!;
           if (webviewParams != null &&
-              webviewParams!.onRenderProcessGone != null)
+              webviewParams!.onRenderProcessGone != null) {
             webviewParams!.onRenderProcessGone!(
               _controllerFromPlatform,
               detail,
             );
-          else
+          } else {
             _inAppBrowserEventHandler!.onRenderProcessGone(detail);
+          }
         }
         break;
       case "onNavigationResponse":
@@ -802,46 +792,34 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          NavigationResponse navigationResponse = NavigationResponse.fromMap(
-            arguments,
-          )!;
+          NavigationResponse navigationResponse = fromWire(arguments, NavigationResponse.fromJson)!;
 
           if (webviewParams != null &&
-              webviewParams!.onNavigationResponse != null)
+              webviewParams!.onNavigationResponse != null) {
             return (await webviewParams!.onNavigationResponse!(
               _controllerFromPlatform,
               navigationResponse,
-            ))?.toNativeValue();
-          else
+            ))?.index;
+          } else {
             return (await _inAppBrowserEventHandler!.onNavigationResponse(
               navigationResponse,
-            ))?.toNativeValue();
+            ))?.index;
+          }
         }
         break;
       case "onPrintRequest":
-        if ((webviewParams != null &&
-                (webviewParams!.onPrintRequest != null ||
-                    // ignore: deprecated_member_use_from_same_package
-                    webviewParams!.onPrint != null)) ||
+        if ((webviewParams != null && webviewParams!.onPrintRequest != null) ||
             _inAppBrowserEventHandler != null) {
           String? url = call.arguments["url"];
           WebUri? uri = url != null ? WebUri(url) : null;
 
-          if (webviewParams != null) {
-            if (webviewParams!.onPrintRequest != null)
-              return await webviewParams!.onPrintRequest!(
-                _controllerFromPlatform,
-                uri,
-                null, // PrintJobController not supported on Linux
-              );
-            else {
-              // ignore: deprecated_member_use_from_same_package
-              webviewParams!.onPrint!(_controllerFromPlatform, uri);
-              return false;
-            }
+          if (webviewParams != null && webviewParams!.onPrintRequest != null) {
+            return await webviewParams!.onPrintRequest!(
+              _controllerFromPlatform,
+              uri,
+              null, // PrintJobController not supported on Linux
+            );
           } else {
-            // ignore: deprecated_member_use_from_same_package
-            _inAppBrowserEventHandler!.onPrint(uri);
             return await _inAppBrowserEventHandler!.onPrintRequest(
               uri,
               null, // PrintJobController not supported on Linux
@@ -853,126 +831,104 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
         if ((webviewParams != null &&
                 webviewParams!.onCameraCaptureStateChanged != null) ||
             _inAppBrowserEventHandler != null) {
-          var oldState = MediaCaptureState.fromNativeValue(
+          var oldState = mediaCaptureStateFromWire(
             call.arguments["oldState"],
           );
-          var newState = MediaCaptureState.fromNativeValue(
+          var newState = mediaCaptureStateFromWire(
             call.arguments["newState"],
           );
 
           if (webviewParams != null &&
-              webviewParams!.onCameraCaptureStateChanged != null)
+              webviewParams!.onCameraCaptureStateChanged != null) {
             webviewParams!.onCameraCaptureStateChanged!(
               _controllerFromPlatform,
               oldState,
               newState,
             );
-          else
+          } else {
             _inAppBrowserEventHandler!.onCameraCaptureStateChanged(
               oldState,
               newState,
             );
+          }
         }
         break;
       case "onMicrophoneCaptureStateChanged":
         if ((webviewParams != null &&
                 webviewParams!.onMicrophoneCaptureStateChanged != null) ||
             _inAppBrowserEventHandler != null) {
-          var oldState = MediaCaptureState.fromNativeValue(
+          var oldState = mediaCaptureStateFromWire(
             call.arguments["oldState"],
           );
-          var newState = MediaCaptureState.fromNativeValue(
+          var newState = mediaCaptureStateFromWire(
             call.arguments["newState"],
           );
 
           if (webviewParams != null &&
-              webviewParams!.onMicrophoneCaptureStateChanged != null)
+              webviewParams!.onMicrophoneCaptureStateChanged != null) {
             webviewParams!.onMicrophoneCaptureStateChanged!(
               _controllerFromPlatform,
               oldState,
               newState,
             );
-          else
+          } else {
             _inAppBrowserEventHandler!.onMicrophoneCaptureStateChanged(
               oldState,
               newState,
             );
+          }
         }
         break;
       case "onShowFileChooser":
-        if ((webviewParams != null &&
-                webviewParams!.onShowFileChooser != null) ||
-            _inAppBrowserEventHandler != null) {
-          Map<String, dynamic> arguments = call.arguments
-              .cast<String, dynamic>();
-          ShowFileChooserRequest request = ShowFileChooserRequest.fromMap(
-            arguments,
-          )!;
-
-          if (webviewParams != null && webviewParams!.onShowFileChooser != null)
-            return (await webviewParams!.onShowFileChooser!(
-              _controllerFromPlatform,
-              request,
-            ))?.toMap();
-          else
-            return (await _inAppBrowserEventHandler!.onShowFileChooser(
-              request,
-            ))?.toMap();
-        }
+        // zikzak has no file chooser callback. A null answer means "not
+        // handled by the app" (handledByClient false), so native shows its
+        // GTK file chooser (linux/in_app_webview/in_app_webview.cc,
+        // OnRunFileChooser).
         return null;
       // onFindResultReceived is now handled by FindInteractionController
       case "onLoadResourceWithCustomScheme":
         if ((webviewParams != null &&
-                (webviewParams!.onLoadResourceWithCustomScheme != null ||
-                    // ignore: deprecated_member_use_from_same_package
-                    webviewParams!.onLoadResourceCustomScheme != null)) ||
+                webviewParams!.onLoadResourceWithCustomScheme != null) ||
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> requestMap = call.arguments
               .cast<String, dynamic>();
-          WebResourceRequest request = WebResourceRequest.fromMap(requestMap)!;
+          WebResourceRequest request = fromWire(
+            requestMap,
+            WebResourceRequest.fromJson,
+          )!;
 
-          if (webviewParams != null) {
-            if (webviewParams!.onLoadResourceWithCustomScheme != null)
-              return (await webviewParams!.onLoadResourceWithCustomScheme!(
-                _controllerFromPlatform,
-                request,
-              ))?.toMap();
-            else {
-              return (await webviewParams!
-                      // ignore: deprecated_member_use_from_same_package
-                      .onLoadResourceCustomScheme!(
-                    _controllerFromPlatform,
-                    request.url,
-                  ))
-                  ?.toMap();
-            }
+          if (webviewParams != null &&
+              webviewParams!.onLoadResourceWithCustomScheme != null) {
+            return (await webviewParams!.onLoadResourceWithCustomScheme!(
+              _controllerFromPlatform,
+              request,
+            ))?.toJson();
           } else {
-            return ((await _inAppBrowserEventHandler!
-                        .onLoadResourceWithCustomScheme(request)) ??
-                    (await _inAppBrowserEventHandler!
-                        .onLoadResourceCustomScheme(request.url)))
-                ?.toMap();
+            return (await _inAppBrowserEventHandler!
+                    .onLoadResourceWithCustomScheme(request))
+                ?.toJson();
           }
         }
         break;
       case "onCallJsHandler":
         String handlerName = call.arguments["handlerName"];
-        Map<String, dynamic> handlerDataMap = call.arguments["data"]
-            .cast<String, dynamic>();
-        // decode args to json
-        handlerDataMap["args"] = jsonDecode(handlerDataMap["args"]);
-        final handlerData = JavaScriptHandlerFunctionData.fromMap(
-          handlerDataMap,
-        )!;
+        // Native sends {origin, requestUrl, isMainFrame, args} with the
+        // JavaScript arguments JSON-encoded in `args`
+        // (linux/types/javascript_handler_function_data.cc).
+        final handlerDataMap = wireMap(call.arguments["data"]) ?? {};
+        final encodedArgs = handlerDataMap["args"];
+        final List<dynamic> handlerArgs = encodedArgs is String
+            ? jsonDecode(encodedArgs) as List<dynamic>
+            : <dynamic>[];
 
-        _debugLog(handlerName, handlerData);
+        _debugLog(handlerName, handlerArgs);
 
         switch (handlerName) {
           case "onLoadResource":
             if ((webviewParams != null &&
                     webviewParams!.onLoadResource != null) ||
                 _inAppBrowserEventHandler != null) {
-              Map<String, dynamic> arguments = handlerData.args[0]
+              Map<String, dynamic> arguments = handlerArgs[0]
                   .cast<String, dynamic>();
               arguments["startTime"] = arguments["startTime"] is int
                   ? arguments["startTime"].toDouble()
@@ -981,128 +937,135 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
                   ? arguments["duration"].toDouble()
                   : arguments["duration"];
 
-              var response = LoadedResource.fromMap(arguments)!;
+              var response = fromWire(arguments, LoadedResource.fromJson)!;
 
               if (webviewParams != null &&
-                  webviewParams!.onLoadResource != null)
+                  webviewParams!.onLoadResource != null) {
                 webviewParams!.onLoadResource!(
                   _controllerFromPlatform,
                   response,
                 );
-              else
+              } else {
                 _inAppBrowserEventHandler!.onLoadResource(response);
+              }
             }
             return null;
           case "shouldInterceptAjaxRequest":
             if ((webviewParams != null &&
                     webviewParams!.shouldInterceptAjaxRequest != null) ||
                 _inAppBrowserEventHandler != null) {
-              Map<String, dynamic> arguments = handlerData.args[0]
+              Map<String, dynamic> arguments = handlerArgs[0]
                   .cast<String, dynamic>();
-              AjaxRequest request = AjaxRequest.fromMap(arguments)!;
+              AjaxRequest request = fromWire(arguments, AjaxRequest.fromJson)!;
 
               if (webviewParams != null &&
-                  webviewParams!.shouldInterceptAjaxRequest != null)
+                  webviewParams!.shouldInterceptAjaxRequest != null) {
                 return jsonEncode(
                   await webviewParams!.shouldInterceptAjaxRequest!(
                     _controllerFromPlatform,
                     request,
                   ),
                 );
-              else
+              } else {
                 return jsonEncode(
                   await _inAppBrowserEventHandler!.shouldInterceptAjaxRequest(
                     request,
                   ),
                 );
+              }
             }
             return null;
           case "onAjaxReadyStateChange":
             if ((webviewParams != null &&
                     webviewParams!.onAjaxReadyStateChange != null) ||
                 _inAppBrowserEventHandler != null) {
-              Map<String, dynamic> arguments = handlerData.args[0]
+              Map<String, dynamic> arguments = handlerArgs[0]
                   .cast<String, dynamic>();
-              AjaxRequest request = AjaxRequest.fromMap(arguments)!;
+              AjaxRequest request = fromWire(arguments, AjaxRequest.fromJson)!;
 
               if (webviewParams != null &&
-                  webviewParams!.onAjaxReadyStateChange != null)
+                  webviewParams!.onAjaxReadyStateChange != null) {
                 return jsonEncode(
                   (await webviewParams!.onAjaxReadyStateChange!(
                     _controllerFromPlatform,
                     request,
-                  ))?.toNativeValue(),
+                  ))?.index,
                 );
-              else
+              } else {
                 return jsonEncode(
                   (await _inAppBrowserEventHandler!.onAjaxReadyStateChange(
                     request,
-                  ))?.toNativeValue(),
+                  ))?.index,
                 );
+              }
             }
             return null;
           case "onAjaxProgress":
             if ((webviewParams != null &&
                     webviewParams!.onAjaxProgress != null) ||
                 _inAppBrowserEventHandler != null) {
-              Map<String, dynamic> arguments = handlerData.args[0]
+              Map<String, dynamic> arguments = handlerArgs[0]
                   .cast<String, dynamic>();
-              AjaxRequest request = AjaxRequest.fromMap(arguments)!;
+              AjaxRequest request = fromWire(arguments, AjaxRequest.fromJson)!;
 
               if (webviewParams != null &&
-                  webviewParams!.onAjaxProgress != null)
+                  webviewParams!.onAjaxProgress != null) {
                 return jsonEncode(
                   (await webviewParams!.onAjaxProgress!(
                     _controllerFromPlatform,
                     request,
-                  ))?.toNativeValue(),
+                  ))?.index,
                 );
-              else
+              } else {
                 return jsonEncode(
                   (await _inAppBrowserEventHandler!.onAjaxProgress(
                     request,
-                  ))?.toNativeValue(),
+                  ))?.index,
                 );
+              }
             }
             return null;
           case "shouldInterceptFetchRequest":
             if ((webviewParams != null &&
                     webviewParams!.shouldInterceptFetchRequest != null) ||
                 _inAppBrowserEventHandler != null) {
-              Map<String, dynamic> arguments = handlerData.args[0]
+              Map<String, dynamic> arguments = handlerArgs[0]
                   .cast<String, dynamic>();
-              FetchRequest request = FetchRequest.fromMap(arguments)!;
+              FetchRequest request = fromWire(arguments, FetchRequest.fromJson)!;
 
               if (webviewParams != null &&
-                  webviewParams!.shouldInterceptFetchRequest != null)
+                  webviewParams!.shouldInterceptFetchRequest != null) {
                 return jsonEncode(
                   await webviewParams!.shouldInterceptFetchRequest!(
                     _controllerFromPlatform,
                     request,
                   ),
                 );
-              else
+              } else {
                 return jsonEncode(
                   await _inAppBrowserEventHandler!.shouldInterceptFetchRequest(
                     request,
                   ),
                 );
+              }
             }
             return null;
           case "onWindowFocus":
-            if (webviewParams != null && webviewParams!.onWindowFocus != null)
+            if (webviewParams != null && webviewParams!.onWindowFocus != null) {
               webviewParams!.onWindowFocus!(_controllerFromPlatform);
-            else if (_inAppBrowserEventHandler != null)
+            } else if (_inAppBrowserEventHandler != null) {
               _inAppBrowserEventHandler!.onWindowFocus();
+            }
             return null;
           case "onWindowBlur":
-            if (webviewParams != null && webviewParams!.onWindowBlur != null)
+            if (webviewParams != null && webviewParams!.onWindowBlur != null) {
               webviewParams!.onWindowBlur!(_controllerFromPlatform);
-            else if (_inAppBrowserEventHandler != null)
+            } else if (_inAppBrowserEventHandler != null) {
               _inAppBrowserEventHandler!.onWindowBlur();
+            }
             return null;
           case "onInjectedScriptLoaded":
-            String id = handlerData.args[0];
+            String id = handlerArgs[0];
             var onLoadCallback = _injectedScriptsFromURL[id]?.onLoad;
             if ((webviewParams != null || _inAppBrowserEventHandler != null) &&
                 onLoadCallback != null) {
@@ -1110,7 +1073,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
             }
             return null;
           case "onInjectedScriptError":
-            String id = handlerData.args[0];
+            String id = handlerArgs[0];
             var onErrorCallback = _injectedScriptsFromURL[id]?.onError;
             if ((webviewParams != null || _inAppBrowserEventHandler != null) &&
                 onErrorCallback != null) {
@@ -1118,23 +1081,19 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
             }
             return null;
           case "onWebMessageListenerPostMessageReceived":
-            Map<String, dynamic> arguments = handlerData.args[0]
+            Map<String, dynamic> arguments = handlerArgs[0]
                 .cast<String, dynamic>();
             String jsObjectName = arguments["jsObjectName"];
             // Find the corresponding web message listener
             for (var listener in _webMessageListeners) {
               if (listener.params.jsObjectName == jsObjectName) {
                 // Forward to the listener's channel
-                Map<String, dynamic>? messageMap = arguments["message"]
-                    ?.cast<String, dynamic>();
-                WebMessage? message = messageMap != null
-                    ? WebMessage.fromMap(messageMap)
-                    : null;
+                WebMessage? message = webMessageFromWire(arguments["message"]);
                 String? sourceOrigin = arguments["sourceOrigin"];
                 bool isMainFrame = arguments["isMainFrame"] ?? true;
                 // Call the listener's onPostMessage callback via channel
                 listener.channel?.invokeMethod("onPostMessage", {
-                  "message": message?.toMap(),
+                  "message": message?.toJson(),
                   "sourceOrigin": sourceOrigin,
                   "isMainFrame": isMainFrame,
                 });
@@ -1143,21 +1102,17 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
             }
             return null;
           case "onWebMessagePortMessageReceived":
-            Map<String, dynamic> arguments = handlerData.args[0]
+            Map<String, dynamic> arguments = handlerArgs[0]
                 .cast<String, dynamic>();
             String webMessageChannelId = arguments["webMessageChannelId"];
             int index = arguments["index"];
             // Find the channel and forward the message
             for (var webMessageChannel in _webMessageChannels) {
               if (webMessageChannel.id == webMessageChannelId) {
-                Map<String, dynamic>? messageMap = arguments["message"]
-                    ?.cast<String, dynamic>();
-                WebMessage? message = messageMap != null
-                    ? WebMessage.fromMap(messageMap)
-                    : null;
+                WebMessage? message = webMessageFromWire(arguments["message"]);
                 webMessageChannel.internalChannel?.invokeMethod("onMessage", {
                   "index": index,
-                  "message": message?.toMap(),
+                  "message": message?.toJson(),
                 });
                 break;
               }
@@ -1168,24 +1123,13 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
         if (_javaScriptHandlersMap.containsKey(handlerName)) {
           // convert result to json
           try {
-            var jsHandlerResult = null;
-            if (_javaScriptHandlersMap[handlerName]
-                is JavaScriptHandlerCallback) {
-              jsHandlerResult =
-                  await (_javaScriptHandlersMap[handlerName]
-                      as JavaScriptHandlerCallback)(handlerData.args);
-            } else if (_javaScriptHandlersMap[handlerName]
-                is JavaScriptHandlerFunction) {
-              jsHandlerResult =
-                  await (_javaScriptHandlersMap[handlerName]
-                      as JavaScriptHandlerFunction)(handlerData);
-            } else {
-              jsHandlerResult = await _javaScriptHandlersMap[handlerName]!();
-            }
+            final jsHandlerResult = await _javaScriptHandlersMap[handlerName]!(
+              handlerArgs,
+            );
             return jsonEncode(jsHandlerResult);
           } catch (error, stacktrace) {
             developer.log(
-              error.toString() + '\n' + stacktrace.toString(),
+              '$error\n$stacktrace',
               name: 'JavaScript Handler "$handlerName"',
             );
             throw Exception(error.toString().replaceFirst('Exception: ', ''));
@@ -1214,17 +1158,13 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
   @override
   Future<void> loadUrl({
     required URLRequest urlRequest,
-    @Deprecated('Use allowingReadAccessTo instead')
-    Uri? iosAllowingReadAccessTo,
     WebUri? allowingReadAccessTo,
   }) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('urlRequest', () => urlRequest.toMap());
+    args.putIfAbsent('urlRequest', () => urlRequest.toJson());
     args.putIfAbsent(
       'allowingReadAccessTo',
-      () =>
-          allowingReadAccessTo?.toString() ??
-          iosAllowingReadAccessTo?.toString(),
+      () => allowingReadAccessTo?.toString(),
     );
     await channel?.invokeMethod('loadUrl', args);
   }
@@ -1235,10 +1175,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
     String mimeType = "text/html",
     String encoding = "utf8",
     WebUri? baseUrl,
-    @Deprecated('Use historyUrl instead') Uri? androidHistoryUrl,
     WebUri? historyUrl,
-    @Deprecated('Use allowingReadAccessTo instead')
-    Uri? iosAllowingReadAccessTo,
     WebUri? allowingReadAccessTo,
   }) async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1329,13 +1266,15 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('source', () => source);
     if (contentWorld != null) {
-      args.putIfAbsent('contentWorld', () => contentWorld.toMap());
+      args.putIfAbsent('contentWorld', () => contentWorld.toJson());
     }
     var result = await channel?.invokeMethod('evaluateJavascript', args);
     if (result != null && result is String) {
       try {
         result = jsonDecode(result);
-      } catch (e) {}
+      } on FormatException {
+        // Not JSON: return the string as native sent it.
+      }
     }
     return result;
   }
@@ -1353,7 +1292,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
     args.putIfAbsent('arguments', () => jsonEncode(arguments));
     args.putIfAbsent('argumentKeys', () => arguments.keys.toList());
     if (contentWorld != null) {
-      args.putIfAbsent('contentWorld', () => contentWorld.toMap());
+      args.putIfAbsent('contentWorld', () => contentWorld.toJson());
     }
 
     // Native returns a JSON string: {"value": ..., "error": ...}
@@ -1388,9 +1327,68 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
     args.putIfAbsent('urlFile', () => urlFile.toString());
     args.putIfAbsent(
       'scriptHtmlTagAttributes',
-      () => scriptHtmlTagAttributes?.toMap(),
+      () => scriptHtmlTagAttributes?.toJson(),
     );
     await channel?.invokeMethod('injectJavascriptFileFromUrl', args);
+  }
+
+  static const Map<String, (int keysym, int scanCode, String text)> _namedKeys = {
+    'Enter': (0xff0d, 36, '\r'),
+    'Tab': (0xff09, 23, '\t'),
+    'Backspace': (0xff08, 22, ''),
+    'Escape': (0xff1b, 9, ''),
+    'Delete': (0xffff, 119, ''),
+    'ArrowLeft': (0xff51, 113, ''),
+    'ArrowUp': (0xff52, 111, ''),
+    'ArrowRight': (0xff53, 114, ''),
+    'ArrowDown': (0xff54, 116, ''),
+    'Home': (0xff50, 110, ''),
+    'End': (0xff57, 115, ''),
+    'PageUp': (0xff55, 112, ''),
+    'PageDown': (0xff56, 117, ''),
+    ' ': (0x20, 65, ' '),
+  };
+
+  // X keycodes of a US layout for printable ASCII; used as the hardware
+  // keycode WebKit reports in KeyboardEvent.code.
+  static const Map<String, int> _asciiScanCodes = {
+    'a': 38, 'b': 56, 'c': 54, 'd': 40, 'e': 26, 'f': 41, 'g': 42, 'h': 43,
+    'i': 31, 'j': 44, 'k': 45, 'l': 46, 'm': 58, 'n': 57, 'o': 32, 'p': 33,
+    'q': 24, 'r': 27, 's': 39, 't': 28, 'u': 30, 'v': 55, 'w': 25, 'x': 53,
+    'y': 29, 'z': 52, '1': 10, '2': 11, '3': 12, '4': 13, '5': 14, '6': 15,
+    '7': 16, '8': 17, '9': 18, '0': 19,
+  };
+
+  /// Dispatches a key press (press + release) to the page.
+  ///
+  /// [key] is a DOM `KeyboardEvent.key` value. [keyCode] is the macOS virtual
+  /// key code zikzak's interface defines; it is not used on Linux.
+  @override
+  Future<void> pressKey({
+    required String key,
+    required int keyCode,
+    String characters = '',
+  }) async {
+    final named = _namedKeys[key];
+    final int keysym;
+    final int scanCode;
+    final String text;
+    if (named != null) {
+      (keysym, scanCode, text) = named;
+    } else if (key.runes.length == 1) {
+      final rune = key.runes.single;
+      // XKB maps Latin-1 directly and other Unicode as 0x01000000 + code point.
+      keysym = rune < 0x100 ? rune : 0x01000000 + rune;
+      scanCode = _asciiScanCodes[key.toLowerCase()] ?? 0;
+      text = characters.isNotEmpty ? characters : key;
+    } else {
+      throw ArgumentError.value(key, 'key', 'not a supported key name');
+    }
+    await channel?.invokeMethod('pressKey', {
+      'keysym': keysym,
+      'scanCode': scanCode,
+      'characters': characters.isNotEmpty ? characters : text,
+    });
   }
 
   @override
@@ -1409,7 +1407,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
     args.putIfAbsent('urlFile', () => urlFile.toString());
     args.putIfAbsent(
       'cssLinkHtmlTagAttributes',
-      () => cssLinkHtmlTagAttributes?.toMap(),
+      () => cssLinkHtmlTagAttributes?.toJson(),
     );
     await channel?.invokeMethod('injectCSSFileFromUrl', args);
   }
@@ -1440,7 +1438,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
       args,
     );
     if (result != null) {
-      return SslCertificate.fromMap(result.cast<String, dynamic>());
+      return SslCertificate.fromMap(wireMap(result));
     }
     return null;
   }
@@ -1453,7 +1451,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
       args,
     );
     if (result != null) {
-      return InAppWebViewHitTestResult.fromMap(result.cast<String, dynamic>());
+      return fromWire(result, InAppWebViewHitTestResult.fromJson);
     }
     return null;
   }
@@ -1463,27 +1461,6 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('includeDiskFiles', () => includeDiskFiles);
     await _staticChannel.invokeMethod('clearAllCache', args);
-  }
-
-  @override
-  Future<void> setJavaScriptBridgeName(String bridgeName) async {
-    assert(
-      RegExp(r'^[a-zA-Z_]\w*$').hasMatch(bridgeName),
-      'bridgeName must be a non-empty string with only alphanumeric and underscore characters. It can\'t start with a number.',
-    );
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('bridgeName', () => bridgeName);
-    await _staticChannel.invokeMethod('setJavaScriptBridgeName', args);
-  }
-
-  @override
-  Future<String> getJavaScriptBridgeName() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    return await _staticChannel.invokeMethod<String>(
-          'getJavaScriptBridgeName',
-          args,
-        ) ??
-        'zikzak_inappwebview';
   }
 
   @override
@@ -1589,38 +1566,47 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
   @override
   Future<InAppWebViewSettings?> getSettings() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    Map<dynamic, dynamic>? settings = await channel?.invokeMethod(
-      'getSettings',
-      args,
-    );
-    if (settings != null) {
-      settings = settings.cast<String, dynamic>();
-      return InAppWebViewSettings.fromMap(settings as Map<String, dynamic>);
-    }
-    return null;
+    final settings = await channel?.invokeMethod('getSettings', args);
+    return inAppWebViewSettingsFromWire(settings);
   }
 
   @override
   Future<void> setSettings({required InAppWebViewSettings settings}) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('settings', () => settings.toMap());
+    // See withAjaxEventFlags: re-send the Ajax event keys, from the widget's
+    // callbacks or, in an InAppBrowser (whose events are methods), whenever
+    // Ajax interception is enabled.
+    final params = webviewParams;
+    final ajaxBrowser =
+        _inAppBrowser != null && settings.useShouldInterceptAjaxRequest == true;
+    args.putIfAbsent(
+      'settings',
+      () => withAjaxEventFlags(
+        inAppWebViewSettingsToWire(settings),
+        onReadyStateChange:
+            params?.onAjaxReadyStateChange != null || ajaxBrowser,
+        onProgress: params?.onAjaxProgress != null || ajaxBrowser,
+      ),
+    );
     await channel?.invokeMethod('setSettings', args);
   }
 
   @override
   void addJavaScriptHandler({
     required String handlerName,
-    required Function callback,
+    required JavaScriptHandlerCallback callback,
   }) {
     assert(
-      !kJavaScriptHandlerForbiddenNames.contains(handlerName),
+      !_javaScriptHandlerForbiddenNames.contains(handlerName),
       '"$handlerName" is a reserved name and cannot be used as a JavaScript handler name.',
     );
     _javaScriptHandlersMap[handlerName] = callback;
   }
 
   @override
-  Function? removeJavaScriptHandler({required String handlerName}) {
+  JavaScriptHandlerCallback? removeJavaScriptHandler({
+    required String handlerName,
+  }) {
     return _javaScriptHandlersMap.remove(handlerName);
   }
 
@@ -1631,10 +1617,8 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
 
   @override
   Future<void> addUserScript({required UserScript userScript}) async {
-    // Note: WebKitGTK doesn't support content worlds like WKWebView,
-    // so we ignore the contentWorld parameter
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('userScript', () => userScript.toMap());
+    args.putIfAbsent('userScript', () => userScriptToWire(userScript));
     await channel?.invokeMethod('addUserScript', args);
 
     _userScripts[userScript.injectionTime]?.add(userScript);
@@ -1659,7 +1643,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
     args.putIfAbsent('index', () => index);
     args.putIfAbsent(
       'injectionTime',
-      () => userScript.injectionTime.toNativeValue(),
+      () => userScript.injectionTime.index,
     );
     await channel?.invokeMethod('removeUserScript', args);
 
@@ -1720,7 +1704,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
   ) async {
     assert(
       !_webMessageListeners.contains(webMessageListener),
-      "${webMessageListener} was already added.",
+      "$webMessageListener was already added.",
     );
     assert(
       !_webMessageListenerObjNames.contains(
@@ -1747,10 +1731,9 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
   @override
   Future<LinuxWebMessageChannel?> createWebMessageChannel() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    Map<String, dynamic>? result = (await channel?.invokeMethod(
-      'createWebMessageChannel',
-      args,
-    ))?.cast<String, dynamic>();
+    final result = wireMap(
+      await channel?.invokeMethod('createWebMessageChannel', args),
+    );
     final webMessageChannel = LinuxWebMessageChannel.static().fromMap(result);
     if (webMessageChannel != null) {
       _webMessageChannels.add(webMessageChannel);
@@ -1763,11 +1746,9 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
     required WebMessage message,
     WebUri? targetOrigin,
   }) async {
-    if (targetOrigin == null) {
-      targetOrigin = WebUri('');
-    }
+    targetOrigin ??= WebUri('');
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('message', () => message.toMap());
+    args.putIfAbsent('message', () => message.toJson());
     args.putIfAbsent('targetOrigin', () => targetOrigin.toString());
     await channel?.invokeMethod('postWebMessage', args);
   }
@@ -1798,55 +1779,62 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
     return await channel?.invokeMethod<bool>('isInFullscreen', {}) ?? false;
   }
 
-  @override
+  /// Asks the view to enter fullscreen. Only the legacy WPE backend acts on
+  /// it; with WPEPlatform it does nothing.
+  ///
+  /// Linux only; not part of zikzak's platform interface.
   Future<void> requestEnterFullscreen() async {
     await channel?.invokeMethod('requestEnterFullscreen', {});
   }
 
-  @override
+  /// Asks the view to leave fullscreen. Only the legacy WPE backend acts on
+  /// it; with WPEPlatform it does nothing.
+  ///
+  /// Linux only; not part of zikzak's platform interface.
   Future<void> requestExitFullscreen() async {
     await channel?.invokeMethod('requestExitFullscreen', {});
   }
 
-  @override
+  /// Shows or hides the WPE view.
+  ///
+  /// Linux only; not part of zikzak's platform interface.
   Future<void> setVisible({required bool visible}) async {
     await channel?.invokeMethod('setVisible', visible);
   }
 
-  @override
+  /// Sets the refresh rate WPE renders at, in mHz as WPE expects.
+  ///
+  /// Linux only; not part of zikzak's platform interface.
   Future<void> setTargetRefreshRate({required int rate}) async {
     await channel?.invokeMethod('setTargetRefreshRate', rate);
   }
 
-  @override
-  Future<int> getTargetRefreshRate() async {
-    return await channel?.invokeMethod<int>('getTargetRefreshRate', {}) ?? 0;
-  }
-
-  @override
+  /// Returns the WPE screen scale (1.0 on the legacy backend).
+  ///
+  /// Linux only; not part of zikzak's platform interface.
   Future<double> getScreenScale() async {
     return await channel?.invokeMethod<double>('getScreenScale', {}) ?? 1.0;
   }
 
-  @override
+  /// Sets the WPE screen scale (ignored on the legacy backend).
+  ///
+  /// Linux only; not part of zikzak's platform interface.
   Future<void> setScreenScale({required double scale}) async {
     await channel?.invokeMethod('setScreenScale', scale);
   }
 
-  @override
+  /// Whether the WPE view is visible.
+  ///
+  /// Linux only; not part of zikzak's platform interface.
   Future<bool> isVisible() async {
     return await channel?.invokeMethod<bool>('isVisible', {}) ?? false;
   }
 
-  @override
+  /// Locks the pointer to the view; returns whether WPE granted the lock.
+  ///
+  /// Linux only; not part of zikzak's platform interface.
   Future<bool> requestPointerLock() async {
     return await channel?.invokeMethod<bool>('requestPointerLock', {}) ?? false;
-  }
-
-  @override
-  Future<bool> requestPointerUnlock() async {
-    return await channel?.invokeMethod<bool>('requestPointerUnlock', {}) ??
-        false;
   }
 
   @override
@@ -1856,18 +1844,31 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent(
       'screenshotConfiguration',
-      () => screenshotConfiguration?.toMap(),
+      () => screenshotConfiguration != null
+          ? screenshotConfigurationToWire(screenshotConfiguration)
+          : null,
     );
     return await channel?.invokeMethod<Uint8List?>('takeScreenshot', args);
   }
 
   @override
+  Future<Uint8List?> createPdf({PDFConfiguration? pdfConfiguration}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('pdfConfiguration', () => pdfConfiguration?.toJson());
+    return await channel?.invokeMethod<Uint8List?>('createPdf', args);
+  }
+
+  /// Returns the serialized WebKit session state (back/forward list), or null.
+  ///
+  /// Linux only; not part of zikzak's platform interface.
   Future<Uint8List?> saveState() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await channel?.invokeMethod<Uint8List?>('saveState', args);
   }
 
-  @override
+  /// Restores a session state returned by [saveState].
+  ///
+  /// Linux only; not part of zikzak's platform interface.
   Future<bool> restoreState(Uint8List state) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('state', () => state);
@@ -1881,8 +1882,9 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
   }) async {
     if (!autoname) {
       assert(
-        WebArchiveFormat.MHT.isSupported() &&
-            filePath.endsWith("." + WebArchiveFormat.MHT.toNativeValue()!),
+        filePath.endsWith(
+          ".${webArchiveFormatToWire(WebArchiveFormat.MHT)}",
+        ),
       );
     }
 
@@ -1912,7 +1914,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
       args,
     );
     if (result != null) {
-      return WebHistory.fromMap(result.cast<String, dynamic>());
+      return fromWire(result, WebHistory.fromJson);
     }
     return null;
   }
@@ -1948,11 +1950,11 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
     if (html == null || html.isEmpty) {
       return favicons;
     }
-    var assetPathBase;
+    String? assetPathBase;
 
     if (webviewUrl.isScheme("file")) {
       var assetPathSplit = webviewUrl.toString().split("/flutter_assets/");
-      assetPathBase = assetPathSplit[0] + "/flutter_assets/";
+      assetPathBase = "${assetPathSplit[0]}/flutter_assets/";
     }
 
     InAppWebViewSettings? settings = await getSettings();
@@ -1999,7 +2001,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
             }
             manifestUrl =
                 ((assetPathBase == null)
-                    ? webviewUrl.scheme + "://" + webviewUrl.host + "/"
+                    ? "${webviewUrl.scheme}://${webviewUrl.host}/"
                     : assetPathBase) +
                 manifestUrl;
           }
@@ -2022,7 +2024,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
     try {
       HttpClient client = HttpClient();
       var faviconUrl =
-          webviewUrl.scheme + "://" + webviewUrl.host + "/favicon.ico";
+          "${webviewUrl.scheme}://${webviewUrl.host}/favicon.ico";
       var faviconUri = WebUri(faviconUrl);
       var headRequest = await client.headUrl(faviconUri);
       var headResponse = await headRequest.close();
@@ -2031,7 +2033,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
       }
     } catch (e) {
       developer.log(
-        "/favicon.ico file not found: " + e.toString(),
+        "/favicon.ico file not found: $e",
         name: runtimeType.toString(),
       );
     }
@@ -2040,10 +2042,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
     HttpClientRequest? manifestRequest;
     HttpClientResponse? manifestResponse;
     bool manifestFound = false;
-    if (manifestUrl == null) {
-      manifestUrl =
-          webviewUrl.scheme + "://" + webviewUrl.host + "/manifest.json";
-    }
+    manifestUrl ??= "${webviewUrl.scheme}://${webviewUrl.host}/manifest.json";
     try {
       HttpClient client = HttpClient();
       manifestRequest = await client.getUrl(Uri.parse(manifestUrl));
@@ -2053,8 +2052,8 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
           manifestResponse.headers.contentType?.mimeType == "application/json";
     } catch (e) {
       developer.log(
-        "Manifest file not found: " + e.toString(),
-        name: this.runtimeType.toString(),
+        "Manifest file not found: $e",
+        name: runtimeType.toString(),
       );
     }
 
@@ -2079,8 +2078,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
         }
       } catch (e) {
         developer.log(
-          "Cannot get favicons from Manifest file. It might not have a valid format: " +
-              e.toString(),
+          "Cannot get favicons from Manifest file. It might not have a valid format: $e",
           error: e,
           name: runtimeType.toString(),
         );
@@ -2111,14 +2109,14 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
       }
       urlIcon =
           ((assetPathBase == null)
-              ? url.scheme + "://" + url.host + "/"
+              ? "${url.scheme}://${url.host}/"
               : assetPathBase) +
           urlIcon;
     }
     if (isManifest) {
       rel = (sizes != null)
           ? urlSplit[urlSplit.length - 1]
-                .replaceFirst("-" + sizes, "")
+                .replaceFirst("-$sizes", "")
                 .split(" ")[0]
                 .split(".")[0]
           : null;
@@ -2168,7 +2166,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
       args,
     );
     if (result != null) {
-      return MediaPlaybackState.fromNativeValue(result);
+      return mediaPlaybackStateFromWire(result);
     }
     return null;
   }
@@ -2181,7 +2179,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
       args,
     );
     if (result != null) {
-      return MediaCaptureState.fromNativeValue(result);
+      return mediaCaptureStateFromWire(result);
     }
     return null;
   }
@@ -2189,7 +2187,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
   @override
   Future<void> setCameraCaptureState({required MediaCaptureState state}) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('state', () => state.toNativeValue());
+    args.putIfAbsent('state', () => mediaCaptureStateToWire(state));
     await channel?.invokeMethod('setCameraCaptureState', args);
   }
 
@@ -2201,7 +2199,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
       args,
     );
     if (result != null) {
-      return MediaCaptureState.fromNativeValue(result);
+      return mediaCaptureStateFromWire(result);
     }
     return null;
   }
@@ -2211,7 +2209,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
     required MediaCaptureState state,
   }) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('state', () => state.toNativeValue());
+    args.putIfAbsent('state', () => mediaCaptureStateToWire(state));
     await channel?.invokeMethod('setMicrophoneCaptureState', args);
   }
 
@@ -2299,26 +2297,34 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
     return UtilColor.fromHex(hexColor);
   }
 
-  @override
+  /// Whether the page is playing audio.
+  ///
+  /// Linux only; not part of zikzak's platform interface.
   Future<bool> isPlayingAudio() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await channel?.invokeMethod<bool>('isPlayingAudio', args) ?? false;
   }
 
-  @override
+  /// Whether the page's audio is muted.
+  ///
+  /// Linux only; not part of zikzak's platform interface.
   Future<bool> isMuted() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await channel?.invokeMethod<bool>('isMuted', args) ?? false;
   }
 
-  @override
+  /// Mutes or unmutes the page's audio.
+  ///
+  /// Linux only; not part of zikzak's platform interface.
   Future<void> setMuted({required bool muted}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('muted', () => muted);
     await channel?.invokeMethod('setMuted', args);
   }
 
-  @override
+  /// Terminates the web process; `onRenderProcessGone` reports it.
+  ///
+  /// Linux only; not part of zikzak's platform interface.
   Future<void> terminateWebProcess() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await channel?.invokeMethod('terminateWebProcess', args);
@@ -2330,17 +2336,27 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
     await channel?.invokeMethod('clearFocus', args);
   }
 
-  @override
-  Future<bool?> requestFocus({
-    FocusDirection? direction,
-    InAppWebViewRect? previouslyFocusedRect,
-  }) async {
+  /// Gives the view keyboard focus.
+  ///
+  /// Linux only; not part of zikzak's platform interface.
+  Future<bool?> requestFocus({InAppWebViewRect? previouslyFocusedRect}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await channel?.invokeMethod<bool?>('requestFocus', args);
   }
 
+  bool _disposed = false;
+
+  /// Releases the Dart side of the controller. Safe to call more than once.
+  ///
+  /// The native WebView is released by its owner: the widget's
+  /// `CustomPlatformView` (plugin channel `dispose` with the texture id),
+  /// `LinuxHeadlessInAppWebView.dispose` or the [LinuxInAppBrowser] closing.
   @override
   void dispose({bool isKeepAlive = false}) {
+    if (_disposed) {
+      return;
+    }
+    _disposed = true;
     if (!isKeepAlive) {
       for (final webMessageListener in _webMessageListeners) {
         webMessageListener.dispose();
@@ -2358,5 +2374,5 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
 }
 
 extension InternalInAppWebViewController on LinuxInAppWebViewController {
-  get handleMethod => _handleMethod;
+  Future<dynamic> Function(MethodCall call) get handleMethod => _handleMethod;
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/services.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
+import '../util/wire.dart';
+
 /// Object specifying creation parameters for creating a [LinuxCookieManager].
 ///
 /// When adding additional fields make sure they can be null or have a default
@@ -61,16 +63,21 @@ class LinuxCookieManager extends PlatformCookieManager {
     PlatformInAppWebViewController? iosBelow11WebViewController,
     PlatformInAppWebViewController? webViewController,
   }) async {
+    // Native never reads maxAge, so convert it to an absolute expiry
+    // (milliseconds since epoch) unless the caller gave expiresDate.
+    final effectiveExpires = expiresDate ??
+        (maxAge != null
+            ? DateTime.now().millisecondsSinceEpoch + maxAge * 1000
+            : null);
     final Map<String, dynamic> cookie = {
       'name': name,
       'value': value,
       'path': path,
-      if (domain != null) 'domain': domain,
-      if (expiresDate != null) 'expiresDate': expiresDate,
-      if (maxAge != null) 'maxAge': maxAge,
-      if (isSecure != null) 'isSecure': isSecure,
-      if (isHttpOnly != null) 'isHttpOnly': isHttpOnly,
-      if (sameSite != null) 'sameSite': sameSite.toString().split('.').last,
+      'domain': ?domain,
+      'expiresDate': ?effectiveExpires,
+      'isSecure': ?isSecure,
+      'isHttpOnly': ?isHttpOnly,
+      if (sameSite != null) 'sameSite': httpCookieSameSitePolicyToWire(sameSite),
     };
 
     final result = await _channel.invokeMethod<bool>('setCookie', {
@@ -98,7 +105,7 @@ class LinuxCookieManager extends PlatformCookieManager {
 
     return result
         .cast<Map<dynamic, dynamic>>()
-        .map((cookieMap) => Cookie.fromMap(cookieMap.cast<String, dynamic>())!)
+        .map((cookieMap) => fromWire(cookieMap, Cookie.fromJson)!)
         .toList();
   }
 
@@ -119,7 +126,7 @@ class LinuxCookieManager extends PlatformCookieManager {
       return null;
     }
 
-    return Cookie.fromMap(result.cast<String, dynamic>());
+    return fromWire(result, Cookie.fromJson);
   }
 
   @override
@@ -166,6 +173,10 @@ class LinuxCookieManager extends PlatformCookieManager {
     return result ?? false;
   }
 
+  /// The cookie manager is a singleton on a static channel; nothing to release.
+  @override
+  void dispose({bool isKeepAlive = false}) {}
+
   @override
   Future<List<Cookie>> getAllCookies() async {
     final result = await _channel.invokeMethod<List<dynamic>>('getAllCookies');
@@ -176,7 +187,7 @@ class LinuxCookieManager extends PlatformCookieManager {
 
     return result
         .cast<Map<dynamic, dynamic>>()
-        .map((cookieMap) => Cookie.fromMap(cookieMap.cast<String, dynamic>())!)
+        .map((cookieMap) => fromWire(cookieMap, Cookie.fromJson)!)
         .toList();
   }
 }

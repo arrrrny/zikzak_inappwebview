@@ -11,7 +11,7 @@ import '../in_app_webview/in_app_webview_controller.dart';
 /// more information.
 class LinuxWebStorageCreationParams extends PlatformWebStorageCreationParams {
   /// Creates a new [LinuxWebStorageCreationParams] instance.
-  LinuxWebStorageCreationParams({
+  const LinuxWebStorageCreationParams({
     required super.localStorage,
     required super.sessionStorage,
   });
@@ -48,7 +48,7 @@ class LinuxWebStorage extends PlatformWebStorage {
   PlatformSessionStorage get sessionStorage => params.sessionStorage;
 
   @override
-  void dispose() {
+  void dispose({bool isKeepAlive = false}) {
     localStorage.dispose();
     sessionStorage.dispose();
   }
@@ -61,7 +61,7 @@ class LinuxWebStorage extends PlatformWebStorage {
 /// more information.
 class LinuxStorageCreationParams extends PlatformStorageCreationParams {
   /// Creates a new [LinuxStorageCreationParams] instance.
-  LinuxStorageCreationParams({
+  const LinuxStorageCreationParams({
     required super.controller,
     required super.webStorageType,
   });
@@ -121,7 +121,9 @@ abstract mixin class LinuxStorage implements PlatformStorage {
 
     try {
       return json.decode(itemValue);
-    } catch (e) {}
+    } on FormatException {
+      // Not JSON: return the stored string as is.
+    }
 
     return itemValue;
   }
@@ -194,7 +196,7 @@ abstract mixin class LinuxStorage implements PlatformStorage {
   }
 
   @override
-  void dispose() {
+  void dispose({bool isKeepAlive = false}) {
     controller = null;
   }
 }

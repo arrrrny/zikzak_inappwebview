@@ -604,6 +604,14 @@ void WebViewChannelDelegate::HandleMethodCall(FlMethodCall* method_call) {
     return;
   }
 
+  // zikzak's createPdf: WPE WebKit has no print-to-PDF API, so answer null
+  // ("could not create it") as the platform interface specifies, instead of
+  // falling through to not-implemented (MissingPluginException in Dart).
+  if (string_equals(methodName, "createPdf")) {
+    fl_method_call_respond_success(method_call, nullptr, nullptr);
+    return;
+  }
+
   if (string_equals(methodName, "takeScreenshot")) {
     // Capture method_call for async callback
     g_object_ref(method_call);
@@ -1103,6 +1111,18 @@ void WebViewChannelDelegate::HandleMethodCall(FlMethodCall* method_call) {
     bool success = webView->requestFocus();
     g_autoptr(FlValue) result = fl_value_new_bool(success);
     fl_method_call_respond_success(method_call, result, nullptr);
+    return;
+  }
+
+  // === Key Input ===
+  // zikzak's pressKey: keysym is an XKB keysym, scanCode an X hardware keycode.
+  if (string_equals(methodName, "pressKey")) {
+    int64_t keysym = get_fl_map_value<int64_t>(args, "keysym", 0);
+    int scanCode = static_cast<int>(get_fl_map_value<int64_t>(args, "scanCode", 0));
+    std::string characters = get_fl_map_value<std::string>(args, "characters", "");
+    webView->SendKeyEvent(0, keysym, scanCode, 0, characters);
+    webView->SendKeyEvent(1, keysym, scanCode, 0, characters);
+    fl_method_call_respond_success(method_call, nullptr, nullptr);
     return;
   }
 

@@ -13,7 +13,6 @@ import 'web_message/web_message_listener.dart';
 import 'web_message/web_message_port.dart';
 import 'web_storage/web_storage.dart';
 import 'web_storage/web_storage_manager.dart';
-import 'webview_environment/webview_environment.dart';
 
 /// Implementation of [InAppWebViewPlatform] using WPE WebKit.
 class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
@@ -53,41 +52,12 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
     return LinuxInAppWebViewWidget(params);
   }
 
-  /// Creates a new empty [LinuxInAppWebViewWidget] to access static methods.
-  ///
-  /// This function should only be called by the app-facing package.
-  /// Look at using [InAppWebView] in `zikzak_inappwebview` instead.
-  @override
-  LinuxInAppWebViewWidget createPlatformInAppWebViewWidgetStatic() {
-    return LinuxInAppWebViewWidget.static();
-  }
-
-  /// Creates a new empty [PlatformCookieManager] to access static methods.
-  @override
-  PlatformCookieManager createPlatformCookieManagerStatic() {
-    return LinuxCookieManager.static();
-  }
-
   /// Creates a new [LinuxCookieManager].
   @override
   LinuxCookieManager createPlatformCookieManager(
     PlatformCookieManagerCreationParams params,
   ) {
     return LinuxCookieManager(params);
-  }
-
-  /// Creates a new empty [PlatformWebViewEnvironment] to access static methods.
-  @override
-  PlatformWebViewEnvironment createPlatformWebViewEnvironmentStatic() {
-    return LinuxWebViewEnvironment.static();
-  }
-
-  /// Creates a new [LinuxWebViewEnvironment].
-  @override
-  LinuxWebViewEnvironment createPlatformWebViewEnvironment(
-    PlatformWebViewEnvironmentCreationParams params,
-  ) {
-    return LinuxWebViewEnvironment(params);
   }
 
   // ************************************************************************ //
@@ -111,13 +81,6 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
     return LinuxHttpAuthCredentialDatabase(params);
   }
 
-  /// Creates a new empty [LinuxHttpAuthCredentialDatabase] to access static methods.
-  @override
-  LinuxHttpAuthCredentialDatabase
-  createPlatformHttpAuthCredentialDatabaseStatic() {
-    return LinuxHttpAuthCredentialDatabase.static();
-  }
-
   /// Creates a new empty [LinuxInAppBrowser] to access static methods.
   @override
   LinuxInAppBrowser createPlatformInAppBrowserStatic() {
@@ -132,30 +95,12 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
     return LinuxInAppBrowser(params);
   }
 
-  /// Creates a new empty [PlatformHeadlessInAppWebView] to access static methods.
-  @override
-  PlatformHeadlessInAppWebView createPlatformHeadlessInAppWebViewStatic() {
-    return LinuxHeadlessInAppWebView.static();
-  }
-
   /// Creates a new [LinuxHeadlessInAppWebView].
   @override
   LinuxHeadlessInAppWebView createPlatformHeadlessInAppWebView(
     PlatformHeadlessInAppWebViewCreationParams params,
   ) {
     return LinuxHeadlessInAppWebView(params);
-  }
-
-  /// Creates a new empty [PlatformProcessGlobalConfig] to access static methods.
-  @override
-  PlatformProcessGlobalConfig createPlatformProcessGlobalConfigStatic() {
-    return _PlatformProcessGlobalConfig.static();
-  }
-
-  /// Creates a new empty [PlatformProxyController] to access static methods.
-  @override
-  PlatformProxyController createPlatformProxyControllerStatic() {
-    return LinuxProxyController.static();
   }
 
   /// Creates a new [LinuxProxyController].
@@ -173,19 +118,6 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
     return _PlatformServiceWorkerController.static();
   }
 
-  /// Creates a new empty [PlatformTracingController] to access static methods.
-  @override
-  PlatformTracingController createPlatformTracingControllerStatic() {
-    return _PlatformTracingController.static();
-  }
-
-  /// Creates a new empty [PlatformFindInteractionController] to access static methods.
-  @override
-  PlatformFindInteractionController
-  createPlatformFindInteractionControllerStatic() {
-    return LinuxFindInteractionController.static();
-  }
-
   /// Creates a new [LinuxFindInteractionController].
   @override
   LinuxFindInteractionController createPlatformFindInteractionController(
@@ -194,31 +126,11 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
     return LinuxFindInteractionController(params);
   }
 
-  /// Creates a new empty [PlatformPrintJobController] to access static methods.
-  @override
-  PlatformPrintJobController createPlatformPrintJobControllerStatic() {
-    return _PlatformPrintJobController.static();
-  }
-
-  /// Creates a new empty [PlatformPullToRefreshController] to access static methods.
-  @override
-  PlatformPullToRefreshController
-  createPlatformPullToRefreshControllerStatic() {
-    return _PlatformPullToRefreshController.static();
-  }
-
   /// Creates a new empty [PlatformWebAuthenticationSession] to access static methods.
   @override
   PlatformWebAuthenticationSession
   createPlatformWebAuthenticationSessionStatic() {
     return _PlatformWebAuthenticationSession.static();
-  }
-
-  /// Creates a new empty [PlatformWebNotificationController] to access static methods.
-  @override
-  PlatformWebNotificationController
-  createPlatformWebNotificationControllerStatic() {
-    return _PlatformWebNotificationController.static();
   }
 
   /// Creates a new empty [LinuxWebMessageChannel] to access static methods.
@@ -243,12 +155,6 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
     return LinuxWebMessagePort(params);
   }
 
-  /// Creates a new empty [PlatformWebMessageListener] to access static methods.
-  @override
-  PlatformWebMessageListener createPlatformWebMessageListenerStatic() {
-    return LinuxWebMessageListener.static();
-  }
-
   /// Creates a new [LinuxWebMessageListener].
   @override
   LinuxWebMessageListener createPlatformWebMessageListener(
@@ -268,20 +174,6 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
     return LinuxWebStorage(params);
   }
 
-  /// Creates a new empty [LinuxWebStorage] to access static methods.
-  ///
-  /// This function should only be called by the app-facing package.
-  /// Look at using [WebStorage] in `zikzak_inappwebview` instead.
-  @override
-  LinuxWebStorage createPlatformWebStorageStatic() {
-    return LinuxWebStorage(
-      LinuxWebStorageCreationParams(
-        localStorage: createPlatformLocalStorageStatic(),
-        sessionStorage: createPlatformSessionStorageStatic(),
-      ),
-    );
-  }
-
   /// Creates a new [LinuxLocalStorage].
   ///
   /// This function should only be called by the app-facing package.
@@ -291,15 +183,6 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
     PlatformLocalStorageCreationParams params,
   ) {
     return LinuxLocalStorage(params);
-  }
-
-  /// Creates a new empty [LinuxLocalStorage] to access static methods.
-  ///
-  /// This function should only be called by the app-facing package.
-  /// Look at using [LocalStorage] in `zikzak_inappwebview` instead.
-  @override
-  LinuxLocalStorage createPlatformLocalStorageStatic() {
-    return LinuxLocalStorage.defaultStorage(controller: null);
   }
 
   /// Creates a new [LinuxSessionStorage].
@@ -313,52 +196,12 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
     return LinuxSessionStorage(params);
   }
 
-  /// Creates a new empty [LinuxSessionStorage] to access static methods.
-  ///
-  /// This function should only be called by the app-facing package.
-  /// Look at using [SessionStorage] in `zikzak_inappwebview` instead.
-  @override
-  LinuxSessionStorage createPlatformSessionStorageStatic() {
-    return LinuxSessionStorage.defaultStorage(controller: null);
-  }
-
-  /// Creates a new empty [PlatformWebStorageManager] to access static methods.
-  @override
-  PlatformWebStorageManager createPlatformWebStorageManagerStatic() {
-    return LinuxWebStorageManager.static();
-  }
-
   /// Creates a new [LinuxWebStorageManager].
   @override
   LinuxWebStorageManager createPlatformWebStorageManager(
     PlatformWebStorageManagerCreationParams params,
   ) {
     return LinuxWebStorageManager(params);
-  }
-
-  /// Creates a new empty [PlatformAssetsPathHandler] to access static methods.
-  @override
-  PlatformAssetsPathHandler createPlatformAssetsPathHandlerStatic() {
-    return _PlatformAssetsPathHandler.static();
-  }
-
-  /// Creates a new empty [PlatformResourcesPathHandler] to access static methods.
-  @override
-  PlatformResourcesPathHandler createPlatformResourcesPathHandlerStatic() {
-    return _PlatformResourcesPathHandler.static();
-  }
-
-  /// Creates a new empty [PlatformInternalStoragePathHandler] to access static methods.
-  @override
-  PlatformInternalStoragePathHandler
-  createPlatformInternalStoragePathHandlerStatic() {
-    return _PlatformInternalStoragePathHandler.static();
-  }
-
-  /// Creates a new empty [PlatformCustomPathHandler] to access static methods.
-  @override
-  PlatformCustomPathHandler createPlatformCustomPathHandlerStatic() {
-    return _PlatformCustomPathHandler.static();
   }
 
   /// Creates a new [DefaultInAppLocalhostServer].
@@ -370,15 +213,6 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
     PlatformInAppLocalhostServerCreationParams params,
   ) {
     return DefaultInAppLocalhostServer(params);
-  }
-
-  /// Creates a new empty [DefaultInAppLocalhostServer] to access static methods.
-  ///
-  /// This function should only be called by the app-facing package.
-  /// Look at using [InAppLocalhostServer] in `zikzak_inappwebview` instead.
-  @override
-  DefaultInAppLocalhostServer createPlatformInAppLocalhostServerStatic() {
-    return DefaultInAppLocalhostServer.static();
   }
 
   /// Creates a new empty [PlatformWebViewFeature] to access static methods.
@@ -394,8 +228,8 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
 // Stub implementations for unsupported classes
 
 class _PlatformChromeSafariBrowser extends PlatformChromeSafariBrowser {
-  _PlatformChromeSafariBrowser(PlatformChromeSafariBrowserCreationParams params)
-    : super.implementation(params);
+  _PlatformChromeSafariBrowser(super.params)
+    : super.implementation();
   static final _PlatformChromeSafariBrowser _staticValue =
       _PlatformChromeSafariBrowser(
         const PlatformChromeSafariBrowserCreationParams(),
@@ -404,21 +238,10 @@ class _PlatformChromeSafariBrowser extends PlatformChromeSafariBrowser {
   factory _PlatformChromeSafariBrowser.static() => _staticValue;
 }
 
-class _PlatformProcessGlobalConfig extends PlatformProcessGlobalConfig {
-  _PlatformProcessGlobalConfig(PlatformProcessGlobalConfigCreationParams params)
-    : super.implementation(params);
-  static final _PlatformProcessGlobalConfig _staticValue =
-      _PlatformProcessGlobalConfig(
-        const PlatformProcessGlobalConfigCreationParams(),
-      );
-
-  factory _PlatformProcessGlobalConfig.static() => _staticValue;
-}
-
 class _PlatformServiceWorkerController extends PlatformServiceWorkerController {
   _PlatformServiceWorkerController(
-    PlatformServiceWorkerControllerCreationParams params,
-  ) : super.implementation(params);
+    super.params,
+  ) : super.implementation();
   static final _PlatformServiceWorkerController _staticValue =
       _PlatformServiceWorkerController(
         const PlatformServiceWorkerControllerCreationParams(),
@@ -426,51 +249,19 @@ class _PlatformServiceWorkerController extends PlatformServiceWorkerController {
 
   factory _PlatformServiceWorkerController.static() => _staticValue;
 
+  // Static-only stub: holds no resources.
+  @override
+  void dispose({bool isKeepAlive = false}) {}
+
   @override
   ServiceWorkerClient? get serviceWorkerClient => throw UnimplementedError();
-}
-
-class _PlatformTracingController extends PlatformTracingController {
-  _PlatformTracingController(PlatformTracingControllerCreationParams params)
-    : super.implementation(params);
-  static final _PlatformTracingController _staticValue =
-      _PlatformTracingController(
-        const PlatformTracingControllerCreationParams(),
-      );
-
-  factory _PlatformTracingController.static() => _staticValue;
-}
-
-class _PlatformPrintJobController extends PlatformPrintJobController {
-  _PlatformPrintJobController(PlatformPrintJobControllerCreationParams params)
-    : super.implementation(params);
-
-  static final _PlatformPrintJobController _staticValue =
-      _PlatformPrintJobController(
-        const PlatformPrintJobControllerCreationParams(id: ''),
-      );
-
-  factory _PlatformPrintJobController.static() => _staticValue;
-}
-
-class _PlatformPullToRefreshController extends PlatformPullToRefreshController {
-  _PlatformPullToRefreshController(
-    PlatformPullToRefreshControllerCreationParams params,
-  ) : super.implementation(params);
-
-  static final _PlatformPullToRefreshController _staticValue =
-      _PlatformPullToRefreshController(
-        PlatformPullToRefreshControllerCreationParams(),
-      );
-
-  factory _PlatformPullToRefreshController.static() => _staticValue;
 }
 
 class _PlatformWebAuthenticationSession
     extends PlatformWebAuthenticationSession {
   _PlatformWebAuthenticationSession(
-    PlatformWebAuthenticationSessionCreationParams params,
-  ) : super.implementation(params);
+    super.params,
+  ) : super.implementation();
 
   static final _PlatformWebAuthenticationSession _staticValue =
       _PlatformWebAuthenticationSession(
@@ -480,137 +271,17 @@ class _PlatformWebAuthenticationSession
   factory _PlatformWebAuthenticationSession.static() => _staticValue;
 }
 
-class _PlatformWebNotificationController
-    extends PlatformWebNotificationController {
-  _PlatformWebNotificationController(
-    PlatformWebNotificationControllerCreationParams params,
-  ) : super.implementation(params);
-
-  static final _PlatformWebNotificationController _staticValue =
-      _PlatformWebNotificationController(
-        PlatformWebNotificationControllerCreationParams(
-          id: '',
-          notification: WebNotification(),
-        ),
-      );
-
-  factory _PlatformWebNotificationController.static() => _staticValue;
-}
-
 class _PlatformWebViewFeature extends PlatformWebViewFeature {
-  _PlatformWebViewFeature(PlatformWebViewFeatureCreationParams params)
-    : super.implementation(params);
+  _PlatformWebViewFeature(super.params)
+    : super.implementation();
 
   static final _PlatformWebViewFeature _staticValue = _PlatformWebViewFeature(
     PlatformWebViewFeatureCreationParams(),
   );
   factory _PlatformWebViewFeature.static() => _staticValue;
+
+  // Static-only stub: holds no resources.
+  @override
+  void dispose({bool isKeepAlive = false}) {}
 }
 
-class _PlatformAssetsPathHandler extends PlatformAssetsPathHandler {
-  _PlatformAssetsPathHandler(PlatformAssetsPathHandlerCreationParams params)
-    : super.implementation(params);
-
-  static final _PlatformAssetsPathHandler _staticValue =
-      _PlatformAssetsPathHandler(
-        PlatformAssetsPathHandlerCreationParams(
-          PlatformPathHandlerCreationParams(path: ''),
-        ),
-      );
-
-  factory _PlatformAssetsPathHandler.static() => _staticValue;
-
-  @override
-  PlatformPathHandlerEvents? eventHandler;
-
-  @override
-  Map<String, dynamic> toMap({EnumMethod? enumMethod}) => {
-    "path": path,
-    "type": type,
-  };
-
-  @override
-  Map<String, dynamic> toJson() => toMap();
-}
-
-class _PlatformResourcesPathHandler extends PlatformResourcesPathHandler {
-  _PlatformResourcesPathHandler(
-    PlatformResourcesPathHandlerCreationParams params,
-  ) : super.implementation(params);
-
-  static final _PlatformResourcesPathHandler _staticValue =
-      _PlatformResourcesPathHandler(
-        PlatformResourcesPathHandlerCreationParams(
-          PlatformPathHandlerCreationParams(path: ''),
-        ),
-      );
-
-  factory _PlatformResourcesPathHandler.static() => _staticValue;
-
-  @override
-  PlatformPathHandlerEvents? eventHandler;
-
-  @override
-  Map<String, dynamic> toMap({EnumMethod? enumMethod}) => {
-    "path": path,
-    "type": type,
-  };
-
-  @override
-  Map<String, dynamic> toJson() => toMap();
-}
-
-class _PlatformInternalStoragePathHandler
-    extends PlatformInternalStoragePathHandler {
-  _PlatformInternalStoragePathHandler(
-    PlatformInternalStoragePathHandlerCreationParams params,
-  ) : super.implementation(params);
-
-  static final _PlatformInternalStoragePathHandler _staticValue =
-      _PlatformInternalStoragePathHandler(
-        PlatformInternalStoragePathHandlerCreationParams(
-          PlatformPathHandlerCreationParams(path: ''),
-          directory: '',
-        ),
-      );
-
-  factory _PlatformInternalStoragePathHandler.static() => _staticValue;
-
-  @override
-  PlatformPathHandlerEvents? eventHandler;
-
-  @override
-  Map<String, dynamic> toMap({EnumMethod? enumMethod}) => {
-    "path": path,
-    "type": type,
-  };
-
-  @override
-  Map<String, dynamic> toJson() => toMap();
-}
-
-class _PlatformCustomPathHandler extends PlatformCustomPathHandler {
-  _PlatformCustomPathHandler(PlatformCustomPathHandlerCreationParams params)
-    : super.implementation(params);
-
-  static final _PlatformCustomPathHandler _staticValue =
-      _PlatformCustomPathHandler(
-        PlatformCustomPathHandlerCreationParams(
-          PlatformPathHandlerCreationParams(path: ''),
-        ),
-      );
-
-  factory _PlatformCustomPathHandler.static() => _staticValue;
-
-  @override
-  PlatformPathHandlerEvents? eventHandler;
-
-  @override
-  Map<String, dynamic> toMap({EnumMethod? enumMethod}) => {
-    "path": path,
-    "type": type,
-  };
-
-  @override
-  Map<String, dynamic> toJson() => toMap();
-}

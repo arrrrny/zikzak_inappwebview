@@ -3,6 +3,7 @@
 /// WPE WebKit expects:
 /// - key_code: XKB keysym (Unicode for printable chars, 0xFF00+ for special keys)
 /// - hardware_key_code: X11 keycode (evdev scancode + 8)
+library;
 
 import 'package:flutter/services.dart';
 

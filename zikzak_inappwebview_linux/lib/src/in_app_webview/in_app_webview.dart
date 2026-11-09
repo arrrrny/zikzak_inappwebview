@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
 import '../find_interaction/find_interaction_controller.dart';
-import '../webview_environment/webview_environment.dart';
+import '../util/wire.dart';
 import 'in_app_webview_controller.dart';
 import 'custom_platform_view.dart';
 
@@ -14,32 +14,26 @@ import 'custom_platform_view.dart';
 class LinuxInAppWebViewWidgetCreationParams
     extends PlatformInAppWebViewWidgetCreationParams {
   LinuxInAppWebViewWidgetCreationParams({
-    super.controllerFromPlatform,
     super.key,
     super.layoutDirection,
     super.gestureRecognizers,
     super.headlessWebView,
     super.keepAlive,
     super.preventGestureDelay,
+    super.webViewEnvironment,
+    super.controllerFromPlatform,
     super.windowId,
-    this.webViewEnvironment,
     super.onWebViewCreated,
     super.onLoadStart,
     super.onLoadStop,
-    @Deprecated('Use onReceivedError instead') super.onLoadError,
     super.onReceivedError,
-    @Deprecated("Use onReceivedHttpError instead") super.onLoadHttpError,
     super.onReceivedHttpError,
     super.onProgressChanged,
     super.onConsoleMessage,
     super.shouldOverrideUrlLoading,
     super.onLoadResource,
     super.onScrollChanged,
-    @Deprecated('Use onDownloadStarting instead') super.onDownloadStart,
-    @Deprecated('Use onDownloadStarting instead') super.onDownloadStartRequest,
-    super.onDownloadStarting,
-    @Deprecated('Use onLoadResourceWithCustomScheme instead')
-    super.onLoadResourceCustomScheme,
+    super.onDownloadStartRequest,
     super.onLoadResourceWithCustomScheme,
     super.onCreateWindow,
     super.onCloseWindow,
@@ -49,14 +43,11 @@ class LinuxInAppWebViewWidgetCreationParams
     super.onReceivedHttpAuthRequest,
     super.onReceivedServerTrustAuthRequest,
     super.onReceivedClientCertRequest,
-    @Deprecated('Use FindInteractionController.onFindResultReceived instead')
-    super.onFindResultReceived,
     super.shouldInterceptAjaxRequest,
     super.onAjaxReadyStateChange,
     super.onAjaxProgress,
     super.shouldInterceptFetchRequest,
     super.onUpdateVisitedHistory,
-    @Deprecated("Use onPrintRequest instead") super.onPrint,
     super.onPrintRequest,
     super.onLongPressHitTestResult,
     super.onEnterFullscreen,
@@ -89,10 +80,12 @@ class LinuxInAppWebViewWidgetCreationParams
     super.onCameraCaptureStateChanged,
     super.onMicrophoneCaptureStateChanged,
     super.onContentSizeChanged,
+    super.onNetworkRequest,
+    super.onNetworkResponse,
+    super.onNetworkLoadingFinished,
     super.initialUrlRequest,
     super.initialFile,
     super.initialData,
-    @Deprecated('Use initialSettings instead') super.initialOptions,
     super.initialSettings,
     super.contextMenu,
     super.initialUserScripts,
@@ -105,32 +98,26 @@ class LinuxInAppWebViewWidgetCreationParams
   LinuxInAppWebViewWidgetCreationParams.fromPlatformInAppWebViewWidgetCreationParams(
     PlatformInAppWebViewWidgetCreationParams params,
   ) : this(
-        controllerFromPlatform: params.controllerFromPlatform,
         key: params.key,
         layoutDirection: params.layoutDirection,
         gestureRecognizers: params.gestureRecognizers,
         headlessWebView: params.headlessWebView,
         keepAlive: params.keepAlive,
         preventGestureDelay: params.preventGestureDelay,
+        webViewEnvironment: params.webViewEnvironment,
+        controllerFromPlatform: params.controllerFromPlatform,
         windowId: params.windowId,
-        webViewEnvironment:
-            params.webViewEnvironment as LinuxWebViewEnvironment?,
         onWebViewCreated: params.onWebViewCreated,
         onLoadStart: params.onLoadStart,
         onLoadStop: params.onLoadStop,
-        onLoadError: params.onLoadError,
         onReceivedError: params.onReceivedError,
-        onLoadHttpError: params.onLoadHttpError,
         onReceivedHttpError: params.onReceivedHttpError,
         onProgressChanged: params.onProgressChanged,
         onConsoleMessage: params.onConsoleMessage,
         shouldOverrideUrlLoading: params.shouldOverrideUrlLoading,
         onLoadResource: params.onLoadResource,
         onScrollChanged: params.onScrollChanged,
-        onDownloadStart: params.onDownloadStart,
         onDownloadStartRequest: params.onDownloadStartRequest,
-        onDownloadStarting: params.onDownloadStarting,
-        onLoadResourceCustomScheme: params.onLoadResourceCustomScheme,
         onLoadResourceWithCustomScheme: params.onLoadResourceWithCustomScheme,
         onCreateWindow: params.onCreateWindow,
         onCloseWindow: params.onCloseWindow,
@@ -138,16 +125,13 @@ class LinuxInAppWebViewWidgetCreationParams
         onJsConfirm: params.onJsConfirm,
         onJsPrompt: params.onJsPrompt,
         onReceivedHttpAuthRequest: params.onReceivedHttpAuthRequest,
-        onReceivedServerTrustAuthRequest:
-            params.onReceivedServerTrustAuthRequest,
+        onReceivedServerTrustAuthRequest: params.onReceivedServerTrustAuthRequest,
         onReceivedClientCertRequest: params.onReceivedClientCertRequest,
-        onFindResultReceived: params.onFindResultReceived,
         shouldInterceptAjaxRequest: params.shouldInterceptAjaxRequest,
         onAjaxReadyStateChange: params.onAjaxReadyStateChange,
         onAjaxProgress: params.onAjaxProgress,
         shouldInterceptFetchRequest: params.shouldInterceptFetchRequest,
         onUpdateVisitedHistory: params.onUpdateVisitedHistory,
-        onPrint: params.onPrint,
         onPrintRequest: params.onPrintRequest,
         onLongPressHitTestResult: params.onLongPressHitTestResult,
         onEnterFullscreen: params.onEnterFullscreen,
@@ -160,10 +144,8 @@ class LinuxInAppWebViewWidgetCreationParams
         onZoomScaleChanged: params.onZoomScaleChanged,
         onSafeBrowsingHit: params.onSafeBrowsingHit,
         onPermissionRequest: params.onPermissionRequest,
-        onGeolocationPermissionsShowPrompt:
-            params.onGeolocationPermissionsShowPrompt,
-        onGeolocationPermissionsHidePrompt:
-            params.onGeolocationPermissionsHidePrompt,
+        onGeolocationPermissionsShowPrompt: params.onGeolocationPermissionsShowPrompt,
+        onGeolocationPermissionsHidePrompt: params.onGeolocationPermissionsHidePrompt,
         shouldInterceptRequest: params.shouldInterceptRequest,
         onRenderProcessGone: params.onRenderProcessGone,
         onRenderProcessResponsive: params.onRenderProcessResponsive,
@@ -176,26 +158,24 @@ class LinuxInAppWebViewWidgetCreationParams
         onPermissionRequestCanceled: params.onPermissionRequestCanceled,
         onRequestFocus: params.onRequestFocus,
         onWebContentProcessDidTerminate: params.onWebContentProcessDidTerminate,
-        onDidReceiveServerRedirectForProvisionalNavigation:
-            params.onDidReceiveServerRedirectForProvisionalNavigation,
+        onDidReceiveServerRedirectForProvisionalNavigation: params.onDidReceiveServerRedirectForProvisionalNavigation,
         onNavigationResponse: params.onNavigationResponse,
         shouldAllowDeprecatedTLS: params.shouldAllowDeprecatedTLS,
         onCameraCaptureStateChanged: params.onCameraCaptureStateChanged,
         onMicrophoneCaptureStateChanged: params.onMicrophoneCaptureStateChanged,
         onContentSizeChanged: params.onContentSizeChanged,
+        onNetworkRequest: params.onNetworkRequest,
+        onNetworkResponse: params.onNetworkResponse,
+        onNetworkLoadingFinished: params.onNetworkLoadingFinished,
         initialUrlRequest: params.initialUrlRequest,
         initialFile: params.initialFile,
         initialData: params.initialData,
-        initialOptions: params.initialOptions,
         initialSettings: params.initialSettings,
         contextMenu: params.contextMenu,
         initialUserScripts: params.initialUserScripts,
         pullToRefreshController: params.pullToRefreshController,
         findInteractionController: params.findInteractionController,
       );
-
-  @override
-  final LinuxWebViewEnvironment? webViewEnvironment;
 }
 
 ///{@macro zikzak_inappwebview_platform_interface.PlatformInAppWebViewWidget}
@@ -227,14 +207,14 @@ class LinuxInAppWebViewWidget extends PlatformInAppWebViewWidget {
 
   @override
   Widget build(BuildContext context) {
-    final initialSettings = params.initialSettings ?? InAppWebViewSettings();
-    _inferInitialSettings(initialSettings);
-
-    Map<String, dynamic> settingsMap =
-        (params.initialSettings != null ? initialSettings.toMap() : null) ??
-        // ignore: deprecated_member_use_from_same_package
-        params.initialOptions?.toMap() ??
-        initialSettings.toMap();
+    final initialSettings = _inferInitialSettings(
+      params.initialSettings ?? InAppWebViewSettings(),
+    );
+    Map<String, dynamic> settingsMap = withAjaxEventFlags(
+      inAppWebViewSettingsToWire(initialSettings),
+      onReadyStateChange: params.onAjaxReadyStateChange != null,
+      onProgress: params.onAjaxProgress != null,
+    );
 
     if ((params.headlessWebView?.isRunning() ?? false) &&
         params.keepAlive != null) {
@@ -248,9 +228,9 @@ class LinuxInAppWebViewWidget extends PlatformInAppWebViewWidget {
     return CustomPlatformView(
       onPlatformViewCreated: _onPlatformViewCreated,
       creationParams: <String, dynamic>{
-        'initialUrlRequest': params.initialUrlRequest?.toMap(),
+        'initialUrlRequest': params.initialUrlRequest?.toJson(),
         'initialFile': params.initialFile,
-        'initialData': params.initialData?.toMap(),
+        'initialData': params.initialData?.toJson(),
         'initialSettings': settingsMap,
         'contextMenu': params.contextMenu?.toMap() ?? {},
         'windowId': params.windowId,
@@ -258,9 +238,8 @@ class LinuxInAppWebViewWidget extends PlatformInAppWebViewWidget {
             ? params.headlessWebView?.id
             : null,
         'initialUserScripts':
-            params.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
+            params.initialUserScripts?.map(userScriptToWire).toList() ?? [],
         'keepAliveId': params.keepAlive?.id,
-        'webViewEnvironmentId': params.webViewEnvironment?.id,
       },
     );
   }
@@ -301,53 +280,46 @@ class LinuxInAppWebViewWidget extends PlatformInAppWebViewWidget {
     }
   }
 
-  void _inferInitialSettings(InAppWebViewSettings settings) {
+  InAppWebViewSettings _inferInitialSettings(InAppWebViewSettings settings) {
+    var inferred = settings;
     if (params.shouldOverrideUrlLoading != null &&
         settings.useShouldOverrideUrlLoading == null) {
-      settings.useShouldOverrideUrlLoading = true;
+      inferred = inferred.copyWith(useShouldOverrideUrlLoading: true);
     }
     if (params.onLoadResource != null && settings.useOnLoadResource == null) {
-      settings.useOnLoadResource = true;
+      inferred = inferred.copyWith(useOnLoadResource: true);
     }
-    if ((params.onDownloadStartRequest != null ||
-            params.onDownloadStarting != null) &&
+    if (params.onDownloadStartRequest != null &&
         settings.useOnDownloadStart == null) {
-      settings.useOnDownloadStart = true;
+      inferred = inferred.copyWith(useOnDownloadStart: true);
     }
     if ((params.shouldInterceptAjaxRequest != null ||
-        params.onAjaxProgress != null ||
-        params.onAjaxReadyStateChange != null)) {
-      if (settings.useShouldInterceptAjaxRequest == null) {
-        settings.useShouldInterceptAjaxRequest = true;
-      }
-      if (params.onAjaxReadyStateChange != null &&
-          settings.useOnAjaxReadyStateChange == null) {
-        settings.useOnAjaxReadyStateChange = true;
-      }
-      if (params.onAjaxProgress != null && settings.useOnAjaxProgress == null) {
-        settings.useOnAjaxProgress = true;
-      }
+            params.onAjaxProgress != null ||
+            params.onAjaxReadyStateChange != null) &&
+        settings.useShouldInterceptAjaxRequest == null) {
+      inferred = inferred.copyWith(useShouldInterceptAjaxRequest: true);
     }
     if (params.shouldInterceptFetchRequest != null &&
         settings.useShouldInterceptFetchRequest == null) {
-      settings.useShouldInterceptFetchRequest = true;
+      inferred = inferred.copyWith(useShouldInterceptFetchRequest: true);
     }
     if (params.shouldInterceptRequest != null &&
         settings.useShouldInterceptRequest == null) {
-      settings.useShouldInterceptRequest = true;
+      inferred = inferred.copyWith(useShouldInterceptRequest: true);
     }
     if (params.onRenderProcessGone != null &&
         settings.useOnRenderProcessGone == null) {
-      settings.useOnRenderProcessGone = true;
+      inferred = inferred.copyWith(useOnRenderProcessGone: true);
     }
     if (params.onNavigationResponse != null &&
         settings.useOnNavigationResponse == null) {
-      settings.useOnNavigationResponse = true;
+      inferred = inferred.copyWith(useOnNavigationResponse: true);
     }
+    return inferred;
   }
 
   @override
-  void dispose() {
+  void dispose({bool isKeepAlive = false}) {
     dynamic viewId = _controller?.id;
     debugLog(
       className: runtimeType.toString(),
@@ -356,10 +328,10 @@ class LinuxInAppWebViewWidget extends PlatformInAppWebViewWidget {
       method: "dispose",
       args: [],
     );
-    final isKeepAlive = params.keepAlive != null;
-    _controller?.dispose(isKeepAlive: isKeepAlive);
+    final keepAlive = isKeepAlive || params.keepAlive != null;
+    _controller?.dispose(isKeepAlive: keepAlive);
     _controller = null;
-    params.findInteractionController?.dispose(isKeepAlive: isKeepAlive);
+    params.findInteractionController?.dispose(isKeepAlive: keepAlive);
   }
 
   @override
