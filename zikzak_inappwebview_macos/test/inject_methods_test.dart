@@ -107,5 +107,53 @@ void main() {
         expect(bare['scriptHtmlTagAttributes'], isNull);
       },
     );
+
+    test(
+      'ScriptHtmlTagAttributes onLoad/onError fire via the callHandler bridge',
+      () async {
+        // Issue #416 wiring: the native side emits
+        // callHandler('onInjectedScriptLoaded'/'onInjectedScriptError', [id])
+        // when scriptHtmlTagAttributes.id is set; the controller must route
+        // those back to the registered attributes' callbacks.
+        var loaded = false;
+        var errored = false;
+        await controller.injectJavascriptFileFromUrl(
+          urlFile: WebUri('https://example.com/app.js'),
+          scriptHtmlTagAttributes: ScriptHtmlTagAttributes(
+            id: 'lib',
+            onLoad: () => loaded = true,
+            onError: () => errored = true,
+          ),
+        );
+
+        Future<void> sendBridge(String handlerName, String id) {
+          return TestDefaultBinaryMessengerBinding
+              .instance
+              .defaultBinaryMessenger
+              .handlePlatformMessage(
+                channelName,
+                const StandardMethodCodec().encodeMethodCall(
+                  MethodCall('callHandler', {
+                    'handlerName': handlerName,
+                    'args': '["$id"]',
+                  }),
+                ),
+                (_) {},
+              );
+        }
+
+        await sendBridge('onInjectedScriptLoaded', 'lib');
+        expect(loaded, isTrue, reason: 'onLoad must fire on the bridge call');
+        expect(errored, isFalse);
+
+        await sendBridge('onInjectedScriptError', 'lib');
+        expect(errored, isTrue, reason: 'onError must fire on the bridge call');
+
+        // An unregistered id must be a no-op, never a throw.
+        loaded = false;
+        await sendBridge('onInjectedScriptLoaded', 'unknown');
+        expect(loaded, isFalse);
+      },
+    );
   });
 }

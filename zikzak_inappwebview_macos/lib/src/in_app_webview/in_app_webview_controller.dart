@@ -71,6 +71,11 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
   late MethodChannel _channel;
   Map<String, JavaScriptHandlerCallback> _javaScriptHandlersMap =
       HashMap<String, JavaScriptHandlerCallback>();
+  // Issue #416 review fix: attributes registered by id so the native
+  // onInjectedScriptLoaded/onInjectedScriptError bridge calls (emitted by
+  // InAppWebView.swift when scriptHtmlTagAttributes.id is set) can be routed
+  // back to the caller's onLoad/onError — mirroring the iOS controller.
+  final Map<String, ScriptHtmlTagAttributes> _injectedScriptsFromURL = {};
 
   Future<dynamic> handleMethod(MethodCall call) async {
     final controller = params.webviewParams?.controllerFromPlatform != null
@@ -306,6 +311,22 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
         try {
           args = jsonDecode(argsJson) as List<dynamic>;
         } catch (_) {}
+        // Issue #416 review fix: route the injected-script lifecycle bridge
+        // calls to the registered attributes before any user handler lookup
+        // (they must never leak into _javaScriptHandlersMap).
+        if (handlerName == 'onInjectedScriptLoaded' ||
+            handlerName == 'onInjectedScriptError') {
+          final id = args.isNotEmpty ? args[0] as String : '';
+          final attributes = _injectedScriptsFromURL[id];
+          if (handlerName == 'onInjectedScriptLoaded') {
+            final onLoadCallback = attributes?.onLoad;
+            if (onLoadCallback != null) onLoadCallback();
+          } else {
+            final onErrorCallback = attributes?.onError;
+            if (onErrorCallback != null) onErrorCallback();
+          }
+          return null;
+        }
         if (_javaScriptHandlersMap.containsKey(handlerName)) {
           try {
             return jsonEncode(await _javaScriptHandlersMap[handlerName]!(args));
@@ -670,6 +691,10 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
     ScriptHtmlTagAttributes? scriptHtmlTagAttributes,
   }) async {
     assert(urlFile.toString().isNotEmpty);
+    final id = scriptHtmlTagAttributes?.id;
+    if (scriptHtmlTagAttributes != null && id != null) {
+      _injectedScriptsFromURL[id] = scriptHtmlTagAttributes;
+    }
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('urlFile', () => urlFile.toString());
     args.putIfAbsent(
@@ -731,6 +756,7 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
     if (!isKeepAlive) {
       _channel.setMethodCallHandler(null);
       _javaScriptHandlersMap.clear();
+      _injectedScriptsFromURL.clear();
     }
   }
 }
