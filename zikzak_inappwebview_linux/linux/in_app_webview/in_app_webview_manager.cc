@@ -295,13 +295,15 @@ void InAppWebViewManager::RemoveWindowWebView(int64_t windowId) {
 void InAppWebViewManager::ClearAllCache(FlMethodCall* method_call, bool includeDiskFiles) {
   WebKitNetworkSession* session = webkit_network_session_get_default();
   if (session == nullptr) {
-    fl_method_call_respond_success(method_call, fl_value_new_bool(FALSE), nullptr);
+    g_autoptr(FlValue) result = fl_value_new_bool(FALSE);
+    fl_method_call_respond_success(method_call, result, nullptr);
     return;
   }
 
   WebKitWebsiteDataManager* data_manager = webkit_network_session_get_website_data_manager(session);
   if (data_manager == nullptr) {
-    fl_method_call_respond_success(method_call, fl_value_new_bool(FALSE), nullptr);
+    g_autoptr(FlValue) result = fl_value_new_bool(FALSE);
+    fl_method_call_respond_success(method_call, result, nullptr);
     return;
   }
 
@@ -331,7 +333,8 @@ void InAppWebViewManager::ClearAllCache(FlMethodCall* method_call, bool includeD
               method_call, "CLEAR_CACHE_ERROR", error->message, nullptr, nullptr);
           g_error_free(error);
         } else {
-          fl_method_call_respond_success(method_call, fl_value_new_bool(success), nullptr);
+          g_autoptr(FlValue) result = fl_value_new_bool(success);
+          fl_method_call_respond_success(method_call, result, nullptr);
         }
 
         g_object_unref(method_call);

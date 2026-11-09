@@ -35,7 +35,8 @@ void WebMessageChannel::dispose() {
 
 void WebMessageChannel::HandleMethodCall(FlMethodCall* method_call) {
   if (webView_ == nullptr) {
-    fl_method_call_respond_success(method_call, fl_value_new_null(), nullptr);
+    g_autoptr(FlValue) result = fl_value_new_null();
+    fl_method_call_respond_success(method_call, result, nullptr);
     return;
   }
 

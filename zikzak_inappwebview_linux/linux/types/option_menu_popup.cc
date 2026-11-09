@@ -481,17 +481,24 @@ gboolean OptionMenuPopup::OnButtonRelease(GtkWidget* widget, GdkEventButton* eve
       const auto& item = self->items_[index];
       if (item.enabled && !item.is_group_label) {
         int selected_index = index;
-        
-        // Clear dismissed callback since we're selecting an item
+
+        // Activate the item, then run the same finish path as a dismissal
+        // (close + unref the WebKitOptionMenu). Nulling the dismissed
+        // callback without running it would leak the reffed menu.
         auto item_callback = self->item_selected_callback_;
-        self->dismissed_callback_ = nullptr;
-        
+        auto dismissed_callback = self->dismissed_callback_;
+        self->item_selected_callback_ = nullptr;
+        self->dismissed_callback_ = nullptr;  // Hide() must not run it twice
+
         self->Hide();
 
         if (item_callback) {
           item_callback(selected_index);
         }
-        
+        if (dismissed_callback) {
+          dismissed_callback();
+        }
+
         return TRUE;
       }
     }
@@ -585,14 +592,22 @@ gboolean OptionMenuPopup::OnKeyPress(GtkWidget* widget, GdkEventKey* event,
         const auto& item = self->items_[self->hovered_index_];
         if (item.enabled && !item.is_group_label) {
           int selected_index = self->hovered_index_;
-          
+
+          // Activate the item, then run the same finish path as a dismissal
+          // (close + unref the WebKitOptionMenu). Nulling the dismissed
+          // callback without running it would leak the reffed menu.
           auto item_callback = self->item_selected_callback_;
-          self->dismissed_callback_ = nullptr;
-          
+          auto dismissed_callback = self->dismissed_callback_;
+          self->item_selected_callback_ = nullptr;
+          self->dismissed_callback_ = nullptr;  // Hide() must not run it twice
+
           self->Hide();
-          
+
           if (item_callback) {
             item_callback(selected_index);
+          }
+          if (dismissed_callback) {
+            dismissed_callback();
           }
           return TRUE;
         }

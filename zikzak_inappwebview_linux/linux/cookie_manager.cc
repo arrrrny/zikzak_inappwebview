@@ -183,7 +183,8 @@ void CookieManager::HandleMethodCall(FlMethodCall* method_call) {
     FlValue* cookieMap = fl_value_lookup_string(args, "cookie");
 
     if (url.empty() || cookieMap == nullptr) {
-      fl_method_call_respond_success(method_call, fl_value_new_bool(FALSE), nullptr);
+      g_autoptr(FlValue) result = fl_value_new_bool(FALSE);
+      fl_method_call_respond_success(method_call, result, nullptr);
       return;
     }
 
@@ -191,14 +192,16 @@ void CookieManager::HandleMethodCall(FlMethodCall* method_call) {
 
     g_object_ref(method_call);
     setCookie(url, cookie, [method_call](bool success) {
-      fl_method_call_respond_success(method_call, fl_value_new_bool(success), nullptr);
+      g_autoptr(FlValue) result = fl_value_new_bool(success);
+      fl_method_call_respond_success(method_call, result, nullptr);
       g_object_unref(method_call);
     });
   } else if (string_equals(method, "getCookies")) {
     std::string url = get_fl_map_value<std::string>(args, "url", "");
 
     if (url.empty()) {
-      fl_method_call_respond_success(method_call, fl_value_new_list(), nullptr);
+      g_autoptr(FlValue) result = fl_value_new_list();
+      fl_method_call_respond_success(method_call, result, nullptr);
       return;
     }
 
@@ -216,7 +219,8 @@ void CookieManager::HandleMethodCall(FlMethodCall* method_call) {
     std::string name = get_fl_map_value<std::string>(args, "name", "");
 
     if (url.empty() || name.empty()) {
-      fl_method_call_respond_success(method_call, fl_value_new_null(), nullptr);
+      g_autoptr(FlValue) result = fl_value_new_null();
+      fl_method_call_respond_success(method_call, result, nullptr);
       return;
     }
 
@@ -225,7 +229,8 @@ void CookieManager::HandleMethodCall(FlMethodCall* method_call) {
       if (cookie.has_value()) {
         fl_method_call_respond_success(method_call, cookie.value().toFlValue(), nullptr);
       } else {
-        fl_method_call_respond_success(method_call, fl_value_new_null(), nullptr);
+        g_autoptr(FlValue) result = fl_value_new_null();
+        fl_method_call_respond_success(method_call, result, nullptr);
       }
       g_object_unref(method_call);
     });
@@ -237,7 +242,8 @@ void CookieManager::HandleMethodCall(FlMethodCall* method_call) {
 
     g_object_ref(method_call);
     deleteCookie(url, name, domain, path, [method_call](bool success) {
-      fl_method_call_respond_success(method_call, fl_value_new_bool(success), nullptr);
+      g_autoptr(FlValue) result = fl_value_new_bool(success);
+      fl_method_call_respond_success(method_call, result, nullptr);
       g_object_unref(method_call);
     });
   } else if (string_equals(method, "deleteCookies")) {
@@ -247,13 +253,15 @@ void CookieManager::HandleMethodCall(FlMethodCall* method_call) {
 
     g_object_ref(method_call);
     deleteCookies(url, domain, path, [method_call](bool success) {
-      fl_method_call_respond_success(method_call, fl_value_new_bool(success), nullptr);
+      g_autoptr(FlValue) result = fl_value_new_bool(success);
+      fl_method_call_respond_success(method_call, result, nullptr);
       g_object_unref(method_call);
     });
   } else if (string_equals(method, "deleteAllCookies")) {
     g_object_ref(method_call);
     deleteAllCookies([method_call](bool success) {
-      fl_method_call_respond_success(method_call, fl_value_new_bool(success), nullptr);
+      g_autoptr(FlValue) result = fl_value_new_bool(success);
+      fl_method_call_respond_success(method_call, result, nullptr);
       g_object_unref(method_call);
     });
   } else if (string_equals(method, "getAllCookies")) {
@@ -498,12 +506,18 @@ void CookieManager::deleteCookies(const std::string& url, const std::string& dom
                auto* anyFailed = new std::atomic<bool>(false);
                auto* sharedCallback = new std::function<void(bool)>(callback);
 
+               // libsoup stores Domain=example.com cookies with a leading
+               // dot (".example.com"); match both forms like deleteCookie.
+               auto stripDot = [](const std::string& d) {
+                 return !d.empty() && d[0] == '.' ? d.substr(1) : d;
+               };
+
                for (const auto& cookie : cookies) {
                  std::string cookieDomain = cookie.domain.value_or("");
                  std::string cookiePath = cookie.path.value_or("/");
 
                  // Filter by domain if specified
-                 if (!domain.empty() && cookieDomain != domain) {
+                 if (!domain.empty() && stripDot(cookieDomain) != stripDot(domain)) {
                    size_t prev = remaining->fetch_sub(1);
                    if (prev == 1) {
                      (*sharedCallback)(!(*anyFailed));

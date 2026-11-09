@@ -2300,6 +2300,13 @@ void InAppWebView::addWebMessageListener(const std::string& id,
   // Create the JavaScript to inject
   std::string jsSource = WebMessageListenerJS::createWebMessageListenerInjectionJs(
       jsObjectName, allowedOriginRulesJs);
+  if (jsSource.empty()) {
+    // createWebMessageListenerInjectionJs rejected the jsObjectName (not a
+    // valid JS identifier); skip the injection entirely.
+    errorLog("InAppWebView: skipping web message listener injection for invalid jsObjectName: " +
+             jsObjectName);
+    return;
+  }
 
   // Create a user script for this web message listener
   // We use a unique group name to allow removal if needed

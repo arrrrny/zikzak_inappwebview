@@ -66,7 +66,8 @@ void HeadlessWebViewChannelDelegate::HandleMethodCall(FlMethodCall* method_call)
           to_fl_map({{"width", make_fl_value(width)}, {"height", make_fl_value(height)}});
       fl_method_call_respond_success(method_call, result, nullptr);
     } else {
-      fl_method_call_respond_success(method_call, fl_value_new_null(), nullptr);
+      g_autoptr(FlValue) result = fl_value_new_null();
+      fl_method_call_respond_success(method_call, result, nullptr);
     }
     return;
   }

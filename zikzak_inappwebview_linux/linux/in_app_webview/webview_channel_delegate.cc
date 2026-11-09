@@ -231,7 +231,8 @@ void WebViewChannelDelegate::HandleMethodCall(FlMethodCall* method_call) {
   if (string_equals(methodName, "show")) {
     if (inAppBrowser) {
       inAppBrowser->show();
-      fl_method_call_respond_success(method_call, fl_value_new_bool(true), nullptr);
+      g_autoptr(FlValue) result = fl_value_new_bool(true);
+      fl_method_call_respond_success(method_call, result, nullptr);
     } else {
       fl_method_call_respond_not_implemented(method_call, nullptr);
     }
@@ -241,7 +242,8 @@ void WebViewChannelDelegate::HandleMethodCall(FlMethodCall* method_call) {
   if (string_equals(methodName, "hide")) {
     if (inAppBrowser) {
       inAppBrowser->hide();
-      fl_method_call_respond_success(method_call, fl_value_new_bool(true), nullptr);
+      g_autoptr(FlValue) result = fl_value_new_bool(true);
+      fl_method_call_respond_success(method_call, result, nullptr);
     } else {
       fl_method_call_respond_not_implemented(method_call, nullptr);
     }
@@ -251,7 +253,8 @@ void WebViewChannelDelegate::HandleMethodCall(FlMethodCall* method_call) {
   if (string_equals(methodName, "close")) {
     if (inAppBrowser) {
       inAppBrowser->close();
-      fl_method_call_respond_success(method_call, fl_value_new_bool(true), nullptr);
+      g_autoptr(FlValue) result = fl_value_new_bool(true);
+      fl_method_call_respond_success(method_call, result, nullptr);
     } else {
       fl_method_call_respond_not_implemented(method_call, nullptr);
     }
@@ -261,7 +264,8 @@ void WebViewChannelDelegate::HandleMethodCall(FlMethodCall* method_call) {
   if (string_equals(methodName, "isHidden")) {
     if (inAppBrowser) {
       bool hidden = inAppBrowser->isHidden();
-      fl_method_call_respond_success(method_call, fl_value_new_bool(hidden), nullptr);
+      g_autoptr(FlValue) result = fl_value_new_bool(hidden);
+      fl_method_call_respond_success(method_call, result, nullptr);
     } else {
       fl_method_call_respond_not_implemented(method_call, nullptr);
     }
@@ -715,7 +719,8 @@ void WebViewChannelDelegate::HandleMethodCall(FlMethodCall* method_call) {
     bool autoname = get_fl_map_value<bool>(args, "autoname", false);
     
     if (filePath.empty()) {
-      fl_method_call_respond_success(method_call, fl_value_new_null(), nullptr);
+      g_autoptr(FlValue) result = fl_value_new_null();
+      fl_method_call_respond_success(method_call, result, nullptr);
       return;
     }
     
@@ -727,7 +732,8 @@ void WebViewChannelDelegate::HandleMethodCall(FlMethodCall* method_call) {
         g_autoptr(FlValue) flResult = fl_value_new_string(result->c_str());
         fl_method_call_respond_success(method_call, flResult, nullptr);
       } else {
-        fl_method_call_respond_success(method_call, fl_value_new_null(), nullptr);
+        g_autoptr(FlValue) result = fl_value_new_null();
+        fl_method_call_respond_success(method_call, result, nullptr);
       }
       g_object_unref(method_call);
     });
@@ -879,7 +885,8 @@ void WebViewChannelDelegate::HandleMethodCall(FlMethodCall* method_call) {
         });
         fl_method_call_respond_success(method_call, result, nullptr);
       } else {
-        fl_method_call_respond_success(method_call, fl_value_new_null(), nullptr);
+        g_autoptr(FlValue) result = fl_value_new_null();
+        fl_method_call_respond_success(method_call, result, nullptr);
       }
       g_object_unref(method_call);
     });

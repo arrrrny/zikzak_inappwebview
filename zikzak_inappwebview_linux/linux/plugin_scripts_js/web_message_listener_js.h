@@ -3,6 +3,7 @@
 
 #include <string>
 
+#include "../utils/string.h"
 #include "javascript_bridge_js.h"
 
 namespace zikzak_inappwebview {
@@ -154,13 +155,13 @@ FlutterInAppWebViewWebMessageListener.prototype.removeEventListener = function(t
   static std::string createWebMessageListenerInjectionJs(
       const std::string& jsObjectName,
       const std::string& allowedOriginRulesJs) {
-    std::string jsObjectNameEscaped = jsObjectName;
-    // Escape single quotes in jsObjectName
-    size_t pos = 0;
-    while ((pos = jsObjectNameEscaped.find("'", pos)) != std::string::npos) {
-      jsObjectNameEscaped.replace(pos, 1, "\\'");
-      pos += 2;
+    // Only valid JS identifiers can be exposed as the listener object; a
+    // malformed name would break (or inject into) every injected page.
+    if (!is_js_identifier(jsObjectName)) {
+      debugLog("WebMessageListener: invalid jsObjectName: " + jsObjectName);
+      return "";
     }
+    std::string jsObjectNameEscaped = escape_js_single_quoted(jsObjectName);
 
     return "(function() {\n" + IS_ORIGIN_ALLOWED_JS_SOURCE() + "\n" +
            WEB_MESSAGE_LISTENER_JS_SOURCE() +

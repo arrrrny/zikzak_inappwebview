@@ -89,7 +89,8 @@ void InAppBrowserManager::HandleMethodCallImpl(FlMethodCall* method_call) {
   if (strcmp(method, "open") == 0) {
     applyDebugLoggingSetting(args);
     createInAppBrowser(args);
-    fl_method_call_respond_success(method_call, fl_value_new_bool(true), nullptr);
+    g_autoptr(FlValue) result = fl_value_new_bool(true);
+    fl_method_call_respond_success(method_call, result, nullptr);
     return;
   }
 
@@ -214,7 +215,8 @@ void InAppBrowserManager::openWithSystemBrowser(const std::string& url,
     return;
   }
 
-  fl_method_call_respond_success(method_call, fl_value_new_bool(true), nullptr);
+  g_autoptr(FlValue) result = fl_value_new_bool(true);
+  fl_method_call_respond_success(method_call, result, nullptr);
 }
 
 void InAppBrowserManager::removeBrowser(const std::string& id) {

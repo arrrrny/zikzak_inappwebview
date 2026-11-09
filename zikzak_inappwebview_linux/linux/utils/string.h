@@ -181,6 +181,46 @@ static inline std::string trim(const std::string& str) {
   return str.substr(first, (last - first + 1));
 }
 
+// Returns true when `name` is a valid JavaScript identifier (used for
+// web-message jsObjectName and similar app-supplied names that end up
+// embedded in injected page scripts).
+static inline bool is_js_identifier(const std::string& name) {
+  if (name.empty()) {
+    return false;
+  }
+  auto is_ident_start = [](char c) {
+    return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '_' || c == '$';
+  };
+  auto is_ident_part = [&](char c) { return is_ident_start(c) || (c >= '0' && c <= '9'); };
+  if (!is_ident_start(name[0])) {
+    return false;
+  }
+  for (size_t i = 1; i < name.size(); ++i) {
+    if (!is_ident_part(name[i])) {
+      return false;
+    }
+  }
+  return true;
+}
+
+// Escapes `value` for embedding inside a single-quoted JS string literal
+// (backslashes first, then quotes and control characters).
+static inline std::string escape_js_single_quoted(const std::string& value) {
+  std::string escaped;
+  escaped.reserve(value.size() * 2);
+  for (char c : value) {
+    switch (c) {
+      case '\\': escaped += "\\\\"; break;
+      case '\'': escaped += "\\'"; break;
+      case '\n': escaped += "\\n"; break;
+      case '\r': escaped += "\\r"; break;
+      case '\t': escaped += "\\t"; break;
+      default: escaped += c; break;
+    }
+  }
+  return escaped;
+}
+
 }  // namespace zikzak_inappwebview
 
 #endif  // ZIKZAK_INAPPWEBVIEW_PLUGIN_UTIL_STRING_H_

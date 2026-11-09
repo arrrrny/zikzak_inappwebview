@@ -30,25 +30,29 @@ void InAppBrowserChannelDelegate::HandleMethodCall(FlMethodCall* method_call) {
 
   if (strcmp(methodName, "show") == 0) {
     browser_->show();
-    fl_method_call_respond_success(method_call, fl_value_new_bool(true), nullptr);
+    g_autoptr(FlValue) result = fl_value_new_bool(true);
+    fl_method_call_respond_success(method_call, result, nullptr);
     return;
   }
 
   if (strcmp(methodName, "hide") == 0) {
     browser_->hide();
-    fl_method_call_respond_success(method_call, fl_value_new_bool(true), nullptr);
+    g_autoptr(FlValue) result = fl_value_new_bool(true);
+    fl_method_call_respond_success(method_call, result, nullptr);
     return;
   }
 
   if (strcmp(methodName, "close") == 0) {
     browser_->close();
-    fl_method_call_respond_success(method_call, fl_value_new_bool(true), nullptr);
+    g_autoptr(FlValue) result = fl_value_new_bool(true);
+    fl_method_call_respond_success(method_call, result, nullptr);
     return;
   }
 
   if (strcmp(methodName, "isHidden") == 0) {
     bool hidden = browser_->isHidden();
-    fl_method_call_respond_success(method_call, fl_value_new_bool(hidden), nullptr);
+    g_autoptr(FlValue) result = fl_value_new_bool(hidden);
+    fl_method_call_respond_success(method_call, result, nullptr);
     return;
   }
 
@@ -58,7 +62,8 @@ void InAppBrowserChannelDelegate::HandleMethodCall(FlMethodCall* method_call) {
       auto newSettings = std::make_shared<InAppBrowserSettings>(settingsValue);
       browser_->setSettings(newSettings, settingsValue);
     }
-    fl_method_call_respond_success(method_call, fl_value_new_bool(true), nullptr);
+    g_autoptr(FlValue) result = fl_value_new_bool(true);
+    fl_method_call_respond_success(method_call, result, nullptr);
     return;
   }
 

@@ -5,6 +5,7 @@
 #include "../in_app_webview/in_app_webview.h"
 #include "../utils/flutter.h"
 #include "../utils/log.h"
+#include "../utils/string.h"
 #include "web_message_listener.h"
 
 namespace zikzak_inappwebview {
@@ -31,7 +32,8 @@ WebMessageListenerChannelDelegate::~WebMessageListenerChannelDelegate() {
 
 void WebMessageListenerChannelDelegate::HandleMethodCall(FlMethodCall* method_call) {
   if (webMessageListener_ == nullptr) {
-    fl_method_call_respond_success(method_call, fl_value_new_null(), nullptr);
+    g_autoptr(FlValue) result = fl_value_new_null();
+    fl_method_call_respond_success(method_call, result, nullptr);
     return;
   }
 
@@ -98,13 +100,10 @@ void WebMessageListenerChannelDelegate::HandleMethodCall(FlMethodCall* method_ca
       messageDataJs = "\"" + escaped + "\"";
     }
 
-    // Escape the jsObjectName for JavaScript
-    std::string jsObjectNameEscaped = webMessageListener_->jsObjectName();
-    size_t pos = 0;
-    while ((pos = jsObjectNameEscaped.find("'", pos)) != std::string::npos) {
-      jsObjectNameEscaped.replace(pos, 1, "\\'");
-      pos += 2;
-    }
+    // Escape the jsObjectName for JavaScript. The name was validated at
+    // injection time (must be a JS identifier); escape it anyway so a
+    // trailing backslash can never flip the closing quote.
+    std::string jsObjectNameEscaped = escape_js_single_quoted(webMessageListener_->jsObjectName());
 
     // Build JavaScript to dispatch message to the listener's callbacks
     // This matches iOS WebMessageListenerChannelDelegate.postMessage behavior

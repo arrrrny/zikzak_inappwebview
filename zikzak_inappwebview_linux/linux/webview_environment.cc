@@ -43,25 +43,32 @@ void WebViewEnvironmentInstanceChannelDelegate::HandleMethodCall(FlMethodCall* m
   const gchar* method = fl_method_call_get_name(method_call);
 
   if (string_equals(method, "dispose")) {
-    // Dispose this instance - call the callback to remove from parent's map
+    // Respond BEFORE destroying this object: disposeCallback_ erases the
+    // owning unique_ptr, so returning into the rest of HandleMethodCall on
+    // a freed this is only safe by luck.
+    g_autoptr(FlValue) result = fl_value_new_null();
+    fl_method_call_respond_success(method_call, result, nullptr);
     disposeCallback_(id_);
-    fl_method_call_respond_success(method_call, fl_value_new_null(), nullptr);
+    return;
   } else if (string_equals(method, "isSpellCheckingEnabled")) {
     bool enabled = isSpellCheckingEnabled();
-    fl_method_call_respond_success(method_call, fl_value_new_bool(enabled), nullptr);
+    g_autoptr(FlValue) result = fl_value_new_bool(enabled);
+    fl_method_call_respond_success(method_call, result, nullptr);
   } else if (string_equals(method, "getSpellCheckingLanguages")) {
     auto languages = getSpellCheckingLanguages();
-    FlValue* list = fl_value_new_list();
+    g_autoptr(FlValue) list = fl_value_new_list();
     for (const auto& lang : languages) {
       fl_value_append_take(list, fl_value_new_string(lang.c_str()));
     }
     fl_method_call_respond_success(method_call, list, nullptr);
   } else if (string_equals(method, "getCacheModel")) {
     int model = getCacheModel();
-    fl_method_call_respond_success(method_call, fl_value_new_int(model), nullptr);
+    g_autoptr(FlValue) result = fl_value_new_int(model);
+    fl_method_call_respond_success(method_call, result, nullptr);
   } else if (string_equals(method, "isAutomationAllowed")) {
     bool allowed = isAutomationAllowed();
-    fl_method_call_respond_success(method_call, fl_value_new_bool(allowed), nullptr);
+    g_autoptr(FlValue) result = fl_value_new_bool(allowed);
+    fl_method_call_respond_success(method_call, result, nullptr);
   } else {
     fl_method_call_respond_not_implemented(method_call, nullptr);
   }
@@ -135,7 +142,8 @@ void WebViewEnvironment::HandleMethodCall(FlMethodCall* method_call) {
 
   if (string_equals(method, "getAvailableVersion")) {
     std::string version = getAvailableVersion();
-    fl_method_call_respond_success(method_call, fl_value_new_string(version.c_str()), nullptr);
+    g_autoptr(FlValue) result = fl_value_new_string(version.c_str());
+    fl_method_call_respond_success(method_call, result, nullptr);
   } else if (string_equals(method, "create")) {
     auto id = get_fl_map_value<std::string>(args, "id", "");
     if (id.empty()) {
@@ -145,7 +153,8 @@ void WebViewEnvironment::HandleMethodCall(FlMethodCall* method_call) {
     }
     FlValue* settings = fl_value_lookup_string(args, "settings");
     create(id, settings);
-    fl_method_call_respond_success(method_call, fl_value_new_null(), nullptr);
+    g_autoptr(FlValue) result = fl_value_new_null();
+    fl_method_call_respond_success(method_call, result, nullptr);
   } else {
     fl_method_call_respond_not_implemented(method_call, nullptr);
   }

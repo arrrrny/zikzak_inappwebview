@@ -78,17 +78,20 @@ void ProxyManager::HandleMethodCall(FlMethodCall* method_call) {
   if (string_equals(method, "setProxyOverride")) {
     FlValue* settingsMap = get_fl_map_value_raw(args, "settings");
     if (settingsMap == nullptr || fl_value_get_type(settingsMap) != FL_VALUE_TYPE_MAP) {
-      fl_method_call_respond_success(method_call, fl_value_new_null(), nullptr);
+      g_autoptr(FlValue) result = fl_value_new_null();
+      fl_method_call_respond_success(method_call, result, nullptr);
       return;
     }
 
     ProxySettings settings(settingsMap);
     setProxyOverride(settings);
-    fl_method_call_respond_success(method_call, fl_value_new_null(), nullptr);
+    g_autoptr(FlValue) result = fl_value_new_null();
+    fl_method_call_respond_success(method_call, result, nullptr);
 
   } else if (string_equals(method, "clearProxyOverride")) {
     clearProxyOverride();
-    fl_method_call_respond_success(method_call, fl_value_new_null(), nullptr);
+    g_autoptr(FlValue) result = fl_value_new_null();
+    fl_method_call_respond_success(method_call, result, nullptr);
 
   } else {
     fl_method_call_respond_not_implemented(method_call, nullptr);

@@ -207,7 +207,8 @@ void WebStorageManager::removeDataFor(FlMethodCall* method_call) {
       fl_value_get_type(recordListValue) != FL_VALUE_TYPE_LIST ||
       fl_value_get_length(recordListValue) == 0) {
     // No records to delete
-    fl_method_call_respond_success(method_call, fl_value_new_bool(TRUE), nullptr);
+    g_autoptr(FlValue) result = fl_value_new_bool(TRUE);
+    fl_method_call_respond_success(method_call, result, nullptr);
     return;
   }
 
@@ -224,7 +225,8 @@ void WebStorageManager::removeDataFor(FlMethodCall* method_call) {
   }
 
   if (displayNames.empty()) {
-    fl_method_call_respond_success(method_call, fl_value_new_bool(TRUE), nullptr);
+    g_autoptr(FlValue) result = fl_value_new_bool(TRUE);
+    fl_method_call_respond_success(method_call, result, nullptr);
     return;
   }
 
@@ -281,8 +283,8 @@ void WebStorageManager::removeDataFor(FlMethodCall* method_call) {
                          reinterpret_cast<GDestroyNotify>(webkit_website_data_unref));
 
         if (matching_records == nullptr) {
-          fl_method_call_respond_success(ctx->method_call,
-                                         fl_value_new_bool(TRUE), nullptr);
+          g_autoptr(FlValue) result = fl_value_new_bool(TRUE);
+          fl_method_call_respond_success(ctx->method_call, result, nullptr);
           g_object_unref(ctx->method_call);
           delete ctx;
           return;
@@ -307,8 +309,8 @@ void WebStorageManager::removeDataFor(FlMethodCall* method_call) {
                     ctx->method_call, "REMOVE_ERROR", error->message, nullptr, nullptr);
                 g_error_free(error);
               } else {
-                fl_method_call_respond_success(ctx->method_call,
-                                               fl_value_new_bool(success), nullptr);
+                g_autoptr(FlValue) result = fl_value_new_bool(success);
+                fl_method_call_respond_success(ctx->method_call, result, nullptr);
               }
 
               g_object_unref(ctx->method_call);
@@ -361,8 +363,8 @@ void WebStorageManager::removeDataModifiedSince(FlMethodCall* method_call) {
               method_call, "CLEAR_ERROR", error->message, nullptr, nullptr);
           g_error_free(error);
         } else {
-          fl_method_call_respond_success(method_call,
-                                         fl_value_new_bool(success), nullptr);
+          g_autoptr(FlValue) result = fl_value_new_bool(success);
+          fl_method_call_respond_success(method_call, result, nullptr);
         }
 
         g_object_unref(method_call);

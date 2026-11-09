@@ -19,6 +19,10 @@ namespace zikzak_inappwebview {
 
 using json = nlohmann::json;
 
+// Field separator for the credential index keys (ASCII unit separator,
+// which cannot appear in hosts, ports, protocols or realms).
+static const char kProtectionSpaceKeySeparator = '\x1F';
+
 namespace {
 bool string_equals(const gchar* a, const char* b) {
   return strcmp(a, b) == 0;
@@ -95,10 +99,13 @@ FlValue* Credential::toFlValue() const {
 // === CredentialDatabase ===
 
 std::string CredentialDatabase::makeKey(const ProtectionSpace& ps) {
+  // Join fields with the ASCII unit separator: hosts can be IPv6 literals
+  // (full of ':') and realms may contain ':' too, so a colon-separated key
+  // is ambiguous and fromKey would mangle it.
   std::ostringstream oss;
-  oss << ps.host << ":" << ps.port << ":" 
-      << ps.protocol.value_or("") << ":" 
-      << ps.realm.value_or("");
+  oss << ps.host << kProtectionSpaceKeySeparator << ps.port
+      << kProtectionSpaceKeySeparator << ps.protocol.value_or("")
+      << kProtectionSpaceKeySeparator << ps.realm.value_or("");
   return oss.str();
 }
 
@@ -120,14 +127,23 @@ ProtectionSpace CredentialDatabase::fromKey(const std::string& key) {
   std::istringstream iss(key);
   std::string part;
 
-  // Split by ':'
-  while (std::getline(iss, part, ':')) {
+  char delimiter = kProtectionSpaceKeySeparator;
+  size_t delimiterCount = std::count(key.begin(), key.end(), delimiter);
+  if (delimiterCount == 0) {
+    // Legacy on-disk format (pre-#420): colon separated. Keep parsing it so
+    // saved credentials written by older builds still resolve; IPv6 keys in
+    // that format were already mangled and stay broken.
+    delimiter = ':';
+    delimiterCount = std::count(key.begin(), key.end(), ':');
+  }
+
+  // Split by the delimiter
+  while (std::getline(iss, part, delimiter)) {
     parts.push_back(part);
   }
 
-  // Handle case where key ends with colons (empty parts at end)
-  size_t colonCount = std::count(key.begin(), key.end(), ':');
-  while (parts.size() <= colonCount) {
+  // Handle case where key ends with delimiters (empty parts at end)
+  while (parts.size() <= delimiterCount) {
     parts.push_back("");
   }
 
@@ -298,7 +314,8 @@ void CredentialDatabase::HandleMethodCall(FlMethodCall* method_call) {
 
     setHttpAuthCredential(ps, cred);
 
-    fl_method_call_respond_success(method_call, fl_value_new_bool(TRUE), nullptr);
+    g_autoptr(FlValue) result = fl_value_new_bool(TRUE);
+    fl_method_call_respond_success(method_call, result, nullptr);
 
   } else if (string_equals(method, "removeHttpAuthCredential")) {
     std::string host = get_fl_map_value<std::string>(args, "host", "");
@@ -318,7 +335,8 @@ void CredentialDatabase::HandleMethodCall(FlMethodCall* method_call) {
 
     removeHttpAuthCredential(ps, cred);
 
-    fl_method_call_respond_success(method_call, fl_value_new_bool(TRUE), nullptr);
+    g_autoptr(FlValue) result = fl_value_new_bool(TRUE);
+    fl_method_call_respond_success(method_call, result, nullptr);
 
   } else if (string_equals(method, "removeHttpAuthCredentials")) {
     std::string host = get_fl_map_value<std::string>(args, "host", "");
@@ -334,12 +352,14 @@ void CredentialDatabase::HandleMethodCall(FlMethodCall* method_call) {
 
     removeHttpAuthCredentials(ps);
 
-    fl_method_call_respond_success(method_call, fl_value_new_bool(TRUE), nullptr);
+    g_autoptr(FlValue) result = fl_value_new_bool(TRUE);
+    fl_method_call_respond_success(method_call, result, nullptr);
 
   } else if (string_equals(method, "clearAllAuthCredentials")) {
     clearAllAuthCredentials();
 
-    fl_method_call_respond_success(method_call, fl_value_new_bool(TRUE), nullptr);
+    g_autoptr(FlValue) result = fl_value_new_bool(TRUE);
+    fl_method_call_respond_success(method_call, result, nullptr);
 
   } else {
     fl_method_call_respond_not_implemented(method_call, nullptr);
