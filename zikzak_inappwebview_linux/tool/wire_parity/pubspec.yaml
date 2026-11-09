@@ -1,0 +1,13 @@
+name: wire_parity
+description: Dev-only check that zikzak's wire encodings match what upstream's Linux native code expects.
+publish_to: none
+environment:
+  sdk: ">=3.8.0 <4.0.0"
+dependencies:
+  flutter:
+    sdk: flutter
+  zikzak_inappwebview_platform_interface: ^6.3.4
+  flutter_inappwebview_platform_interface: 1.4.0-beta.3
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
