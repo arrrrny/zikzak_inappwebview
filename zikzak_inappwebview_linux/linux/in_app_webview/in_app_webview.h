@@ -604,6 +604,16 @@ class InAppWebView {
   // Disposing flag to prevent callbacks during destruction
   std::atomic<bool> is_disposing_{false};
 
+  // Shared liveness flag for async completions (JS evaluations, timers,
+  // filter compiles). Callbacks capture a copy of the shared flag and bail
+  // out once this object is destroyed; the flag outlives the destructor.
+  std::shared_ptr<std::atomic<bool>> lifetime_flag_ =
+      std::make_shared<std::atomic<bool>>(true);
+
+  // Set when a DMA-BUF-to-EGL import failed for this view; skips the
+  // zero-copy path until the web process (and its EGL context) is recreated.
+  bool egl_import_failed_ = false;
+
   // Mouse state
   double cursor_x_ = 0;
   double cursor_y_ = 0;
@@ -715,6 +725,9 @@ class InAppWebView {
 
   // Read pixels from EGL image to CPU buffer
   void ReadPixelsFromEglImage(void* egl_image, uint32_t width, uint32_t height);
+  // Deletes the readback FBO/texture while a GL context is current (no-op
+  // for ids 0). Must be called with the context bound.
+  void DestroyReadbackTargets();
 
   // === WebKit signals (same as WebKitGTK) ===
   static void OnLoadChanged(WebKitWebView* web_view, WebKitLoadEvent load_event,

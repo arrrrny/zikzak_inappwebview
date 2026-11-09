@@ -281,8 +281,12 @@ InAppWebView::InAppWebView(FlPluginRegistrar* registrar, FlBinaryMessenger* mess
 
     content_blocker_handler_->setContentBlockers(
         settings_->contentBlockers,
-        [this, initialUrlRequest, initialData, initialDataMimeType, initialDataEncoding,
+        [guard = lifetime_flag_, this, initialUrlRequest, initialData, initialDataMimeType, initialDataEncoding,
          initialDataBaseUrl, initialFile](bool success) {
+          if (!guard->load()) {
+            // The webview was disposed while the filters compiled.
+            return;
+          }
           if (!success) {
             debugLog("InAppWebView: Content blockers failed to apply, loading content anyway");
           }
@@ -357,6 +361,12 @@ void InAppWebView::AttachChannel(FlBinaryMessenger* messenger, const std::string
 
 InAppWebView::~InAppWebView() {
   debugLog("dealloc InAppWebView");
+
+  // Fence async completions first: any evaluate_javascript / timer /
+  // filter-compile callback that fires after this point must bail out on its
+  // captured guard instead of touching this freed object.
+  is_disposing_.store(true);
+  lifetime_flag_->store(false);
 
   CleanupMonitorChangeHandlers();
 
@@ -486,6 +496,12 @@ InAppWebView::~InAppWebView() {
                                                                             exported_image_);
       exported_image_ = nullptr;
     }
+  }
+
+  // Delete readback GL targets left over from early-return paths; only valid
+  // while a GL context is current on this thread.
+  if (HasCurrentGLContext()) {
+    DestroyReadbackTargets();
   }
 
   if (webview_ != nullptr) {
@@ -1242,10 +1258,11 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
   
   WPEBuffer* previous_buffer = nullptr;
   bool buffer_handled = false;
-  
-  // Track EGL import failures to avoid repeated attempts
-  // Static because if EGL fails once, it will likely keep failing (e.g., no GPU)
-  static bool egl_import_failed_permanently = false;
+
+  // Track EGL import failures to avoid repeated attempts. Per-instance (a
+  // process-wide latch would disable zero-copy for every webview off one
+  // transient failure); cleared in OnWebProcessTerminated, since a web
+  // process restart recreates the EGL context.
   
   {
     std::lock_guard<std::mutex> lock(wpe_buffer_mutex_);
@@ -1268,8 +1285,8 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
     // === Priority 1: Try EGL image import (zero-copy, best performance) ===
     // Only attempt EGL for DMA-BUF buffers (SHM buffers cannot be imported via EGL)
     // Skip if previous EGL attempts failed
-    if (egl_display_ != nullptr && 
-        is_dma_buf && !egl_import_failed_permanently) {
+    if (egl_display_ != nullptr &&
+        is_dma_buf && !egl_import_failed_) {
       GError* error = nullptr;
       void* egl_image = wpe_buffer_import_to_egl_image(buffer, &error);
       
@@ -1279,9 +1296,9 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
         current_buffer_height_ = buf_height;
         buffer_handled = true;
       } else {
-        // Mark EGL as permanently failed so we don't keep trying
+        // Mark EGL as failed for this view so we don't keep trying
         // This is common in VMs or software-only environments
-        egl_import_failed_permanently = true;
+        egl_import_failed_ = true;
         if (error != nullptr) {
           g_clear_error(&error);
         }
@@ -1480,6 +1497,22 @@ void InAppWebView::ReadPixelsFromEglImage(void* egl_image, uint32_t width, uint3
 
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   glBindTexture(GL_TEXTURE_2D, 0);
+
+  // The readback targets are single-use per frame: delete them while the
+  // context is still current instead of leaking one FBO + texture per view.
+  // (Early returns above leave them allocated for the next attempt.)
+  DestroyReadbackTargets();
+}
+
+void InAppWebView::DestroyReadbackTargets() {
+  if (readback_texture_ != 0) {
+    glDeleteTextures(1, &readback_texture_);
+    readback_texture_ = 0;
+  }
+  if (fbo_ != 0) {
+    glDeleteFramebuffers(1, &fbo_);
+    fbo_ = 0;
+  }
 }
 
 // === Navigation Methods ===
@@ -1527,8 +1560,13 @@ void InAppWebView::loadData(const std::string& data, const std::string& mime_typ
 
   g_message("InAppWebView: loadData() called while loading, stopping current load first");
   webkit_web_view_stop_loading(webview_);
-  // Give WebKit/WPE FDO a moment to clean up pending operations
-  while (g_main_context_iteration(NULL, FALSE)) { }
+  // webkit_web_view_stop_loading is synchronous; do NOT pump the GLib main
+  // loop here — it would dispatch queued method calls (e.g. a `dispose` sent
+  // in reaction to an earlier load event) re-entrantly, and the code below
+  // would then run against a freed view.
+  if (webview_ == nullptr || is_disposing_.load()) {
+    return;
+  }
 
   GBytes* bytes = g_bytes_new(data.data(), data.size());
   webkit_web_view_load_bytes(webview_, bytes, mime_type.c_str(), encoding.c_str(),
@@ -1542,8 +1580,13 @@ void InAppWebView::loadFile(const std::string& asset_file_path) {
 
   g_message("InAppWebView: loadFile() called while loading, stopping current load first");
   webkit_web_view_stop_loading(webview_);
-  // Give WebKit/WPE FDO a moment to clean up pending operations
-  while (g_main_context_iteration(NULL, FALSE)) { }
+  // webkit_web_view_stop_loading is synchronous; do NOT pump the GLib main
+  // loop here — it would dispatch queued method calls (e.g. a `dispose` sent
+  // in reaction to an earlier load event) re-entrantly, and the code below
+  // would then run against a freed view.
+  if (webview_ == nullptr || is_disposing_.load()) {
+    return;
+  }
 
   // Get the path to the running executable
   char exe_path[PATH_MAX];
@@ -1574,8 +1617,13 @@ void InAppWebView::postUrl(const std::string& url, const std::vector<uint8_t>& p
 
   g_message("InAppWebView: postUrl() called while loading, stopping current load first");
   webkit_web_view_stop_loading(webview_);
-  // Give WebKit/WPE FDO a moment to clean up pending operations
-  while (g_main_context_iteration(NULL, FALSE)) { }
+  // webkit_web_view_stop_loading is synchronous; do NOT pump the GLib main
+  // loop here — it would dispatch queued method calls (e.g. a `dispose` sent
+  // in reaction to an earlier load event) re-entrantly, and the code below
+  // would then run against a freed view.
+  if (webview_ == nullptr || is_disposing_.load()) {
+    return;
+  }
 
   // WPE WebKit's webkit_web_view_load_request() doesn't support POST body directly.
   // We use JavaScript XMLHttpRequest to perform the POST and load the result.
@@ -1622,13 +1670,20 @@ void InAppWebView::postUrl(const std::string& url, const std::vector<uint8_t>& p
 
   // Use evaluateJavascript to run the XHR after the blank page loads
   // We need to wait for the load to complete, so we use a delayed approach
-  std::string* js_copy = new std::string(js);
+  struct PostUrlData {
+    InAppWebView* self;
+    std::shared_ptr<std::atomic<bool>> guard;
+    std::string js;
+  };
+  auto* data = new PostUrlData{this, lifetime_flag_, std::move(js)};
   g_timeout_add(100, [](gpointer user_data) -> gboolean {
-    auto* data = static_cast<std::pair<InAppWebView*, std::string*>*>(user_data);
-    if (data->first->webview() != nullptr) {
+    auto* data = static_cast<PostUrlData*>(user_data);
+    // The view may have been disposed within the 100 ms window; the guard
+    // check must pass before `self` can be dereferenced.
+    if (data->guard->load() && data->self->webview() != nullptr) {
       webkit_web_view_evaluate_javascript(
-          data->first->webview(),
-          data->second->c_str(),
+          data->self->webview(),
+          data->js.c_str(),
           -1,
           nullptr,  // world
           nullptr,  // source_uri
@@ -1636,10 +1691,9 @@ void InAppWebView::postUrl(const std::string& url, const std::vector<uint8_t>& p
           nullptr,  // callback
           nullptr); // user_data
     }
-    delete data->second;
     delete data;
     return G_SOURCE_REMOVE;
-  }, new std::pair<InAppWebView*, std::string*>(this, js_copy));
+  }, data);
 }
 
 void InAppWebView::reload() {
@@ -1655,8 +1709,13 @@ void InAppWebView::reloadFromOrigin() {
 
   g_message("InAppWebView: reloadFromOrigin() called while loading, stopping current load first");
   webkit_web_view_stop_loading(webview_);
-  // Give WebKit/WPE FDO a moment to clean up pending operations
-  while (g_main_context_iteration(NULL, FALSE)) { }
+  // webkit_web_view_stop_loading is synchronous; do NOT pump the GLib main
+  // loop here — it would dispatch queued method calls (e.g. a `dispose` sent
+  // in reaction to an earlier load event) re-entrantly, and the code below
+  // would then run against a freed view.
+  if (webview_ == nullptr || is_disposing_.load()) {
+    return;
+  }
   
   webkit_web_view_reload_bypass_cache(webview_);
 }
@@ -2279,16 +2338,23 @@ void InAppWebView::createWebMessageChannel(
 
   // Capture variables for the callback
   InAppWebView* self = this;
+  auto guard = lifetime_flag_;
   FlBinaryMessenger* messenger = messenger_;
 
   // Execute JavaScript to create the channel
-  evaluateJavascript(js, std::nullopt, [self, callback, channelId, messenger](const std::optional<std::string>& result) {
+  evaluateJavascript(js, std::nullopt, [guard, self, callback, channelId, messenger](const std::optional<std::string>& result) {
+    // The webview may have been disposed while the JS ran; the guard check
+    // must pass before `self` can be dereferenced.
+    if (!guard->load()) {
+      callback(std::nullopt);
+      return;
+    }
     // If we got a result, the channel was created successfully
     if (result.has_value()) {
       // Create and store the WebMessageChannel object
       auto channel = std::make_unique<WebMessageChannel>(messenger, channelId, self);
       self->web_message_channels_[channelId] = std::move(channel);
-      
+
       callback(channelId);
     } else {
       callback(std::nullopt);
@@ -4081,13 +4147,18 @@ gboolean InAppWebView::OnLoadFailedWithTlsErrors(WebKitWebView* web_view, gchar*
   g_object_ref(certificate);
   g_object_ref(web_view);
 
+  // `failing_uri` is owned by the signal emission and is freed when this
+  // handler returns, but the Dart response arrives asynchronously — copy it
+  // into the lambda instead of capturing the raw pointer.
+  const std::string failing_uri_str = failing_uri != nullptr ? std::string(failing_uri) : "";
+
   auto callback = std::make_unique<WebViewChannelDelegate::ServerTrustAuthRequestCallback>();
-  callback->nonNullSuccess = [web_view, failing_uri, certificate](
+  callback->nonNullSuccess = [web_view, failing_uri_str, certificate](
       const ServerTrustAuthResponse& response) -> bool {
     if (response.action == ServerTrustAuthResponseAction::PROCEED) {
       // Allow the certificate for this host
       // Extract host from failing_uri
-      std::string host = get_host_from_url(std::string(failing_uri != nullptr ? failing_uri : ""));
+      std::string host = get_host_from_url(failing_uri_str);
       if (!host.empty()) {
         // Get the network session from the web view
         WebKitNetworkSession* network_session = webkit_web_view_get_network_session(web_view);
@@ -6368,10 +6439,11 @@ void InAppWebView::saveWebArchive(const std::string& filePath, bool autoname,
     std::function<void(const std::optional<std::string>&)> callback;
     std::string filePath;
     InAppWebView* self;
+    std::shared_ptr<std::atomic<bool>> guard;
   };
-  
-  auto* data = new SaveCallbackData{callback, finalPath, this};
-  
+
+  auto* data = new SaveCallbackData{callback, finalPath, this, lifetime_flag_};
+
   // Use webkit_web_view_save_to_file with MHTML format
   webkit_web_view_save_to_file(
       webview_,
@@ -6381,12 +6453,19 @@ void InAppWebView::saveWebArchive(const std::string& filePath, bool autoname,
       [](GObject* source_object, GAsyncResult* result, gpointer user_data) {
         auto* callbackData = static_cast<SaveCallbackData*>(user_data);
         WebKitWebView* webView = WEBKIT_WEB_VIEW(source_object);
-        
+
         GError* error = nullptr;
         gboolean success = webkit_web_view_save_to_file_finish(webView, result, &error);
-        
+
+        // The webview may have been disposed while the save ran; the guard
+        // check must pass before `self` can be dereferenced. The save itself
+        // already completed (or failed) against the GObject, so report that.
         if (success) {
-          callbackData->callback(callbackData->filePath);
+          if (callbackData->guard->load()) {
+            callbackData->callback(callbackData->filePath);
+          } else {
+            callbackData->callback(std::nullopt);
+          }
         } else {
           if (error != nullptr) {
             debugLog("InAppWebView::saveWebArchive failed: " + std::string(error->message));
@@ -6394,7 +6473,7 @@ void InAppWebView::saveWebArchive(const std::string& filePath, bool autoname,
           }
           callbackData->callback(std::nullopt);
         }
-        
+
         delete callbackData;
       },
       data
@@ -6406,7 +6485,8 @@ void InAppWebView::saveWebArchive(const std::string& filePath, bool autoname,
 void InAppWebView::copyToClipboard() {
   if (webview_ == nullptr) return;
 
-  getSelectedText([this](const std::optional<std::string>& text) {
+  getSelectedText([guard = lifetime_flag_, this](const std::optional<std::string>& text) {
+    if (!guard->load()) return;
     if (text.has_value() && !text->empty()) {
       copyTextToClipboard(*text);
     }
@@ -6419,7 +6499,8 @@ void InAppWebView::copyToClipboard() {
 void InAppWebView::cutToClipboard() {
   if (webview_ == nullptr) return;
 
-  getSelectedText([this](const std::optional<std::string>& text) {
+  getSelectedText([guard = lifetime_flag_, this](const std::optional<std::string>& text) {
+    if (!guard->load()) return;
     if (text.has_value() && !text->empty()) {
       copyTextToClipboard(*text);
     }
@@ -6703,6 +6784,10 @@ void InAppWebView::OnWebProcessTerminated(WebKitWebView* web_view,
 
   g_warning("InAppWebView[%ld]: WebProcess terminated (reason=%s, didCrash=%s)",
             self->id_, reason_str, didCrash ? "true" : "false");
+
+  // The EGL context is recreated with the new web process, so a previous
+  // DMA-BUF import failure may no longer apply.
+  self->egl_import_failed_ = false;
 
 #ifdef HAVE_WPE_BACKEND_LEGACY
   // IMPORTANT: When WebProcess crashes (especially from "Failed to bind wl_compositor"),
