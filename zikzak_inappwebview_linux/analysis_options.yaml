@@ -7,6 +7,10 @@ analyzer:
     - windows/**
     - macos/**
     - linux/**
+    # A nested package with its own pubspec (it deliberately depends on both
+    # the zikzak and the upstream platform interface to compare wire
+    # encodings), so it is analyzed in its own context, not this one.
+    - tool/wire_parity/**
 include: package:flutter_lints/flutter.yaml
 
 # Additional information about this file can be found at
