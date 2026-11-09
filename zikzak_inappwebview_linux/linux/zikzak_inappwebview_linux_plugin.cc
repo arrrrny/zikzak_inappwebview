@@ -1,260 +1,188 @@
 #include "include/zikzak_inappwebview_linux/zikzak_inappwebview_linux_plugin.h"
-
 #include "include/zikzak_inappwebview_linux/in_app_web_view_flutter_plugin.h"
 
+#include "zikzak_inappwebview_linux_plugin_private.h"
+#include "plugin_instance.h"
+
 #include <flutter_linux/flutter_linux.h>
+#include <gdk/gdk.h>
 #include <gtk/gtk.h>
-#include <sys/utsname.h>
 
 #include <cstring>
+#include <memory>
 
-#include "include/zikzak_inappwebview_linux/in_app_webview.h"
-#include "zikzak_inappwebview_linux_plugin_private.h"
+#include "cookie_manager.h"
+#include "credential_database.h"
+#include "headless_in_app_webview/headless_in_app_webview_manager.h"
+#include "in_app_browser/in_app_browser_manager.h"
+#include "in_app_webview/in_app_webview_manager.h"
+#include "proxy_manager.h"
+#include "utils/software_rendering.h"
+#include "web_storage_manager.h"
+#include "webview_environment.h"
 
-#define ZIKZAK_INAPPWEBVIEW_LINUX_PLUGIN(obj)                                  \
-  (G_TYPE_CHECK_INSTANCE_CAST((obj),                                           \
-                              zikzak_inappwebview_linux_plugin_get_type(),     \
+#define ZIKZAK_INAPPWEBVIEW_LINUX_PLUGIN(obj)                                     \
+  (G_TYPE_CHECK_INSTANCE_CAST((obj), zikzak_inappwebview_linux_plugin_get_type(), \
                               ZikzakInappwebviewLinuxPlugin))
 
 struct _ZikzakInappwebviewLinuxPlugin {
   GObject parent_instance;
-  FlPluginRegistrar *registrar;
-  FlBinaryMessenger *messenger;
-  FlTextureRegistrar *texture_registrar;
-  GHashTable *web_views;
+  FlPluginRegistrar* registrar;
+  
+  // C++ plugin instance for passing to managers
+  std::unique_ptr<zikzak_inappwebview::PluginInstance> plugin_instance;
+  
+  // Managers are owned by the GObject
+  std::unique_ptr<zikzak_inappwebview::InAppWebViewManager> in_app_webview_manager;
+  std::unique_ptr<zikzak_inappwebview::HeadlessInAppWebViewManager> headless_in_app_webview_manager;
+  std::unique_ptr<zikzak_inappwebview::InAppBrowserManager> in_app_browser_manager;
+  std::unique_ptr<zikzak_inappwebview::CookieManager> cookie_manager;
+  std::unique_ptr<zikzak_inappwebview::CredentialDatabase> credential_database;
+  std::unique_ptr<zikzak_inappwebview::ProxyManager> proxy_manager;
+  std::unique_ptr<zikzak_inappwebview::WebStorageManager> web_storage_manager;
+  std::unique_ptr<zikzak_inappwebview::WebViewEnvironment> webview_environment;
 };
 
 G_DEFINE_TYPE(ZikzakInappwebviewLinuxPlugin, zikzak_inappwebview_linux_plugin,
               g_object_get_type())
 
-// Called when a method call is received from Flutter.
-static void zikzak_inappwebview_linux_plugin_handle_method_call(
-    ZikzakInappwebviewLinuxPlugin *self, FlMethodCall *method_call) {
-  g_autoptr(FlMethodResponse) response = nullptr;
+static void zikzak_inappwebview_linux_plugin_dispose(GObject* object) {
+  ZikzakInappwebviewLinuxPlugin* self = ZIKZAK_INAPPWEBVIEW_LINUX_PLUGIN(object);
 
-  const gchar *method = fl_method_call_get_name(method_call);
-  FlValue *args = fl_method_call_get_args(method_call);
+  // Clean up the managers
+  self->in_app_webview_manager.reset();
+  self->headless_in_app_webview_manager.reset();
+  self->in_app_browser_manager.reset();
+  self->cookie_manager.reset();
+  self->credential_database.reset();
+  self->proxy_manager.reset();
+  self->web_storage_manager.reset();
+  self->webview_environment.reset();
+  
+  // Clean up the plugin instance last (after managers are gone)
+  self->plugin_instance.reset();
 
-  if (strcmp(method, "getPlatformVersion") == 0) {
-    response = get_platform_version();
-  } else if (strcmp(method, "create") == 0) {
-    if (fl_value_get_type(args) == FL_VALUE_TYPE_MAP) {
-      FlValue *idVal = fl_value_lookup_string(args, "id");
-      if (idVal && fl_value_get_type(idVal) == FL_VALUE_TYPE_STRING) {
-        const char *id = fl_value_get_string(idVal);
-
-        InAppWebView *webview =
-            in_app_webview_new(self->messenger, self->texture_registrar, id);
-
-        g_hash_table_insert(self->web_views, g_strdup(id), webview);
-
-        in_app_webview_load_initial(webview,
-                                    fl_value_lookup_string(args, "params"));
-
-        int64_t texture_id = in_app_webview_get_texture_id(webview);
-        response = FL_METHOD_RESPONSE(
-            fl_method_success_response_new(fl_value_new_int(texture_id)));
-      }
-    }
-    if (!response) {
-      response = FL_METHOD_RESPONSE(
-          fl_method_error_response_new("error", "Invalid arguments", nullptr));
-    }
-  } else {
-    response = FL_METHOD_RESPONSE(fl_method_not_implemented_response_new());
-  }
-
-  fl_method_call_respond(method_call, response, nullptr);
-}
-
-static void headless_first_load_finished(InAppWebView *webview, gpointer user_data) {
-  FlMethodCall *method_call = FL_METHOD_CALL(user_data);
-  g_autoptr(FlMethodResponse) response = FL_METHOD_RESPONSE(
-      fl_method_success_response_new(fl_value_new_bool(true)));
-  fl_method_call_respond(method_call, response, nullptr);
-  g_object_unref(method_call);
-}
-
-static void headless_method_call_cb(FlMethodChannel *channel,
-                                    FlMethodCall *method_call,
-                                    gpointer user_data) {
-  ZikzakInappwebviewLinuxPlugin *self =
-      ZIKZAK_INAPPWEBVIEW_LINUX_PLUGIN(user_data);
-  g_autoptr(FlMethodResponse) response = nullptr;
-  // When the readiness gate defers the response, the shared respond tail
-  // must be skipped — the callback owns the FlMethodCall response.
-  gboolean deferred = FALSE;
-
-  const gchar *method = fl_method_call_get_name(method_call);
-  FlValue *args = fl_method_call_get_args(method_call);
-
-  if (strcmp(method, "run") == 0) {
-    if (fl_value_get_type(args) == FL_VALUE_TYPE_MAP) {
-      FlValue *idVal = fl_value_lookup_string(args, "id");
-      if (idVal && fl_value_get_type(idVal) == FL_VALUE_TYPE_STRING) {
-        const char *id = fl_value_get_string(idVal);
-        InAppWebView *webview =
-            in_app_webview_new(self->messenger, self->texture_registrar, id);
-        g_hash_table_insert(self->web_views, g_strdup(id), webview);
-        FlValue *params = fl_value_lookup_string(args, "params");
-        // Readiness gate: complete run() only after the initial load reaches
-        // a terminal state (WEBKIT_LOAD_FINISHED). WebKitGTK's web process
-        // spawns asynchronously; a navigation issued while it is still
-        // starting can be dropped. Signal-driven on purpose: no timeout
-        // constant — a missing terminal event is a wiring bug that must
-        // surface loudly, not be masked by a magic number.
-        gboolean has_initial_load = false;
-        if (params != nullptr && fl_value_get_type(params) == FL_VALUE_TYPE_MAP) {
-          has_initial_load =
-              fl_value_lookup_string(params, "initialUrlRequest") != nullptr ||
-              fl_value_lookup_string(params, "initialFile") != nullptr ||
-              fl_value_lookup_string(params, "initialData") != nullptr;
-        }
-        if (has_initial_load) {
-          g_object_ref(method_call);
-          in_app_webview_set_first_load_callback(webview,
-                                                 headless_first_load_finished,
-                                                 method_call);
-          deferred = TRUE;
-        } else {
-          response = FL_METHOD_RESPONSE(
-              fl_method_success_response_new(fl_value_new_bool(true)));
-        }
-        in_app_webview_load_initial(webview, params);
-        g_autofree gchar *channel_name =
-            g_strdup_printf("wtf.zikzak/flutter_headless_inappwebview_%s", id);
-        g_autoptr(FlStandardMethodCodec) codec = fl_standard_method_codec_new();
-        FlMethodChannel *headless_channel = fl_method_channel_new(
-            self->messenger, channel_name, FL_METHOD_CODEC(codec));
-        fl_method_channel_invoke_method(headless_channel, "onWebViewCreated",
-                                        nullptr, nullptr, nullptr, nullptr);
-      }
-    }
-  } else if (strcmp(method, "createHeadless") == 0) {
-    if (fl_value_get_type(args) == FL_VALUE_TYPE_MAP) {
-      FlValue *idVal = fl_value_lookup_string(args, "id");
-      if (idVal && fl_value_get_type(idVal) == FL_VALUE_TYPE_STRING) {
-        const char *id = fl_value_get_string(idVal);
-
-        InAppWebView *webview =
-            in_app_webview_new(self->messenger, self->texture_registrar, id);
-        g_hash_table_insert(self->web_views, g_strdup(id), webview);
-        in_app_webview_load_initial(webview,
-                                    fl_value_lookup_string(args, "params"));
-
-        response = FL_METHOD_RESPONSE(
-            fl_method_success_response_new(fl_value_new_bool(true)));
-      }
-    }
-  } else {
-    response = FL_METHOD_RESPONSE(fl_method_not_implemented_response_new());
-  }
-
-  if (deferred) {
-    return;
-  }
-
-  if (!response) {
-    response = FL_METHOD_RESPONSE(
-        fl_method_error_response_new("error", "Invalid arguments", nullptr));
-  }
-
-  fl_method_call_respond(method_call, response, nullptr);
-}
-
-static void browser_method_call_cb(FlMethodChannel *channel,
-                                   FlMethodCall *method_call,
-                                   gpointer user_data) {
-  fl_method_call_respond(
-      method_call, FL_METHOD_RESPONSE(fl_method_not_implemented_response_new()),
-      nullptr);
-}
-
-FlMethodResponse *get_platform_version() {
-  struct utsname uname_data = {};
-  uname(&uname_data);
-  g_autofree gchar *version = g_strdup_printf("Linux %s", uname_data.version);
-  g_autoptr(FlValue) result = fl_value_new_string(version);
-  return FL_METHOD_RESPONSE(fl_method_success_response_new(result));
-}
-
-static void zikzak_inappwebview_linux_plugin_dispose(GObject *object) {
-  ZikzakInappwebviewLinuxPlugin *self =
-      ZIKZAK_INAPPWEBVIEW_LINUX_PLUGIN(object);
-  if (self->web_views) {
-    g_hash_table_destroy(self->web_views);
-  }
-  g_clear_object(&self->messenger);
-  g_clear_object(&self->texture_registrar);
-  G_OBJECT_CLASS(zikzak_inappwebview_linux_plugin_parent_class)
-      ->dispose(object);
+  G_OBJECT_CLASS(zikzak_inappwebview_linux_plugin_parent_class)->dispose(object);
 }
 
 static void zikzak_inappwebview_linux_plugin_class_init(
-    ZikzakInappwebviewLinuxPluginClass *klass) {
+    ZikzakInappwebviewLinuxPluginClass* klass) {
   G_OBJECT_CLASS(klass)->dispose = zikzak_inappwebview_linux_plugin_dispose;
 }
 
-static void
-zikzak_inappwebview_linux_plugin_init(ZikzakInappwebviewLinuxPlugin *self) {
-  self->web_views =
-      g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_object_unref);
+static void zikzak_inappwebview_linux_plugin_init(ZikzakInappwebviewLinuxPlugin* self) {
+  self->registrar = nullptr;
+  // Note: in_app_webview_manager is initialized by its default constructor
 }
 
-static void method_call_cb(FlMethodChannel *channel, FlMethodCall *method_call,
-                           gpointer user_data) {
-  ZikzakInappwebviewLinuxPlugin *plugin =
-      ZIKZAK_INAPPWEBVIEW_LINUX_PLUGIN(user_data);
-  zikzak_inappwebview_linux_plugin_handle_method_call(plugin, method_call);
-}
+void zikzak_inappwebview_linux_plugin_register_with_registrar(FlPluginRegistrar* registrar) {
+  // === CRITICAL: Check for VM/problematic GPU BEFORE any WebKit initialization ===
+  // This must happen before any WPEDisplay is created, because WebKit's WebProcess
+  // inherits environment variables at spawn time. Setting LIBGL_ALWAYS_SOFTWARE
+  // after WebProcess starts has no effect.
+  zikzak_inappwebview::ApplySoftwareRenderingIfNeeded();
 
-void zikzak_inappwebview_linux_plugin_register_with_registrar(
-    FlPluginRegistrar *registrar) {
-  ZikzakInappwebviewLinuxPlugin *plugin = ZIKZAK_INAPPWEBVIEW_LINUX_PLUGIN(
+  ZikzakInappwebviewLinuxPlugin* plugin = ZIKZAK_INAPPWEBVIEW_LINUX_PLUGIN(
       g_object_new(zikzak_inappwebview_linux_plugin_get_type(), nullptr));
 
   plugin->registrar = registrar;
-  // The FlPluginRegistrar may be invalidated by the engine after plugin
-  // registration completes. Cache referenced messenger/texture registrar
-  // for per-webview method channel and texture registration.
-  plugin->messenger = FL_BINARY_MESSENGER(
-      g_object_ref(fl_plugin_registrar_get_messenger(registrar)));
-  plugin->texture_registrar = FL_TEXTURE_REGISTRAR(
-      g_object_ref(fl_plugin_registrar_get_texture_registrar(registrar)));
 
-  g_autoptr(FlStandardMethodCodec) codec = fl_standard_method_codec_new();
-  g_autoptr(FlMethodChannel) channel = fl_method_channel_new(
-      fl_plugin_registrar_get_messenger(registrar), "zikzak_inappwebview_linux",
-      FL_METHOD_CODEC(codec));
-  fl_method_channel_set_method_call_handler(
-      channel, method_call_cb, g_object_ref(plugin), g_object_unref);
+  plugin->plugin_instance = std::make_unique<zikzak_inappwebview::PluginInstance>(registrar);
+  auto* pluginInstance = plugin->plugin_instance.get();
 
-  g_autoptr(FlStandardMethodCodec) headless_codec =
-      fl_standard_method_codec_new();
-  g_autoptr(FlMethodChannel) headless_channel =
-      fl_method_channel_new(fl_plugin_registrar_get_messenger(registrar),
-                            "wtf.zikzak/flutter_headless_inappwebview",
-                            FL_METHOD_CODEC(headless_codec));
-  fl_method_channel_set_method_call_handler(
-      headless_channel, headless_method_call_cb, g_object_ref(plugin),
-      g_object_unref);
+  plugin->in_app_webview_manager =
+      std::make_unique<zikzak_inappwebview::InAppWebViewManager>(pluginInstance);
+  pluginInstance->inAppWebViewManager = plugin->in_app_webview_manager.get();
 
-  g_autoptr(FlStandardMethodCodec) browser_codec =
-      fl_standard_method_codec_new();
-  g_autoptr(FlMethodChannel) browser_channel = fl_method_channel_new(
-      fl_plugin_registrar_get_messenger(registrar),
-      "dev.zuzu/flutter_inappbrowser", FL_METHOD_CODEC(browser_codec));
-  fl_method_channel_set_method_call_handler(
-      browser_channel, browser_method_call_cb, g_object_ref(plugin),
-      g_object_unref);
+  plugin->headless_in_app_webview_manager =
+      std::make_unique<zikzak_inappwebview::HeadlessInAppWebViewManager>(pluginInstance);
+  pluginInstance->headlessInAppWebViewManager = plugin->headless_in_app_webview_manager.get();
 
-  g_object_unref(plugin);
+  plugin->in_app_browser_manager =
+      std::make_unique<zikzak_inappwebview::InAppBrowserManager>(pluginInstance);
+  pluginInstance->inAppBrowserManager = plugin->in_app_browser_manager.get();
+
+  plugin->cookie_manager = std::make_unique<zikzak_inappwebview::CookieManager>(pluginInstance);
+  pluginInstance->cookieManager = plugin->cookie_manager.get();
+
+  plugin->credential_database =
+      std::make_unique<zikzak_inappwebview::CredentialDatabase>(pluginInstance);
+  pluginInstance->credentialDatabase = plugin->credential_database.get();
+
+  plugin->proxy_manager = std::make_unique<zikzak_inappwebview::ProxyManager>(pluginInstance);
+  pluginInstance->proxyManager = plugin->proxy_manager.get();
+
+  plugin->web_storage_manager = std::make_unique<zikzak_inappwebview::WebStorageManager>(pluginInstance);
+  pluginInstance->webStorageManager = plugin->web_storage_manager.get();
+
+  plugin->webview_environment = std::make_unique<zikzak_inappwebview::WebViewEnvironment>(pluginInstance);
+  pluginInstance->webViewEnvironment = plugin->webview_environment.get();
+
+  // Note: We don't unref the plugin here as it needs to stay alive
+  // for the lifetime of the application
+  g_object_ref(plugin);
 }
 
-// Compatibility wrapper for the legacy InAppWebViewFlutterPlugin naming
-// used by Flutter's generated_plugin_registrant.cc
-extern "C" FLUTTER_PLUGIN_EXPORT void
-in_app_web_view_flutter_plugin_register_with_registrar(
-    FlPluginRegistrar *registrar) {
+// === Helper functions for accessing Flutter view and window ===
+
+FlView* zikzak_inappwebview_linux_plugin_get_view(FlPluginRegistrar* registrar) {
+  if (registrar == nullptr) {
+    return nullptr;
+  }
+  return fl_plugin_registrar_get_view(registrar);
+}
+
+GtkWindow* zikzak_inappwebview_linux_plugin_get_window(FlPluginRegistrar* registrar) {
+  FlView* view = zikzak_inappwebview_linux_plugin_get_view(registrar);
+  if (view == nullptr) {
+    return nullptr;
+  }
+
+  GtkWidget* widget = GTK_WIDGET(view);
+  if (widget == nullptr) {
+    return nullptr;
+  }
+
+  GtkWidget* toplevel = gtk_widget_get_toplevel(widget);
+  if (toplevel == nullptr || !GTK_IS_WINDOW(toplevel)) {
+    return nullptr;
+  }
+
+  return GTK_WINDOW(toplevel);
+}
+
+int zikzak_inappwebview_linux_plugin_get_monitor_refresh_rate(FlPluginRegistrar* registrar) {
+  GtkWindow* window = zikzak_inappwebview_linux_plugin_get_window(registrar);
+  return zikzak_inappwebview_linux_plugin_get_monitor_refresh_rate_for_window(window);
+}
+
+int zikzak_inappwebview_linux_plugin_get_monitor_refresh_rate_for_window(GtkWindow* window) {
+  if (window == nullptr) {
+    return 0;
+  }
+
+  GdkWindow* gdk_window = gtk_widget_get_window(GTK_WIDGET(window));
+  if (gdk_window == nullptr) {
+    return 0;
+  }
+
+  GdkDisplay* display = gdk_display_get_default();
+  if (display == nullptr) {
+    return 0;
+  }
+
+  GdkMonitor* monitor = gdk_display_get_monitor_at_window(display, gdk_window);
+  if (monitor == nullptr) {
+    return 0;
+  }
+
+  // gdk_monitor_get_refresh_rate returns the refresh rate in millihertz
+  // (e.g., 60000 for 60 Hz)
+  return gdk_monitor_get_refresh_rate(monitor);
+}
+
+
+void in_app_web_view_flutter_plugin_register_with_registrar(
+    FlPluginRegistrar* registrar) {
   zikzak_inappwebview_linux_plugin_register_with_registrar(registrar);
 }

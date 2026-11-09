@@ -1,0 +1,20 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>zikzak Linux manual test</title>
+<style>body{font:16px sans-serif;margin:24px} section{margin:16px 0} textarea{width:100%;height:60px}</style></head>
+<body>
+<h1>Manual test</h1>
+<section>Text: <input id="t" placeholder="type here (IME, dead keys)"> <span id="echo"></span></section>
+<section><select id="s"><option>one</option><option>two</option><option>three</option></select> <span id="sel"></span></section>
+<section><button id="b">click me</button> <span id="clicks">0</span></section>
+<section><textarea>right-click here for the context menu; select text and copy</textarea></section>
+<section><a href="https://example.com/">link</a> &nbsp; <span id="size"></span></section>
+<div style="height:1500px;background:linear-gradient(#fff,#99c)">scroll me</div>
+<script>
+const $ = (id) => document.getElementById(id);
+$('t').addEventListener('input', e => $('echo').textContent = e.target.value);
+$('s').addEventListener('change', e => $('sel').textContent = 'selected ' + e.target.value);
+let n = 0; $('b').addEventListener('click', () => $('clicks').textContent = ++n);
+const size = () => $('size').textContent = innerWidth + '×' + innerHeight + ' @' + devicePixelRatio;
+addEventListener('resize', size); size();
+document.cookie = 'manual=1; path=/';
+</script></body></html>

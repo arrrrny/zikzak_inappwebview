@@ -1,16 +1,26 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
-
 import '../find_interaction/find_interaction_controller.dart';
+import '../util/debug_logging.dart';
+import '../util/wire.dart';
 import 'in_app_webview_controller.dart';
 
+/// Object specifying creation parameters for creating a [LinuxHeadlessInAppWebView].
+///
+/// When adding additional fields make sure they can be null or have a default
+/// value to avoid breaking changes. See [PlatformHeadlessInAppWebViewCreationParams] for
+/// more information.
+@immutable
 class LinuxHeadlessInAppWebViewCreationParams
     extends PlatformHeadlessInAppWebViewCreationParams {
-  LinuxHeadlessInAppWebViewCreationParams({
-    super.controllerFromPlatform,
+  /// Creates a new [LinuxHeadlessInAppWebViewCreationParams] instance.
+  const LinuxHeadlessInAppWebViewCreationParams({
     super.initialSize,
+    super.webViewEnvironment,
+    super.controllerFromPlatform,
     super.windowId,
     super.onWebViewCreated,
     super.onLoadStart,
@@ -69,6 +79,9 @@ class LinuxHeadlessInAppWebViewCreationParams
     super.onCameraCaptureStateChanged,
     super.onMicrophoneCaptureStateChanged,
     super.onContentSizeChanged,
+    super.onNetworkRequest,
+    super.onNetworkResponse,
+    super.onNetworkLoadingFinished,
     super.initialUrlRequest,
     super.initialFile,
     super.initialData,
@@ -76,14 +89,16 @@ class LinuxHeadlessInAppWebViewCreationParams
     super.contextMenu,
     super.initialUserScripts,
     super.pullToRefreshController,
-    this.findInteractionController,
+    LinuxFindInteractionController? super.findInteractionController,
   });
 
+  /// Creates a [LinuxHeadlessInAppWebViewCreationParams] instance based on [PlatformHeadlessInAppWebViewCreationParams].
   LinuxHeadlessInAppWebViewCreationParams.fromPlatformHeadlessInAppWebViewCreationParams(
     PlatformHeadlessInAppWebViewCreationParams params,
   ) : this(
-        controllerFromPlatform: params.controllerFromPlatform,
         initialSize: params.initialSize,
+        webViewEnvironment: params.webViewEnvironment,
+        controllerFromPlatform: params.controllerFromPlatform,
         windowId: params.windowId,
         onWebViewCreated: params.onWebViewCreated,
         onLoadStart: params.onLoadStart,
@@ -103,8 +118,7 @@ class LinuxHeadlessInAppWebViewCreationParams
         onJsConfirm: params.onJsConfirm,
         onJsPrompt: params.onJsPrompt,
         onReceivedHttpAuthRequest: params.onReceivedHttpAuthRequest,
-        onReceivedServerTrustAuthRequest:
-            params.onReceivedServerTrustAuthRequest,
+        onReceivedServerTrustAuthRequest: params.onReceivedServerTrustAuthRequest,
         onReceivedClientCertRequest: params.onReceivedClientCertRequest,
         shouldInterceptAjaxRequest: params.shouldInterceptAjaxRequest,
         onAjaxReadyStateChange: params.onAjaxReadyStateChange,
@@ -123,10 +137,8 @@ class LinuxHeadlessInAppWebViewCreationParams
         onZoomScaleChanged: params.onZoomScaleChanged,
         onSafeBrowsingHit: params.onSafeBrowsingHit,
         onPermissionRequest: params.onPermissionRequest,
-        onGeolocationPermissionsShowPrompt:
-            params.onGeolocationPermissionsShowPrompt,
-        onGeolocationPermissionsHidePrompt:
-            params.onGeolocationPermissionsHidePrompt,
+        onGeolocationPermissionsShowPrompt: params.onGeolocationPermissionsShowPrompt,
+        onGeolocationPermissionsHidePrompt: params.onGeolocationPermissionsHidePrompt,
         shouldInterceptRequest: params.shouldInterceptRequest,
         onRenderProcessGone: params.onRenderProcessGone,
         onRenderProcessResponsive: params.onRenderProcessResponsive,
@@ -139,13 +151,15 @@ class LinuxHeadlessInAppWebViewCreationParams
         onPermissionRequestCanceled: params.onPermissionRequestCanceled,
         onRequestFocus: params.onRequestFocus,
         onWebContentProcessDidTerminate: params.onWebContentProcessDidTerminate,
-        onDidReceiveServerRedirectForProvisionalNavigation:
-            params.onDidReceiveServerRedirectForProvisionalNavigation,
+        onDidReceiveServerRedirectForProvisionalNavigation: params.onDidReceiveServerRedirectForProvisionalNavigation,
         onNavigationResponse: params.onNavigationResponse,
         shouldAllowDeprecatedTLS: params.shouldAllowDeprecatedTLS,
         onCameraCaptureStateChanged: params.onCameraCaptureStateChanged,
         onMicrophoneCaptureStateChanged: params.onMicrophoneCaptureStateChanged,
         onContentSizeChanged: params.onContentSizeChanged,
+        onNetworkRequest: params.onNetworkRequest,
+        onNetworkResponse: params.onNetworkResponse,
+        onNetworkLoadingFinished: params.onNetworkLoadingFinished,
         initialUrlRequest: params.initialUrlRequest,
         initialFile: params.initialFile,
         initialData: params.initialData,
@@ -158,9 +172,11 @@ class LinuxHeadlessInAppWebViewCreationParams
       );
 
   @override
-  final LinuxFindInteractionController? findInteractionController;
+  LinuxFindInteractionController? get findInteractionController =>
+      super.findInteractionController as LinuxFindInteractionController?;
 }
 
+///{@macro zikzak_inappwebview_platform_interface.PlatformHeadlessInAppWebView}
 class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     with ChannelController {
   @override
@@ -169,18 +185,12 @@ class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
   bool _started = false;
   bool _running = false;
 
-  /// Tracks whether [dispose] has been called.
-  ///
-  /// Kept separate from [_running] so that a [dispose] call issued while
-  /// [run] is still in flight is not silently ignored.
+  /// Set by [dispose]; kept apart from [_running] so that a [dispose] issued
+  /// while [run] is still in flight is not ignored.
   bool _disposed = false;
 
   /// Completes when an in-flight [run] finishes, including the deferred
   /// native teardown it performs when [dispose] was called mid-startup.
-  ///
-  /// [dispose] waits on this so that `await dispose()` only returns once
-  /// the native side has been fully released. `null` when no [run] is in
-  /// flight.
   Completer<void>? _runCompleter;
 
   static const MethodChannel _sharedChannel = MethodChannel(
@@ -189,6 +199,7 @@ class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
 
   LinuxInAppWebViewController? _webViewController;
 
+  /// Constructs a [LinuxHeadlessInAppWebView].
   LinuxHeadlessInAppWebView(PlatformHeadlessInAppWebViewCreationParams params)
     : super.implementation(
         params is LinuxHeadlessInAppWebViewCreationParams
@@ -200,10 +211,16 @@ class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     id = IdGenerator.generate();
   }
 
+  static final LinuxHeadlessInAppWebView _staticValue =
+      LinuxHeadlessInAppWebView(LinuxHeadlessInAppWebViewCreationParams());
+
+  factory LinuxHeadlessInAppWebView.static() {
+    return _staticValue;
+  }
+
   @override
   LinuxInAppWebViewController? get webViewController => _webViewController;
 
-  dynamic get controllerFromPlatform => _controllerFromPlatform;
   dynamic _controllerFromPlatform;
 
   LinuxHeadlessInAppWebViewCreationParams get _linuxParams =>
@@ -211,22 +228,16 @@ class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
 
   void _init() {
     _webViewController = LinuxInAppWebViewController(
-      PlatformInAppWebViewControllerCreationParams(
-        id: id,
-        webviewParams: params,
-      ),
+      LinuxInAppWebViewControllerCreationParams(id: id, webviewParams: params),
     );
     _controllerFromPlatform =
         params.controllerFromPlatform?.call(_webViewController!) ??
         _webViewController!;
-    if (_linuxParams.findInteractionController != null) {
-      _linuxParams.findInteractionController!.channel = MethodChannel(
-        'wtf.zikzak/zikzak_inappwebview_find_interaction_$id',
-      );
-      _linuxParams.findInteractionController!.setupMethodHandler();
-    }
-
-    channel = MethodChannel('wtf.zikzak/flutter_headless_inappwebview_$id');
+    // Initialize the find interaction controller with the same ID
+    _linuxParams.findInteractionController?.init(id);
+    channel = MethodChannel(
+      'wtf.zikzak/flutter_headless_inappwebview_$id',
+    );
     handler = _handleMethod;
     initMethodCallHandler();
   }
@@ -252,24 +263,18 @@ class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     _started = true;
     _init();
 
-    var initialSettings = params.initialSettings ?? InAppWebViewSettings();
-    initialSettings = _inferInitialSettings(initialSettings);
-
-    Map<String, dynamic> settingsMap =
-        (params.initialSettings != null ? initialSettings.toJson() : null) ??
-        initialSettings.toJson();
-
-    Map<String, dynamic> pullToRefreshSettings = PullToRefreshSettings(
-      enabled: false,
-    ).toJson();
-
-    Map<String, dynamic> findInteractionSettings =
-        _linuxParams.findInteractionController?.onFindResultReceived != null
-        ? {}
-        : {};
+    final initialSettings = _inferInitialSettings(
+      params.initialSettings ?? InAppWebViewSettings(),
+    );
+    Map<String, dynamic> settingsMap = withAjaxEventFlags(
+      inAppWebViewSettingsToWire(initialSettings),
+      onReadyStateChange: params.onAjaxReadyStateChange != null,
+      onProgress: params.onAjaxProgress != null,
+    );
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('id', () => id);
+    args.putIfAbsent(debugLoggingEnabledArg, () => nativeDebugLoggingEnabled);
     args.putIfAbsent(
       'params',
       () => <String, dynamic>{
@@ -277,12 +282,10 @@ class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
         'initialFile': params.initialFile,
         'initialData': params.initialData?.toJson(),
         'initialSettings': settingsMap,
-        'contextMenu': params.contextMenu?.toJson() ?? {},
+        'contextMenu': params.contextMenu?.toMap() ?? {},
         'windowId': params.windowId,
         'initialUserScripts':
-            params.initialUserScripts?.map((e) => e.toJson()).toList() ?? [],
-        'pullToRefreshSettings': pullToRefreshSettings,
-        'findInteractionSettings': findInteractionSettings,
+            params.initialUserScripts?.map(userScriptToWire).toList() ?? [],
         'initialSize': params.initialSize.toJson(),
       },
     );
@@ -293,11 +296,15 @@ class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
       _running = true;
       if (_disposed) {
         // dispose() was called while the native WebView was still starting:
-        // tear it down now that the native side exists.
+        // tear it down now that it exists.
         await _disposeNative();
       }
+    } catch (e) {
+      // Release what _init() created, so a retried run() starts clean.
+      _releaseDart();
+      rethrow;
     } finally {
-      // Unblock a dispose() call waiting for this in-flight run().
+      // Unblock a dispose() waiting for this run().
       runCompleter.complete();
       if (identical(_runCompleter, runCompleter)) {
         _runCompleter = null;
@@ -318,13 +325,19 @@ class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
         settings.useOnDownloadStart == null) {
       inferred = inferred.copyWith(useOnDownloadStart: true);
     }
-    if (params.shouldInterceptAjaxRequest != null &&
+    if ((params.shouldInterceptAjaxRequest != null ||
+            params.onAjaxProgress != null ||
+            params.onAjaxReadyStateChange != null) &&
         settings.useShouldInterceptAjaxRequest == null) {
       inferred = inferred.copyWith(useShouldInterceptAjaxRequest: true);
     }
     if (params.shouldInterceptFetchRequest != null &&
         settings.useShouldInterceptFetchRequest == null) {
       inferred = inferred.copyWith(useShouldInterceptFetchRequest: true);
+    }
+    if (params.shouldInterceptRequest != null &&
+        settings.useShouldInterceptRequest == null) {
+      inferred = inferred.copyWith(useShouldInterceptRequest: true);
     }
     if (params.onRenderProcessGone != null &&
         settings.useOnRenderProcessGone == null) {
@@ -360,10 +373,10 @@ class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     }
 
     Map<String, dynamic> args = <String, dynamic>{};
-    Map<String, dynamic> sizeMap = (await channel?.invokeMethod(
-      'getSize',
-      args,
-    ))?.cast<String, dynamic>();
+    final sizeMap = wireMap(await channel?.invokeMethod('getSize', args));
+    if (sizeMap == null) {
+      return null;
+    }
     return MapSize.fromMap(sizeMap);
   }
 
@@ -374,9 +387,8 @@ class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     }
     _disposed = true;
     if (!_running) {
-      // run() has not completed yet (or was never called). If it is still
-      // in flight, wait for it: run() performs the native cleanup itself
-      // once the native side is up. Otherwise there is nothing to release.
+      // run() has not finished (or was never called). If it is in flight,
+      // wait for it: it releases the native side itself once it exists.
       await _runCompleter?.future;
       return;
     }
@@ -384,27 +396,30 @@ class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
   }
 
   Future<void> _disposeNative() async {
-    // Isolate each teardown step so that a single failure (for example the
-    // native side already being gone) cannot leave the rest undisposed.
     try {
-      await _sharedChannel.invokeMethod('dispose', <String, dynamic>{'id': id});
-    } catch (_) {
-      // The native WebView may already be gone; continue local teardown.
+      Map<String, dynamic> args = <String, dynamic>{};
+      await channel?.invokeMethod('dispose', args);
+    } finally {
+      // Release the Dart side even when native teardown fails.
+      _releaseDart();
     }
+  }
+
+  /// Releases the channel, controller and find controller [_init] set up.
+  void _releaseDart() {
     disposeChannel();
     _started = false;
     _running = false;
-    try {
-      _webViewController?.dispose();
-    } catch (_) {
-      // Ignore controller teardown failures.
-    }
+    _webViewController?.dispose();
     _webViewController = null;
     _controllerFromPlatform = null;
-    try {
-      _linuxParams.findInteractionController?.dispose();
-    } catch (_) {
-      // Ignore auxiliary controller teardown failures.
-    }
+    _linuxParams.findInteractionController?.dispose();
+  }
+}
+
+extension InternalHeadlessInAppWebView on LinuxHeadlessInAppWebView {
+  Future<void> internalDispose() async {
+    _started = false;
+    _running = false;
   }
 }

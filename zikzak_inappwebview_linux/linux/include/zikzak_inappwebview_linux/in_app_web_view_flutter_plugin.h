@@ -1,22 +1,21 @@
-#ifndef FLUTTER_PLUGIN_IN_APP_WEB_VIEW_FLUTTER_PLUGIN_H_
-#define FLUTTER_PLUGIN_IN_APP_WEB_VIEW_FLUTTER_PLUGIN_H_
+#ifndef ZIKZAK_INAPPWEBVIEW_LINUX_IN_APP_WEB_VIEW_FLUTTER_PLUGIN_H_
+#define ZIKZAK_INAPPWEBVIEW_LINUX_IN_APP_WEB_VIEW_FLUTTER_PLUGIN_H_
 
 #include <flutter_linux/flutter_linux.h>
 
-#ifndef FLUTTER_PLUGIN_EXPORT
+#ifdef FLUTTER_PLUGIN_IMPL
+#define FLUTTER_PLUGIN_EXPORT __attribute__((visibility("default")))
+#else
 #define FLUTTER_PLUGIN_EXPORT
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+G_BEGIN_DECLS
 
-FLUTTER_PLUGIN_EXPORT void
-in_app_web_view_flutter_plugin_register_with_registrar(
-    FlPluginRegistrar *registrar);
+// Entry point named after pubspec.yaml's `pluginClass: InAppWebViewFlutterPlugin`,
+// which Flutter's generated_plugin_registrant.cc calls.
+FLUTTER_PLUGIN_EXPORT void in_app_web_view_flutter_plugin_register_with_registrar(
+    FlPluginRegistrar* registrar);
 
-#ifdef __cplusplus
-}
-#endif
+G_END_DECLS
 
-#endif // FLUTTER_PLUGIN_IN_APP_WEB_VIEW_FLUTTER_PLUGIN_H_
+#endif  // ZIKZAK_INAPPWEBVIEW_LINUX_IN_APP_WEB_VIEW_FLUTTER_PLUGIN_H_
