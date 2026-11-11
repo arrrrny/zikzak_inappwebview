@@ -704,6 +704,26 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
     await _channel.invokeMethod('injectJavascriptFileFromUrl', args);
   }
 
+  // Issue #419: the asset variants, same failure class as #416 — the call
+  // died on the platform-interface stub (UnimplementedError) before reaching
+  // the channel. Like iOS, they are pure Dart: the asset file is loaded to
+  // a string with rootBundle and dispatched through the already-implemented
+  // injectCSSCode / evaluateJavascript channel calls (the native Swift side
+  // has no inject*FileFromAsset cases of its own).
+  @override
+  Future<dynamic> injectJavascriptFileFromAsset({
+    required String assetFilePath,
+  }) async {
+    String source = await rootBundle.loadString(assetFilePath);
+    return await evaluateJavascript(source: source);
+  }
+
+  @override
+  Future<void> injectCSSFileFromAsset({required String assetFilePath}) async {
+    String source = await rootBundle.loadString(assetFilePath);
+    await injectCSSCode(source: source);
+  }
+
   @override
   Future<void> pressKey({
     required String key,
