@@ -1,6 +1,7 @@
 import AuthenticationServices
 import Cocoa
 import Foundation
+import LocalAuthentication
 import WebKit
 
 /// Issue #358 — WebAuthn/passkey ceremonies over `ASAuthorizationController`.
@@ -64,20 +65,29 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
 
     // MARK: - Availability
 
-    /// Window/presentation check only — NOT an entitlement or consent probe.
-    /// `true` here means the webview can present the ASAuthorization sheet;
-    /// whether the host actually carries the
-    /// `com.apple.developer.web-browser.authentication-services` entitlement
-    /// (and the user has enabled browser passkeys) is only enforced by
-    /// ASCAgent at ceremony time, so an unentitled host advertises `true`
-    /// here and then fails every ceremony. Sites gate passkey UX on this
-    /// static; consulting `ASAuthorizationWebBrowserPublicKeyCredentialManager`
-    /// (macOS 14.2+) is the follow-up for real fidelity.
+    /// Capability check — NOT an entitlement, consent, or presentation probe.
+    /// The WebAuthn static answers whether a user-verifying platform
+    /// authenticator EXISTS on this machine; it must not depend on this
+    /// document being currently presentable. Safari answers `true` for
+    /// background tabs, and sites gate their passkey UX on the static — a
+    /// window-presence check here made every hidden tab advertise "no
+    /// platform authenticator" (issue #422; consumer report
+    /// zuraffa_browser#836, ASC's red "browser needs to be updated"
+    /// warning). Presentation stays a ceremony-time concern:
+    /// `beginCeremony` still fails with NotAllowedError when there is no
+    /// window to anchor the sheet to.
+    ///
+    /// `ASAuthorizationWebBrowserPublicKeyCredentialManager` carries no
+    /// availability query before macOS 26.2 (`isDeviceConfiguredForPasskeys`),
+    /// so on the 12.0 deployment target the floor is LAContext: Touch ID
+    /// hardware (or an equivalent enrolled biometry) IS the user-verifying
+    /// platform authenticator on macOS.
     private func isPlatformAuthenticatorAvailable() -> Bool {
-        guard let webView = webView, !webView.isHeadlessOffscreen, webView.window != nil else {
+        guard let webView = webView, !webView.isHeadlessOffscreen else {
             return false
         }
-        return true
+        var error: NSError?
+        return LAContext().canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error)
     }
 
     // MARK: - base64url
