@@ -27,6 +27,11 @@ From the makers of this plugin: **[Zuraffa Browser](https://zuraffa.com)** — t
 
 [**Download Zuraffa Browser →**](https://apps.apple.com/app/id6811352058)
 
+<div align="center">
+<a href="https://www.producthunt.com/products/zuraffa-browser?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-zuraffa-browser" target="_blank" rel="noopener noreferrer"><img alt="Zuraffa Browser - Solves all CAPTCHAs with 100% Accuracy.  | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1312357&amp;theme=light&amp;t=1794403507600"></a>
+</div>
+
+
 
 [**Documentation**](https://arrrrny.github.io/zikzak_inappwebview/) | [**Pub.dev**](https://pub.dev/packages/zikzak_inappwebview) | [**API Reference**](https://pub.dev/documentation/zikzak_inappwebview/latest/) | [**Changelog**](https://github.com/arrrrny/zikzak_inappwebview/blob/master/zikzak_inappwebview/CHANGELOG.md)
 
