@@ -144,6 +144,80 @@ void main() {
     });
   });
 
+  group('isUvPaa availability contract (issue #422)', () {
+    late String source;
+
+    setUpAll(() {
+      source = bridgeSwift.readAsStringSync();
+    });
+
+    /// Extracts a Swift function body: from the signature line to the first
+    /// closing brace at the function's own indentation (4 spaces).
+    String functionBody(String signature) {
+      final start = source.indexOf(signature);
+      expect(start, isNot(-1), reason: 'signature not found: $signature');
+      final end = source.indexOf('\n    }', start);
+      expect(end, isNot(-1), reason: 'function body not found: $signature');
+      return source.substring(start, end);
+    }
+
+    test('the availability static never reads window presence', () {
+      // isUvPaa must report whether a user-verifying platform authenticator
+      // EXISTS on this machine — Safari answers true for background tabs, and
+      // sites gate their passkey UX on the static (ASC's red "browser needs
+      // to be updated" warning, zuraffa_browser#836). A background tab's
+      // WebView has no window, so a window-presence check answers false
+      // there and every hidden tab advertises "no platform authenticator".
+      final body = functionBody(
+        'private func isPlatformAuthenticatorAvailable() -> Bool {',
+      );
+      expect(
+        body,
+        isNot(contains('.window')),
+        reason:
+            'the availability static must not read webView.window — window '
+            'presence is a ceremony-time concern (beginCeremony), not a '
+            'capability answer (issue #422)',
+      );
+    });
+
+    test('the availability static still fails fast for headless webviews', () {
+      // The headless/offscreen fail-fast stance is app-side pinned
+      // (zuraffa_browser test/platform/macos_headless_webauthn_test.dart) and
+      // is independent of the window-presence decoupling.
+      final body = functionBody(
+        'private func isPlatformAuthenticatorAvailable() -> Bool {',
+      );
+      expect(body, contains('isHeadlessOffscreen'));
+    });
+
+    test('the availability static answers from platform capability', () {
+      // LAContext's biometry query is the capability floor: Touch ID
+      // hardware is the user-verifying platform authenticator on macOS.
+      // (ASAuthorizationWebBrowserPublicKeyCredentialManager carries no
+      // availability query before macOS 26.2, so it cannot answer the
+      // static on the deployment target.)
+      final body = functionBody(
+        'private func isPlatformAuthenticatorAvailable() -> Bool {',
+      );
+      expect(body, contains('LAContext'));
+      expect(body, contains('canEvaluatePolicy'));
+      expect(body, contains('deviceOwnerAuthenticationWithBiometrics'));
+      expect(source, contains('import LocalAuthentication'));
+    });
+
+    test('the window check stays at ceremony time', () {
+      // Decoupling the static must not remove the ceremony-time guard:
+      // presenting the passkey sheet still requires a window, and
+      // beginCeremony is where that failure belongs (NotAllowedError).
+      final body = functionBody(
+        'private func beginCeremony(completion: @escaping ([String: Any]) -> Void) -> Bool {',
+      );
+      expect(body, contains('webView.window != nil'));
+      expect(body, contains('no window to present the passkey sheet'));
+    });
+  });
+
   group('PasskeysJS.swift shim (issue #358)', () {
     late String source;
 
@@ -176,17 +250,14 @@ void main() {
       expect(source, contains("callHandler('PasskeyBridge'"));
     });
 
-    test(
-      'interpolates the JS bridge name (no literal backslash-paren in emitted JS)',
-      () {
-        // A `\\(` inside the Swift multiline string emits a literal
-        // backslash — a JS SyntaxError that kills the whole shim IIFE while
-        // every `contains` assertion still passes. Pin the interpolation
-        // contract so the next escape slip goes red.
-        expect(source, contains(r'window.\(JAVASCRIPT_BRIDGE_NAME)'));
-        expect(source, isNot(contains(r'window.\\(')));
-      },
-    );
+    test('interpolates the JS bridge name (no literal backslash-paren in emitted JS)', () {
+      // A `\\(` inside the Swift multiline string emits a literal
+      // backslash — a JS SyntaxError that kills the whole shim IIFE while
+      // every `contains` assertion still passes. Pin the interpolation
+      // contract so the next escape slip goes red.
+      expect(source, contains(r'window.\(JAVASCRIPT_BRIDGE_NAME)'));
+      expect(source, isNot(contains(r'window.\\(')));
+    });
 
     test('normalizes the top-level rpId for authentication options', () {
       // PublicKeyCredentialRequestOptions carries the optional rpId at the
