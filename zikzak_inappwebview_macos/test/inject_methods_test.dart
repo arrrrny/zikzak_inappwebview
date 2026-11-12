@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
@@ -155,5 +157,88 @@ void main() {
         expect(loaded, isFalse);
       },
     );
+  });
+
+  group('inject-* asset variants (issue #419)', () {
+    // The asset variants must not throw UnimplementedError. The native
+    // macOS side has no inject*FileFromAsset channel cases — the contract
+    // (mirroring the iOS controller) is pure Dart: load the asset string
+    // with rootBundle, then dispatch through the already-implemented
+    // injectCSSCode / evaluateJavascript channel calls.
+    const cssAssetPath = 'assets/test/issue-419-style.css';
+    const jsAssetPath = 'assets/test/issue-419-app.js';
+
+    setUp(() {
+      final assets = <String, String>{
+        cssAssetPath: 'body { background: green; }',
+        jsAssetPath: 'console.log("issue-419");',
+      };
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMessageHandler('flutter/assets', (ByteData? message) async {
+            if (message == null) {
+              return null;
+            }
+            final requested = utf8.decode(message.buffer.asUint8List());
+            final content = assets[requested];
+            if (content == null) {
+              return null;
+            }
+            return ByteData.sublistView(
+              Uint8List.fromList(utf8.encode(content)),
+            );
+          });
+      addTearDown(() {
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMessageHandler('flutter/assets', null);
+      });
+    });
+
+    test(
+      'injectCSSFileFromAsset loads the asset and forwards via injectCSSCode',
+      () async {
+        await controller.injectCSSFileFromAsset(assetFilePath: cssAssetPath);
+
+        expect(calls, hasLength(1));
+        final call = calls.single;
+        expect(call.method, equals('injectCSSCode'));
+        final args = (call.arguments as Map).cast<String, dynamic>();
+        expect(args['source'], equals('body { background: green; }'));
+      },
+    );
+
+    test('injectJavascriptFileFromAsset loads the asset and forwards via evaluateJavascript', () async {
+      final result = await controller.injectJavascriptFileFromAsset(
+        assetFilePath: jsAssetPath,
+      );
+
+      // The mocked channel returns true, and evaluateJavascript must
+      // surface it through the asset variant.
+      expect(result, isTrue);
+      expect(calls, hasLength(1));
+      final call = calls.single;
+      expect(call.method, equals('evaluateJavascript'));
+      final args = (call.arguments as Map).cast<String, dynamic>();
+      expect(args['source'], equals('console.log("issue-419");'));
+    });
+
+    test('injectCSSFileFromAsset throws when asset is missing', () async {
+      expect(
+        () => controller.injectCSSFileFromAsset(
+          assetFilePath: 'assets/test/does-not-exist.css',
+        ),
+        throwsA(anything),
+      );
+      expect(calls, isEmpty);
+    });
+
+    test('injectJavascriptFileFromAsset throws when asset is missing', () async {
+      expect(
+        () => controller.injectJavascriptFileFromAsset(
+          assetFilePath: 'assets/test/does-not-exist.js',
+        ),
+        throwsA(anything),
+      );
+      expect(calls, isEmpty);
+    });
   });
 }
