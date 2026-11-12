@@ -220,5 +220,25 @@ void main() {
       final args = (call.arguments as Map).cast<String, dynamic>();
       expect(args['source'], equals('console.log("issue-419");'));
     });
+
+    test('injectCSSFileFromAsset throws when asset is missing', () async {
+      expect(
+        () => controller.injectCSSFileFromAsset(
+          assetFilePath: 'assets/test/does-not-exist.css',
+        ),
+        throwsA(anything),
+      );
+      expect(calls, isEmpty);
+    });
+
+    test('injectJavascriptFileFromAsset throws when asset is missing', () async {
+      expect(
+        () => controller.injectJavascriptFileFromAsset(
+          assetFilePath: 'assets/test/does-not-exist.js',
+        ),
+        throwsA(anything),
+      );
+      expect(calls, isEmpty);
+    });
   });
 }
