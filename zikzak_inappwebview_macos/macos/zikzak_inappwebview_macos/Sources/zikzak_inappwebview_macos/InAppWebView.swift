@@ -560,6 +560,31 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                             self?.load(request)
                         }
                     }
+                } else if let initialData = args["initialData"] as? [String: Any] {
+                    // #425: the GUI creation path handled initialUrlRequest only
+                    // — an initialData webview armed the readiness gate but
+                    // never issued any load, rendering a blank about:blank
+                    // forever. Mirror makeInitialLoad's data branch through the
+                    // same #197 readiness and #338 content-rule gates.
+                    debugLog("INITIAL_LOAD_DATA")
+                    let data = initialData["data"] as? String ?? ""
+                    let mimeType = initialData["mimeType"] as? String ?? "text/html"
+                    let encoding = initialData["encoding"] as? String ?? "utf-8"
+                    let baseURL =
+                        URL(string: initialData["baseUrl"] as? String ?? "about:blank")
+                        ?? URL(string: "about:blank")!
+                    let dataData = data.data(using: .utf8)
+                    self.performLoad { [weak self] in
+                        self?.loadAfterContentRuleLists { [weak self] in
+                            if let dataData = dataData {
+                                self?.load(
+                                    dataData, mimeType: mimeType,
+                                    characterEncodingName: encoding, baseURL: baseURL)
+                            } else {
+                                self?.loadHTMLString(data, baseURL: baseURL)
+                            }
+                        }
+                    }
                 }
             }
 
