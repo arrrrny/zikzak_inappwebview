@@ -560,6 +560,20 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                             self?.load(request)
                         }
                     }
+                } else if args["initialData"] != nil {
+                    // #425: the GUI creation path handled initialUrlRequest only
+                    // — an initialData webview armed the readiness gate but
+                    // never issued any load, rendering a blank about:blank
+                    // forever. The load itself comes from the shared
+                    // loadInitialData, so this path cannot drift from
+                    // makeInitialLoad's data branch; #197 readiness and #338
+                    // content-rule gates wrap the shared loader as below.
+                    debugLog("INITIAL_LOAD_DATA")
+                    self.performLoad { [weak self] in
+                        self?.loadAfterContentRuleLists { [weak self] in
+                            self?.loadInitialData(args["initialData"] as? [String: Any] ?? [:])
+                        }
+                    }
                 }
             }
 
@@ -660,20 +674,31 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 self.load(URLRequest(url: fileURL))
             }
         } else if let initialData = initialData {
-            let data = initialData["data"] as? String ?? ""
-            let mimeType = initialData["mimeType"] as? String ?? "text/html"
-            let encoding = initialData["encoding"] as? String ?? "utf-8"
-            let baseURL = URL(string: initialData["baseUrl"] as? String ?? "about:blank")
-            if let dataData = data.data(using: .utf8) {
-                self.load(
-                    dataData, mimeType: mimeType,
-                    characterEncodingName: encoding, baseURL: baseURL ?? URL(string: "about:blank")!)
-            } else {
-                self.loadHTMLString(data, baseURL: baseURL)
-            }
+            self.loadInitialData(initialData)
         } else if let initialUrlRequest = initialUrlRequest {
             let request = URLRequest(fromPluginMap: initialUrlRequest)
             self.load(request)
+        }
+    }
+
+    ///Issues the `initialData` load from the creation [params] (GUI and
+    ///headless paths share this body, so the two cannot drift).
+    ///
+    ///Reads the `data` / `mimeType` / `encoding` / `baseUrl` keys of the
+    ///`InAppWebViewInitialData` JSON. Falls back to `loadHTMLString` when the
+    ///payload is not valid UTF-8.
+    private func loadInitialData(_ initialData: [String: Any]) {
+        let data = initialData["data"] as? String ?? ""
+        let mimeType = initialData["mimeType"] as? String ?? "text/html"
+        let encoding = initialData["encoding"] as? String ?? "utf-8"
+        let baseURL = URL(string: initialData["baseUrl"] as? String ?? "about:blank")
+            ?? URL(string: "about:blank")!
+        if let dataData = data.data(using: .utf8) {
+            self.load(
+                dataData, mimeType: mimeType,
+                characterEncodingName: encoding, baseURL: baseURL)
+        } else {
+            self.loadHTMLString(data, baseURL: baseURL)
         }
     }
 
