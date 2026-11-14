@@ -77,17 +77,42 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
     /// `beginCeremony` still fails with NotAllowedError when there is no
     /// window to anchor the sheet to.
     ///
-    /// `ASAuthorizationWebBrowserPublicKeyCredentialManager` carries no
-    /// availability query before macOS 26.2 (`isDeviceConfiguredForPasskeys`),
-    /// so on the 12.0 deployment target the floor is LAContext: Touch ID
-    /// hardware (or an equivalent enrolled biometry) IS the user-verifying
-    /// platform authenticator on macOS.
+    /// The authoritative probe is the browser passkey manager's
+    /// `isDeviceConfiguredForPasskeys` (class static, macOS 26.2+): it
+    /// answers whether the DEVICE is configured for passkeys. Touch ID
+    /// enrollment is NOT a capability gate — a fingerprint-less Mac still
+    /// verifies ceremonies with the login password, and a biometrics-only
+    /// floor answered false on every configured-but-fingerprint-less Mac
+    /// (issue #427; consumer report zuraffa_browser#836 — ASC's red
+    /// "browser needs to be updated" warning, again). Below 26.2 the floor
+    /// is LAContext `.deviceOwnerAuthentication` — biometrics OR the
+    /// account password — never biometrics-only.
     private func isPlatformAuthenticatorAvailable() -> Bool {
         guard let webView = webView, !webView.isHeadlessOffscreen else {
             return false
         }
         var error: NSError?
-        return LAContext().canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error)
+        if #available(macOS 26.2, *) {
+            // `isDeviceConfiguredForPasskeys` is only declared in the macOS
+            // 26.2 SDK, but this package compiles against older SDKs (CI
+            // builds the macOS package on the macOS 15 SDK), where a direct
+            // static call is a compile error even behind `#available`. The
+            // class-property getter is resolved through the ObjC runtime
+            // instead, and a class without the getter falls back to the
+            // LAContext floor below.
+            let managerClass: NSObject.Type =
+                ASAuthorizationWebBrowserPublicKeyCredentialManager.self
+            let selector = NSSelectorFromString("isDeviceConfiguredForPasskeys")
+            if let method = class_getClassMethod(managerClass, selector) {
+                typealias ClassGetter = @convention(c) (AnyObject, Selector) -> Bool
+                let getter = unsafeBitCast(
+                    method_getImplementation(method),
+                    to: ClassGetter.self
+                )
+                return getter(managerClass, selector)
+            }
+        }
+        return LAContext().canEvaluatePolicy(.deviceOwnerAuthentication, error: &error)
     }
 
     // MARK: - base64url

@@ -142,6 +142,27 @@ void main() {
       // instead of hanging the JS promise.
       expect(source, contains('isHeadlessOffscreen'));
     });
+    test(
+      'answers isUvPaa from device passkey configuration, not Touch ID enrollment (#427)',
+      () {
+        // A configured Mac without an enrolled fingerprint still verifies
+        // passkey ceremonies with the login password: the biometrics-only
+        // LAContext floor answered false there and re-broke ASC
+        // (zuraffa_browser#836). Measured 2026-11-14, macOS 26.7.1:
+        // biometrics false, deviceOwnerAuthentication true,
+        // isDeviceConfiguredForPasskeys true.
+        expect(source, contains('isDeviceConfiguredForPasskeys'));
+        expect(source, contains('deviceOwnerAuthentication'));
+        expect(
+          source,
+          isNot(contains('deviceOwnerAuthenticationWithBiometrics')),
+          reason:
+              'the biometrics-only floor answered false on every '
+              'fingerprint-less configured Mac (issue #427)',
+        );
+        expect(source, contains('if #available(macOS 26.2'));
+      },
+    );
   });
 
   group('isUvPaa availability contract (issue #422)', () {
@@ -192,17 +213,17 @@ void main() {
     });
 
     test('the availability static answers from platform capability', () {
-      // LAContext's biometry query is the capability floor: Touch ID
-      // hardware is the user-verifying platform authenticator on macOS.
-      // (ASAuthorizationWebBrowserPublicKeyCredentialManager carries no
-      // availability query before macOS 26.2, so it cannot answer the
-      // static on the deployment target.)
+      // The platform capability is the device's passkey configuration
+      // (isDeviceConfiguredForPasskeys, macOS 26.2+), with the LAContext
+      // deviceOwnerAuthentication query — biometrics OR the login
+      // password — as the pre-26.2 fallback. Biometrics-only enrollment
+      // never was the capability floor (issue #427).
       final body = functionBody(
         'private func isPlatformAuthenticatorAvailable() -> Bool {',
       );
       expect(body, contains('LAContext'));
       expect(body, contains('canEvaluatePolicy'));
-      expect(body, contains('deviceOwnerAuthenticationWithBiometrics'));
+      expect(body, contains('deviceOwnerAuthentication'));
       expect(source, contains('import LocalAuthentication'));
     });
 
