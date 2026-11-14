@@ -93,6 +93,11 @@ private func javaScriptExceptionMessage(_ error: Error) -> String {
 /// change degrades to a missing key instead of a channel-encoder surprise. A
 /// failure that carries none of those keys (a transport-level error) keeps the
 /// previous shape: the localized description with `details: nil`.
+/// The error code a failed createPdf answers with (#970): the Dart consumer
+/// (zuraffa_browser's createPdf seam) branches on it to escalate the native
+/// failure as a typed PDF export error.
+private let createPdfFailedCode = "createPdfFailed"
+
 private func javaScriptExceptionError(_ error: Error) -> FlutterError {
     let nsError = error as NSError
     let userInfo = nsError.userInfo
@@ -1106,7 +1111,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                                type: .error,
                                nsError.description)
                         result(FlutterError(
-                            code: "createPdfFailed",
+                            code: createPdfFailedCode,
                             message: nsError.localizedDescription,
                             details: [
                                 "domain": nsError.domain,
