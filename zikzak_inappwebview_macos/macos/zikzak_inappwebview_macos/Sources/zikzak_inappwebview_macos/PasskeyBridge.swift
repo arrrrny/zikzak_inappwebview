@@ -93,8 +93,24 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
         }
         var error: NSError?
         if #available(macOS 26.2, *) {
-            return ASAuthorizationWebBrowserPublicKeyCredentialManager
-                .isDeviceConfiguredForPasskeys
+            // `isDeviceConfiguredForPasskeys` is only declared in the macOS
+            // 26.2 SDK, but this package compiles against older SDKs (CI
+            // builds the macOS package on the macOS 15 SDK), where a direct
+            // static call is a compile error even behind `#available`. The
+            // class-property getter is resolved through the ObjC runtime
+            // instead, and a class without the getter falls back to the
+            // LAContext floor below.
+            let managerClass: NSObject.Type =
+                ASAuthorizationWebBrowserPublicKeyCredentialManager.self
+            let selector = NSSelectorFromString("isDeviceConfiguredForPasskeys")
+            if let method = class_getClassMethod(managerClass, selector) {
+                typealias ClassGetter = @convention(c) (AnyObject, Selector) -> Bool
+                let getter = unsafeBitCast(
+                    method_getImplementation(method),
+                    to: ClassGetter.self
+                )
+                return getter(managerClass, selector)
+            }
         }
         return LAContext().canEvaluatePolicy(.deviceOwnerAuthentication, error: &error)
     }

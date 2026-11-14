@@ -213,17 +213,17 @@ void main() {
     });
 
     test('the availability static answers from platform capability', () {
-      // LAContext's biometry query is the capability floor: Touch ID
-      // hardware is the user-verifying platform authenticator on macOS.
-      // (ASAuthorizationWebBrowserPublicKeyCredentialManager carries no
-      // availability query before macOS 26.2, so it cannot answer the
-      // static on the deployment target.)
+      // The platform capability is the device's passkey configuration
+      // (isDeviceConfiguredForPasskeys, macOS 26.2+), with the LAContext
+      // deviceOwnerAuthentication query — biometrics OR the login
+      // password — as the pre-26.2 fallback. Biometrics-only enrollment
+      // never was the capability floor (issue #427).
       final body = functionBody(
         'private func isPlatformAuthenticatorAvailable() -> Bool {',
       );
       expect(body, contains('LAContext'));
       expect(body, contains('canEvaluatePolicy'));
-      expect(body, contains('deviceOwnerAuthenticationWithBiometrics'));
+      expect(body, contains('deviceOwnerAuthentication'));
       expect(source, contains('import LocalAuthentication'));
     });
 
