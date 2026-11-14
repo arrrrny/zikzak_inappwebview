@@ -20,7 +20,12 @@ dependencies:
     sdk: flutter
   material_ui: ^1.9.0
   zikzak_inappwebview_platform_interface: ^6.3.4
-  webview_windows: ^0.4.0
+  # Temporary git ref until the companion CDP API lands upstream:
+  # https://github.com/jnschulze/flutter-webview-windows/pull/334
+  webview_windows:
+    git:
+      url: https://github.com/TsinbeiLabs/flutter-webview-windows.git
+      ref: ba0940e
   path: ^1.9.0
   path_provider: ^2.1.0
 
