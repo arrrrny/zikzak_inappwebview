@@ -2,6 +2,7 @@ import Cocoa
 import CryptoKit
 import FlutterMacOS
 import WebKit
+import os
 
 /// Maps a stable identifier string into a stable `UUID` for
 /// `WKWebsiteDataStore(forIdentifier:)`. Accepts three input shapes so the
@@ -1089,8 +1090,28 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                     switch res {
                     case .success(let data):
                         result(data)
-                    case .failure(_):
-                        result(nil)
+                    case .failure(let error):
+                        // Issue #970: the native failure used to be discarded
+                        // here (`case .failure(_): result(nil)`), so an
+                        // app-context PDF export failed with zero diagnostic
+                        // signal — no error text, no os_log line — and the
+                        // Dart caller could not tell "unsupported platform"
+                        // from a real render failure. Surface it: the
+                        // unified log carries the full NSError, and Dart gets
+                        // a typed FlutterError; nil stays the
+                        // unsupported-platform path only (the #available else
+                        // below).
+                        let nsError = error as NSError
+                        os_log("createPDF failed: %{public}@",
+                               type: .error,
+                               nsError.description)
+                        result(FlutterError(
+                            code: "createPdfFailed",
+                            message: nsError.localizedDescription,
+                            details: [
+                                "domain": nsError.domain,
+                                "code": nsError.code,
+                            ]))
                     }
                 }
             } else {
