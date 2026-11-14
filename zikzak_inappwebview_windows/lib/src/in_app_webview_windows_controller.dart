@@ -31,6 +31,9 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
   final Map<String, JavaScriptHandlerCallback> _javaScriptHandlersMap = {};
 
   StreamSubscription<dynamic>? _webMessageSubscription;
+  StreamSubscription<Map<String, dynamic>>? _devToolsProtocolSubscription;
+  final Map<String, Map<String, String>> _pendingRequestHeaders = {};
+  final Map<String, Function(dynamic data)> _devToolsProtocolCallbacks = {};
 
   /// Whether the JavaScript handler bridge has already been installed on the
   /// underlying [WebviewController]. The bridge is idempotent so it is safe to
@@ -75,6 +78,9 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
       _canGoBack = history.canGoBack;
       _canGoForward = history.canGoForward;
     });
+    _devToolsProtocolSubscription = _controller.devToolsProtocolEvent.listen(
+      _handleDevToolsProtocolEvent,
+    );
   }
 
   /// The most recent URL reported by the `urlChanged` event, or null before the
@@ -137,6 +143,7 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
   if (window.zikzak_inappwebview && window.zikzak_inappwebview._isZikzakBridge) {
     return;
   }
+
   var pending = {};
   var nextCallId = 0;
   function asArray(value) {
@@ -191,6 +198,42 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
     } catch (_) {
       // Same as above — never propagate injection errors to the caller.
     }
+  }
+
+  void _handleDevToolsProtocolEvent(Map<String, dynamic> event) {
+    final eventName = event['eventName'];
+    if (eventName is String) {
+      _devToolsProtocolCallbacks[eventName]?.call(event['data']);
+    }
+    if (eventName != 'Fetch.requestPaused') return;
+    final data = event['data'];
+    if (data is! Map) return;
+    final requestId = data['requestId'];
+    final request = data['request'];
+    if (requestId is! String || request is! Map) return;
+    final url = request['url'];
+    if (url is! String) return;
+    final extra =
+        _pendingRequestHeaders.remove(url) ?? const <String, String>{};
+    final headers = Map<String, dynamic>.from(request['headers'] as Map? ?? {});
+    for (final entry in extra.entries) {
+      headers.removeWhere(
+        (key, _) => key.toLowerCase() == entry.key.toLowerCase(),
+      );
+      headers[entry.key] = entry.value;
+    }
+    unawaited(
+      _controller.callDevToolsProtocolMethod(
+        'Fetch.continueRequest',
+        <String, dynamic>{
+          'requestId': requestId,
+          if (headers.isNotEmpty)
+            'headers': headers.entries
+                .map((entry) => {'name': entry.key, 'value': entry.value})
+                .toList(),
+        },
+      ),
+    );
   }
 
   void _dispatchWebMessage(dynamic message) {
@@ -266,8 +309,40 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
     WebUri? allowingReadAccessTo,
   }) async {
     if (urlRequest.url != null) {
+      final url = urlRequest.url.toString();
+      if (urlRequest.headers != null && urlRequest.headers!.isNotEmpty) {
+        _pendingRequestHeaders[url] = urlRequest.headers!;
+      }
+      await _controller.callDevToolsProtocolMethod('Fetch.enable', {
+        'patterns': [
+          {'resourceType': 'Document', 'requestStage': 'Request'},
+        ],
+      });
       await _controller.loadUrl(urlRequest.url.toString());
     }
+  }
+
+  @override
+  Future<dynamic> callDevToolsProtocolMethod({
+    required String methodName,
+    Map<String, dynamic>? parameters,
+  }) => _controller.callDevToolsProtocolMethod(methodName, parameters);
+
+  @override
+  Future<void> addDevToolsProtocolEventListener({
+    required String eventName,
+    required Function(dynamic data) callback,
+  }) async {
+    _devToolsProtocolCallbacks[eventName] = callback;
+    await _controller.addDevToolsProtocolEventListener(eventName);
+  }
+
+  @override
+  Future<void> removeDevToolsProtocolEventListener({
+    required String eventName,
+  }) async {
+    _devToolsProtocolCallbacks.remove(eventName);
+    await _controller.removeDevToolsProtocolEventListener(eventName);
   }
 
   @override
@@ -279,8 +354,11 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
     WebUri? historyUrl,
     WebUri? allowingReadAccessTo,
   }) async {
+    final source = baseUrl == null
+        ? data
+        : '<base href="${htmlEscape.convert(baseUrl.toString())}">$data';
     final dataUri = Uri.dataFromString(
-      data,
+      source,
       mimeType: mimeType,
       encoding: Encoding.getByName(encoding),
     ).toString();
@@ -388,6 +466,10 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
   void dispose({bool isKeepAlive = false}) {
     _webMessageSubscription?.cancel();
     _webMessageSubscription = null;
+    _devToolsProtocolSubscription?.cancel();
+    _devToolsProtocolSubscription = null;
+    _pendingRequestHeaders.clear();
+    _devToolsProtocolCallbacks.clear();
     _urlSubscription?.cancel();
     _urlSubscription = null;
     _loadingStateSubscription?.cancel();

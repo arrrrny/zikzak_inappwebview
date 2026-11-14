@@ -29,3 +29,11 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^6.0.0
 
+dependency_overrides:
+  # Remove after the companion API is released upstream:
+  # https://github.com/jnschulze/flutter-webview-windows/pull/334
+  webview_windows:
+    git:
+      url: https://github.com/TsinbeiLabs/flutter-webview-windows.git
+      ref: ba0940e
+
