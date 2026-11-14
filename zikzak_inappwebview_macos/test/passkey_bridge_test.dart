@@ -142,6 +142,27 @@ void main() {
       // instead of hanging the JS promise.
       expect(source, contains('isHeadlessOffscreen'));
     });
+    test(
+      'answers isUvPaa from device passkey configuration, not Touch ID enrollment (#427)',
+      () {
+        // A configured Mac without an enrolled fingerprint still verifies
+        // passkey ceremonies with the login password: the biometrics-only
+        // LAContext floor answered false there and re-broke ASC
+        // (zuraffa_browser#836). Measured 2026-11-14, macOS 26.7.1:
+        // biometrics false, deviceOwnerAuthentication true,
+        // isDeviceConfiguredForPasskeys true.
+        expect(source, contains('isDeviceConfiguredForPasskeys'));
+        expect(source, contains('deviceOwnerAuthentication'));
+        expect(
+          source,
+          isNot(contains('deviceOwnerAuthenticationWithBiometrics')),
+          reason:
+              'the biometrics-only floor answered false on every '
+              'fingerprint-less configured Mac (issue #427)',
+        );
+        expect(source, contains('if #available(macOS 26.2'));
+      },
+    );
   });
 
   group('PasskeysJS.swift shim (issue #358)', () {

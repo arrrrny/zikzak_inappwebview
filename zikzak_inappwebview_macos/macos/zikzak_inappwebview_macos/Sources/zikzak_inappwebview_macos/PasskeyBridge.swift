@@ -77,17 +77,26 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
     /// `beginCeremony` still fails with NotAllowedError when there is no
     /// window to anchor the sheet to.
     ///
-    /// `ASAuthorizationWebBrowserPublicKeyCredentialManager` carries no
-    /// availability query before macOS 26.2 (`isDeviceConfiguredForPasskeys`),
-    /// so on the 12.0 deployment target the floor is LAContext: Touch ID
-    /// hardware (or an equivalent enrolled biometry) IS the user-verifying
-    /// platform authenticator on macOS.
+    /// The authoritative probe is the browser passkey manager's
+    /// `isDeviceConfiguredForPasskeys` (class static, macOS 26.2+): it
+    /// answers whether the DEVICE is configured for passkeys. Touch ID
+    /// enrollment is NOT a capability gate — a fingerprint-less Mac still
+    /// verifies ceremonies with the login password, and a biometrics-only
+    /// floor answered false on every configured-but-fingerprint-less Mac
+    /// (issue #427; consumer report zuraffa_browser#836 — ASC's red
+    /// "browser needs to be updated" warning, again). Below 26.2 the floor
+    /// is LAContext `.deviceOwnerAuthentication` — biometrics OR the
+    /// account password — never biometrics-only.
     private func isPlatformAuthenticatorAvailable() -> Bool {
         guard let webView = webView, !webView.isHeadlessOffscreen else {
             return false
         }
         var error: NSError?
-        return LAContext().canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error)
+        if #available(macOS 26.2, *) {
+            return ASAuthorizationWebBrowserPublicKeyCredentialManager
+                .isDeviceConfiguredForPasskeys
+        }
+        return LAContext().canEvaluatePolicy(.deviceOwnerAuthentication, error: &error)
     }
 
     // MARK: - base64url
