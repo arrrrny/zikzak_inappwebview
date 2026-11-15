@@ -85,6 +85,11 @@ private func javaScriptExceptionMessage(_ error: Error) -> String {
         ?? nsError.localizedDescription
 }
 
+/// The error code a failed createPdf answers with (#431,
+/// zuraffa_browser#970): the Dart consumer (zuraffa_browser's createPdf seam)
+/// branches on it to escalate the native failure as a typed PDF export error.
+private let createPdfFailedCode = "createPdfFailed"
+
 /// Builds the `FlutterError` a failed `evaluateJavascript` reports (#373).
 ///
 /// The message is the JS exception text (see `javaScriptExceptionMessage`),
@@ -93,11 +98,6 @@ private func javaScriptExceptionMessage(_ error: Error) -> String {
 /// change degrades to a missing key instead of a channel-encoder surprise. A
 /// failure that carries none of those keys (a transport-level error) keeps the
 /// previous shape: the localized description with `details: nil`.
-/// The error code a failed createPdf answers with (#970): the Dart consumer
-/// (zuraffa_browser's createPdf seam) branches on it to escalate the native
-/// failure as a typed PDF export error.
-private let createPdfFailedCode = "createPdfFailed"
-
 private func javaScriptExceptionError(_ error: Error) -> FlutterError {
     let nsError = error as NSError
     let userInfo = nsError.userInfo
@@ -1071,7 +1071,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                     case .success(let data):
                         result(data)
                     case .failure(let error):
-                        // Issue #970: the native failure used to be discarded
+                        // Issue #431 (zuraffa_browser#970): the native failure used to be discarded
                         // here (`case .failure(_): result(nil)`), so an
                         // app-context PDF export failed with zero diagnostic
                         // signal — no error text, no os_log line — and the
@@ -1082,9 +1082,9 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                         // unsupported-platform path only (the #available else
                         // below).
                         let nsError = error as NSError
-                        os_log("createPDF failed: %{public}@",
-                               type: .error,
-                               nsError.description)
+                        Logger(subsystem: "wtf.zikzak.inappwebview",
+                               category: "InAppWebView")
+                            .error("createPDF failed: \(public: nsError.description)")
                         result(FlutterError(
                             code: createPdfFailedCode,
                             message: nsError.localizedDescription,

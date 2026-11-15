@@ -1968,7 +1968,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///
   ///**NOTE for iOS**: available only on iOS 14.0+.
   ///
-  ///**NOTE for MacOS**: available only on MacOS 11.0+.
+  ///**NOTE for MacOS**: available only on MacOS 11.0+. Native render failures throw a `PlatformException` with code `createPdfFailed` (its `details` carry the NSError's `domain` and `code`); `null` is returned only on the unsupported-platform path (MacOS < 11.0).
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android ([WebView.createPrintDocumentAdapter](https://developer.android.com/reference/android/webkit/WebView#createPrintDocumentAdapter(java.lang.String)))

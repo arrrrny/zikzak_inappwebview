@@ -1,3 +1,7 @@
+## Unreleased
+
+- [macOS] `createPdf` no longer swallows native render failures. A failed `WKWebView.createPDF` logs the full `NSError` to the unified log and answers the Dart caller with a typed `PlatformException(code: createPdfFailed)` whose `details` carry the NSError's `domain` and `code`; `null` is returned only on the unsupported-platform path (macOS < 11), so "unsupported platform" and "render failure" are distinguishable again (#431)
+
 ## 6.3.4 - 2026-11-01
 
 * fix: address review comments on #406
