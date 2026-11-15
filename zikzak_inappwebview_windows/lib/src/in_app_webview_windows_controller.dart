@@ -35,6 +35,12 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
   final Map<String, Map<String, String>> _pendingRequestHeaders = {};
   final Map<String, Function(dynamic data)> _devToolsProtocolCallbacks = {};
 
+  /// Whether `Fetch` interception is currently enabled on the underlying
+  /// controller. It is turned on only while a navigation has headers to inject
+  /// and turned back off once they are consumed, so a header-less navigation
+  /// never pays the pause → Dart → continue round-trip.
+  bool _fetchEnabled = false;
+
   /// Whether the JavaScript handler bridge has already been installed on the
   /// underlying [WebviewController]. The bridge is idempotent so it is safe to
   /// install it only once.
@@ -209,31 +215,95 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
     final data = event['data'];
     if (data is! Map) return;
     final requestId = data['requestId'];
+    // Without a request id there is nothing to resume. Every other guard
+    // degrades to "continue with the original request": a malformed or
+    // unexpectedly-shaped event must never leave a paused navigation hanging
+    // (white screen, no timeout, no recovery).
+    if (requestId is! String) return;
+
+    var headers = <String, dynamic>{};
     final request = data['request'];
-    if (requestId is! String || request is! Map) return;
-    final url = request['url'];
-    if (url is! String) return;
-    final extra =
-        _pendingRequestHeaders.remove(url) ?? const <String, String>{};
-    final headers = Map<String, dynamic>.from(request['headers'] as Map? ?? {});
-    for (final entry in extra.entries) {
-      headers.removeWhere(
-        (key, _) => key.toLowerCase() == entry.key.toLowerCase(),
-      );
-      headers[entry.key] = entry.value;
+    if (request is Map) {
+      final requestHeaders = request['headers'];
+      if (requestHeaders is Map) {
+        headers.addAll(
+          requestHeaders.map((key, value) => MapEntry(key.toString(), value)),
+        );
+      }
+      final url = request['url'];
+      if (url is String) {
+        final extra =
+            _pendingRequestHeaders.remove(_canonicalKeyFor(url)) ??
+            const <String, String>{};
+        for (final entry in extra.entries) {
+          headers.removeWhere(
+            (key, _) => key.toLowerCase() == entry.key.toLowerCase(),
+          );
+          headers[entry.key] = entry.value;
+        }
+      }
     }
     unawaited(
-      _controller.callDevToolsProtocolMethod(
-        'Fetch.continueRequest',
-        <String, dynamic>{
-          'requestId': requestId,
-          if (headers.isNotEmpty)
-            'headers': headers.entries
-                .map((entry) => {'name': entry.key, 'value': entry.value})
-                .toList(),
-        },
-      ),
+      _controller
+          .callDevToolsProtocolMethod(
+            'Fetch.continueRequest',
+            <String, dynamic>{
+              'requestId': requestId,
+              if (headers.isNotEmpty)
+                'headers': headers.entries
+                    .map((entry) => {'name': entry.key, 'value': entry.value})
+                    .toList(),
+            },
+          )
+          .catchError((Object _) {
+            // Never leave the request paused: a failed continuation is
+            // swallowed rather than freezing the navigation.
+          }),
     );
+    // The pending headers are consumed; turn interception back off so later
+    // header-less navigations are not held for a needless round-trip.
+    if (_pendingRequestHeaders.isEmpty) {
+      unawaited(_disableFetch());
+    }
+  }
+
+  /// Normalizes a URL for [_pendingRequestHeaders] matching.
+  ///
+  /// WebView2 reports `Fetch.requestPaused` URLs in Chromium's canonical form
+  /// (an empty path becomes `/`, a default port is elided), while
+  /// [Uri.toString] preserves whatever the caller wrote. Keying the map by this
+  /// form on both the store and the lookup keeps the two sides matching.
+  String _canonicalRequestUrl(Uri uri) {
+    final defaultPort =
+        (uri.scheme == 'https' && uri.port == 443) ||
+        (uri.scheme == 'http' && uri.port == 80);
+    final path = uri.path.isEmpty ? '/' : uri.path;
+    final query = uri.query.isEmpty ? '' : '?${uri.query}';
+    return '${uri.scheme}://${uri.host}'
+        '${defaultPort ? '' : ':${uri.port}'}'
+        '$path$query';
+  }
+
+  /// [_canonicalRequestUrl] for a URL that arrived as a string, falling back to
+  /// the raw string when it cannot be parsed (it can then only match itself).
+  String _canonicalKeyFor(String url) {
+    try {
+      return _canonicalRequestUrl(Uri.parse(url));
+    } catch (_) {
+      return url;
+    }
+  }
+
+  /// Turns `Fetch` interception off. Best-effort: a failure here must never
+  /// break the navigation that triggered it.
+  Future<void> _disableFetch() async {
+    if (!_fetchEnabled) return;
+    _fetchEnabled = false;
+    try {
+      await _controller.callDevToolsProtocolMethod('Fetch.disable', {});
+    } catch (_) {
+      // Ignore — interception staying on is harmless, a broken navigation is not.
+    }
   }
 
   void _dispatchWebMessage(dynamic message) {
@@ -308,18 +378,30 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
     required URLRequest urlRequest,
     WebUri? allowingReadAccessTo,
   }) async {
-    if (urlRequest.url != null) {
-      final url = urlRequest.url.toString();
-      if (urlRequest.headers != null && urlRequest.headers!.isNotEmpty) {
-        _pendingRequestHeaders[url] = urlRequest.headers!;
+    final url = urlRequest.url;
+    if (url == null) return;
+    final headers = urlRequest.headers;
+    final hasHeaders = headers != null && headers.isNotEmpty;
+    if (hasHeaders) {
+      _pendingRequestHeaders[_canonicalRequestUrl(url)] = headers;
+      try {
+        await _controller.callDevToolsProtocolMethod('Fetch.enable', {
+          'patterns': [
+            {'resourceType': 'Document', 'requestStage': 'Request'},
+          ],
+        });
+        _fetchEnabled = true;
+      } catch (_) {
+        // Interception is unavailable: drop the pending headers and navigate
+        // plainly so a header-less navigation never regresses.
+        _pendingRequestHeaders.remove(_canonicalRequestUrl(url));
       }
-      await _controller.callDevToolsProtocolMethod('Fetch.enable', {
-        'patterns': [
-          {'resourceType': 'Document', 'requestStage': 'Request'},
-        ],
-      });
-      await _controller.loadUrl(urlRequest.url.toString());
+    } else {
+      // Nothing to inject — make sure interception is off so plain
+      // navigations do not pay a needless pause → Dart → continue round-trip.
+      await _disableFetch();
     }
+    await _controller.loadUrl(url.toString());
   }
 
   @override
@@ -354,15 +436,30 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
     WebUri? historyUrl,
     WebUri? allowingReadAccessTo,
   }) async {
-    final source = baseUrl == null
-        ? data
-        : '<base href="${htmlEscape.convert(baseUrl.toString())}">$data';
+    final source = baseUrl == null ? data : _withBaseTag(data, baseUrl);
     final dataUri = Uri.dataFromString(
       source,
       mimeType: mimeType,
       encoding: Encoding.getByName(encoding),
     ).toString();
     await _controller.loadUrl(dataUri);
+  }
+
+  /// Injects a `<base href>` tag into [data], after a leading doctype when one
+  /// is present.
+  ///
+  /// Anything before `<!DOCTYPE html>` is a parse error, so a base tag
+  /// prepended at position 0 makes the parser drop the doctype and render the
+  /// document in quirks mode. The tag therefore goes immediately after the
+  /// doctype, keeping the caller's standards-mode document intact.
+  String _withBaseTag(String data, WebUri baseUrl) {
+    final baseTag = '<base href="${htmlEscape.convert(baseUrl.toString())}">';
+    final doctype = RegExp(
+      r'^\s*<!DOCTYPE[^>]*>',
+      caseSensitive: false,
+    ).firstMatch(data);
+    if (doctype == null) return '$baseTag$data';
+    return '${doctype.group(0)}$baseTag${data.substring(doctype.end)}';
   }
 
   @override
@@ -469,6 +566,7 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
     _devToolsProtocolSubscription?.cancel();
     _devToolsProtocolSubscription = null;
     _pendingRequestHeaders.clear();
+    _fetchEnabled = false;
     _devToolsProtocolCallbacks.clear();
     _urlSubscription?.cancel();
     _urlSubscription = null;
