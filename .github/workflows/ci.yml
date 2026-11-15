@@ -20,12 +20,18 @@ jobs:
       fail-fast: false
       matrix:
         runner: [ubuntu-24.04, ubuntu-24.04-arm]
-    # Pinned by digest, not by the rolling `sid` tag: this job gates merges and
-    # `debian:sid` is rebuilt continuously, so a transient archive break or a
-    # WPE soname bump would fail it with no code change behind it. The
-    # `pkg-config --atleast-version=2.50` assertion below is what keeps the
-    # version floor honest, so a digest bump only has to happen when a newer
-    # WPE is actually wanted.
+    # Pinned by digest, not by the rolling `sid` tag, so the base rootfs
+    # (toolchain and libraries already in the image) is reproducible and a
+    # change to it is a deliberate digest bump. This does NOT pin the packages
+    # the first step installs: `apt-get update && apt-get install` still
+    # resolves libwpewebkit-2.0-dev, libwpe-1.0-dev, cmake and clang from the
+    # live `sid` archive, so an archive break or a WPE soname bump there can
+    # still fail this merge-gating job with no code change behind it. Pinning
+    # those packages to a sid version (or to snapshot.debian.org) would be a
+    # further hardening step, not a guarantee this comment claims. The
+    # `pkg-config --atleast-version=2.50` assertion below keeps the version
+    # floor honest, so a digest bump only has to happen when a newer WPE is
+    # actually wanted.
     # debian:sid OCI index, created 2026-11-04
     container: debian:sid@sha256:e276677157e13bc51ea5b8651f54ad28883f503cc37b3e3af2c4b6cc2f4efe7b
     defaults:

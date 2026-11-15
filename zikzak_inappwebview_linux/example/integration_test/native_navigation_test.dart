@@ -47,8 +47,8 @@ window.receivedCookie = ${jsonEncode(request.headers.value('cookie'))};
       final loaded = StreamController<String>.broadcast();
       addTearDown(loaded.close);
       final prevented = Completer<void>();
-      Future<NavigationActionPolicy> Function() navigationPolicy = () async =>
-          NavigationActionPolicy.ALLOW;
+      Future<NavigationActionPolicy> Function(NavigationAction action)
+      navigationPolicy = (_) async => NavigationActionPolicy.ALLOW;
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -67,7 +67,8 @@ window.receivedCookie = ${jsonEncode(request.headers.value('cookie'))};
                   ]),
                   onWebViewCreated: (controller) => ready.complete(controller),
                   onLoadStop: (_, url) => loaded.add(url.toString()),
-                  shouldOverrideUrlLoading: (_, action) => navigationPolicy(),
+                  shouldOverrideUrlLoading: (_, action) =>
+                      navigationPolicy(action),
                 ),
               ).build(context),
             ),
@@ -143,9 +144,21 @@ window.receivedCookie = ${jsonEncode(request.headers.value('cookie'))};
         source: 'window.receivedAuthentication',
       );
       expect(plainAuthHeader, isNull);
-      navigationPolicy = () async {
-        if (!prevented.isCompleted) prevented.complete();
-        return NavigationActionPolicy.CANCEL;
+      final plainCookieHeader = await controller.evaluateJavascript(
+        source: 'window.receivedCookie',
+      );
+      expect(plainCookieHeader, 'session=native-session');
+      navigationPolicy = (action) async {
+        // Complete only on the URL we actually mean to block: a redirect or a
+        // re-navigation would otherwise satisfy `prevented` for the wrong
+        // reason. Only the blocked URL is CANCELled; anything else is allowed
+        // through, so a spurious navigation would change `currentUrl` and fail
+        // the assertion below instead of being silently swallowed.
+        final isBlocked = action.request.url?.toString() == '$origin/blocked';
+        if (isBlocked && !prevented.isCompleted) prevented.complete();
+        return isBlocked
+            ? NavigationActionPolicy.CANCEL
+            : NavigationActionPolicy.ALLOW;
       };
       await controller.evaluateJavascript(
         source: 'window.location.href = "$origin/blocked";',
@@ -157,6 +170,8 @@ window.receivedCookie = ${jsonEncode(request.headers.value('cookie'))};
         'headersPreserved': authHeader == 'native-token',
         'plainNavigationClearsHeaders': plainAuthHeader == null,
         'httpOnlyCookieSent': cookieHeader == 'session=native-session',
+        'cookieSurvivesNavigation':
+            plainCookieHeader == 'session=native-session',
         'documentStartScriptObserved': docStart == 'injected-before-page',
         'bridgeRoundTrip': bridgeResultArgs.contains('native-reply'),
         'navigationPrevented':
