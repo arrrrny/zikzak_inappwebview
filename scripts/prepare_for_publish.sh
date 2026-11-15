@@ -37,10 +37,6 @@ fi
 
 echo -e "${BLUE}=== Preparing to publish version $VERSION ===${NC}"
 
-# Create a new branch for publishing
-git checkout -b $BRANCH_NAME
-echo -e "${GREEN}Created branch: $BRANCH_NAME${NC}"
-
 # List of all packages to update (v3.0: all platforms)
 PACKAGES=(
     "zikzak_inappwebview_platform_interface"
@@ -52,6 +48,43 @@ PACKAGES=(
     "zikzak_inappwebview_linux"
     "zikzak_inappwebview"
 )
+
+# Refuse to publish when a git-sourced dependency_overrides entry would be
+# silently stripped. The publish flow below deletes the whole
+# dependency_overrides section, so a fork a package compiles against would be
+# swapped for whatever its plain constraint resolves to — typically a hosted
+# release that predates the fork's API, which breaks every consumer build.
+echo -e "${BLUE}\n=== Verifying no git-sourced dependency_overrides remain ===${NC}"
+found_git_override=false
+
+for pkg in "${PACKAGES[@]}"; do
+    if [ ! -f "$ROOT_DIR/$pkg/pubspec.yaml" ]; then
+        continue
+    fi
+    override_block=$(awk '
+        /^dependency_overrides:[[:space:]]*$/ { in_block = 1; next }
+        in_block && /^[^[:space:]#]/ { in_block = 0 }
+        in_block { print }
+    ' "$ROOT_DIR/$pkg/pubspec.yaml")
+    if printf '%s\n' "$override_block" | grep -qE '^[[:space:]]+git:'; then
+        echo -e "${RED}Warning: git-sourced dependency_overrides found in $pkg/pubspec.yaml${NC}"
+        echo -e "${YELLOW}Publishing strips dependency_overrides, so this would resolve a hosted version instead:${NC}"
+        printf '%s\n' "$override_block" | sed 's/^/    /'
+        found_git_override=true
+    fi
+done
+
+if [ "$found_git_override" = true ]; then
+    echo -e "\n${RED}✗ Refusing to prepare a publish: a git-sourced dependency_overrides entry${NC}"
+    echo -e "${RED}  would be silently dropped, breaking every consumer build.${NC}"
+    echo -e "${RED}  Land the fork upstream (e.g. jnschulze/flutter-webview-windows#334),${NC}"
+    echo -e "${RED}  then replace the override with a hosted version constraint.${NC}"
+    exit 1
+fi
+
+# Create a new branch for publishing
+git checkout -b $BRANCH_NAME
+echo -e "${GREEN}Created branch: $BRANCH_NAME${NC}"
 
 # Update versions in all package pubspec.yaml files
 for pkg in "${PACKAGES[@]}"; do

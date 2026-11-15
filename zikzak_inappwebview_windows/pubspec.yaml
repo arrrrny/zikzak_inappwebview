@@ -29,3 +29,24 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^6.0.0
 
+dependency_overrides:
+  # The controller compiles against the companion fork's CDP API
+  # (callDevToolsProtocolMethod / devToolsProtocolEvent / listener add+remove),
+  # which is in NO hosted webview_windows release — 0.4.0 is the latest and the
+  # upstream PR (jnschulze/flutter-webview-windows#334) is still open.
+  #
+  # This override is what makes the monorepo resolve the fork. It does NOT
+  # propagate to consumers: pub honours dependency_overrides only in the ROOT
+  # package, so an app resolving this package from pub.dev would get hosted
+  # 0.4.0 and fail to compile. It cannot simply be moved under `dependencies:`
+  # either — a publishable package may not declare a git dependency
+  # (dart analyze: invalid_dependency, fatal under the CI gate).
+  #
+  # scripts/prepare_for_publish.sh therefore refuses to publish while this
+  # git-sourced override exists. Remove it and move to a hosted version once
+  # the companion API lands upstream.
+  webview_windows:
+    git:
+      url: https://github.com/TsinbeiLabs/flutter-webview-windows.git
+      ref: ba0940e
+
