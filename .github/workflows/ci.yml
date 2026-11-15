@@ -41,11 +41,14 @@ jobs:
           pkg-config --atleast-version=2.50 wpe-webkit-2.0
           pkg-config --modversion wpe-webkit-2.0 wpe-platform-2.0 wpe-platform-headless-2.0
       - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          flutter-version: 3.47.0
-          architecture: ${{ runner.arch }}
+      - name: Bootstrap Flutter 3.47.0 for the native architecture
+        # The release archive has no Linux ARM64 entry. A source checkout also
+        # owns its files as the container user, avoiding archive UID mismatches.
+        run: |
+          test -d "$RUNNER_TEMP"
+          git clone --depth 1 --branch 3.47.0 https://github.com/flutter/flutter.git "$RUNNER_TEMP/flutter"
+          echo "$RUNNER_TEMP/flutter/bin" >> "$GITHUB_PATH"
+          "$RUNNER_TEMP/flutter/bin/flutter" --version
       - name: Point the Linux example at this checkout
         working-directory: zikzak_inappwebview_linux/example
         run: |
