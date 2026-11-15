@@ -35,7 +35,7 @@ jobs:
         run: |
           apt-get update
           DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-            ca-certificates git curl jq unzip xz-utils clang cmake ninja-build pkg-config \
+            ca-certificates git curl unzip xz-utils clang cmake ninja-build pkg-config \
             libgtk-3-dev libwpewebkit-2.0-dev libwpe-1.0-dev libepoxy-dev \
             libsecret-1-dev libwayland-dev xvfb xauth dbus-x11 libgl1-mesa-dri
           pkg-config --atleast-version=2.50 wpe-webkit-2.0
