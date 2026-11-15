@@ -1084,7 +1084,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                         let nsError = error as NSError
                         Logger(subsystem: "wtf.zikzak.inappwebview",
                                category: "InAppWebView")
-                            .error("createPDF failed: \(public: nsError.description)")
+                            .error("createPDF failed: \(nsError.description, privacy: .public)")
                         result(FlutterError(
                             code: createPdfFailedCode,
                             message: nsError.localizedDescription,
