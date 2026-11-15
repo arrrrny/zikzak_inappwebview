@@ -7,7 +7,7 @@ branch, so YOUR PR is the one that ships. See CONTRIBUTING.md for details.
 
 ## Summary
 
-<!-- What does this PR change, and why? -->
+<!-- What does this PR change, and why? Link the issue it closes, e.g. Closes #123 -->
 
 ## How it was tested
 
@@ -15,5 +15,6 @@ branch, so YOUR PR is the one that ships. See CONTRIBUTING.md for details.
 
 ## Checklist
 
+- [ ] This PR's Summary carries a `Closes #N` line for every issue it closes, so the merge stage closes them automatically
 - [ ] "Allow edits by maintainers" is enabled on this PR
 - [ ] CI is green on the head branch
