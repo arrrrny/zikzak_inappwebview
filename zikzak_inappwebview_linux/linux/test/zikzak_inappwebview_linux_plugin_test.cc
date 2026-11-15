@@ -134,7 +134,7 @@ TEST(UserScriptFromFlValue, PreservesAllowedOriginRules) {
   FlValue* map = fl_value_new_map();
   fl_value_set_string_take(map, "groupName", fl_value_new_string("group"));
   fl_value_set_string_take(map, "source", fl_value_new_string("console.log(1);"));
-  fl_value_set_string_take(map, "injectionTime", fl_value_new_int64(0));
+  fl_value_set_string_take(map, "injectionTime", fl_value_new_int(0));
   fl_value_set_string_take(map, "forMainFrameOnly", fl_value_new_bool(TRUE));
   fl_value_set_string_take(map, "allowedOriginRules", rules);
 
