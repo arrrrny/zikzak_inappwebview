@@ -20,7 +20,14 @@ jobs:
       fail-fast: false
       matrix:
         runner: [ubuntu-24.04, ubuntu-24.04-arm]
-    container: debian:sid
+    # Pinned by digest, not by the rolling `sid` tag: this job gates merges and
+    # `debian:sid` is rebuilt continuously, so a transient archive break or a
+    # WPE soname bump would fail it with no code change behind it. The
+    # `pkg-config --atleast-version=2.50` assertion below is what keeps the
+    # version floor honest, so a digest bump only has to happen when a newer
+    # WPE is actually wanted.
+    # debian:sid OCI index, created 2026-11-04
+    container: debian:sid@sha256:e276677157e13bc51ea5b8651f54ad28883f503cc37b3e3af2c4b6cc2f4efe7b
     defaults:
       run:
         shell: bash
@@ -61,6 +68,10 @@ jobs:
           flutter pub get
       - name: Exercise native navigation, cookies and JavaScript
         working-directory: zikzak_inappwebview_linux/example
+        env:
+          # An explicit path keeps the run's manifest out of the package tree;
+          # the test falls back to its CWD-relative default without it.
+          NATIVE_RESULT_PATH: ${{ github.workspace }}/zikzak_inappwebview_linux/example/build/native-navigation-result.json
         run: dbus-run-session -- xvfb-run -a flutter test integration_test/native_navigation_test.dart -d linux
       - name: Run compiled native tests
         working-directory: zikzak_inappwebview_linux/example

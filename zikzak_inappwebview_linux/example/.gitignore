@@ -33,6 +33,10 @@ migrate_working_dir/
 /build/
 /coverage/
 
+# Default output of integration_test/native_navigation_test.dart when
+# NATIVE_RESULT_PATH is not set (CI passes an explicit path).
+/native-navigation-result.json
+
 # Symbolication related
 app.*.symbols
 

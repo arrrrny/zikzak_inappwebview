@@ -87,22 +87,18 @@ window.receivedCookie = ${jsonEncode(request.headers.value('cookie'))};
         ),
       );
       await firstLoaded.timeout(const Duration(seconds: 30));
-      expect(
-        await controller.evaluateJavascript(
-          source: 'window.receivedAuthentication',
-        ),
-        'native-token',
+      final authHeader = await controller.evaluateJavascript(
+        source: 'window.receivedAuthentication',
       );
-      expect(
-        await controller.evaluateJavascript(source: 'window.receivedCookie'),
-        'session=native-session',
+      final cookieHeader = await controller.evaluateJavascript(
+        source: 'window.receivedCookie',
       );
-      expect(
-        await controller.evaluateJavascript(
-          source: 'window.pageSawDocumentStart',
-        ),
-        'injected-before-page',
+      final docStart = await controller.evaluateJavascript(
+        source: 'window.pageSawDocumentStart',
       );
+      expect(authHeader, 'native-token');
+      expect(cookieHeader, 'session=native-session');
+      expect(docStart, 'injected-before-page');
       expect(
         await controller.evaluateJavascript(source: 'document.cookie'),
         '',
@@ -128,12 +124,14 @@ window.receivedCookie = ${jsonEncode(request.headers.value('cookie'))};
             'window.zikzak_inappwebview.callHandler("nativeProbe", "from-page")'
             '.then(reply => window.zikzak_inappwebview.callHandler("nativeProbeResult", reply))',
       );
-      expect(await bridgeReply.future.timeout(const Duration(seconds: 30)), [
-        'from-page',
-      ]);
-      expect(await bridgeResult.future.timeout(const Duration(seconds: 30)), [
-        'native-reply',
-      ]);
+      final bridgeArgs = await bridgeReply.future.timeout(
+        const Duration(seconds: 30),
+      );
+      final bridgeResultArgs = await bridgeResult.future.timeout(
+        const Duration(seconds: 30),
+      );
+      expect(bridgeArgs, ['from-page']);
+      expect(bridgeResultArgs, ['native-reply']);
       final plainLoaded = loaded.stream.firstWhere(
         (url) => url == '$origin/plain',
       );
@@ -141,32 +139,34 @@ window.receivedCookie = ${jsonEncode(request.headers.value('cookie'))};
         urlRequest: URLRequest(url: WebUri('$origin/plain')),
       );
       await plainLoaded.timeout(const Duration(seconds: 30));
-      expect(
-        await controller.evaluateJavascript(
-          source: 'window.receivedAuthentication',
-        ),
-        isNull,
+      final plainAuthHeader = await controller.evaluateJavascript(
+        source: 'window.receivedAuthentication',
       );
+      expect(plainAuthHeader, isNull);
       navigationPolicy = () async {
-        prevented.complete();
+        if (!prevented.isCompleted) prevented.complete();
         return NavigationActionPolicy.CANCEL;
       };
       await controller.evaluateJavascript(
         source: 'window.location.href = "$origin/blocked";',
       );
       await prevented.future.timeout(const Duration(seconds: 30));
-      expect((await controller.getUrl()).toString(), '$origin/plain');
+      final currentUrl = (await controller.getUrl()).toString();
+      expect(currentUrl, '$origin/plain');
       binding.reportData = {
-        'headersPreserved': true,
-        'plainNavigationClearsHeaders': true,
-        'httpOnlyCookieSent': true,
-        'documentStartScriptObserved': true,
-        'bridgeRoundTrip': true,
-        'navigationPrevented': true,
+        'headersPreserved': authHeader == 'native-token',
+        'plainNavigationClearsHeaders': plainAuthHeader == null,
+        'httpOnlyCookieSent': cookieHeader == 'session=native-session',
+        'documentStartScriptObserved': docStart == 'injected-before-page',
+        'bridgeRoundTrip': bridgeResultArgs.contains('native-reply'),
+        'navigationPrevented':
+            prevented.isCompleted && currentUrl == '$origin/plain',
       };
       await tester.pumpWidget(const SizedBox.shrink());
-      await File('native-navigation-result.json')
-          .writeAsString(jsonEncode(binding.reportData));
+      final outPath =
+          Platform.environment['NATIVE_RESULT_PATH'] ??
+          'native-navigation-result.json';
+      await File(outPath).writeAsString(jsonEncode(binding.reportData));
     },
   );
 }
