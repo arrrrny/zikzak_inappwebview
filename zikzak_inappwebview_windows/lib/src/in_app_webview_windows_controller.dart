@@ -40,6 +40,14 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
   /// and turned back off once they are consumed, so a header-less navigation
   /// never pays the pause → Dart → continue round-trip.
   bool _fetchEnabled = false;
+  Future<void> _fetchOperations = Future<void>.value();
+
+  Future<void> _withFetch(Future<void> Function() operation) {
+    final result = _fetchOperations.then((_) => operation());
+    // Keep the queue usable; the returned future still reports the failure.
+    _fetchOperations = result.catchError((Object _) {});
+    return result;
+  }
 
   /// Whether the JavaScript handler bridge has already been installed on the
   /// underlying [WebviewController]. The bridge is idempotent so it is safe to
@@ -208,12 +216,20 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
 
   void _handleDevToolsProtocolEvent(Map<String, dynamic> event) {
     final eventName = event['eventName'];
+    // Schedule internal handling before calling application listeners, which
+    // may throw. They must not prevent a paused request from being settled.
+    if (eventName == 'Fetch.requestPaused') {
+      final data = event['data'];
+      if (data is Map && data['requestId'] is String) {
+        unawaited(_withFetch(() => _continueRequest(data)));
+      }
+    }
     if (eventName is String) {
       _devToolsProtocolCallbacks[eventName]?.call(event['data']);
     }
-    if (eventName != 'Fetch.requestPaused') return;
-    final data = event['data'];
-    if (data is! Map) return;
+  }
+
+  Future<void> _continueRequest(Map data) async {
     final requestId = data['requestId'];
     // Without a request id there is nothing to resume. Every other guard
     // degrades to "continue with the original request": a malformed or
@@ -243,27 +259,34 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
         }
       }
     }
-    unawaited(
-      _controller
-          .callDevToolsProtocolMethod(
-            'Fetch.continueRequest',
-            <String, dynamic>{
-              'requestId': requestId,
-              if (headers.isNotEmpty)
-                'headers': headers.entries
-                    .map((entry) => {'name': entry.key, 'value': entry.value})
-                    .toList(),
-            },
-          )
-          .catchError((Object _) {
-            // Never leave the request paused: a failed continuation is
-            // swallowed rather than freezing the navigation.
-          }),
-    );
+    try {
+      await _controller.callDevToolsProtocolMethod(
+        'Fetch.continueRequest',
+        <String, dynamic>{
+          'requestId': requestId,
+          if (headers.isNotEmpty)
+            'headers': headers.entries
+                .map((entry) => {'name': entry.key, 'value': entry.value})
+                .toList(),
+        },
+      );
+    } catch (_) {
+      // Terminate the request rather than silently retrying it without headers.
+      try {
+        await _controller.callDevToolsProtocolMethod('Fetch.failRequest', {
+          'requestId': requestId,
+          'errorReason': 'Failed',
+        });
+      } catch (_) {
+        // If the CDP request can no longer be addressed, cancel navigation at
+        // the native WebView2 boundary. A failure here remains observable.
+        await _controller.stop();
+      }
+    }
     // The pending headers are consumed; turn interception back off so later
     // header-less navigations are not held for a needless round-trip.
     if (_pendingRequestHeaders.isEmpty) {
-      unawaited(_disableFetch());
+      await _disableFetch();
     }
   }
 
@@ -274,14 +297,10 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
   /// [Uri.toString] preserves whatever the caller wrote. Keying the map by this
   /// form on both the store and the lookup keeps the two sides matching.
   String _canonicalRequestUrl(Uri uri) {
-    final defaultPort =
-        (uri.scheme == 'https' && uri.port == 443) ||
-        (uri.scheme == 'http' && uri.port == 80);
-    final path = uri.path.isEmpty ? '/' : uri.path;
-    final query = uri.query.isEmpty ? '' : '?${uri.query}';
-    return '${uri.scheme}://${uri.host}'
-        '${defaultPort ? '' : ':${uri.port}'}'
-        '$path$query';
+    final parsed = Uri.parse(uri.toString());
+    return parsed
+        .replace(path: parsed.path.isEmpty ? '/' : parsed.path, fragment: '')
+        .toString();
   }
 
   /// [_canonicalRequestUrl] for a URL that arrived as a string, falling back to
@@ -294,16 +313,11 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
     }
   }
 
-  /// Turns `Fetch` interception off. Best-effort: a failure here must never
-  /// break the navigation that triggered it.
+  /// Change local state only after WebView2 acknowledges the transition.
   Future<void> _disableFetch() async {
     if (!_fetchEnabled) return;
+    await _controller.callDevToolsProtocolMethod('Fetch.disable', {});
     _fetchEnabled = false;
-    try {
-      await _controller.callDevToolsProtocolMethod('Fetch.disable', {});
-    } catch (_) {
-      // Ignore — interception staying on is harmless, a broken navigation is not.
-    }
   }
 
   void _dispatchWebMessage(dynamic message) {
@@ -382,26 +396,30 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
     if (url == null) return;
     final headers = urlRequest.headers;
     final hasHeaders = headers != null && headers.isNotEmpty;
-    if (hasHeaders) {
-      _pendingRequestHeaders[_canonicalRequestUrl(url)] = headers;
-      try {
+    await _withFetch(() async {
+      _pendingRequestHeaders.clear();
+      if (hasHeaders) {
+        await _controller.addDevToolsProtocolEventListener(
+          'Fetch.requestPaused',
+        );
         await _controller.callDevToolsProtocolMethod('Fetch.enable', {
           'patterns': [
             {'resourceType': 'Document', 'requestStage': 'Request'},
           ],
         });
         _fetchEnabled = true;
-      } catch (_) {
-        // Interception is unavailable: drop the pending headers and navigate
-        // plainly so a header-less navigation never regresses.
-        _pendingRequestHeaders.remove(_canonicalRequestUrl(url));
+        _pendingRequestHeaders[_canonicalRequestUrl(url)] = Map.of(headers);
+      } else {
+        await _disableFetch();
       }
-    } else {
-      // Nothing to inject — make sure interception is off so plain
-      // navigations do not pay a needless pause → Dart → continue round-trip.
-      await _disableFetch();
-    }
-    await _controller.loadUrl(url.toString());
+      try {
+        await _controller.loadUrl(url.toString());
+      } catch (_) {
+        _pendingRequestHeaders.clear();
+        await _disableFetch();
+        rethrow;
+      }
+    });
   }
 
   @override
@@ -424,7 +442,13 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
     required String eventName,
   }) async {
     _devToolsProtocolCallbacks.remove(eventName);
-    await _controller.removeDevToolsProtocolEventListener(eventName);
+    // The navigation interceptor owns this listener even when an application
+    // removes its own callback for the same event.
+    await _withFetch(() async {
+      if (eventName != 'Fetch.requestPaused' || !_fetchEnabled) {
+        await _controller.removeDevToolsProtocolEventListener(eventName);
+      }
+    });
   }
 
   @override
@@ -442,7 +466,7 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
       mimeType: mimeType,
       encoding: Encoding.getByName(encoding),
     ).toString();
-    await _controller.loadUrl(dataUri);
+    await loadUrl(urlRequest: URLRequest(url: WebUri(dataUri)));
   }
 
   /// Injects a `<base href>` tag into [data], after a leading doctype when one
@@ -473,7 +497,7 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
 
     // Windows file uri
     final fileUri = Uri.file(filePath).toString();
-    await _controller.loadUrl(fileUri);
+    await loadUrl(urlRequest: URLRequest(url: WebUri(fileUri)));
   }
 
   @override
