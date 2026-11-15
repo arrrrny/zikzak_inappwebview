@@ -134,7 +134,7 @@ TEST(UserScriptFromFlValue, PreservesAllowedOriginRules) {
   FlValue* map = fl_value_new_map();
   fl_value_set_string_take(map, "groupName", fl_value_new_string("group"));
   fl_value_set_string_take(map, "source", fl_value_new_string("console.log(1);"));
-  fl_value_set_string_take(map, "injectionTime", fl_value_new_int64(0));
+  fl_value_set_string_take(map, "injectionTime", fl_value_new_int(1));
   fl_value_set_string_take(map, "forMainFrameOnly", fl_value_new_bool(TRUE));
   fl_value_set_string_take(map, "allowedOriginRules", rules);
 
@@ -144,6 +144,10 @@ TEST(UserScriptFromFlValue, PreservesAllowedOriginRules) {
   ASSERT_TRUE(script.allowedOriginRules.has_value());
   ASSERT_EQ(script.allowedOriginRules->size(), 1u);
   EXPECT_EQ((*script.allowedOriginRules)[0], "https://example.com");
+  // A non-zero injectionTime makes the typed INT read load-bearing: a
+  // regression back to fl_value_new_int64 (or a dropped key) would otherwise
+  // silently fall through to the parser's atDocumentStart default.
+  EXPECT_EQ(script.injectionTime, UserScriptInjectionTime::atDocumentEnd);
 }
 
 TEST(UserScriptFromFlValue, UnsetRulesStayUnset) {

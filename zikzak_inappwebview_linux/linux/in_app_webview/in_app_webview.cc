@@ -424,8 +424,8 @@ InAppWebView::~InAppWebView() {
     // The date dialog's handlers use the heap-allocated DateDialogContext;
     // disconnect the response handler and free the context here since the
     // handler that would delete it can no longer run.
-    g_signal_handlers_disconnect_matched(active_date_dialog_, G_SIGNAL_MATCH_FUNC, 0, 0, nullptr,
-                                         G_CALLBACK(OnDateDialogResponse), nullptr);
+    // Match the owned context directly; GCallback is not a gpointer in C++ (#433).
+    g_signal_handlers_disconnect_by_data(active_date_dialog_, date_dialog_context_);
     DestroyDateDialogContext(date_dialog_context_);
     date_dialog_context_ = nullptr;
     gtk_widget_destroy(active_date_dialog_);

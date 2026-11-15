@@ -3,6 +3,7 @@
 
 #include <string>
 
+#include "../utils/log.h"
 #include "../utils/string.h"
 #include "javascript_bridge_js.h"
 

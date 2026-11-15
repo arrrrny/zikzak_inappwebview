@@ -12,6 +12,82 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Dart tests cannot compile the Linux plugin or exercise WPE's network/bridge.
+  build-linux:
+    name: "build and integration: zikzak_inappwebview_linux (WPE, ${{ matrix.runner }})"
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
+    # Pinned by digest, not by the rolling `sid` tag, so the base rootfs
+    # (toolchain and libraries already in the image) is reproducible and a
+    # change to it is a deliberate digest bump. This does NOT pin the packages
+    # the first step installs: `apt-get update && apt-get install` still
+    # resolves libwpewebkit-2.0-dev, libwpe-1.0-dev, cmake and clang from the
+    # live `sid` archive, so an archive break or a WPE soname bump there can
+    # still fail this merge-gating job with no code change behind it. Pinning
+    # those packages to a sid version (or to snapshot.debian.org) would be a
+    # further hardening step, not a guarantee this comment claims. The
+    # `pkg-config --atleast-version=2.50` assertion below keeps the version
+    # floor honest, so a digest bump only has to happen when a newer WPE is
+    # actually wanted.
+    # debian:sid OCI index, created 2026-11-04
+    container: debian:sid@sha256:e276677157e13bc51ea5b8651f54ad28883f503cc37b3e3af2c4b6cc2f4efe7b
+    defaults:
+      run:
+        shell: bash
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: "3.5"
+      LIBGL_ALWAYS_SOFTWARE: "1"
+      # The isolated CI container runs as root; WebKit's sandbox requires a
+      # non-root desktop session. This switch is scoped to the test job.
+      WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS: "1"
+    steps:
+      - name: Install Flutter and native WPE build requirements
+        run: |
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            ca-certificates git curl unzip xz-utils clang cmake ninja-build pkg-config \
+            libgtk-3-dev libwpewebkit-2.0-dev libwpe-1.0-dev libepoxy-dev \
+            libsecret-1-dev libwayland-dev xvfb xauth dbus-x11 libgl1-mesa-dri
+          pkg-config --atleast-version=2.50 wpe-webkit-2.0
+          pkg-config --modversion wpe-webkit-2.0 wpe-platform-2.0 wpe-platform-headless-2.0
+      - uses: actions/checkout@v4
+      - name: Bootstrap Flutter 3.47.0 for the native architecture
+        # The release archive has no Linux ARM64 entry. A source checkout also
+        # owns its files as the container user, avoiding archive UID mismatches.
+        run: |
+          test -d "$RUNNER_TEMP"
+          git clone --depth 1 --branch 3.47.0 https://github.com/flutter/flutter.git "$RUNNER_TEMP/flutter"
+          echo "$RUNNER_TEMP/flutter/bin" >> "$GITHUB_PATH"
+          "$RUNNER_TEMP/flutter/bin/flutter" --version
+      - name: Point the Linux example at this checkout
+        working-directory: zikzak_inappwebview_linux/example
+        run: |
+          cat > pubspec_overrides.yaml <<'YAML'
+          dependency_overrides:
+            zikzak_inappwebview_platform_interface:
+              path: ../../zikzak_inappwebview_platform_interface
+          YAML
+          flutter config --enable-linux-desktop
+          flutter pub get
+      - name: Exercise native navigation, cookies and JavaScript
+        working-directory: zikzak_inappwebview_linux/example
+        env:
+          # An explicit path keeps the run's manifest out of the package tree;
+          # the test falls back to its CWD-relative default without it.
+          NATIVE_RESULT_PATH: ${{ github.workspace }}/zikzak_inappwebview_linux/example/build/native-navigation-result.json
+        run: dbus-run-session -- xvfb-run -a flutter test integration_test/native_navigation_test.dart -d linux
+      - name: Run compiled native tests
+        working-directory: zikzak_inappwebview_linux/example
+        run: ctest --test-dir build/linux/*/debug/plugins/zikzak_inappwebview_linux --output-on-failure --no-tests=error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-native-navigation-result-${{ matrix.runner }}
+          path: zikzak_inappwebview_linux/example/**/native-navigation-result.json
+          if-no-files-found: error
+
   analyze:
     name: "analyze: ${{ matrix.package }}"
     runs-on: ubuntu-latest
