@@ -5,7 +5,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:path/path.dart' as p;
-import 'package:webview_windows/webview_windows.dart';
+import 'package:zikzak_webview_windows/zikzak_webview_windows.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
 /// Names reserved by the platform and not allowed for user-registered

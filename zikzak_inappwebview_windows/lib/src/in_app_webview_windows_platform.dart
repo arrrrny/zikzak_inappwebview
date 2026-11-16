@@ -6,7 +6,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart' show PlatformException;
 
 import 'package:path_provider/path_provider.dart';
-import 'package:webview_windows/webview_windows.dart';
+import 'package:zikzak_webview_windows/zikzak_webview_windows.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
 import 'in_app_webview_windows_controller.dart';

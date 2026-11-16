@@ -1,0 +1,22 @@
+name: zikzak_webview_windows_example
+description: Demonstrates how to use the zikzak_webview_windows plugin.
+
+publish_to: 'none'
+
+environment:
+  sdk: ">=3.8.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  zikzak_webview_windows:
+    path: ../
+  window_manager: ^0.2.7
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true

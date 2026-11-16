@@ -96,6 +96,7 @@ jobs:
       matrix:
         package:
           - zikzak_inappwebview_platform_interface
+          - zikzak_webview_windows
           - zikzak_inappwebview_web
           - zikzak_inappwebview_macos
           - zikzak_inappwebview_windows
@@ -124,6 +125,7 @@ jobs:
       matrix:
         package:
           - zikzak_inappwebview_platform_interface
+          - zikzak_webview_windows
           - zikzak_inappwebview_macos
           - zikzak_inappwebview_windows
           - zikzak_inappwebview_linux

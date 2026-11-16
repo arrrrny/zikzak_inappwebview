@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:webview_windows/webview_windows.dart' show LoadingState, Webview;
+import 'package:zikzak_webview_windows/zikzak_webview_windows.dart' show LoadingState, Webview;
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 import 'package:zikzak_inappwebview_windows/src/in_app_webview_windows_platform.dart';
 

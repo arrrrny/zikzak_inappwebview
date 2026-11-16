@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:webview_windows/webview_windows.dart';
+import 'package:zikzak_webview_windows/zikzak_webview_windows.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 import 'package:zikzak_inappwebview_windows/src/in_app_webview_windows_controller.dart';
 
