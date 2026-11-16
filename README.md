@@ -55,20 +55,20 @@ Add `zikzak_inappwebview` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  zikzak_inappwebview: ^6.3.4
+  zikzak_inappwebview: ^6.4.0
 ```
 
 ## ⚙️ Requirements
 
-| Platform    | Minimum Version | Notes                     |
-| ----------- | --------------- | ------------------------- |
-| **Flutter** | 3.10.0+         |                           |
-| **Android** | API 24+         | Android 7.0+              |
-| **iOS**     | 15.0+           |                           |
-| **macOS**   | 12.0+           |                           |
-| **Windows** | 10+             | Requires WebView2 Runtime |
-| **Linux**   |                 | Requires WebKitGTK 2.40+  |
-| **Web**     | Any             |                           |
+| Platform    | Minimum Version | Notes                                                                                     |
+| ----------- | --------------- | ----------------------------------------------------------------------------------------- |
+| **Flutter** | 3.47.0+         | The honest floor: zuraffa 7.x needs `meta ^1.19.0`, which Flutter pins up to 3.44.x (#393) |
+| **Android** | API 24+         | Android 7.0+                                                                              |
+| **iOS**     | 15.0+           |                                                                                           |
+| **macOS**   | 12.0+           |                                                                                           |
+| **Windows** | 10+             | Requires WebView2 Runtime                                                                 |
+| **Linux**   | WPE WebKit 2.50+| Requires `wpe-webkit-2.0`, `wpe-platform-2.0`, `wpe-platform-headless-2.0`, `wpe-1.0`     |
+| **Web**     | Any             |                                                                                           |
 
 ## ⚠️ Known Issues
 

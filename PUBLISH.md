@@ -30,18 +30,25 @@ The `prepare_for_publish.sh` script reads the version and propagates it to all `
 
 - **Type**: `pub.dev`
 - **Packages** (in publish order):
-  1. `zikzak_inappwebview_platform_interface`
-  2. `zikzak_inappwebview_android`
-  3. `zikzak_inappwebview_ios`
-  4. `zikzak_inappwebview_web`
-  5. `zikzak_inappwebview_macos`
-  6. `zikzak_inappwebview_windows`
-  7. `zikzak_inappwebview_linux`
-  8. `zikzak_inappwebview`
+  1. `zikzak_webview_windows` — **its own version line (`0.5.0`), published separately, first.** The BSD-3 fork of
+     `webview_windows` that `zikzak_inappwebview_windows` compiles against; it must exist on pub.dev before the
+     Windows facade can resolve it. Run `./scripts/publish_windows_fork.sh`, then the flow below.
+  2. `zikzak_inappwebview_platform_interface`
+  3. `zikzak_inappwebview_android`
+  4. `zikzak_inappwebview_ios`
+  5. `zikzak_inappwebview_web`
+  6. `zikzak_inappwebview_macos`
+  7. `zikzak_inappwebview_windows`
+  8. `zikzak_inappwebview_linux`
+  9. `zikzak_inappwebview`
 - **All packages are public**
+- **Only packages 2–9 share a version number** (`tool/versions.dart` → `packageVersion`). The fork is versioned
+  independently and must never be added to `prepare_for_publish.sh`'s package list, which would rewrite its
+  `version:` to the 6.x value.
 
 ## Scripts
 
+- **Pre-publish (fork)**: `./scripts/publish_windows_fork.sh` — dry run then publish `zikzak_webview_windows` at its own version; refuses to republish an existing pub.dev version
 - **Pre-publish**: `./scripts/prepare_for_publish.sh <version>` — creates branch, updates versions, converts path deps to versioned, updates changelogs, commits
 - **Publish**: `./scripts/publish.sh` — publishes all packages in dependency order to pub.dev (with checks, dry-runs)
 - **Post-publish**: `./scripts/push_to_master.sh` — merges publish branch to master, creates and pushes git tag
@@ -54,11 +61,13 @@ The `prepare_for_publish.sh` script reads the version and propagates it to all `
 ### Automated (single command — no confirmation needed)
 
 ```bash
+# Only when the fork changed: publish zikzak_webview_windows at its own version
+# (skip this if the published 0.5.x already matches zikzak_webview_windows/pubspec.yaml).
+bash scripts/publish_windows_fork.sh && \
 # Full publish: prepare → publish to pub.dev → merge to master → restore dev
 bash scripts/prepare_for_publish.sh <version> <<< "" && \
   bash scripts/publish.sh && \
-  bash scripts/push_to_master.sh -f && \
-  bash scripts/restore_dev_setup.sh
+  bash scripts/push_to_master.sh -f
 ```
 
 ⚠️ `publish.sh` needs a 20-minute timeout due to pub.dev propagation delays.
@@ -67,11 +76,17 @@ bash scripts/prepare_for_publish.sh <version> <<< "" && \
 
 1. Edit `tool/versions.dart` with the new version and dependency versions.
 2. Run `dart run tool/update_readmes.dart` to sync README snippets.
-3. Update the root `CHANGELOG.md` with the new version entry.
+3. Update the **umbrella** `zikzak_inappwebview/CHANGELOG.md` **and** the repo-root `CHANGELOG.md` with the new
+   version entry. The script propagates only the umbrella's entry to the other 7 packages — if it is missing there,
+   every package changelog gets raw commit subjects instead.
 4. `./scripts/prepare_for_publish.sh <version>`
 5. `bash scripts/publish.sh` (publishes to pub.dev)
 6. `bash scripts/push_to_master.sh -f` (merge + tag, auto-deletes branch)
-7. `bash scripts/restore_dev_setup.sh` (back to dev setup)
+7. Restore the dev setup **by hand** — `restore_dev_setup.sh` writes `path:` under `dependencies:`, which makes every
+   publishable package emit `invalid_dependency` (a warning, i.e. a red CI build). Append a `dependency_overrides:`
+   block to each pubspec instead: 7 platform packages for the umbrella, `platform_interface` for each platform
+   package, and `zikzak_webview_windows` for `zikzak_inappwebview_windows`. `zikzak_inappwebview_platform_interface`
+   needs none. Verify with `flutter analyze --no-fatal-infos` that `invalid_dependency` is 0.
 
 ## Notes
 
@@ -112,8 +127,10 @@ bash scripts/prepare_for_publish.sh <version> <<< "" && \
 - `publish.sh` creates and pushes the git tag itself; `push_to_master.sh` then
   finds it already present and skips. That is expected, not an error.
 - The pre-publish script is interactive (asks for commit message). Pipe `echo ""` for default.
-- The root `CHANGELOG.md` is the single source of truth for changelog content. The script reads the entry for the new version from it and propagates to all sub-package changelogs.
-- `zikzak_inappwebview_windows` may show path dependency warnings for `webview_windows` and `path` — these are external deps, not zikzak packages, and are expected.
-- **Timeout**: `publish.sh` needs at least 20 minutes (`timeout_ms: 1200000`). Pub.dev takes up to 10 minutes to propagate each newly published package before dependents can resolve it, and with 9 packages published sequentially, the total can be 20–30 minutes.
+- Changelogs: `prepare_for_publish.sh` reads the new version's entry from the **umbrella**
+  `zikzak_inappwebview/CHANGELOG.md` (its `ROOT_CHANGELOG`) and propagates it to the other 7 packages. The repo-root
+  `CHANGELOG.md` is a separate hand-curated log the script never reads — write the entry into both.
+- `zikzak_inappwebview_windows` may show path dependency warnings for `zikzak_webview_windows` and `path` — these are external deps, not 6.x packages, and are expected.
+- **Timeout**: `publish.sh` needs at least 20 minutes (`timeout_ms: 1200000`). Pub.dev takes up to 10 minutes to propagate each newly published package before dependents can resolve it, and with 8 lockstep packages published sequentially (9 counting the fork), the total can be 20–30 minutes.
 - All scripts accept `-f` / `--force` flags to run non-interactively — the automated workflow uses this.
 - **No `any` constraints**: Before publishing, ALL `pubspec.yaml` files must have real version constraints. Search for `: any` and replace with caret bounds (e.g., `^X.Y.Z`). The publish-manager skill now validates this automatically in Step 4.

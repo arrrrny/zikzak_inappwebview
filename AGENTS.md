@@ -173,7 +173,7 @@ The same workaround is quoted in the `6.2.x` `CHANGELOG.md` entries and in `PUBL
 
 `zikzak_inappwebview` is a **Flutter plugin** (a community fork of `flutter_inappwebview`, API-equivalent to upstream 6.x, published as fork version 4.x/5.x) that provides an inline WebView, a headless WebView, and an in-app browser window across **6 platforms**: Android, iOS, macOS, Web, Windows, Linux.
 
-It is a **Dart/Flutter monorepo** made of **9 independent pub packages** that form one federated plugin. It is NOT a single app. The `zikzak_inappwebview` package is the "umbrella" / app-facing package; the rest are platform implementations plus a shared platform-interface package.
+It is a **Dart/Flutter monorepo** made of **10 independent pub packages** that form one federated plugin. It is NOT a single app. The `zikzak_inappwebview` package is the "umbrella" / app-facing package; the rest are platform implementations plus a shared platform-interface package. One of them, `zikzak_webview_windows`, is not a zikzak platform facade at all — it is a BSD-3 fork of `webview_windows` (see below).
 
 - **License:** Apache License 2.0 (see `LICENSE`). Dart source files do NOT carry per-file Apache headers — don't add them.
 - **Homepage / docs:** https://arrrrny.github.io/zikzak_inappwebview
@@ -211,14 +211,43 @@ zikzak_inappwebview_android/        # Android impl — Java (159 files) under an
 zikzak_inappwebview_ios/            # iOS impl — Swift (141 files) under ios/ (Swift Package Manager; Package.swift present)
 zikzak_inappwebview_macos/          # macOS impl — Swift (70 files) under macos/ (Package.swift present)
 zikzak_inappwebview_web/            # Web impl — pure Dart using `dart:js_interop` / `package:web` (no native code)
-zikzak_inappwebview_windows/        # Windows impl — Dart facade over `webview_windows` package (no own native code)
-zikzak_inappwebview_linux/          # Linux impl — Dart + C++ (in_app_webview.cc, plugin private .h) over WebKitGTK
+zikzak_webview_windows/             # BSD-3 fork of `webview_windows` 0.4.0 (Niklas Schulze), renamed + DevTools protocol API; own native C++ (version 0.5.0, NOT lockstep with the 6.x line)
+zikzak_inappwebview_windows/        # Windows impl — Dart facade over `zikzak_webview_windows` (no own native code)
+zikzak_inappwebview_linux/          # Linux impl — Dart + C++ over WPE WebKit (headless WPEPlatform; not WebKitGTK since 6.4.0)
 zikzak_inappwebview_module/         # value-add "intelligence" layer (publish_to: none; dev only)
 
 scripts/                            # publish + grep_gate shell scripts (see Deployment)
 specs/                             # feature specs (spec-kit): spec.md, plan.md, tasks.md, tdd/
 .specify/                          # spec-kit config, extensions, bugs/, workflows/, memory/ (constitution.md, tdd-profile.md)
 ```
+
+### The `zikzak_webview_windows` fork
+
+`zikzak_inappwebview_windows` is a Dart facade; the native WebView2 implementation lives in
+`zikzak_webview_windows`, which is a **BSD-3 fork of `webview_windows` 0.4.0 by Niklas Schulze**
+(`jnschulze/flutter-webview-windows`), taken at `ba0940e`. It exists for one reason: the fork carries the
+WebView2 DevTools protocol API (`callDevToolsProtocolMethod`, `devToolsProtocolEvent`, devtools listener
+add/remove) from [upstream PR #334](https://github.com/jnschulze/flutter-webview-windows/pull/334), which **no
+hosted `webview_windows` release has**. The facade compiles against that API, so a hosted 0.4.0 would not compile.
+
+Three consequences worth knowing before touching it:
+
+- **It does not share the monorepo's version line.** Every other publishable package is `6.x` in lockstep; this one
+  is `0.5.0`, because it mirrors upstream's numbering plus the fork delta. `prepare_for_publish.sh` must never be
+  pointed at it, and `publish.sh` does not publish it — see PUBLISH.md for the separate step.
+- **Renaming is not cosmetic.** Flutter's Windows plugin registrant derives the include path and the registration
+  symbol from the package name (`_cppPluginRegistryImplementationTemplate` in `flutter_tools` emits
+  `<name>/<filename>.h` and `<class>RegisterWithRegistrar`), so the native plugin, its CMake target
+  (`zikzak_webview_windows_plugin`) and `ZikzakWebviewWindowsPlugin` all follow the package name. The
+  `io.jns.webview.win` method-channel prefix and the `flutter_webview_windows` data directory deliberately do not —
+  they are internal strings shared with the native side.
+- **Windows native code cannot be compiled or CI-gated here.** This machine is macOS and the CI matrix has no
+  Windows runner, so a C++ break in `windows/` is invisible to `flutter analyze` and `flutter test`. A green
+  monorepo run says nothing about the native build; only `flutter build windows` on a Windows host does.
+
+Syncing from upstream means re-taking the diff, not merging: the fork carries a rename, so a plain upstream merge
+conflicts on every renamed path. Prefer re-applying upstream's `lib/` and `windows/` changes on top and re-running
+the rename steps.
 
 ### Two-tier architecture (Core vs Module)
 
@@ -251,10 +280,10 @@ Models were migrated from the old `@ExchangeableObject`/`@ExchangeableEnum` buil
 ### Native layers
 - **Android:** Java (NOT Kotlin despite older docs). Package `wtf.zikzak.zikzak_inappwebview_android`. `android/build.gradle`: AGP 8.13.1, `compileSdk 36`, Java 17, `minSdk 24` (Android 7.0), depends on `androidx.webkit:webkit:1.15.0`, `androidx.browser:browser:1.8.0`. 16KB page-size alignment is on (AGP >= 8.5.1).
 - **iOS / macOS:** Swift, consumed via **Swift Package Manager** (`ios/zikzak_inappwebview_ios/Package.swift`, `macos/.../Package.swift`). `build_ios_xcframework.sh` rebuilds the XCFramework.
-- **Linux:** C++ (`linux/in_app_webview.cc`, `linux/zikzak_inappwebview_linux_plugin.cc`, `linux/CMakeLists.txt`) over WebKitGTK; requires WebKitGTK 2.40+ at runtime.
+- **Linux:** C++ (`linux/in_app_webview.cc`, `linux/zikzak_inappwebview_linux_plugin.cc`, `linux/CMakeLists.txt`) over **WPE WebKit** — re-based in 6.4.0 (#420), so the runtime requirement is WPE WebKit 2.50+ with the headless `WPEPlatform` backend (`wpe-webkit-2.0`, `wpe-platform-2.0`, `wpe-platform-headless-2.0`, `wpe-1.0`), not WebKitGTK 2.40+.
 - **Windows:** no own native code — a Dart wrapper over the external `webview_windows` package (plus `path`, `path_provider`). Requires the WebView2 Runtime on the target machine.
 - **Web:** pure Dart using `dart:js_interop` / `package:web` (`^1.1.1`). Some APIs (e.g. screenshot/PDF) are deliberate stubs returning `null`.
-- **Runtime minimums** (from `README.md`): Android API 24+, iOS 16.0+, macOS 12.0+, Windows 10+, Linux WebKitGTK 2.40+.
+- **Runtime minimums** (from `README.md`): Flutter 3.47.0+, Android API 24+, iOS 15.0+, macOS 12.0+, Windows 10+, Linux WPE WebKit 2.50+, Web any.
 
 ### App-facing Dart organization (umbrella `lib/src/main.dart`)
 Exports are grouped by feature: `in_app_webview`, `in_app_browser`, `chrome_safari_browser`, `web_storage`, `cookie_manager`, `pull_to_refresh`, `web_message`, `web_authentication_session`, `print_job`, `find_interaction`, `service_worker_controller`, `proxy_controller`, `webview_asset_loader`, `tracing_controller`, `process_global_config`, `in_app_localhost_server`, `webview_environment`, `webview_navigation_guards`, `navigation_tracker`, `session_recipe`, `dialogue_dismisser`, plus `webview_sessions` (the `zikzak_session`-backed portable session API, spec 014).
@@ -306,21 +335,24 @@ cd zikzak_inappwebview/example && flutter test integration_test/<file>.dart -d <
 
 ### Known repository state — measured on `master` at 2026-10-17, after the `6.2.1` release
 
-`master` is **green**: the 17-job CI matrix passes, and every number below was reproduced locally on the same commit via `./scripts/local_ci.sh`. Re-measure before leaning on it — this table moves.
+`master` is **green**: the 21-job CI matrix passes, and every number below was reproduced locally on this release's tree (1028 test cases, 0 warnings anywhere) via a per-package `flutter analyze --no-fatal-infos` + `flutter test --concurrency=2` sweep. Re-measure before leaning on it — this table moves.
 
 | Package | test files | `flutter test` | `flutter analyze` |
 | --- | --- | --- | --- |
-| `zikzak_inappwebview` | 27 | 250 pass — GREEN | 23 infos, 0 warnings, 0 errors |
-| `zikzak_inappwebview_platform_interface` | 38 | 306 pass — GREEN | 77 infos, 0 warnings, 0 errors |
-| `zikzak_inappwebview_macos` | 11 | 106 pass — GREEN | clean |
-| `zikzak_inappwebview_ios` | 9 | 27 pass — GREEN | 192 infos, 0 warnings, 0 errors |
-| `zikzak_inappwebview_windows` | 6 | 36 pass — GREEN | clean |
-| `zikzak_inappwebview_linux` | 2 | 9 pass — GREEN | 5 infos, 0 warnings, 0 errors |
+| `zikzak_inappwebview` | 29 | 269 pass — GREEN | 44 infos, 0 warnings, 0 errors |
+| `zikzak_inappwebview_platform_interface` | 39 | 309 pass — GREEN | 77 infos, 0 warnings, 0 errors |
+| `zikzak_inappwebview_macos` | 19 | 156 pass — GREEN | clean |
+| `zikzak_inappwebview_ios` | 17 | 113 pass — GREEN | 192 infos, 0 warnings, 0 errors |
+| `zikzak_inappwebview_windows` | 7 | 55 pass — GREEN | clean |
+| `zikzak_webview_windows` | 1 | 2 pass — GREEN | 6 infos, 0 warnings, 0 errors |
+| `zikzak_inappwebview_linux` | 10 | 67 pass — GREEN | 4 infos, 0 warnings, 0 errors |
 | `zikzak_inappwebview_web` | 1 | 1 pass — GREEN, but ONLY with `--platform chrome` | clean |
-| `zikzak_inappwebview_android` | 5 | 16 pass — outside the CI matrix | 197 infos, 0 warnings, 0 errors |
-| `zikzak_inappwebview_module` | 1 | 6 pass — outside the CI matrix | clean (`publish_to: none`, never published) |
+| `zikzak_inappwebview_android` | 7 | 29 pass — outside the CI matrix | 197 infos, 0 warnings, 0 errors |
+| `zikzak_inappwebview_module` | 2 | 27 pass — outside the CI matrix | clean (`publish_to: none`, never published) |
 
-The remaining infos are style-level and deliberately tolerated (`--no-fatal-infos`). Warnings are **not** tolerated — a new warning in any matrix package is a red build. Note that `zikzak_inappwebview_android` and `zikzak_inappwebview_module` are simply absent from both matrices (`analyze` covers 7 packages, `test` covers 6 plus the `--platform chrome` web job); both are green when measured locally, so their exclusion is not a lint-debt gate. Treat their numbers as unverified-in-CI.
+The remaining infos are style-level and deliberately tolerated (`--no-fatal-infos`). Warnings are **not** tolerated — a new warning in any matrix package is a red build. Note that `zikzak_inappwebview_android` and `zikzak_inappwebview_module` are simply absent from both matrices (`analyze` covers 8 packages, `test` covers 7 plus the `--platform chrome` web job); both are green when measured locally, so their exclusion is not a lint-debt gate. Treat their numbers as unverified-in-CI.
+
+`zikzak_webview_windows`'s two tests are Dart-only surface probes. Nothing in either matrix compiles its C++ — see the Windows caveat in "The `zikzak_webview_windows` fork" above.
 
 One local-CI step is not fully exercised on this machine: a `build-ios` "Check the toolchain compiles the arm this job exists for" step asserts a pre-Swift-6 toolchain on any runner that is not `macos-15`, and the local Xcode is Swift 6.x, so that branch would fail here by construction. Since #412 no pre-Swift-6 runner is in the matrix, so only the `macos-15` branch is reachable in CI — it asserts Swift 6, which this machine's Xcode satisfies, so it passes; the `else` branch is unreachable until a pre-Swift-6 runner is added back, and the assertion stays for whoever does. Both Swift builds — `flutter build ios --release --no-codesign` and `flutter build macos --debug` — do run and pass locally, so the Swift sources are genuinely compiled.
 
@@ -332,7 +364,7 @@ Every publishable package resolves its intra-repo dependencies through `dependen
 
 Doc staleness to be aware of:
 - `.specify/memory/tdd-profile.md` claims 10 umbrella test files / 112 tests and a green baseline — the umbrella now has 27 files / 250 tests. Treat it as partially outdated.
-- Every package is at `6.3.4`, and README installation snippets match.
+- Every package is at `6.4.0`, and README installation snippets match.
 
 ---
 
@@ -355,7 +387,7 @@ Per `.specify/memory/constitution.md` and `tdd-profile.md`:
 - Analyzer `exclude` lists `build/**` and all native platform dirs (`android/`, `ios/`, `web/`, `macos/`, `windows/`, `linux/`) so native code is not Dart-analyzed.
 - Native style follows each platform's norm: Java (Android), Swift (iOS/macOS) with `#if !os(macOS)` guards where an API is iOS-only (see `INSIGHTS.md` for WKWebView iOS/macOS divergences), C++ (Linux).
 - Commits follow Conventional Commits (`feat(...)`, `fix(...)`, `test(...)`, `refactor(...)`, `docs(...)`); scopes are package- or spec-based (e.g. `test(in_app_webview)`, `fix(android)`, `docs(specs)`, `test(001): ...` referencing a spec number). PRs are merged into `master` via GitHub merge commits (`Merge pull request #NNN from arrrrny/<branch>`); feature branches are named `feat/...`, `fix/...`, or `<NNN>-<slug>`.
-- **CI exists and gates `master`.** `.github/workflows/ci.yml` runs a 17-job matrix on every push to `master` and every PR into it: `flutter analyze` and `flutter test` for `platform_interface`, `ios`, `web`, `macos`, `windows`, `linux` and `zikzak_inappwebview` (`web` with `--platform chrome`), plus a `build-ios` job (`macos-15`; `macos-14` was dropped in #412 when its runner image retired) that compiles the iOS Swift sources, a `build-macos` job (`macos-15`) that compiles the macOS Swift sources — both by building the example app from this checkout via a `pubspec_overrides.yaml` path override — and a `resolve-floor` job that pins the declared Flutter floor (3.47.0) and resolves a minimal consumer app (`equatable: ^3.0.0` + this checkout; the #393 repro), asserting path resolution and a nocterm-free zuraffa 7.x. `zikzak_inappwebview_android` is the only published package still outside the matrix. There is no Makefile or Jenkinsfile. The authoritative gate remains running `flutter analyze --no-fatal-infos` + `flutter test` yourself in each affected package before you push.
+- **CI exists and gates `master`.** `.github/workflows/ci.yml` runs a 21-job matrix (jobs × matrix legs) on every push to `master` and every PR into it: `flutter analyze` and `flutter test` for `platform_interface`, `webview_windows` (the fork), `ios`, `web`, `macos`, `windows`, `linux` and `zikzak_inappwebview` (`web` with `--platform chrome`), plus a `build-ios` job (`macos-15`; `macos-14` was dropped in #412 when its runner image retired) that compiles the iOS Swift sources, a `build-macos` job (`macos-15`) that compiles the macOS Swift sources — both by building the example app from this checkout via a `pubspec_overrides.yaml` path override — and a `resolve-floor` job that pins the declared Flutter floor (3.47.0) and resolves a minimal consumer app (`equatable: ^3.0.0` + this checkout; the #393 repro), asserting path resolution and a nocterm-free zuraffa 7.x. `zikzak_inappwebview_android` is the only published package still outside the matrix. There is no Makefile or Jenkinsfile. The authoritative gate remains running `flutter analyze --no-fatal-infos` + `flutter test` yourself in each affected package before you push.
 - The analyze step passes `--no-fatal-infos`: compile **errors and warnings fail the job**, style-level infos do not. A new warning in any matrix package is a red build.
 - **Only `build-ios` and `build-macos` compile Swift.** The other jobs are pure Dart, so a Swift-only break — a bad `#available` scope, an override whose signature stops matching a different SDK, a typo in a `WKDownloadDelegate` method — passes all of them. Run `cd zikzak_inappwebview/example && flutter build ios --release --no-codesign` (or `flutter build macos --debug`) locally when you touch iOS/macOS Swift, and be aware that a local Xcode may be newer than the runner's: the `evaluateJavaScript` override in `InAppWebView.swift` compiled on Xcode 26 and failed on the runner's older SDK, which is exactly the class of bug this job exists to catch. Since #333 the iOS job ran on both `macos-14` (Swift 5.10, compiling the `#else` arm of that override) and `macos-15` (Swift 6, compiling the `#if compiler(>=6.0)` arm); a local Xcode 26 build only ever compiles the latter. **Since #412 the `macos-14` leg is gone** — actions/runner-images retired every macOS 14 image on 2026-11-02 and no hosted pre-Swift-6 runner remains, so `build-ios` is `macos-15`-only and the `#else` arm is no longer compiled in CI. The arm stays in the source on purpose (`Package.swift` declares `swift-tools-version: 5.9`, so Xcode 15 consumers still compile it); re-close the gap by adding a self-hosted or pinned pre-Swift-6 runner to the `build-ios` matrix. The macOS job runs on `macos-15` alone — no macOS source has a `#if compiler` arm, so a second runner would compile the same arm twice — which still leaves the macOS sources compiled against one SDK generation only, the same blind spot the iOS two-runner split used to close.
 - **macOS source-contract tests are not a type-check.** The `zikzak_inappwebview_macos` tests pass on Swift that does not compile: they read the `.swift` files as text and assert on their shape. That is why `build-macos` exists. Treat a green macOS test run as evidence about code *shape*, never as evidence that it compiles — before the `build-macos` job landed, all 73 of them passed while nothing compiled the package at all.
@@ -373,24 +405,34 @@ Per `.specify/memory/constitution.md` and `tdd-profile.md`:
 
 ## 📦 Deployment / Publishing
 
-Controlled by `scripts/` and documented in `PUBLISH.md`. **8 packages** publish to pub.dev, in this exact dependency order (from `scripts/publish.sh` / `scripts/prepare_for_publish.sh`):
+Controlled by `scripts/` and documented in `PUBLISH.md`. **9 packages** publish to pub.dev. Eight of them publish in
+this exact dependency order, at one shared version (from `scripts/publish.sh` / `scripts/prepare_for_publish.sh`):
 
 ```
 zikzak_inappwebview_platform_interface → _android → _ios → _web → _macos → _windows → _linux → zikzak_inappwebview
 ```
 
-`zikzak_inappwebview_module` is NOT published (`publish_to: none`). Note `PUBLISH.md` lists a 9th, first package `zikzak_inappwebview_internal_annotations` that no longer exists in this repo — its package list is stale; trust the scripts.
+The ninth, `zikzak_webview_windows`, publishes **separately and first**, at its own version line (`0.5.0`, not `6.x`):
+it is the fork the Windows facade compiles against, so it must exist on pub.dev before `zikzak_inappwebview_windows`
+can resolve. See PUBLISH.md. `zikzak_inappwebview_module` is NOT published (`publish_to: none`).
 
 Scripts:
 - `scripts/prepare_for_publish.sh <version>` — branch, bump versions, convert path deps → versioned constraints, propagate changelogs, commit. (Interactive; pipe `echo ""` for default.)
 - `scripts/publish.sh` — publish to pub.dev in order (needs **≥20 min** timeout; pub.dev propagation between packages).
 - `scripts/push_to_master.sh -f` — merge publish branch to master, tag, auto-delete branch.
+- `scripts/publish_windows_fork.sh` — publish the `zikzak_webview_windows` fork (its own 0.5.x line) with a dry run first; run it **before** `publish.sh`.
 - `scripts/restore_dev_setup.sh` — revert to path dependencies for local dev.
 - `scripts/revert_publish_changes.sh` — discard publish changes.
 
 **Pre-publish rules:**
 - Convert ALL path deps to caret version constraints; **no `: any`** allowed in any `pubspec.yaml` (publish-manager validates this).
-- The root `CHANGELOG.md` is the single source of truth; `prepare_for_publish.sh` reads the new version's entry and propagates it to every sub-package CHANGELOG. (Note: the repo currently has **no root CHANGELOG.md** — per-package CHANGELOG.md files exist instead. Reconcile before relying on the script.)
+- **Two changelogs, and they are not the same file.** `prepare_for_publish.sh` reads the new version's entry from
+  **`zikzak_inappwebview/CHANGELOG.md`** (the umbrella's — its `ROOT_CHANGELOG` variable) and propagates it into the
+  other 7 package changelogs, skipping the umbrella's because it already has it. The **repo-root `CHANGELOG.md`** is a
+  separate, hand-curated project log that the script never reads. Write the new entry into **both**: if the umbrella's
+  is missing it, the script falls back to dumping raw commit subjects into every package changelog (that is how
+  `zikzak_inappwebview/CHANGELOG.md`'s `6.3.4` entry became the one-line `* fix: address review comments on #406`).
+  The two files have drifted apart historically — the umbrella's entries are more detailed and it is missing `6.3.2`.
 - Example app (`zikzak_inappwebview/example`) uses `dependency_overrides` pointing at local platform packages for dev; these are stripped before publish.
 
 ---
@@ -507,3 +549,83 @@ for `dart test`; pass the flag anyway when you override it, and never raise
 the number on a host that also runs the forklift pool. CI carries the same
 flags in `.github/workflows`.
 <!-- test-concurrency:end -->
+
+<!-- dependency-bump-rule:begin -->
+## Publishing without a dependency bump is a no-op — file the upgrade chore
+
+Before any release, resolve and align the DECLARED constraints to what actually
+resolved. What a machine resolves is what it builds: a `pubspec.yaml` saying
+`^2.4.3` next to a resolved `2.4.4` only guarantees the next machine resolves
+to something else, so the release you just cut is not the release anyone else
+gets.
+
+**Repo-specific first — this is a 9-package monorepo, not one pub root.** There
+is no root `pubspec.yaml` and no root lockfile; every package resolves on its
+own, and `.gitignore` keeps `pubspec.lock` out of the umbrella, `_android`,
+`_ios`, `_linux` and `_platform_interface` packages (dart.dev: libraries should
+not include `pubspec.lock`). Only seven locks are tracked —
+`zikzak_inappwebview/example`, `zikzak_inappwebview_linux/example`,
+`zikzak_inappwebview_linux/tool/wire_parity`, and the `_macos`, `_web`,
+`_windows`, `_module` packages — so those are the ones whose drift changes what
+a builder or the example apps get. Read `PUBLISH.md` and `tool/versions.dart`
+before touching any version string.
+
+```bash
+cd <package> && rm -f pubspec.lock && flutter pub get   # Flutter, not dart-only
+```
+
+Then set the caret constraints to the version the resolver picked — here that
+means editing `tool/versions.dart` (the single source of truth for every
+published-package version and the key third-party pins), running
+`dart run tool/update_readmes.dart`, then letting
+`./scripts/prepare_for_publish.sh <version>` propagate the values into the nine
+pubspecs and the sub-package changelogs. Never hand-edit a version in a pubspec
+or a README.
+
+**Measure the tree that ships, not the dev tree.** In dev mode every package
+resolves its siblings through `dependency_overrides:` pointing at this checkout,
+so `flutter pub outdated` inside the repo sees the local packages as path deps
+and never reports them as upgrades. Run it in the publish state — after
+`prepare_for_publish.sh` has stripped `dependency_overrides:` and converted them
+to versioned constraints, or in a scratch clone of that branch — because that is
+the resolution consumers get. `scripts/publish.sh` already aborts the publish
+when `flutter pub get` cannot resolve a package, which is the resolution check
+that makes a drifted constraint fail loudly instead of silently.
+
+**Do not raise every constraint to the locked version.** The lockfile is what
+this repo builds against; the DECLARED constraint is what consumers resolve. Pub
+ignores a dependency's lockfile, and a caret constraint does not pin consumers
+to one version. Two things here are deliberate pins, not drift: every package
+declares `sdk: >=3.8.0 <4.0.0` and `flutter: >=3.47.0`, and the Flutter floor
+is the honest minimum because every zuraffa 7.x (via `zuraffa_session`) needs
+`meta ^1.19.0`, which Flutter only allows from 3.47.0 (#393) — a newer local
+toolchain is not a reason to move either floor. Align a constraint upward only
+when a dependency change actually requires it, and preserve the supported lower
+bound otherwise.
+
+**Then look at what is still held back.** `flutter pub outdated` lists every
+package whose declared constraint refuses an available upgrade. Those are the
+upgrades this release did NOT take.
+
+**The rule:** when a package could be upgraded but was not bumped automatically,
+the publish **continues as normal** — do not block the release on it — and you
+MUST file a GitHub chore issue for the available upgrades (label it `chore`, the
+label `gh-triage` applies to a chore per
+`.specify/extensions/gh-triage/gh-triage-config.yml`). A publish that silently
+leaves upgrades on the table is not a smaller publish; it is a publish nobody
+knows is stale. File the issue with the package names, the current and available
+versions, and whether the constraint or a transitive pin is what holds it.
+
+Two corollaries worth remembering:
+
+- **A `flutter pub upgrade` that changes nothing is a signal, not a success.**
+  If the constraint blocks the upgrade, bumping the constraint is the fix — and
+  that is exactly the chore issue above.
+- **Transitive holds are still chore material.** A package held only because a
+  dependency pins it is not this repo's constraint to widen, but it is still an
+  available upgrade a human should decide on.
+
+This is the fleet rule for every Dart/Flutter repo. This repo's publish flow
+already runs the per-package resolve (`scripts/publish.sh`), so it still owes the
+chore issue for whatever `flutter pub outdated` reports.
+<!-- dependency-bump-rule:end -->
