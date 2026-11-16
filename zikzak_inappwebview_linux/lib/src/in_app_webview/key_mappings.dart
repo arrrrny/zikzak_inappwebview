@@ -109,25 +109,21 @@ const _specialKeyToKeysym = <int, int>{
   0x10000000d: 0xff0d, // Enter (XK_Return)
   0x10000001b: 0xff1b, // Escape (XK_Escape)
   0x10000007f: 0xffff, // Delete (XK_Delete)
-
   // Arrow keys - Flutter LogicalKeyboardKey.arrow*.keyId values
   0x100000301: 0xff54, // ArrowDown (XK_Down)
   0x100000302: 0xff51, // ArrowLeft (XK_Left)
   0x100000303: 0xff53, // ArrowRight (XK_Right)
   0x100000304: 0xff52, // ArrowUp (XK_Up)
-
   // Navigation keys - Flutter LogicalKeyboardKey.*.keyId values
   0x100000305: 0xff57, // End (XK_End)
   0x100000306: 0xff50, // Home (XK_Home)
   0x100000307: 0xff56, // PageDown (XK_Page_Down)
   0x100000308: 0xff55, // PageUp (XK_Page_Up)
   0x100000407: 0xff63, // Insert (XK_Insert)
-
   // Lock keys
   0x100000104: 0xffe5, // CapsLock (XK_Caps_Lock)
   0x10000010a: 0xff7f, // NumLock (XK_Num_Lock)
   0x10000010c: 0xff14, // ScrollLock (XK_Scroll_Lock)
-
   // Modifier keys (note: 0x200000xxx range)
   0x200000100: 0xffe3, // ControlLeft (XK_Control_L)
   0x200000101: 0xffe4, // ControlRight (XK_Control_R)
@@ -137,7 +133,6 @@ const _specialKeyToKeysym = <int, int>{
   0x200000105: 0xffea, // AltRight (XK_Alt_R)
   0x200000106: 0xffeb, // MetaLeft (XK_Super_L)
   0x200000107: 0xffec, // MetaRight (XK_Super_R)
-
   // Misc
   0x20: 0x0020, // Space
   0x100000505: 0xff67, // ContextMenu (XK_Menu)

@@ -94,7 +94,9 @@ abstract mixin class LinuxStorage implements PlatformStorage {
     );
     // evaluateJavascript already JSON-decodes the result, so a length arrives
     // as int (a String would only appear from a legacy native build).
-    return result is int ? result : (result is String ? int.tryParse(result) : null);
+    return result is int
+        ? result
+        : (result is String ? int.tryParse(result) : null);
   }
 
   @override
@@ -214,7 +216,8 @@ abstract mixin class LinuxStorage implements PlatformStorage {
 /// When adding additional fields make sure they can be null or have a default
 /// value to avoid breaking changes. See [PlatformLocalStorageCreationParams] for
 /// more information.
-class LinuxLocalStorageCreationParams extends PlatformLocalStorageCreationParams {
+class LinuxLocalStorageCreationParams
+    extends PlatformLocalStorageCreationParams {
   /// Creates a new [LinuxLocalStorageCreationParams] instance.
   LinuxLocalStorageCreationParams(super.params);
 

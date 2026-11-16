@@ -228,8 +228,7 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
 // Stub implementations for unsupported classes
 
 class _PlatformChromeSafariBrowser extends PlatformChromeSafariBrowser {
-  _PlatformChromeSafariBrowser(super.params)
-    : super.implementation();
+  _PlatformChromeSafariBrowser(super.params) : super.implementation();
   static final _PlatformChromeSafariBrowser _staticValue =
       _PlatformChromeSafariBrowser(
         const PlatformChromeSafariBrowserCreationParams(),
@@ -239,9 +238,7 @@ class _PlatformChromeSafariBrowser extends PlatformChromeSafariBrowser {
 }
 
 class _PlatformServiceWorkerController extends PlatformServiceWorkerController {
-  _PlatformServiceWorkerController(
-    super.params,
-  ) : super.implementation();
+  _PlatformServiceWorkerController(super.params) : super.implementation();
   static final _PlatformServiceWorkerController _staticValue =
       _PlatformServiceWorkerController(
         const PlatformServiceWorkerControllerCreationParams(),
@@ -259,9 +256,7 @@ class _PlatformServiceWorkerController extends PlatformServiceWorkerController {
 
 class _PlatformWebAuthenticationSession
     extends PlatformWebAuthenticationSession {
-  _PlatformWebAuthenticationSession(
-    super.params,
-  ) : super.implementation();
+  _PlatformWebAuthenticationSession(super.params) : super.implementation();
 
   static final _PlatformWebAuthenticationSession _staticValue =
       _PlatformWebAuthenticationSession(
@@ -272,8 +267,7 @@ class _PlatformWebAuthenticationSession
 }
 
 class _PlatformWebViewFeature extends PlatformWebViewFeature {
-  _PlatformWebViewFeature(super.params)
-    : super.implementation();
+  _PlatformWebViewFeature(super.params) : super.implementation();
 
   static final _PlatformWebViewFeature _staticValue = _PlatformWebViewFeature(
     PlatformWebViewFeatureCreationParams(),
@@ -284,4 +278,3 @@ class _PlatformWebViewFeature extends PlatformWebViewFeature {
   @override
   void dispose({bool isKeepAlive = false}) {}
 }
-

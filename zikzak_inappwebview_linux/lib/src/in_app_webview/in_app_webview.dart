@@ -126,7 +126,8 @@ class LinuxInAppWebViewWidgetCreationParams
         onJsConfirm: params.onJsConfirm,
         onJsPrompt: params.onJsPrompt,
         onReceivedHttpAuthRequest: params.onReceivedHttpAuthRequest,
-        onReceivedServerTrustAuthRequest: params.onReceivedServerTrustAuthRequest,
+        onReceivedServerTrustAuthRequest:
+            params.onReceivedServerTrustAuthRequest,
         onReceivedClientCertRequest: params.onReceivedClientCertRequest,
         shouldInterceptAjaxRequest: params.shouldInterceptAjaxRequest,
         onAjaxReadyStateChange: params.onAjaxReadyStateChange,
@@ -145,8 +146,10 @@ class LinuxInAppWebViewWidgetCreationParams
         onZoomScaleChanged: params.onZoomScaleChanged,
         onSafeBrowsingHit: params.onSafeBrowsingHit,
         onPermissionRequest: params.onPermissionRequest,
-        onGeolocationPermissionsShowPrompt: params.onGeolocationPermissionsShowPrompt,
-        onGeolocationPermissionsHidePrompt: params.onGeolocationPermissionsHidePrompt,
+        onGeolocationPermissionsShowPrompt:
+            params.onGeolocationPermissionsShowPrompt,
+        onGeolocationPermissionsHidePrompt:
+            params.onGeolocationPermissionsHidePrompt,
         shouldInterceptRequest: params.shouldInterceptRequest,
         onRenderProcessGone: params.onRenderProcessGone,
         onRenderProcessResponsive: params.onRenderProcessResponsive,
@@ -159,7 +162,8 @@ class LinuxInAppWebViewWidgetCreationParams
         onPermissionRequestCanceled: params.onPermissionRequestCanceled,
         onRequestFocus: params.onRequestFocus,
         onWebContentProcessDidTerminate: params.onWebContentProcessDidTerminate,
-        onDidReceiveServerRedirectForProvisionalNavigation: params.onDidReceiveServerRedirectForProvisionalNavigation,
+        onDidReceiveServerRedirectForProvisionalNavigation:
+            params.onDidReceiveServerRedirectForProvisionalNavigation,
         onNavigationResponse: params.onNavigationResponse,
         shouldAllowDeprecatedTLS: params.shouldAllowDeprecatedTLS,
         onCameraCaptureStateChanged: params.onCameraCaptureStateChanged,

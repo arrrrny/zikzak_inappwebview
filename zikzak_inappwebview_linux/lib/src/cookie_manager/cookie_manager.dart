@@ -65,7 +65,8 @@ class LinuxCookieManager extends PlatformCookieManager {
   }) async {
     // Native never reads maxAge, so convert it to an absolute expiry
     // (milliseconds since epoch) unless the caller gave expiresDate.
-    final effectiveExpires = expiresDate ??
+    final effectiveExpires =
+        expiresDate ??
         (maxAge != null
             ? DateTime.now().millisecondsSinceEpoch + maxAge * 1000
             : null);
@@ -77,7 +78,8 @@ class LinuxCookieManager extends PlatformCookieManager {
       'expiresDate': ?effectiveExpires,
       'isSecure': ?isSecure,
       'isHttpOnly': ?isHttpOnly,
-      if (sameSite != null) 'sameSite': httpCookieSameSitePolicyToWire(sameSite),
+      if (sameSite != null)
+        'sameSite': httpCookieSameSitePolicyToWire(sameSite),
     };
 
     final result = await _channel.invokeMethod<bool>('setCookie', {

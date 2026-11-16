@@ -86,10 +86,8 @@ class LinuxWebMessageListener extends PlatformWebMessageListener
     switch (call.method) {
       case "onPostMessage":
         _replyProxy ??= LinuxJavaScriptReplyProxy(
-            PlatformJavaScriptReplyProxyCreationParams(
-              webMessageListener: this,
-            ),
-          );
+          PlatformJavaScriptReplyProxyCreationParams(webMessageListener: this),
+        );
         if (onPostMessage != null) {
           WebMessage? message = webMessageFromWire(call.arguments["message"]);
           WebUri? sourceOrigin = call.arguments["sourceOrigin"] != null

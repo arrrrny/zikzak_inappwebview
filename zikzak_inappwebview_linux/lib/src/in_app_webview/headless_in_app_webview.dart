@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
+
 import '../find_interaction/find_interaction_controller.dart';
 import '../util/debug_logging.dart';
 import '../util/wire.dart';
@@ -118,7 +119,8 @@ class LinuxHeadlessInAppWebViewCreationParams
         onJsConfirm: params.onJsConfirm,
         onJsPrompt: params.onJsPrompt,
         onReceivedHttpAuthRequest: params.onReceivedHttpAuthRequest,
-        onReceivedServerTrustAuthRequest: params.onReceivedServerTrustAuthRequest,
+        onReceivedServerTrustAuthRequest:
+            params.onReceivedServerTrustAuthRequest,
         onReceivedClientCertRequest: params.onReceivedClientCertRequest,
         shouldInterceptAjaxRequest: params.shouldInterceptAjaxRequest,
         onAjaxReadyStateChange: params.onAjaxReadyStateChange,
@@ -137,8 +139,10 @@ class LinuxHeadlessInAppWebViewCreationParams
         onZoomScaleChanged: params.onZoomScaleChanged,
         onSafeBrowsingHit: params.onSafeBrowsingHit,
         onPermissionRequest: params.onPermissionRequest,
-        onGeolocationPermissionsShowPrompt: params.onGeolocationPermissionsShowPrompt,
-        onGeolocationPermissionsHidePrompt: params.onGeolocationPermissionsHidePrompt,
+        onGeolocationPermissionsShowPrompt:
+            params.onGeolocationPermissionsShowPrompt,
+        onGeolocationPermissionsHidePrompt:
+            params.onGeolocationPermissionsHidePrompt,
         shouldInterceptRequest: params.shouldInterceptRequest,
         onRenderProcessGone: params.onRenderProcessGone,
         onRenderProcessResponsive: params.onRenderProcessResponsive,
@@ -151,7 +155,8 @@ class LinuxHeadlessInAppWebViewCreationParams
         onPermissionRequestCanceled: params.onPermissionRequestCanceled,
         onRequestFocus: params.onRequestFocus,
         onWebContentProcessDidTerminate: params.onWebContentProcessDidTerminate,
-        onDidReceiveServerRedirectForProvisionalNavigation: params.onDidReceiveServerRedirectForProvisionalNavigation,
+        onDidReceiveServerRedirectForProvisionalNavigation:
+            params.onDidReceiveServerRedirectForProvisionalNavigation,
         onNavigationResponse: params.onNavigationResponse,
         shouldAllowDeprecatedTLS: params.shouldAllowDeprecatedTLS,
         onCameraCaptureStateChanged: params.onCameraCaptureStateChanged,
@@ -235,9 +240,7 @@ class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
         _webViewController!;
     // Initialize the find interaction controller with the same ID
     _linuxParams.findInteractionController?.init(id);
-    channel = MethodChannel(
-      'wtf.zikzak/flutter_headless_inappwebview_$id',
-    );
+    channel = MethodChannel('wtf.zikzak/flutter_headless_inappwebview_$id');
     handler = _handleMethod;
     initMethodCallHandler();
   }

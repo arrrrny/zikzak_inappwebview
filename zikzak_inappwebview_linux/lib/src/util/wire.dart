@@ -33,24 +33,23 @@ T? fromWire<T>(Object? value, T Function(Map<String, dynamic>) fromJson) {
 /// `contentWorld`. Native (linux/types/user_script.cc) falls back to the page
 /// world too, so this keeps the payload identical to upstream's.
 Map<String, dynamic> userScriptToWire(UserScript script) => {
-      ...script.toJson(),
-      'contentWorld': script.contentWorld?.toJson() ?? {'name': 'page'},
-    };
+  ...script.toJson(),
+  'contentWorld': script.contentWorld?.toJson() ?? {'name': 'page'},
+};
 
 /// zikzak's [ClientCertResponse] has no `selectedCertificate`; native
 /// (linux/types/client_cert_response.cc) defaults it to -1, which is sent
 /// explicitly so the payload matches upstream's.
 Map<String, dynamic> clientCertResponseToWire(ClientCertResponse response) => {
-      ...response.toJson(),
-      'selectedCertificate': -1,
-    };
+  ...response.toJson(),
+  'selectedCertificate': -1,
+};
 
 /// Native never reads `compressFormat` (it always returns PNG) and upstream
 /// sends none on Linux.
 Map<String, dynamic> screenshotConfigurationToWire(
   ScreenshotConfiguration configuration,
-) =>
-    configuration.toJson()..remove('compressFormat');
+) => configuration.toJson()..remove('compressFormat');
 
 /// iOS/web-only settings that zikzak encodes as enum names, upstream as ints
 /// or HTTP tokens. Linux native neither reads nor sends them, and zikzak's
@@ -167,8 +166,7 @@ PermissionRequest? permissionRequestFromWire(Object? value) {
     origin: origin is String ? WebUri(origin) : null,
     resources: [
       if (resources is List)
-        for (final r in resources)
-          ?_nativePermissionResourceTypes[r],
+        for (final r in resources) ?_nativePermissionResourceTypes[r],
     ],
   );
 }
@@ -182,15 +180,17 @@ FindSession? findSessionFromWire(Object? value) {
   final style = map['searchResultDisplayStyle'];
   return FindSession(
     resultCount: (map['resultCount'] as num?)?.toInt() ?? 0,
-    highlightedResultIndex: (map['highlightedResultIndex'] as num?)?.toInt() ?? 0,
-    searchResultDisplayStyle: (style is int &&
-                style >= 0 &&
-                style < SearchResultDisplayStyle.values.length)
+    highlightedResultIndex:
+        (map['highlightedResultIndex'] as num?)?.toInt() ?? 0,
+    searchResultDisplayStyle:
+        (style is int &&
+            style >= 0 &&
+            style < SearchResultDisplayStyle.values.length)
         ? SearchResultDisplayStyle.values[style]
         : SearchResultDisplayStyle.values
-                .where((e) => e.name == style)
-                .firstOrNull ??
-            SearchResultDisplayStyle.CURRENT_AND_TOTAL,
+                  .where((e) => e.name == style)
+                  .firstOrNull ??
+              SearchResultDisplayStyle.CURRENT_AND_TOTAL,
   );
 }
 
