@@ -1,3 +1,39 @@
+## 6.4.0 - 2026-11-16
+
+
+### Features
+
+- [Windows] The WebView2 DevTools protocol is now reachable from Dart. `callDevToolsProtocolMethod`, `addDevToolsProtocolEventListener` and `removeDevToolsProtocolEventListener` are implemented against the WebView2 `Fetch` domain, so a consumer can intercept and settle requests (`Fetch.enable`, `Fetch.failRequest`, `Fetch.disable`) with Fetch ownership serialized per webview (#429). They join the platform interface as `UnimplementedError` defaults on every other platform and are exposed on the app-facing `InAppWebViewController`. The native side needs the companion package `zikzak_webview_windows` — see Dependencies.
+- [Linux] The package is re-based on **WPE WebKit** and no longer builds against WebKitGTK (#420). Pages render off-screen through the headless `WPEPlatform` backend and are shown as a Flutter texture, with input, resize, HiDPI scaling, IME, popups, context menus and cookies handled by the plugin. The runtime requirement is now WPE WebKit 2.50+ (`wpe-webkit-2.0`, `wpe-platform-2.0`, `wpe-platform-headless-2.0`, `wpe-1.0`) plus CMake 3.12+, and a non-system WPE prefix works through `*_LINK_LIBRARIES`. A new `tool/wire_parity` harness pins the Dart↔native enum and settings wire format so the two halves cannot drift.
+
+### Bug Fixes
+
+- [macOS] `createPDF` failures are no longer silent: the native error is logged through `os_log` (with the correct privacy interpolation) and surfaced as a typed `FlutterError` carrying its failure code as a named constant, instead of failing invisibly to the Dart caller (zuraffa_browser#970).
+- [macOS] `isUvPaa` is answered from the platform capability rather than from window presence, so the availability static is decoupled from the window and a headless webview reports the same answer as an on-screen one (#422); it is also derived from the device's actual passkey configuration instead of Touch ID enrolment (#427, consumer pin over #425).
+- [macOS] `isDeviceConfiguredForPasskeys` resolves through the ObjC runtime, so it works on SDKs older than 26.2 instead of failing against a missing symbol (#427).
+- [macOS] `injectCSSFileFromAsset` / `injectJavascriptFileFromAsset` are implemented on the macOS controller — they threw `UnimplementedError` — with a missing-asset error-path test to match (#419, #424); the `inject*` overrides are also ported into `MacOSInAppWebViewController` (#416).
+- [iOS] The proxy profile registry is applied at data-store creation and `profileId` is forwarded, so per-profile proxy settings take effect instead of being dropped (#410).
+- [iOS] `WKUIDelegate.runOpenPanelWith` is implemented with `NSOpenPanel`, so `<input type="file">` opens a file chooser (#408).
+- [Linux] Stale frames from destroyed EGL images no longer render, native info logs are gated by the debug-logging setting, and dialog lifetime plus the custom-scheme registry were fixed in review of the WPE port (#420).
+
+### Dependencies
+
+- `zuraffa_session` moves to `^7.5.0`, the current release of the zuraffa family (`zuraffa` and `zuraffa_session` are both at 7.5.0), and the dev-only module lock is refreshed to match. The `SessionPort` / `PortableSession` contract this package codes against is unchanged across the 7.x line, so this is a version-line move rather than an API break (#421).
+- **New dependency: `zikzak_webview_windows` 0.5.0** — a BSD-3 fork of `webview_windows` 0.4.0 (Niklas Schulze, `jnschulze/flutter-webview-windows` at `ba0940e`), renamed and published by this project because the WebView2 DevTools protocol API is in no hosted `webview_windows` release (upstream PR #334 is still open). `zikzak_inappwebview_windows` now depends on it by hosted constraint instead of a git `dependency_overrides` entry, so consumers resolve a real package instead of a facade that could not compile. The fork carries its own version line (0.5.0, not the lockstep 6.x) and is published by `scripts/publish_windows_fork.sh` before the rest of the fleet.
+
+### Docs
+
+- `CONTRIBUTING.md` and the pull-request template now state that maintainer edits are allowed on PRs, so an external contribution can be fixed up in place instead of bounced back (#436).
+- README title and badges refreshed, and the requirements table corrected: Flutter 3.47.0+ (was 3.10.0+) and Linux WPE WebKit 2.50+ (was WebKitGTK 2.40+).
+
+### CI
+
+- Linux native runners are bootstrapped against a pinned Flutter source, so the WPE port is compiled and exercised in CI rather than only analyzed (#420).
+- `build-ios` drops the retired `macos-14` runner and is now `macos-15`-only (#412).
+
+### Internal
+
+- Every fix above is guarded by host-runnable tests, including the 568-line WebView2 DevTools suite (`in_app_webview_windows_devtools_test.dart`) and the Linux `wire_parity` harness. Swift changes remain gated by `build-ios` / `build-macos`; the Windows native side of `zikzak_webview_windows` is compiled by neither — see "The `zikzak_webview_windows` fork" in `AGENTS.md`.
 ## Unreleased
 
 - [macOS] `createPdf` no longer swallows native render failures. A failed `WKWebView.createPDF` logs the full `NSError` to the unified log and answers the Dart caller with a typed `PlatformException(code: createPdfFailed)` whose `details` carry the NSError's `domain` and `code`; `null` is returned only on the unsupported-platform path (macOS < 11), so "unsupported platform" and "render failure" are distinguishable again (#431)

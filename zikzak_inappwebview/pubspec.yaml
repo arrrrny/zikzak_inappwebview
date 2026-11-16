@@ -1,6 +1,6 @@
 name: zikzak_inappwebview
 description: A Flutter plugin that allows you to add an inline webview, to use an headless webview, and to open an in-app browser window.
-version: 6.3.4
+version: 6.4.0
 homepage: https://arrrrny.github.io/zikzak_inappwebview
 repository: https://github.com/arrrrny/zikzak_inappwebview
 issue_tracker: https://github.com/arrrrny/zikzak_inappwebview/issues
@@ -19,13 +19,13 @@ dependencies:
   flutter:
     sdk: flutter
   material_ui: ^1.9.0
-  zikzak_inappwebview_platform_interface: ^6.3.4
-  zikzak_inappwebview_android: ^6.3.4
-  zikzak_inappwebview_ios: ^6.3.4
-  zikzak_inappwebview_macos: ^6.3.4
-  zikzak_inappwebview_web: ^6.3.4
-  zikzak_inappwebview_windows: ^6.3.4
-  zikzak_inappwebview_linux: ^6.3.4
+  zikzak_inappwebview_platform_interface: ^6.4.0
+  zikzak_inappwebview_android: ^6.4.0
+  zikzak_inappwebview_ios: ^6.4.0
+  zikzak_inappwebview_macos: ^6.4.0
+  zikzak_inappwebview_web: ^6.4.0
+  zikzak_inappwebview_windows: ^6.4.0
+  zikzak_inappwebview_linux: ^6.4.0
   synchronized: ^3.4.1
   # Rides the unified zuraffa family line at 7.5.0, the current release of
   # both `zuraffa` and `zuraffa_session`. The SessionPort/PortableSession
