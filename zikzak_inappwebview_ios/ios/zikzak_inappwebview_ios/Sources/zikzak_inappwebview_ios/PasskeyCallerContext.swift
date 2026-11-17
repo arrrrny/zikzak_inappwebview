@@ -99,7 +99,7 @@ struct PasskeyCallerContext {
         guard let scheme = scheme?.lowercased(), !scheme.isEmpty,
             let host = host?.lowercased(), !host.isEmpty
         else { return "" }
-        var origin = "\(scheme)://\(bracketed(host))"
+        var origin = "\(scheme)://\(bracketed(host: host))"
         if let port = canonicalPort(port, scheme: scheme) {
             origin += ":\(port)"
         }
