@@ -306,9 +306,19 @@ class InAppWebView {
   // The EGL image is owned by WPE and remains valid until the next frame.
   void* GetCurrentEglImage(uint32_t* out_width, uint32_t* out_height) const;
 
-  // Skip pixel readback - when using zero-copy EGL texture mode, we don't need
-  // to read pixels back to CPU. This improves performance and avoids GL context issues.
-  void SetSkipPixelReadback(bool skip) { skip_pixel_readback_ = skip; }
+  // Pixel readback control.
+  //
+  // The WPE buffer callbacks fill the CPU pixel buffer only while pixel
+  // readback is required: a zero-copy EGL texture gets its frames straight
+  // from a DMA-BUF EGL image and would only pay for a copy it never reads,
+  // while a texture that samples pixels (the pixel-buffer texture, or the EGL
+  // texture once its EGL image import failed) cannot be drawn without it.
+  void SetPixelReadbackRequired(bool required) {
+    pixel_readback_required_ = required;
+  }
+  bool IsPixelReadbackRequired() const {
+    return pixel_readback_required_.load(std::memory_order_relaxed);
+  }
 
   // Frame available callback (called when new frame is ready)
   void SetOnFrameAvailable(std::function<void()> callback);
@@ -521,9 +531,10 @@ class InAppWebView {
   std::atomic<size_t> read_buffer_index_{1};
   mutable std::mutex buffer_swap_mutex_;
   
-  // Flag to skip pixel readback when using zero-copy EGL texture mode
-  // When true, OnExportDmaBuf won't call ReadPixelsFromEglImage
-  bool skip_pixel_readback_ = false;
+  // Pixel readback is required unless a zero-copy EGL texture owns the frames.
+  // Atomic because the texture toggles it from the raster thread while the WPE
+  // buffer callbacks read it from theirs.
+  std::atomic<bool> pixel_readback_required_{false};
 
   // View dimensions
   int width_ = 800;

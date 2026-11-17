@@ -480,6 +480,13 @@ void InAppBrowser::setupWebView(const InAppBrowserCreationParams& params) {
   // Create the InAppWebView - pass nullptr for registrar since we have messenger directly
   webView_ = std::make_shared<InAppWebView>(nullptr, messenger_, 0, webViewParams);
 
+  // The browser has no zero-copy texture of its own to latch off: its GL area
+  // samples the EGL image from its own GL context, which cannot import a WPE
+  // DMA-BUF image on every stack. Its pixel consumers (RenderFromPixelBuffer,
+  // OnDrawingAreaDraw) therefore need the CPU copy on every frame, so ask for
+  // it here the way CustomPlatformView does for its pixel-buffer texture.
+  webView_->SetPixelReadbackRequired(true);
+
   // Attach channel with browser-specific ID
   webView_->AttachChannel(messenger_, METHOD_CHANNEL_NAME_PREFIX + id_, true);
 
@@ -1214,6 +1221,9 @@ void InAppBrowser::OnGlAreaRealize(GtkGLArea* area, gpointer user_data) {
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_STATIC_DRAW);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   browser->glInitialized_ = true;
+  // A fresh context may be able to import the EGL image after all, so let the
+  // zero-copy path try again from the first frame.
+  browser->glEglImportFailed_ = false;
 
   // Set initial size
   GtkAllocation alloc;
@@ -1250,7 +1260,7 @@ gboolean InAppBrowser::OnGlAreaRender(GtkGLArea* area, GdkGLContext* context,
   uint32_t imgWidth = 0, imgHeight = 0;
   void* eglImage = browser->webView_->GetCurrentEglImage(&imgWidth, &imgHeight);
 
-  if (eglImage != nullptr && imgWidth > 0 && imgHeight > 0) {
+  if (!browser->glEglImportFailed_ && eglImage != nullptr && imgWidth > 0 && imgHeight > 0) {
     // Get the glEGLImageTargetTexture2DOES function
     static PFNGLEGLIMAGETARGETTEXTURE2DOESPROC glEGLImageTargetTexture2DOES =
         (PFNGLEGLIMAGETARGETTEXTURE2DOESPROC)eglGetProcAddress("glEGLImageTargetTexture2DOES");
@@ -1259,12 +1269,29 @@ gboolean InAppBrowser::OnGlAreaRender(GtkGLArea* area, GdkGLContext* context,
       // Zero-copy path: bind EGL image directly as GL texture
       glActiveTexture(GL_TEXTURE0);
       glBindTexture(GL_TEXTURE_2D, browser->glTexture_);
+
+      // Drain any error an earlier GL call left behind, so the import's result
+      // is attributed to the import alone.
+      while (glGetError() != GL_NO_ERROR) {
+      }
       glEGLImageTargetTexture2DOES(GL_TEXTURE_2D, static_cast<GLeglImageOES>(eglImage));
 
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+      // A rejected import leaves this context without usable storage and GTK
+      // would sample an empty texture — the same blank-window class #442 fixed
+      // for the texture. Latch the failure and fall through to the pixel
+      // buffer, which the webview now fills (see setupWebView).
+      if (glGetError() != GL_NO_ERROR) {
+        glBindTexture(GL_TEXTURE_2D, 0);
+        browser->glEglImportFailed_ = true;
+        zikzak_inappwebview::debugLog(
+            "InAppBrowser: EGL image rejected by the GL context - using pixel buffer");
+        return browser->RenderFromPixelBuffer(area);
+      }
 
       // Use shader program for rendering
       glUseProgram(browser->glProgram_);

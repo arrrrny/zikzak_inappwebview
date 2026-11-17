@@ -19,7 +19,7 @@ CMake 3.12 or newer is required (non-system WPE prefix support uses `*_LINK_LIBR
 
 ### Installing WPE WebKit
 
-- **Debian 13, Fedora, Arch Linux:** install the distribution packages (WPE WebKit with its development files, `libwpe` and the WPEPlatform headless backend).
+- **Debian 13, Fedora, Arch Linux:** install the distribution packages (WPE WebKit with its development files, `libwpe` and the WPEPlatform headless backend). Arch does not ship `libwpe` in the official repositories with WPE 2.54 — install `libwpe-git` from AUR, or build libwpe from source as below, before building WPE WebKit.
 - **Ubuntu 24.04:** WPE WebKit 2.50+ is not packaged; build it from source as below. This is `~/.cache/wpe-build/build.sh` from the development machine, reduced to its steps. Ubuntu 24.04 has no `libbacktrace-dev`, hence `-DUSE_LIBBACKTRACE=OFF`.
 
 Build dependencies:
@@ -85,6 +85,20 @@ When WPE is found in a non-system prefix, the plugin records that prefix's `lib`
 WPE is not bundled: `libWPEWebKit-2.0` and `libwpe-1.0` are loaded from the WPE install, and so are its helper processes (`WPEWebProcess`, `WPENetworkProcess`, `WPEGPUProcess`, found at the `libexec` path compiled into WPE WebKit). Shipping WPE with an app is out of scope for this plugin, so a bundle moved to another machine needs WPE installed there at the same location. Do not set `LIBRARY_PATH`, `LDFLAGS` or `LD_LIBRARY_PATH`.
 
 `WPE_BACKEND.md` in this package is upstream's generic WPE install guide, kept as imported. Where it differs from this README (install prefix, log names, bundling), this README takes precedence for zikzak.
+
+### Rendering mode
+
+Pages are rendered off-screen by WPE and shown in Flutter as a texture. These environment variables select how a frame reaches that texture; each is read once at start-up, so set it before the app runs:
+
+| variable | effect |
+|---|---|
+| `ZIKZAK_INAPPWEBVIEW_LINUX_DISABLE_GL=1` | use the CPU pixel-buffer texture instead of a GL texture |
+| `ZIKZAK_INAPPWEBVIEW_LINUX_DISABLE_ZERO_COPY=1` | keep the GL texture, but upload pixels instead of binding WPE's EGL image |
+| `LIBGL_ALWAYS_SOFTWARE=1` | the standard Mesa switch; WPE then renders into SHM buffers and the plugin uploads those pixels |
+
+The default is zero-copy: WPE's DMA-BUF frame becomes an EGL image that Flutter samples directly. When that image cannot be bound in Flutter's GL context — it belongs to another EGL display, or the driver rejects the import — the plugin latches zero-copy off and uploads pixels from then on, so the view still paints instead of staying blank. If the area is blank anyway, set `ZIKZAK_INAPPWEBVIEW_LINUX_DISABLE_ZERO_COPY=1` to force the pixel path from the first frame; the native log (`[zikzak_inappwebview]` lines, see below) then names the rejected EGL image or the GL error it reported. The variable is read as "set to any value", `1` shown: `=0` selects the pixel path too.
+
+A browser window (`InAppBrowser`) has no zero-copy texture of its own — its GL area samples the EGL image from its own context — so it always requests the CPU copy and uploads pixels, whichever mode the variable above names. `FramePathFor` decides the WPEPlatform frame path; the legacy fdo backend decides by whether pixel readback is required.
 
 Under CMake 4 the example needs `CMAKE_POLICY_VERSION_MINIMUM=3.5` (its googletest 1.11 dependency): `CMAKE_POLICY_VERSION_MINIMUM=3.5 flutter build linux --debug`. If a rebuild fails at the install step, delete `build` and `.dart_tool/flutter_build` first.
 

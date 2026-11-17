@@ -4,8 +4,10 @@
 
 #include "../zikzak_inappwebview_linux_plugin_private.h"
 #include "../plugin_instance.h"
+#include "../in_app_webview/in_app_webview.h"
 #include "../in_app_webview/in_app_webview_settings.h"
 #include "../types/url_request.h"
+#include "../types/user_script.h"
 #include "../utils/flutter.h"
 #include "../utils/log.h"
 #include "../webview_environment.h"
@@ -155,6 +157,24 @@ void HeadlessInAppWebViewManager::Run(FlMethodCall* method_call) {
   auto initial_file = get_optional_fl_map_value<std::string>(params, "initialFile");
   if (initial_file.has_value()) {
     webviewParams.initialFile = initial_file.value();
+  }
+
+  // Parse initial user scripts. The visible view has always passed these
+  // through, but the headless path dropped them: `initialUserScripts` never
+  // reached the webview, so a script only ran if the app re-added it from
+  // `onWebViewCreated` (#442).
+  FlValue* initial_user_scripts = get_fl_map_value_raw(params, "initialUserScripts");
+  if (initial_user_scripts != nullptr &&
+      fl_value_get_type(initial_user_scripts) == FL_VALUE_TYPE_LIST) {
+    size_t count = fl_value_get_length(initial_user_scripts);
+    for (size_t i = 0; i < count; i++) {
+      FlValue* script_value = fl_value_get_list_value(initial_user_scripts, i);
+      if (script_value != nullptr && fl_value_get_type(script_value) == FL_VALUE_TYPE_MAP) {
+        webviewParams.initialUserScripts.push_back(std::make_shared<UserScript>(script_value));
+      }
+    }
+    debugLog("HeadlessInAppWebViewManager: parsed " + std::to_string(count) +
+             " initial user script(s)");
   }
 
   // Parse webViewEnvironmentId and look up the custom WebKitWebContext
