@@ -203,6 +203,17 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     /// removal. Mirrors the iOS `userOnlyScripts` OrderedSet.
     private var userOnlyScripts: [UserScript] = []
 
+    /// The scripts the plugin itself injects at creation time (console bridge,
+    /// JS bridge, passkeys shim, print, find-interaction, web messages).
+    ///
+    /// WKUserContentController exposes its script list read-only, so a rebuild
+    /// after a removal has to re-add these from a list we keep ourselves —
+    /// `rebuildUserOnlyScripts()` re-adds THIS list and then
+    /// `userOnlyScripts`. Without it a `removeUserScriptsByGroupName` (the
+    /// time-zone switch's live push) silently dropped the bridge, the passkeys
+    /// shim, print and find-interaction along with the removed group.
+    private var pluginUserScripts: [WKUserScript] = []
+
     /// Tracked for `onZoomScaleChanged` KVO (macOS `pageZoom`, macOS 11+).
     private var lastPageZoom: CGFloat = 1.0
 
@@ -465,13 +476,13 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         if settings?.consoleLogEnabled ?? true {
             let userScript = WKUserScript(
                 source: consoleOverrideScript, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-            userContentController.addUserScript(userScript)
+            addPluginUserScript(userScript)
         }
 
         let bridgeScript = WKUserScript(
             source: JAVASCRIPT_BRIDGE_JS_SOURCE, injectionTime: .atDocumentStart,
             forMainFrameOnly: false)
-        userContentController.addUserScript(bridgeScript)
+        addPluginUserScript(bridgeScript)
 
         // Issue #358: WebAuthn/passkey shim. Injected in every frame at
         // document start, right after the JS bridge it calls through.
@@ -486,23 +497,23 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             let passkeysScript = WKUserScript(
                 source: PASSKEYS_JS_SOURCE, injectionTime: .atDocumentStart,
                 forMainFrameOnly: false)
-            userContentController.addUserScript(passkeysScript)
+            addPluginUserScript(passkeysScript)
         }
 
         let printScript = WKUserScript(
             source: PRINT_JS_SOURCE, injectionTime: .atDocumentStart, forMainFrameOnly: true)
-        userContentController.addUserScript(printScript)
+        addPluginUserScript(printScript)
 
         let findInteractionUserScript = WKUserScript(
             source: FIND_TEXT_HIGHLIGHT_JS_SOURCE, injectionTime: .atDocumentStart,
             forMainFrameOnly: true)
-        userContentController.addUserScript(findInteractionUserScript)
+        addPluginUserScript(findInteractionUserScript)
 
         // WebMessage listener constructor + origin-matching helpers (#197).
         let webMessageListenerScript = WKUserScript(
             source: WEB_MESSAGE_LISTENER_JS_SOURCE, injectionTime: .atDocumentStart,
             forMainFrameOnly: false)
-        userContentController.addUserScript(webMessageListenerScript)
+        addPluginUserScript(webMessageListenerScript)
 
         // Initialise the in-page webMessageChannels map + scroll/content-size
         // observers. The scroll observer is debounced via requestAnimationFrame
@@ -539,7 +550,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             })();
             """,
             injectionTime: .atDocumentStart, forMainFrameOnly: false)
-        userContentController.addUserScript(webMessageInitScript)
+        addPluginUserScript(webMessageInitScript)
 
         bindChannels(registrar: registrar, viewId: viewId, channelName: channelName)
 
@@ -1922,6 +1933,13 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         """
     }
 
+    /// Inject one of the plugin's own scripts and remember it, so a later
+    /// `rebuildUserOnlyScripts()` can put it back.
+    private func addPluginUserScript(_ userScript: WKUserScript) {
+        pluginUserScripts.append(userScript)
+        configuration.userContentController.addUserScript(userScript)
+    }
+
     /// Remove a single user script at `index` matching `script`. WKUserContentController
     /// has no single-script removal, so we rebuild the whole list.
     private func removeUserOnlyScript(at index: Int, matching script: UserScript) {
@@ -1942,20 +1960,22 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
 
     private func removeAllUserOnlyScripts() {
         userOnlyScripts.removeAll()
-        configuration.userContentController.removeAllUserScripts()
-        // Re-add the plugin scripts that should always be present.
-        configuration.userContentController.addUserScript(
-            WKUserScript(source: JAVASCRIPT_BRIDGE_JS_SOURCE, injectionTime: .atDocumentStart, forMainFrameOnly: false))
+        rebuildUserOnlyScripts()
     }
 
     /// Rebuild the WKUserContentController's user script list from the tracked
-    /// `userOnlyScripts` array. Called after any removal.
+    /// `pluginUserScripts` + `userOnlyScripts` arrays. Called after any removal.
+    ///
+    /// Both halves are required: the plugin's own scripts (bridge, passkeys,
+    /// print, find-interaction, web messages) and the ones Dart added. The
+    /// rebuild used to re-add only the JS bridge, so a group removal silently
+    /// dropped every other always-on script.
     private func rebuildUserOnlyScripts() {
         let ucc = configuration.userContentController
         ucc.removeAllUserScripts()
-        // Re-add the plugin scripts that should always be present.
-        ucc.addUserScript(
-            WKUserScript(source: JAVASCRIPT_BRIDGE_JS_SOURCE, injectionTime: .atDocumentStart, forMainFrameOnly: false))
+        for s in pluginUserScripts {
+            ucc.addUserScript(s)
+        }
         for s in userOnlyScripts {
             ucc.addUserScript(s)
         }
