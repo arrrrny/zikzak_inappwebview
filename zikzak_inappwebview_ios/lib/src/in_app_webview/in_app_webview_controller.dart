@@ -114,6 +114,15 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
       _inAppBrowser?.eventHandler;
 
   dynamic _controllerFromPlatform;
+  /// Last URL seen from the native side (`onLoadStart`, `onUpdateVisitedHistory`)
+  /// or handed to [loadUrl], used by [getUrl] only when its platform channel is
+  /// gone (`MissingPluginException`).
+  ///
+  /// Best-effort by construction: `goBack`, `goForward`, `goBackOrForward`,
+  /// `reload`, `loadData` and `loadFile` change the URL natively and report it
+  /// back through `onUpdateVisitedHistory`/`onLoadStart`. During a per-view
+  /// channel gap neither the native `getUrl` nor those callbacks can arrive, so
+  /// [getUrl] can serve a stale URL for the duration of the gap.
   WebUri? _cachedUrl;
 
   @override
@@ -1452,11 +1461,15 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
     try {
       String? url = await channel?.invokeMethod<String?>('getUrl', args);
       if (url != null) _cachedUrl = WebUri(url);
-      return url != null ? WebUri(url) : _cachedUrl;
+      // A successful call is authoritative: `null` means the native view is
+      // alive but has no URL (a blank webview, or `loadData` with
+      // `about:blank`), which is not the same as the channel being gone.
+      return url != null ? WebUri(url) : null;
     } on MissingPluginException {
       // A platform view can briefly outlive its per-view channel while iOS is
       // rebuilding or reattaching the native view. Keep the last observed URL
-      // useful to callers instead of surfacing an unhandled zone error.
+      // useful to callers instead of surfacing an unhandled zone error; the
+      // cache is only consulted here, where the native answer is unavailable.
       return _cachedUrl;
     }
   }
