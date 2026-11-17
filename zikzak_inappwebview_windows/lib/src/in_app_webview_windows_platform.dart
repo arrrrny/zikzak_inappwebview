@@ -221,8 +221,8 @@ class _InAppWebViewWindowsWidgetStateImpl
       }
       _platformController = controller;
       // The controller resolves its own app-facing wrapper from
-      // `controllerFromPlatform` on first access (the Android convention), so
-      // there is no post-construction field to assign.
+      // `controllerFromPlatform` on first access, so there is no
+      // post-construction field to assign.
       final callbackController = controller.callbackController;
 
       // Publish the controller BEFORE any listener or load can deliver load
