@@ -220,12 +220,10 @@ class _InAppWebViewWindowsWidgetStateImpl
         return;
       }
       _platformController = controller;
-      final callbackController =
-          // The platform widget wrapper always installs this callback; the
-          // `?? controller` fallback only exists so direct platform-object
-          // usage (tests) keeps working.
-          widget.params.controllerFromPlatform?.call(controller) ?? controller;
-      controller.callbackController = callbackController;
+      // The controller resolves its own app-facing wrapper from
+      // `controllerFromPlatform` on first access (the Android convention), so
+      // there is no post-construction field to assign.
+      final callbackController = controller.callbackController;
 
       // Publish the controller BEFORE any listener or load can deliver load
       // events: onWebViewCreated must precede onLoadStart/onLoadStop, the

@@ -27,7 +27,25 @@ final _JAVASCRIPT_HANDLER_FORBIDDEN_NAMES = UnmodifiableListView<String>([
 class InAppWebViewWindowsController extends PlatformInAppWebViewController {
   final PlatformInAppWebViewControllerCreationParams _creationParams;
   final WebviewController _controller;
-  Object? callbackController;
+
+  /// The app-facing controller handed to `shouldOverrideUrlLoading` and the
+  /// other `params` callbacks.
+  ///
+  /// In the federated plugin this is the wrapper `zikzak_inappwebview` returns
+  /// from `controllerFromPlatform` (not this platform controller). It is
+  /// resolved lazily on first access — the same value the Android
+  /// implementation caches in its constructor — and cached, so a controller
+  /// built through any path has a non-null value to pass to the callbacks. It
+  /// is `dynamic` because the wrapper does not implement
+  /// [PlatformInAppWebViewController] (see the note on
+  /// `dispatchLoadingStateChange`).
+  dynamic _callbackController;
+
+  /// The value passed to the navigation callback; see [_callbackController].
+  dynamic get callbackController =>
+      _callbackController ??=
+          _creationParams.webviewParams?.controllerFromPlatform?.call(this) ??
+          this;
 
   /// Handlers registered through [addJavaScriptHandler], keyed by name.
   final Map<String, JavaScriptHandlerCallback> _javaScriptHandlersMap = {};
@@ -36,14 +54,44 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
   StreamSubscription<Map<String, dynamic>>? _devToolsProtocolSubscription;
   final Map<String, Map<String, String>> _pendingRequestHeaders = {};
   final Map<String, String> _pendingHtmlDocuments = {};
-  final Map<UserScript, ScriptID> _userScriptIds = {};
+  /// User scripts registered with WebView2, keyed by [UserScript] value.
+  ///
+  /// The value is a LIST of ids, not a single id: WebView2 registers a script
+  /// on every `addScriptToExecuteOnDocumentCreated` call and the same
+  /// [UserScript] value can be added more than once (a rebuild, a
+  /// re-registered `initialUserScripts` list), producing several ids that must
+  /// all be removed to fully unregister it.
+  final Map<UserScript, List<ScriptID>> _userScriptIds = {};
   final Map<String, Function(dynamic data)> _devToolsProtocolCallbacks = {};
 
   /// Whether `Fetch` interception is currently enabled on the underlying
   /// controller. It is turned on only while a navigation has headers to inject
-  /// and turned back off once they are consumed, so a header-less navigation
-  /// never pays the pause → Dart → continue round-trip.
+  /// or a navigation-policy callback to consult, and turned back off once the
+  /// pending work is consumed, so a fully idle webview never pays the
+  /// pause → Dart → continue round-trip.
   bool _fetchEnabled = false;
+
+  /// Whether the `Fetch.requestPaused` DevTools listener is currently
+  /// registered with WebView2.
+  ///
+  /// WebView2 refuses a duplicate registration (its native
+  /// `AddDevToolsProtocolEventListener` returns `false` when the event is
+  /// already registered, surfacing as a `PlatformException(method_failed)`), so
+  /// the listener is owned by the controller and registered exactly once for
+  /// the lifetime of the webview rather than re-added on every fetch-enabled
+  /// load. See [_ensureFetchListener].
+  bool _fetchListenerAdded = false;
+
+  /// Registers the `Fetch.requestPaused` DevTools listener once.
+  ///
+  /// A second [WebviewController.addDevToolsProtocolEventListener] for an event
+  /// that is already registered throws on the native side, so every caller must
+  /// go through this guard instead of calling the controller directly.
+  Future<void> _ensureFetchListener() async {
+    if (_fetchListenerAdded) return;
+    await _controller.addDevToolsProtocolEventListener('Fetch.requestPaused');
+    _fetchListenerAdded = true;
+  }
   Future<void> _fetchOperations = Future<void>.value();
 
   Future<void> _withFetch(Future<void> Function() operation) {
@@ -263,17 +311,28 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
 
     final navigationCallback =
         _creationParams.webviewParams?.shouldOverrideUrlLoading;
-    if (navigationCallback != null &&
-        callbackController != null &&
-        url is String) {
+    if (navigationCallback != null && url is String) {
+      // `Fetch.requestPaused` carries a `frameId` but no `isForMainFrame`, and
+      // the `Document` resource type also matches iframe navigations. WebView2
+      // does not surface the main-frame id on this event, so an empty frameId
+      // (Chromium reports none for the top-level document request) is treated as
+      // main frame and any real frameId as a subframe. This is an approximation,
+      // not the derived id the review suggested, which is tracked as a follow-up
+      // on PR #443.
+      final frameId = data['frameId'];
+      final isForMainFrame = frameId == null || frameId == '';
       final policy = await navigationCallback(
         callbackController,
         NavigationAction(
           request: URLRequest(url: WebUri(url)),
-          isForMainFrame: true,
+          isForMainFrame: isForMainFrame,
         ),
       );
       if (policy == NavigationActionPolicy.CANCEL) {
+        // Consume the cancelled request's pending headers before returning:
+        // the navigation is gone, and leaving them armed would leak an auth
+        // header into a later navigation to the same URL.
+        _pendingRequestHeaders.remove(_canonicalKeyFor(url));
         await _controller.callDevToolsProtocolMethod('Fetch.failRequest', {
           'requestId': requestId,
           'errorReason': 'Aborted',
@@ -447,10 +506,12 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
         _creationParams.webviewParams?.shouldOverrideUrlLoading != null;
     await _withFetch(() async {
       _pendingRequestHeaders.clear();
+      // A new top-level navigation supersedes any outstanding loadData(baseUrl:)
+      // that never delivered its requestPaused event; leaving the stale document
+      // armed would fulfill a later navigation to the same URL with it.
+      _pendingHtmlDocuments.clear();
       if (hasHeaders || hasNavigationCallback) {
-        await _controller.addDevToolsProtocolEventListener(
-          'Fetch.requestPaused',
-        );
+        await _ensureFetchListener();
         await _controller.callDevToolsProtocolMethod('Fetch.enable', {
           'patterns': [
             {'resourceType': 'Document', 'requestStage': 'Request'},
@@ -485,7 +546,14 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
     required Function(dynamic data) callback,
   }) async {
     _devToolsProtocolCallbacks[eventName] = callback;
-    await _controller.addDevToolsProtocolEventListener(eventName);
+    // The navigation interceptor registers the `Fetch.requestPaused` listener
+    // itself; routing it through the guard keeps the native registration
+    // idempotent instead of throwing on the second navigation.
+    if (eventName == 'Fetch.requestPaused') {
+      await _ensureFetchListener();
+    } else {
+      await _controller.addDevToolsProtocolEventListener(eventName);
+    }
   }
 
   @override
@@ -520,10 +588,19 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
       await loadUrl(urlRequest: URLRequest(url: WebUri(dataUri)));
       return;
     }
+    // SECURITY NOTE: with a [baseUrl] the HTML is served through the WebView2
+    // `Fetch` boundary as a real document of that origin — NOT as a `data:` URL
+    // in an opaque origin. The injected markup therefore runs with the full
+    // privileges of `baseUrl`: it can read that origin's non-HttpOnly cookies,
+    // `localStorage`, IndexedDB, and issue credentialed `fetch` calls. This is
+    // exactly what the authenticated-document use case needs, but [loadData] is
+    // also the API most often handed untrusted HTML (rendered markdown, message
+    // bodies), so pass a [baseUrl] you trust the origin of. A `file://`
+    // [baseUrl] confers the same file-origin privileges.
     final url = baseUrl.toString();
     await _withFetch(() async {
       _pendingRequestHeaders.clear();
-      await _controller.addDevToolsProtocolEventListener('Fetch.requestPaused');
+      await _ensureFetchListener();
       await _controller.callDevToolsProtocolMethod('Fetch.enable', {
         'patterns': [
           {'resourceType': 'Document', 'requestStage': 'Request'},
@@ -548,25 +625,133 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
         'Windows WebView2 supports only AT_DOCUMENT_START user scripts',
       );
     }
+    // WebView2's `addScriptToExecuteOnDocumentCreated` takes only the source: it
+    // has no `forMainFrameOnly` / `allowedOriginRules` / `contentWorld` options.
+    // Honor `forMainFrameOnly` (default true) by gating the source on the frame
+    // it runs in, and honor `allowedOriginRules` by gating on the document
+    // origin, so a narrowed script does not silently run in every frame and on
+    // every origin as WebView2 would do by default.
     final id = await _controller.addScriptToExecuteOnDocumentCreated(
-      userScript.source,
+      _wrapUserScriptSource(userScript),
     );
-    if (id != null) _userScriptIds[userScript] = id;
+    if (id != null) _userScriptIds.putIfAbsent(userScript, () => []).add(id);
+  }
+
+  /// Wraps a user script's [UserScript.source] in the frame/origin guards that
+  /// WebView2's source-only registration cannot express natively.
+  ///
+  /// - `forMainFrameOnly` (default `true`): when `false`, the script runs in
+  ///   every frame; when `true`, the wrapper returns early unless it is the top
+  ///   frame (`window.top === window`, with a cross-origin-safe fallback).
+  /// - `allowedOriginRules` (default `{'*'}`): when narrowed, the wrapper
+  ///   returns early unless `document.location.origin` matches one of the rules
+  ///   (exact match or a single trailing `*` wildcard). `*` always matches.
+  String _wrapUserScriptSource(UserScript userScript) {
+    final source = userScript.source;
+    final rules = userScript.allowedOriginRules;
+    final restrictOrigin = rules.isNotEmpty && !rules.contains('*');
+    final restrictFrame = userScript.forMainFrameOnly;
+    if (!restrictOrigin && !restrictFrame) return source;
+
+    final buffer = StringBuffer('(function(){\n');
+    if (restrictFrame) {
+      buffer.write('''
+  try {
+    if (window.top !== window) return;
+  } catch (e) {
+    // Cross-origin access to window.top throws; the script is therefore not in
+    // the top frame, so skip it (forMainFrameOnly).
+    return;
+  }
+''');
+    }
+    if (restrictOrigin) {
+      final ruleList = rules.map((r) => "'${r.replaceAll(r"\\", r"\\\\").replaceAll("'", r"\\'")}'").join(',');
+      buffer.write('''
+  var __allowed = [$ruleList];
+  var __origin = (document && document.location && document.location.origin) || '';
+  var __matched = __allowed.some(function(rule) {
+    if (rule === '*') return true;
+    if (rule.length > 1 && rule.slice(-1) === '*') {
+      return __origin.indexOf(rule.slice(0, -1)) === 0;
+    }
+    return rule === __origin;
+  });
+  if (!__matched) return;
+''');
+    }
+    buffer.write('$source\n})();');
+    return buffer.toString();
   }
 
   @override
   Future<void> addUserScripts({required List<UserScript> userScripts}) async {
+    // Validate the whole batch up front so a bad script (e.g. AT_DOCUMENT_END)
+    // is rejected before anything is registered — otherwise the earlier scripts
+    // stay injected with no bulk-removal API to undo them (NetworkCaptureManager
+    // feeds this path with generated batches).
     for (final userScript in userScripts) {
-      await addUserScript(userScript: userScript);
+      if (userScript.injectionTime !=
+          UserScriptInjectionTime.AT_DOCUMENT_START) {
+        throw UnsupportedError(
+          'Windows WebView2 supports only AT_DOCUMENT_START user scripts',
+        );
+      }
+    }
+    // Track what registered so a mid-loop failure can roll back instead of
+    // leaving a partially applied batch.
+    final registered = <UserScript>[];
+    try {
+      for (final userScript in userScripts) {
+        await addUserScript(userScript: userScript);
+        registered.add(userScript);
+      }
+    } catch (_) {
+      for (final userScript in registered) {
+        await removeUserScript(userScript: userScript);
+      }
+      rethrow;
     }
   }
 
   @override
   Future<bool> removeUserScript({required UserScript userScript}) async {
-    final id = _userScriptIds.remove(userScript);
-    if (id == null) return false;
-    await _controller.removeScriptToExecuteOnDocumentCreated(id);
+    final ids = _userScriptIds.remove(userScript);
+    if (ids == null) return false;
+    // A script may be registered under more than one id (a rebuild, or a
+    // re-registered initialUserScripts list): remove every registered id so
+    // none stays injected for the lifetime of the webview.
+    for (final id in ids) {
+      await _controller.removeScriptToExecuteOnDocumentCreated(id);
+    }
     return true;
+  }
+
+  @override
+  Future<void> removeUserScripts({required List<UserScript> userScripts}) async {
+    for (final userScript in userScripts) {
+      await removeUserScript(userScript: userScript);
+    }
+  }
+
+  @override
+  Future<void> removeAllUserScripts() async {
+    for (final ids in _userScriptIds.values) {
+      for (final id in ids) {
+        await _controller.removeScriptToExecuteOnDocumentCreated(id);
+      }
+    }
+    _userScriptIds.clear();
+  }
+
+  @override
+  Future<void> removeUserScriptsByGroupName({required String groupName}) async {
+    final matching = _userScriptIds.keys
+        .where((userScript) => userScript.groupName == groupName)
+        .toList();
+    for (final userScript in matching) {
+      await removeUserScript(userScript: userScript);
+    }
   }
 
   @override
@@ -674,11 +859,14 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
     _devToolsProtocolSubscription = null;
     _pendingRequestHeaders.clear();
     _pendingHtmlDocuments.clear();
-    for (final id in _userScriptIds.values) {
-      unawaited(_controller.removeScriptToExecuteOnDocumentCreated(id));
+    for (final ids in _userScriptIds.values) {
+      for (final id in ids) {
+        unawaited(_controller.removeScriptToExecuteOnDocumentCreated(id));
+      }
     }
     _userScriptIds.clear();
     _fetchEnabled = false;
+    _fetchListenerAdded = false;
     _devToolsProtocolCallbacks.clear();
     _urlSubscription?.cancel();
     _urlSubscription = null;
