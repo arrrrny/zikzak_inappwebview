@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
 
+import 'package:flutter/services.dart' show PlatformException;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:zikzak_webview_windows/zikzak_webview_windows.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
@@ -25,7 +27,25 @@ class _FakeWebviewController extends WebviewController {
   final List<String> addedListeners = <String>[];
   final List<String> removedListeners = <String>[];
 
+  /// The sources passed to `addScriptToExecuteOnDocumentCreated`, in order.
+  final List<String> addedScripts = <String>[];
+
+  /// The ids passed to `removeScriptToExecuteOnDocumentCreated`, in order.
+  final List<ScriptID> removedScriptIds = <ScriptID>[];
+
+  /// The DevTools events currently registered natively.
+  ///
+  /// `AddDevToolsProtocolEventListener` refuses an event that is already
+  /// registered (it returns `false`, which the platform channel raises as a
+  /// `PlatformException`), so this set is the contract the controller's
+  /// registration bookkeeping has to agree with.
+  final Set<String> registeredListeners = <String>{};
+
+  /// Per-method CDP results, keyed by method name.
   final Map<String, Future<dynamic> Function()> results = {};
+
+  int _nextScriptId = 0;
+
   Future<String> nextCall(String method) =>
       _calls.stream.firstWhere((call) => call == method);
 
@@ -49,12 +69,38 @@ class _FakeWebviewController extends WebviewController {
   Future<void> loadUrl(String url) async => loadedUrls.add(url);
 
   @override
-  Future<void> addDevToolsProtocolEventListener(String eventName) async =>
-      addedListeners.add(eventName);
+  Future<void> addDevToolsProtocolEventListener(String eventName) async {
+    if (registeredListeners.contains(eventName)) {
+      // The native contract: a duplicate registration is an error, not a
+      // no-op, which is what made the second navigation of a fetch-enabled
+      // webview throw before the registration was tracked.
+      throw PlatformException(
+        code: 'method_failed',
+        message:
+            'DevTools protocol event listener already registered: $eventName',
+      );
+    }
+    registeredListeners.add(eventName);
+    addedListeners.add(eventName);
+  }
 
   @override
-  Future<void> removeDevToolsProtocolEventListener(String eventName) async =>
-      removedListeners.add(eventName);
+  Future<void> removeDevToolsProtocolEventListener(String eventName) async {
+    registeredListeners.remove(eventName);
+    removedListeners.add(eventName);
+  }
+
+  @override
+  Future<ScriptID?> addScriptToExecuteOnDocumentCreated(String script) async {
+    addedScripts.add(script);
+    final id = 'script-${_nextScriptId++}';
+    return id;
+  }
+
+  @override
+  Future<void> removeScriptToExecuteOnDocumentCreated(ScriptID scriptId) async {
+    removedScriptIds.add(scriptId);
+  }
 
   @override
   Future<void> stop() async => calls.add('stop');
@@ -69,6 +115,35 @@ InAppWebViewWindowsController _buildController(
   _FakeWebviewController webviewController,
 ) {
   final params = PlatformInAppWebViewControllerCreationParams(id: 0);
+  return InAppWebViewWindowsController(params, webviewController);
+}
+
+/// A controller whose creation params carry a
+/// `shouldOverrideUrlLoading` callback, which is what puts a navigation on the
+/// Fetch boundary at all.
+///
+/// [onNavigation] receives the [NavigationAction] the controller built; when it
+/// is omitted every decision is [policy].
+InAppWebViewWindowsController _buildControllerWithNavigationPolicy(
+  _FakeWebviewController webviewController, {
+  NavigationActionPolicy policy = NavigationActionPolicy.ALLOW,
+  Future<NavigationActionPolicy?> Function(NavigationAction action)?
+      onNavigation,
+}) {
+  final params = PlatformInAppWebViewControllerCreationParams(
+    id: 0,
+    webviewParams: PlatformWebViewCreationParams(
+      controllerFromPlatform: (PlatformInAppWebViewController controller) =>
+          controller,
+      shouldOverrideUrlLoading: (dynamic controller, NavigationAction action) =>
+          onNavigation == null
+              ? Future<NavigationActionPolicy?>.value(policy)
+              : onNavigation(action),
+    ),
+  );
+  // The controller resolves its own callback controller lazily from
+  // `controllerFromPlatform`, so a controller built directly needs no
+  // post-construction assignment.
   return InAppWebViewWindowsController(params, webviewController);
 }
 
@@ -451,64 +526,35 @@ void main() {
     );
   });
 
-  group('loadData base-url injection', () {
-    Future<String> loadedSourceOf(_FakeWebviewController web) async {
-      final uri = Uri.parse(web.loadedUrls.single);
-      return uri.data!.contentAsString();
-    }
-
-    test('keeps a leading doctype first (standards mode)', () async {
+  group('loadData base-url origin', () {
+    test('serves HTML at the requested HTTP origin', () async {
       final web = _FakeWebviewController();
       final controller = _buildController(web);
       addTearDown(controller.dispose);
       addTearDown(web.close);
 
+      const html = '<!DOCTYPE html><html><body>x</body></html>';
       await controller.loadData(
-        data: '<!DOCTYPE html><html><body>x</body></html>',
-        baseUrl: WebUri('https://a.dev'),
+        data: html,
+        baseUrl: WebUri('https://a.dev/bootstrap/'),
       );
 
-      final source = await loadedSourceOf(web);
+      expect(web.loadedUrls, ['https://a.dev/bootstrap/']);
+      final settled = web.nextCall('Fetch.fulfillRequest');
+      web.emit({
+        'eventName': 'Fetch.requestPaused',
+        'data': {
+          'requestId': 'html-1',
+          'request': {'url': 'https://a.dev/bootstrap/'},
+        },
+      });
+      await settled;
       expect(
-        source,
-        startsWith('<!DOCTYPE html><base href="https:&#47;&#47;a.dev">'),
+        _paramsOf(web, 'Fetch.fulfillRequest'),
+        containsPair('requestId', 'html-1'),
       );
-    });
-
-    test(
-      'matches a case-insensitive doctype and keeps surrounding whitespace',
-      () async {
-        final web = _FakeWebviewController();
-        final controller = _buildController(web);
-        addTearDown(controller.dispose);
-        addTearDown(web.close);
-
-        await controller.loadData(
-          data: '\n  <!doctype html>\n<p>x</p>',
-          baseUrl: WebUri('https://a.dev'),
-        );
-
-        final source = await loadedSourceOf(web);
-        expect(
-          source,
-          '\n  <!doctype html><base href="https:&#47;&#47;a.dev">\n<p>x</p>',
-        );
-      },
-    );
-
-    test('prepends the base tag when there is no doctype', () async {
-      final web = _FakeWebviewController();
-      final controller = _buildController(web);
-      addTearDown(controller.dispose);
-      addTearDown(web.close);
-
-      await controller.loadData(
-        data: '<html><body>x</body></html>',
-        baseUrl: WebUri('https://a.dev'),
-      );
-
-      final source = await loadedSourceOf(web);
-      expect(source, startsWith('<base href="https:&#47;&#47;a.dev">'));
+      final body = _paramsOf(web, 'Fetch.fulfillRequest')['body'] as String;
+      expect(base64Decode(body), utf8.encode(html));
     });
 
     test('leaves the data untouched when no baseUrl is given', () async {
@@ -519,7 +565,7 @@ void main() {
 
       await controller.loadData(data: '<!DOCTYPE html><p>x</p>');
 
-      final source = await loadedSourceOf(web);
+      final source = Uri.parse(web.loadedUrls.single).data!.contentAsString();
       expect(source, '<!DOCTYPE html><p>x</p>');
     });
   });
@@ -563,6 +609,499 @@ void main() {
         'data': {'timestamp': 1},
       });
       expect(await received.future, {'timestamp': 1});
+    });
+  });
+
+  group('Fetch.requestPaused listener registration', () {
+    test('registers the interceptor listener once, not once per load', () async {
+      final web = _FakeWebviewController();
+      final controller = _buildControllerWithNavigationPolicy(web);
+      addTearDown(controller.dispose);
+      addTearDown(web.close);
+
+      await controller.loadUrl(
+        urlRequest: URLRequest(url: WebUri('https://example.com/one')),
+      );
+      await controller.loadUrl(
+        urlRequest: URLRequest(url: WebUri('https://example.com/two')),
+      );
+
+      // The native side refuses a duplicate registration, so a second add is a
+      // PlatformException rather than a no-op.
+      expect(web.addedListeners, <String>['Fetch.requestPaused']);
+      expect(web.registeredListeners, <String>{'Fetch.requestPaused'});
+    });
+
+    test('a second navigation still loads when a policy is registered', () async {
+      final web = _FakeWebviewController();
+      final controller = _buildControllerWithNavigationPolicy(web);
+      addTearDown(controller.dispose);
+      addTearDown(web.close);
+
+      await controller.loadUrl(
+        urlRequest: URLRequest(url: WebUri('https://example.com/one')),
+      );
+      final first = web.nextCall('Fetch.disable');
+      web.emit({
+        'eventName': 'Fetch.requestPaused',
+        'data': {
+          'requestId': 'first',
+          'request': {'url': 'https://example.com/one', 'headers': {}},
+        },
+      });
+      await first;
+
+      // Before the registration guard this threw PlatformException(method_failed)
+      // and the navigation never reached loadUrl.
+      await controller.loadUrl(
+        urlRequest: URLRequest(url: WebUri('https://example.com/two')),
+      );
+      expect(web.loadedUrls, <String>[
+        'https://example.com/one',
+        'https://example.com/two',
+      ]);
+    });
+
+    test('loadData twice renders both documents', () async {
+      final web = _FakeWebviewController();
+      final controller = _buildController(web);
+      addTearDown(controller.dispose);
+      addTearDown(web.close);
+
+      await controller.loadData(
+        data: '<p>one</p>',
+        baseUrl: WebUri('https://a.dev/one'),
+      );
+      await controller.loadData(
+        data: '<p>two</p>',
+        baseUrl: WebUri('https://a.dev/two'),
+      );
+
+      expect(web.addedListeners, <String>['Fetch.requestPaused']);
+      expect(
+        web.loadedUrls,
+        <String>['https://a.dev/one', 'https://a.dev/two'],
+      );
+    });
+
+    test('an application subscription to the same event is not re-added', () async {
+      final web = _FakeWebviewController();
+      final controller = _buildController(web);
+      addTearDown(controller.dispose);
+      addTearDown(web.close);
+
+      await controller.addDevToolsProtocolEventListener(
+        eventName: 'Fetch.requestPaused',
+        callback: (_) {},
+      );
+      await controller.loadUrl(
+        urlRequest: URLRequest(
+          url: WebUri('https://example.com/'),
+          headers: const {'X-One': '1'},
+        ),
+      );
+
+      expect(web.addedListeners, <String>['Fetch.requestPaused']);
+    });
+  });
+
+  group('shouldOverrideUrlLoading over the Fetch boundary', () {
+    test('ALLOW continues the request', () async {
+      final web = _FakeWebviewController();
+      final controller = _buildControllerWithNavigationPolicy(
+        web,
+        policy: NavigationActionPolicy.ALLOW,
+      );
+      addTearDown(controller.dispose);
+      addTearDown(web.close);
+
+      await controller.loadUrl(
+        urlRequest: URLRequest(url: WebUri('https://example.com/')),
+      );
+      final settled = web.nextCall('Fetch.continueRequest');
+      web.emit({
+        'eventName': 'Fetch.requestPaused',
+        'data': {
+          'requestId': 'allow-1',
+          'request': {'url': 'https://example.com/', 'headers': {}},
+        },
+      });
+      await settled;
+
+      expect(_paramsOf(web, 'Fetch.continueRequest')['requestId'], 'allow-1');
+      expect(web.calls, isNot(contains('Fetch.failRequest')));
+    });
+
+    test('CANCEL fails the request with Aborted', () async {
+      final web = _FakeWebviewController();
+      final controller = _buildControllerWithNavigationPolicy(
+        web,
+        policy: NavigationActionPolicy.CANCEL,
+      );
+      addTearDown(controller.dispose);
+      addTearDown(web.close);
+
+      await controller.loadUrl(
+        urlRequest: URLRequest(url: WebUri('https://example.com/')),
+      );
+      final settled = web.nextCall('Fetch.failRequest');
+      web.emit({
+        'eventName': 'Fetch.requestPaused',
+        'data': {
+          'requestId': 'cancel-1',
+          'request': {'url': 'https://example.com/', 'headers': {}},
+        },
+      });
+      await settled;
+
+      expect(_paramsOf(web, 'Fetch.failRequest'), {
+        'requestId': 'cancel-1',
+        'errorReason': 'Aborted',
+      });
+      expect(web.calls, isNot(contains('Fetch.continueRequest')));
+    });
+
+    test('CANCEL leaves no headers armed for a later navigation', () async {
+      final web = _FakeWebviewController();
+      final controller = _buildControllerWithNavigationPolicy(
+        web,
+        policy: NavigationActionPolicy.CANCEL,
+      );
+      addTearDown(controller.dispose);
+      addTearDown(web.close);
+
+      await controller.loadUrl(
+        urlRequest: URLRequest(
+          url: WebUri('https://example.com/'),
+          headers: const {'Authorization': 'Bearer cancelled'},
+        ),
+      );
+      final disabled = web.nextCall('Fetch.disable').timeout(
+        const Duration(seconds: 5),
+      );
+      web.emit({
+        'eventName': 'Fetch.requestPaused',
+        'data': {
+          'requestId': 'cancel-2',
+          'request': {'url': 'https://example.com/', 'headers': {}},
+        },
+      });
+      await disabled;
+
+      expect(_paramsOf(web, 'Fetch.failRequest'), {
+        'requestId': 'cancel-2',
+        'errorReason': 'Aborted',
+      });
+      // The cancelled request consumed its header entry, so interception is
+      // turned back off instead of staying armed.
+      expect(web.calls, containsAllInOrder(<String>[
+        'Fetch.enable',
+        'Fetch.failRequest',
+        'Fetch.disable',
+      ]));
+    });
+
+    test('reports a subframe document load as not the main frame', () async {
+      final web = _FakeWebviewController();
+      final seen = <NavigationAction>[];
+      final controller = _buildControllerWithNavigationPolicy(
+        web,
+        onNavigation: (action) async {
+          seen.add(action);
+          return NavigationActionPolicy.ALLOW;
+        },
+      );
+      web.results['Page.getFrameTree'] = () async =>
+          {'frameTree': {'frame': {'id': 'main-frame'}}};
+      addTearDown(controller.dispose);
+      addTearDown(web.close);
+
+      await controller.loadUrl(
+        urlRequest: URLRequest(url: WebUri('https://example.com/')),
+      );
+      final settled = web.nextCall('Fetch.continueRequest');
+      web.emit({
+        'eventName': 'Fetch.requestPaused',
+        'data': {
+          'requestId': 'sub-1',
+          'frameId': 'iframe-7',
+          'request': {'url': 'https://example.com/iframe', 'headers': {}},
+        },
+      });
+      await settled;
+
+      expect(seen.single.isForMainFrame, isFalse);
+    });
+
+    test('reports a top-level document load as the main frame', () async {
+      final web = _FakeWebviewController();
+      final seen = <NavigationAction>[];
+      final controller = _buildControllerWithNavigationPolicy(
+        web,
+        onNavigation: (action) async {
+          seen.add(action);
+          return NavigationActionPolicy.ALLOW;
+        },
+      );
+      web.results['Page.getFrameTree'] = () async =>
+          {'frameTree': {'frame': {'id': 'main-frame'}}};
+      addTearDown(controller.dispose);
+      addTearDown(web.close);
+
+      await controller.loadUrl(
+        urlRequest: URLRequest(url: WebUri('https://example.com/')),
+      );
+      final settled = web.nextCall('Fetch.continueRequest');
+      web.emit({
+        'eventName': 'Fetch.requestPaused',
+        'data': {
+          'requestId': 'main-1',
+          'frameId': 'main-frame',
+          'request': {'url': 'https://example.com/', 'headers': {}},
+        },
+      });
+      await settled;
+
+      expect(seen.single.isForMainFrame, isTrue);
+    });
+  });
+
+  group('pending loadData documents', () {
+    test('a later loadUrl abandons the outstanding document', () async {
+      final web = _FakeWebviewController();
+      final controller = _buildController(web);
+      addTearDown(controller.dispose);
+      addTearDown(web.close);
+
+      await controller.loadData(
+        data: '<p>never rendered</p>',
+        baseUrl: WebUri('https://a.dev/stale'),
+      );
+      await controller.loadUrl(
+        urlRequest: URLRequest(url: WebUri('https://a.dev/fresh')),
+      );
+
+      final settled = web.nextCall('Fetch.continueRequest');
+      web.emit({
+        'eventName': 'Fetch.requestPaused',
+        'data': {
+          'requestId': 'after-1',
+          'request': {'url': 'https://a.dev/stale', 'headers': {}},
+        },
+      });
+      await settled;
+
+      // The stale document must not be fulfilled for a later navigation.
+      expect(web.calls, isNot(contains('Fetch.fulfillRequest')));
+      expect(_paramsOf(web, 'Fetch.continueRequest')['requestId'], 'after-1');
+    });
+  });
+
+  group('user scripts', () {
+    test('addUserScript registers the source and removeUserScript undoes it', () async {
+      final web = _FakeWebviewController();
+      final controller = _buildController(web);
+      addTearDown(controller.dispose);
+      addTearDown(web.close);
+
+      final script = UserScript(
+        injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,
+        source: 'window.__marked = true;',
+        forMainFrameOnly: false,
+      );
+      await controller.addUserScript(userScript: script);
+
+      expect(web.addedScripts, <String>['window.__marked = true;']);
+
+      expect(await controller.removeUserScript(userScript: script), isTrue);
+      expect(web.removedScriptIds, <String>['script-0']);
+      expect(await controller.removeUserScript(userScript: script), isFalse);
+      expect(web.removedScriptIds, <String>['script-0']);
+    });
+
+    test('addUserScript rejects AT_DOCUMENT_END', () async {
+      final web = _FakeWebviewController();
+      final controller = _buildController(web);
+      addTearDown(controller.dispose);
+      addTearDown(web.close);
+
+      await expectLater(
+        controller.addUserScript(
+          userScript: UserScript(
+            injectionTime: UserScriptInjectionTime.AT_DOCUMENT_END,
+            source: 'window.__late = true;',
+            forMainFrameOnly: false,
+          ),
+        ),
+        throwsUnsupportedError,
+      );
+      expect(web.addedScripts, isEmpty);
+    });
+
+    test('addUserScripts registers nothing when one entry is unsupported', () async {
+      final web = _FakeWebviewController();
+      final controller = _buildController(web);
+      addTearDown(controller.dispose);
+      addTearDown(web.close);
+
+      await expectLater(
+        controller.addUserScripts(
+          userScripts: [
+            UserScript(
+              injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,
+              source: 'window.__first = true;',
+              forMainFrameOnly: false,
+            ),
+            UserScript(
+              injectionTime: UserScriptInjectionTime.AT_DOCUMENT_END,
+              source: 'window.__second = true;',
+              forMainFrameOnly: false,
+            ),
+          ],
+        ),
+        throwsUnsupportedError,
+      );
+
+      expect(web.addedScripts, isEmpty);
+    });
+
+    test('removeAllUserScripts drains every registered script', () async {
+      final web = _FakeWebviewController();
+      final controller = _buildController(web);
+      addTearDown(controller.dispose);
+      addTearDown(web.close);
+
+      await controller.addUserScripts(
+        userScripts: [
+          UserScript(
+            injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,
+            source: 'window.__a = true;',
+            forMainFrameOnly: false,
+          ),
+          UserScript(
+            injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,
+            source: 'window.__b = true;',
+            forMainFrameOnly: false,
+          ),
+        ],
+      );
+      await controller.removeAllUserScripts();
+
+      expect(web.removedScriptIds, <String>['script-0', 'script-1']);
+      expect(
+        await controller.removeUserScript(
+          userScript: UserScript(
+            injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,
+            source: 'window.__a = true;',
+            forMainFrameOnly: false,
+          ),
+        ),
+        isFalse,
+      );
+    });
+
+    test('removeUserScriptsByGroupName only drops that group', () async {
+      final web = _FakeWebviewController();
+      final controller = _buildController(web);
+      addTearDown(controller.dispose);
+      addTearDown(web.close);
+
+      final first = UserScript(
+        groupName: 'capture',
+        injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,
+        source: 'window.__a = true;',
+        forMainFrameOnly: false,
+      );
+      final second = UserScript(
+        groupName: 'other',
+        injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,
+        source: 'window.__b = true;',
+        forMainFrameOnly: false,
+      );
+      await controller.addUserScripts(userScripts: [first, second]);
+      await controller.removeUserScriptsByGroupName(groupName: 'capture');
+
+      expect(web.removedScriptIds, <String>['script-0']);
+      expect(await controller.removeUserScript(userScript: second), isTrue);
+      expect(web.removedScriptIds, <String>['script-0', 'script-1']);
+    });
+
+    test('the same script registered twice is removed twice', () async {
+      final web = _FakeWebviewController();
+      final controller = _buildController(web);
+      addTearDown(controller.dispose);
+      addTearDown(web.close);
+
+      final script = UserScript(
+        injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,
+        source: 'window.__twice = true;',
+        forMainFrameOnly: false,
+      );
+      await controller.addUserScript(userScript: script);
+      await controller.addUserScript(userScript: script);
+
+      expect(web.addedScripts, hasLength(2));
+      expect(await controller.removeUserScript(userScript: script), isTrue);
+      expect(web.removedScriptIds, <String>['script-0', 'script-1']);
+    });
+
+    test('forMainFrameOnly guards the source', () async {
+      final web = _FakeWebviewController();
+      final controller = _buildController(web);
+      addTearDown(controller.dispose);
+      addTearDown(web.close);
+
+      await controller.addUserScript(
+        userScript: UserScript(
+          injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,
+          source: 'window.__top = true;',
+        ),
+      );
+
+      expect(web.addedScripts.single, contains('window === window.top'));
+      expect(web.addedScripts.single, contains('window.__top = true;'));
+    });
+
+    test('allowedOriginRules narrow the source to those origins', () async {
+      final web = _FakeWebviewController();
+      final controller = _buildController(web);
+      addTearDown(controller.dispose);
+      addTearDown(web.close);
+
+      await controller.addUserScript(
+        userScript: UserScript(
+          allowedOriginRules: {'https://a.dev/*'},
+          injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,
+          source: 'window.__scoped = true;',
+          forMainFrameOnly: false,
+        ),
+      );
+
+      final source = web.addedScripts.single;
+      expect(source, isNot('window.__scoped = true;'));
+      // The rule is JSON-encoded into the guard, so the pattern's backslash
+      // arrives doubled: `https://a\\.dev/.*` inside the JavaScript literal.
+      expect(source, contains(r'https://a\\.dev/.*'));
+      expect(source, contains('new RegExp'));
+      expect(source, contains('window.__scoped = true;'));
+    });
+
+    test('an all-origins script is registered verbatim', () async {
+      final web = _FakeWebviewController();
+      final controller = _buildController(web);
+      addTearDown(controller.dispose);
+      addTearDown(web.close);
+
+      await controller.addUserScript(
+        userScript: UserScript(
+          allowedOriginRules: {'*'},
+          injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,
+          source: 'window.__plain = true;',
+          forMainFrameOnly: false,
+        ),
+      );
+
+      expect(web.addedScripts, <String>['window.__plain = true;']);
     });
   });
 }

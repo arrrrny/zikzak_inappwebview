@@ -220,11 +220,10 @@ class _InAppWebViewWindowsWidgetStateImpl
         return;
       }
       _platformController = controller;
-      final callbackController =
-          // The platform widget wrapper always installs this callback; the
-          // `?? controller` fallback only exists so direct platform-object
-          // usage (tests) keeps working.
-          widget.params.controllerFromPlatform?.call(controller) ?? controller;
+      // The controller resolves its own app-facing wrapper from
+      // `controllerFromPlatform` on first access, so there is no
+      // post-construction field to assign.
+      final callbackController = controller.callbackController;
 
       // Publish the controller BEFORE any listener or load can deliver load
       // events: onWebViewCreated must precede onLoadStart/onLoadStop, the
@@ -299,9 +298,7 @@ class _InAppWebViewWindowsWidgetStateImpl
 
       // Load initial URL
       if (widget.params.initialUrlRequest != null) {
-        await _controller.loadUrl(
-          widget.params.initialUrlRequest!.url.toString(),
-        );
+        await controller.loadUrl(urlRequest: widget.params.initialUrlRequest!);
       }
     } catch (e) {
       print("Failed to initialize webview: $e");

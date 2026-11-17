@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart' show kDebugMode, debugPrint;
 import 'package:path/path.dart' as p;
 import 'package:zikzak_webview_windows/zikzak_webview_windows.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
@@ -25,7 +26,31 @@ final _JAVASCRIPT_HANDLER_FORBIDDEN_NAMES = UnmodifiableListView<String>([
 ]);
 
 class InAppWebViewWindowsController extends PlatformInAppWebViewController {
+  final PlatformInAppWebViewControllerCreationParams _creationParams;
   final WebviewController _controller;
+
+  /// The app-facing controller handed to
+  /// [PlatformWebViewCreationParams.shouldOverrideUrlLoading] and the other
+  /// `params` callbacks, as opposed to this platform controller.
+  ///
+  /// In the federated plugin that is the wrapper `zikzak_inappwebview` returns
+  /// from `controllerFromPlatform`, so it cannot be a constructor parameter:
+  /// `controllerFromPlatform` needs this instance to exist first. It is
+  /// therefore resolved on first access and cached, which is also what the
+  /// Android implementation does, so no caller has to remember to assign a
+  /// public field after construction and a controller built by any path has a
+  /// value to pass.
+  ///
+  /// `dynamic` because the wrapper does not implement
+  /// [PlatformInAppWebViewController] — see the note on
+  /// `dispatchLoadingStateChange`.
+  dynamic _callbackController;
+
+  /// The value passed to the creation callbacks; see [_callbackController].
+  dynamic get callbackController =>
+      _callbackController ??=
+          _creationParams.webviewParams?.controllerFromPlatform?.call(this) ??
+          this;
 
   /// Handlers registered through [addJavaScriptHandler], keyed by name.
   final Map<String, JavaScriptHandlerCallback> _javaScriptHandlersMap = {};
@@ -33,12 +58,33 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
   StreamSubscription<dynamic>? _webMessageSubscription;
   StreamSubscription<Map<String, dynamic>>? _devToolsProtocolSubscription;
   final Map<String, Map<String, String>> _pendingRequestHeaders = {};
+  final Map<String, String> _pendingHtmlDocuments = {};
+
+  /// The WebView2 `ScriptID`s registered for each [UserScript].
+  ///
+  /// The key is the script's value, and the value is a list rather than a
+  /// single id because [UserScript] has value equality: registering the same
+  /// script twice registers two native scripts, and removing one id would
+  /// leave the other injected with nothing left in Dart that can address it.
+  final Map<UserScript, List<ScriptID>> _userScriptIds = {};
   final Map<String, Function(dynamic data)> _devToolsProtocolCallbacks = {};
 
-  /// Whether `Fetch` interception is currently enabled on the underlying
-  /// controller. It is turned on only while a navigation has headers to inject
-  /// and turned back off once they are consumed, so a header-less navigation
-  /// never pays the pause → Dart → continue round-trip.
+  /// The CDP events this controller has registered on the native side.
+  ///
+  /// `AddDevToolsProtocolEventListener` refuses an event that is already
+  /// registered (it returns `false`, which the platform channel turns into a
+  /// `PlatformException`), so a second registration of the same event is a
+  /// hard error rather than a no-op. Tracking the set keeps registration
+  /// idempotent, both for the interceptor's own `Fetch.requestPaused` and for
+  /// an application that asks for an event this controller already owns.
+  final Set<String> _registeredDevToolsEvents = <String>{};
+
+  /// Whether Fetch interception is currently enabled on the underlying
+  /// controller. It is turned on only while a navigation needs it — to inject
+  /// request headers or to hand its URL to
+  /// `shouldOverrideUrlLoading` — and turned back off once every pending
+  /// request is consumed, so a navigation that needs neither never pays the
+  /// pause → Dart → continue round-trip.
   bool _fetchEnabled = false;
   Future<void> _fetchOperations = Future<void>.value();
 
@@ -76,7 +122,8 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
   InAppWebViewWindowsController(
     PlatformInAppWebViewControllerCreationParams params,
     this._controller,
-  ) : super.implementation(params) {
+  ) : _creationParams = params,
+      super.implementation(params) {
     _urlSubscription = _controller.url.listen((url) => _currentUrl = url);
     _loadingStateSubscription = _controller.loadingState.listen((state) {
       // webview_windows reports no granular percentage, so mirror the same
@@ -237,8 +284,51 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
     // (white screen, no timeout, no recovery).
     if (requestId is! String) return;
 
-    var headers = <String, dynamic>{};
     final request = data['request'];
+    final url = request is Map ? request['url'] : null;
+    if (url is String) {
+      final html = _pendingHtmlDocuments.remove(_canonicalKeyFor(url));
+      if (html != null) {
+        await _controller.callDevToolsProtocolMethod('Fetch.fulfillRequest', {
+          'requestId': requestId,
+          'responseCode': 200,
+          'responseHeaders': [
+            {'name': 'Content-Type', 'value': 'text/html; charset=utf-8'},
+            {'name': 'Cache-Control', 'value': 'no-store'},
+          ],
+          'body': base64Encode(utf8.encode(html)),
+        });
+        await _finishFetchIfIdle();
+        return;
+      }
+    }
+
+    final navigationCallback =
+        _creationParams.webviewParams?.shouldOverrideUrlLoading;
+    if (navigationCallback != null && url is String) {
+      final mainFrameId = await _resolveMainFrameId();
+      final policy = await navigationCallback(
+        callbackController,
+        NavigationAction(
+          request: URLRequest(url: WebUri(url)),
+          isForMainFrame: _isMainFrame(mainFrameId, data['frameId']),
+        ),
+      );
+      if (policy == NavigationActionPolicy.CANCEL) {
+        // The request is going away, so its headers must not stay armed:
+        // a later navigation to the same URL would otherwise inherit the
+        // headers of a navigation the application cancelled.
+        _pendingRequestHeaders.remove(_canonicalKeyFor(url));
+        await _controller.callDevToolsProtocolMethod('Fetch.failRequest', {
+          'requestId': requestId,
+          'errorReason': 'Aborted',
+        });
+        await _finishFetchIfIdle();
+        return;
+      }
+    }
+
+    var headers = <String, dynamic>{};
     if (request is Map) {
       final requestHeaders = request['headers'];
       if (requestHeaders is Map) {
@@ -246,10 +336,10 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
           requestHeaders.map((key, value) => MapEntry(key.toString(), value)),
         );
       }
-      final url = request['url'];
-      if (url is String) {
+      final requestUrl = request['url'];
+      if (requestUrl is String) {
         final extra =
-            _pendingRequestHeaders.remove(_canonicalKeyFor(url)) ??
+            _pendingRequestHeaders.remove(_canonicalKeyFor(requestUrl)) ??
             const <String, String>{};
         for (final entry in extra.entries) {
           headers.removeWhere(
@@ -283,10 +373,84 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
         await _controller.stop();
       }
     }
-    // The pending headers are consumed; turn interception back off so later
-    // header-less navigations are not held for a needless round-trip.
-    if (_pendingRequestHeaders.isEmpty) {
+    await _finishFetchIfIdle();
+  }
+
+  Future<void> _finishFetchIfIdle() async {
+    if (_pendingRequestHeaders.isEmpty && _pendingHtmlDocuments.isEmpty) {
       await _disableFetch();
+    }
+  }
+
+  /// The CDP frame id of the main frame, or null until
+  /// `Page.getFrameTree` answered.
+  String? _mainFrameId;
+
+  /// Whether [_resolveMainFrameId] already asked, so an answer it cannot use
+  /// is not re-requested for every navigation.
+  bool _mainFrameLookupAttempted = false;
+
+  /// Resolves the main-frame id once, so a subframe document load can be told
+  /// apart from the top-level one.
+  ///
+  /// `Fetch.requestPaused` reports the `frameId` but not whether the frame is
+  /// the main one, and the `Fetch.enable` pattern matches `resourceType:
+  /// Document` in every frame — so without this the branch cannot tell an
+  /// iframe navigation from a top-level one and every document load is reported
+  /// to the application as `isForMainFrame: true`. WebView2 answers
+  /// `Page.getFrameTree` without a prior `Page.enable`; if it does not, the
+  /// id stays null and [isMainFrame] falls back to the main-frame answer, which
+  /// is what the caller saw before this distinction existed.
+  Future<String?> _resolveMainFrameId() async {
+    if (_mainFrameId != null || _mainFrameLookupAttempted) return _mainFrameId;
+    _mainFrameLookupAttempted = true;
+    try {
+      final result = await _controller.callDevToolsProtocolMethod(
+        'Page.getFrameTree',
+      );
+      if (result is Map) {
+        final frameTree = result['frameTree'];
+        if (frameTree is Map) {
+          final frame = frameTree['frame'];
+          if (frame is Map && frame['id'] is String) {
+            _mainFrameId = frame['id'] as String;
+          }
+        }
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        debugPrint(
+          'zikzak_inappwebview_windows: Page.getFrameTree failed '
+          '($error); subframe navigations will be reported as main-frame ones.',
+        );
+      }
+    }
+    return _mainFrameId;
+  }
+
+  /// Whether the paused request at [frameId] belongs to the main frame.
+  ///
+  /// When the main-frame id could not be resolved there is nothing to compare
+  /// against, so the answer is the historical one — `true`.
+  bool _isMainFrame(String? mainFrameId, Object? frameId) {
+    if (mainFrameId == null) return true;
+    return frameId is! String || frameId.isEmpty || frameId == mainFrameId;
+  }
+
+  /// Registers [eventName] with WebView2, at most once per event.
+  ///
+  /// `AddDevToolsProtocolEventListener` returns `false` for an event that is
+  /// already registered and the platform channel raises that as a
+  /// `PlatformException`, so re-adding a live event throws instead of
+  /// converging. Every registration in this class goes through here so the
+  /// native side and [_registeredDevToolsEvents] can never disagree.
+  Future<void> _ensureDevToolsListener(String eventName) async {
+    if (!_registeredDevToolsEvents.add(eventName)) return;
+    try {
+      await _controller.addDevToolsProtocolEventListener(eventName);
+    } catch (_) {
+      _registeredDevToolsEvents.remove(eventName);
+      rethrow;
     }
   }
 
@@ -396,19 +560,25 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
     if (url == null) return;
     final headers = urlRequest.headers;
     final hasHeaders = headers != null && headers.isNotEmpty;
+    final hasNavigationCallback =
+        _creationParams.webviewParams?.shouldOverrideUrlLoading != null;
     await _withFetch(() async {
       _pendingRequestHeaders.clear();
-      if (hasHeaders) {
-        await _controller.addDevToolsProtocolEventListener(
-          'Fetch.requestPaused',
-        );
+      // A new navigation supersedes any outstanding loadData(baseUrl:):
+      // otherwise an abandoned loadData leaves its HTML armed and it can be
+      // fulfilled for a later navigation to the same URL.
+      _pendingHtmlDocuments.clear();
+      if (hasHeaders || hasNavigationCallback) {
+        await _ensureDevToolsListener('Fetch.requestPaused');
         await _controller.callDevToolsProtocolMethod('Fetch.enable', {
           'patterns': [
             {'resourceType': 'Document', 'requestStage': 'Request'},
           ],
         });
         _fetchEnabled = true;
-        _pendingRequestHeaders[_canonicalRequestUrl(url)] = Map.of(headers);
+        if (hasHeaders) {
+          _pendingRequestHeaders[_canonicalRequestUrl(url)] = Map.of(headers);
+        }
       } else {
         await _disableFetch();
       }
@@ -434,7 +604,7 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
     required Function(dynamic data) callback,
   }) async {
     _devToolsProtocolCallbacks[eventName] = callback;
-    await _controller.addDevToolsProtocolEventListener(eventName);
+    await _ensureDevToolsListener(eventName);
   }
 
   @override
@@ -446,11 +616,27 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
     // removes its own callback for the same event.
     await _withFetch(() async {
       if (eventName != 'Fetch.requestPaused' || !_fetchEnabled) {
-        await _controller.removeDevToolsProtocolEventListener(eventName);
+        if (_registeredDevToolsEvents.remove(eventName)) {
+          await _controller.removeDevToolsProtocolEventListener(eventName);
+        }
       }
     });
   }
 
+  /// Loads [data] as a document.
+  ///
+  /// Without a [baseUrl] the document comes from a `data:` URL and therefore
+  /// has an opaque origin. **With a [baseUrl] the data is served as a real
+  /// document of that origin** — that is what makes relative URLs, origin
+  /// scoped storage and cookies, and the navigation policy behave the way a
+  /// consumer of an authenticated document expects — and it is also a
+  /// privilege: the injected markup runs as that origin, so it can read the
+  /// origin's non-`HttpOnly` cookies, its `localStorage`, its IndexedDB, and
+  /// issue credentialed `fetch` calls to it. That is exactly right for the
+  /// authenticated-document use case and exactly wrong for HTML the caller did
+  /// not author (rendered markdown, message bodies), so hand untrusted markup a
+  /// `baseUrl` only deliberately. A [baseUrl] of `file://` carries the same
+  /// sentence.
   @override
   Future<void> loadData({
     required String data,
@@ -460,30 +646,181 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
     WebUri? historyUrl,
     WebUri? allowingReadAccessTo,
   }) async {
-    final source = baseUrl == null ? data : _withBaseTag(data, baseUrl);
-    final dataUri = Uri.dataFromString(
-      source,
-      mimeType: mimeType,
-      encoding: Encoding.getByName(encoding),
-    ).toString();
-    await loadUrl(urlRequest: URLRequest(url: WebUri(dataUri)));
+    if (baseUrl == null) {
+      final dataUri = Uri.dataFromString(
+        data,
+        mimeType: mimeType,
+        encoding: Encoding.getByName(encoding),
+      ).toString();
+      await loadUrl(urlRequest: URLRequest(url: WebUri(dataUri)));
+      return;
+    }
+    final url = baseUrl.toString();
+    await _withFetch(() async {
+      _pendingRequestHeaders.clear();
+      _pendingHtmlDocuments.clear();
+      await _ensureDevToolsListener('Fetch.requestPaused');
+      await _controller.callDevToolsProtocolMethod('Fetch.enable', {
+        'patterns': [
+          {'resourceType': 'Document', 'requestStage': 'Request'},
+        ],
+      });
+      _fetchEnabled = true;
+      _pendingHtmlDocuments[_canonicalRequestUrl(baseUrl)] = data;
+      try {
+        await _controller.loadUrl(url);
+      } catch (_) {
+        _pendingHtmlDocuments.remove(_canonicalRequestUrl(baseUrl));
+        await _disableFetch();
+        rethrow;
+      }
+    });
   }
 
-  /// Injects a `<base href>` tag into [data], after a leading doctype when one
-  /// is present.
+  @override
+  Future<void> addUserScript({required UserScript userScript}) async {
+    _assertDocumentStartSupported(userScript);
+    final id = await _controller.addScriptToExecuteOnDocumentCreated(
+      _userScriptSource(userScript),
+    );
+    if (id != null) {
+      _userScriptIds.putIfAbsent(userScript, () => <ScriptID>[]).add(id);
+    }
+  }
+
+  @override
+  Future<void> addUserScripts({required List<UserScript> userScripts}) async {
+    // Validate the whole batch before registering anything: a list whose second
+    // entry is AT_DOCUMENT_END used to leave the first one injected with no way
+    // to undo it, and NetworkCaptureManager.mergeUserScripts feeds this path.
+    for (final userScript in userScripts) {
+      _assertDocumentStartSupported(userScript);
+    }
+    for (final userScript in userScripts) {
+      await addUserScript(userScript: userScript);
+    }
+  }
+
+  @override
+  Future<bool> removeUserScript({required UserScript userScript}) async {
+    final ids = _userScriptIds.remove(userScript);
+    if (ids == null) return false;
+    for (final id in ids) {
+      await _controller.removeScriptToExecuteOnDocumentCreated(id);
+    }
+    return true;
+  }
+
+  @override
+  Future<void> removeUserScripts({
+    required List<UserScript> userScripts,
+  }) async {
+    for (final userScript in userScripts) {
+      await removeUserScript(userScript: userScript);
+    }
+  }
+
+  @override
+  Future<void> removeAllUserScripts() async {
+    final ids = _userScriptIds.values.expand((entry) => entry).toList(
+      growable: false,
+    );
+    _userScriptIds.clear();
+    for (final id in ids) {
+      await _controller.removeScriptToExecuteOnDocumentCreated(id);
+    }
+  }
+
+  @override
+  Future<void> removeUserScriptsByGroupName({
+    required String groupName,
+  }) async {
+    final grouped = _userScriptIds.entries
+        .where((entry) => entry.key.groupName == groupName)
+        .map((entry) => entry.key)
+        .toList(growable: false);
+    for (final userScript in grouped) {
+      await removeUserScript(userScript: userScript);
+    }
+  }
+
+  /// Throws when [userScript] cannot run on Windows at all.
   ///
-  /// Anything before `<!DOCTYPE html>` is a parse error, so a base tag
-  /// prepended at position 0 makes the parser drop the doctype and render the
-  /// document in quirks mode. The tag therefore goes immediately after the
-  /// doctype, keeping the caller's standards-mode document intact.
-  String _withBaseTag(String data, WebUri baseUrl) {
-    final baseTag = '<base href="${htmlEscape.convert(baseUrl.toString())}">';
-    final doctype = RegExp(
-      r'^\s*<!DOCTYPE[^>]*>',
-      caseSensitive: false,
-    ).firstMatch(data);
-    if (doctype == null) return '$baseTag$data';
-    return '${doctype.group(0)}$baseTag${data.substring(doctype.end)}';
+  /// WebView2's `AddScriptToExecuteOnDocumentCreated` has no injection-time
+  /// option: it always runs after the global object is created and before the
+  /// document is parsed, which is exactly
+  /// [UserScriptInjectionTime.AT_DOCUMENT_START]. An
+  /// [UserScriptInjectionTime.AT_DOCUMENT_END] script therefore has no honest
+  /// translation here and fails loudly rather than being registered at the
+  /// wrong time.
+  void _assertDocumentStartSupported(UserScript userScript) {
+    if (userScript.injectionTime == UserScriptInjectionTime.AT_DOCUMENT_START) {
+      return;
+    }
+    throw UnsupportedError(
+      'Windows WebView2 supports only AT_DOCUMENT_START user scripts',
+    );
+  }
+
+  /// The source registered with WebView2 for [userScript].
+  ///
+  /// WebView2 registers a document-created script for every frame and every
+  /// origin and accepts no options, so the two [UserScript] fields that narrow
+  /// where a script runs are enforced inside the script itself:
+  ///
+  /// - [UserScript.forMainFrameOnly] becomes a `window === window.top` guard,
+  ///   so a script declared for the main frame (the default) no longer runs
+  ///   inside third-party iframes.
+  /// - [UserScript.allowedOriginRules] becomes an origin/URL pattern check, so
+  ///   a script narrowed to one origin is not injected everywhere else.
+  ///
+  /// The source is left untouched when neither field narrows anything, which
+  /// keeps the common `{'*'}` / main-frame-only-plus-all-origins case byte for
+  /// byte what it was. [UserScript.contentWorld] has no WebView2 equivalent
+  /// and is not honoured.
+  String _userScriptSource(UserScript userScript) {
+    final conditions = <String>[
+      if (userScript.forMainFrameOnly) 'window === window.top',
+      if (!_allowsAllOrigins(userScript.allowedOriginRules))
+        _originGuardExpression(userScript.allowedOriginRules),
+    ];
+    if (conditions.isEmpty) return userScript.source;
+    return 'if (${conditions.join(' && ')}) {\n${userScript.source}\n}';
+  }
+
+  bool _allowsAllOrigins(Set<String> allowedOriginRules) =>
+      allowedOriginRules.contains('*');
+
+  /// A JavaScript expression that is true when the document's URL matches one
+  /// of [allowedOriginRules].
+  ///
+  /// Each rule is anchored and matched against both the full href and the
+  /// origin, with `*` as the only wildcard — the same "matching rules for the
+  /// allowed origins" shape the platform interface documents. A URL with no
+  /// parseable origin (a `data:` or `about:` document) can only match a rule
+  /// that names it.
+  String _originGuardExpression(Set<String> allowedOriginRules) {
+    final patterns = allowedOriginRules
+        .map((rule) => '^${_originRuleToPattern(rule)}\$')
+        .toList(growable: false);
+    return '(function(){var p=${jsonEncode(patterns)};'
+        'for(var i=0;i<p.length;i++){'
+        'if(new RegExp(p[i]).test(location.href)'
+        '||new RegExp(p[i]).test(location.origin)){return true;}'
+        '}return false;})()';
+  }
+
+  /// Translates one [allowedOriginRules] entry into an anchored regular
+  /// expression source, where `*` is the only wildcard.
+  String _originRuleToPattern(String rule) {
+    const metacharacters = r'\.^$+?()[]{}|';
+    final buffer = StringBuffer();
+    for (final rune in rule.runes) {
+      final character = String.fromCharCode(rune);
+      if (metacharacters.contains(character)) buffer.write(r'\');
+      buffer.write(character);
+    }
+    return buffer.toString().replaceAll('*', '.*');
   }
 
   @override
@@ -590,7 +927,16 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
     _devToolsProtocolSubscription?.cancel();
     _devToolsProtocolSubscription = null;
     _pendingRequestHeaders.clear();
+    _pendingHtmlDocuments.clear();
+    final scriptIds = _userScriptIds.values.expand((entry) => entry).toList(
+      growable: false,
+    );
+    _userScriptIds.clear();
+    for (final id in scriptIds) {
+      unawaited(_controller.removeScriptToExecuteOnDocumentCreated(id));
+    }
     _fetchEnabled = false;
+    _registeredDevToolsEvents.clear();
     _devToolsProtocolCallbacks.clear();
     _urlSubscription?.cancel();
     _urlSubscription = null;
