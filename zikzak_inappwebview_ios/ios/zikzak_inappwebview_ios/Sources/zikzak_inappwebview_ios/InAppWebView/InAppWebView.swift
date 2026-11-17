@@ -4001,6 +4001,13 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 }
                 let _callHandlerID = body["_callHandlerID"] as? Int64 ?? 0
                 let args = body["args"] as? String ?? "[]"
+                // Issue #446: sign the origin of the frame that actually
+                // called the ceremony, not the origin AuthenticationServices
+                // derives from the relying-party identifier. WebKit reports the
+                // calling frame on the message itself, so the page cannot
+                // substitute an origin of its own choosing.
+                let caller = PasskeyCallerContext.from(
+                    frameInfo: message.frameInfo, mainFrameURL: webView.url)
                 // A disarmed child (passkeyBridgeEnabled = false or an
                 // explicitly requested webAuthenticationSupport == NONE
                 // withheld its bridge at creation) still inherits the
@@ -4022,7 +4029,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                         """, completionHandler: nil)
                 }
                 if let bridge = webView.passkeyBridge {
-                    bridge.handleCall(argsJson: args, completion: resolvePasskeyResult)
+                    bridge.handleCall(
+                        argsJson: args, caller: caller,
+                        completion: resolvePasskeyResult)
                 } else {
                     resolvePasskeyResult(
                         PasskeyBridge.errorResult(

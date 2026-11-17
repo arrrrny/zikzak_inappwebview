@@ -491,4 +491,82 @@ void main() {
       );
     });
   });
+
+  group('Passkey ceremony signs the web caller origin on iOS (issue #446)', () {
+    // Same defect as macOS #446: the app-context
+    // `createCredential*Request(challenge:)` API signs the origin
+    // AuthenticationServices derives from the relying-party identifier, so an
+    // RP used from a cross-origin iframe signs the RP origin. The browser
+    // client-data API is macOS 13.5 / iOS 17.4, so iOS gates on 17.4 and
+    // falls back to the app-context request below it.
+    late String source;
+    late String callerContextSource;
+    late String webViewSource;
+
+    setUpAll(() {
+      source = bridgeSwift.readAsStringSync();
+      webViewSource = webViewSwift.readAsStringSync();
+      final callerContextSwift = File(
+        'ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/'
+        'PasskeyCallerContext.swift',
+      );
+      expect(
+        callerContextSwift.existsSync(),
+        isTrue,
+        reason: 'PasskeyCallerContext.swift not found — issue #446',
+      );
+      callerContextSource = callerContextSwift.readAsStringSync();
+    });
+
+    test('derives the caller origin from the WebKit frame, not from JS', () {
+      expect(callerContextSource, contains('securityOrigin'));
+      expect(callerContextSource, contains('frameInfo'));
+      expect(
+        source,
+        isNot(contains('options["origin"]')),
+        reason:
+            'a JavaScript-provided origin is attacker-controlled; the bridge '
+            'must only trust the frame the message arrived on',
+      );
+    });
+
+    test('hands the calling frame to the bridge', () {
+      expect(source, contains('caller: PasskeyCallerContext?'));
+      expect(webViewSource, contains('message.frameInfo'));
+      expect(webViewSource, contains('PasskeyCallerContext.from'));
+    });
+
+    test('builds assertion and registration requests from client data', () {
+      expect(source, contains('ASPublicKeyCredentialClientData(challenge:'));
+      expect(
+        source,
+        matches(RegExp(r'createCredentialAssertionRequest\(\s*clientData:')),
+      );
+      expect(
+        source,
+        matches(RegExp(r'createCredentialRegistrationRequest\(\s*clientData:')),
+      );
+      expect(source, contains('if #available(iOS 17.4, *)'));
+    });
+
+    test('keeps the challenge-only path as the documented fallback', () {
+      expect(
+        source,
+        matches(RegExp(r'createCredentialAssertionRequest\(\s*challenge:')),
+      );
+      expect(
+        source,
+        matches(RegExp(r'createCredentialRegistrationRequest\(\s*challenge:')),
+      );
+      expect(source, contains('signs the relying-party origin'));
+    });
+
+    test('carries the cross-origin metadata the client data exposes', () {
+      expect(source, contains('crossOrigin'));
+      expect(source, contains('topOrigin'));
+      expect(source, contains('.sameOriginWithAncestors'));
+      expect(source, contains('.crossOrigin'));
+      expect(callerContextSource, contains('sameOriginWithAncestors'));
+    });
+  });
 }
