@@ -305,10 +305,6 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
     }
 
     if (customSettings.hideDefaultMenuItems) {
-      MenuItem actionClose = menu.findItem(R.id.action_close);
-      if (actionClose != null) {
-        actionClose.setVisible(false);
-      }
       MenuItem actionGoBack = menu.findItem(R.id.action_go_back);
       if (actionGoBack != null) {
         actionGoBack.setVisible(false);
@@ -326,6 +322,8 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
         actionShare.setVisible(false);
       }
     }
+
+    applyCloseButtonVisibility(customSettings);
 
     for (final InAppBrowserMenuItem menuItem : menuItems) {
       int order = menuItem.getOrder() != null ? menuItem.getOrder() : Menu.NONE;
@@ -357,6 +355,24 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
     }
 
     return true;
+  }
+
+  /**
+   * The single writer of the close menu item's visibility (issue #440).
+   *
+   * {@code hideCloseButton} hides only the close affordance, while
+   * {@code hideDefaultMenuItems} keeps its all-items meaning, so the close item
+   * is visible exactly when neither flag is set. Keeping the decision here —
+   * rather than inline at the inflate site and again in {@code setSettings} —
+   * is what stops the initial state and a runtime toggle from diverging, which
+   * is the defect #439 fixed on iOS.
+   */
+  void applyCloseButtonVisibility(@Nullable InAppBrowserSettings settings) {
+    if (menu == null || settings == null)
+      return;
+    MenuItem actionClose = menu.findItem(R.id.action_close);
+    if (actionClose != null)
+      actionClose.setVisible(!settings.hideCloseButton && !settings.hideDefaultMenuItems);
   }
 
   public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -510,11 +526,12 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
       }
     }
 
-    if (menu != null && newSettingsMap.get("hideDefaultMenuItems") != null && customSettings.hideDefaultMenuItems != newSettings.hideDefaultMenuItems) {
-      MenuItem actionClose = menu.findItem(R.id.action_close);
-      if (actionClose != null) {
-        actionClose.setVisible(!newSettings.hideDefaultMenuItems);
-      }
+    boolean defaultMenuItemsChanged = newSettingsMap.get("hideDefaultMenuItems") != null
+            && customSettings.hideDefaultMenuItems != newSettings.hideDefaultMenuItems;
+    boolean closeButtonChanged = newSettingsMap.get("hideCloseButton") != null
+            && customSettings.hideCloseButton != newSettings.hideCloseButton;
+
+    if (menu != null && defaultMenuItemsChanged) {
       MenuItem actionGoBack = menu.findItem(R.id.action_go_back);
       if (actionGoBack != null) {
         actionGoBack.setVisible(!newSettings.hideDefaultMenuItems);
@@ -532,6 +549,11 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
         actionShare.setVisible(!newSettings.hideDefaultMenuItems);
       }
     }
+
+    // The close item has two flags that can change it, so it is re-applied
+    // through its single writer whenever either one moved.
+    if (menu != null && (defaultMenuItemsChanged || closeButtonChanged))
+      applyCloseButtonVisibility(newSettings);
 
     customSettings = newSettings;
   }
