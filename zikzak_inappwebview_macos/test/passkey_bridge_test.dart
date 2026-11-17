@@ -343,4 +343,173 @@ void main() {
       expect(source, contains('"PasskeyBridge"'));
     });
   });
+
+  group('Passkey ceremony signs the web caller origin (issue #446)', () {
+    // The app-context `createCredential*Request(challenge:)` API lets
+    // AuthenticationServices derive the signed origin from the relying-party
+    // identifier, so an RP used from a cross-origin iframe signed the RP
+    // origin (`https://apple.com` for Apple's `idmsa.apple.com` iframe) and
+    // App Store Connect failed the assertion. The browser client-data API
+    // signs the origin the native side supplies, which must come from
+    // WebKit's own view of the calling frame — never from JS.
+    late String source;
+    late String callerContextSource;
+    late String webViewSource;
+
+    setUpAll(() {
+      source = bridgeSwift.readAsStringSync();
+      webViewSource = webViewSwift.readAsStringSync();
+      final callerContextSwift = File(
+        'macos/zikzak_inappwebview_macos/Sources/zikzak_inappwebview_macos/'
+        'PasskeyCallerContext.swift',
+      );
+      expect(
+        callerContextSwift.existsSync(),
+        isTrue,
+        reason: 'PasskeyCallerContext.swift not found — issue #446',
+      );
+      callerContextSource = callerContextSwift.readAsStringSync();
+    });
+
+    test('derives the caller origin from the WebKit frame, not from JS', () {
+      expect(
+        callerContextSource,
+        contains('securityOrigin'),
+        reason:
+            'the caller origin must come from WKFrameInfo.securityOrigin, '
+            'WebKit\'s own view of the calling frame',
+      );
+      expect(callerContextSource, contains('frameInfo'));
+      expect(
+        source,
+        isNot(contains('options["origin"]')),
+        reason:
+            'a JavaScript-provided origin is attacker-controlled; the bridge '
+            'must only trust the frame the message arrived on',
+      );
+    });
+
+    test('hands the calling frame to the bridge', () {
+      expect(
+        source,
+        contains('caller: PasskeyCallerContext?'),
+        reason: 'handleCall must accept the resolved caller context',
+      );
+      expect(
+        webViewSource,
+        contains('message.frameInfo'),
+        reason:
+            'the WKScriptMessage handler is the only place that knows which '
+            'frame posted the ceremony request',
+      );
+      expect(webViewSource, contains('PasskeyCallerContext.from'));
+    });
+
+    test('builds assertion requests from client data when available', () {
+      expect(
+        source,
+        contains('ASPublicKeyCredentialClientData(challenge:'),
+        reason: 'the browser request must carry challenge AND origin',
+      );
+      expect(
+        source,
+        matches(RegExp(r'createCredentialAssertionRequest\(\s*clientData:')),
+      );
+      expect(source, contains('if #available(macOS 13.5, *)'));
+    });
+
+    test('builds registration requests from client data when available', () {
+      expect(
+        source,
+        matches(RegExp(r'createCredentialRegistrationRequest\(\s*clientData:')),
+      );
+    });
+
+    test(
+      'signs security-key browser requests from client data where available',
+      () {
+        expect(
+          source,
+          matches(
+            RegExp(
+              r'if #available\(macOS 14\.4, \*\)[\s\S]{0,600}'
+              r'createCredentialRegistrationRequest\(\s*clientData:',
+            ),
+          ),
+          reason:
+              'the security-key provider carries the client-data requests from '
+              'macOS 14.4 and must use them too',
+        );
+      },
+    );
+
+    test('keeps the challenge-only path as the documented fallback', () {
+      expect(
+        source,
+        matches(RegExp(r'createCredentialAssertionRequest\(\s*challenge:')),
+        reason:
+            'below macOS 13.5 the app-context API is the only one available '
+            'and must still serve ceremonies',
+      );
+      expect(
+        source,
+        matches(RegExp(r'createCredentialRegistrationRequest\(\s*challenge:')),
+      );
+      expect(
+        source,
+        contains('signs the relying-party origin'),
+        reason: 'the fallback\'s origin limitation must be documented in code',
+      );
+    });
+
+    test('carries the cross-origin metadata the client data exposes', () {
+      expect(source, contains('crossOrigin'));
+      expect(source, contains('topOrigin'));
+      expect(source, contains('.sameOriginWithAncestors'));
+      expect(source, contains('.crossOrigin'));
+      expect(
+        callerContextSource,
+        contains('sameOriginWithAncestors'),
+        reason:
+            'a same-origin subframe is still a subframe: the client data must '
+            'say so instead of claiming a top-level ceremony',
+      );
+    });
+
+    test('never claims a top-level ceremony for a known subframe', () {
+      expect(
+        callerContextSource,
+        contains('return isMainFrame ? .notSet : .crossOrigin'),
+        reason:
+            'a subframe whose top-level origin has no serializable host '
+            '(`about:blank`, `file://`) is still a subframe: `.notSet` reads '
+            'as a top-level ceremony, which is the mismatch #446 fixes',
+      );
+    });
+
+    test('re-brackets an IPv6 literal host in the serialized origin', () {
+      expect(
+        callerContextSource,
+        contains(r'host.contains(":") && !host.hasPrefix("[")'),
+        reason:
+            'WKSecurityOrigin.host and URL.host both strip the brackets of an '
+            'IPv6 literal, so the serialization has to put them back',
+      );
+      expect(
+        callerContextSource,
+        contains(r'"[\(host)]"'),
+        reason: 'RFC 6454 serializes an IPv6 literal host in brackets',
+      );
+    });
+
+    test('logs the app-context fallback instead of failing silently', () {
+      expect(
+        source,
+        contains('no trusted caller origin'),
+        reason:
+            'the app-context fallback signs the relying-party origin — the '
+            '#446 defect — so choosing it must leave a trace in the log',
+      );
+    });
+  });
 }

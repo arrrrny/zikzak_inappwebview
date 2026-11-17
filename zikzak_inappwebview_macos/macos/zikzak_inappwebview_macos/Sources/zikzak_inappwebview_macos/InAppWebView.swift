@@ -2704,9 +2704,16 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 // to Dart. The bridge always RESOLVES the JS promise — the
                 // shim converts {"ok": false, error: {name, message}} into
                 // a DOMException so the WebAuthn error names survive.
+                // Issue #446: the ceremony must sign the origin of the frame
+                // that actually called it, not the origin AuthenticationServices
+                // derives from the relying-party identifier. WebKit reports the
+                // calling frame on the message itself, so the page cannot
+                // substitute an origin of its own choosing.
                 let _callHandlerID = body["_callHandlerID"] as? Int64 ?? 0
                 let args = body["args"] as? String ?? "[]"
-                passkeyBridge?.handleCall(argsJson: args) { [weak self] result in
+                let caller = PasskeyCallerContext.from(
+                    frameInfo: message.frameInfo, mainFrameURL: self.url)
+                passkeyBridge?.handleCall(argsJson: args, caller: caller) { [weak self] result in
                     guard let self = self else { return }
                     let jsonData =
                         (try? JSONSerialization.data(withJSONObject: result))

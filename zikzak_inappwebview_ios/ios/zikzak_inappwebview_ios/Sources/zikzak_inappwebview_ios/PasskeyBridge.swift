@@ -47,8 +47,15 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
     // MARK: - Entry point
 
     /// `argsJson` is the JS bridge's `args` field: a JSON array whose first
-    /// element is the shim's `{method, options}` payload object.
-    func handleCall(argsJson: String, completion: @escaping ([String: Any]) -> Void) {
+    /// element is the shim's `{method, options}` payload object. `caller` is
+    /// the trusted web-caller context the `WKScriptMessage` handler resolved
+    /// from the frame the request arrived on (issue #446) — the bridge never
+    /// reads an origin out of the payload.
+    func handleCall(
+        argsJson: String,
+        caller: PasskeyCallerContext?,
+        completion: @escaping ([String: Any]) -> Void
+    ) {
         guard let data = argsJson.data(using: .utf8),
               let args = try? JSONSerialization.jsonObject(with: data) as? [Any],
               let payload = args.first as? [String: Any],
@@ -59,9 +66,9 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
         let options = payload["options"] as? [String: Any] ?? [:]
         switch method {
         case "create":
-            performCreate(options: options, completion: completion)
+            performCreate(options: options, caller: caller, completion: completion)
         case "get":
-            performGet(options: options, completion: completion)
+            performGet(options: options, caller: caller, completion: completion)
         case "cancel":
             cancelCeremony()
             completion(["ok": true])
@@ -241,9 +248,125 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
         return selection?["authenticatorAttachment"] as? String != "platform"
     }
 
+    // MARK: - Browser client data
+
+    /// Issue #446 — the client data of a browser request: the calling frame's
+    /// real origin, plus the top-level origin and cross-origin flag when the
+    /// ceremony runs from a subframe.
+    ///
+    /// Returns nil when the caller context is unknown or the OS predates the
+    /// client-data API; the caller then builds the app-context request, whose
+    /// signed origin is the relying party's rather than the frame's. A nil
+    /// return is therefore the issue #446 defect, and it is logged where it
+    /// happens — the fallback is silent otherwise, and a ceremony that signed
+    /// the wrong origin leaves no trace at all.
+    @available(iOS 17.4, *)
+    private func clientData(challenge: Data, caller: PasskeyCallerContext?) -> ASPublicKeyCredentialClientData? {
+        guard let caller = caller, !caller.origin.isEmpty else {
+            print("[PasskeyBridge] no trusted caller origin (a `file://` or "
+                + "`about:blank` frame has no security origin) — falling back "
+                + "to the app-context request, which signs the relying-party "
+                + "origin instead (issue #446)")
+            return nil
+        }
+        var clientData = ASPublicKeyCredentialClientData(challenge: challenge, origin: caller.origin)
+        clientData.topOrigin = caller.topOrigin
+        clientData.crossOrigin = Self.crossOriginValue(caller.crossOrigin)
+        return clientData
+    }
+
+    /// Swift imports the cross-origin value as an optional: `nil` is the
+    /// not-set state, so a top-level ceremony leaves it alone rather than
+    /// naming a case the SDK does not expose to Swift.
+    @available(iOS 17.4, *)
+    private static func crossOriginValue(
+        _ value: PasskeyCallerContext.CrossOrigin
+    ) -> ASPublicKeyCredentialClientData.CrossOriginValue? {
+        switch value {
+        case .notSet: return nil
+        case .crossOrigin: return .crossOrigin
+        case .sameOriginWithAncestors: return .sameOriginWithAncestors
+        }
+    }
+
+    // MARK: - Requests
+
+    /// Platform registration as a browser request when the caller context and
+    /// the client-data API allow it, otherwise as the app-context request.
+    private func platformRegistrationRequest(
+        rpId: String, challenge: Data, name: String, userID: Data,
+        caller: PasskeyCallerContext?
+    ) -> ASAuthorizationPlatformPublicKeyCredentialRegistrationRequest {
+        let provider = ASAuthorizationPlatformPublicKeyCredentialProvider(relyingPartyIdentifier: rpId)
+        if #available(iOS 17.4, *),
+           let clientData = clientData(challenge: challenge, caller: caller)
+        {
+            return provider.createCredentialRegistrationRequest(
+                clientData: clientData, name: name, userID: userID)
+        }
+        // Below iOS 17.4 there is no client-data API: this app-context
+        // request signs the relying-party origin, not the calling frame's
+        // (issue #446). The limitation is inherent to the API, not a choice.
+        return provider.createCredentialRegistrationRequest(
+            challenge: challenge, name: name, userID: userID)
+    }
+
+    private func platformAssertionRequest(
+        rpId: String, challenge: Data, caller: PasskeyCallerContext?
+    ) -> ASAuthorizationPlatformPublicKeyCredentialAssertionRequest {
+        let provider = ASAuthorizationPlatformPublicKeyCredentialProvider(relyingPartyIdentifier: rpId)
+        if #available(iOS 17.4, *),
+           let clientData = clientData(challenge: challenge, caller: caller)
+        {
+            return provider.createCredentialAssertionRequest(clientData: clientData)
+        }
+        // Below iOS 17.4 there is no client-data API: this app-context
+        // request signs the relying-party origin, not the calling frame's
+        // (issue #446). The limitation is inherent to the API, not a choice.
+        return provider.createCredentialAssertionRequest(challenge: challenge)
+    }
+
+    private func securityKeyRegistrationRequest(
+        rpId: String, challenge: Data, displayName: String, name: String,
+        userID: Data, caller: PasskeyCallerContext?
+    ) -> ASAuthorizationSecurityKeyPublicKeyCredentialRegistrationRequest {
+        let provider = ASAuthorizationSecurityKeyPublicKeyCredentialProvider(relyingPartyIdentifier: rpId)
+        if #available(iOS 17.4, *),
+           let clientData = clientData(challenge: challenge, caller: caller)
+        {
+            return provider.createCredentialRegistrationRequest(
+                clientData: clientData, displayName: displayName, name: name,
+                userID: userID)
+        }
+        // Below iOS 17.4 the security-key provider carries no client-data
+        // request: this app-context request signs the relying-party origin,
+        // not the calling frame's (issue #446).
+        return provider.createCredentialRegistrationRequest(
+            challenge: challenge, displayName: displayName, name: name,
+            userID: userID)
+    }
+
+    private func securityKeyAssertionRequest(
+        rpId: String, challenge: Data, caller: PasskeyCallerContext?
+    ) -> ASAuthorizationSecurityKeyPublicKeyCredentialAssertionRequest {
+        let provider = ASAuthorizationSecurityKeyPublicKeyCredentialProvider(relyingPartyIdentifier: rpId)
+        if #available(iOS 17.4, *),
+           let clientData = clientData(challenge: challenge, caller: caller)
+        {
+            return provider.createCredentialAssertionRequest(clientData: clientData)
+        }
+        // Below iOS 17.4 the security-key provider carries no client-data
+        // request: this app-context request signs the relying-party origin,
+        // not the calling frame's (issue #446).
+        return provider.createCredentialAssertionRequest(challenge: challenge)
+    }
+
     // MARK: - Ceremonies
 
-    private func performCreate(options: [String: Any], completion: @escaping ([String: Any]) -> Void) {
+    private func performCreate(
+        options: [String: Any], caller: PasskeyCallerContext?,
+        completion: @escaping ([String: Any]) -> Void
+    ) {
         let rpId: String
         let challenge: Data
         switch (parseRpId(options), parseChallenge(options)) {
@@ -265,8 +388,9 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
 
         var requests: [ASAuthorizationRequest] = []
         if wantsPlatform(options) {
-            let provider = ASAuthorizationPlatformPublicKeyCredentialProvider(relyingPartyIdentifier: rpId)
-            let request = provider.createCredentialRegistrationRequest(challenge: challenge, name: name, userID: userID)
+            let request = platformRegistrationRequest(
+                rpId: rpId, challenge: challenge, name: name, userID: userID,
+                caller: caller)
             request.userVerificationPreference = userVerificationPreference(from: options)
             request.attestationPreference = attestationPreference(from: options)
             let excluded = platformDescriptors(from: options, key: "excludeCredentials")
@@ -279,8 +403,9 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
             requests.append(request)
         }
         if wantsSecurityKey(options) {
-            let provider = ASAuthorizationSecurityKeyPublicKeyCredentialProvider(relyingPartyIdentifier: rpId)
-            let request = provider.createCredentialRegistrationRequest(challenge: challenge, displayName: displayName, name: name, userID: userID)
+            let request = securityKeyRegistrationRequest(
+                rpId: rpId, challenge: challenge, displayName: displayName,
+                name: name, userID: userID, caller: caller)
             request.userVerificationPreference = userVerificationPreference(from: options)
             request.attestationPreference = attestationPreference(from: options)
             request.credentialParameters = credentialParameters(from: options)
@@ -294,7 +419,10 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
         run(requests: requests, completion: completion)
     }
 
-    private func performGet(options: [String: Any], completion: @escaping ([String: Any]) -> Void) {
+    private func performGet(
+        options: [String: Any], caller: PasskeyCallerContext?,
+        completion: @escaping ([String: Any]) -> Void
+    ) {
         let rpId: String
         let challenge: Data
         switch (parseRpId(options), parseChallenge(options)) {
@@ -309,16 +437,16 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
 
         var requests: [ASAuthorizationRequest] = []
         if wantsPlatform(options) {
-            let provider = ASAuthorizationPlatformPublicKeyCredentialProvider(relyingPartyIdentifier: rpId)
-            let request = provider.createCredentialAssertionRequest(challenge: challenge)
+            let request = platformAssertionRequest(
+                rpId: rpId, challenge: challenge, caller: caller)
             request.userVerificationPreference = userVerificationPreference(from: options)
             let allowed = platformDescriptors(from: options, key: "allowCredentials")
             if !allowed.isEmpty { request.allowedCredentials = allowed }
             requests.append(request)
         }
         if wantsSecurityKey(options) {
-            let provider = ASAuthorizationSecurityKeyPublicKeyCredentialProvider(relyingPartyIdentifier: rpId)
-            let request = provider.createCredentialAssertionRequest(challenge: challenge)
+            let request = securityKeyAssertionRequest(
+                rpId: rpId, challenge: challenge, caller: caller)
             request.userVerificationPreference = userVerificationPreference(from: options)
             let allowed = securityKeyDescriptors(from: options, key: "allowCredentials")
             if !allowed.isEmpty { request.allowedCredentials = allowed }
