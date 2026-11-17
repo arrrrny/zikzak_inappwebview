@@ -125,7 +125,8 @@ class WindowsCookieManager extends PlatformCookieManager {
   }) async {
     await _call('Network.deleteCookies', {
       'name': name,
-      'domain': domain ??
+      'domain':
+          domain ??
           await _storedDomain(
             url: url,
             name: name,

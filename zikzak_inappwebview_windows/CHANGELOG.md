@@ -1,3 +1,18 @@
+## 6.4.1 - 2026-11-18
+
+
+### Bug Fixes
+
+- [Windows] WebView2 cookie operations now share the browser profile: `initializeShared` resolves the requested `userDataFolder` / `browserExecutableFolder` against the one already in use and names both in its `StateError`, and path comparison is null-safe and separator-tolerant (#445). `deleteCookie` reads the cookie back and deletes it under the domain it is actually stored with — a cookie set for `'.example.com'` was stored dotted while `url.host` is `'example.com'`, so the CDP delete matched nothing and the method still answered `true`.
+- [Windows] DevTools `Fetch.requestPaused` no longer throws `PlatformException(method_failed)` on a second fetch-enabled load (#443). `isForMainFrame` is derived from the request's `frameId` (resolved once from `Page.getFrameTree`) instead of hardcoded `true`, so subframe navigations report correctly; cancelled navigations no longer leak an auth header into a later navigation; `loadData` no longer fulfils a later navigation with stale HTML; user scripts honour `forMainFrameOnly` / `allowedOriginRules` and are fully removable (`removeUserScripts`, `removeAllUserScripts`, `removeUserScriptsByGroupName`); `addUserScripts` gained rollback.
+- [Windows] The main-frame id is resolved from `Page.getFrameTree` rather than approximated by an absent `frameId`, which had inverted `isForMainFrame` for ordinary top-level navigations (#443 follow-up). `callbackController` is resolved lazily and cached; user-script sources are guarded with a block statement instead of an IIFE; DevTools listener registration is tracked in one shared set so a duplicate is impossible on every path.
+- [Linux] The visible `InAppWebView` now paints its content through a verified frame path — previously it showed a black or white area while the page was alive (#447). The EGL image import is checked with `glGetError` plus an empty-texture check before a frame is accepted; zero-copy latches off on failure so the pixel path reallocates and fetches pixels from WPE. `ZIKZAK_INAPPWEBVIEW_LINUX_DISABLE_ZERO_COPY=1` forces the pixel path from the first frame. `initialUserScripts` are parsed in the headless `run()`, which had dropped them.
+- [iOS] `getUrl` stays `null` on the healthy path: the `MissingPluginException` fallback no longer returns a stale `_cachedUrl` when the native side answers `null` (#444). The URL cache is now documented as best-effort across a channel gap.
+- [iOS] `getUrl` tolerates a missing view channel instead of throwing, with the cache consulted only on the exception path.
+- [iOS] `hideCloseButton` is now authoritative for the `InAppBrowser` (#439).
+- [Android] `InAppBrowserSettings` parses `hideCloseButton` (default `false`), reports it in `toMap`, and resolves the close item's visibility in one writer — `hideDefaultMenuItems` keeps its all-items meaning while `hideCloseButton` hides only the close item (#440).
+- [macOS/iOS] Passkey ceremonies sign the web caller origin: both `createCredential` and `getCredential` build browser requests from `ASPublicKeyCredential` client-data (macOS 13.5+, iOS 17.4+) whenever the caller origin is known, so a cross-origin iframe ceremony sends its own origin in `clientDataJSON` instead of the RP origin (#446). The origin comes from `WKScriptMessage.frameInfo.securityOrigin`, never from the page.
+- [macOS/iOS] The `host:` label is passed to `bracketed` in both passkey bridges — the fixes round on #448 had called it without the label, breaking the Swift build (#448).
 ## Unreleased
 
 - Implement native Windows CookieManager operations through WebView2 CDP, including HttpOnly/session cookies, URL-scoped reads, full inventory, expiry conversion, and deletion by domain/path.

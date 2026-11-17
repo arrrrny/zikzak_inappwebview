@@ -47,10 +47,8 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
   dynamic _callbackController;
 
   /// The value passed to the creation callbacks; see [_callbackController].
-  dynamic get callbackController =>
-      _callbackController ??=
-          _creationParams.webviewParams?.controllerFromPlatform?.call(this) ??
-          this;
+  dynamic get callbackController => _callbackController ??=
+      _creationParams.webviewParams?.controllerFromPlatform?.call(this) ?? this;
 
   /// Handlers registered through [addJavaScriptHandler], keyed by name.
   final Map<String, JavaScriptHandlerCallback> _javaScriptHandlersMap = {};
@@ -722,9 +720,9 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
 
   @override
   Future<void> removeAllUserScripts() async {
-    final ids = _userScriptIds.values.expand((entry) => entry).toList(
-      growable: false,
-    );
+    final ids = _userScriptIds.values
+        .expand((entry) => entry)
+        .toList(growable: false);
     _userScriptIds.clear();
     for (final id in ids) {
       await _controller.removeScriptToExecuteOnDocumentCreated(id);
@@ -732,9 +730,7 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
   }
 
   @override
-  Future<void> removeUserScriptsByGroupName({
-    required String groupName,
-  }) async {
+  Future<void> removeUserScriptsByGroupName({required String groupName}) async {
     final grouped = _userScriptIds.entries
         .where((entry) => entry.key.groupName == groupName)
         .map((entry) => entry.key)
@@ -928,9 +924,9 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
     _devToolsProtocolSubscription = null;
     _pendingRequestHeaders.clear();
     _pendingHtmlDocuments.clear();
-    final scriptIds = _userScriptIds.values.expand((entry) => entry).toList(
-      growable: false,
-    );
+    final scriptIds = _userScriptIds.values
+        .expand((entry) => entry)
+        .toList(growable: false);
     _userScriptIds.clear();
     for (final id in scriptIds) {
       unawaited(_controller.removeScriptToExecuteOnDocumentCreated(id));

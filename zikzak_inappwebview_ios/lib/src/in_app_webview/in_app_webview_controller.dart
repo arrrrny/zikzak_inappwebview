@@ -114,6 +114,7 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
       _inAppBrowser?.eventHandler;
 
   dynamic _controllerFromPlatform;
+
   /// Last URL seen from the native side (`onLoadStart`, `onUpdateVisitedHistory`)
   /// or handed to [loadUrl], used by [getUrl] only when its platform channel is
   /// gone (`MissingPluginException`).
