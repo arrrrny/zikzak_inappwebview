@@ -1,51 +1,12 @@
 import 'dart:async';
-import 'dart:io';
 
-import 'package:flutter/foundation.dart' show kDebugMode, visibleForTesting;
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter/services.dart' show PlatformException;
 
-import 'package:path_provider/path_provider.dart';
 import 'package:zikzak_webview_windows/zikzak_webview_windows.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
 import 'in_app_webview_windows_controller.dart';
-
-bool isEnvironmentAlreadyInitializedError(Object error) {
-  return error is PlatformException &&
-      error.code == 'environment_already_initialized';
-}
-
-/// Initializes the shared WebView2 environment, tolerating an environment
-/// that another WebView already created.
-///
-/// The WebView2 environment is process-wide and immutable: once some other
-/// WebView has created it, this WebView reuses it and its own requested
-/// args (user-data folder, browser executable, additional arguments) are
-/// NOT applied — a `debugPrint` in debug builds surfaces that divergence.
-/// Any other [PlatformException] is rethrown: only
-/// `environment_already_initialized` is safe to ignore.
-@visibleForTesting
-Future<void> ensureWebView2Environment(WebViewEnvironmentInitArgs args) async {
-  try {
-    await WebviewController.initializeEnvironment(
-      userDataPath: args.userDataPath,
-      browserExePath: args.browserExePath,
-      additionalArguments: args.additionalArguments,
-    );
-  } on PlatformException catch (error) {
-    if (!isEnvironmentAlreadyInitializedError(error)) rethrow;
-    if (kDebugMode) {
-      debugPrint(
-        'zikzak_inappwebview_windows: WebView2 environment already initialized '
-        'by another WebView; reusing it. Requested args were NOT applied '
-        '(userDataPath: ${args.userDataPath}, browserExePath: '
-        '${args.browserExePath}, additionalArguments: '
-        '${args.additionalArguments}).',
-      );
-    }
-  }
-}
+import 'webview_environment.dart' show WindowsWebViewEnvironment;
 
 class _VirtualHostMappingInfo {
   final String folderPath;
@@ -162,28 +123,6 @@ class _InAppWebViewWindowsWidgetStateImpl
     initPlatformState();
   }
 
-  Future<String> _getDefaultUserDataFolder() async {
-    final directory = await getApplicationSupportDirectory();
-    final path = '${directory.path}/zikzak_webview2_data';
-    final dir = Directory(path);
-    if (!await dir.exists()) {
-      await dir.create(recursive: true);
-    }
-    // Verify writability
-    final testFile = File('$path/.write_test');
-    try {
-      await testFile.writeAsString('test');
-      try {
-        await testFile.delete();
-      } catch (_) {
-        // Ignore deletion errors (e.g., temporary file locks from AV)
-      }
-      return path;
-    } catch (e) {
-      throw StateError('WebView2 user data folder is not writable: $path');
-    }
-  }
-
   Future<void> initPlatformState() async {
     try {
       // Resolve the WebView2 environment arguments from the user-supplied
@@ -192,16 +131,7 @@ class _InAppWebViewWindowsWidgetStateImpl
       // `additionalBrowserArguments` — so Chromium flags such as
       // `--disable-web-security` never reached WebView2 (issue #178).
       final settings = widget.params.webViewEnvironment?.settings;
-      final defaultUserDataFolder = await _getDefaultUserDataFolder();
-      final args = resolveEnvironmentInitArgs(
-        settings: settings,
-        defaultUserDataFolder: () => defaultUserDataFolder,
-      );
-
-      // The WebView2 environment is shared by all controllers and can only be
-      // initialized once. Reusing it is valid when another WebView already
-      // initialized the process-wide environment; any other failure rethrows.
-      await ensureWebView2Environment(args);
+      await WindowsWebViewEnvironment.initializeShared(settings: settings);
 
       await _controller.initialize();
 
@@ -321,60 +251,4 @@ class _InAppWebViewWindowsWidgetStateImpl
     _platformController = null;
     super.dispose();
   }
-}
-
-/// Arguments forwarded to [WebviewController.initializeEnvironment] when
-/// bringing up the shared WebView2 environment.
-///
-/// Exposed as a typed record so the mapping from
-/// [WebViewEnvironmentSettings] to the underlying `webview_windows` API
-/// can be unit-tested without a live WebView2 runtime.
-class WebViewEnvironmentInitArgs {
-  const WebViewEnvironmentInitArgs({
-    required this.userDataPath,
-    this.browserExePath,
-    this.additionalArguments,
-  });
-
-  /// User-data folder to use for the WebView2 runtime. Always non-null —
-  /// falls back to the platform default when the caller did not supply one.
-  final String userDataPath;
-
-  /// Path to a fixed-version WebView2 runtime, or `null` to use the
-  /// installed runtime.
-  final String? browserExePath;
-
-  /// Raw Chromium command-line switches forwarded to WebView2's
-  /// `ICoreWebView2EnvironmentOptions::put_AdditionalBrowserArguments`.
-  ///
-  /// Example: `"--disable-web-security --allow-running-insecure-content"`.
-  final String? additionalArguments;
-}
-
-/// Maps a [WebViewEnvironmentSettings] into the parameters accepted by
-/// [WebviewController.initializeEnvironment].
-///
-/// This is the single source of truth for which Windows-only settings are
-/// forwarded to the WebView2 runtime. Before this helper existed, only
-/// [WebViewEnvironmentSettings.userDataFolder] was honored, silently
-/// dropping `additionalBrowserArguments` — so Chromium flags such as
-/// `--disable-web-security` never reached WebView2 and local CORS could
-/// not be disabled (issue #178).
-///
-/// Pure and synchronous so it can be unit-tested without a live WebView2
-/// runtime; the caller supplies the default user-data folder via
-/// [defaultUserDataFolder] (which is only invoked when [settings] is `null`
-/// or does not specify `userDataFolder`).
-WebViewEnvironmentInitArgs resolveEnvironmentInitArgs({
-  required WebViewEnvironmentSettings? settings,
-  required String Function() defaultUserDataFolder,
-}) {
-  if (settings == null) {
-    return WebViewEnvironmentInitArgs(userDataPath: defaultUserDataFolder());
-  }
-  return WebViewEnvironmentInitArgs(
-    userDataPath: settings.userDataFolder ?? defaultUserDataFolder(),
-    browserExePath: settings.browserExecutableFolder,
-    additionalArguments: settings.additionalBrowserArguments,
-  );
 }
