@@ -18,6 +18,11 @@ G_BEGIN_DECLS
  * - Zero GPU → CPU → GPU round-trip
  * - Direct DMA-BUF sharing between WPE WebKit and Flutter
  * - Minimal latency for large textures
+ *
+ * When the EGL image cannot be imported (the image belongs to a display this
+ * GL context cannot reach), the texture latches zero-copy off and uploads the
+ * webview's pixel buffer instead, so the view still paints. Set
+ * ZIKZAK_INAPPWEBVIEW_LINUX_DISABLE_ZERO_COPY=1 to start on that path.
  */
 
 #define INAPPWEBVIEW_TYPE_EGL_TEXTURE (inappwebview_egl_texture_get_type())

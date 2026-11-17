@@ -95,7 +95,8 @@ CustomPlatformView::CustomPlatformView(FlBinaryMessenger* messenger,
 
   // Create texture - two modes:
   // 1. EGL/GL texture (hardware accelerated) - uses zero-copy EGL when available,
-  //    falls back to pixel buffer upload when EGL is not available (e.g., in VMs)
+  //    falls back to pixel buffer uploads when the EGL image cannot be bound
+  //    (e.g. in VMs or on a stack where the import fails)
   // 2. Pixel buffer texture (software) - pure software fallback when GL is disabled
   //
   // The EGL texture handles both EGL and SHM modes internally, providing the best
@@ -103,12 +104,14 @@ CustomPlatformView::CustomPlatformView(FlBinaryMessenger* messenger,
   if (UseGLTexture()) {
     texture_ = FL_TEXTURE(inappwebview_egl_texture_new(webview_.get()));
     egl_texture_ = INAPPWEBVIEW_EGL_TEXTURE(texture_);
-    // In zero-copy EGL mode, we don't need pixel readback - the EGL image is passed
-    // directly to Flutter. This improves performance and avoids GL context issues.
-    webview_->SetSkipPixelReadback(true);
-    debugLog("CustomPlatformView: using GL texture (hardware accelerated)");
+    // The EGL texture keeps the DMA-BUF image for Flutter (no CPU copy) unless
+    // its import fails, in which case it asks the webview for pixels itself.
+    debugLog("CustomPlatformView: using GL texture (zero-copy EGL when available)");
   } else {
     texture_ = FL_TEXTURE(inappwebview_texture_new(webview_.get()));
+    // The pixel-buffer texture has no way to read a DMA-BUF frame itself, so
+    // the WPE buffer callbacks must hand it the CPU copy.
+    webview_->SetPixelReadbackRequired(true);
     debugLog("CustomPlatformView: using pixel buffer texture (software)");
   }
 

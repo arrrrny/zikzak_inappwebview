@@ -49,6 +49,10 @@
 - [Linux] When a non-system WPE prefix is found through `PKG_CONFIG_PATH`, its `lib` directory is recorded as an rpath.
 - [Linux] Native info logs follow `PlatformInAppWebViewController.debugLoggingSettings.enabled` (sent with every webview, headless webview and `InAppBrowser` creation); native errors always print, release builds included. See README "Logging".
 
+### Bug Fixes
+
+- [Linux] A visible webview no longer stays blank when its EGL image cannot be bound (#442). The frame path is decided in one place now (`FramePathFor`, unit-tested in `linux/test/render_path_test.cc`): while an EGL image is imported, the WPE buffer callbacks fill no CPU pixel buffer, so a texture that could not sample that image — the pixel-buffer texture of `ZIKZAK_INAPPWEBVIEW_LINUX_DISABLE_GL=1`, or the EGL texture once its import failed — had nothing to draw. `inappwebview_egl_texture` now verifies the import (`glGetError` plus an empty-texture check), latches zero-copy off when it fails and asks the webview for pixels, so the next frame is uploaded from the pixel buffer; `ZIKZAK_INAPPWEBVIEW_LINUX_DISABLE_ZERO_COPY=1` forces that path from the first frame. The headless webview also applies `initialUserScripts` again: its `run` never parsed them, so a script only ran when the app re-added it through `controller.addUserScript()` in `onWebViewCreated`.
+
 ### Known gaps
 
 - [Linux] Apps cannot supply files for `<input type="file">` themselves: zikzak's platform interface has no file-chooser callback (upstream's `onShowFileChooser`). The Linux port leaves the request to native, which shows its GTK file chooser.

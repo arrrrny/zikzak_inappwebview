@@ -62,6 +62,18 @@ struct _InAppWebViewEGLTexture {
   gboolean extension_checked;
   gboolean extension_available;
 
+  // TRUE once the EGL image could not be bound: from then on this texture
+  // takes its pixels from the webview's pixel buffer instead of from an EGL
+  // image. See the populate() comment for why a failed import is invisible
+  // to Flutter.
+  gboolean zero_copy_disabled;
+
+  // Size for which the EGL image was last verified to be the texture's
+  // storage. The level query below is repeated only when the image size
+  // changes, not on every frame.
+  uint32_t verified_width;
+  uint32_t verified_height;
+
   // Mutex to protect frame data access
   GMutex mutex;
 };
@@ -104,6 +116,51 @@ static gboolean check_egl_image_extension(InAppWebViewEGLTexture* self) {
   return self->extension_available;
 }
 
+// Latch zero-copy off for this texture and ask the webview for pixels.
+//
+// The WPE buffer callback only fills the CPU pixel buffer while pixel
+// readback is required, so a texture that has to sample pixels must say so;
+// otherwise the pixel path below has nothing to upload and the view stays
+// blank (issue #442: black area in zero-copy mode, white area in software
+// texture mode).
+static void disable_zero_copy(InAppWebViewEGLTexture* self, const char* reason) {
+  self->zero_copy_disabled = TRUE;
+  // The texture's storage may have been the (rejected) EGL image, so make
+  // the pixel path reallocate it instead of updating it in place.
+  self->texture_width = 0;
+  self->texture_height = 0;
+  if (self->webview != nullptr) {
+    self->webview->SetPixelReadbackRequired(true);
+  }
+  zikzak_inappwebview::debugLog(std::string("InAppWebViewEGLTexture: ") + reason +
+                                " - falling back to pixel buffer uploads");
+}
+
+// Check that the EGL image really became this texture's storage.
+//
+// An EGL image only imports into a context that can reach the display it was
+// created on. When it cannot, the driver either reports a GL error or leaves
+// the texture without storage, and Flutter samples that empty texture: the
+// widget area stays black and nothing in the log says why (issue #442).
+static gboolean egl_image_became_texture(InAppWebViewEGLTexture* self) {
+  if (self->verified_width == self->width && self->verified_height == self->height) {
+    return TRUE;
+  }
+
+  GLint width = 0;
+  GLint height = 0;
+  glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &width);
+  glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &height);
+
+  if (width <= 0 || height <= 0) {
+    return FALSE;
+  }
+
+  self->verified_width = self->width;
+  self->verified_height = self->height;
+  return TRUE;
+}
+
 // Populate callback - called by Flutter to get the OpenGL texture
 static gboolean inappwebview_egl_texture_populate(FlTextureGL* texture, uint32_t* target,
                                                   uint32_t* name, uint32_t* out_width,
@@ -142,7 +199,8 @@ static gboolean inappwebview_egl_texture_populate(FlTextureGL* texture, uint32_t
 
   // Use the EGL image that was set via inappwebview_egl_texture_set_egl_image()
   // This is updated by the on_frame_available callback before Flutter is notified
-  if (self->current_egl_image != nullptr && self->width > 0 && self->height > 0) {
+  if (!self->zero_copy_disabled && self->current_egl_image != nullptr && self->width > 0 &&
+      self->height > 0) {
     // Check if EGL image extension is available
     if (check_egl_image_extension(self)) {
       // Create texture if needed
@@ -162,21 +220,42 @@ static gboolean inappwebview_egl_texture_populate(FlTextureGL* texture, uint32_t
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
+      // The import has to be verified: a rejected EGL image leaves this
+      // texture without usable storage, and Flutter then paints an empty
+      // texture (the black area of issue #442) instead of an error.
+      gboolean bound = TRUE;
+      const GLenum error = glGetError();
+      if (error != GL_NO_ERROR) {
+        zikzak_inappwebview::debugLog(
+            "InAppWebViewEGLTexture: glEGLImageTargetTexture2DOES failed (GL error " +
+            std::to_string(error) + ")");
+        bound = FALSE;
+      } else if (!egl_image_became_texture(self)) {
+        zikzak_inappwebview::debugLog(
+            "InAppWebViewEGLTexture: EGL image did not become the texture's storage");
+        bound = FALSE;
+      }
+
       glBindTexture(GL_TEXTURE_2D, 0);
 
-      // Update tracked dimensions
-      self->texture_width = self->width;
-      self->texture_height = self->height;
+      if (bound) {
+        // Update tracked dimensions
+        self->texture_width = self->width;
+        self->texture_height = self->height;
 
-      *target = GL_TEXTURE_2D;
-      *name = self->texture_id;
-      *out_width = self->width;
-      *out_height = self->height;
-      
-      self->has_new_frame = FALSE;
+        *target = GL_TEXTURE_2D;
+        *name = self->texture_id;
+        *out_width = self->width;
+        *out_height = self->height;
 
-      g_mutex_unlock(&self->mutex);
-      return TRUE;
+        self->has_new_frame = FALSE;
+
+        g_mutex_unlock(&self->mutex);
+        return TRUE;
+      }
+
+      // Fall through to the pixel buffer path below for this frame.
+      disable_zero_copy(self, "EGL image rejected by the GL context");
     }
   }
 
@@ -315,6 +394,9 @@ static void inappwebview_egl_texture_init(InAppWebViewEGLTexture* self) {
   self->glEGLImageTargetTexture2DOES = nullptr;
   self->extension_checked = FALSE;
   self->extension_available = FALSE;
+  self->zero_copy_disabled = FALSE;
+  self->verified_width = 0;
+  self->verified_height = 0;
   g_mutex_init(&self->mutex);
 }
 
@@ -323,7 +405,17 @@ InAppWebViewEGLTexture* inappwebview_egl_texture_new(
   InAppWebViewEGLTexture* self =
       INAPPWEBVIEW_EGL_TEXTURE(g_object_new(INAPPWEBVIEW_TYPE_EGL_TEXTURE, nullptr));
   self->webview = webview;
-  zikzak_inappwebview::debugLog("InAppWebViewEGLTexture: created (zero-copy mode)");
+
+  // Escape hatch for the zero-copy path: the EGL image import works on some
+  // stacks only, and when it does not the texture now falls back on its own —
+  // but this variable forces the pixel buffer path from the first frame.
+  // Set ZIKZAK_INAPPWEBVIEW_LINUX_DISABLE_ZERO_COPY=1 to use it.
+  if (g_getenv("ZIKZAK_INAPPWEBVIEW_LINUX_DISABLE_ZERO_COPY") != nullptr) {
+    disable_zero_copy(self,
+                      "zero-copy disabled by ZIKZAK_INAPPWEBVIEW_LINUX_DISABLE_ZERO_COPY");
+  } else {
+    zikzak_inappwebview::debugLog("InAppWebViewEGLTexture: created (zero-copy mode)");
+  }
   return self;
 }
 
@@ -334,6 +426,13 @@ void inappwebview_egl_texture_set_egl_image(InAppWebViewEGLTexture* self, void* 
   }
 
   g_mutex_lock(&self->mutex);
+
+  // Zero-copy is off: this texture takes its pixels from the pixel buffer, so
+  // an EGL image handle is of no use here.
+  if (self->zero_copy_disabled) {
+    g_mutex_unlock(&self->mutex);
+    return;
+  }
 
   self->current_egl_image = egl_image;
   self->width = width;

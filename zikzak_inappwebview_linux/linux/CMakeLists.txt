@@ -343,6 +343,7 @@ FetchContent_MakeAvailable(googletest)
 add_executable(${TEST_RUNNER}
   test/zikzak_inappwebview_linux_plugin_test.cc
   test/log_test.cc
+  test/render_path_test.cc
   ${PLUGIN_SOURCES}
 )
 apply_standard_settings(${TEST_RUNNER})

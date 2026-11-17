@@ -69,6 +69,7 @@
 #include "../utils/flutter.h"
 #include "../utils/gl_context.h"
 #include "../utils/log.h"
+#include "../utils/render_path.h"
 #include "../utils/uri.h"
 #include "in_app_webview_manager.h"
 #include "simd_convert.h"
@@ -1305,10 +1306,12 @@ void InAppWebView::OnExportDmaBuf(::wpe_fdo_egl_exported_image* image) {
   EGLImageKHR egl_image = wpe_fdo_egl_exported_image_get_egl_image(image);
 
   // Only do pixel readback if:
-  // 1. skip_pixel_readback_ is false (not using zero-copy mode)
+  // 1. pixel_readback_required_ is set (no zero-copy texture is consuming the
+  //    EGL image directly, so something needs the CPU copy)
   // 2. egl_display_ is available
   // 3. We have a valid EGL image
-  if (!skip_pixel_readback_ && egl_image != EGL_NO_IMAGE_KHR && egl_display_ != nullptr) {
+  if (IsPixelReadbackRequired() && egl_image != EGL_NO_IMAGE_KHR &&
+      egl_display_ != nullptr) {
     ReadPixelsFromEglImage(egl_image, img_width, img_height);
   }
 
@@ -1387,10 +1390,16 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
     bool is_shm = WPE_IS_BUFFER_SHM(buffer);
     
     // === Priority 1: Try EGL image import (zero-copy, best performance) ===
-    // Only attempt EGL for DMA-BUF buffers (SHM buffers cannot be imported via EGL)
-    // Skip if previous EGL attempts failed
-    if (egl_display_ != nullptr &&
-        is_dma_buf && !egl_import_failed_) {
+    // Only attempt EGL for DMA-BUF buffers (SHM buffers cannot be imported via
+    // EGL) and only while nothing needs the CPU copy: the EGL image and the
+    // pixel buffer are exclusive here, so importing an image that no texture
+    // can sample would leave the pixel buffer empty and the view blank (#442).
+    const bool pixel_readback_required =
+        pixel_readback_required_.load(std::memory_order_relaxed);
+    const FramePath path =
+        FramePathFor(egl_display_ != nullptr, is_dma_buf, egl_import_failed_,
+                     pixel_readback_required);
+    if (path == FramePath::kZeroCopyEgl) {
       GError* error = nullptr;
       void* egl_image = wpe_buffer_import_to_egl_image(buffer, &error);
       
