@@ -114,6 +114,7 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
       _inAppBrowser?.eventHandler;
 
   dynamic _controllerFromPlatform;
+  WebUri? _cachedUrl;
 
   @override
   late IOSWebStorage webStorage;
@@ -278,6 +279,9 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
     switch (call.method) {
       case "onLoadStart":
         _injectedScriptsFromURL.clear();
+        _cachedUrl = call.arguments["url"] == null
+            ? _cachedUrl
+            : WebUri(call.arguments["url"] as String);
         if ((webviewParams != null && webviewParams!.onLoadStart != null) ||
             _inAppBrowserEventHandler != null) {
           String? url = call.arguments["url"];
@@ -942,10 +946,12 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
         }
         break;
       case "onUpdateVisitedHistory":
+        String? visitedUrl = call.arguments["url"];
+        if (visitedUrl != null) _cachedUrl = WebUri(visitedUrl);
         if ((webviewParams != null &&
                 webviewParams!.onUpdateVisitedHistory != null) ||
             _inAppBrowserEventHandler != null) {
-          String? url = call.arguments["url"];
+          String? url = visitedUrl;
           bool? isReload = call.arguments["isReload"];
           WebUri? uri = url != null ? WebUri(url) : null;
           if (webviewParams != null &&
@@ -1443,8 +1449,16 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
   @override
   Future<WebUri?> getUrl() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    String? url = await channel?.invokeMethod<String?>('getUrl', args);
-    return url != null ? WebUri(url) : null;
+    try {
+      String? url = await channel?.invokeMethod<String?>('getUrl', args);
+      if (url != null) _cachedUrl = WebUri(url);
+      return url != null ? WebUri(url) : _cachedUrl;
+    } on MissingPluginException {
+      // A platform view can briefly outlive its per-view channel while iOS is
+      // rebuilding or reattaching the native view. Keep the last observed URL
+      // useful to callers instead of surfacing an unhandled zone error.
+      return _cachedUrl;
+    }
   }
 
   @override
@@ -1729,6 +1743,7 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
           allowingReadAccessTo?.toString() ??
           iosAllowingReadAccessTo?.toString(),
     );
+    if (urlRequest.url != null) _cachedUrl = urlRequest.url;
     await channel?.invokeMethod('loadUrl', args);
   }
 

@@ -98,5 +98,19 @@ void main() {
       expect(loaded.single?.toString(), 'https://a.dev/');
       expect(stopped.single, isNull);
     });
+
+    test(
+      'getUrl returns the cached URL when its view channel is unavailable',
+      () async {
+        await controller.handleMethod(
+          MethodCall('onUpdateVisitedHistory', {'url': 'https://a.dev/cached'}),
+        );
+        final channel = MethodChannel(
+          'wtf.zikzak/zikzak_inappwebview_$controllerId',
+        );
+        channel.setMockMethodCallHandler(null);
+        expect(await controller.getUrl(), WebUri('https://a.dev/cached'));
+      },
+    );
   });
 }
