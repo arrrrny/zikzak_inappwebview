@@ -1,3 +1,8 @@
+## Unreleased
+
+- Implement native Windows CookieManager operations through WebView2 CDP, including HttpOnly/session cookies, URL-scoped reads, full inventory, expiry conversion, and deletion by domain/path.
+- Register WebViewEnvironment creation and share initialization between cookie operations and visible webviews. Reject incompatible process-wide profile/proxy options.
+
 ## 6.4.0 - 2026-11-16
 
 
