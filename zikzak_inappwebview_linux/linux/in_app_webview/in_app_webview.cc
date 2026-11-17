@@ -1394,6 +1394,9 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
     // EGL) and only while nothing needs the CPU copy: the EGL image and the
     // pixel buffer are exclusive here, so importing an image that no texture
     // can sample would leave the pixel buffer empty and the view blank (#442).
+    // FramePathFor is this arm's rule only: the legacy fdo backend makes the
+    // same keep-or-copy decision in OnExportDmaBuf, gated on
+    // IsPixelReadbackRequired() — change one arm and the other does not follow.
     const bool pixel_readback_required =
         pixel_readback_required_.load(std::memory_order_relaxed);
     const FramePath path =

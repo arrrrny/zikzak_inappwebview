@@ -5,12 +5,18 @@
 // that the import worked, and the CPU pixel buffer was never filled — so
 // neither the zero-copy path nor the fallback had anything to draw.
 //
-// The decision the buffer callbacks follow is unit-tested in C++
-// (`linux/test/render_path_test.cc`). What is asserted here is the wiring
-// around it, which needs a GL context and a WPE display to exercise for
-// real: the texture verifies the import before it accepts a frame, and the
-// two textures that sample pixels ask the webview to fill the pixel buffer.
+// These assert the WIRING AROUND the frame-path decision, not the decision
+// itself: that the texture verifies the import before it accepts a frame, and
+// that the two textures which sample pixels ask the webview to fill the pixel
+// buffer. The decision is unit-tested in C++ (`linux/test/render_path_test.cc`).
 // Read as text; the native build proves compilation.
+//
+// A source-contract test is not a type-check and not a behavioural test: a
+// `contains('if (bound) {')` is satisfied by any `if (bound)` in the file,
+// including one that computes `bound` and then ignores it, and the whole file
+// fails on a rename of `bound` or `disable_zero_copy` with no behaviour change.
+// That is the same limitation the macOS source-contract tests carry — treat a
+// green run here as evidence about shape, never about behaviour.
 
 import 'dart:io';
 

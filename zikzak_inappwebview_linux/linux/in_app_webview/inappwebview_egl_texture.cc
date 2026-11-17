@@ -68,9 +68,13 @@ struct _InAppWebViewEGLTexture {
   // to Flutter.
   gboolean zero_copy_disabled;
 
-  // Size for which the EGL image was last verified to be the texture's
-  // storage. The level query below is repeated only when the image size
-  // changes, not on every frame.
+  // The EGL image (and its size) for which the level query below last
+  // confirmed this texture's storage. The query is repeated only when the
+  // image or the size changes, not on every frame. The pointer is part of the
+  // key because a later same-size image can fail to bind without a GL error:
+  // trusting the size alone would accept it on an earlier success and draw a
+  // stale frame instead of the pixel fallback.
+  void* verified_egl_image;
   uint32_t verified_width;
   uint32_t verified_height;
 
@@ -129,6 +133,11 @@ static void disable_zero_copy(InAppWebViewEGLTexture* self, const char* reason) 
   // the pixel path reallocate it instead of updating it in place.
   self->texture_width = 0;
   self->texture_height = 0;
+  // Hygiene: the latch above makes these unreachable, but clear them so a
+  // later reader cannot mistake a stale verification for a live one.
+  self->verified_egl_image = nullptr;
+  self->verified_width = 0;
+  self->verified_height = 0;
   if (self->webview != nullptr) {
     self->webview->SetPixelReadbackRequired(true);
   }
@@ -143,7 +152,11 @@ static void disable_zero_copy(InAppWebViewEGLTexture* self, const char* reason) 
 // the texture without storage, and Flutter samples that empty texture: the
 // widget area stays black and nothing in the log says why (issue #442).
 static gboolean egl_image_became_texture(InAppWebViewEGLTexture* self) {
-  if (self->verified_width == self->width && self->verified_height == self->height) {
+  // Trust the level query only for the exact image that was verified: a later
+  // frame carries a new EGL image, and a same-size image that fails to bind
+  // without a GL error must not be accepted on the earlier success.
+  if (self->verified_egl_image == self->current_egl_image &&
+      self->verified_width == self->width && self->verified_height == self->height) {
     return TRUE;
   }
 
@@ -156,6 +169,7 @@ static gboolean egl_image_became_texture(InAppWebViewEGLTexture* self) {
     return FALSE;
   }
 
+  self->verified_egl_image = self->current_egl_image;
   self->verified_width = self->width;
   self->verified_height = self->height;
   return TRUE;
@@ -395,6 +409,7 @@ static void inappwebview_egl_texture_init(InAppWebViewEGLTexture* self) {
   self->extension_checked = FALSE;
   self->extension_available = FALSE;
   self->zero_copy_disabled = FALSE;
+  self->verified_egl_image = nullptr;
   self->verified_width = 0;
   self->verified_height = 0;
   g_mutex_init(&self->mutex);

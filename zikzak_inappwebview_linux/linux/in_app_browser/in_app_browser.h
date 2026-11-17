@@ -147,6 +147,10 @@ class InAppBrowser {
   bool useGlRendering_ = false;
   unsigned int glTexture_ = 0;
   bool glInitialized_ = false;
+  // Set once the EGL image import into this area's GL context fails: the
+  // browser then stays on the pixel buffer path instead of retrying a failing
+  // import every frame.
+  bool glEglImportFailed_ = false;
 
   // Shader-based rendering (OpenGL ES compatible)
   unsigned int glProgram_ = 0;
