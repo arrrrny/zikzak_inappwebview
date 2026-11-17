@@ -25,7 +25,9 @@ final _JAVASCRIPT_HANDLER_FORBIDDEN_NAMES = UnmodifiableListView<String>([
 ]);
 
 class InAppWebViewWindowsController extends PlatformInAppWebViewController {
+  final PlatformInAppWebViewControllerCreationParams _creationParams;
   final WebviewController _controller;
+  Object? callbackController;
 
   /// Handlers registered through [addJavaScriptHandler], keyed by name.
   final Map<String, JavaScriptHandlerCallback> _javaScriptHandlersMap = {};
@@ -33,6 +35,8 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
   StreamSubscription<dynamic>? _webMessageSubscription;
   StreamSubscription<Map<String, dynamic>>? _devToolsProtocolSubscription;
   final Map<String, Map<String, String>> _pendingRequestHeaders = {};
+  final Map<String, String> _pendingHtmlDocuments = {};
+  final Map<UserScript, ScriptID> _userScriptIds = {};
   final Map<String, Function(dynamic data)> _devToolsProtocolCallbacks = {};
 
   /// Whether `Fetch` interception is currently enabled on the underlying
@@ -76,7 +80,8 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
   InAppWebViewWindowsController(
     PlatformInAppWebViewControllerCreationParams params,
     this._controller,
-  ) : super.implementation(params) {
+  ) : _creationParams = params,
+      super.implementation(params) {
     _urlSubscription = _controller.url.listen((url) => _currentUrl = url);
     _loadingStateSubscription = _controller.loadingState.listen((state) {
       // webview_windows reports no granular percentage, so mirror the same
@@ -237,8 +242,48 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
     // (white screen, no timeout, no recovery).
     if (requestId is! String) return;
 
-    var headers = <String, dynamic>{};
     final request = data['request'];
+    final url = request is Map ? request['url'] : null;
+    if (url is String) {
+      final html = _pendingHtmlDocuments.remove(_canonicalKeyFor(url));
+      if (html != null) {
+        await _controller.callDevToolsProtocolMethod('Fetch.fulfillRequest', {
+          'requestId': requestId,
+          'responseCode': 200,
+          'responseHeaders': [
+            {'name': 'Content-Type', 'value': 'text/html; charset=utf-8'},
+            {'name': 'Cache-Control', 'value': 'no-store'},
+          ],
+          'body': base64Encode(utf8.encode(html)),
+        });
+        await _finishFetchIfIdle();
+        return;
+      }
+    }
+
+    final navigationCallback =
+        _creationParams.webviewParams?.shouldOverrideUrlLoading;
+    if (navigationCallback != null &&
+        callbackController != null &&
+        url is String) {
+      final policy = await navigationCallback(
+        callbackController,
+        NavigationAction(
+          request: URLRequest(url: WebUri(url)),
+          isForMainFrame: true,
+        ),
+      );
+      if (policy == NavigationActionPolicy.CANCEL) {
+        await _controller.callDevToolsProtocolMethod('Fetch.failRequest', {
+          'requestId': requestId,
+          'errorReason': 'Aborted',
+        });
+        await _finishFetchIfIdle();
+        return;
+      }
+    }
+
+    var headers = <String, dynamic>{};
     if (request is Map) {
       final requestHeaders = request['headers'];
       if (requestHeaders is Map) {
@@ -246,10 +291,10 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
           requestHeaders.map((key, value) => MapEntry(key.toString(), value)),
         );
       }
-      final url = request['url'];
-      if (url is String) {
+      final requestUrl = request['url'];
+      if (requestUrl is String) {
         final extra =
-            _pendingRequestHeaders.remove(_canonicalKeyFor(url)) ??
+            _pendingRequestHeaders.remove(_canonicalKeyFor(requestUrl)) ??
             const <String, String>{};
         for (final entry in extra.entries) {
           headers.removeWhere(
@@ -283,9 +328,11 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
         await _controller.stop();
       }
     }
-    // The pending headers are consumed; turn interception back off so later
-    // header-less navigations are not held for a needless round-trip.
-    if (_pendingRequestHeaders.isEmpty) {
+    await _finishFetchIfIdle();
+  }
+
+  Future<void> _finishFetchIfIdle() async {
+    if (_pendingRequestHeaders.isEmpty && _pendingHtmlDocuments.isEmpty) {
       await _disableFetch();
     }
   }
@@ -396,9 +443,11 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
     if (url == null) return;
     final headers = urlRequest.headers;
     final hasHeaders = headers != null && headers.isNotEmpty;
+    final hasNavigationCallback =
+        _creationParams.webviewParams?.shouldOverrideUrlLoading != null;
     await _withFetch(() async {
       _pendingRequestHeaders.clear();
-      if (hasHeaders) {
+      if (hasHeaders || hasNavigationCallback) {
         await _controller.addDevToolsProtocolEventListener(
           'Fetch.requestPaused',
         );
@@ -408,7 +457,9 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
           ],
         });
         _fetchEnabled = true;
-        _pendingRequestHeaders[_canonicalRequestUrl(url)] = Map.of(headers);
+        if (hasHeaders) {
+          _pendingRequestHeaders[_canonicalRequestUrl(url)] = Map.of(headers);
+        }
       } else {
         await _disableFetch();
       }
@@ -460,30 +511,62 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
     WebUri? historyUrl,
     WebUri? allowingReadAccessTo,
   }) async {
-    final source = baseUrl == null ? data : _withBaseTag(data, baseUrl);
-    final dataUri = Uri.dataFromString(
-      source,
-      mimeType: mimeType,
-      encoding: Encoding.getByName(encoding),
-    ).toString();
-    await loadUrl(urlRequest: URLRequest(url: WebUri(dataUri)));
+    if (baseUrl == null) {
+      final dataUri = Uri.dataFromString(
+        data,
+        mimeType: mimeType,
+        encoding: Encoding.getByName(encoding),
+      ).toString();
+      await loadUrl(urlRequest: URLRequest(url: WebUri(dataUri)));
+      return;
+    }
+    final url = baseUrl.toString();
+    await _withFetch(() async {
+      _pendingRequestHeaders.clear();
+      await _controller.addDevToolsProtocolEventListener('Fetch.requestPaused');
+      await _controller.callDevToolsProtocolMethod('Fetch.enable', {
+        'patterns': [
+          {'resourceType': 'Document', 'requestStage': 'Request'},
+        ],
+      });
+      _fetchEnabled = true;
+      _pendingHtmlDocuments[_canonicalRequestUrl(baseUrl)] = data;
+      try {
+        await _controller.loadUrl(url);
+      } catch (_) {
+        _pendingHtmlDocuments.remove(_canonicalRequestUrl(baseUrl));
+        await _disableFetch();
+        rethrow;
+      }
+    });
   }
 
-  /// Injects a `<base href>` tag into [data], after a leading doctype when one
-  /// is present.
-  ///
-  /// Anything before `<!DOCTYPE html>` is a parse error, so a base tag
-  /// prepended at position 0 makes the parser drop the doctype and render the
-  /// document in quirks mode. The tag therefore goes immediately after the
-  /// doctype, keeping the caller's standards-mode document intact.
-  String _withBaseTag(String data, WebUri baseUrl) {
-    final baseTag = '<base href="${htmlEscape.convert(baseUrl.toString())}">';
-    final doctype = RegExp(
-      r'^\s*<!DOCTYPE[^>]*>',
-      caseSensitive: false,
-    ).firstMatch(data);
-    if (doctype == null) return '$baseTag$data';
-    return '${doctype.group(0)}$baseTag${data.substring(doctype.end)}';
+  @override
+  Future<void> addUserScript({required UserScript userScript}) async {
+    if (userScript.injectionTime != UserScriptInjectionTime.AT_DOCUMENT_START) {
+      throw UnsupportedError(
+        'Windows WebView2 supports only AT_DOCUMENT_START user scripts',
+      );
+    }
+    final id = await _controller.addScriptToExecuteOnDocumentCreated(
+      userScript.source,
+    );
+    if (id != null) _userScriptIds[userScript] = id;
+  }
+
+  @override
+  Future<void> addUserScripts({required List<UserScript> userScripts}) async {
+    for (final userScript in userScripts) {
+      await addUserScript(userScript: userScript);
+    }
+  }
+
+  @override
+  Future<bool> removeUserScript({required UserScript userScript}) async {
+    final id = _userScriptIds.remove(userScript);
+    if (id == null) return false;
+    await _controller.removeScriptToExecuteOnDocumentCreated(id);
+    return true;
   }
 
   @override
@@ -590,6 +673,11 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
     _devToolsProtocolSubscription?.cancel();
     _devToolsProtocolSubscription = null;
     _pendingRequestHeaders.clear();
+    _pendingHtmlDocuments.clear();
+    for (final id in _userScriptIds.values) {
+      unawaited(_controller.removeScriptToExecuteOnDocumentCreated(id));
+    }
+    _userScriptIds.clear();
     _fetchEnabled = false;
     _devToolsProtocolCallbacks.clear();
     _urlSubscription?.cancel();

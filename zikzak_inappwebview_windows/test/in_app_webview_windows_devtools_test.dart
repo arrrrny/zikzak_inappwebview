@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:zikzak_webview_windows/zikzak_webview_windows.dart';
@@ -451,64 +452,35 @@ void main() {
     );
   });
 
-  group('loadData base-url injection', () {
-    Future<String> loadedSourceOf(_FakeWebviewController web) async {
-      final uri = Uri.parse(web.loadedUrls.single);
-      return uri.data!.contentAsString();
-    }
-
-    test('keeps a leading doctype first (standards mode)', () async {
+  group('loadData base-url origin', () {
+    test('serves HTML at the requested HTTP origin', () async {
       final web = _FakeWebviewController();
       final controller = _buildController(web);
       addTearDown(controller.dispose);
       addTearDown(web.close);
 
+      const html = '<!DOCTYPE html><html><body>x</body></html>';
       await controller.loadData(
-        data: '<!DOCTYPE html><html><body>x</body></html>',
-        baseUrl: WebUri('https://a.dev'),
+        data: html,
+        baseUrl: WebUri('https://a.dev/bootstrap/'),
       );
 
-      final source = await loadedSourceOf(web);
+      expect(web.loadedUrls, ['https://a.dev/bootstrap/']);
+      final settled = web.nextCall('Fetch.fulfillRequest');
+      web.emit({
+        'eventName': 'Fetch.requestPaused',
+        'data': {
+          'requestId': 'html-1',
+          'request': {'url': 'https://a.dev/bootstrap/'},
+        },
+      });
+      await settled;
       expect(
-        source,
-        startsWith('<!DOCTYPE html><base href="https:&#47;&#47;a.dev">'),
+        _paramsOf(web, 'Fetch.fulfillRequest'),
+        containsPair('requestId', 'html-1'),
       );
-    });
-
-    test(
-      'matches a case-insensitive doctype and keeps surrounding whitespace',
-      () async {
-        final web = _FakeWebviewController();
-        final controller = _buildController(web);
-        addTearDown(controller.dispose);
-        addTearDown(web.close);
-
-        await controller.loadData(
-          data: '\n  <!doctype html>\n<p>x</p>',
-          baseUrl: WebUri('https://a.dev'),
-        );
-
-        final source = await loadedSourceOf(web);
-        expect(
-          source,
-          '\n  <!doctype html><base href="https:&#47;&#47;a.dev">\n<p>x</p>',
-        );
-      },
-    );
-
-    test('prepends the base tag when there is no doctype', () async {
-      final web = _FakeWebviewController();
-      final controller = _buildController(web);
-      addTearDown(controller.dispose);
-      addTearDown(web.close);
-
-      await controller.loadData(
-        data: '<html><body>x</body></html>',
-        baseUrl: WebUri('https://a.dev'),
-      );
-
-      final source = await loadedSourceOf(web);
-      expect(source, startsWith('<base href="https:&#47;&#47;a.dev">'));
+      final body = _paramsOf(web, 'Fetch.fulfillRequest')['body'] as String;
+      expect(base64Decode(body), utf8.encode(html));
     });
 
     test('leaves the data untouched when no baseUrl is given', () async {
@@ -519,7 +491,7 @@ void main() {
 
       await controller.loadData(data: '<!DOCTYPE html><p>x</p>');
 
-      final source = await loadedSourceOf(web);
+      final source = Uri.parse(web.loadedUrls.single).data!.contentAsString();
       expect(source, '<!DOCTYPE html><p>x</p>');
     });
   });
