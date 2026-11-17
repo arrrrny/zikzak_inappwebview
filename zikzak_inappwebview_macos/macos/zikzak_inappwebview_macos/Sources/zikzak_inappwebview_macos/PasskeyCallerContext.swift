@@ -73,28 +73,46 @@ struct PasskeyCallerContext {
     private static func crossOrigin(
         isMainFrame: Bool, origin: String, topOrigin: String?
     ) -> CrossOrigin {
+        guard let topOrigin = topOrigin, !topOrigin.isEmpty else {
+            // A top-level ceremony is `.notSet`; every other caller is a
+            // subframe, and a subframe is cross-origin unless its origin
+            // equals the top-level one. When the top-level origin has no
+            // serializable host (`about:blank`, `file://` — the popup shape
+            // sign-in-with-Apple uses) that comparison is impossible, but the
+            // caller IS a subframe, and `.notSet` would tell the relying party
+            // this were a top-level ceremony — the very mismatch #446 fixes.
+            // `ASPublicKeyCredentialClientDataCrossOriginValue` has no
+            // "unknown" case to hide behind, so claim the conservative
+            // `.crossOrigin`.
+            return isMainFrame ? .notSet : .crossOrigin
+        }
         if isMainFrame { return .notSet }
-        // A subframe whose top-level origin the bridge cannot see is not
-        // claimed either way: an invented value here is a statement the
-        // relying party would act on, and this bridge has nothing to base it
-        // on.
-        guard let topOrigin = topOrigin, !topOrigin.isEmpty else { return .notSet }
         return origin == topOrigin ? .sameOriginWithAncestors : .crossOrigin
     }
 
     /// Renders a security origin as the serialization WebAuthn client data
     /// uses: `scheme://host[:port]`, with the scheme's default port omitted so
     /// that a `WKSecurityOrigin` and a parsed `URL` of the same origin render
-    /// identically.
+    /// identically. An IPv6 literal host is re-bracketed (see `bracketed`), so
+    /// both paths render the RFC 6454 form.
     static func originString(scheme: String?, host: String?, port: Int) -> String {
         guard let scheme = scheme?.lowercased(), !scheme.isEmpty,
             let host = host?.lowercased(), !host.isEmpty
         else { return "" }
-        var origin = "\(scheme)://\(host)"
+        var origin = "\(scheme)://\(bracketed(host))"
         if let port = canonicalPort(port, scheme: scheme) {
             origin += ":\(port)"
         }
         return origin
+    }
+
+    /// `WKSecurityOrigin.host` and `URL.host` both strip the brackets of an
+    /// IPv6 literal — `http://[::1]:8080` reads back as `::1` — so the
+    /// serialization has to put them back (RFC 6454 §6.2.3, RFC 3986 §3.2.2).
+    /// Without them the origin reads `http://::1:8080`, which is not the same
+    /// origin and does not parse back as one.
+    private static func bracketed(host: String) -> String {
+        host.contains(":") && !host.hasPrefix("[") ? "[\(host)]" : host
     }
 
     static func originString(from url: URL) -> String? {

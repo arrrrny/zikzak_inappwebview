@@ -568,5 +568,85 @@ void main() {
       expect(source, contains('.crossOrigin'));
       expect(callerContextSource, contains('sameOriginWithAncestors'));
     });
+
+    test('never claims a top-level ceremony for a known subframe', () {
+      expect(
+        callerContextSource,
+        contains('return isMainFrame ? .notSet : .crossOrigin'),
+        reason:
+            'a subframe whose top-level origin has no serializable host '
+            '(`about:blank`, `file://`) is still a subframe: `.notSet` reads '
+            'as a top-level ceremony, which is the mismatch #446 fixes',
+      );
+    });
+
+    test('re-brackets an IPv6 literal host in the serialized origin', () {
+      expect(
+        callerContextSource,
+        contains(r'host.contains(":") && !host.hasPrefix("[")'),
+        reason:
+            'WKSecurityOrigin.host and URL.host both strip the brackets of an '
+            'IPv6 literal, so the serialization has to put them back',
+      );
+      expect(
+        callerContextSource,
+        contains(r'"[\(host)]"'),
+        reason: 'RFC 6454 serializes an IPv6 literal host in brackets',
+      );
+    });
+
+    test('logs the app-context fallback instead of failing silently', () {
+      expect(
+        source,
+        contains('no trusted caller origin'),
+        reason:
+            'the app-context fallback signs the relying-party origin — the '
+            '#446 defect — so choosing it must leave a trace in the log',
+      );
+    });
+  });
+
+  group('PasskeyCallerContext.swift — one derivation, two packages (issue #448)', () {
+    // The Swift sources are per-platform packages, so `PasskeyCallerContext`
+    // exists as two copies and neither package may depend on the other. The
+    // copies are line-for-line identical except for the platform order inside
+    // two doc sentences, so this compares every line that is not a `///` doc
+    // comment: a change that lands in one copy and not the other fails here
+    // instead of forking the derivation (the repo already asserts the same
+    // for the JS shim — see the no-drift group above).
+    test('the iOS and macOS copies stay in step', () {
+      final iOSCallerContext = File(
+        'ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/'
+        'PasskeyCallerContext.swift',
+      );
+      final macOSCallerContext = File(
+        '../zikzak_inappwebview_macos/macos/zikzak_inappwebview_macos/'
+        'Sources/zikzak_inappwebview_macos/PasskeyCallerContext.swift',
+      );
+      expect(
+        iOSCallerContext.existsSync(),
+        isTrue,
+        reason: 'iOS PasskeyCallerContext.swift missing',
+      );
+      expect(
+        macOSCallerContext.existsSync(),
+        isTrue,
+        reason: 'macOS PasskeyCallerContext.swift missing',
+      );
+
+      List<String> codeLines(String swiftSource) => swiftSource
+          .split('\n')
+          .where((line) => !line.trimLeft().startsWith('///'))
+          .map((line) => line.trimRight())
+          .toList();
+
+      expect(
+        codeLines(iOSCallerContext.readAsStringSync()),
+        equals(codeLines(macOSCallerContext.readAsStringSync())),
+        reason:
+            'the two PasskeyCallerContext.swift copies drifted — apply the '
+            'same change to both platform packages',
+      );
+    });
   });
 }

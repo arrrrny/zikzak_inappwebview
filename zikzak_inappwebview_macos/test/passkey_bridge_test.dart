@@ -475,5 +475,41 @@ void main() {
             'say so instead of claiming a top-level ceremony',
       );
     });
+
+    test('never claims a top-level ceremony for a known subframe', () {
+      expect(
+        callerContextSource,
+        contains('return isMainFrame ? .notSet : .crossOrigin'),
+        reason:
+            'a subframe whose top-level origin has no serializable host '
+            '(`about:blank`, `file://`) is still a subframe: `.notSet` reads '
+            'as a top-level ceremony, which is the mismatch #446 fixes',
+      );
+    });
+
+    test('re-brackets an IPv6 literal host in the serialized origin', () {
+      expect(
+        callerContextSource,
+        contains(r'host.contains(":") && !host.hasPrefix("[")'),
+        reason:
+            'WKSecurityOrigin.host and URL.host both strip the brackets of an '
+            'IPv6 literal, so the serialization has to put them back',
+      );
+      expect(
+        callerContextSource,
+        contains(r'"[\(host)]"'),
+        reason: 'RFC 6454 serializes an IPv6 literal host in brackets',
+      );
+    });
+
+    test('logs the app-context fallback instead of failing silently', () {
+      expect(
+        source,
+        contains('no trusted caller origin'),
+        reason:
+            'the app-context fallback signs the relying-party origin — the '
+            '#446 defect — so choosing it must leave a trace in the log',
+      );
+    });
   });
 }

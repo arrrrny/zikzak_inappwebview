@@ -262,10 +262,19 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
     ///
     /// Returns nil when the caller context is unknown or the OS predates the
     /// client-data API; the caller then builds the app-context request, whose
-    /// signed origin is the relying party's rather than the frame's.
+    /// signed origin is the relying party's rather than the frame's. A nil
+    /// return is therefore the issue #446 defect, and it is logged where it
+    /// happens — the fallback is silent otherwise, and a ceremony that signed
+    /// the wrong origin leaves no trace at all.
     @available(macOS 13.5, *)
     private func clientData(challenge: Data, caller: PasskeyCallerContext?) -> ASPublicKeyCredentialClientData? {
-        guard let caller = caller, !caller.origin.isEmpty else { return nil }
+        guard let caller = caller, !caller.origin.isEmpty else {
+            print("[PasskeyBridge] no trusted caller origin (a `file://` or "
+                + "`about:blank` frame has no security origin) — falling back "
+                + "to the app-context request, which signs the relying-party "
+                + "origin instead (issue #446)")
+            return nil
+        }
         var clientData = ASPublicKeyCredentialClientData(challenge: challenge, origin: caller.origin)
         clientData.topOrigin = caller.topOrigin
         clientData.crossOrigin = Self.crossOriginValue(caller.crossOrigin)
