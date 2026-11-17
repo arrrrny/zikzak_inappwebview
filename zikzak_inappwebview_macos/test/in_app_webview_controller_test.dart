@@ -610,4 +610,95 @@ void main() {
       expect(calls.single.method, 'reloadFromOrigin');
     });
   });
+
+  // The four user-script overrides. The platform-interface defaults throw
+  // UnimplementedError, and macOS shipped without them: the Swift side has
+  // always handled `addUserScript` / `removeUserScript` /
+  // `removeUserScriptsByGroupName` / `removeAllUserScripts`
+  // (InAppWebView.swift), so every Dart-side call died at the first await
+  // with the native capability already in place. zuraffa_browser's live
+  // time-zone switch is the caller that made it visible.
+  group('user script overrides', () {
+    late List<MethodCall> calls;
+
+    setUp(() {
+      calls = <MethodCall>[];
+      const channel = MethodChannel('dev.zuzu/zikzak_inappwebview_12345');
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, (call) async {
+        calls.add(call);
+        return true;
+      });
+      addTearDown(() {
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(channel, null);
+      });
+    });
+
+    UserScript script({
+      String source = 'console.log(1);',
+      UserScriptInjectionTime injectionTime = UserScriptInjectionTime.AT_DOCUMENT_START,
+      String? groupName,
+    }) => UserScript(
+      source: source,
+      injectionTime: injectionTime,
+      groupName: groupName,
+    );
+
+    test('addUserScript reaches the native dispatch case instead of throwing', () async {
+      await controller.addUserScript(userScript: script(source: 'a();'));
+
+      expect(calls, hasLength(1));
+      expect(calls.single.method, 'addUserScript');
+      expect((await (calls.single.arguments as Map)['userScript'] as Map)['source'], 'a();');
+    });
+
+    test('a repeated addUserScript is a no-op — the native side would stack it', () async {
+      final userScript = script(source: 'a();');
+      await controller.addUserScript(userScript: userScript);
+      await controller.addUserScript(userScript: userScript);
+
+      expect(calls, hasLength(1), reason: 'the second add must not reach the native side');
+    });
+
+    test('addUserScripts adds each script in order', () async {
+      await controller.addUserScripts(
+        userScripts: <UserScript>[script(source: 'a();'), script(source: 'b();')],
+      );
+
+      expect(calls.map((c) => c.method), <String>['addUserScript', 'addUserScript']);
+    });
+
+    test('removeUserScriptsByGroupName reaches the native dispatch case', () async {
+      await controller.addUserScript(userScript: script(groupName: 'zone'));
+      calls.clear();
+
+      await controller.removeUserScriptsByGroupName(groupName: 'zone');
+
+      expect(calls, hasLength(1));
+      expect(calls.single.method, 'removeUserScriptsByGroupName');
+      expect((calls.single.arguments as Map)['groupName'], 'zone');
+    });
+
+    test('removeUserScript answers false for a script it never added', () async {
+      final removed = await controller.removeUserScript(userScript: script(source: 'never-added();'));
+
+      expect(removed, isFalse);
+      expect(calls, isEmpty, reason: 'nothing to remove — no native call');
+    });
+
+    test('removeUserScript removes a tracked script and passes its index natively', () async {
+      final first = script(source: 'a();');
+      final second = script(source: 'b();');
+      await controller.addUserScript(userScript: first);
+      await controller.addUserScript(userScript: second);
+      calls.clear();
+
+      final removed = await controller.removeUserScript(userScript: second);
+
+      expect(removed, isTrue);
+      expect(calls.single.method, 'removeUserScript');
+      expect((calls.single.arguments as Map)['index'], 1);
+    });
+  });
 }
