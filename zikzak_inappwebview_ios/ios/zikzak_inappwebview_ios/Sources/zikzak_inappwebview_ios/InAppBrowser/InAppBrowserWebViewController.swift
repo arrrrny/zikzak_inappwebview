@@ -298,9 +298,11 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
             if let closeButtonCaption = browserSettings.closeButtonCaption,
                 !closeButtonCaption.isEmpty
             {
-                closeButton = UIBarButtonItem(
-                    title: closeButtonCaption, style: .plain, target: self, action: #selector(close)
-                )
+                setCloseButton(
+                    UIBarButtonItem(
+                        title: closeButtonCaption, style: .plain, target: self,
+                        action: #selector(close)
+                    ))
             } else {
                 setDefaultCloseButton()
             }
@@ -314,10 +316,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
             }
 
             navigationItem.rightBarButtonItems = []
-
-            if !browserSettings.hideCloseButton {
-                navigationItem.rightBarButtonItems = [closeButton]
-            }
+            applyCloseButtonVisibility()
 
             if !menuItems.isEmpty {
                 var uiActions: [UIAction] = []
@@ -353,13 +352,60 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     }
 
     func setDefaultCloseButton() {
-        if closeButton != nil {
+        setCloseButton(
+            UIBarButtonItem(
+                barButtonSystemItem: .close, target: self, action: #selector(close)))
+    }
+
+    /// Installs [newButton] as the close button, dropping the outgoing one from
+    /// the navigation item so a later `applyCloseButtonVisibility()` re-insert
+    /// never leaves the replaced item behind as a second close button (#438).
+    ///
+    /// `closeButton` is replaced in more than one place — the `closeButtonCaption`
+    /// branch of `setSettings()` and `setDefaultCloseButton()` — and a bare
+    /// reassignment leaves the previous item in `rightBarButtonItems`: dead (its
+    /// target/action are nilled below) but still rendered. The identity check in
+    /// `applyCloseButtonVisibility()` only recognises the *current* instance, so
+    /// without this removal the next `viewWillAppear` sees the new object missing
+    /// and inserts it at 0 — two close buttons. Route every replacement here.
+    func setCloseButton(_ newButton: UIBarButtonItem) {
+        if let closeButton = closeButton {
+            navigationItem.rightBarButtonItems?.removeAll { $0 === closeButton }
             closeButton.target = nil
             closeButton.action = nil
         }
-        var barButtonSystemItem = UIBarButtonItem.SystemItem.close
-        closeButton = UIBarButtonItem(
-            barButtonSystemItem: barButtonSystemItem, target: self, action: #selector(close))
+        closeButton = newButton
+    }
+
+    /// Re-applies the close button's presence from `hideCloseButton`, leaving
+    /// every other right-hand item (the menu button, any `showAsAction` menu
+    /// item) untouched.
+    ///
+    /// This is the single writer of the close button's presence. `prepareWebView()`
+    /// runs inside `loadView()`, i.e. before the controller is presented, and
+    /// UIKit installs the navigation bar's items from `navigationItem` during the
+    /// appearance transition — so a decision taken only there is not
+    /// automatically the one the bar renders. Re-applying it from
+    /// `viewWillAppear` (and from `setSettings`, which used to assign the array
+    /// wholesale and drop the menu button with it) makes the setting the last
+    /// word on what is on screen (#438).
+    func applyCloseButtonVisibility(hideCloseButton: Bool? = nil) {
+        guard let closeButton = closeButton else {
+            return
+        }
+        let hide = hideCloseButton ?? browserSettings?.hideCloseButton ?? false
+        var items = navigationItem.rightBarButtonItems ?? []
+        if hide {
+            items.removeAll { $0 === closeButton }
+        } else if !items.contains(where: { $0 === closeButton }) {
+            items.insert(closeButton, at: 0)
+        }
+        navigationItem.rightBarButtonItems = items
+    }
+
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        applyCloseButtonVisibility()
     }
 
     public func didChangeTitle(title: String?) {
@@ -608,11 +654,10 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
                 if let oldTitle = closeButton.title, !oldTitle.isEmpty {
                     closeButton.title = closeButtonCaption
                 } else {
-                    closeButton.target = nil
-                    closeButton.action = nil
-                    closeButton = UIBarButtonItem(
-                        title: closeButtonCaption, style: .plain, target: self,
-                        action: #selector(close))
+                    setCloseButton(
+                        UIBarButtonItem(
+                            title: closeButtonCaption, style: .plain, target: self,
+                            action: #selector(close)))
                 }
             } else {
                 setDefaultCloseButton()
@@ -632,11 +677,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         if newSettingsMap["hideCloseButton"] != nil,
             browserSettings?.hideCloseButton != newSettings.hideCloseButton
         {
-            if !newSettings.hideCloseButton {
-                navigationItem.rightBarButtonItems = [closeButton]
-            } else {
-                navigationItem.rightBarButtonItems = []
-            }
+            applyCloseButtonVisibility(hideCloseButton: newSettings.hideCloseButton)
         }
 
         if newSettingsMap["presentationStyle"] != nil,
