@@ -198,6 +198,100 @@ void main() {
       );
     });
 
+    test('every closeButton replacement removes the outgoing item first', () {
+      // The identity dedupe in applyCloseButtonVisibility only recognises the
+      // CURRENT closeButton, so a reassignment that leaves the previous item in
+      // rightBarButtonItems renders a second, dead close button on the next
+      // appearance (#439 review). Both reassignment sites must therefore drop
+      // the outgoing item or route through a setter that does.
+      final setter = functionBody(code, 'func setCloseButton(_ newButton: UIBarButtonItem)');
+      expect(
+        setter,
+        isNotNull,
+        reason: 'a single setter must own the outgoing-item removal',
+      );
+      expect(
+        setter,
+        matches(
+          RegExp(
+            r'removeAll\s*\{\s*\$0\s*===\s*closeButton\s*\}',
+          ),
+        ),
+        reason: 'setCloseButton must remove the outgoing item from the bar',
+      );
+
+      final setSettings = functionBody(
+        code,
+        'func setSettings(newSettings: InAppBrowserSettings',
+      );
+      expect(
+        setSettings,
+        isNotNull,
+        reason: 'setSettings must not reassign closeButton directly',
+      );
+      expect(
+        setSettings,
+        isNot(
+          matches(
+            RegExp(r'closeButton\s*=\s*UIBarButtonItem'),
+          ),
+        ),
+        reason:
+            'setSettings still reassigns closeButton, so a caption change '
+            'leaves the old item in the bar (two close buttons)',
+      );
+      expect(
+        setSettings,
+        contains('setCloseButton('),
+        reason: 'the caption replacement must go through the setter',
+      );
+      expect(
+        setSettings,
+        contains('setDefaultCloseButton()'),
+        reason: 'the empty-caption replacement must go through setDefaultCloseButton',
+      );
+
+      final setDefault = functionBody(code, 'func setDefaultCloseButton()');
+      expect(
+        setDefault,
+        isNotNull,
+        reason: 'setDefaultCloseButton must not reassign closeButton directly',
+      );
+      expect(
+        setDefault,
+        isNot(
+          matches(
+            RegExp(r'closeButton\s*=\s*UIBarButtonItem'),
+          ),
+        ),
+        reason:
+            'setDefaultCloseButton still reassigns closeButton, so a reset '
+            'leaves the old item in the bar (two close buttons)',
+      );
+      expect(
+        setDefault,
+        contains('setCloseButton('),
+        reason: 'the default replacement must go through the setter',
+      );
+
+      final prepare = functionBody(code, 'func prepareWebView()');
+      expect(prepare, isNotNull);
+      expect(
+        prepare,
+        isNot(
+          matches(
+            RegExp(r'closeButton\s*=\s*UIBarButtonItem'),
+          ),
+        ),
+        reason: 'prepareWebView still reassigns closeButton directly',
+      );
+      expect(
+        prepare,
+        contains('setCloseButton('),
+        reason: 'the initial caption must go through the setter',
+      );
+    });
+
     test('the Swift settings class still parses hideCloseButton', () {
       final settings = locate(
         'ios/zikzak_inappwebview_ios/Sources/zikzak_inappwebview_ios/'

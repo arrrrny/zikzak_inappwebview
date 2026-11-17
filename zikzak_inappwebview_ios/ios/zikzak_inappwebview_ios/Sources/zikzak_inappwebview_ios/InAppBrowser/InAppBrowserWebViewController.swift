@@ -298,9 +298,11 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
             if let closeButtonCaption = browserSettings.closeButtonCaption,
                 !closeButtonCaption.isEmpty
             {
-                closeButton = UIBarButtonItem(
-                    title: closeButtonCaption, style: .plain, target: self, action: #selector(close)
-                )
+                setCloseButton(
+                    UIBarButtonItem(
+                        title: closeButtonCaption, style: .plain, target: self,
+                        action: #selector(close)
+                    ))
             } else {
                 setDefaultCloseButton()
             }
@@ -350,13 +352,29 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     }
 
     func setDefaultCloseButton() {
-        if closeButton != nil {
+        setCloseButton(
+            UIBarButtonItem(
+                barButtonSystemItem: .close, target: self, action: #selector(close)))
+    }
+
+    /// Installs [newButton] as the close button, dropping the outgoing one from
+    /// the navigation item so a later `applyCloseButtonVisibility()` re-insert
+    /// never leaves the replaced item behind as a second close button (#438).
+    ///
+    /// `closeButton` is replaced in more than one place — the `closeButtonCaption`
+    /// branch of `setSettings()` and `setDefaultCloseButton()` — and a bare
+    /// reassignment leaves the previous item in `rightBarButtonItems`: dead (its
+    /// target/action are nilled below) but still rendered. The identity check in
+    /// `applyCloseButtonVisibility()` only recognises the *current* instance, so
+    /// without this removal the next `viewWillAppear` sees the new object missing
+    /// and inserts it at 0 — two close buttons. Route every replacement here.
+    func setCloseButton(_ newButton: UIBarButtonItem) {
+        if let closeButton = closeButton {
+            navigationItem.rightBarButtonItems?.removeAll { $0 === closeButton }
             closeButton.target = nil
             closeButton.action = nil
         }
-        var barButtonSystemItem = UIBarButtonItem.SystemItem.close
-        closeButton = UIBarButtonItem(
-            barButtonSystemItem: barButtonSystemItem, target: self, action: #selector(close))
+        closeButton = newButton
     }
 
     /// Re-applies the close button's presence from `hideCloseButton`, leaving
@@ -636,11 +654,10 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
                 if let oldTitle = closeButton.title, !oldTitle.isEmpty {
                     closeButton.title = closeButtonCaption
                 } else {
-                    closeButton.target = nil
-                    closeButton.action = nil
-                    closeButton = UIBarButtonItem(
-                        title: closeButtonCaption, style: .plain, target: self,
-                        action: #selector(close))
+                    setCloseButton(
+                        UIBarButtonItem(
+                            title: closeButtonCaption, style: .plain, target: self,
+                            action: #selector(close)))
                 }
             } else {
                 setDefaultCloseButton()
