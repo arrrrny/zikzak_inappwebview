@@ -125,10 +125,43 @@ class WindowsCookieManager extends PlatformCookieManager {
   }) async {
     await _call('Network.deleteCookies', {
       'name': name,
-      'domain': domain ?? url.host,
+      'domain': domain ??
+          await _storedDomain(
+            url: url,
+            name: name,
+            path: path,
+            webViewController: webViewController,
+          ),
       'path': path,
     }, webViewController);
     return true;
+  }
+
+  /// The domain the stored cookie actually carries, as CDP sees it.
+  ///
+  /// A cookie set for `domain: '.example.com'` is stored with that leading dot
+  /// while the URL host is `example.com`, and CDP `Network.deleteCookies`
+  /// matches the domain it is handed — so a delete built from the bare host
+  /// removes nothing. The cookie is the only place the dotted form is
+  /// recorded, so it is read back before the delete. A cookie with no match
+  /// falls back to the host, which is a no-op delete, exactly as it is on the
+  /// platforms that have no dotted domains.
+  Future<String> _storedDomain({
+    required WebUri url,
+    required String name,
+    required String path,
+    PlatformInAppWebViewController? webViewController,
+  }) async {
+    Cookie? fallback;
+    for (final cookie in await getCookies(
+      url: url,
+      webViewController: webViewController,
+    )) {
+      if (cookie.name != name || cookie.domain == null) continue;
+      if (cookie.path == path) return cookie.domain!;
+      fallback ??= cookie;
+    }
+    return fallback?.domain ?? url.host;
   }
 
   @override
@@ -156,12 +189,20 @@ class WindowsCookieManager extends PlatformCookieManager {
     return true;
   }
 
+  /// Clears the whole profile, so the CDP result carries nothing to report:
+  /// like the Android, iOS and macOS implementations this method answers its
+  /// always-true contract and lets a native failure surface as the
+  /// [PlatformException] `_call` rethrows.
   @override
   Future<bool> deleteAllCookies() async {
     await _call('Network.clearBrowserCookies', {});
     return true;
   }
 
+  /// `removed` reports whether a session cookie was found and deleted, which
+  /// is this method's own bookkeeping rather than a per-delete CDP result.
+  /// Deleting the last one is not a failure, so a native refusal is surfaced
+  /// by `_call` instead of being folded into the flag.
   @override
   Future<bool> removeSessionCookies() async {
     var removed = false;

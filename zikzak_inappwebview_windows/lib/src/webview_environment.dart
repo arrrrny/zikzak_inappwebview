@@ -61,25 +61,51 @@ class WindowsWebViewEnvironment extends PlatformWebViewEnvironment {
 
   /// Null options reuse the current process profile. Explicit conflicting
   /// options fail instead of silently using another profile or proxy.
+  ///
+  /// The message names both the option that was requested and the one already
+  /// in use, because the throw happens at a call site that has nothing to do
+  /// with the option that caused it: a cookie operation without an explicit
+  /// environment claims the DEFAULT profile, and a later `create` or webview
+  /// passing its own `userDataFolder` or `additionalBrowserArguments` (the
+  /// `--disable-web-security` case) is where that surfaces.
   static Future<void> initializeShared({
     WebViewEnvironmentSettings? settings,
   }) async {
     final pending = _initialization ??= _initialize(settings);
     final args = pending is _EnvironmentOptions ? pending : await pending;
-    if (settings != null &&
-        ((settings.userDataFolder != null &&
-                !p.equals(settings.userDataFolder!, args.userDataPath)) ||
-            (settings.browserExecutableFolder != null &&
-                settings.browserExecutableFolder != args.browserExePath) ||
-            (settings.additionalBrowserArguments != null &&
-                settings.additionalBrowserArguments !=
-                    args.additionalArguments))) {
-      throw StateError(
-        'WebView2 already uses a different process-wide environment. '
-        'Create the desired environment before any webview or cookie operation.',
-      );
-    }
+    if (settings == null) return;
+    final conflicts = <String>[
+      if (settings.userDataFolder != null &&
+          !_samePath(settings.userDataFolder, args.userDataPath))
+        'userDataFolder "${settings.userDataFolder}"',
+      if (settings.browserExecutableFolder != null &&
+          !_samePath(settings.browserExecutableFolder, args.browserExePath))
+        'browserExecutableFolder "${settings.browserExecutableFolder}"',
+      if (settings.additionalBrowserArguments != null &&
+          settings.additionalBrowserArguments != args.additionalArguments)
+        'additionalBrowserArguments "${settings.additionalBrowserArguments}"',
+    ];
+    if (conflicts.isEmpty) return;
+    throw StateError(
+      'WebView2 already uses a different process-wide environment '
+      '(userDataFolder "${args.userDataPath}"'
+      '${args.browserExePath == null ? '' : ', browserExecutableFolder "${args.browserExePath}"'}'
+      '${args.additionalArguments == null ? '' : ', additionalBrowserArguments "${args.additionalArguments}"'})'
+      ': the requested ${conflicts.join(' and ')} '
+      '${conflicts.length == 1 ? 'conflicts' : 'conflict'} with it. '
+      'Create the desired environment before any webview or cookie operation; '
+      'a cookie operation without an explicit webViewEnvironment claims the '
+      'default profile.',
+    );
   }
+
+  /// Path comparison that tolerates a null on either side and a trailing
+  /// separator, the two ways the same folder can be spelled differently by the
+  /// caller and by [getApplicationSupportDirectory].
+  static bool _samePath(String? requested, String? inUse) =>
+      requested == null || inUse == null
+      ? requested == inUse
+      : p.equals(requested, inUse);
 
   /// A non-navigating controller provides CDP access before a visible webview
   /// exists. It shares the process profile and is released by [dispose].
