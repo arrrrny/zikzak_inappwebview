@@ -98,5 +98,36 @@ void main() {
       expect(loaded.single?.toString(), 'https://a.dev/');
       expect(stopped.single, isNull);
     });
+
+    test(
+      'getUrl returns the cached URL when its view channel is unavailable',
+      () async {
+        await controller.handleMethod(
+          MethodCall('onUpdateVisitedHistory', {'url': 'https://a.dev/cached'}),
+        );
+        // Mock method-call handlers are keyed by channel NAME, so building a
+        // second MethodChannel for the same name and clearing it also drops the
+        // handler `setUp` installed — that is what makes the view channel look
+        // gone. `setUp` reinstalls the handler before every test, so this
+        // cannot leak into a later one even if the tests are reordered.
+        final channel = MethodChannel(
+          'wtf.zikzak/zikzak_inappwebview_$controllerId',
+        );
+        channel.setMockMethodCallHandler(null);
+        expect(await controller.getUrl(), WebUri('https://a.dev/cached'));
+      },
+    );
+
+    test('getUrl returns null when the channel is healthy but has no URL',
+        () async {
+      await controller.handleMethod(
+        MethodCall('onUpdateVisitedHistory', {'url': 'https://a.dev/cached'}),
+      );
+      // The `setUp` handler answers every call with null, so the channel is
+      // healthy and the native view simply has no URL: the cached value must
+      // not stand in for it. This also fails if the mock handler ever leaks
+      // out of the test above.
+      expect(await controller.getUrl(), isNull);
+    });
   });
 }
