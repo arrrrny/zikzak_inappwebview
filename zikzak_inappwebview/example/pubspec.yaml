@@ -38,8 +38,8 @@ dependencies:
   url_launcher: ^6.2.0
   zikzak_inappwebview:
     path: ../
-  zikzak_inappwebview_platform_interface: ^6.4.1
-  zikzak_inappwebview_web: ^6.4.1
+  zikzak_inappwebview_platform_interface: ^6.5.0
+  zikzak_inappwebview_web: ^6.5.0
 
 # DEV ONLY: point at the local plugin source so Swift/ObjC/Java changes are
 # compiled into the example app during development. Remove before publishing.
@@ -98,3 +98,7 @@ flutter:
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
 
+
+dependency_overrides:
+  zikzak_inappwebview_platform_interface:
+    path: ../../zikzak_inappwebview_platform_interface

@@ -31,6 +31,12 @@ public class HeadlessInAppWebView: Disposable {
         channelDelegate?.onWebViewCreated()
     }
 
+    /// Tells the Dart owner this instance was evicted at the cap (issue #371),
+    /// before [dispose] clears the per-instance handler.
+    public func notifyEvicted() {
+        channelDelegate?.onEvicted()
+    }
+
     public func prepare(params: NSDictionary) {
         if let view = flutterWebView?.view() {
             view.alpha = 1.0

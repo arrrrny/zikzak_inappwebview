@@ -18,7 +18,7 @@ A [Flutter](https://flutter.dev/) WebView plugin for Windows built on [Microsoft
 * The native plugin follows the rename (`ZikzakWebviewWindowsPlugin`, CMake target
   `zikzak_webview_windows_plugin`), because Flutter's Windows plugin registrant derives the header path and the
   registration symbol from the package name.
-* SDK constraint widened from `>=2.13.0 <3.0.0` to `>=3.8.0 <4.0.0`, and `flutter: >=3.47.0` declared. The upstream upper
+* SDK constraint widened from `>=2.13.0 <3.0.0` to `>=3.8.0 <4.0.0`, and `flutter: >=3.50.0` declared. The upstream upper
   bound excludes Dart 3, so a hosted package carrying it cannot be resolved by any Dart 3 consumer.
 * Carries the WebView2 DevTools protocol API (`callDevToolsProtocolMethod`, `devToolsProtocolEvent`, DevTools listener
   add/remove) from TsinbeiLabs' branch for upstream PR #334.

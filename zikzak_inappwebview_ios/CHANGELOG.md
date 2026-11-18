@@ -1,3 +1,17 @@
+## 6.5.0 - 2026-11-18
+
+
+### Features
+
+- `HeadlessWebViewRegistry.acquire` queues registrations FIFO-style when the registry is full of active instances: it parks the caller until `markIdle`/`evict`/`disposeAll` frees a slot (waking waiters in arrival order), bounded by the new `HeadlessWebViewRegistryConfig.slotAcquireTimeout` (default 30s, `Duration.zero` preserves the immediate `track`-style failure). `track` keeps its loud failure; the queue makes "pool is busy" a wait, not a crash.
+
+### Bug Fixes
+
+- A headless WebView create at the live cap now recycles the oldest live instance FIFO instead of failing with `headless_cap_exceeded` (iOS/Android): native instances outlive a Dart hot restart (the dead isolate cannot dispose them), so the cap used to stay saturated and refuse every later create for the rest of the process — HTTP pre-initialization among the casualties.
+
+### Documentation
+
+- The Flutter floor is raised to **3.50.0** (Dart 3.14.0) across all packages: the iOS platform-view "rendering layer confusion" regression is fixed only from Flutter 3.50.0 (#331, upstream `flutter/flutter#193363`). The prior 3.47.0 floor — set by the zuraffa 7.x `meta ^1.19.0` pin (#393) — is superseded; 3.50.0 still satisfies that pin. The `resolve-floor` CI job now pins 3.50.0 and the READMEs document the new minimum.
 ## 6.4.1 - 2026-11-18
 
 
@@ -50,6 +64,8 @@
 
 - Every fix above is guarded by host-runnable tests, including the 568-line WebView2 DevTools suite (`in_app_webview_windows_devtools_test.dart`) and the Linux `wire_parity` harness. Swift changes remain gated by `build-ios` / `build-macos`; the Windows native side of `zikzak_webview_windows` is compiled by neither — see "The `zikzak_webview_windows` fork" in `AGENTS.md`.
 ## Unreleased
+
+- [iOS] A headless WebView create at the live cap (3) now recycles the oldest live instance FIFO instead of failing with `headless_cap_exceeded`: native instances outlive a Dart hot restart (the dead isolate cannot dispose them), so the cap used to stay saturated and refuse every later create for the rest of the process — HTTP pre-initialization among the casualties. The hard error survives only when eviction cannot free a slot (headless cap queue fix). Behavioral coverage lives in `example/integration_test/headless_lifecycle_test.dart`; a source-contract test pins the eviction-before-failure shape.
 
 - [iOS] Per-profile proxy configurations reach persistent data stores (#410). The iOS `ProxyController` dropped `ProxySettings.profileId` entirely — the Dart side never put it on the method channel and the native `ProxyManager` never read it — so the resolved `ProxyConfiguration` only ever reached `WKWebsiteDataStore.default()`. Every WebView created with a `persistentStoreIdentifier` (the consumer's per-profile `WKWebsiteDataStore`s) egressed directly: enabling a global, managed, or per-profile proxy on iOS routed no traffic for isolated profiles. The port now mirrors the macOS design: the Dart `IosProxyController` forwards `profileId` on `setProxyOverride` and `clearProxyOverride`, the native `ProxyManager` keeps the static `profileProxies` registry (a `profileId`-scoped clear removes only that entry; a bare clear wipes the registry), and the persistent-store creation site in `InAppWebView.swift` applies the registry via the new `ProxyManager.applyProxy(forIdentifier:to:)` before assigning `configuration.websiteDataStore`. The registry also tracks each profile's live data stores, so setting an override re-applies it to stores that already exist instead of waiting for the next one to be created. A per-profile set no longer writes the shared store: only an identifier-less (shared) set touches `WKWebsiteDataStore.default()`. Registry keys are trimmed on both sides, matching `persistentUUID(from:)`. A host-runnable source-contract test (`ios_proxy_profile_registry_contract_test`) pins the whole chain so the defect class cannot silently return. `build-ios` CI remains the compile gate.
 

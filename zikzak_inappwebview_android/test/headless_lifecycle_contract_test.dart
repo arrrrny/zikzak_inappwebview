@@ -137,6 +137,42 @@ void main() {
       },
     );
 
+    test(
+      'a create at the cap recycles the least-recently-used live instance '
+      '(cap queue)',
+      () {
+        final sources = javaSources();
+        final managerPath = sources.keys.firstWhere(
+          (p) => p.endsWith('HeadlessInAppWebViewManager.java'),
+        );
+        final manager = sources[managerPath]!;
+
+        expect(
+          manager,
+          contains('leastRecentlyUsedId()'),
+          reason: 'cap queue: a create at the cap evicts the LRU live id, '
+              'not the longest-lived one',
+        );
+        expect(
+          manager,
+          contains('dispose(victim)'),
+          reason: 'cap queue: eviction tears down the native WebView, '
+              'not only the map entry',
+        );
+        expect(
+          manager.indexOf('leastRecentlyUsedId()'),
+          lessThan(manager.indexOf('"headless_cap_exceeded"')),
+          reason: 'cap queue: eviction is attempted before the hard failure',
+        );
+        expect(
+          manager,
+          contains('notifyEvicted()'),
+          reason: 'cap queue: the Dart owner is told of the eviction before '
+              'the per-instance handler is cleared',
+        );
+      },
+    );
+
     test('the headless view lives in a dedicated off-screen container', () {
       final sources = javaSources();
       final viewPath = sources.keys.firstWhere(

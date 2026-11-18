@@ -23,6 +23,7 @@ class AndroidHeadlessInAppWebViewCreationParams
     super.initialSize,
     super.windowId,
     super.onWebViewCreated,
+    super.onEvicted,
     super.onLoadStart,
     super.onLoadStop,
     super.onReceivedError,
@@ -97,6 +98,7 @@ class AndroidHeadlessInAppWebViewCreationParams
         initialSize: params.initialSize,
         windowId: params.windowId,
         onWebViewCreated: params.onWebViewCreated,
+        onEvicted: params.onEvicted,
         onLoadStart: params.onLoadStart,
         onLoadStop: params.onLoadStop,
         onReceivedError: params.onReceivedError,
@@ -250,10 +252,47 @@ class AndroidHeadlessInAppWebView extends PlatformHeadlessInAppWebView
           params.onWebViewCreated!(_controllerFromPlatform);
         }
         break;
+      case "onEvicted":
+        // The native manager recycled this instance to stay under the
+        // live-instance cap (issue #371). Settle the Dart side here so a
+        // later setSize/getSize/run targets a dead channel with no handler.
+        _handleNativeEviction();
+        break;
       default:
         throw UnimplementedError("Unimplemented ${call.method} method");
     }
     return null;
+  }
+
+  /// Settles the Dart side after the native manager evicted this instance.
+  ///
+  /// Mirrors the teardown a normal [dispose] performs (minus the shared
+  /// `dispose` round-trip, which the native manager already did) so the
+  /// instance stops advertising itself as live: `_disposed` short-circuits a
+  /// later [dispose], `_running` guards [setSize]/[getSize], and the
+  /// controller/auxiliary controllers are released.
+  void _handleNativeEviction() {
+    if (_disposed) {
+      return;
+    }
+    _disposed = true;
+    _started = false;
+    _running = false;
+    disposeChannel();
+    try {
+      _webViewController?.dispose();
+    } catch (_) {
+      // Ignore controller teardown failures.
+    }
+    _webViewController = null;
+    _controllerFromPlatform = null;
+    try {
+      _androidParams.pullToRefreshController?.dispose();
+      _androidParams.findInteractionController?.dispose();
+    } catch (_) {
+      // Ignore auxiliary controller teardown failures.
+    }
+    params.onEvicted?.call();
   }
 
   Future<void> run() async {

@@ -35,3 +35,8 @@ Flutter SDK, `material_ui`, and `zikzak_inappwebview_platform_interface`.
 Set the standard `WEBVIEW2_USER_DATA_FOLDER` environment variable to a fresh
 temporary profile for each run. The consumer owns that directory and removes it
 after its process exits (WebView2 keeps the profile open while running).
+
+`integration_test/windows_navigation_test.dart` uses the same consumer setup to
+exercise the first intercepted request with headers, subsequent page-initiated
+navigation, cancellation, and a successful load after cancellation. Run it in a
+separate process with its own fresh profile.
