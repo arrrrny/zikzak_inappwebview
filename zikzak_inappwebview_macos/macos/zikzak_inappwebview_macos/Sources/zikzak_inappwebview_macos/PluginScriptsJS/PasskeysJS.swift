@@ -43,7 +43,9 @@ let PASSKEYS_JS_SOURCE = """
     // bundle no-ops console.* in production, and content-world mismatches
     // swallow console-forwarded lines). Fire-and-forget; the native side
     // answers {"ok": true} which the promise ignores.
+    var telemetryEnabled = \(PasskeyBridge.telemetryEnabled);
     function telemetry(message) {
+        if (!telemetryEnabled) return;
         try {
             bridgeCall({ method: 'telemetry', options: { text: String(message).slice(0, 1200) } })
                 .catch(function() {});
@@ -159,15 +161,15 @@ let PASSKEYS_JS_SOURCE = """
     // the resolved credential and the response status/body-head, so a
     // server-side rejection ("Can't verify your account") is attributable
     // to an exact endpoint + payload + status instead of a guess.
+    if (!telemetryEnabled) return; // no wrappers, no bridge traffic by default
     (function installNetworkLogger() {
         var origFetch = window.fetch;
         if (typeof origFetch === 'function') {
             window.fetch = function(input, init) {
                 var url = (typeof input === 'string') ? input
                     : (input && input.url) || String(input);
-                var isAuth = url.indexOf('appleauth') !== -1
-                    || url.indexOf('verify') !== -1
-                    || url.indexOf('auth') !== -1;
+                var isAuth = url.indexOf('/appleauth/') !== -1
+                    || url.indexOf('/verify/') !== -1;
                 var p = origFetch.call(window, input, init);
                 if (isAuth) {
                     var body = (init && init.body) || '';
@@ -198,7 +200,7 @@ let PASSKEYS_JS_SOURCE = """
         XMLHttpRequest.prototype.send = function(body) {
             var xhr = this;
             var url = String(xhr.__pkUrl || '');
-            if (url.indexOf('appleauth') !== -1 || url.indexOf('verify') !== -1 || url.indexOf('auth') !== -1) {
+            if (url.indexOf('/appleauth/') !== -1 || url.indexOf('/verify/') !== -1) {
                 xhr.addEventListener('loadend', function() {
                     telemetry('XHR ' + xhr.__pkMethod + ' ' + url
                         + ' -> ' + xhr.status

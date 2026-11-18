@@ -28,6 +28,28 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
     /// also accepted so hand-crafted payloads work.
     static let base64urlMarker = "$b64url"
 
+
+    /// Read once at first use; the injected PasskeysJS shim interpolates
+    /// this into `var telemetryEnabled = …` so the RP round-trip logger and
+    /// ceremony telemetry exist in the page ONLY under the same env-var
+    /// gate as the native prints. One source of truth for passkey
+    /// diagnostics.
+    static let telemetryEnabled: Bool = {
+        let env = ProcessInfo.processInfo.environment
+        return env["ZURAFFA_PASSKEY_DEBUG"] == "1" || env["ZIKZAK_PASSKEY_DEBUG"] == "1"
+    }()
+
+    /// Diagnostics gate: ceremony/network tracing prints only when
+    /// ZURAFFA_PASSKEY_DEBUG=1 (or ZIKZAK_PASSKEY_DEBUG=1) is set in the
+    /// process environment. Default OFF — a release app must not log
+    /// credential metadata or RP request/response bodies to stdout.
+    static func pkDebug(_ message: String) {
+        guard ProcessInfo.processInfo.environment["ZURAFFA_PASSKEY_DEBUG"] == "1"
+            || ProcessInfo.processInfo.environment["ZIKZAK_PASSKEY_DEBUG"] == "1" else {
+            return
+        }
+        print(message)
+    }
     private weak var webView: InAppWebView?
     private var controller: ASAuthorizationController?
     private var completion: (([String: Any]) -> Void)?
@@ -53,12 +75,12 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
               let args = try? JSONSerialization.jsonObject(with: data) as? [Any],
               let payload = args.first as? [String: Any],
               let method = payload["method"] as? String else {
-            print("[PasskeyBridge][PKDBG] handleCall: MALFORMED payload "
+            PasskeyBridge.pkDebug("[PKPKDBG] handleCall: MALFORMED payload "
                 + "(argsJson prefix \(argsJson.prefix(200)))")
             completion(Self.errorResult(name: "TypeError", message: "Malformed PasskeyBridge payload."))
             return
         }
-        print("[PasskeyBridge][PKDBG] handleCall: method=\(method) "
+        PasskeyBridge.pkDebug("[PKPKDBG] handleCall: method=\(method) "
             + "caller=\(caller.map { "origin=\($0.origin) topOrigin=\($0.topOrigin ?? "nil") crossOrigin=\($0.crossOrigin)" } ?? "nil")")
         let options = payload["options"] as? [String: Any] ?? [:]
         let logged = Self.pkCompletion(completion)
@@ -72,7 +94,7 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
             completion(["ok": true])
         case "isUvPaa":
             let available = isPlatformAuthenticatorAvailable()
-            print("[PasskeyBridge][PKDBG] handleCall: isUvPaa -> \(available)")
+            PasskeyBridge.pkDebug("[PKPKDBG] handleCall: isUvPaa -> \(available)")
             completion(["ok": true, "available": available])
         case "telemetry":
             // Fire-and-forget observability channel from the injected shim
@@ -81,10 +103,10 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
             // production, so console-forwarded lines never arrive — this
             // rides the same trusted bridge the ceremonies use.
             let text = (payload["options"] as? [String: Any])?["text"] as? String ?? ""
-            print("[PasskeyBridge][PKTEL] \(text)")
+            PasskeyBridge.pkDebug("[PKPKTEL] \(text)")
             completion(["ok": true])
         default:
-            print("[PasskeyBridge][PKDBG] handleCall: UNKNOWN method '\(method)'")
+            PasskeyBridge.pkDebug("[PKPKDBG] handleCall: UNKNOWN method '\(method)'")
             completion(Self.errorResult(name: "TypeError", message: "Unknown PasskeyBridge method '\(method)'."))
         }
     }
@@ -99,7 +121,7 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
         return { result in
             if let ok = result["ok"] as? Bool, !ok,
                let error = result["error"] as? [String: Any] {
-                print("[PasskeyBridge][PKDBG] ceremony ERROR: \(error["name"] ?? "?") — \(error["message"] ?? "?")")
+                PasskeyBridge.pkDebug("[PKPKDBG] ceremony ERROR: \(error["name"] ?? "?") — \(error["message"] ?? "?")")
             }
             completion(result)
         }
@@ -606,7 +628,7 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
                 attachment: "cross-platform")])
             return
         }
-        print("[PasskeyBridge][PKDBG] authorization: unrecognized credential "
+        PasskeyBridge.pkDebug("[PKPKDBG] authorization: unrecognized credential "
             + "type \(type(of: authorization.credential))")
         completion(Self.errorResult(name: "NotAllowedError", message: "The authorization returned an unrecognized credential type."))
     }
@@ -621,10 +643,10 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
         guard let data = data,
               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
         else {
-            print("[PasskeyBridge][PKDBG] \(kind): clientDataJSON unreadable")
+            PasskeyBridge.pkDebug("[PKPKDBG] \(kind): clientDataJSON unreadable")
             return
         }
-        print("[PasskeyBridge][PKDBG] \(kind): origin=\(json["origin"] ?? "nil") "
+        PasskeyBridge.pkDebug("[PKPKDBG] \(kind): origin=\(json["origin"] ?? "nil") "
             + "topOrigin=\(json["topOrigin"] ?? "nil") "
             + "crossOrigin=\(json["crossOrigin"] ?? "nil") "
             + "type=\(json["type"] ?? "nil") rpId=\(json["rpId"] ?? "nil")")
@@ -633,7 +655,7 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
     public func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
         let completion = takeCompletion()
         let nsError = error as NSError
-        print("[PasskeyBridge][PKDBG] didCompleteWithError: domain=\(nsError.domain) "
+        PasskeyBridge.pkDebug("[PKPKDBG] didCompleteWithError: domain=\(nsError.domain) "
             + "code=\(nsError.code) message=\(nsError.localizedDescription) "
             + "underlying=\(String(describing: nsError.userInfo[NSUnderlyingErrorKey]))")
         // Every ASAuthorizationError surface (user cancel, timeout, no
