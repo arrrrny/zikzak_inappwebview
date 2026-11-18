@@ -1,3 +1,17 @@
+## 6.5.0 - 2026-11-18
+
+
+### Features
+
+- `HeadlessWebViewRegistry.acquire` queues registrations FIFO-style when the registry is full of active instances: it parks the caller until `markIdle`/`evict`/`disposeAll` frees a slot (waking waiters in arrival order), bounded by the new `HeadlessWebViewRegistryConfig.slotAcquireTimeout` (default 30s, `Duration.zero` preserves the immediate `track`-style failure). `track` keeps its loud failure; the queue makes "pool is busy" a wait, not a crash.
+
+### Bug Fixes
+
+- A headless WebView create at the live cap now recycles the oldest live instance FIFO instead of failing with `headless_cap_exceeded` (iOS/Android): native instances outlive a Dart hot restart (the dead isolate cannot dispose them), so the cap used to stay saturated and refuse every later create for the rest of the process — HTTP pre-initialization among the casualties.
+
+### Documentation
+
+- The Flutter floor is raised to **3.50.0** (Dart 3.14.0) across all packages: the iOS platform-view "rendering layer confusion" regression is fixed only from Flutter 3.50.0 (#331, upstream `flutter/flutter#193363`). The prior 3.47.0 floor — set by the zuraffa 7.x `meta ^1.19.0` pin (#393) — is superseded; 3.50.0 still satisfies that pin. The `resolve-floor` CI job now pins 3.50.0 and the READMEs document the new minimum.
 ## 6.4.1 - 2026-11-18
 
 
