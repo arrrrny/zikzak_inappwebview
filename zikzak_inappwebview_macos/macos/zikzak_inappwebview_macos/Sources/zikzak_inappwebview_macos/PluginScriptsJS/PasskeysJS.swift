@@ -161,8 +161,8 @@ let PASSKEYS_JS_SOURCE = """
     // the resolved credential and the response status/body-head, so a
     // server-side rejection ("Can't verify your account") is attributable
     // to an exact endpoint + payload + status instead of a guess.
-    if (!telemetryEnabled) return; // no wrappers, no bridge traffic by default
     (function installNetworkLogger() {
+        if (!telemetryEnabled) return; // no wrappers, no bridge traffic by default
         var origFetch = window.fetch;
         if (typeof origFetch === 'function') {
             window.fetch = function(input, init) {
@@ -172,11 +172,17 @@ let PASSKEYS_JS_SOURCE = """
                     || url.indexOf('/verify/') !== -1;
                 var p = origFetch.call(window, input, init);
                 if (isAuth) {
-                    var body = (init && init.body) || '';
+                    // A page may pass a Request object with no init — read
+                    // method/body off the Request first, else init, else
+                    // defaults (a bare `init && init.method` logs a
+                    // misleading GET for `fetch(new Request(url, {method:
+                    // 'POST', body}))`).
+                    var method = (init && init.method) || (input && input.method) || 'GET';
+                    var body = (init && init.body) || (input && input.body) || '';
                     p.then(function(resp) {
                         var clone = resp.clone();
                         clone.text().then(function(text) {
-                            telemetry('FETCH ' + (init && init.method || 'GET')
+                            telemetry('FETCH ' + method
                                 + ' ' + url + ' -> ' + resp.status
                                 + ' body=' + String(body).slice(0, 300)
                                 + ' resp=' + text.slice(0, 300));
@@ -258,6 +264,16 @@ let PASSKEYS_JS_SOURCE = """
         // credential (this fires) or a native bridge failure (it does not).
         bridgePromise.then(
             function(credential) {
+                // The exact bytes the RP receives, logged over the native
+                // bridge — distinguishes a client-side serialization failure
+                // from a server rejection. Runs here (not after the signal
+                // branch) so ceremonies without an AbortSignal log too.
+                try {
+                    var j = JSON.stringify(credential.toJSON());
+                    telemetry('assertion-toJSON=' + j.slice(0, 900));
+                } catch (e1) {
+                    telemetry('assertion-toJSON THREW: ' + e1.message);
+                }
                 try {
                     var probe = JSON.stringify(credential);
                     telemetry('ceremony RESOLVED method=' + method +
@@ -284,17 +300,7 @@ let PASSKEYS_JS_SOURCE = """
             };
             signal.addEventListener('abort', onAbort, {once: true});
             bridgePromise.then(
-                function(credential) {
-                    signal.removeEventListener('abort', onAbort);
-                    // The exact bytes the RP receives, logged over the native
-                    // bridge right before they leave the shim — distinguishes
-                    // a client-side serialization failure from a server
-                    // rejection (senior-AI refinement of the observability
-                    // plan).
-                    try { telemetry('assertion-toJSON=' + JSON.stringify(credential.toJSON()).slice(0, 900)); }
-                    catch (e2) { telemetry('assertion-toJSON THREW: ' + e2.message); }
-                    resolve(credential);
-                },
+                function(credential) { signal.removeEventListener('abort', onAbort); resolve(credential); },
                 function(error) { signal.removeEventListener('abort', onAbort); reject(error); }
             );
         });

@@ -44,10 +44,7 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
     /// process environment. Default OFF — a release app must not log
     /// credential metadata or RP request/response bodies to stdout.
     static func pkDebug(_ message: String) {
-        guard ProcessInfo.processInfo.environment["ZURAFFA_PASSKEY_DEBUG"] == "1"
-            || ProcessInfo.processInfo.environment["ZIKZAK_PASSKEY_DEBUG"] == "1" else {
-            return
-        }
+        guard telemetryEnabled else { return }
         print(message)
     }
     private weak var webView: InAppWebView?
@@ -75,12 +72,12 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
               let args = try? JSONSerialization.jsonObject(with: data) as? [Any],
               let payload = args.first as? [String: Any],
               let method = payload["method"] as? String else {
-            PasskeyBridge.pkDebug("[PKPKDBG] handleCall: MALFORMED payload "
+            PasskeyBridge.pkDebug("[PKDBG] handleCall: MALFORMED payload "
                 + "(argsJson prefix \(argsJson.prefix(200)))")
             completion(Self.errorResult(name: "TypeError", message: "Malformed PasskeyBridge payload."))
             return
         }
-        PasskeyBridge.pkDebug("[PKPKDBG] handleCall: method=\(method) "
+        PasskeyBridge.pkDebug("[PKDBG] handleCall: method=\(method) "
             + "caller=\(caller.map { "origin=\($0.origin) topOrigin=\($0.topOrigin ?? "nil") crossOrigin=\($0.crossOrigin)" } ?? "nil")")
         let options = payload["options"] as? [String: Any] ?? [:]
         let logged = Self.pkCompletion(completion)
@@ -94,7 +91,7 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
             completion(["ok": true])
         case "isUvPaa":
             let available = isPlatformAuthenticatorAvailable()
-            PasskeyBridge.pkDebug("[PKPKDBG] handleCall: isUvPaa -> \(available)")
+            PasskeyBridge.pkDebug("[PKDBG] handleCall: isUvPaa -> \(available)")
             completion(["ok": true, "available": available])
         case "telemetry":
             // Fire-and-forget observability channel from the injected shim
@@ -103,10 +100,10 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
             // production, so console-forwarded lines never arrive — this
             // rides the same trusted bridge the ceremonies use.
             let text = (payload["options"] as? [String: Any])?["text"] as? String ?? ""
-            PasskeyBridge.pkDebug("[PKPKTEL] \(text)")
+            PasskeyBridge.pkDebug("[PKTEL] \(text)")
             completion(["ok": true])
         default:
-            PasskeyBridge.pkDebug("[PKPKDBG] handleCall: UNKNOWN method '\(method)'")
+            PasskeyBridge.pkDebug("[PKDBG] handleCall: UNKNOWN method '\(method)'")
             completion(Self.errorResult(name: "TypeError", message: "Unknown PasskeyBridge method '\(method)'."))
         }
     }
@@ -121,7 +118,7 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
         return { result in
             if let ok = result["ok"] as? Bool, !ok,
                let error = result["error"] as? [String: Any] {
-                PasskeyBridge.pkDebug("[PKPKDBG] ceremony ERROR: \(error["name"] ?? "?") — \(error["message"] ?? "?")")
+                PasskeyBridge.pkDebug("[PKDBG] ceremony ERROR: \(error["name"] ?? "?") — \(error["message"] ?? "?")")
             }
             completion(result)
         }
@@ -628,7 +625,7 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
                 attachment: "cross-platform")])
             return
         }
-        PasskeyBridge.pkDebug("[PKPKDBG] authorization: unrecognized credential "
+        PasskeyBridge.pkDebug("[PKDBG] authorization: unrecognized credential "
             + "type \(type(of: authorization.credential))")
         completion(Self.errorResult(name: "NotAllowedError", message: "The authorization returned an unrecognized credential type."))
     }
@@ -643,10 +640,10 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
         guard let data = data,
               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
         else {
-            PasskeyBridge.pkDebug("[PKPKDBG] \(kind): clientDataJSON unreadable")
+            PasskeyBridge.pkDebug("[PKDBG] \(kind): clientDataJSON unreadable")
             return
         }
-        PasskeyBridge.pkDebug("[PKPKDBG] \(kind): origin=\(json["origin"] ?? "nil") "
+        PasskeyBridge.pkDebug("[PKDBG] \(kind): origin=\(json["origin"] ?? "nil") "
             + "topOrigin=\(json["topOrigin"] ?? "nil") "
             + "crossOrigin=\(json["crossOrigin"] ?? "nil") "
             + "type=\(json["type"] ?? "nil") rpId=\(json["rpId"] ?? "nil")")
@@ -655,7 +652,7 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
     public func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
         let completion = takeCompletion()
         let nsError = error as NSError
-        PasskeyBridge.pkDebug("[PKPKDBG] didCompleteWithError: domain=\(nsError.domain) "
+        PasskeyBridge.pkDebug("[PKDBG] didCompleteWithError: domain=\(nsError.domain) "
             + "code=\(nsError.code) message=\(nsError.localizedDescription) "
             + "underlying=\(String(describing: nsError.userInfo[NSUnderlyingErrorKey]))")
         // Every ASAuthorizationError surface (user cancel, timeout, no
@@ -742,15 +739,29 @@ enum PasskeyClientDataJSONFixer {
     /// force-unwrap inside the replacement only after a successful install.
     private static var originalJSONIMP: IMP?
 
-    static func install() {
+    /// Thread-safe single execution: two InAppWebView instances can init
+    /// concurrently, and a second exchange would capture the replacement as
+    /// the "original" (the ceremony then recurses — the stack overflow in
+    /// Zuraffa-2026-11-18-210521.ips). `static let` is lazy + thread-safe
+    /// (dispatch_once semantics) in Swift.
+    ///
+    /// The closure contains the logic DIRECTLY — it must not call back into
+    /// `install()`, which reads `installOnce` and would re-enter the
+    /// dispatch_once that is currently running (reentrant callout = SIGILL,
+    /// caught live as Zuraffa-2026-11-18-221739.ips).
+    private static let installOnce: Void = {
         if #available(macOS 13.5, *) {
             install13_5()
         } else {
             // Below 13.5 there is no ASPublicKeyCredentialClientData and no
             // client-data API at all — the app-context request path runs
             // there and needs no fix.
-            print("[PasskeyBridge] clientDataJSON fixer: macOS < 13.5, not installed")
+            pkDebug("[PasskeyBridge] clientDataJSON fixer: macOS < 13.5, not installed")
         }
+    }()
+
+    static func install() {
+        _ = installOnce
     }
 
     @available(macOS 13.5, *)
@@ -763,14 +774,14 @@ enum PasskeyClientDataJSONFixer {
         guard !installed else { return }
         guard let cls: AnyClass = NSClassFromString("ASPublicKeyCredentialClientData"),
               let method = class_getInstanceMethod(cls, NSSelectorFromString("jsonForOperationType:")) else {
-            print("[PasskeyBridge] clientDataJSON fixer: class or method not found, not installed")
+            pkDebug("[PasskeyBridge] clientDataJSON fixer: class or method not found, not installed")
             return
         }
         originalJSONIMP = method_getImplementation(method)
         let replacement = unsafeBitCast(replacementIMP, to: IMP.self)
         method_setImplementation(method, replacement)
         installed = true
-        print("[PasskeyBridge] clientDataJSON fixer installed")
+        pkDebug("[PasskeyBridge] clientDataJSON fixer installed")
     }
 
     private static var installed = false
@@ -786,7 +797,14 @@ enum PasskeyClientDataJSONFixer {
             originalIMP,
             to: (@convention(c) (AnyObject, Selector, UInt) -> NSData).self)
         let appleJSON = original(receiver, sel, operationType)
-        let topOrigin = (receiver as? NSObject)?.value(forKey: "topOrigin") as? String
+        // KVC guard: if Apple renames/removes the backing property in a
+        // future macOS release, value(forKey:) throws an uncatchable
+        // NSUndefinedKeyException and crashes the host. responds(to:) keeps
+        // the fixer a no-op instead.
+        let receiverObject = receiver as? NSObject
+        let topOrigin = (receiverObject?.responds(to: NSSelectorFromString("topOrigin")) == true)
+            ? receiverObject?.value(forKey: "topOrigin") as? String
+            : nil
         return PasskeyClientDataJSONFixer.injectTopOrigin(
             originalJSON: appleJSON, topOrigin: topOrigin)
     }
@@ -807,10 +825,11 @@ enum PasskeyClientDataJSONFixer {
               let topOrigin = topOrigin, !topOrigin.isEmpty else {
             return originalJSON
         }
-        // Field order matches Chromium's builder (type, challenge, origin,
-        // crossOrigin, topOrigin) — order is not semantically required, but
-        // keeping the canonical shape makes the output comparable to what
-        // Safari emits.
+        // NOTE on order: Swift Dictionary hashing means JSONSerialization
+        // may emit keys in arbitrary order — harmless per the WebAuthn spec
+        // (RPs parse JSON; the signature covers the emitted bytes, which
+        // hash and JSON agree on). The rebuild below preserves the
+        // fields, not a guaranteed byte order.
         var rebuilt: [String: Any] = [:]
         for key in ["type", "challenge", "origin"] {
             if let value = dict[key] { rebuilt[key] = value; dict.removeValue(forKey: key) }
@@ -819,7 +838,10 @@ enum PasskeyClientDataJSONFixer {
         dict.removeValue(forKey: "crossOrigin")
         rebuilt["topOrigin"] = topOrigin
         for (key, value) in dict { rebuilt[key] = value }
-        guard let data = try? JSONSerialization.data(withJSONObject: rebuilt) else {
+        // .withoutEscapingSlashes: Apple's own generator does not escape
+        // "https://…" as "https:\/\/…" — keep the output byte-comparable to
+        // it (and to what Safari emits).
+        guard let data = try? JSONSerialization.data(withJSONObject: rebuilt, options: [.withoutEscapingSlashes]) else {
             return originalJSON
         }
         print("[PasskeyBridge] clientDataJSON fixer: injected topOrigin=\(topOrigin)")
