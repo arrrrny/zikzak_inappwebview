@@ -825,23 +825,36 @@ enum PasskeyClientDataJSONFixer {
               let topOrigin = topOrigin, !topOrigin.isEmpty else {
             return originalJSON
         }
-        // NOTE on order: Swift Dictionary hashing means JSONSerialization
-        // may emit keys in arbitrary order — harmless per the WebAuthn spec
-        // (RPs parse JSON; the signature covers the emitted bytes, which
-        // hash and JSON agree on). The rebuild below preserves the
-        // fields, not a guaranteed byte order.
-        var rebuilt: [String: Any] = [:]
-        for key in ["type", "challenge", "origin"] {
-            if let value = dict[key] { rebuilt[key] = value; dict.removeValue(forKey: key) }
+        // STRING INSERTION, not a Dictionary rebuild: a Dictionary round
+        // trip through JSONSerialization randomizes key order per process
+        // (Swift hashing), and App Store Connect's validator rejected a
+        // clientDataJSON whose challenge sat at the END of the object — the
+        // -900030 browser wall returned on exactly such a run. Chromium's
+        // client_data_json.cc and Safari emit
+        // type,challenge,origin,crossOrigin,topOrigin; Apple's generator
+        // emits type,challenge,origin,crossOrigin — the topOrigin slot is
+        // always right after crossOrigin. So: insert into APPLE'S OWN
+        // emitted bytes at exactly that position and reorder nothing. The
+        // injected value rides Apple's serialization (no escaped slashes).
+        guard let jsonString = String(data: originalJSON as Data, encoding: .utf8) else {
+            return originalJSON
         }
-        rebuilt["crossOrigin"] = true
-        dict.removeValue(forKey: "crossOrigin")
-        rebuilt["topOrigin"] = topOrigin
-        for (key, value) in dict { rebuilt[key] = value }
-        // .withoutEscapingSlashes: Apple's own generator does not escape
-        // "https://…" as "https:\/\/…" — keep the output byte-comparable to
-        // it (and to what Safari emits).
-        guard let data = try? JSONSerialization.data(withJSONObject: rebuilt, options: [.withoutEscapingSlashes]) else {
+        guard let crossRange = jsonString.range(of: "\"crossOrigin\":true") else {
+            return originalJSON
+        }
+        // RFC 8259 string escaping for the injected value (defensive: the
+        // origin is a plain scheme://host string, but stay correct).
+        var escaped = ""
+        for ch in topOrigin.unicodeScalars {
+            switch ch {
+            case .init(34): escaped += "\""
+            case .init(92): escaped += "\\"
+            default: escaped.unicodeScalars.append(ch)
+            }
+        }
+        var result = jsonString
+        result.insert(contentsOf: ",\"topOrigin\":\"\(escaped)\"", at: crossRange.upperBound)
+        guard let data = result.data(using: .utf8) else {
             return originalJSON
         }
         print("[PasskeyBridge] clientDataJSON fixer: injected topOrigin=\(topOrigin)")
