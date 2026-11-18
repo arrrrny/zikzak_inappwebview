@@ -216,10 +216,11 @@ void main() {
         );
         expect(
           body,
-          contains('canChooseDirectories = false'),
+          contains('canChooseDirectories = parameters.allowsDirectories'),
           reason:
-              'a file input must not pick directories — the other half of '
-              'the mapping this AC pins',
+              'a webkitdirectory input must be able to pick folders — the '
+              'panel honors the allowsDirectories mapping WebKit derives '
+              'from the input element (#633 consumer contract)',
         );
       },
     );
