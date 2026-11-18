@@ -641,7 +641,7 @@ void main() {
       await controller.loadUrl(
         urlRequest: URLRequest(url: WebUri('https://example.com/one')),
       );
-      final first = web.nextCall('Fetch.disable');
+      final first = web.nextCall('Fetch.continueRequest');
       web.emit({
         'eventName': 'Fetch.requestPaused',
         'data': {
@@ -763,9 +763,10 @@ void main() {
 
     test('CANCEL leaves no headers armed for a later navigation', () async {
       final web = _FakeWebviewController();
+      var policy = NavigationActionPolicy.CANCEL;
       final controller = _buildControllerWithNavigationPolicy(
         web,
-        policy: NavigationActionPolicy.CANCEL,
+        onNavigation: (_) async => policy,
       );
       addTearDown(controller.dispose);
       addTearDown(web.close);
@@ -776,7 +777,7 @@ void main() {
           headers: const {'Authorization': 'Bearer cancelled'},
         ),
       );
-      final disabled = web.nextCall('Fetch.disable').timeout(
+      final cancelled = web.nextCall('Fetch.failRequest').timeout(
         const Duration(seconds: 5),
       );
       web.emit({
@@ -786,19 +787,26 @@ void main() {
           'request': {'url': 'https://example.com/', 'headers': {}},
         },
       });
-      await disabled;
+      await cancelled;
 
       expect(_paramsOf(web, 'Fetch.failRequest'), {
         'requestId': 'cancel-2',
         'errorReason': 'Aborted',
       });
-      // The cancelled request consumed its header entry, so interception is
-      // turned back off instead of staying armed.
-      expect(web.calls, containsAllInOrder(<String>[
-        'Fetch.enable',
-        'Fetch.failRequest',
-        'Fetch.disable',
-      ]));
+      // Policy still owns interception after the one-shot headers are consumed.
+      // A later browser request must not inherit the cancelled authorization.
+      policy = NavigationActionPolicy.ALLOW;
+      final continued = web.nextCall('Fetch.continueRequest');
+      web.emit({
+        'eventName': 'Fetch.requestPaused',
+        'data': {
+          'requestId': 'later',
+          'request': {'url': 'https://example.com/', 'headers': {}},
+        },
+      });
+      await continued;
+      expect(_paramsOf(web, 'Fetch.continueRequest'), {'requestId': 'later'});
+      expect(web.calls, isNot(contains('Fetch.disable')));
     });
 
     test('reports a subframe document load as not the main frame', () async {

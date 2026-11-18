@@ -375,7 +375,9 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
   }
 
   Future<void> _finishFetchIfIdle() async {
-    if (_pendingRequestHeaders.isEmpty && _pendingHtmlDocuments.isEmpty) {
+    if (_creationParams.webviewParams?.shouldOverrideUrlLoading == null &&
+        _pendingRequestHeaders.isEmpty &&
+        _pendingHtmlDocuments.isEmpty) {
       await _disableFetch();
     }
   }
@@ -567,6 +569,9 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
       // fulfilled for a later navigation to the same URL.
       _pendingHtmlDocuments.clear();
       if (hasHeaders || hasNavigationCallback) {
+        // Resolve before pausing a document: querying the frame tree from a
+        // paused navigation can deadlock WebView2 (#449).
+        if (hasNavigationCallback) await _resolveMainFrameId();
         await _ensureDevToolsListener('Fetch.requestPaused');
         await _controller.callDevToolsProtocolMethod('Fetch.enable', {
           'patterns': [
@@ -657,6 +662,9 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
     await _withFetch(() async {
       _pendingRequestHeaders.clear();
       _pendingHtmlDocuments.clear();
+      if (_creationParams.webviewParams?.shouldOverrideUrlLoading != null) {
+        await _resolveMainFrameId();
+      }
       await _ensureDevToolsListener('Fetch.requestPaused');
       await _controller.callDevToolsProtocolMethod('Fetch.enable', {
         'patterns': [
