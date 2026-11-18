@@ -305,13 +305,22 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
         _creationParams.webviewParams?.shouldOverrideUrlLoading;
     if (navigationCallback != null && url is String) {
       final mainFrameId = await _resolveMainFrameId();
-      final policy = await navigationCallback(
-        callbackController,
-        NavigationAction(
-          request: URLRequest(url: WebUri(url)),
-          isForMainFrame: _isMainFrame(mainFrameId, data['frameId']),
-        ),
-      );
+      NavigationActionPolicy? policy;
+      try {
+        policy = await navigationCallback(
+          callbackController,
+          NavigationAction(
+            request: URLRequest(url: WebUri(url)),
+            isForMainFrame: _isMainFrame(mainFrameId, data['frameId']),
+          ),
+        );
+      } catch (_) {
+        // A throwing policy callback must not leave the paused request
+        // unsettled: the event handler runs unawaited, so a rejected future
+        // here would hang the navigation (white screen, no timeout, no
+        // recovery). Every other malformed-input branch in this method
+        // degrades to "continue with the original request", and so does this.
+      }
       if (policy == NavigationActionPolicy.CANCEL) {
         // The request is going away, so its headers must not stay armed:
         // a later navigation to the same URL would otherwise inherit the
@@ -401,6 +410,12 @@ class InAppWebViewWindowsController extends PlatformInAppWebViewController {
   /// `Page.getFrameTree` without a prior `Page.enable`; if it does not, the
   /// id stays null and [isMainFrame] falls back to the main-frame answer, which
   /// is what the caller saw before this distinction existed.
+  ///
+  /// The answer is cached for the lifetime of this controller. A
+  /// cross-process (site-isolation) navigation can swap the main frame, and a
+  /// swapped frame would then be classified as a subframe
+  /// (`isForMainFrame: false`) until the webview is recreated — the accepted
+  /// cost of never querying the frame tree from a paused navigation (#449).
   Future<String?> _resolveMainFrameId() async {
     if (_mainFrameId != null || _mainFrameLookupAttempted) return _mainFrameId;
     _mainFrameLookupAttempted = true;

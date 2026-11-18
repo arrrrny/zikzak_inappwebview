@@ -1,3 +1,8 @@
+## Unreleased
+
+- [Windows] Resolve the main frame before enabling Fetch and retain interception while a navigation callback is registered, preventing first-load stalls and later policy bypasses (#449). With a `shouldOverrideUrlLoading` callback registered, Fetch now stays armed for the controller's lifetime, so every Document request in every frame (main and iframes) round-trips through Dart — iframe navigations that previously may not have fired the callback now reliably do, with `isForMainFrame: false`, at a per-navigation cost.
+- [Windows] A throwing `shouldOverrideUrlLoading` callback now degrades to continuing the request with its original headers instead of leaving the paused navigation hanging (#449 review).
+
 ## 6.4.1 - 2026-11-18
 
 ### Bug Fixes

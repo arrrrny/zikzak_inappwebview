@@ -809,6 +809,62 @@ void main() {
       expect(web.calls, isNot(contains('Fetch.disable')));
     });
 
+    test('resolves the main frame before enabling interception', () async {
+      final web = _FakeWebviewController();
+      final controller = _buildControllerWithNavigationPolicy(web);
+      web.results['Page.getFrameTree'] = () async =>
+          {'frameTree': {'frame': {'id': 'main-frame'}}};
+      addTearDown(controller.dispose);
+      addTearDown(web.close);
+
+      await controller.loadUrl(
+        urlRequest: URLRequest(url: WebUri('https://example.com/')),
+      );
+
+      // The ordering IS the #449 fix: querying the frame tree from a paused
+      // navigation can deadlock WebView2, so the lookup has to run before
+      // Fetch.enable. The fake never deadlocks, so only this assertion pins it
+      // — a refactor that moved the lookup back under the pause would keep the
+      // suite green without it.
+      expect(
+        web.calls,
+        containsAllInOrder(<String>['Page.getFrameTree', 'Fetch.enable']),
+      );
+    });
+
+    test('a throwing policy callback still settles the request', () async {
+      final web = _FakeWebviewController();
+      final controller = _buildControllerWithNavigationPolicy(
+        web,
+        onNavigation: (action) =>
+            throw StateError('policy callback exploded'),
+      );
+      addTearDown(controller.dispose);
+      addTearDown(web.close);
+
+      await controller.loadUrl(
+        urlRequest: URLRequest(url: WebUri('https://example.com/')),
+      );
+      final settled = web.nextCall('Fetch.continueRequest');
+      web.emit({
+        'eventName': 'Fetch.requestPaused',
+        'data': {
+          'requestId': 'throwing-1',
+          'request': {'url': 'https://example.com/', 'headers': {}},
+        },
+      });
+      await settled;
+
+      // A rejecting callback future is unawaited-swallowed by the event
+      // handler, so the paused request must degrade to "continue with the
+      // original request" like every other malformed-input branch — never
+      // stay paused (a white screen with no timeout and no recovery).
+      expect(_paramsOf(web, 'Fetch.continueRequest'), {
+        'requestId': 'throwing-1',
+      });
+      expect(web.calls, isNot(contains('Fetch.failRequest')));
+    });
+
     test('reports a subframe document load as not the main frame', () async {
       final web = _FakeWebviewController();
       final seen = <NavigationAction>[];
