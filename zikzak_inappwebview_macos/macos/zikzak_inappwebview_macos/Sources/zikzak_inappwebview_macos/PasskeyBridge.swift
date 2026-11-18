@@ -233,7 +233,7 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
                     switch $0 {
                     case "usb": return .usb
                     case "nfc": return .nfc
-                    case "ble": return .bluetooth
+                    case "ble", "hybrid", "cable": return .bluetooth
                     default: return nil
                     }
                 }
@@ -275,8 +275,7 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
                 + "origin instead (issue #446)")
             return nil
         }
-        var clientData = ASPublicKeyCredentialClientData(
-            challenge: challenge, origin: caller.origin,
+        var clientData = ASPublicKeyCredentialClientData(challenge: challenge, origin: caller.origin,
             topOrigin: caller.topOrigin,
             crossOrigin: Self.crossOriginValue(caller.crossOrigin))
         return clientData
