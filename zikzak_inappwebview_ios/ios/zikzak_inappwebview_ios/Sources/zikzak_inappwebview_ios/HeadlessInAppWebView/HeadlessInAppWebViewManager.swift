@@ -17,9 +17,12 @@ public class HeadlessInAppWebViewManager: ChannelDelegate {
     /// Every headless WebView owns a WebContent process and its own navigation
     /// queue, so a per-domain scraper that creates one per host used to grow
     /// without bound until the transport's own navigations stopped committing.
-    /// Creating beyond the cap fails loudly instead of silently growing; the
-    /// Dart-side `HeadlessWebViewRegistry` uses the same platform cap and can
-    /// evict an idle instance before the ceiling is ever reached.
+    /// Creating beyond the cap recycles the oldest live instance instead of
+    /// growing or failing: native instances outlive a Dart hot restart (the
+    /// dead isolate cannot dispose them), so a saturated cap would otherwise
+    /// refuse every later create for the rest of the process. The Dart-side
+    /// `HeadlessWebViewRegistry` uses the same platform cap and can evict an
+    /// idle instance before the ceiling is ever reached.
     static let maxLiveWebViews = 3
 
     var plugin: SwiftFlutterPlugin?
@@ -52,15 +55,28 @@ public class HeadlessInAppWebViewManager: ChannelDelegate {
                     return
                 }
                 pruneLiveOrder()
-                guard instance(id) != nil || liveOrder.count < HeadlessInAppWebViewManager.maxLiveWebViews else {
-                    result(FlutterError(
-                        code: "headless_cap_exceeded",
-                        message: "headless WebView cap reached",
-                        details: [
-                            "maxLiveWebViews": HeadlessInAppWebViewManager.maxLiveWebViews,
-                            "liveWebViews": liveOrder.count,
-                        ]))
-                    return
+                if instance(id) == nil && liveOrder.count >= HeadlessInAppWebViewManager.maxLiveWebViews {
+                    // FIFO eviction: the create recycles the oldest live
+                    // instance instead of dying at the cap. This is what
+                    // reaps instances orphaned by a Dart hot restart — the
+                    // dead isolate cannot dispose them, so without this the
+                    // cap stays saturated and every later create fails for
+                    // the rest of the process (zikzak_inappwebview headless
+                    // cap queue fix).
+                    if let oldestId = liveOrder.first {
+                        dispose(id: oldestId)
+                    }
+                    pruneLiveOrder()
+                    guard liveOrder.count < HeadlessInAppWebViewManager.maxLiveWebViews else {
+                        result(FlutterError(
+                            code: "headless_cap_exceeded",
+                            message: "headless WebView cap reached",
+                            details: [
+                                "maxLiveWebViews": HeadlessInAppWebViewManager.maxLiveWebViews,
+                                "liveWebViews": liveOrder.count,
+                            ]))
+                        return
+                    }
                 }
                 run(id: id, params: params) {
                     result(true)

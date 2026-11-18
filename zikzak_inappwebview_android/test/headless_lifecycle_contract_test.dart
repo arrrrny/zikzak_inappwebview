@@ -137,6 +137,34 @@ void main() {
       },
     );
 
+    test(
+      'a create at the cap recycles the oldest live instance FIFO (cap queue)',
+      () {
+        final sources = javaSources();
+        final managerPath = sources.keys.firstWhere(
+          (p) => p.endsWith('HeadlessInAppWebViewManager.java'),
+        );
+        final manager = sources[managerPath]!;
+
+        expect(
+          manager,
+          contains('liveIds.get(0)'),
+          reason: 'cap queue: a create at the cap evicts the oldest live id',
+        );
+        expect(
+          manager,
+          contains('dispose(oldestId)'),
+          reason: 'cap queue: eviction tears down the native WebView, '
+              'not only the map entry',
+        );
+        expect(
+          manager.indexOf('dispose(oldestId)'),
+          lessThan(manager.indexOf('"headless_cap_exceeded"')),
+          reason: 'cap queue: eviction is attempted before the hard failure',
+        );
+      },
+    );
+
     test('the headless view lives in a dedicated off-screen container', () {
       final sources = javaSources();
       final viewPath = sources.keys.firstWhere(

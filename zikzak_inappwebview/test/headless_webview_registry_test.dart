@@ -282,4 +282,158 @@ void main() {
       expect(_disposeCount(webView), 1);
     });
   });
+
+  group('HeadlessWebViewRegistry acquire queue (headless cap fix)', () {
+    test(
+      'acquire with an idle instance available evicts it without waiting',
+      () async {
+        final registry = HeadlessWebViewRegistry(
+          config: const HeadlessWebViewRegistryConfig(maxLiveInstances: 1),
+        );
+        final idle = _webView('idle');
+        await registry.track(idle);
+
+        final next = _webView('next');
+        await registry.acquire(next);
+
+        expect(registry.contains(next), isTrue);
+        expect(_disposeCount(idle), 1);
+      },
+    );
+
+    test(
+      'acquire parks when every instance is active and proceeds when one '
+      'is marked idle',
+      () async {
+        final registry = HeadlessWebViewRegistry(
+          config: const HeadlessWebViewRegistryConfig(maxLiveInstances: 1),
+        );
+        final active = _webView('active');
+        await registry.track(active, active: true);
+
+        final next = _webView('next');
+        final acquisition = registry.acquire(next);
+        // The park happens synchronously inside acquire (no await precedes
+        // it), so the instance must not be registered yet.
+        expect(registry.contains(next), isFalse);
+
+        registry.markIdle(active);
+        await acquisition;
+
+        expect(registry.contains(next), isTrue);
+        expect(
+          _disposeCount(active),
+          1,
+          reason: 'the idled instance is evicted for the waiter',
+        );
+      },
+    );
+
+    test('parked acquires wake in arrival order', () async {
+      final registry = HeadlessWebViewRegistry(
+        config: const HeadlessWebViewRegistryConfig(maxLiveInstances: 1),
+      );
+      final active = _webView('active');
+      await registry.track(active, active: true);
+
+      final firstView = _webView('first');
+      final secondView = _webView('second');
+      final log = <String>[];
+
+      Future<void> park(HeadlessInAppWebView view, String name) async {
+        await registry.acquire(view, active: true);
+        log.add(name);
+      }
+
+      final first = park(firstView, 'first');
+      final second = park(secondView, 'second');
+
+      registry.markIdle(active);
+      await first;
+      expect(log, ['first']);
+
+      // 'first' registered as active, so 'second' re-parked; idling 'first'
+      // is what lets the FIFO tail through.
+      registry.markIdle(firstView);
+      await second;
+      expect(log, ['first', 'second']);
+      expect(registry.contains(secondView), isTrue);
+    });
+
+    test(
+      'a parked acquire fails loudly when the slot acquire timeout elapses',
+      () async {
+        final registry = HeadlessWebViewRegistry(
+          config: const HeadlessWebViewRegistryConfig(
+            maxLiveInstances: 1,
+            slotAcquireTimeout: Duration(milliseconds: 50),
+          ),
+        );
+        final active = _webView('active');
+        await registry.track(active, active: true);
+
+        final next = _webView('next');
+        await expectLater(
+          registry.acquire(next),
+          throwsA(isA<HeadlessWebViewCapExceededException>()),
+        );
+        expect(registry.contains(next), isFalse);
+        expect(registry.contains(active), isTrue);
+      },
+    );
+
+    test('a zero slot acquire timeout fails immediately like track', () async {
+      final registry = HeadlessWebViewRegistry(
+        config: const HeadlessWebViewRegistryConfig(
+          maxLiveInstances: 1,
+          slotAcquireTimeout: Duration.zero,
+        ),
+      );
+      final active = _webView('active');
+      await registry.track(active, active: true);
+
+      final next = _webView('next');
+      await expectLater(
+        registry.acquire(next),
+        throwsA(isA<HeadlessWebViewCapExceededException>()),
+      );
+    });
+
+    test('evicting an active instance wakes the parked acquire', () async {
+      final registry = HeadlessWebViewRegistry(
+        config: const HeadlessWebViewRegistryConfig(maxLiveInstances: 1),
+      );
+      final active = _webView('active');
+      await registry.track(active, active: true);
+
+      final next = _webView('next');
+      final acquisition = registry.acquire(next);
+
+      await registry.evict(active);
+      await acquisition;
+
+      expect(registry.contains(next), isTrue);
+      expect(registry.contains(active), isFalse);
+    });
+
+    test(
+      'disposeAll wakes parked acquires into the emptied registry',
+      () async {
+        final registry = HeadlessWebViewRegistry(
+          config: const HeadlessWebViewRegistryConfig(maxLiveInstances: 1),
+        );
+        final active = _webView('active');
+        await registry.track(active, active: true);
+
+        final next = _webView('next');
+        final acquisition = registry.acquire(next);
+
+        await registry.disposeAll();
+        await acquisition;
+
+        expect(registry.contains(next), isTrue);
+        expect(_disposeCount(active), 1);
+      },
+    );
+  });
 }

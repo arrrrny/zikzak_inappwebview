@@ -181,6 +181,34 @@ void main() {
       );
     });
 
+    test(
+      'a create at the cap recycles the oldest live instance FIFO (cap queue)',
+      () {
+        final managers = managerSources();
+        final managerPath = managers.keys.firstWhere(
+          (p) => p.endsWith('HeadlessInAppWebViewManager.swift'),
+        );
+        final manager = managers[managerPath]!;
+
+        expect(
+          manager,
+          contains('liveOrder.first'),
+          reason: 'cap queue: a create at the cap evicts the oldest live id',
+        );
+        expect(
+          manager,
+          contains('dispose(id: oldestId)'),
+          reason: 'cap queue: eviction tears down the native WebView, '
+              'not only the map entry',
+        );
+        expect(
+          manager.indexOf('liveOrder.first'),
+          lessThan(manager.indexOf('"headless_cap_exceeded"')),
+          reason: 'cap queue: eviction is attempted before the hard failure',
+        );
+      },
+    );
+
     test('headless views are hosted in a dedicated off-screen container', () {
       final sources = swiftSources();
       final headlessPath = sources.keys.firstWhere(

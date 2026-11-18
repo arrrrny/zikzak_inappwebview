@@ -49,9 +49,12 @@ public class HeadlessInAppWebViewManager extends ChannelDelegateImpl {
    *
    * <p>Every headless WebView owns a renderer and its own navigation queue, so a
    * per-domain scraper that creates one per host used to grow without bound.
-   * Creating beyond the cap fails loudly instead of silently growing; the
-   * Dart-side HeadlessWebViewRegistry uses the same platform cap and can evict
-   * an idle instance before the ceiling is ever reached.
+   * Creating beyond the cap recycles the oldest live instance instead of
+   * growing or failing: native instances outlive a Dart hot restart (the dead
+   * isolate cannot dispose them), so a saturated cap would otherwise refuse
+   * every later create for the rest of the process. The Dart-side
+   * HeadlessWebViewRegistry uses the same platform cap and can evict an idle
+   * instance before the ceiling is ever reached.
    */
   public static final int maxLiveWebViews = 3;
 
@@ -91,11 +94,24 @@ public class HeadlessInAppWebViewManager extends ChannelDelegateImpl {
           }
           pruneLiveIds();
           if (instance(id) == null && liveIds.size() >= maxLiveWebViews) {
-            result.error(
-                "headless_cap_exceeded",
-                "headless WebView cap reached",
-                maxLiveWebViews);
-            return;
+            // FIFO eviction: the create recycles the oldest live instance
+            // instead of dying at the cap. This is what reaps instances
+            // orphaned by a Dart hot restart — the dead isolate cannot
+            // dispose them, so without this the cap stays saturated and
+            // every later create fails for the rest of the process
+            // (zikzak_inappwebview headless cap queue fix).
+            final String oldestId = liveIds.isEmpty() ? null : liveIds.get(0);
+            if (oldestId != null) {
+              dispose(oldestId);
+            }
+            pruneLiveIds();
+            if (liveIds.size() >= maxLiveWebViews) {
+              result.error(
+                  "headless_cap_exceeded",
+                  "headless WebView cap reached",
+                  maxLiveWebViews);
+              return;
+            }
           }
           final HashMap<String, Object> params = (HashMap<String, Object>) paramsArgument;
           run(id, params, () -> result.success(true));
