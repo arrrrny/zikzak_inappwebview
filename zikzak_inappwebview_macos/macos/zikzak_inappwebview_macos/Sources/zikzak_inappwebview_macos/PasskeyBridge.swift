@@ -51,22 +51,46 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
               let args = try? JSONSerialization.jsonObject(with: data) as? [Any],
               let payload = args.first as? [String: Any],
               let method = payload["method"] as? String else {
+            print("[PasskeyBridge][PKDBG] handleCall: MALFORMED payload "
+                + "(argsJson prefix \(argsJson.prefix(200)))")
             completion(Self.errorResult(name: "TypeError", message: "Malformed PasskeyBridge payload."))
             return
         }
+        print("[PasskeyBridge][PKDBG] handleCall: method=\(method) "
+            + "caller=\(caller.map { "origin=\($0.origin) topOrigin=\($0.topOrigin ?? "nil") crossOrigin=\($0.crossOrigin)" } ?? "nil")")
         let options = payload["options"] as? [String: Any] ?? [:]
+        let logged = Self.pkCompletion(completion)
         switch method {
         case "create":
-            performCreate(options: options, caller: caller, completion: completion)
+            performCreate(options: options, caller: caller, completion: logged)
         case "get":
-            performGet(options: options, caller: caller, completion: completion)
+            performGet(options: options, caller: caller, completion: logged)
         case "cancel":
             cancelCeremony()
             completion(["ok": true])
         case "isUvPaa":
-            completion(["ok": true, "available": isPlatformAuthenticatorAvailable()])
+            let available = isPlatformAuthenticatorAvailable()
+            print("[PasskeyBridge][PKDBG] handleCall: isUvPaa -> \(available)")
+            completion(["ok": true, "available": available])
         default:
+            print("[PasskeyBridge][PKDBG] handleCall: UNKNOWN method '\(method)'")
             completion(Self.errorResult(name: "TypeError", message: "Unknown PasskeyBridge method '\(method)'."))
+        }
+    }
+
+    /// PKDBG: wrap a completion so every error result the bridge returns is
+    /// visible — ASC's "browser needs to be updated" banner is its client-side
+    /// mapping of a rejected navigator.credentials call, and the error paths
+    /// below were silent.
+    static func pkCompletion(
+        _ completion: @escaping ([String: Any]) -> Void
+    ) -> ([String: Any]) -> Void {
+        return { result in
+            if let ok = result["ok"] as? Bool, !ok,
+               let error = result["error"] as? [String: Any] {
+                print("[PasskeyBridge][PKDBG] ceremony ERROR: \(error["name"] ?? "?") — \(error["message"] ?? "?")")
+            }
+            completion(result)
         }
     }
 
@@ -571,6 +595,8 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
                 attachment: "cross-platform")])
             return
         }
+        print("[PasskeyBridge][PKDBG] authorization: unrecognized credential "
+            + "type \(type(of: authorization.credential))")
         completion(Self.errorResult(name: "NotAllowedError", message: "The authorization returned an unrecognized credential type."))
     }
 
@@ -595,6 +621,10 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
 
     public func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
         let completion = takeCompletion()
+        let nsError = error as NSError
+        print("[PasskeyBridge][PKDBG] didCompleteWithError: domain=\(nsError.domain) "
+            + "code=\(nsError.code) message=\(nsError.localizedDescription) "
+            + "underlying=\(String(describing: nsError.userInfo[NSUnderlyingErrorKey]))")
         // Every ASAuthorizationError surface (user cancel, timeout, no
         // credentials, not interactive) maps to NotAllowedError per the
         // WebAuthn error contract; the underlying message is preserved for
