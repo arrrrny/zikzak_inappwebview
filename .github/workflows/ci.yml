@@ -54,12 +54,12 @@ jobs:
           pkg-config --atleast-version=2.50 wpe-webkit-2.0
           pkg-config --modversion wpe-webkit-2.0 wpe-platform-2.0 wpe-platform-headless-2.0
       - uses: actions/checkout@v4
-      - name: Bootstrap Flutter 3.47.0 for the native architecture
+      - name: Bootstrap Flutter 3.50.0 for the native architecture
         # The release archive has no Linux ARM64 entry. A source checkout also
         # owns its files as the container user, avoiding archive UID mismatches.
         run: |
           test -d "$RUNNER_TEMP"
-          git clone --depth 1 --branch 3.47.0 https://github.com/flutter/flutter.git "$RUNNER_TEMP/flutter"
+          git clone --depth 1 --branch 3.50.0 https://github.com/flutter/flutter.git "$RUNNER_TEMP/flutter"
           echo "$RUNNER_TEMP/flutter/bin" >> "$GITHUB_PATH"
           "$RUNNER_TEMP/flutter/bin/flutter" --version
       - name: Point the Linux example at this checkout
@@ -170,14 +170,14 @@ jobs:
   # `flutter:` floor must move together; the job name carries the version so
   # a stale pairing is visible on the checks list.
   resolve-floor:
-    name: "resolve: minimal consumer on Flutter 3.47.0 (declared floor)"
+    name: "resolve: minimal consumer on Flutter 3.50.0 (declared floor)"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version: 3.47.0
+          flutter-version: 3.50.0
       - name: Write the minimal consumer probe
         run: |
           mkdir -p .consumer-probe
@@ -185,9 +185,9 @@ jobs:
           name: consumer_probe
           publish_to: none
           environment:
-            # Flutter 3.47.0 ships Dart 3.13.0 (official releases JSON).
-            sdk: ">=3.13.0 <4.0.0"
-            flutter: ">=3.47.0"
+            # Flutter 3.50.0 ships Dart 3.14.0 (official releases JSON).
+            sdk: ">=3.14.0 <4.0.0"
+            flutter: ">=3.50.0"
           dependencies:
             flutter:
               sdk: flutter
