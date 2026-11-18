@@ -514,7 +514,7 @@ packages:
       path: "../zikzak_inappwebview_platform_interface"
       relative: true
     source: path
-    version: "6.4.1"
+    version: "6.5.0"
   zikzak_webview_windows:
     dependency: "direct main"
     description:

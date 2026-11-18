@@ -362,15 +362,15 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "6.4.1"
+    version: "6.5.0"
   zikzak_inappwebview_platform_interface:
     dependency: "direct main"
     description:
       name: zikzak_inappwebview_platform_interface
-      sha256: ce00f35d5d2fcd5c92a006b5d100a470ea175334525aa8bbc309e9b8611a81fe
+      sha256: "83201a23f1255447b8780c72a6e744222d5e10d73b460b3c3bced012839d7c99"
       url: "https://pub.dev"
     source: hosted
-    version: "6.4.1"
+    version: "6.5.0"
   zorphy_annotation:
     dependency: transitive
     description:
