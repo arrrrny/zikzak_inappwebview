@@ -270,8 +270,11 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
             return nil
         }
         var clientData = ASPublicKeyCredentialClientData(challenge: challenge, origin: caller.origin)
-        clientData.topOrigin = caller.topOrigin
+        // `crossOrigin` before `topOrigin` — see the macOS PasskeyBridge for
+        // the full rationale (the refined setter drops topOrigin while the
+        // request still reads as top-level).
         clientData.crossOrigin = Self.crossOriginValue(caller.crossOrigin)
+        clientData.topOrigin = caller.topOrigin
         return clientData
     }
 
