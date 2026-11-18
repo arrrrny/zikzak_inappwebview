@@ -756,7 +756,7 @@ enum PasskeyClientDataJSONFixer {
             // Below 13.5 there is no ASPublicKeyCredentialClientData and no
             // client-data API at all — the app-context request path runs
             // there and needs no fix.
-            pkDebug("[PasskeyBridge] clientDataJSON fixer: macOS < 13.5, not installed")
+            PasskeyBridge.pkDebug("[PasskeyBridge] clientDataJSON fixer: macOS < 13.5, not installed")
         }
     }()
 
@@ -774,14 +774,14 @@ enum PasskeyClientDataJSONFixer {
         guard !installed else { return }
         guard let cls: AnyClass = NSClassFromString("ASPublicKeyCredentialClientData"),
               let method = class_getInstanceMethod(cls, NSSelectorFromString("jsonForOperationType:")) else {
-            pkDebug("[PasskeyBridge] clientDataJSON fixer: class or method not found, not installed")
+            PasskeyBridge.pkDebug("[PasskeyBridge] clientDataJSON fixer: class or method not found, not installed")
             return
         }
         originalJSONIMP = method_getImplementation(method)
         let replacement = unsafeBitCast(replacementIMP, to: IMP.self)
         method_setImplementation(method, replacement)
         installed = true
-        pkDebug("[PasskeyBridge] clientDataJSON fixer installed")
+        PasskeyBridge.pkDebug("[PasskeyBridge] clientDataJSON fixer installed")
     }
 
     private static var installed = false
