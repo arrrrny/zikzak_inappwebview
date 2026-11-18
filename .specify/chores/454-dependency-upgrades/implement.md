@@ -24,9 +24,9 @@ the published contract instead of widening it.
 
 | File | Change | Notes |
 |------|--------|-------|
-| `zikzak_inappwebview/example/pubspec.lock` | modified | 38 deps re-resolved; adds `jni_util 1.0.0`, `listen` |
+| `zikzak_inappwebview/example/pubspec.lock` | modified | 38 deps re-resolved; adds `jni_util 1.0.0` |
 | `zikzak_inappwebview_linux/example/pubspec.lock` | modified | 12 deps re-resolved |
-| `zikzak_inappwebview_linux/tool/wire_parity/pubspec.lock` | modified | 4 deps; `zikzak_inappwebview_platform_interface 6.3.4 → 6.5.0`, `zorphy_annotation 2.4.4 → 2.4.6`, `test_api 0.7.12 → 0.7.14`, and the stale `sdks: flutter ">=3.47.0"` footer → `">=3.50.0"` (the footer #393 recorded as still stale) |
+| `zikzak_inappwebview_linux/tool/wire_parity/pubspec.lock` | modified | 5 deps; adds `listen 1.0.1`, `zikzak_inappwebview_platform_interface 6.3.4 → 6.5.0`, `zorphy_annotation 2.4.4 → 2.4.6`, `test_api 0.7.12 → 0.7.14`, and the stale `sdks: flutter ">=3.47.0"` footer → `">=3.50.0"` (the footer #393 recorded as still stale) |
 | `zikzak_inappwebview_macos/pubspec.lock` | modified | `material_ui 1.11.0 → 1.11.1`, `cupertino_ui 1.1.6 → 1.1.7` |
 | `zikzak_inappwebview_web/pubspec.lock` | modified | same two |
 | `zikzak_inappwebview_windows/pubspec.lock` | modified | same two |
