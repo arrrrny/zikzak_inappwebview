@@ -3540,6 +3540,14 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         initiatedByFrame frame: WKFrameInfo,
         completionHandler: @escaping ([URL]?) -> Void
     ) {
+        // A headless (off-screen) webview has no user to pick files: fail
+        // fast with the cancel completion instead of surfacing an app-modal
+        // panel that automation can never answer — runModal() would hang the
+        // headless app forever (issue #633 consumer contract).
+        if isHeadlessOffscreen {
+            completionHandler(nil)
+            return
+        }
         if let presenter = openPanelPresenter {
             presenter(parameters, completionHandler)
             return
@@ -3547,7 +3555,11 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
 
         let panel = NSOpenPanel()
         panel.canChooseFiles = true
-        panel.canChooseDirectories = false
+        // A `webkitdirectory` input asks the panel for folders: WebKit maps
+        // the input attribute to allowsDirectories, and the panel must honor
+        // it or folder upload is dead (issue #633 consumer contract; the
+        // merged #418 hard-coded false, dropping the mapping the pin had).
+        panel.canChooseDirectories = parameters.allowsDirectories
         panel.allowsMultipleSelection = parameters.allowsMultipleSelection
         panel.resolvesAliases = true
 
