@@ -39,6 +39,16 @@ let PASSKEYS_JS_SOURCE = """
         }
         return window.\(JAVASCRIPT_BRIDGE_NAME).callHandler('PasskeyBridge', payload);
     }
+    // Telemetry over the SAME native bridge (never console: Apple's widget
+    // bundle no-ops console.* in production, and content-world mismatches
+    // swallow console-forwarded lines). Fire-and-forget; the native side
+    // answers {"ok": true} which the promise ignores.
+    function telemetry(message) {
+        try {
+            bridgeCall({ method: 'telemetry', options: { text: String(message).slice(0, 1200) } })
+                .catch(function() {});
+        } catch (e) {}
+    }
 
     var B64URL_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
 
@@ -86,6 +96,10 @@ let PASSKEYS_JS_SOURCE = """
         return value;
     }
 
+    function bufferToBase64url(buffer) {
+        return b64urlEncode(buffer);
+    }
+
     function buildCredential(c) {
         var response;
         if (c.kind === 'attestation') {
@@ -101,15 +115,100 @@ let PASSKEYS_JS_SOURCE = """
                 userHandle: c.response.userHandle ? b64urlDecode(c.response.userHandle) : null
             };
         }
-        return {
+        var credential = {
             id: c.id,
             rawId: b64urlDecode(c.rawId),
             type: "public-key",
-            authenticatorAttachment: c.authenticatorAttachment || null,
+            authenticatorAttachment: c.authenticatorAttachment || "platform",
             response: response,
             getClientExtensionResults: function() { return c.clientExtensionResults || {}; }
         };
+        // Relying parties (idmsa.apple.com above all) serialize the resolved
+        // credential immediately after the ceremony — either via
+        // credential.toJSON() or JSON.stringify(credential). A plain object
+        // without toJSON makes JSON.stringify emit ArrayBuffer fields as
+        // "{}" and a missing toJSON throws where the widget calls it
+        // directly — either failure surfaces to the user as the generic
+        // "your browser needs to be updated" banner. The spec shape
+        // (PublicKeyCredential.toJSON) base64url-encodes every ArrayBuffer.
+        credential.toJSON = function() {
+            var out = {
+                id: this.id,
+                rawId: bufferToBase64url(this.rawId),
+                type: this.type,
+                authenticatorAttachment: this.authenticatorAttachment,
+                clientExtensionResults: this.getClientExtensionResults(),
+                response: {}
+            };
+            var r = this.response;
+            for (var key in r) {
+                if (Object.prototype.hasOwnProperty.call(r, key)) {
+                    out.response[key] = (r[key] instanceof ArrayBuffer)
+                        ? bufferToBase64url(r[key]) : r[key];
+                }
+            }
+            return out;
+        };
+        return credential;
     }
+
+    // Server-round-trip observability: idmsa.apple.com POSTs the assertion
+    // from inside its own frame; the app's network capture and CDP do not
+    // mirror subframe traffic, so the only reliable vantage is a fetch/XHR
+    // wrapper installed in this frame. Logs the request the RP makes with
+    // the resolved credential and the response status/body-head, so a
+    // server-side rejection ("Can't verify your account") is attributable
+    // to an exact endpoint + payload + status instead of a guess.
+    (function installNetworkLogger() {
+        var origFetch = window.fetch;
+        if (typeof origFetch === 'function') {
+            window.fetch = function(input, init) {
+                var url = (typeof input === 'string') ? input
+                    : (input && input.url) || String(input);
+                var isAuth = url.indexOf('appleauth') !== -1
+                    || url.indexOf('verify') !== -1
+                    || url.indexOf('auth') !== -1;
+                var p = origFetch.call(window, input, init);
+                if (isAuth) {
+                    var body = (init && init.body) || '';
+                    p.then(function(resp) {
+                        var clone = resp.clone();
+                        clone.text().then(function(text) {
+                            telemetry('FETCH ' + (init && init.method || 'GET')
+                                + ' ' + url + ' -> ' + resp.status
+                                + ' body=' + String(body).slice(0, 300)
+                                + ' resp=' + text.slice(0, 300));
+                        }).catch(function() {
+                            telemetry('FETCH ' + url + ' -> ' + resp.status + ' (body unread)');
+                        });
+                    }).catch(function(err) {
+                        telemetry('FETCH ' + url + ' FAILED ' + err);
+                    });
+                }
+                return p;
+            };
+        }
+        var OrigOpen = XMLHttpRequest.prototype.open;
+        var OrigSend = XMLHttpRequest.prototype.send;
+        XMLHttpRequest.prototype.open = function(method, url) {
+            this.__pkMethod = method;
+            this.__pkUrl = url;
+            return OrigOpen.apply(this, arguments);
+        };
+        XMLHttpRequest.prototype.send = function(body) {
+            var xhr = this;
+            var url = String(xhr.__pkUrl || '');
+            if (url.indexOf('appleauth') !== -1 || url.indexOf('verify') !== -1 || url.indexOf('auth') !== -1) {
+                xhr.addEventListener('loadend', function() {
+                    telemetry('XHR ' + xhr.__pkMethod + ' ' + url
+                        + ' -> ' + xhr.status
+                        + ' body=' + String(body || '').slice(0, 300)
+                        + ' resp=' + String(xhr.responseText || '').slice(0, 300));
+                });
+            }
+            return OrigSend.apply(this, arguments);
+        };
+    })();
 
     function bridgeError(result) {
         var name = (result && result.error && result.error.name) || 'NotAllowedError';
@@ -149,6 +248,29 @@ let PASSKEYS_JS_SOURCE = """
             throw bridgeError(result);
         });
 
+        // Ceremony observability for relying parties that reject silently
+        // (App Store Connect renders its "browser needs to be updated"
+        // banner with no console output when serialization or the server
+        // round-trip fails). Marks resolve/reject on the shim side so a
+        // failed run can be attributed to either the page's use of the
+        // credential (this fires) or a native bridge failure (it does not).
+        bridgePromise.then(
+            function(credential) {
+                try {
+                    var probe = JSON.stringify(credential);
+                    telemetry('ceremony RESOLVED method=' + method +
+                        ' serializeOK=' + (typeof probe === 'string' && probe.length > 10) +
+                        ' len=' + (probe ? probe.length : 0));
+                } catch (e) {
+                    telemetry('ceremony RESOLVED but serialization threw: ' + e.message);
+                }
+            },
+            function(error) {
+                telemetry('ceremony REJECTED method=' + method +
+                    ' name=' + (error && error.name) + ' msg=' + (error && error.message));
+            }
+        );
+
         if (!signal) return bridgePromise;
         return new Promise(function(resolve, reject) {
             var onAbort = function() {
@@ -160,7 +282,17 @@ let PASSKEYS_JS_SOURCE = """
             };
             signal.addEventListener('abort', onAbort, {once: true});
             bridgePromise.then(
-                function(credential) { signal.removeEventListener('abort', onAbort); resolve(credential); },
+                function(credential) {
+                    signal.removeEventListener('abort', onAbort);
+                    // The exact bytes the RP receives, logged over the native
+                    // bridge right before they leave the shim — distinguishes
+                    // a client-side serialization failure from a server
+                    // rejection (senior-AI refinement of the observability
+                    // plan).
+                    try { telemetry('assertion-toJSON=' + JSON.stringify(credential.toJSON()).slice(0, 900)); }
+                    catch (e2) { telemetry('assertion-toJSON THREW: ' + e2.message); }
+                    resolve(credential);
+                },
                 function(error) { signal.removeEventListener('abort', onAbort); reject(error); }
             );
         });
@@ -198,5 +330,27 @@ let PASSKEYS_JS_SOURCE = """
         // sites fall back to modal ceremonies, which ARE bridged.
         return Promise.resolve(false);
     };
+    // idmsa.apple.com's widget calls getClientCapabilities() when present
+    // and reads `hybridTransport` / `passkeyPlatformAuthenticator` off the
+    // result to decide whether passkeys are usable; a missing static reads
+    // as supported (it guards `void 0 !==`), but a throw inside the call is
+    // caught and ALSO reads as supported — so this only formalizes the
+    // capability surface the widget already assumes. Values match what the
+    // bridge actually supports: platform authenticator yes (isUvPaa),
+    // hybrid (QR/phone) yes since the bluetooth entitlement, conditional
+    // get (autofill) no.
+    if (typeof window.PublicKeyCredential.getClientCapabilities !== 'function') {
+        window.PublicKeyCredential.getClientCapabilities = function() {
+            return Promise.resolve({
+                conditionalGet: false,
+                conditionalCreate: false,
+                hybridTransport: true,
+                passkeyPlatformAuthenticator: true,
+                userVerifyingPlatformAuthenticator: true,
+                relatedOrigins: false,
+                signalAvailable: true
+            });
+        };
+    }
 })();
 """

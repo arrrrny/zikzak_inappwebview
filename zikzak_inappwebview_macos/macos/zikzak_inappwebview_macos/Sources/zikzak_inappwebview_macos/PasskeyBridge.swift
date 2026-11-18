@@ -2,6 +2,7 @@ import AuthenticationServices
 import Cocoa
 import Foundation
 import LocalAuthentication
+import ObjectiveC
 import WebKit
 
 /// Issue #358 — WebAuthn/passkey ceremonies over `ASAuthorizationController`.
@@ -33,6 +34,7 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
 
     init(webView: InAppWebView) {
         self.webView = webView
+        PasskeyClientDataJSONFixer.install()
     }
 
     // MARK: - Entry point
@@ -72,6 +74,15 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
             let available = isPlatformAuthenticatorAvailable()
             print("[PasskeyBridge][PKDBG] handleCall: isUvPaa -> \(available)")
             completion(["ok": true, "available": available])
+        case "telemetry":
+            // Fire-and-forget observability channel from the injected shim
+            // (assertion serialization, RP network round-trips inside
+            // cross-origin iframes). Apple's widget no-ops console.* in
+            // production, so console-forwarded lines never arrive — this
+            // rides the same trusted bridge the ceremonies use.
+            let text = (payload["options"] as? [String: Any])?["text"] as? String ?? ""
+            print("[PasskeyBridge][PKTEL] \(text)")
+            completion(["ok": true])
         default:
             print("[PasskeyBridge][PKDBG] handleCall: UNKNOWN method '\(method)'")
             completion(Self.errorResult(name: "TypeError", message: "Unknown PasskeyBridge method '\(method)'."))
@@ -677,5 +688,119 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
 
     static func errorResult(name: String, message: String) -> [String: Any] {
         return ["ok": false, "error": ["name": name, "message": message]]
+    }
+}
+
+/// Issue #446 — macOS's `ASPublicKeyCredentialClientData` jsonForOperationType:
+/// emits `{"type","challenge","origin","crossOrigin"}` but NEVER `topOrigin`,
+/// even when the object carries one (verified at the raw ObjC level: every
+/// crossOrigin value, both assignment orders, and re-derived options all
+/// omit the field). Chromium's CollectedClientData contract
+/// (components/webauthn/core/browser/client_data_json.cc) requires
+/// `"crossOrigin":true,"topOrigin":"<top>"` for cross-origin iframe
+/// ceremonies, and relying parties that validate the embedding origin —
+/// App Store Connect's idmsa.apple.com widget above all — reject the
+/// assertion without it. The signature covers the hash of this JSON, so it
+/// cannot be fixed after the fact; the only interception point is the
+/// generator itself.
+///
+/// `ASPublicKeyCredentialClientData` is NS_REFINED_FOR_SWIFT: the Swift
+/// -visible type is a refinement, not the ObjC class, so neither `#selector`
+/// nor an @objc extension nor `Type.self -> AnyClass` work on it. The swizzle
+/// therefore runs entirely at the ObjC runtime level: resolve the class by
+/// its runtime name, save the original IMP, and install a non-capturing
+/// C-ABI replacement with `method_setImplementation`. The replacement calls
+/// the saved original IMP, reads `topOrigin` off the receiver via KVC, and
+/// injects it into the emitted JSON when Apple's own output says
+/// `crossOrigin:true` and the field is absent. Same-origin output passes
+/// through byte-identical.
+enum PasskeyClientDataJSONFixer {
+    /// The original IMP, saved at install time for re-entry. Nil means the
+    /// replacement never runs (install failed), so the static is safe to
+    /// force-unwrap inside the replacement only after a successful install.
+    private static var originalJSONIMP: IMP?
+
+    static func install() {
+        if #available(macOS 13.5, *) {
+            install13_5()
+        } else {
+            // Below 13.5 there is no ASPublicKeyCredentialClientData and no
+            // client-data API at all — the app-context request path runs
+            // there and needs no fix.
+            print("[PasskeyBridge] clientDataJSON fixer: macOS < 13.5, not installed")
+        }
+    }
+
+    @available(macOS 13.5, *)
+    private static func install13_5() {
+        // Idempotence is load-bearing: install() runs on every PasskeyBridge
+        // init (one per webview), and a second run would capture THIS
+        // replacement as the "original" — the replacement then re-enters
+        // itself and the ceremony crashes the app with stack overflow
+        // (Zuraffa-2026-11-18-210521.ips).
+        guard !installed else { return }
+        guard let cls: AnyClass = NSClassFromString("ASPublicKeyCredentialClientData"),
+              let method = class_getInstanceMethod(cls, NSSelectorFromString("jsonForOperationType:")) else {
+            print("[PasskeyBridge] clientDataJSON fixer: class or method not found, not installed")
+            return
+        }
+        originalJSONIMP = method_getImplementation(method)
+        let replacement = unsafeBitCast(replacementIMP, to: IMP.self)
+        method_setImplementation(method, replacement)
+        installed = true
+        print("[PasskeyBridge] clientDataJSON fixer installed")
+    }
+
+    private static var installed = false
+
+    /// The C-ABI replacement IMP. Non-capturing: it reads state from the
+    /// receiver (KVC) and the saved original IMP (static), so it converts to
+    /// a plain function pointer.
+    private static let replacementIMP: @convention(c) (AnyObject, Selector, UInt) -> NSData = { receiver, sel, operationType in
+        guard let originalIMP = PasskeyClientDataJSONFixer.originalJSONIMP else {
+            return NSData()
+        }
+        let original = unsafeBitCast(
+            originalIMP,
+            to: (@convention(c) (AnyObject, Selector, UInt) -> NSData).self)
+        let appleJSON = original(receiver, sel, operationType)
+        let topOrigin = (receiver as? NSObject)?.value(forKey: "topOrigin") as? String
+        return PasskeyClientDataJSONFixer.injectTopOrigin(
+            originalJSON: appleJSON, topOrigin: topOrigin)
+    }
+
+    /// Parse Apple's emitted JSON, insert `topOrigin` after `crossOrigin`
+    /// when the flag reads true and the field is absent. The emitted JSON is
+    /// Apple's own serialization of the object's state, so its
+    /// `origin`/`crossOrigin` values are authoritative; `topOrigin` is only
+    /// ever ADDED, never rewritten. Same-origin output passes through
+    /// untouched.
+    static func injectTopOrigin(originalJSON: NSData, topOrigin: String?) -> NSData {
+        guard let object = try? JSONSerialization.jsonObject(with: originalJSON as Data),
+              var dict = object as? [String: Any] else {
+            return originalJSON
+        }
+        let crossOrigin = dict["crossOrigin"] as? Bool ?? false
+        guard crossOrigin, dict["topOrigin"] == nil,
+              let topOrigin = topOrigin, !topOrigin.isEmpty else {
+            return originalJSON
+        }
+        // Field order matches Chromium's builder (type, challenge, origin,
+        // crossOrigin, topOrigin) — order is not semantically required, but
+        // keeping the canonical shape makes the output comparable to what
+        // Safari emits.
+        var rebuilt: [String: Any] = [:]
+        for key in ["type", "challenge", "origin"] {
+            if let value = dict[key] { rebuilt[key] = value; dict.removeValue(forKey: key) }
+        }
+        rebuilt["crossOrigin"] = true
+        dict.removeValue(forKey: "crossOrigin")
+        rebuilt["topOrigin"] = topOrigin
+        for (key, value) in dict { rebuilt[key] = value }
+        guard let data = try? JSONSerialization.data(withJSONObject: rebuilt) else {
+            return originalJSON
+        }
+        print("[PasskeyBridge] clientDataJSON fixer: injected topOrigin=\(topOrigin)")
+        return data as NSData
     }
 }
