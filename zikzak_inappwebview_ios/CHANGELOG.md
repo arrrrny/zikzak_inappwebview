@@ -1,3 +1,9 @@
+## Unreleased
+
+### Bug Fixes
+
+- [iOS] A passkey ceremony inside a cross-origin iframe now serializes both origins into `clientDataJSON`. `ASPublicKeyCredentialClientData`'s refined setter validates `topOrigin` against the request's current cross-origin state and silently drops it while the request still reads as top-level, so the assignment order is now `crossOrigin` first, then `topOrigin` — the shape macOS already uses. A live iframe ceremony was sending `crossOrigin: true` with no `topOrigin`, which relying parties that validate the embedding origin reject (#446 follow-up).
+
 ## 6.5.0 - 2026-11-18
 
 

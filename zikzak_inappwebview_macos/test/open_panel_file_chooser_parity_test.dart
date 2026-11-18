@@ -216,10 +216,10 @@ void main() {
         );
         expect(
           body,
-          // WORKAROUND (arrrrny/zikzak_inappwebview#452): 9a23c384 changed
-          // the panel to honor `parameters.allowsDirectories` (#408
-          // webkitdirectory support); the expectation below is aligned to
-          // that intentional behavior, not the old hard-coded `false`.
+          // This PR (9a23c384) taught the panel to honor
+          // `parameters.allowsDirectories` (#408 webkitdirectory support), so
+          // the expectation is aligned to that new behavior rather than the
+          // old hard-coded `false`.
           contains('canChooseDirectories = parameters.allowsDirectories'),
           reason:
               'the panel must honor the directories flag WebKit derives '

@@ -2669,15 +2669,41 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         _ userContentController: WKUserContentController, didReceive message: WKScriptMessage,
         replyHandler: @escaping (Any?, String?) -> Void
     ) {
-        let payload = (message.body as? [String: Any]) ?? [:]
+        // #309 — this is a reply-capable entry point registered under a name
+        // ANY page can post to, so it owes the same defensive read of
+        // `message.body` as every plain handler: one touch, inside the ObjC
+        // exception boundary, with non-cloneable values stringified. Reading
+        // the body directly here re-opened the exact crash #309 contains (a
+        // page posting a `DOMException` SIGSEGVs inside
+        // `CloneDeserializer::readDOMException`).
+        let (body, deserializationError) =
+            WeakScriptMessageHandler.defensivelyDeserializeBody(of: message)
+        if let deserializationError {
+            replyHandler(
+                PasskeyBridge.errorResult(name: "SecurityError", message: deserializationError), nil)
+            return
+        }
+        let payload = body as? [String: Any] ?? [:]
         let argsJson: String
         if let data = try? JSONSerialization.data(withJSONObject: [payload]) {
             argsJson = String(data: data, encoding: .utf8) ?? "[{}]"
         } else {
             argsJson = "[{}]"
         }
+        // The handler is registered unconditionally, but `passkeyBridge` only
+        // exists when the creation-time gate armed it (`passkeysGateResult`).
+        // A disarmed webview used to drop the reply on the floor and hang the
+        // page's `postMessage` promise forever; answer with a DOMException-shaped
+        // error the shim rejects, the same way the bridge reports a refusal.
+        guard let passkeyBridge else {
+            replyHandler(
+                PasskeyBridge.errorResult(
+                    name: "NotAllowedError", message: "Passkey bridge is not armed."),
+                nil)
+            return
+        }
         let caller = PasskeyCallerContext.from(frameInfo: message.frameInfo, mainFrameURL: self.url)
-        passkeyBridge?.handleCall(argsJson: argsJson, caller: caller) { result in
+        passkeyBridge.handleCall(argsJson: argsJson, caller: caller) { result in
             replyHandler(result, nil)
         }
     }
