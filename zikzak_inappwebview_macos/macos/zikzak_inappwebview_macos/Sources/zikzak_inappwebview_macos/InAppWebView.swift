@@ -582,31 +582,17 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             // the HeadlessInAppWebViewManager can arm its readiness gate
             // BEFORE the first navigation is issued (see makeInitialLoad).
             if !deferInitialLoad {
-                if let initialUrlRequest = args["initialUrlRequest"] as? [String: Any] {
-                    debugLog("INITIAL_LOAD")
-                    let request = URLRequest(fromPluginMap: initialUrlRequest)
-                    self.performLoad { [weak self] in
-                        // #338: hold the load until any content-rule
-                        // compilation kicked off by setSettings below settles,
-                        // so the first navigation cannot outrun the rules.
-                        self?.loadAfterContentRuleLists { [weak self] in
-                            self?.load(request)
-                        }
-                    }
-                } else if args["initialData"] != nil {
-                    // #425: the GUI creation path handled initialUrlRequest only
-                    // — an initialData webview armed the readiness gate but
-                    // never issued any load, rendering a blank about:blank
-                    // forever. The load itself comes from the shared
-                    // loadInitialData, so this path cannot drift from
-                    // makeInitialLoad's data branch; #197 readiness and #338
-                    // content-rule gates wrap the shared loader as below.
-                    debugLog("INITIAL_LOAD_DATA")
-                    self.performLoad { [weak self] in
-                        self?.loadAfterContentRuleLists { [weak self] in
-                            self?.loadInitialData(args["initialData"] as? [String: Any] ?? [:])
-                        }
-                    }
+                // The whole initial load is dispatched through the shared
+                // makeInitialLoad, so the GUI path cannot drop an input kind
+                // the headless path handles (#425 was exactly that drift for
+                // initialData; the reviewer flagged the identical gap one kind
+                // over for initialFile). makeInitialLoad carries the #338
+                // content-rule gate itself; the #197 WebContent readiness gate
+                // wraps the dispatch here, matching the headless manager's
+                // readiness ping + makeInitialLoad order.
+                debugLog("INITIAL_LOAD_DISPATCH")
+                self.performLoad { [weak self] in
+                    self?.makeInitialLoad(params: args)
                 }
             }
 
