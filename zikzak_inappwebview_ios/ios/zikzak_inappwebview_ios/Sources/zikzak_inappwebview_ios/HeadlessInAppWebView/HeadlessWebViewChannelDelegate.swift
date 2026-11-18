@@ -18,7 +18,14 @@ public class HeadlessWebViewChannelDelegate: ChannelDelegate {
     
     public override func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let arguments = call.arguments as? NSDictionary
-        
+
+        // Touch the LRU clock: this instance just received a per-instance
+        // call, so a later eviction recycles the least-recently-used id
+        // rather than the longest-lived one (issue #371 review).
+        if let headlessWebView = headlessWebView {
+            headlessWebView.plugin?.headlessInAppWebViewManager?.touch(id: headlessWebView.id)
+        }
+
         switch call.method {
         case "dispose":
             if let headlessWebView = headlessWebView {
@@ -51,6 +58,14 @@ public class HeadlessWebViewChannelDelegate: ChannelDelegate {
     public func onWebViewCreated() {
         let arguments: [String: Any?] = [:]
         channel?.invokeMethod("onWebViewCreated", arguments: arguments)
+    }
+
+    /// Notifies the Dart owner that the native manager evicted this instance to
+    /// stay under the live-instance cap (issue #371). Invoked BEFORE the
+    /// handler is cleared so the per-instance channel is still routed.
+    public func onEvicted() {
+        let arguments: [String: Any?] = [:]
+        channel?.invokeMethod("onEvicted", arguments: arguments)
     }
     
     public override func dispose() {

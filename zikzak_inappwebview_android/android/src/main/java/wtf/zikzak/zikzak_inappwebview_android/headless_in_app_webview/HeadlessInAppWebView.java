@@ -45,6 +45,16 @@ public class HeadlessInAppWebView implements Disposable {
     }
   }
 
+  /**
+   * Tells the Dart owner this instance was evicted at the cap (issue #371),
+   * before {@link #dispose()} clears the per-instance handler.
+   */
+  public void notifyEvicted() {
+    if (channelDelegate != null) {
+      channelDelegate.onEvicted();
+    }
+  }
+
   public void prepare(Map<String, Object> params) {
     if (flutterWebView != null) {
       View view = flutterWebView.getView();

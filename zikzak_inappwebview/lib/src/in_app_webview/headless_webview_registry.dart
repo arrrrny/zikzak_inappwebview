@@ -136,6 +136,15 @@ class HeadlessWebViewRegistry {
   /// arrival order. The head is woken when a slot frees.
   final List<Completer<void>> _slotWaiters = [];
 
+  /// Ids of idle instances whose eviction is already in flight.
+  ///
+  /// Two concurrent [acquire] calls must not both pick the same
+  /// `oldestIdle` and then both await its `dispose()`: the loser would burn
+  /// the eviction and, after the winner freed the slot, be told
+  /// [HeadlessWebViewCapExceededException] as if nothing happened (issue #371
+  /// review). Reserving the id here makes the second caller re-pick.
+  final Set<HeadlessInAppWebView> _evicting = {};
+
   HeadlessWebViewRegistry({
     HeadlessWebViewRegistryConfig? config,
     DateTime Function()? clock,
@@ -218,6 +227,12 @@ class HeadlessWebViewRegistry {
     HeadlessInAppWebView webView, {
     bool active = false,
   }) async {
+    // Absolute deadline for the whole call, not a per-park budget: every
+    // spurious wake-up (a `markIdle` on an already-idle instance, an `evict`
+    // of a different id) used to cancel the timer and re-park with a fresh
+    // full `slotAcquireTimeout`, so the documented bound was per-park rather
+    // than per-call (issue #371 review).
+    final deadline = Stopwatch()..start();
     while (true) {
       final existing = _entries[webView];
       if (existing != null) {
@@ -235,26 +250,41 @@ class HeadlessWebViewRegistry {
 
       final oldestIdle = _oldestIdleInstance();
       if (oldestIdle != null) {
-        final entry = _entries[oldestIdle];
-        if (entry != null) {
-          await _disposeEntry(oldestIdle, entry);
+        // Reserve the candidate before the await so a concurrent caller
+        // cannot pick the same one and double-evict it.
+        _evicting.add(oldestIdle);
+        try {
+          final entry = _entries[oldestIdle];
+          if (entry != null) {
+            await _disposeEntry(oldestIdle, entry);
+          }
+        } finally {
+          _evicting.remove(oldestIdle);
         }
+        // Only re-check when the eviction actually released the slot: a
+        // failed native dispose keeps the entry (see [_disposeEntry]), and
+        // retrying the same idle instance forever would spin. A call that
+        // freed a slot and lost it to another acquirer re-parks below rather
+        // than reporting a cap failure for work it did (issue #371 review).
         if (_entries.length < config.maxLiveInstances) {
           continue;
         }
       }
 
-      if (config.slotAcquireTimeout <= Duration.zero) {
+      if (config.slotAcquireTimeout <= Duration.zero ||
+          deadline.elapsed >= config.slotAcquireTimeout) {
         throw HeadlessWebViewCapExceededException(
           maxLiveInstances: config.maxLiveInstances,
           liveCount: _entries.length,
         );
       }
 
-      // Full of active instances: park at the FIFO tail until a slot frees.
+      // Full of active instances: park at the FIFO tail until a slot frees,
+      // bounded by the REMAINING budget so the wait is per-call.
+      final remaining = config.slotAcquireTimeout - deadline.elapsed;
       final waiter = Completer<void>();
       _slotWaiters.add(waiter);
-      final timer = Timer(config.slotAcquireTimeout, () {
+      final timer = Timer(remaining, () {
         _slotWaiters.remove(waiter);
         if (!waiter.isCompleted) {
           waiter.completeError(
@@ -338,6 +368,7 @@ class HeadlessWebViewRegistry {
     DateTime? oldestAt;
     for (final entry in _entries.entries) {
       if (entry.value.active) continue;
+      if (_evicting.contains(entry.key)) continue;
       if (oldestAt == null || entry.value.lastUsedAt.isBefore(oldestAt)) {
         oldest = entry.key;
         oldestAt = entry.value.lastUsedAt;

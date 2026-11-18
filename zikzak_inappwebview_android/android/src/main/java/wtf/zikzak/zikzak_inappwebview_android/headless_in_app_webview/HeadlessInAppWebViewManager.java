@@ -30,10 +30,8 @@ import wtf.zikzak.zikzak_inappwebview_android.InAppWebViewFlutterPlugin;
 import wtf.zikzak.zikzak_inappwebview_android.types.ChannelDelegateImpl;
 import wtf.zikzak.zikzak_inappwebview_android.webview.in_app_webview.FlutterWebView;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import io.flutter.plugin.common.MethodCall;
@@ -60,8 +58,14 @@ public class HeadlessInAppWebViewManager extends ChannelDelegateImpl {
 
   public final Map<String, HeadlessInAppWebView> webViews = new HashMap<>();
 
-  /** Live ids, oldest registration first — the cap's ordering. */
-  private final List<String> liveIds = new ArrayList<>();
+  /**
+   * Live ids and the last time each was touched (its most recent per-instance
+   * channel call). The cap recycles the <b>least-recently-used</b> id, not the
+   * longest-lived one: a long-running session is the instance most likely to
+   * be in use, so registration order (the old FIFO) evicted the wrong victim
+   * (issue #371 review).
+   */
+  private final Map<String, Long> lastUsedAt = new HashMap<>();
 
   @Nullable private HeadlessWebViewContainer container;
 
@@ -93,19 +97,21 @@ public class HeadlessInAppWebViewManager extends ChannelDelegateImpl {
             return;
           }
           pruneLiveIds();
-          if (instance(id) == null && liveIds.size() >= maxLiveWebViews) {
-            // FIFO eviction: the create recycles the oldest live instance
-            // instead of dying at the cap. This is what reaps instances
-            // orphaned by a Dart hot restart — the dead isolate cannot
-            // dispose them, so without this the cap stays saturated and
-            // every later create fails for the rest of the process
-            // (zikzak_inappwebview headless cap queue fix).
-            final String oldestId = liveIds.isEmpty() ? null : liveIds.get(0);
-            if (oldestId != null) {
-              dispose(oldestId);
+          if (instance(id) == null && lastUsedAt.size() >= maxLiveWebViews) {
+            // LRU eviction: the create recycles the least-recently-used live
+            // instance instead of dying at the cap. This is what reaps
+            // instances orphaned by a Dart hot restart — the dead isolate
+            // cannot dispose them, so without this the cap stays saturated
+            // and every later create fails for the rest of the process
+            // (zikzak_inappwebview headless cap queue fix). LRU, not
+            // registration-FIFO: a session alive since app start is the one
+            // most likely in use.
+            final String victim = leastRecentlyUsedId();
+            if (victim != null) {
+              dispose(victim);
             }
             pruneLiveIds();
-            if (liveIds.size() >= maxLiveWebViews) {
+            if (lastUsedAt.size() >= maxLiveWebViews) {
               result.error(
                   "headless_cap_exceeded",
                   "headless WebView cap reached",
@@ -180,8 +186,13 @@ public class HeadlessInAppWebViewManager extends ChannelDelegateImpl {
   /** Releases one headless WebView: the instance is torn down and removed. */
   public void dispose(@NonNull final String id) {
     final HeadlessInAppWebView headlessInAppWebView = webViews.remove(id);
-    liveIds.remove(id);
+    lastUsedAt.remove(id);
     if (headlessInAppWebView != null) {
+      // Notify the owner over the per-instance channel BEFORE the handler is
+      // cleared: the Dart `HeadlessInAppWebView` keeps `_lifecycle ==
+      // notDisposed` otherwise, so its next setSize/getSize would reach a
+      // channel with no handler (issue #371 review).
+      headlessInAppWebView.notifyEvicted();
       headlessInAppWebView.dispose();
     }
   }
@@ -210,7 +221,7 @@ public class HeadlessInAppWebViewManager extends ChannelDelegateImpl {
       }
     }
     webViews.clear();
-    liveIds.clear();
+    lastUsedAt.clear();
     if (container != null) {
       container.dispose();
       container = null;
@@ -224,8 +235,33 @@ public class HeadlessInAppWebViewManager extends ChannelDelegateImpl {
   }
 
   private void track(@NonNull final String id) {
-    liveIds.remove(id);
-    liveIds.add(id);
+    lastUsedAt.put(id, System.currentTimeMillis());
+  }
+
+  /**
+   * Records that {@code id} was just used, so a later eviction recycles the
+   * least-recently-used instance rather than the longest-lived one.
+   */
+  void touch(@NonNull final String id) {
+    if (lastUsedAt.containsKey(id)) {
+      lastUsedAt.put(id, System.currentTimeMillis());
+    }
+  }
+
+  /**
+   * The live id with the oldest last-used timestamp, or {@code null} when none.
+   */
+  @Nullable
+  private String leastRecentlyUsedId() {
+    String victim = null;
+    long oldest = Long.MAX_VALUE;
+    for (Map.Entry<String, Long> entry : lastUsedAt.entrySet()) {
+      if (entry.getValue() < oldest) {
+        oldest = entry.getValue();
+        victim = entry.getKey();
+      }
+    }
+    return victim;
   }
 
   /**
@@ -233,6 +269,6 @@ public class HeadlessInAppWebViewManager extends ChannelDelegateImpl {
    * so the cap counts live WebViews rather than dead entries.
    */
   private void pruneLiveIds() {
-    liveIds.removeIf(id -> instance(id) == null);
+    lastUsedAt.keySet().removeIf(id -> instance(id) == null);
   }
 }

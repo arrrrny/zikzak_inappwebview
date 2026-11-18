@@ -182,7 +182,8 @@ void main() {
     });
 
     test(
-      'a create at the cap recycles the oldest live instance FIFO (cap queue)',
+      'a create at the cap recycles the least-recently-used live instance '
+      '(cap queue)',
       () {
         final managers = managerSources();
         final managerPath = managers.keys.firstWhere(
@@ -192,19 +193,26 @@ void main() {
 
         expect(
           manager,
-          contains('liveOrder.first'),
-          reason: 'cap queue: a create at the cap evicts the oldest live id',
+          contains('leastRecentlyUsedId()'),
+          reason: 'cap queue: a create at the cap evicts the LRU live id, '
+              'not the longest-lived one',
         );
         expect(
           manager,
-          contains('dispose(id: oldestId)'),
+          contains('dispose(id: victim)'),
           reason: 'cap queue: eviction tears down the native WebView, '
               'not only the map entry',
         );
         expect(
-          manager.indexOf('liveOrder.first'),
+          manager.indexOf('leastRecentlyUsedId()'),
           lessThan(manager.indexOf('"headless_cap_exceeded"')),
           reason: 'cap queue: eviction is attempted before the hard failure',
+        );
+        expect(
+          manager,
+          contains('notifyEvicted()'),
+          reason: 'cap queue: the Dart owner is told of the eviction before '
+              'the per-instance handler is cleared',
         );
       },
     );

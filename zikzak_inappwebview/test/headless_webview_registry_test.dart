@@ -188,6 +188,40 @@ void main() {
     });
 
     test(
+      'a create at the cap disposes exactly one live instance before '
+      'succeeding',
+      () async {
+        // Behavioural twin of the native source-contract test: at the cap,
+        // registering a new instance recycles ONE live instance (the oldest
+        // idle) and then succeeds — never zero (which would exceed the cap)
+        // and never two (which would over-evict). This pins the
+        // eviction-before-success shape the source-text `contains(...)` test
+        // can only smoke-test (issue #371 review).
+        final registry = HeadlessWebViewRegistry(
+          config: const HeadlessWebViewRegistryConfig(maxLiveInstances: 2),
+        );
+        final first = _webView('first');
+        final second = _webView('second');
+        await registry.track(first);
+        await registry.track(second);
+        expect(registry.liveCount, 2);
+
+        final third = _webView('third');
+        await registry.track(third);
+
+        expect(registry.liveCount, 2, reason: 'the cap is never exceeded');
+        final disposed = [first, second, third]
+            .where((v) => _disposeCount(v) == 1);
+        expect(
+          disposed,
+          hasLength(1),
+          reason: 'exactly one live instance is recycled for the newcomer',
+        );
+        expect(registry.contains(third), isTrue);
+      },
+    );
+
+    test(
       'tracking the same instance twice does not grow the registry',
       () async {
         final registry = HeadlessWebViewRegistry(
@@ -433,6 +467,45 @@ void main() {
 
         expect(registry.contains(next), isTrue);
         expect(_disposeCount(active), 1);
+      },
+    );
+
+    test(
+      'evictIdleExpired disposes an expired idle instance and frees its slot',
+      () async {
+        // The TTL sweeper is the production path most likely to free a slot
+        // (an app-level tick), and it frees it through `_disposeEntry` — the
+        // same helper `evict`/`disposeAll` use, which signals the parked
+        // FIFO (pinned by the "disposeAll wakes parked acquires" and
+        // "evicting an active instance wakes the parked acquire" tests).
+        // Pin the sweeper's own contract here: it disposes the expired idle
+        // instance and a later acquire proceeds into the freed slot, so a
+        // refactor that adds an early return to the sweep goes red (issue
+        // #371 review).
+        //
+        // NOTE: a parked acquire always evicts an idle instance itself on
+        // wake (see `_oldestIdleInstance`), so `markIdle` — which both idles
+        // and signals — lets the waiter self-serve. The distinct
+        // `evictIdleExpired` path is therefore pinned by its observable
+        // effect (the expired instance is disposed and the slot is free),
+        // not by racing it against a parked waiter.
+        var now = DateTime.utc(2026, 1, 1, 12);
+        final registry = HeadlessWebViewRegistry(
+          config: const HeadlessWebViewRegistryConfig(
+            maxLiveInstances: 1,
+            idleTtl: Duration(milliseconds: 10),
+          ),
+          clock: () => now,
+        );
+        final idle = _webView('idle');
+        await registry.track(idle);
+        now = now.add(const Duration(seconds: 1));
+
+        final evicted = await registry.evictIdleExpired();
+
+        expect(evicted, [idle]);
+        expect(_disposeCount(idle), 1);
+        expect(registry.liveCount, 0);
       },
     );
   });

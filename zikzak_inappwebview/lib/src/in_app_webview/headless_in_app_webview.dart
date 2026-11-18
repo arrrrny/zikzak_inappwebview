@@ -175,6 +175,7 @@ class HeadlessInAppWebView implements Disposable {
     )?
     onUpdateVisitedHistory,
     void Function(InAppWebViewController controller)? onWebViewCreated,
+    void Function()? onEvicted,
     Future<AjaxRequest?> Function(
       InAppWebViewController controller,
       AjaxRequest ajaxRequest,
@@ -364,8 +365,12 @@ class HeadlessInAppWebView implements Disposable {
       onNetworkResponse: onNetworkResponse,
       onNetworkLoadingFinished: onNetworkLoadingFinished,
     );
-    return HeadlessInAppWebView.fromPlatformCreationParams(
-      params: PlatformHeadlessInAppWebViewCreationParams(
+    // `late` so the `onEvicted` closure below can reach this instance: the
+    // native manager may evict the instance at any later `run()`, long after
+    // construction, and the Dart owner must settle its lifecycle then instead
+    // of discovering the eviction on a dead per-instance channel.
+    late final HeadlessInAppWebView self;
+    final params = PlatformHeadlessInAppWebViewCreationParams(
         controllerFromPlatform: (PlatformInAppWebViewController controller) =>
             InAppWebViewController.fromPlatform(platform: controller),
         initialSize: initialSize,
@@ -385,6 +390,10 @@ class HeadlessInAppWebView implements Disposable {
         onWebViewCreated: (controller) {
           networkCaptureManager?.attach(controller);
           onWebViewCreated?.call(controller);
+        },
+        onEvicted: () {
+          self._handleNativeEviction();
+          onEvicted?.call();
         },
         onLoadStart: (controller, url) {
           networkCaptureManager?.onPageLoad(controller);
@@ -653,8 +662,20 @@ class HeadlessInAppWebView implements Disposable {
             ? (controller, responseBody) =>
                   onNetworkLoadingFinished.call(controller, responseBody)
             : null,
-      ),
     );
+    self = HeadlessInAppWebView.fromPlatformCreationParams(params: params);
+    return self;
+  }
+
+  /// Settles the lifecycle when the native manager evicted this instance to
+  /// stay under its live-instance cap (issue #371).
+  ///
+  /// The platform Dart layer routes the native `onEvicted` notification here
+  /// (it owns the per-instance channel), so a recycled instance stops
+  /// advertising itself as live and a later [dispose] becomes the documented
+  /// no-op instead of a second teardown of a dead channel.
+  void _handleNativeEviction() {
+    _lifecycle = DisposeLifecycle.released;
   }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformHeadlessInAppWebView.run}
