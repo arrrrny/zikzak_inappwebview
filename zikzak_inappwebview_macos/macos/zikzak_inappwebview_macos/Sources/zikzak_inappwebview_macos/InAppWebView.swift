@@ -123,7 +123,7 @@ private func javaScriptExceptionError(_ error: Error) -> FlutterError {
         code: "InAppWebView", message: message, details: details.isEmpty ? nil : details)
 }
 
-public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler, DefensivelyDeserializedScriptMessageHandling, WKUIDelegate, NSMenuDelegate, WKDownloadDelegate {
+public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler, WKScriptMessageHandlerWithReply, DefensivelyDeserializedScriptMessageHandling, WKUIDelegate, NSMenuDelegate, WKDownloadDelegate {
     var channel: FlutterMethodChannel!
     var registrar: FlutterPluginRegistrar? = nil
     var plugin: InAppWebViewFlutterPlugin?
@@ -202,6 +202,17 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     /// `(groupName, WKUserScript)` list here and rebuild the controller on
     /// removal. Mirrors the iOS `userOnlyScripts` OrderedSet.
     private var userOnlyScripts: [UserScript] = []
+
+    /// The scripts the plugin itself injects at creation time (console bridge,
+    /// JS bridge, passkeys shim, print, find-interaction, web messages).
+    ///
+    /// WKUserContentController exposes its script list read-only, so a rebuild
+    /// after a removal has to re-add these from a list we keep ourselves —
+    /// `rebuildUserOnlyScripts()` re-adds THIS list and then
+    /// `userOnlyScripts`. Without it a `removeUserScriptsByGroupName` (the
+    /// time-zone switch's live push) silently dropped the bridge, the passkeys
+    /// shim, print and find-interaction along with the removed group.
+    private var pluginUserScripts: [WKUserScript] = []
 
     /// Tracked for `onZoomScaleChanged` KVO (macOS `pageZoom`, macOS 11+).
     private var lastPageZoom: CGFloat = 1.0
@@ -404,6 +415,22 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         // Scroll / content-size events (issue #197): posted from JS.
         userContentController.add(
             WeakScriptMessageHandler(delegate: self), name: "onScrollChangedReceived")
+        // Frame-correct passkey replies (issue #446 follow-up): the reply-
+        // capable handler routes its answer to the frame that sent the
+        // message, so a ceremony running in a cross-origin iframe (App Store
+        // Connect's idmsa.apple.com widget) actually receives its
+        // completion. The legacy callHandler reply is a main-frame
+        // evaluateJavaScript that can never reach an iframe's promise.
+        //
+        // The WithReply-only `addScriptMessageHandler(_:contentWorld:name:)`
+        // overload MUST be used: the `add(_:contentWorld:name:)` overload
+        // registers a plain WKScriptMessageHandler, under which postMessage
+        // resolves `undefined` without ever reaching the reply delegate.
+        if #available(macOS 12.0, *) {
+            userContentController.addScriptMessageHandler(
+                WeakReplyScriptMessageHandler(delegate: self), contentWorld: .page,
+                name: "PasskeyBridge")
+        }
 
         let consoleOverrideScript = """
             (function() {
@@ -465,13 +492,13 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         if settings?.consoleLogEnabled ?? true {
             let userScript = WKUserScript(
                 source: consoleOverrideScript, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-            userContentController.addUserScript(userScript)
+            addPluginUserScript(userScript)
         }
 
         let bridgeScript = WKUserScript(
             source: JAVASCRIPT_BRIDGE_JS_SOURCE, injectionTime: .atDocumentStart,
             forMainFrameOnly: false)
-        userContentController.addUserScript(bridgeScript)
+        addPluginUserScript(bridgeScript)
 
         // Issue #358: WebAuthn/passkey shim. Injected in every frame at
         // document start, right after the JS bridge it calls through.
@@ -486,23 +513,23 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             let passkeysScript = WKUserScript(
                 source: PASSKEYS_JS_SOURCE, injectionTime: .atDocumentStart,
                 forMainFrameOnly: false)
-            userContentController.addUserScript(passkeysScript)
+            addPluginUserScript(passkeysScript)
         }
 
         let printScript = WKUserScript(
             source: PRINT_JS_SOURCE, injectionTime: .atDocumentStart, forMainFrameOnly: true)
-        userContentController.addUserScript(printScript)
+        addPluginUserScript(printScript)
 
         let findInteractionUserScript = WKUserScript(
             source: FIND_TEXT_HIGHLIGHT_JS_SOURCE, injectionTime: .atDocumentStart,
             forMainFrameOnly: true)
-        userContentController.addUserScript(findInteractionUserScript)
+        addPluginUserScript(findInteractionUserScript)
 
         // WebMessage listener constructor + origin-matching helpers (#197).
         let webMessageListenerScript = WKUserScript(
             source: WEB_MESSAGE_LISTENER_JS_SOURCE, injectionTime: .atDocumentStart,
             forMainFrameOnly: false)
-        userContentController.addUserScript(webMessageListenerScript)
+        addPluginUserScript(webMessageListenerScript)
 
         // Initialise the in-page webMessageChannels map + scroll/content-size
         // observers. The scroll observer is debounced via requestAnimationFrame
@@ -539,7 +566,7 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             })();
             """,
             injectionTime: .atDocumentStart, forMainFrameOnly: false)
-        userContentController.addUserScript(webMessageInitScript)
+        addPluginUserScript(webMessageInitScript)
 
         bindChannels(registrar: registrar, viewId: viewId, channelName: channelName)
 
@@ -1922,6 +1949,13 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         """
     }
 
+    /// Inject one of the plugin's own scripts and remember it, so a later
+    /// `rebuildUserOnlyScripts()` can put it back.
+    private func addPluginUserScript(_ userScript: WKUserScript) {
+        pluginUserScripts.append(userScript)
+        configuration.userContentController.addUserScript(userScript)
+    }
+
     /// Remove a single user script at `index` matching `script`. WKUserContentController
     /// has no single-script removal, so we rebuild the whole list.
     private func removeUserOnlyScript(at index: Int, matching script: UserScript) {
@@ -1942,20 +1976,22 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
 
     private func removeAllUserOnlyScripts() {
         userOnlyScripts.removeAll()
-        configuration.userContentController.removeAllUserScripts()
-        // Re-add the plugin scripts that should always be present.
-        configuration.userContentController.addUserScript(
-            WKUserScript(source: JAVASCRIPT_BRIDGE_JS_SOURCE, injectionTime: .atDocumentStart, forMainFrameOnly: false))
+        rebuildUserOnlyScripts()
     }
 
     /// Rebuild the WKUserContentController's user script list from the tracked
-    /// `userOnlyScripts` array. Called after any removal.
+    /// `pluginUserScripts` + `userOnlyScripts` arrays. Called after any removal.
+    ///
+    /// Both halves are required: the plugin's own scripts (bridge, passkeys,
+    /// print, find-interaction, web messages) and the ones Dart added. The
+    /// rebuild used to re-add only the JS bridge, so a group removal silently
+    /// dropped every other always-on script.
     private func rebuildUserOnlyScripts() {
         let ucc = configuration.userContentController
         ucc.removeAllUserScripts()
-        // Re-add the plugin scripts that should always be present.
-        ucc.addUserScript(
-            WKUserScript(source: JAVASCRIPT_BRIDGE_JS_SOURCE, injectionTime: .atDocumentStart, forMainFrameOnly: false))
+        for s in pluginUserScripts {
+            ucc.addUserScript(s)
+        }
         for s in userOnlyScripts {
             ucc.addUserScript(s)
         }
@@ -2622,6 +2658,56 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     // Internal fallback for direct registration. Every zikzak macOS handler is
     // registered via WeakScriptMessageHandler, which calls the sanitized variant
     // below after defensively deserializing the body (#309).
+    /// Reply-capable passkey bridge entry (macOS 12+). WebKit delivers the
+    /// reply to the frame that posted the message, which is what makes
+    /// iframe ceremonies (ASC's idmsa.apple.com passkey widget) resolvable;
+    /// the legacy `callHandler` path answers with a main-frame
+    /// `evaluateJavaScript` and the iframe's promise hangs until the RP
+    /// page times out into its generic "browser needs to be updated" banner.
+    @available(macOS 12.0, *)
+    public func userContentController(
+        _ userContentController: WKUserContentController, didReceive message: WKScriptMessage,
+        replyHandler: @escaping (Any?, String?) -> Void
+    ) {
+        // #309 — this is a reply-capable entry point registered under a name
+        // ANY page can post to, so it owes the same defensive read of
+        // `message.body` as every plain handler: one touch, inside the ObjC
+        // exception boundary, with non-cloneable values stringified. Reading
+        // the body directly here re-opened the exact crash #309 contains (a
+        // page posting a `DOMException` SIGSEGVs inside
+        // `CloneDeserializer::readDOMException`).
+        let (body, deserializationError) =
+            WeakScriptMessageHandler.defensivelyDeserializeBody(of: message)
+        if let deserializationError {
+            replyHandler(
+                PasskeyBridge.errorResult(name: "SecurityError", message: deserializationError), nil)
+            return
+        }
+        let payload = body as? [String: Any] ?? [:]
+        let argsJson: String
+        if let data = try? JSONSerialization.data(withJSONObject: [payload]) {
+            argsJson = String(data: data, encoding: .utf8) ?? "[{}]"
+        } else {
+            argsJson = "[{}]"
+        }
+        // The handler is registered unconditionally, but `passkeyBridge` only
+        // exists when the creation-time gate armed it (`passkeysGateResult`).
+        // A disarmed webview used to drop the reply on the floor and hang the
+        // page's `postMessage` promise forever; answer with a DOMException-shaped
+        // error the shim rejects, the same way the bridge reports a refusal.
+        guard let passkeyBridge else {
+            replyHandler(
+                PasskeyBridge.errorResult(
+                    name: "NotAllowedError", message: "Passkey bridge is not armed."),
+                nil)
+            return
+        }
+        let caller = PasskeyCallerContext.from(frameInfo: message.frameInfo, mainFrameURL: self.url)
+        passkeyBridge.handleCall(argsJson: argsJson, caller: caller) { result in
+            replyHandler(result, nil)
+        }
+    }
+
     public func userContentController(
         _ userContentController: WKUserContentController, didReceive message: WKScriptMessage
     ) {
@@ -3520,6 +3606,14 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         initiatedByFrame frame: WKFrameInfo,
         completionHandler: @escaping ([URL]?) -> Void
     ) {
+        // A headless (off-screen) webview has no user to pick files: fail
+        // fast with the cancel completion instead of surfacing an app-modal
+        // panel that automation can never answer — runModal() would hang the
+        // headless app forever (issue #633 consumer contract).
+        if isHeadlessOffscreen {
+            completionHandler(nil)
+            return
+        }
         if let presenter = openPanelPresenter {
             presenter(parameters, completionHandler)
             return
@@ -3527,7 +3621,11 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
 
         let panel = NSOpenPanel()
         panel.canChooseFiles = true
-        panel.canChooseDirectories = false
+        // A `webkitdirectory` input asks the panel for folders: WebKit maps
+        // the input attribute to allowsDirectories, and the panel must honor
+        // it or folder upload is dead (issue #633 consumer contract; the
+        // merged #418 hard-coded false, dropping the mapping the pin had).
+        panel.canChooseDirectories = parameters.allowsDirectories
         panel.allowsMultipleSelection = parameters.allowsMultipleSelection
         panel.resolvesAliases = true
 

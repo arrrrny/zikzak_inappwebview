@@ -77,6 +77,17 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
   // back to the caller's onLoad/onError — mirroring the iOS controller.
   final Map<String, ScriptHtmlTagAttributes> _injectedScriptsFromURL = {};
 
+  /// The scripts added through [addUserScript] / [addUserScripts], grouped by
+  /// injection time — the same bookkeeping the iOS port keeps, and the one the
+  /// native side mirrors in `InAppWebView.userOnlyScripts`.
+  ///
+  /// The tracker is what makes a repeated `addUserScript` a no-op and gives
+  /// [removeUserScript] the index the native `removeUserScript` case expects.
+  Map<UserScriptInjectionTime, List<UserScript>> _userScripts = {
+    UserScriptInjectionTime.AT_DOCUMENT_START: <UserScript>[],
+    UserScriptInjectionTime.AT_DOCUMENT_END: <UserScript>[],
+  };
+
   Future<dynamic> handleMethod(MethodCall call) async {
     final controller = params.webviewParams?.controllerFromPlatform != null
         ? params.webviewParams!.controllerFromPlatform!(this)
@@ -753,6 +764,71 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
       );
     }
     return null;
+  }
+
+  @override
+  Future<void> addUserScript({required UserScript userScript}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('userScript', () => userScript.toJson());
+    if (!(_userScripts[userScript.injectionTime]?.contains(userScript) ??
+        false)) {
+      _userScripts[userScript.injectionTime]?.add(userScript);
+      await _channel.invokeMethod('addUserScript', args);
+    }
+  }
+
+  @override
+  Future<void> addUserScripts({required List<UserScript> userScripts}) async {
+    for (var i = 0; i < userScripts.length; i++) {
+      await addUserScript(userScript: userScripts[i]);
+    }
+  }
+
+  @override
+  Future<bool> removeUserScript({required UserScript userScript}) async {
+    var index = _userScripts[userScript.injectionTime]?.indexOf(userScript);
+    if (index == null || index == -1) {
+      return false;
+    }
+
+    _userScripts[userScript.injectionTime]?.remove(userScript);
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('userScript', () => userScript.toJson());
+    args.putIfAbsent('index', () => index);
+    await _channel.invokeMethod('removeUserScript', args);
+
+    return true;
+  }
+
+  @override
+  Future<void> removeUserScriptsByGroupName({required String groupName}) async {
+    for (final injectionTime in UserScriptInjectionTime.values) {
+      final userScripts = _userScripts[injectionTime];
+      if (userScripts == null) continue;
+      userScripts.removeWhere((userScript) => userScript.groupName == groupName);
+    }
+
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('groupName', () => groupName);
+    await _channel.invokeMethod('removeUserScriptsByGroupName', args);
+  }
+
+  @override
+  Future<void> removeUserScripts({
+    required List<UserScript> userScripts,
+  }) async {
+    for (final userScript in userScripts) {
+      await removeUserScript(userScript: userScript);
+    }
+  }
+
+  @override
+  Future<void> removeAllUserScripts() async {
+    for (final injectionTime in UserScriptInjectionTime.values) {
+      _userScripts[injectionTime]?.clear();
+    }
+
+    await _channel.invokeMethod('removeAllUserScripts', <String, dynamic>{});
   }
 
   @override

@@ -1,16 +1,17 @@
+## Unreleased
+
+- [macOS] The Dart user-script surface is implemented — `addUserScript`, `addUserScripts`, `removeUserScript`, `removeUserScriptsByGroupName` and `removeAllUserScripts` now override `PlatformInAppWebViewController` instead of inheriting its defaults, which throw `UnimplementedError`. The Swift side has always dispatched all five (`InAppWebView.swift` `case "addUserScript"` / `"removeUserScript"` / `"removeUserScriptsByGroupName"` / `"removeAllUserScripts"`), so every Dart-side call died at the first await while the native capability was already in place — the same shape as the `reloadFromOrigin` gap below. A consumer that injects a document-start script and then replaces or clears it by group (zuraffa_browser's live time-zone switch) silently did nothing, and the failure was invisible: the platform default throws before any channel call, so nothing reached the native side to log (zuraffa_browser#996). The overrides mirror the iOS port's bookkeeping: a `_userScripts` map keyed by injection time makes a repeated `addUserScript` a no-op (the native side would stack it), gives `removeUserScript` the index the native case expects, and lets a group removal clear the tracked entries before it dispatches
+- [macOS] A user-script rebuild no longer drops the plugin's own scripts. `WKUserContentController` has no single-script removal, so a removal rebuilds the whole list — and `rebuildUserOnlyScripts()` re-added only the JS bridge, silently discarding the console bridge, the passkeys shim, the print and find-interaction scripts and the web-message scripts along with the group it was asked to remove. Every group removal (`removeUserScriptsByGroupName`, `removeUserScript`, `removeAllUserScripts`) therefore broke console ingestion, passkeys, printing and find-in-page until the next reload. The plugin now tracks what it injects (`pluginUserScripts`) and the rebuild restores that list first, then the Dart-added scripts
+- [macOS] Passkey ceremonies started in a cross-origin iframe resolve instead of hanging (#446 follow-up). App Store Connect runs its ceremony inside an `idmsa.apple.com` iframe, and the legacy reply path answered with a main-frame `evaluateJavaScript` — a reply the iframe's `postMessage` promise never sees, so the page waited for the RP's timeout and rendered the generic "browser needs to be updated" banner. `PasskeyBridge` is now registered through the reply-capable `addScriptMessageHandler(_:contentWorld:name:)` overload (macOS 12+), so WebKit resolves the reply in the frame that sent the request. The new reply-capable entry reads `message.body` through the same `#309` defensive deserializer as every other handler, and it answers a `NotAllowedError` when the bridge is disarmed or the body could not be deserialized instead of silently dropping the reply and hanging the page
+
+
 ## 6.5.0 - 2026-11-18
 
-
 ### Features
-
 - `HeadlessWebViewRegistry.acquire` queues registrations FIFO-style when the registry is full of active instances: it parks the caller until `markIdle`/`evict`/`disposeAll` frees a slot (waking waiters in arrival order), bounded by the new `HeadlessWebViewRegistryConfig.slotAcquireTimeout` (default 30s, `Duration.zero` preserves the immediate `track`-style failure). `track` keeps its loud failure; the queue makes "pool is busy" a wait, not a crash.
-
 ### Bug Fixes
-
 - A headless WebView create at the live cap now recycles the oldest live instance FIFO instead of failing with `headless_cap_exceeded` (iOS/Android): native instances outlive a Dart hot restart (the dead isolate cannot dispose them), so the cap used to stay saturated and refuse every later create for the rest of the process — HTTP pre-initialization among the casualties.
-
 ### Documentation
-
 - The Flutter floor is raised to **3.50.0** (Dart 3.14.0) across all packages: the iOS platform-view "rendering layer confusion" regression is fixed only from Flutter 3.50.0 (#331, upstream `flutter/flutter#193363`). The prior 3.47.0 floor — set by the zuraffa 7.x `meta ^1.19.0` pin (#393) — is superseded; 3.50.0 still satisfies that pin. The `resolve-floor` CI job now pins 3.50.0 and the READMEs document the new minimum.
 ## 6.4.1 - 2026-11-18
 

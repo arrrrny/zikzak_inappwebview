@@ -276,8 +276,14 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
             return nil
         }
         var clientData = ASPublicKeyCredentialClientData(challenge: challenge, origin: caller.origin)
-        clientData.topOrigin = caller.topOrigin
+        // `crossOrigin` must be assigned BEFORE `topOrigin`: the refined
+        // setter validates the top origin against the request's current
+        // cross-origin state and silently drops it while the request still
+        // reads as top-level (observed in the clientDataJSON of an iframe
+        // ceremony: crossOrigin:true present, topOrigin missing — which
+        // relying parties that validate the embedding origin reject).
         clientData.crossOrigin = Self.crossOriginValue(caller.crossOrigin)
+        clientData.topOrigin = caller.topOrigin
         return clientData
     }
 
