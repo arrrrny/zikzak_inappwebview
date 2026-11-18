@@ -216,10 +216,14 @@ void main() {
         );
         expect(
           body,
-          contains('canChooseDirectories = false'),
+          // WORKAROUND (arrrrny/zikzak_inappwebview#452): 9a23c384 changed
+          // the panel to honor `parameters.allowsDirectories` (#408
+          // webkitdirectory support); the expectation below is aligned to
+          // that intentional behavior, not the old hard-coded `false`.
+          contains('canChooseDirectories = parameters.allowsDirectories'),
           reason:
-              'a file input must not pick directories — the other half of '
-              'the mapping this AC pins',
+              'the panel must honor the directories flag WebKit derives '
+              'from the input element (webkitdirectory, #408)',
         );
       },
     );
