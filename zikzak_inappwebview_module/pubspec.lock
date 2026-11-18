@@ -133,10 +133,10 @@ packages:
     dependency: transitive
     description:
       name: cupertino_ui
-      sha256: "369e39a1c5c030a6212589c3da1809920b1c2cfade7b02aade7695bfa4b88c3a"
+      sha256: c3eaf7f5bdfee36deb0b14a4cbf7602f1b6b8d8b8576b81f38fc08c25881c94c
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.6"
+    version: "1.1.7"
   dart_style:
     dependency: transitive
     description:
@@ -377,10 +377,10 @@ packages:
     dependency: transitive
     description:
       name: material_ui
-      sha256: "474c135fd46b56ff1d35ca982155e8863d28fbc6464d1192acf4ee53a738680e"
+      sha256: a6b19012df437a356cbc01f8ea22a105e07194c47c9a6009da0032a0ce35c4ab
       url: "https://pub.dev"
     source: hosted
-    version: "1.11.0"
+    version: "1.11.1"
   meta:
     dependency: transitive
     description:
@@ -634,14 +634,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.2"
-  webview_windows:
-    dependency: transitive
-    description:
-      name: webview_windows
-      sha256: "47fcad5875a45db29dbb5c9e6709bf5c88dcc429049872701343f91ed7255730"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.4.0"
   xdg_directories:
     dependency: transitive
     description:
@@ -664,63 +656,71 @@ packages:
       path: "../zikzak_inappwebview"
       relative: true
     source: path
-    version: "6.3.4"
+    version: "6.5.0"
   zikzak_inappwebview_android:
     dependency: transitive
     description:
       name: zikzak_inappwebview_android
-      sha256: "5bf3a86c21f66a6bf91bb601b7b0cd7bdd941af07095e225ce36105373a6752e"
+      sha256: "721af50a6e569b140292bdb40985848622e1e8dbca85ca96f71c210ac7828b82"
       url: "https://pub.dev"
     source: hosted
-    version: "6.3.4"
+    version: "6.5.0"
   zikzak_inappwebview_ios:
     dependency: transitive
     description:
       name: zikzak_inappwebview_ios
-      sha256: "2cd0a16f9dc0cc89265b8218aabef657982468b01ad805e1d25b53374d0b14c0"
+      sha256: "21f5279a27207c7f0e899b7fa4257c9bd1fdd37f1ec4821527b9e055de191871"
       url: "https://pub.dev"
     source: hosted
-    version: "6.3.4"
+    version: "6.5.0"
   zikzak_inappwebview_linux:
     dependency: transitive
     description:
       name: zikzak_inappwebview_linux
-      sha256: "73a6f063c44239db4f628d36f5a5be0b46b4d6b8b10a28535a726b97684e9ed7"
+      sha256: "809b8c9e9166b8ee0877f28def8e9009c08f6509ef207a581eaeadcdb1f403a9"
       url: "https://pub.dev"
     source: hosted
-    version: "6.3.4"
+    version: "6.5.0"
   zikzak_inappwebview_macos:
     dependency: transitive
     description:
       name: zikzak_inappwebview_macos
-      sha256: "5d75a37c5ed30d59e817dfbc64eb310d17b53c18ad8ef6e75b011d6c0c2ac744"
+      sha256: f91b3ab964902c89410117410ab48a7ca6bafbcc2b4300533c25cc71b283c89e
       url: "https://pub.dev"
     source: hosted
-    version: "6.3.4"
+    version: "6.5.0"
   zikzak_inappwebview_platform_interface:
     dependency: transitive
     description:
       name: zikzak_inappwebview_platform_interface
-      sha256: "50ba4e17cb032b395c7cf1d7903d48cf9fa5402a43a8c3b7d5821350c6c606cb"
+      sha256: "83201a23f1255447b8780c72a6e744222d5e10d73b460b3c3bced012839d7c99"
       url: "https://pub.dev"
     source: hosted
-    version: "6.3.4"
+    version: "6.5.0"
   zikzak_inappwebview_web:
     dependency: transitive
     description:
       name: zikzak_inappwebview_web
-      sha256: a4434bc7d3b9998e0f145af7eec9a86e209b1911da5e4b6042f6f1c22a5b5980
+      sha256: "2bb0f1dc8befb496aed6da5db0241a67379e71b2f9fcffca84ad88fe8cdbca7e"
       url: "https://pub.dev"
     source: hosted
-    version: "6.3.4"
+    version: "6.5.0"
   zikzak_inappwebview_windows:
     dependency: transitive
     description:
       name: zikzak_inappwebview_windows
-      sha256: "228f9ca78198730e937f11594ea2a6a00de77ad782bcca2758cc63c063c48ea4"
+      sha256: a53f71ac5e863b37d2218d650c44f2029e08089d5c9c94c9d973af2a3f569ba3
       url: "https://pub.dev"
     source: hosted
-    version: "6.3.4"
+    version: "6.5.0"
+  zikzak_webview_windows:
+    dependency: transitive
+    description:
+      name: zikzak_webview_windows
+      sha256: "55b3c824def24f914b6332efde777b8458df1b071ebb669c35f0a1b64af2a81b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.5.0"
   zorphy:
     dependency: transitive
     description:
