@@ -1,3 +1,19 @@
+<!-- fleet-agents-pointer:begin -->
+# ⚠️ FLEET RULES — LOAD ~/.agents/AGENTS.md FIRST
+
+Before applying any rule in this file, load and follow `~/.agents/AGENTS.md`
+— the fleet-level rules file every machine carries (synced from
+`arrrrny/skills`, the single source of truth, by `sync-skills` inside
+`kimi-code-update`, 3x/day). It owns the fleet-wide HARD RULES: the
+skills-sync rule (every merge-PR task must check the repo's exposed skills —
+create or update them on exported-behavior changes — and auto-PR them to
+`arrrrny/skills`), the English-only response rule, the GitHub account
+spelling (`arrrrny` = a + exactly 4 r's + ny), and the machine bootstrap
+contract (`arrrrny/scripts` + `arrrrny/skills`). Future fleet-wide rule
+changes are made ONCE in that file — never by editing every repo. Where this
+file and the fleet file disagree, the fleet file wins unless this file is
+MORE restrictive for this repo.
+<!-- fleet-agents-pointer:end -->
 # AGENTS.md — ZikZak InAppWebView
 
 <!-- misfire-rule:begin -->
@@ -178,7 +194,7 @@ It is a **Dart/Flutter monorepo** made of **10 independent pub packages** that f
 - **License:** Apache License 2.0 (see `LICENSE`). Dart source files do NOT carry per-file Apache headers — don't add them.
 - **Homepage / docs:** https://arrrrny.github.io/zikzak_inappwebview
 - **Pub:** https://pub.dev/packages/zikzak_inappwebview
-- **SDK floor (all packages):** `sdk: >=3.8.0 <4.0.0`, `flutter: >=3.47.0` (Dart 3.13.0 — the real minimum since every zuraffa 7.x needs `meta ^1.19.0`, which Flutter only allows from 3.47.0; see #393). Installed toolchain on this machine: Flutter 3.47.7 / Dart 3.13.5.
+- **SDK floor (all packages):** `sdk: >=3.8.0 <4.0.0`, `flutter: >=3.50.0` (Dart 3.14.0 — raised from the 3.47.0 meta-pin minimum because the #331 iOS platform-view "rendering layer confusion" regression is fixed only from Flutter 3.50.0; see #331. The zuraffa 7.x `meta ^1.19.0` pin that set the prior 3.47.0 floor via #393 still holds — 3.50.0 satisfies it). Installed toolchain on this machine: Flutter 3.50.0 / Dart 3.14.0.
 
 ### The JavaScript bridge global
 
@@ -283,7 +299,7 @@ Models were migrated from the old `@ExchangeableObject`/`@ExchangeableEnum` buil
 - **Linux:** C++ (`linux/in_app_webview.cc`, `linux/zikzak_inappwebview_linux_plugin.cc`, `linux/CMakeLists.txt`) over **WPE WebKit** — re-based in 6.4.0 (#420), so the runtime requirement is WPE WebKit 2.50+ with the headless `WPEPlatform` backend (`wpe-webkit-2.0`, `wpe-platform-2.0`, `wpe-platform-headless-2.0`, `wpe-1.0`), not WebKitGTK 2.40+.
 - **Windows:** no own native code — a Dart wrapper over the external `webview_windows` package (plus `path`, `path_provider`). Requires the WebView2 Runtime on the target machine.
 - **Web:** pure Dart using `dart:js_interop` / `package:web` (`^1.1.1`). Some APIs (e.g. screenshot/PDF) are deliberate stubs returning `null`.
-- **Runtime minimums** (from `README.md`): Flutter 3.47.0+, Android API 24+, iOS 15.0+, macOS 12.0+, Windows 10+, Linux WPE WebKit 2.50+, Web any.
+- **Runtime minimums** (from `README.md`): Flutter 3.50.0+, Android API 24+, iOS 15.0+, macOS 12.0+, Windows 10+, Linux WPE WebKit 2.50+, Web any.
 
 ### App-facing Dart organization (umbrella `lib/src/main.dart`)
 Exports are grouped by feature: `in_app_webview`, `in_app_browser`, `chrome_safari_browser`, `web_storage`, `cookie_manager`, `pull_to_refresh`, `web_message`, `web_authentication_session`, `print_job`, `find_interaction`, `service_worker_controller`, `proxy_controller`, `webview_asset_loader`, `tracing_controller`, `process_global_config`, `in_app_localhost_server`, `webview_environment`, `webview_navigation_guards`, `navigation_tracker`, `session_recipe`, `dialogue_dismisser`, plus `webview_sessions` (the `zikzak_session`-backed portable session API, spec 014).
@@ -364,7 +380,7 @@ Every publishable package resolves its intra-repo dependencies through `dependen
 
 Doc staleness to be aware of:
 - `.specify/memory/tdd-profile.md` claims 10 umbrella test files / 112 tests and a green baseline — the umbrella now has 27 files / 250 tests. Treat it as partially outdated.
-- Every package is at `6.4.1`, and README installation snippets match.
+- Every package is at `6.5.0`, and README installation snippets match.
 
 ---
 
@@ -387,7 +403,7 @@ Per `.specify/memory/constitution.md` and `tdd-profile.md`:
 - Analyzer `exclude` lists `build/**` and all native platform dirs (`android/`, `ios/`, `web/`, `macos/`, `windows/`, `linux/`) so native code is not Dart-analyzed.
 - Native style follows each platform's norm: Java (Android), Swift (iOS/macOS) with `#if !os(macOS)` guards where an API is iOS-only (see `INSIGHTS.md` for WKWebView iOS/macOS divergences), C++ (Linux).
 - Commits follow Conventional Commits (`feat(...)`, `fix(...)`, `test(...)`, `refactor(...)`, `docs(...)`); scopes are package- or spec-based (e.g. `test(in_app_webview)`, `fix(android)`, `docs(specs)`, `test(001): ...` referencing a spec number). PRs are merged into `master` via GitHub merge commits (`Merge pull request #NNN from arrrrny/<branch>`); feature branches are named `feat/...`, `fix/...`, or `<NNN>-<slug>`.
-- **CI exists and gates `master`.** `.github/workflows/ci.yml` runs a 21-job matrix (jobs × matrix legs) on every push to `master` and every PR into it: `flutter analyze` and `flutter test` for `platform_interface`, `webview_windows` (the fork), `ios`, `web`, `macos`, `windows`, `linux` and `zikzak_inappwebview` (`web` with `--platform chrome`), plus a `build-ios` job (`macos-15`; `macos-14` was dropped in #412 when its runner image retired) that compiles the iOS Swift sources, a `build-macos` job (`macos-15`) that compiles the macOS Swift sources — both by building the example app from this checkout via a `pubspec_overrides.yaml` path override — and a `resolve-floor` job that pins the declared Flutter floor (3.47.0) and resolves a minimal consumer app (`equatable: ^3.0.0` + this checkout; the #393 repro), asserting path resolution and a nocterm-free zuraffa 7.x. `zikzak_inappwebview_android` is the only published package still outside the matrix. There is no Makefile or Jenkinsfile. The authoritative gate remains running `flutter analyze --no-fatal-infos` + `flutter test` yourself in each affected package before you push.
+- **CI exists and gates `master`.** `.github/workflows/ci.yml` runs a 21-job matrix (jobs × matrix legs) on every push to `master` and every PR into it: `flutter analyze` and `flutter test` for `platform_interface`, `webview_windows` (the fork), `ios`, `web`, `macos`, `windows`, `linux` and `zikzak_inappwebview` (`web` with `--platform chrome`), plus a `build-ios` job (`macos-15`; `macos-14` was dropped in #412 when its runner image retired) that compiles the iOS Swift sources, a `build-macos` job (`macos-15`) that compiles the macOS Swift sources — both by building the example app from this checkout via a `pubspec_overrides.yaml` path override — and a `resolve-floor` job that pins the declared Flutter floor (3.50.0) and resolves a minimal consumer app (`equatable: ^3.0.0` + this checkout; the #393 repro), asserting path resolution and a nocterm-free zuraffa 7.x. `zikzak_inappwebview_android` is the only published package still outside the matrix. There is no Makefile or Jenkinsfile. The authoritative gate remains running `flutter analyze --no-fatal-infos` + `flutter test` yourself in each affected package before you push.
 - The analyze step passes `--no-fatal-infos`: compile **errors and warnings fail the job**, style-level infos do not. A new warning in any matrix package is a red build.
 - **Only `build-ios` and `build-macos` compile Swift.** The other jobs are pure Dart, so a Swift-only break — a bad `#available` scope, an override whose signature stops matching a different SDK, a typo in a `WKDownloadDelegate` method — passes all of them. Run `cd zikzak_inappwebview/example && flutter build ios --release --no-codesign` (or `flutter build macos --debug`) locally when you touch iOS/macOS Swift, and be aware that a local Xcode may be newer than the runner's: the `evaluateJavaScript` override in `InAppWebView.swift` compiled on Xcode 26 and failed on the runner's older SDK, which is exactly the class of bug this job exists to catch. Since #333 the iOS job ran on both `macos-14` (Swift 5.10, compiling the `#else` arm of that override) and `macos-15` (Swift 6, compiling the `#if compiler(>=6.0)` arm); a local Xcode 26 build only ever compiles the latter. **Since #412 the `macos-14` leg is gone** — actions/runner-images retired every macOS 14 image on 2026-11-02 and no hosted pre-Swift-6 runner remains, so `build-ios` is `macos-15`-only and the `#else` arm is no longer compiled in CI. The arm stays in the source on purpose (`Package.swift` declares `swift-tools-version: 5.9`, so Xcode 15 consumers still compile it); re-close the gap by adding a self-hosted or pinned pre-Swift-6 runner to the `build-ios` matrix. The macOS job runs on `macos-15` alone — no macOS source has a `#if compiler` arm, so a second runner would compile the same arm twice — which still leaves the macOS sources compiled against one SDK generation only, the same blind spot the iOS two-runner split used to close.
 - **macOS source-contract tests are not a type-check.** The `zikzak_inappwebview_macos` tests pass on Swift that does not compile: they read the `.swift` files as text and assert on their shape. That is why `build-macos` exists. Treat a green macOS test run as evidence about code *shape*, never as evidence that it compiles — before the `build-macos` job landed, all 73 of them passed while nothing compiled the package at all.
@@ -596,12 +612,12 @@ that makes a drifted constraint fail loudly instead of silently.
 this repo builds against; the DECLARED constraint is what consumers resolve. Pub
 ignores a dependency's lockfile, and a caret constraint does not pin consumers
 to one version. Two things here are deliberate pins, not drift: every package
-declares `sdk: >=3.8.0 <4.0.0` and `flutter: >=3.47.0`, and the Flutter floor
-is the honest minimum because every zuraffa 7.x (via `zuraffa_session`) needs
-`meta ^1.19.0`, which Flutter only allows from 3.47.0 (#393) — a newer local
-toolchain is not a reason to move either floor. Align a constraint upward only
-when a dependency change actually requires it, and preserve the supported lower
-bound otherwise.
+declares `sdk: >=3.8.0 <4.0.0` and `flutter: >=3.50.0`. The Flutter floor is
+3.50.0 rather than the lower 3.47.0 that the zuraffa `meta ^1.19.0` pin would
+allow (#393), because the #331 iOS platform-view rendering regression is fixed
+only from Flutter 3.50.0 — a bug fix the floor's consumers need, not merely a
+newer local toolchain. Align a constraint upward only when a dependency change
+actually requires it, and preserve the supported lower bound otherwise.
 
 **Then look at what is still held back.** `flutter pub outdated` lists every
 package whose declared constraint refuses an available upgrade. Those are the

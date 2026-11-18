@@ -53,10 +53,10 @@ packages:
     dependency: transitive
     description:
       name: cupertino_ui
-      sha256: "369e39a1c5c030a6212589c3da1809920b1c2cfade7b02aade7695bfa4b88c3a"
+      sha256: c3eaf7f5bdfee36deb0b14a4cbf7602f1b6b8d8b8576b81f38fc08c25881c94c
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.6"
+    version: "1.1.7"
   dartx:
     dependency: transitive
     description:
@@ -177,10 +177,10 @@ packages:
     dependency: "direct main"
     description:
       name: material_ui
-      sha256: "474c135fd46b56ff1d35ca982155e8863d28fbc6464d1192acf4ee53a738680e"
+      sha256: a6b19012df437a356cbc01f8ea22a105e07194c47c9a6009da0032a0ce35c4ab
       url: "https://pub.dev"
     source: hosted
-    version: "1.11.0"
+    version: "1.11.1"
   meta:
     dependency: transitive
     description:
@@ -301,11 +301,10 @@ packages:
   zikzak_inappwebview_platform_interface:
     dependency: "direct main"
     description:
-      name: zikzak_inappwebview_platform_interface
-      sha256: "963a6e13270ddaba06b1a8d92ef36fb60bfb4a7c7e131cc9397ddc61dd99f6ec"
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.4.0"
+      path: "../zikzak_inappwebview_platform_interface"
+      relative: true
+    source: path
+    version: "6.5.0"
   zorphy_annotation:
     dependency: transitive
     description:
@@ -316,4 +315,4 @@ packages:
     version: "2.4.6"
 sdks:
   dart: ">=3.13.0 <4.0.0"
-  flutter: ">=3.47.0"
+  flutter: ">=3.50.0"

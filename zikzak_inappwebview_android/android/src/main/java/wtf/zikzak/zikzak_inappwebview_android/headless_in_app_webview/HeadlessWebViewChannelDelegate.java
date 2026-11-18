@@ -23,6 +23,13 @@ public class HeadlessWebViewChannelDelegate extends ChannelDelegateImpl {
 
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
+    // Touch the LRU clock: this instance just received a per-instance call,
+    // so a later eviction recycles the least-recently-used id rather than the
+    // longest-lived one (issue #371 review).
+    if (headlessWebView != null && headlessWebView.plugin != null
+        && headlessWebView.plugin.headlessInAppWebViewManager != null) {
+      headlessWebView.plugin.headlessInAppWebViewManager.touch(headlessWebView.id);
+    }
     switch (call.method) {
       case "dispose":
         if (headlessWebView != null) {
@@ -61,6 +68,18 @@ public class HeadlessWebViewChannelDelegate extends ChannelDelegateImpl {
     if (channel == null) return;
     Map<String, Object> obj = new HashMap<>();
     channel.invokeMethod("onWebViewCreated", obj);
+  }
+
+  /**
+   * Notifies the Dart owner that the native manager evicted this instance to
+   * stay under the live-instance cap (issue #371). Invoked BEFORE the handler
+   * is cleared so the per-instance channel is still routed.
+   */
+  public void onEvicted() {
+    MethodChannel channel = getChannel();
+    if (channel == null) return;
+    Map<String, Object> obj = new HashMap<>();
+    channel.invokeMethod("onEvicted", obj);
   }
 
   @Override

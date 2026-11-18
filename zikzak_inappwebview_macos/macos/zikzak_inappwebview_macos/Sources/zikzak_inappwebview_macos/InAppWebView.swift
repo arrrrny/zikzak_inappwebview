@@ -123,7 +123,7 @@ private func javaScriptExceptionError(_ error: Error) -> FlutterError {
         code: "InAppWebView", message: message, details: details.isEmpty ? nil : details)
 }
 
-public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler, DefensivelyDeserializedScriptMessageHandling, WKUIDelegate, NSMenuDelegate, WKDownloadDelegate {
+public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler, WKScriptMessageHandlerWithReply, DefensivelyDeserializedScriptMessageHandling, WKUIDelegate, NSMenuDelegate, WKDownloadDelegate {
     var channel: FlutterMethodChannel!
     var registrar: FlutterPluginRegistrar? = nil
     var plugin: InAppWebViewFlutterPlugin?
@@ -415,6 +415,22 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
         // Scroll / content-size events (issue #197): posted from JS.
         userContentController.add(
             WeakScriptMessageHandler(delegate: self), name: "onScrollChangedReceived")
+        // Frame-correct passkey replies (issue #446 follow-up): the reply-
+        // capable handler routes its answer to the frame that sent the
+        // message, so a ceremony running in a cross-origin iframe (App Store
+        // Connect's idmsa.apple.com widget) actually receives its
+        // completion. The legacy callHandler reply is a main-frame
+        // evaluateJavaScript that can never reach an iframe's promise.
+        //
+        // The WithReply-only `addScriptMessageHandler(_:contentWorld:name:)`
+        // overload MUST be used: the `add(_:contentWorld:name:)` overload
+        // registers a plain WKScriptMessageHandler, under which postMessage
+        // resolves `undefined` without ever reaching the reply delegate.
+        if #available(macOS 12.0, *) {
+            userContentController.addScriptMessageHandler(
+                WeakReplyScriptMessageHandler(delegate: self), contentWorld: .page,
+                name: "PasskeyBridge")
+        }
 
         let consoleOverrideScript = """
             (function() {
@@ -2667,6 +2683,56 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
     // Internal fallback for direct registration. Every zikzak macOS handler is
     // registered via WeakScriptMessageHandler, which calls the sanitized variant
     // below after defensively deserializing the body (#309).
+    /// Reply-capable passkey bridge entry (macOS 12+). WebKit delivers the
+    /// reply to the frame that posted the message, which is what makes
+    /// iframe ceremonies (ASC's idmsa.apple.com passkey widget) resolvable;
+    /// the legacy `callHandler` path answers with a main-frame
+    /// `evaluateJavaScript` and the iframe's promise hangs until the RP
+    /// page times out into its generic "browser needs to be updated" banner.
+    @available(macOS 12.0, *)
+    public func userContentController(
+        _ userContentController: WKUserContentController, didReceive message: WKScriptMessage,
+        replyHandler: @escaping (Any?, String?) -> Void
+    ) {
+        // #309 — this is a reply-capable entry point registered under a name
+        // ANY page can post to, so it owes the same defensive read of
+        // `message.body` as every plain handler: one touch, inside the ObjC
+        // exception boundary, with non-cloneable values stringified. Reading
+        // the body directly here re-opened the exact crash #309 contains (a
+        // page posting a `DOMException` SIGSEGVs inside
+        // `CloneDeserializer::readDOMException`).
+        let (body, deserializationError) =
+            WeakScriptMessageHandler.defensivelyDeserializeBody(of: message)
+        if let deserializationError {
+            replyHandler(
+                PasskeyBridge.errorResult(name: "SecurityError", message: deserializationError), nil)
+            return
+        }
+        let payload = body as? [String: Any] ?? [:]
+        let argsJson: String
+        if let data = try? JSONSerialization.data(withJSONObject: [payload]) {
+            argsJson = String(data: data, encoding: .utf8) ?? "[{}]"
+        } else {
+            argsJson = "[{}]"
+        }
+        // The handler is registered unconditionally, but `passkeyBridge` only
+        // exists when the creation-time gate armed it (`passkeysGateResult`).
+        // A disarmed webview used to drop the reply on the floor and hang the
+        // page's `postMessage` promise forever; answer with a DOMException-shaped
+        // error the shim rejects, the same way the bridge reports a refusal.
+        guard let passkeyBridge else {
+            replyHandler(
+                PasskeyBridge.errorResult(
+                    name: "NotAllowedError", message: "Passkey bridge is not armed."),
+                nil)
+            return
+        }
+        let caller = PasskeyCallerContext.from(frameInfo: message.frameInfo, mainFrameURL: self.url)
+        passkeyBridge.handleCall(argsJson: argsJson, caller: caller) { result in
+            replyHandler(result, nil)
+        }
+    }
+
     public func userContentController(
         _ userContentController: WKUserContentController, didReceive message: WKScriptMessage
     ) {

@@ -216,11 +216,16 @@ void main() {
         );
         expect(
           body,
+          // 9a23c384 taught the panel to honor `parameters.allowsDirectories`
+          // (#408 webkitdirectory support); this branch carries the same
+          // mapping under the #633 consumer contract, so the expectation is
+          // aligned to that new behavior rather than the old hard-coded
+          // `false`.
           contains('canChooseDirectories = parameters.allowsDirectories'),
           reason:
-              'a webkitdirectory input must be able to pick folders — the '
-              'panel honors the allowsDirectories mapping WebKit derives '
-              'from the input element (#633 consumer contract)',
+              'the panel must honor the directories flag WebKit derives '
+              'from the input element (webkitdirectory #408; #633 consumer '
+              'contract)',
         );
       },
     );

@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
+import 'support/swift_source.dart';
+
 /// Issue #358 — WebAuthn/passkeys via JS→native bridge on macOS.
 ///
 /// WebKit's in-page WKWebView WebAuthn mediation is broken for entitled
@@ -509,6 +511,172 @@ void main() {
         reason:
             'the app-context fallback signs the relying-party origin — the '
             '#446 defect — so choosing it must leave a trace in the log',
+      );
+    });
+  });
+
+  group('iframe ceremonies settle through the reply handler (#446)', () {
+    // The legacy `callHandler` reply is a main-frame `evaluateJavaScript`, so a
+    // ceremony started in App Store Connect's cross-origin idmsa.apple.com
+    // iframe never resolves its `postMessage` promise and the RP page times
+    // out into the generic "browser needs to be updated" banner. macOS
+    // therefore registers `PasskeyBridge` with the reply-capable
+    // `addScriptMessageHandler(_:contentWorld:name:)` overload. These are
+    // source-contract tests: the package cannot compile Swift, so `build-macos`
+    // stays the compile gate.
+    late String source;
+    late String replyHandlerSwift;
+    late String replyHandlerBody;
+
+    setUpAll(() {
+      source = webViewSwift.readAsStringSync();
+      final replyHandlerFile = File(
+        'macos/zikzak_inappwebview_macos/Sources/zikzak_inappwebview_macos/'
+        'WeakReplyScriptMessageHandler.swift',
+      );
+      expect(
+        replyHandlerFile.existsSync(),
+        isTrue,
+        reason: 'WeakReplyScriptMessageHandler.swift not found (#446)',
+      );
+      replyHandlerSwift = replyHandlerFile.readAsStringSync();
+      replyHandlerBody = functionBody(
+        source,
+        'func userContentController(\n'
+        '        _ userContentController: WKUserContentController, didReceive '
+        'message: WKScriptMessage,\n'
+        '        replyHandler: @escaping (Any?, String?) -> Void\n'
+        '    )',
+      );
+    });
+
+    test('registers PasskeyBridge through the reply-capable overload', () {
+      expect(
+        source,
+        matches(
+          RegExp(
+            r'addScriptMessageHandler\(\s*'
+            r'WeakReplyScriptMessageHandler\(delegate: self\),\s*'
+            r'contentWorld: \.page,\s*'
+            r'name: "PasskeyBridge"\s*\)',
+          ),
+        ),
+        reason:
+            'the reply-capable overload is the one that resolves the reply in '
+            'the sending frame; the plain `add(_:name:)` overload would leave '
+            'an iframe ceremony hanging',
+      );
+      expect(
+        source,
+        isNot(
+          matches(
+            RegExp(
+              r'userContentController\.add\([\s\S]{0,200}?name: "PasskeyBridge"',
+            ),
+          ),
+        ),
+        reason:
+            'a plain registration under the same name would shadow the reply '
+            'path: WebKit would deliver the message without a reply handler',
+      );
+    });
+
+    test('the wrapper conforms only to WKScriptMessageHandlerWithReply', () {
+      // A helper that also conforms to the plain protocol resolves the plain
+      // overload at the call site, and WebKit then registers it as plain —
+      // postMessage never reaches the reply delegate.
+      final code = stripSwiftNonCode(replyHandlerSwift);
+      expect(
+        code,
+        contains('WKScriptMessageHandlerWithReply'),
+        reason: 'the wrapper must be reply-capable',
+      );
+      expect(
+        code,
+        isNot(matches(RegExp(r'WKScriptMessageHandler\b'))),
+        reason:
+            'conforming to the plain WKScriptMessageHandler alongside the '
+            'reply-capable one silently downgrades the registration',
+      );
+      expect(
+        code,
+        contains('replyHandler'),
+        reason: 'the wrapper must forward the reply closure to its delegate',
+      );
+    });
+
+    test('the handler reads the body through the #309 sanitizer', () {
+      expect(
+        replyHandlerBody,
+        contains(
+          'WeakScriptMessageHandler.defensivelyDeserializeBody(of: message)',
+        ),
+        reason:
+            'the handler is registered under a name any page can post to, so '
+            'it owes the same defensive read as every plain handler — a page '
+            'posting a DOMException otherwise SIGSEGVs in CloneDeserializer '
+            '(#309)',
+      );
+      expect(
+        replyHandlerBody,
+        isNot(contains('message.body as? [String: Any]')),
+        reason: 'message.body must not be read directly on this path',
+      );
+      expect(
+        replyHandlerBody,
+        contains('deserializationError'),
+        reason:
+            'a body WebKit could not deserialize must be answered, not '
+            'silently turned into an empty payload',
+      );
+    });
+
+    test('a disarmed bridge answers an error instead of hanging the page', () {
+      // The handler is registered unconditionally; `passkeyBridge` exists only
+      // behind the creation-time arming gate. `passkeyBridge?.handleCall(...)`
+      // therefore dropped the reply on the floor and left the page promise
+      // unsettled forever.
+      expect(
+        replyHandlerBody,
+        contains('guard let passkeyBridge else'),
+        reason:
+            'the nil bridge must be handled before it is used, not skipped '
+            'with optional chaining',
+      );
+      expect(
+        replyHandlerBody,
+        contains('Passkey bridge is not armed.'),
+        reason:
+            'the page needs a DOMException-shaped answer the shim can reject; '
+            'a dropped reply is what hangs the ceremony',
+      );
+      expect(
+        replyHandlerBody,
+        isNot(contains('passkeyBridge?.handleCall')),
+        reason:
+            'optional chaining is the hang: it calls nothing and never '
+            'replies',
+      );
+      expect(
+        replyHandlerBody,
+        contains('PasskeyBridge.errorResult('),
+        reason:
+            'the error must be the bridge\'s own error shape, which the shim '
+            'turns back into a DOMException with the right name',
+      );
+    });
+
+    test('every reply path settles the page', () {
+      // A path that returns without calling replyHandler is a hang by
+      // construction — WebKit keeps the reply alive until it is called.
+      final settled = RegExp(r'replyHandler\(').allMatches(replyHandlerBody);
+      expect(
+        settled.length,
+        greaterThanOrEqualTo(3),
+        reason:
+            'expected the normal bridge reply plus the two error replies '
+            '(undeserializable body, disarmed bridge); found '
+            '${settled.length}',
       );
     });
   });

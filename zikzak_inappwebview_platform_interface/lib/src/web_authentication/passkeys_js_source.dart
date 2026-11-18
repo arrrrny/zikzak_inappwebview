@@ -17,6 +17,24 @@ const String passkeysJsSource = r'''
     if (window.__zikzakPasskeysShimInstalled) return;
     window.__zikzakPasskeysShimInstalled = true;
 
+    // Frame-correct reply channel. Where the host registers the
+    // 'PasskeyBridge' script-message handler WITH a reply (the
+    // WKScriptMessageHandlerWithReply API), postMessage returns a promise
+    // that WebKit resolves in the frame that sent the message. The legacy
+    // JS-bridge reply is delivered through a main-frame evaluateJavaScript,
+    // which can never resolve a promise that a cross-origin iframe
+    // registered — the iframe's promise hangs until the relying party's own
+    // timeout, which RP pages report as a generic "browser needs to be
+    // updated" banner (issue #446 follow-up: the App Store Connect passkey
+    // ceremony runs in an idmsa.apple.com iframe).
+    function bridgeCall(payload) {
+        var direct = window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers['PasskeyBridge'];
+        if (direct) {
+            return direct.postMessage(payload);
+        }
+        return window.$javascriptBridgeName.callHandler('PasskeyBridge', payload);
+    }
+
     var B64URL_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
 
     function b64urlEncode(buffer) {
@@ -118,7 +136,7 @@ const String passkeysJsSource = r'''
         }
 
         var payload = encodeBinary(publicKey);
-        var bridgePromise = window.$javascriptBridgeName.callHandler('PasskeyBridge', {
+        var bridgePromise = bridgeCall({
             method: method,
             options: payload
         }).then(function(result) {
@@ -132,7 +150,7 @@ const String passkeysJsSource = r'''
                 // Cancel the outstanding ASAuthorizationController; the
                 // late native resolve is ignored because this promise is
                 // already settled.
-                window.$javascriptBridgeName.callHandler('PasskeyBridge', {method: 'cancel'});
+                bridgeCall({method: 'cancel'}).catch(function() {});
                 reject(new DOMException('The operation was aborted.', 'AbortError'));
             };
             signal.addEventListener('abort', onAbort, {once: true});
@@ -166,7 +184,7 @@ const String passkeysJsSource = r'''
         window.PublicKeyCredential = function() {};
     }
     window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable = function() {
-        return window.$javascriptBridgeName.callHandler('PasskeyBridge', {method: 'isUvPaa'})
+        return bridgeCall({method: 'isUvPaa'})
             .then(function(result) { return !!(result && result.ok && result.available); })
             .catch(function() { return false; });
     };

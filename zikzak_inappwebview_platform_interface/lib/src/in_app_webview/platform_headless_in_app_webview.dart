@@ -20,6 +20,7 @@ class PlatformHeadlessInAppWebViewCreationParams
   const PlatformHeadlessInAppWebViewCreationParams({
     this.initialSize = const Size(-1, -1),
     this.webViewEnvironment,
+    this.onEvicted,
     super.controllerFromPlatform,
     super.windowId,
     super.onWebViewCreated,
@@ -111,6 +112,25 @@ class PlatformHeadlessInAppWebViewCreationParams
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows
   final PlatformWebViewEnvironment? webViewEnvironment;
+
+  ///Event fired when the native manager evicts this headless WebView to stay
+  ///under its live-instance cap.
+  ///
+  ///The native side recycles the least-recently-used instance when a new
+  ///`run()` would exceed the platform ceiling (iOS/Android `3`, macOS `5`). A
+  ///recycled instance is torn down natively, so the owner must settle its own
+  ///lifecycle here instead of discovering the eviction on its next per-instance
+  ///call, which now targets a dead channel.
+  ///
+  ///The callback fires BEFORE the per-instance channel handler is cleared, so a
+  ///platform that routes the eviction notification over the instance channel
+  ///still reaches its Dart owner.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
+  final void Function()? onEvicted;
 }
 
 ///{@template zikzak_inappwebview_platform_interface.PlatformHeadlessInAppWebView}
