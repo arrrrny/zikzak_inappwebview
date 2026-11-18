@@ -81,3 +81,7 @@ flutter:
   # https://flutter.dev/custom-fonts/#from-packages
 
 
+
+dependency_overrides:
+  zikzak_inappwebview_platform_interface:
+    path: ../zikzak_inappwebview_platform_interface
