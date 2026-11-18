@@ -15,6 +15,7 @@
 - [macOS/iOS] The `host:` label is passed to `bracketed` in both passkey bridges — the fixes round on #448 had called it without the label, breaking the Swift build (#448).
 ## Unreleased
 
+- Resolve the main frame before enabling Fetch and retain interception while a navigation callback is registered, preventing first-load stalls and later policy bypasses (#449).
 - Implement native Windows CookieManager operations through WebView2 CDP, including HttpOnly/session cookies, URL-scoped reads, full inventory, expiry conversion, and deletion by domain/path.
 - Register WebViewEnvironment creation and share initialization between cookie operations and visible webviews. Reject incompatible process-wide profile/proxy options.
 
