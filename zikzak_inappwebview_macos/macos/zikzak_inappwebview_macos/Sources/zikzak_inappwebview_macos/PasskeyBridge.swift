@@ -530,6 +530,7 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
     public func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
         let completion = takeCompletion()
         if let registration = authorization.credential as? ASAuthorizationPlatformPublicKeyCredentialRegistration {
+            Self.logClientData("platform registration", registration.rawClientDataJSON)
             completion(["ok": true, "credential": Self.serializeRegistration(
                 credentialID: registration.credentialID,
                 clientDataJSON: registration.rawClientDataJSON,
@@ -539,6 +540,7 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
         }
         if #available(macOS 13.0, *),
            let registration = authorization.credential as? ASAuthorizationSecurityKeyPublicKeyCredentialRegistration {
+            Self.logClientData("security-key registration (hybrid/caBLE)", registration.rawClientDataJSON)
             completion(["ok": true, "credential": Self.serializeRegistration(
                 credentialID: registration.credentialID,
                 clientDataJSON: registration.rawClientDataJSON,
@@ -547,6 +549,7 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
             return
         }
         if let assertion = authorization.credential as? ASAuthorizationPlatformPublicKeyCredentialAssertion {
+            Self.logClientData("platform assertion", assertion.rawClientDataJSON)
             completion(["ok": true, "credential": Self.serializeAssertion(
                 credentialID: assertion.credentialID,
                 clientDataJSON: assertion.rawClientDataJSON,
@@ -558,6 +561,7 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
         }
         if #available(macOS 13.0, *),
            let assertion = authorization.credential as? ASAuthorizationSecurityKeyPublicKeyCredentialAssertion {
+            Self.logClientData("security-key assertion (hybrid/caBLE)", assertion.rawClientDataJSON)
             completion(["ok": true, "credential": Self.serializeAssertion(
                 credentialID: assertion.credentialID,
                 clientDataJSON: assertion.rawClientDataJSON,
@@ -568,6 +572,25 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
             return
         }
         completion(Self.errorResult(name: "NotAllowedError", message: "The authorization returned an unrecognized credential type."))
+    }
+
+    /// PKDBG (cross-device trace): decode the clientDataJSON macOS stamped on
+    /// a returned credential, so a cross-origin relying party mismatch is
+    /// observable — the hybrid/caBLE leg is a SECURITY-KEY credential whose
+    /// client data macOS derives itself, and if it stamps the RP origin
+    /// instead of the calling frame's origin the assertion is rejected
+    /// (App Store Connect's "browser needs to be updated" banner).
+    static func logClientData(_ kind: String, _ data: Data?) {
+        guard let data = data,
+              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+        else {
+            print("[PasskeyBridge][PKDBG] \(kind): clientDataJSON unreadable")
+            return
+        }
+        print("[PasskeyBridge][PKDBG] \(kind): origin=\(json["origin"] ?? "nil") "
+            + "topOrigin=\(json["topOrigin"] ?? "nil") "
+            + "crossOrigin=\(json["crossOrigin"] ?? "nil") "
+            + "type=\(json["type"] ?? "nil") rpId=\(json["rpId"] ?? "nil")")
     }
 
     public func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
