@@ -1,3 +1,13 @@
+## Unreleased
+
+### Fixes
+
+- A headless WebView create at the live cap now recycles the oldest live instance FIFO instead of failing with `headless_cap_exceeded` (iOS/Android): native instances outlive a Dart hot restart (the dead isolate cannot dispose them), so the cap used to stay saturated and refuse every later create for the rest of the process — HTTP pre-initialization among the casualties.
+
+### Features
+
+- `HeadlessWebViewRegistry.acquire` queues registrations FIFO-style when the registry is full of active instances: it parks the caller until `markIdle`/`evict`/`disposeAll` frees a slot (waking waiters in arrival order), bounded by the new `HeadlessWebViewRegistryConfig.slotAcquireTimeout` (default 30s, `Duration.zero` preserves the immediate `track`-style failure). `track` keeps its loud failure; the queue makes "pool is busy" a wait, not a crash.
+
 ## 6.4.1 - 2026-11-18
 
 ### Bug Fixes

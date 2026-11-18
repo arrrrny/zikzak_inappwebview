@@ -17,16 +17,23 @@ public class HeadlessInAppWebViewManager: ChannelDelegate {
     /// Every headless WebView owns a WebContent process and its own navigation
     /// queue, so a per-domain scraper that creates one per host used to grow
     /// without bound until the transport's own navigations stopped committing.
-    /// Creating beyond the cap fails loudly instead of silently growing; the
-    /// Dart-side `HeadlessWebViewRegistry` uses the same platform cap and can
-    /// evict an idle instance before the ceiling is ever reached.
+    /// Creating beyond the cap recycles the oldest live instance instead of
+    /// growing or failing: native instances outlive a Dart hot restart (the
+    /// dead isolate cannot dispose them), so a saturated cap would otherwise
+    /// refuse every later create for the rest of the process. The Dart-side
+    /// `HeadlessWebViewRegistry` uses the same platform cap and can evict an
+    /// idle instance before the ceiling is ever reached.
     static let maxLiveWebViews = 3
 
     var plugin: SwiftFlutterPlugin?
     var webViews: [String: HeadlessInAppWebView?] = [:]
 
-    /// Live ids, oldest registration first — the cap's ordering.
-    private var liveOrder: [String] = []
+    /// Live ids and the last time each was touched (its most recent
+    /// per-instance channel call). The cap recycles the **least-recently-used**
+    /// id, not the longest-lived one: a long-running session is the instance
+    /// most likely to be in use, so registration order (the old FIFO) evicted
+    /// the wrong victim (issue #371 review).
+    private var lastUsed: [String: Date] = [:]
 
     init(plugin: SwiftFlutterPlugin) {
         super.init(channel: FlutterMethodChannel(name: HeadlessInAppWebViewManager.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar!.messenger()))
@@ -52,15 +59,29 @@ public class HeadlessInAppWebViewManager: ChannelDelegate {
                     return
                 }
                 pruneLiveOrder()
-                guard instance(id) != nil || liveOrder.count < HeadlessInAppWebViewManager.maxLiveWebViews else {
-                    result(FlutterError(
-                        code: "headless_cap_exceeded",
-                        message: "headless WebView cap reached",
-                        details: [
-                            "maxLiveWebViews": HeadlessInAppWebViewManager.maxLiveWebViews,
-                            "liveWebViews": liveOrder.count,
-                        ]))
-                    return
+                if instance(id) == nil && liveCount() >= HeadlessInAppWebViewManager.maxLiveWebViews {
+                    // LRU eviction: the create recycles the least-recently-used
+                    // live instance instead of dying at the cap. This is what
+                    // reaps instances orphaned by a Dart hot restart — the
+                    // dead isolate cannot dispose them, so without this the
+                    // cap stays saturated and every later create fails for
+                    // the rest of the process (zikzak_inappwebview headless
+                    // cap queue fix). LRU, not registration-FIFO: a session
+                    // alive since app start is the one most likely in use.
+                    if let victim = leastRecentlyUsedId() {
+                        dispose(id: victim)
+                    }
+                    pruneLiveOrder()
+                    guard liveCount() < HeadlessInAppWebViewManager.maxLiveWebViews else {
+                        result(FlutterError(
+                            code: "headless_cap_exceeded",
+                            message: "headless WebView cap reached",
+                            details: [
+                                "maxLiveWebViews": HeadlessInAppWebViewManager.maxLiveWebViews,
+                                "liveWebViews": liveCount(),
+                            ]))
+                        return
+                    }
                 }
                 run(id: id, params: params) {
                     result(true)
@@ -130,7 +151,12 @@ public class HeadlessInAppWebViewManager: ChannelDelegate {
     public func dispose(id: String) {
         let headlessInAppWebView = instance(id)
         webViews[id] = nil
-        liveOrder.removeAll { $0 == id }
+        lastUsed.removeValue(forKey: id)
+        // Notify the owner over the per-instance channel BEFORE the handler is
+        // cleared: the Dart `HeadlessInAppWebView` keeps `_lifecycle ==
+        // notDisposed` otherwise, so its next setSize/loadUrl would reach a
+        // channel with no handler (issue #371 review).
+        headlessInAppWebView?.notifyEvicted()
         headlessInAppWebView?.dispose()
     }
 
@@ -141,7 +167,7 @@ public class HeadlessInAppWebViewManager: ChannelDelegate {
             headlessWebView?.dispose()
         }
         webViews.removeAll()
-        liveOrder.removeAll()
+        lastUsed.removeAll()
         HeadlessWebViewContainer.shared.dispose()
         plugin = nil
     }
@@ -155,14 +181,33 @@ public class HeadlessInAppWebViewManager: ChannelDelegate {
         return webViews[id] ?? nil
     }
 
+    /// How many live WebViews the cap counts (present map entries).
+    private func liveCount() -> Int {
+        return lastUsed.count
+    }
+
     private func track(id: String) {
-        liveOrder.removeAll { $0 == id }
-        liveOrder.append(id)
+        lastUsed[id] = Date()
+    }
+
+    /// Records that [id] was just used, so a later eviction recycles the
+    /// least-recently-used instance rather than the longest-lived one.
+    func touch(id: String) {
+        if lastUsed[id] != nil {
+            lastUsed[id] = Date()
+        }
+    }
+
+    /// The live id with the oldest last-used timestamp, or `nil` when none.
+    private func leastRecentlyUsedId() -> String? {
+        return lastUsed.min(by: { $0.value < $1.value })?.key
     }
 
     /// Drops ids whose instance disposed itself through the per-instance
     /// channel, so the cap counts live WebViews rather than dead entries.
     private func pruneLiveOrder() {
-        liveOrder.removeAll { instance($0) == nil }
+        for id in lastUsed.keys where instance(id) == nil {
+            lastUsed.removeValue(forKey: id)
+        }
     }
 }

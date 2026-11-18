@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
 import 'headless_in_app_webview.dart';
@@ -27,9 +29,17 @@ class HeadlessWebViewRegistryConfig {
   /// [Duration.zero] disables idle-TTL eviction.
   final Duration idleTtl;
 
+  /// How long [HeadlessWebViewRegistry.acquire] waits FIFO-style for a slot
+  /// when every live instance is active before failing with
+  /// [HeadlessWebViewCapExceededException].
+  ///
+  /// [Duration.zero] fails immediately, matching [track]'s loud failure.
+  final Duration slotAcquireTimeout;
+
   const HeadlessWebViewRegistryConfig({
     required this.maxLiveInstances,
     this.idleTtl = const Duration(seconds: 300),
+    this.slotAcquireTimeout = const Duration(seconds: 30),
   }) : assert(maxLiveInstances >= 1, 'a cap of zero can never be satisfied');
 
   /// Platform-aware defaults (iOS/Android `3`, macOS `5`, everything else `8`).
@@ -87,7 +97,8 @@ class HeadlessWebViewCapExceededException implements Exception {
 ///
 /// This is the core-tier equivalent of the module package's headless pool: a
 /// consumer that depends on `zikzak_inappwebview` alone gets live-instance
-/// tracking, cap enforcement, idle-TTL eviction and a dispose-all — the four
+/// tracking, cap enforcement (evict-the-oldest-idle, fail loudly via [track],
+/// or queue FIFO via [acquire]), idle-TTL eviction and a dispose-all — the
 /// primitives a multi-session headless transport needs (issue #371 R4/R7).
 ///
 /// Registration is explicit:
@@ -120,6 +131,19 @@ class HeadlessWebViewRegistry {
 
   /// Live instances in registration order (oldest first).
   final Map<HeadlessInAppWebView, _RegisteredHeadlessWebView> _entries = {};
+
+  /// FIFO tail of [acquire] calls parked on a full-of-active registry, in
+  /// arrival order. The head is woken when a slot frees.
+  final List<Completer<void>> _slotWaiters = [];
+
+  /// Ids of idle instances whose eviction is already in flight.
+  ///
+  /// Two concurrent [acquire] calls must not both pick the same
+  /// `oldestIdle` and then both await its `dispose()`: the loser would burn
+  /// the eviction and, after the winner freed the slot, be told
+  /// [HeadlessWebViewCapExceededException] as if nothing happened (issue #371
+  /// review). Reserving the id here makes the second caller re-pick.
+  final Set<HeadlessInAppWebView> _evicting = {};
 
   HeadlessWebViewRegistry({
     HeadlessWebViewRegistryConfig? config,
@@ -187,14 +211,112 @@ class HeadlessWebViewRegistry {
     );
   }
 
+  /// Registers [webView], parking FIFO-style when the registry is full of
+  /// **active** instances instead of failing immediately.
+  ///
+  /// This is the queue counterpart of [track]. When the cap is reached with
+  /// an idle instance available it behaves like [track] (evict the oldest
+  /// idle and proceed). When every live instance is active it appends a
+  /// waiter to the FIFO tail and suspends until [markIdle], [evict] or
+  /// [disposeAll] frees a slot, waking waiters in arrival order. The wait is
+  /// bounded by [HeadlessWebViewRegistryConfig.slotAcquireTimeout] — when it
+  /// elapses the waiter is removed and [HeadlessWebViewCapExceededException]
+  /// still fires, so a permanently jammed pool fails loudly rather than
+  /// accumulating parked registrations forever.
+  Future<void> acquire(
+    HeadlessInAppWebView webView, {
+    bool active = false,
+  }) async {
+    // Absolute deadline for the whole call, not a per-park budget: every
+    // spurious wake-up (a `markIdle` on an already-idle instance, an `evict`
+    // of a different id) used to cancel the timer and re-park with a fresh
+    // full `slotAcquireTimeout`, so the documented bound was per-park rather
+    // than per-call (issue #371 review).
+    final deadline = Stopwatch()..start();
+    while (true) {
+      final existing = _entries[webView];
+      if (existing != null) {
+        existing.setActive(active, _clock());
+        return;
+      }
+
+      if (_entries.length < config.maxLiveInstances) {
+        _entries[webView] = _RegisteredHeadlessWebView(
+          active: active,
+          lastUsedAt: _clock(),
+        );
+        return;
+      }
+
+      final oldestIdle = _oldestIdleInstance();
+      if (oldestIdle != null) {
+        // Reserve the candidate before the await so a concurrent caller
+        // cannot pick the same one and double-evict it.
+        _evicting.add(oldestIdle);
+        try {
+          final entry = _entries[oldestIdle];
+          if (entry != null) {
+            await _disposeEntry(oldestIdle, entry);
+          }
+        } finally {
+          _evicting.remove(oldestIdle);
+        }
+        // Only re-check when the eviction actually released the slot: a
+        // failed native dispose keeps the entry (see [_disposeEntry]), and
+        // retrying the same idle instance forever would spin. A call that
+        // freed a slot and lost it to another acquirer re-parks below rather
+        // than reporting a cap failure for work it did (issue #371 review).
+        if (_entries.length < config.maxLiveInstances) {
+          continue;
+        }
+      }
+
+      if (config.slotAcquireTimeout <= Duration.zero ||
+          deadline.elapsed >= config.slotAcquireTimeout) {
+        throw HeadlessWebViewCapExceededException(
+          maxLiveInstances: config.maxLiveInstances,
+          liveCount: _entries.length,
+        );
+      }
+
+      // Full of active instances: park at the FIFO tail until a slot frees,
+      // bounded by the REMAINING budget so the wait is per-call.
+      final remaining = config.slotAcquireTimeout - deadline.elapsed;
+      final waiter = Completer<void>();
+      _slotWaiters.add(waiter);
+      final timer = Timer(remaining, () {
+        _slotWaiters.remove(waiter);
+        if (!waiter.isCompleted) {
+          waiter.completeError(
+            HeadlessWebViewCapExceededException(
+              maxLiveInstances: config.maxLiveInstances,
+              liveCount: _entries.length,
+            ),
+          );
+        }
+      });
+      try {
+        await waiter.future;
+      } finally {
+        timer.cancel();
+        _slotWaiters.remove(waiter);
+      }
+      // Re-check: another acquirer may have taken the freed slot first.
+    }
+  }
+
   /// Marks [webView] as busy: eviction will skip it.
   void markActive(HeadlessInAppWebView webView) {
     _entries[webView]?.setActive(true, _clock());
   }
 
   /// Marks [webView] as idle and restarts its idle-TTL clock.
+  ///
+  /// A newly idle instance is evictable, so the FIFO head of [acquire]
+  /// waiters is woken to re-check for a slot.
   void markIdle(HeadlessInAppWebView webView) {
     _entries[webView]?.setActive(false, _clock());
+    _signalSlotFreed();
   }
 
   /// Disposes [webView] and removes it from the registry.
@@ -204,6 +326,7 @@ class HeadlessWebViewRegistry {
       return;
     }
     await _disposeEntry(webView, entry);
+    _signalSlotFreed();
   }
 
   /// Disposes every idle instance whose idle time exceeds
@@ -245,6 +368,7 @@ class HeadlessWebViewRegistry {
     DateTime? oldestAt;
     for (final entry in _entries.entries) {
       if (entry.value.active) continue;
+      if (_evicting.contains(entry.key)) continue;
       if (oldestAt == null || entry.value.lastUsedAt.isBefore(oldestAt)) {
         oldest = entry.key;
         oldestAt = entry.value.lastUsedAt;
@@ -268,12 +392,27 @@ class HeadlessWebViewRegistry {
         throw error;
       }
       _entries.remove(webView);
+      _signalSlotFreed();
     } catch (error) {
       // Keep the registration and report it. A platform that still throws must
       // not abort the teardown of the remaining registrations either.
       debugPrint(
         '[zikzak_inappwebview] headless registry eviction failed: $error',
       );
+    }
+  }
+
+  /// Completes the longest-waiting [acquire] caller, if any.
+  ///
+  /// Woken waiters re-check the registry themselves; this only hands them
+  /// the turn. Called from every path that makes a slot evictable or free.
+  void _signalSlotFreed() {
+    while (_slotWaiters.isNotEmpty) {
+      final waiter = _slotWaiters.removeAt(0);
+      if (!waiter.isCompleted) {
+        waiter.complete();
+        return;
+      }
     }
   }
 }

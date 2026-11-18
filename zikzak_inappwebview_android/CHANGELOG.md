@@ -436,6 +436,8 @@ Version-line release alongside `zikzak_inappwebview` 6.3.2 — no code changes; 
 ## Unreleased
 
 ### Fixes
+- A headless WebView create at the live cap (3) now recycles the oldest live instance FIFO instead of failing with `headless_cap_exceeded`: native instances outlive a Dart hot restart (the dead isolate cannot dispose them), so the cap used to stay saturated and refuse every later create for the rest of the process. The hard error survives only when eviction cannot free a slot (headless cap queue fix). A source-contract test pins the eviction-before-failure shape.
+
 
 - Harden the WebAuthn/passkey wiring (#272 follow-up): log a warning when `webAuthenticationSupport` is requested but `WebViewFeature.WEB_AUTHENTICATION` is not supported by the installed WebView (init and `setSettings` paths) instead of silently dropping the setting, broaden the compat-call catch to `RuntimeException` so OEM WebView wrappers can never crash the app, and guard the `getSettings()` read-back with the same protection (a missing key still parses as `null` on the Dart side).
 

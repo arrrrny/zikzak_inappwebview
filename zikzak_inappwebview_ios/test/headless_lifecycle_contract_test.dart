@@ -181,6 +181,42 @@ void main() {
       );
     });
 
+    test(
+      'a create at the cap recycles the least-recently-used live instance '
+      '(cap queue)',
+      () {
+        final managers = managerSources();
+        final managerPath = managers.keys.firstWhere(
+          (p) => p.endsWith('HeadlessInAppWebViewManager.swift'),
+        );
+        final manager = managers[managerPath]!;
+
+        expect(
+          manager,
+          contains('leastRecentlyUsedId()'),
+          reason: 'cap queue: a create at the cap evicts the LRU live id, '
+              'not the longest-lived one',
+        );
+        expect(
+          manager,
+          contains('dispose(id: victim)'),
+          reason: 'cap queue: eviction tears down the native WebView, '
+              'not only the map entry',
+        );
+        expect(
+          manager.indexOf('leastRecentlyUsedId()'),
+          lessThan(manager.indexOf('"headless_cap_exceeded"')),
+          reason: 'cap queue: eviction is attempted before the hard failure',
+        );
+        expect(
+          manager,
+          contains('notifyEvicted()'),
+          reason: 'cap queue: the Dart owner is told of the eviction before '
+              'the per-instance handler is cleared',
+        );
+      },
+    );
+
     test('headless views are hosted in a dedicated off-screen container', () {
       final sources = swiftSources();
       final headlessPath = sources.keys.firstWhere(
