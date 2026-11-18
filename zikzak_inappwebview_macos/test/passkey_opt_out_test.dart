@@ -109,7 +109,10 @@ void main() {
 
     test('shim injection is gated on the same switch', () {
       final armedIdx = webView.indexOf('passkeysArmed');
-      final injectionIdx = webView.indexOf('addUserScript(passkeysScript)');
+      // The injection routes through addPluginUserScript (the rebuild
+      // tracker, zuraffa_browser#996 rebase over #384); the literal
+      // userContentController call lives only inside that helper now.
+      final injectionIdx = webView.indexOf('addPluginUserScript(passkeysScript)');
       expect(injectionIdx, greaterThan(-1), reason: 'shim injection not found');
       expect(armedIdx, greaterThan(-1));
       expect(
