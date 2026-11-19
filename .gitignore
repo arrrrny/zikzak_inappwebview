@@ -42,3 +42,6 @@ tool/chromedriver
 tool/chromedriver.*
 .memsearch
 patches
+
+# SwiftPM IDE state (user-specific)
+**/.swiftpm/xcode/xcuserdata/

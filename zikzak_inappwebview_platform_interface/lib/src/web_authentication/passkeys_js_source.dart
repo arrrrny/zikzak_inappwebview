@@ -35,6 +35,22 @@ const String passkeysJsSource = r'''
         return window.$javascriptBridgeName.callHandler('PasskeyBridge', payload);
     }
 
+    // Telemetry over the SAME native bridge (never console: Apple's widget
+    // bundle no-ops console.* in production, and content-world mismatches
+    // swallow console-forwarded lines). Fire-and-forget; the native side
+    // answers {"ok": true} which the promise ignores. The telemetry gate
+    // below is rendered to the native `PasskeyBridge.telemetryEnabled`
+    // static by scripts/generate_passkeys_shim.sh — JS cannot read a Swift
+    // static let, so the generator substitutes the literal flag value.
+    var telemetryEnabled = __PK_TELEMETRY_ENABLED__;
+    function telemetry(message) {
+        if (!telemetryEnabled) return;
+        try {
+            bridgeCall({ method: 'telemetry', options: { text: String(message).slice(0, 1200) } })
+                .catch(function() {});
+        } catch (e) {}
+    }
+
     var B64URL_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
 
     function b64urlEncode(buffer) {
@@ -81,6 +97,10 @@ const String passkeysJsSource = r'''
         return value;
     }
 
+    function bufferToBase64url(buffer) {
+        return b64urlEncode(buffer);
+    }
+
     function buildCredential(c) {
         var response;
         if (c.kind === 'attestation') {
@@ -96,7 +116,7 @@ const String passkeysJsSource = r'''
                 userHandle: c.response.userHandle ? b64urlDecode(c.response.userHandle) : null
             };
         }
-        return {
+        var credential = {
             id: c.id,
             rawId: b64urlDecode(c.rawId),
             type: "public-key",
@@ -104,7 +124,98 @@ const String passkeysJsSource = r'''
             response: response,
             getClientExtensionResults: function() { return c.clientExtensionResults || {}; }
         };
+        // Relying parties (idmsa.apple.com above all) serialize the resolved
+        // credential immediately after the ceremony — either via
+        // credential.toJSON() or JSON.stringify(credential). A plain object
+        // without toJSON makes JSON.stringify emit ArrayBuffer fields as
+        // "{}" and a missing toJSON throws where the widget calls it
+        // directly — either failure surfaces to the user as the generic
+        // "your browser needs to be updated" banner. The spec shape
+        // (PublicKeyCredential.toJSON) base64url-encodes every ArrayBuffer.
+        credential.toJSON = function() {
+            var out = {
+                id: this.id,
+                rawId: bufferToBase64url(this.rawId),
+                type: this.type,
+                authenticatorAttachment: this.authenticatorAttachment,
+                clientExtensionResults: this.getClientExtensionResults(),
+                response: {}
+            };
+            var r = this.response;
+            for (var key in r) {
+                if (Object.prototype.hasOwnProperty.call(r, key)) {
+                    out.response[key] = (r[key] instanceof ArrayBuffer)
+                        ? bufferToBase64url(r[key]) : r[key];
+                }
+            }
+            return out;
+        };
+        return credential;
     }
+
+    // Server-round-trip observability: idmsa.apple.com POSTs the assertion
+    // from inside its own frame; the app's network capture and CDP do not
+    // mirror subframe traffic, so the only reliable vantage is a fetch/XHR
+    // wrapper installed in this frame. Logs the request the RP makes with
+    // the resolved credential and the response status/body-head, so a
+    // server-side rejection ("Can't verify your account") is attributable
+    // to an exact endpoint + payload + status instead of a guess.
+    (function installNetworkLogger() {
+        if (!telemetryEnabled) return; // no wrappers, no bridge traffic by default
+        var origFetch = window.fetch;
+        if (typeof origFetch === 'function') {
+            window.fetch = function(input, init) {
+                var url = (typeof input === 'string') ? input
+                    : (input && input.url) || String(input);
+                var isAuth = url.indexOf('/appleauth/') !== -1
+                    || url.indexOf('/verify/') !== -1;
+                var p = origFetch.call(window, input, init);
+                if (isAuth) {
+                    // A page may pass a Request object with no init — read
+                    // method/body off the Request first, else init, else
+                    // defaults (a bare `init && init.method` logs a
+                    // misleading GET for `fetch(new Request(url, {method:
+                    // 'POST', body}))`).
+                    var method = (init && init.method) || (input && input.method) || 'GET';
+                    var body = (init && init.body) || (input && input.body) || '';
+                    p.then(function(resp) {
+                        var clone = resp.clone();
+                        clone.text().then(function(text) {
+                            telemetry('FETCH ' + method
+                                + ' ' + url + ' -> ' + resp.status
+                                + ' body=' + String(body).slice(0, 300)
+                                + ' resp=' + text.slice(0, 300));
+                        }).catch(function() {
+                            telemetry('FETCH ' + url + ' -> ' + resp.status + ' (body unread)');
+                        });
+                    }).catch(function(err) {
+                        telemetry('FETCH ' + url + ' FAILED ' + err);
+                    });
+                }
+                return p;
+            };
+        }
+        var OrigOpen = XMLHttpRequest.prototype.open;
+        var OrigSend = XMLHttpRequest.prototype.send;
+        XMLHttpRequest.prototype.open = function(method, url) {
+            this.__pkMethod = method;
+            this.__pkUrl = url;
+            return OrigOpen.apply(this, arguments);
+        };
+        XMLHttpRequest.prototype.send = function(body) {
+            var xhr = this;
+            var url = String(xhr.__pkUrl || '');
+            if (url.indexOf('/appleauth/') !== -1 || url.indexOf('/verify/') !== -1) {
+                xhr.addEventListener('loadend', function() {
+                    telemetry('XHR ' + xhr.__pkMethod + ' ' + url
+                        + ' -> ' + xhr.status
+                        + ' body=' + String(body || '').slice(0, 300)
+                        + ' resp=' + String(xhr.responseText || '').slice(0, 300));
+                });
+            }
+            return OrigSend.apply(this, arguments);
+        };
+    })();
 
     function bridgeError(result) {
         var name = (result && result.error && result.error.name) || 'NotAllowedError';
@@ -143,6 +254,39 @@ const String passkeysJsSource = r'''
             if (result && result.ok) return buildCredential(result.credential);
             throw bridgeError(result);
         });
+
+        // Ceremony observability for relying parties that reject silently
+        // (App Store Connect renders its "browser needs to be updated"
+        // banner with no console output when serialization or the server
+        // round-trip fails). Marks resolve/reject on the shim side so a
+        // failed run can be attributed to either the page's use of the
+        // credential (this fires) or a native bridge failure (it does not).
+        bridgePromise.then(
+            function(credential) {
+                // The exact bytes the RP receives, logged over the native
+                // bridge — distinguishes a client-side serialization failure
+                // from a server rejection. Runs here (not after the signal
+                // branch) so ceremonies without an AbortSignal log too.
+                try {
+                    var j = JSON.stringify(credential.toJSON());
+                    telemetry('assertion-toJSON=' + j.slice(0, 900));
+                } catch (e1) {
+                    telemetry('assertion-toJSON THREW: ' + e1.message);
+                }
+                try {
+                    var probe = JSON.stringify(credential);
+                    telemetry('ceremony RESOLVED method=' + method +
+                        ' serializeOK=' + (typeof probe === 'string' && probe.length > 10) +
+                        ' len=' + (probe ? probe.length : 0));
+                } catch (e) {
+                    telemetry('ceremony RESOLVED but serialization threw: ' + e.message);
+                }
+            },
+            function(error) {
+                telemetry('ceremony REJECTED method=' + method +
+                    ' name=' + (error && error.name) + ' msg=' + (error && error.message));
+            }
+        );
 
         if (!signal) return bridgePromise;
         return new Promise(function(resolve, reject) {
@@ -193,5 +337,34 @@ const String passkeysJsSource = r'''
         // sites fall back to modal ceremonies, which ARE bridged.
         return Promise.resolve(false);
     };
+    // idmsa.apple.com's widget calls getClientCapabilities() when present
+    // and reads `hybridTransport` / `passkeyPlatformAuthenticator` off the
+    // result to decide whether passkeys are usable; a missing static reads
+    // as supported (it guards `void 0 !==`), but a throw inside the call is
+    // caught and ALSO reads as supported — so this only formalizes the
+    // capability surface the widget already assumes. Values match what the
+    // bridge actually supports: platform authenticator yes (isUvPaa),
+    // hybrid (QR/phone) yes since the bluetooth entitlement, conditional
+    // get (autofill) no. `userVerifyingPlatformAuthenticator` is a live
+    // `isUvPaa` probe rather than a hardcoded `true`: on a device with no
+    // platform authenticator the probe returns false, and a static `true`
+    // here would disagree with the probe the same widget also calls.
+    if (typeof window.PublicKeyCredential.getClientCapabilities !== 'function') {
+        window.PublicKeyCredential.getClientCapabilities = function() {
+            return window.PublicKeyCredential
+                .isUserVerifyingPlatformAuthenticatorAvailable()
+                .then(function(uv) {
+                    return {
+                        conditionalGet: false,
+                        conditionalCreate: false,
+                        hybridTransport: true,
+                        passkeyPlatformAuthenticator: true,
+                        userVerifyingPlatformAuthenticator: !!uv,
+                        relatedOrigins: false,
+                        signalAvailable: true
+                    };
+                });
+        };
+    }
 })();
 ''';

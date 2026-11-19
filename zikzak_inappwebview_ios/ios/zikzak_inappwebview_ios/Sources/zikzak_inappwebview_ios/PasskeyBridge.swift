@@ -36,6 +36,16 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
     /// also accepted so hand-crafted payloads work.
     static let base64urlMarker = "$b64url"
 
+    /// Read once at first use; the injected PasskeysJS shim interpolates
+    /// this into `var telemetryEnabled = …` so the RP round-trip logger and
+    /// ceremony telemetry exist in the page ONLY under the same env-var
+    /// gate as the native prints. One source of truth for passkey
+    /// diagnostics.
+    static let telemetryEnabled: Bool = {
+        let env = ProcessInfo.processInfo.environment
+        return env["ZURAFFA_PASSKEY_DEBUG"] == "1" || env["ZIKZAK_PASSKEY_DEBUG"] == "1"
+    }()
+
     private weak var webView: InAppWebView?
     private var controller: ASAuthorizationController?
     private var completion: (([String: Any]) -> Void)?

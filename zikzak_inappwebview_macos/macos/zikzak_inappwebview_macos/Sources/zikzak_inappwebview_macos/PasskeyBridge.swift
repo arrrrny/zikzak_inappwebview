@@ -2,6 +2,7 @@ import AuthenticationServices
 import Cocoa
 import Foundation
 import LocalAuthentication
+import ObjectiveC
 import WebKit
 
 /// Issue #358 — WebAuthn/passkey ceremonies over `ASAuthorizationController`.
@@ -27,12 +28,32 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
     /// also accepted so hand-crafted payloads work.
     static let base64urlMarker = "$b64url"
 
+
+    /// Read once at first use; the injected PasskeysJS shim interpolates
+    /// this into `var telemetryEnabled = …` so the RP round-trip logger and
+    /// ceremony telemetry exist in the page ONLY under the same env-var
+    /// gate as the native prints. One source of truth for passkey
+    /// diagnostics.
+    static let telemetryEnabled: Bool = {
+        let env = ProcessInfo.processInfo.environment
+        return env["ZURAFFA_PASSKEY_DEBUG"] == "1" || env["ZIKZAK_PASSKEY_DEBUG"] == "1"
+    }()
+
+    /// Diagnostics gate: ceremony/network tracing prints only when
+    /// ZURAFFA_PASSKEY_DEBUG=1 (or ZIKZAK_PASSKEY_DEBUG=1) is set in the
+    /// process environment. Default OFF — a release app must not log
+    /// credential metadata or RP request/response bodies to stdout.
+    static func pkDebug(_ message: String) {
+        guard telemetryEnabled else { return }
+        print(message)
+    }
     private weak var webView: InAppWebView?
     private var controller: ASAuthorizationController?
     private var completion: (([String: Any]) -> Void)?
 
     init(webView: InAppWebView) {
         self.webView = webView
+        PasskeyClientDataJSONFixer.install()
     }
 
     // MARK: - Entry point
@@ -51,22 +72,55 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
               let args = try? JSONSerialization.jsonObject(with: data) as? [Any],
               let payload = args.first as? [String: Any],
               let method = payload["method"] as? String else {
+            PasskeyBridge.pkDebug("[PKDBG] handleCall: MALFORMED payload "
+                + "(argsJson prefix \(argsJson.prefix(200)))")
             completion(Self.errorResult(name: "TypeError", message: "Malformed PasskeyBridge payload."))
             return
         }
+        PasskeyBridge.pkDebug("[PKDBG] handleCall: method=\(method) "
+            + "caller=\(caller.map { "origin=\($0.origin) topOrigin=\($0.topOrigin ?? "nil") crossOrigin=\($0.crossOrigin)" } ?? "nil")")
         let options = payload["options"] as? [String: Any] ?? [:]
+        let logged = Self.pkCompletion(completion)
         switch method {
         case "create":
-            performCreate(options: options, caller: caller, completion: completion)
+            performCreate(options: options, caller: caller, completion: logged)
         case "get":
-            performGet(options: options, caller: caller, completion: completion)
+            performGet(options: options, caller: caller, completion: logged)
         case "cancel":
             cancelCeremony()
             completion(["ok": true])
         case "isUvPaa":
-            completion(["ok": true, "available": isPlatformAuthenticatorAvailable()])
+            let available = isPlatformAuthenticatorAvailable()
+            PasskeyBridge.pkDebug("[PKDBG] handleCall: isUvPaa -> \(available)")
+            completion(["ok": true, "available": available])
+        case "telemetry":
+            // Fire-and-forget observability channel from the injected shim
+            // (assertion serialization, RP network round-trips inside
+            // cross-origin iframes). Apple's widget no-ops console.* in
+            // production, so console-forwarded lines never arrive — this
+            // rides the same trusted bridge the ceremonies use.
+            let text = (payload["options"] as? [String: Any])?["text"] as? String ?? ""
+            PasskeyBridge.pkDebug("[PKTEL] \(text)")
+            completion(["ok": true])
         default:
+            PasskeyBridge.pkDebug("[PKDBG] handleCall: UNKNOWN method '\(method)'")
             completion(Self.errorResult(name: "TypeError", message: "Unknown PasskeyBridge method '\(method)'."))
+        }
+    }
+
+    /// PKDBG: wrap a completion so every error result the bridge returns is
+    /// visible — ASC's "browser needs to be updated" banner is its client-side
+    /// mapping of a rejected navigator.credentials call, and the error paths
+    /// below were silent.
+    static func pkCompletion(
+        _ completion: @escaping ([String: Any]) -> Void
+    ) -> ([String: Any]) -> Void {
+        return { result in
+            if let ok = result["ok"] as? Bool, !ok,
+               let error = result["error"] as? [String: Any] {
+                PasskeyBridge.pkDebug("[PKDBG] ceremony ERROR: \(error["name"] ?? "?") — \(error["message"] ?? "?")")
+            }
+            completion(result)
         }
     }
 
@@ -233,7 +287,7 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
                     switch $0 {
                     case "usb": return .usb
                     case "nfc": return .nfc
-                    case "ble": return .bluetooth
+                    case "ble", "hybrid", "cable": return .bluetooth
                     default: return nil
                     }
                 }
@@ -275,15 +329,9 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
                 + "origin instead (issue #446)")
             return nil
         }
-        var clientData = ASPublicKeyCredentialClientData(challenge: challenge, origin: caller.origin)
-        // `crossOrigin` must be assigned BEFORE `topOrigin`: the refined
-        // setter validates the top origin against the request's current
-        // cross-origin state and silently drops it while the request still
-        // reads as top-level (observed in the clientDataJSON of an iframe
-        // ceremony: crossOrigin:true present, topOrigin missing — which
-        // relying parties that validate the embedding origin reject).
-        clientData.crossOrigin = Self.crossOriginValue(caller.crossOrigin)
-        clientData.topOrigin = caller.topOrigin
+        var clientData = ASPublicKeyCredentialClientData(challenge: challenge, origin: caller.origin,
+            topOrigin: caller.topOrigin,
+            crossOrigin: Self.crossOriginValue(caller.crossOrigin))
         return clientData
     }
 
@@ -536,6 +584,7 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
     public func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
         let completion = takeCompletion()
         if let registration = authorization.credential as? ASAuthorizationPlatformPublicKeyCredentialRegistration {
+            Self.logClientData("platform registration", registration.rawClientDataJSON)
             completion(["ok": true, "credential": Self.serializeRegistration(
                 credentialID: registration.credentialID,
                 clientDataJSON: registration.rawClientDataJSON,
@@ -545,6 +594,7 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
         }
         if #available(macOS 13.0, *),
            let registration = authorization.credential as? ASAuthorizationSecurityKeyPublicKeyCredentialRegistration {
+            Self.logClientData("security-key registration (hybrid/caBLE)", registration.rawClientDataJSON)
             completion(["ok": true, "credential": Self.serializeRegistration(
                 credentialID: registration.credentialID,
                 clientDataJSON: registration.rawClientDataJSON,
@@ -553,6 +603,7 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
             return
         }
         if let assertion = authorization.credential as? ASAuthorizationPlatformPublicKeyCredentialAssertion {
+            Self.logClientData("platform assertion", assertion.rawClientDataJSON)
             completion(["ok": true, "credential": Self.serializeAssertion(
                 credentialID: assertion.credentialID,
                 clientDataJSON: assertion.rawClientDataJSON,
@@ -564,6 +615,7 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
         }
         if #available(macOS 13.0, *),
            let assertion = authorization.credential as? ASAuthorizationSecurityKeyPublicKeyCredentialAssertion {
+            Self.logClientData("security-key assertion (hybrid/caBLE)", assertion.rawClientDataJSON)
             completion(["ok": true, "credential": Self.serializeAssertion(
                 credentialID: assertion.credentialID,
                 clientDataJSON: assertion.rawClientDataJSON,
@@ -573,11 +625,36 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
                 attachment: "cross-platform")])
             return
         }
+        PasskeyBridge.pkDebug("[PKDBG] authorization: unrecognized credential "
+            + "type \(type(of: authorization.credential))")
         completion(Self.errorResult(name: "NotAllowedError", message: "The authorization returned an unrecognized credential type."))
+    }
+
+    /// PKDBG (cross-device trace): decode the clientDataJSON macOS stamped on
+    /// a returned credential, so a cross-origin relying party mismatch is
+    /// observable — the hybrid/caBLE leg is a SECURITY-KEY credential whose
+    /// client data macOS derives itself, and if it stamps the RP origin
+    /// instead of the calling frame's origin the assertion is rejected
+    /// (App Store Connect's "browser needs to be updated" banner).
+    static func logClientData(_ kind: String, _ data: Data?) {
+        guard let data = data,
+              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+        else {
+            PasskeyBridge.pkDebug("[PKDBG] \(kind): clientDataJSON unreadable")
+            return
+        }
+        PasskeyBridge.pkDebug("[PKDBG] \(kind): origin=\(json["origin"] ?? "nil") "
+            + "topOrigin=\(json["topOrigin"] ?? "nil") "
+            + "crossOrigin=\(json["crossOrigin"] ?? "nil") "
+            + "type=\(json["type"] ?? "nil") rpId=\(json["rpId"] ?? "nil")")
     }
 
     public func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
         let completion = takeCompletion()
+        let nsError = error as NSError
+        PasskeyBridge.pkDebug("[PKDBG] didCompleteWithError: domain=\(nsError.domain) "
+            + "code=\(nsError.code) message=\(nsError.localizedDescription) "
+            + "underlying=\(String(describing: nsError.userInfo[NSUnderlyingErrorKey]))")
         // Every ASAuthorizationError surface (user cancel, timeout, no
         // credentials, not interactive) maps to NotAllowedError per the
         // WebAuthn error contract; the underlying message is preserved for
@@ -630,5 +707,164 @@ public class PasskeyBridge: NSObject, ASAuthorizationControllerDelegate, ASAutho
 
     static func errorResult(name: String, message: String) -> [String: Any] {
         return ["ok": false, "error": ["name": name, "message": message]]
+    }
+}
+
+/// Issue #446 — macOS's `ASPublicKeyCredentialClientData` jsonForOperationType:
+/// emits `{"type","challenge","origin","crossOrigin"}` but NEVER `topOrigin`,
+/// even when the object carries one (verified at the raw ObjC level: every
+/// crossOrigin value, both assignment orders, and re-derived options all
+/// omit the field). Chromium's CollectedClientData contract
+/// (components/webauthn/core/browser/client_data_json.cc) requires
+/// `"crossOrigin":true,"topOrigin":"<top>"` for cross-origin iframe
+/// ceremonies, and relying parties that validate the embedding origin —
+/// App Store Connect's idmsa.apple.com widget above all — reject the
+/// assertion without it. The signature covers the hash of this JSON, so it
+/// cannot be fixed after the fact; the only interception point is the
+/// generator itself.
+///
+/// `ASPublicKeyCredentialClientData` is NS_REFINED_FOR_SWIFT: the Swift
+/// -visible type is a refinement, not the ObjC class, so neither `#selector`
+/// nor an @objc extension nor `Type.self -> AnyClass` work on it. The swizzle
+/// therefore runs entirely at the ObjC runtime level: resolve the class by
+/// its runtime name, save the original IMP, and install a non-capturing
+/// C-ABI replacement with `method_setImplementation`. The replacement calls
+/// the saved original IMP, reads `topOrigin` off the receiver via KVC, and
+/// injects it into the emitted JSON when Apple's own output says
+/// `crossOrigin:true` and the field is absent. Same-origin output passes
+/// through byte-identical.
+enum PasskeyClientDataJSONFixer {
+    /// The original IMP, saved at install time for re-entry. Nil means the
+    /// replacement never runs (install failed), so the static is safe to
+    /// force-unwrap inside the replacement only after a successful install.
+    private static var originalJSONIMP: IMP?
+
+    /// Thread-safe single execution: two InAppWebView instances can init
+    /// concurrently, and a second exchange would capture the replacement as
+    /// the "original" (the ceremony then recurses — the stack overflow in
+    /// Zuraffa-2026-11-18-210521.ips). `static let` is lazy + thread-safe
+    /// (dispatch_once semantics) in Swift.
+    ///
+    /// The closure contains the logic DIRECTLY — it must not call back into
+    /// `install()`, which reads `installOnce` and would re-enter the
+    /// dispatch_once that is currently running (reentrant callout = SIGILL,
+    /// caught live as Zuraffa-2026-11-18-221739.ips).
+    private static let installOnce: Void = {
+        if #available(macOS 13.5, *) {
+            install13_5()
+        } else {
+            // Below 13.5 there is no ASPublicKeyCredentialClientData and no
+            // client-data API at all — the app-context request path runs
+            // there and needs no fix.
+            PasskeyBridge.pkDebug("[PasskeyBridge] clientDataJSON fixer: macOS < 13.5, not installed")
+        }
+    }()
+
+    static func install() {
+        _ = installOnce
+    }
+
+    @available(macOS 13.5, *)
+    private static func install13_5() {
+        // Idempotence is load-bearing: install() runs on every PasskeyBridge
+        // init (one per webview), and a second run would capture THIS
+        // replacement as the "original" — the replacement then re-enters
+        // itself and the ceremony crashes the app with stack overflow
+        // (Zuraffa-2026-11-18-210521.ips).
+        guard !installed else { return }
+        guard let cls: AnyClass = NSClassFromString("ASPublicKeyCredentialClientData"),
+              let method = class_getInstanceMethod(cls, NSSelectorFromString("jsonForOperationType:")) else {
+            PasskeyBridge.pkDebug("[PasskeyBridge] clientDataJSON fixer: class or method not found, not installed")
+            return
+        }
+        originalJSONIMP = method_getImplementation(method)
+        let replacement = unsafeBitCast(replacementIMP, to: IMP.self)
+        method_setImplementation(method, replacement)
+        installed = true
+        PasskeyBridge.pkDebug("[PasskeyBridge] clientDataJSON fixer installed")
+    }
+
+    private static var installed = false
+
+    /// The C-ABI replacement IMP. Non-capturing: it reads state from the
+    /// receiver (KVC) and the saved original IMP (static), so it converts to
+    /// a plain function pointer.
+    private static let replacementIMP: @convention(c) (AnyObject, Selector, UInt) -> NSData = { receiver, sel, operationType in
+        guard let originalIMP = PasskeyClientDataJSONFixer.originalJSONIMP else {
+            return NSData()
+        }
+        let original = unsafeBitCast(
+            originalIMP,
+            to: (@convention(c) (AnyObject, Selector, UInt) -> NSData).self)
+        let appleJSON = original(receiver, sel, operationType)
+        // KVC guard: if Apple renames/removes the backing property in a
+        // future macOS release, value(forKey:) throws an uncatchable
+        // NSUndefinedKeyException and crashes the host. responds(to:) keeps
+        // the fixer a no-op instead.
+        let receiverObject = receiver as? NSObject
+        let topOrigin = (receiverObject?.responds(to: NSSelectorFromString("topOrigin")) == true)
+            ? receiverObject?.value(forKey: "topOrigin") as? String
+            : nil
+        return PasskeyClientDataJSONFixer.injectTopOrigin(
+            originalJSON: appleJSON, topOrigin: topOrigin)
+    }
+
+    /// Parse Apple's emitted JSON, insert `topOrigin` after `crossOrigin`
+    /// when the flag reads true and the field is absent. The emitted JSON is
+    /// Apple's own serialization of the object's state, so its
+    /// `origin`/`crossOrigin` values are authoritative; `topOrigin` is only
+    /// ever ADDED, never rewritten. Same-origin output passes through
+    /// untouched.
+    static func injectTopOrigin(originalJSON: NSData, topOrigin: String?) -> NSData {
+        guard let object = try? JSONSerialization.jsonObject(with: originalJSON as Data),
+              var dict = object as? [String: Any] else {
+            return originalJSON
+        }
+        let crossOrigin = dict["crossOrigin"] as? Bool ?? false
+        guard crossOrigin, dict["topOrigin"] == nil,
+              let topOrigin = topOrigin, !topOrigin.isEmpty else {
+            return originalJSON
+        }
+        // STRING INSERTION, not a Dictionary rebuild: a Dictionary round
+        // trip through JSONSerialization randomizes key order per process
+        // (Swift hashing), and App Store Connect's validator rejected a
+        // clientDataJSON whose challenge sat at the END of the object — the
+        // -900030 browser wall returned on exactly such a run. Chromium's
+        // client_data_json.cc and Safari emit
+        // type,challenge,origin,crossOrigin,topOrigin; Apple's generator
+        // emits type,challenge,origin,crossOrigin — the topOrigin slot is
+        // always right after crossOrigin. So: insert into APPLE'S OWN
+        // emitted bytes at exactly that position and reorder nothing. The
+        // injected value rides Apple's serialization (no escaped slashes).
+        guard let jsonString = String(data: originalJSON as Data, encoding: .utf8) else {
+            return originalJSON
+        }
+        guard let crossRange = jsonString.range(of: "\"crossOrigin\":true") else {
+            // The dict check above confirmed `crossOrigin == true`, so a nil
+            // here means Apple's serialization changed shape (whitespace
+            // after the colon, a reordered key). Returning silently is the
+            // exact class of failure this fixer exists to remove — leave a
+            // gated trace so a future format change is observable instead of
+            // a silent no-op that resurfaces as the -900030 browser wall.
+            PasskeyBridge.pkDebug("[PasskeyBridge] clientDataJSON fixer: crossOrigin anchor not found in Apple JSON — topOrigin NOT injected")
+            return originalJSON
+        }
+        // RFC 8259 string escaping for the injected value (defensive: the
+        // origin is a plain scheme://host string, but stay correct).
+        var escaped = ""
+        for ch in topOrigin.unicodeScalars {
+            switch ch {
+            case .init(34): escaped += "\""
+            case .init(92): escaped += "\\"
+            default: escaped.unicodeScalars.append(ch)
+            }
+        }
+        var result = jsonString
+        result.insert(contentsOf: ",\"topOrigin\":\"\(escaped)\"", at: crossRange.upperBound)
+        guard let data = result.data(using: .utf8) else {
+            return originalJSON
+        }
+        PasskeyBridge.pkDebug("[PasskeyBridge] clientDataJSON fixer: injected topOrigin=\(topOrigin)")
+        return data as NSData
     }
 }

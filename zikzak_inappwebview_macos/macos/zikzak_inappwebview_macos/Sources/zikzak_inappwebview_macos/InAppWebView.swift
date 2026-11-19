@@ -2714,6 +2714,8 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
             return
         }
         let caller = PasskeyCallerContext.from(frameInfo: message.frameInfo, mainFrameURL: self.url)
+        PasskeyBridge.pkDebug("[PKDBG] reply-handler entry: caller="
+            + (caller.map { "origin=\($0.origin) topOrigin=\($0.topOrigin ?? "nil") crossOrigin=\($0.crossOrigin)" } ?? "nil"))
         passkeyBridge.handleCall(argsJson: argsJson, caller: caller) { result in
             replyHandler(result, nil)
         }
@@ -2810,6 +2812,8 @@ public class InAppWebView: WKWebView, WKNavigationDelegate, WKScriptMessageHandl
                 let args = body["args"] as? String ?? "[]"
                 let caller = PasskeyCallerContext.from(
                     frameInfo: message.frameInfo, mainFrameURL: self.url)
+                PasskeyBridge.pkDebug("[PKDBG] script-message entry: bridge=\(passkeyBridge != nil) caller="
+                    + (caller.map { "origin=\($0.origin) topOrigin=\($0.topOrigin ?? "nil") crossOrigin=\($0.crossOrigin)" } ?? "nil"))
                 passkeyBridge?.handleCall(argsJson: args, caller: caller) { [weak self] result in
                     guard let self = self else { return }
                     let jsonData =
