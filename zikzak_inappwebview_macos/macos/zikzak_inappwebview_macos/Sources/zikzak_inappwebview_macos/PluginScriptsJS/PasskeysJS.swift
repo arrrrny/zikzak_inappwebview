@@ -39,10 +39,14 @@ let PASSKEYS_JS_SOURCE = """
         }
         return window.\(JAVASCRIPT_BRIDGE_NAME).callHandler('PasskeyBridge', payload);
     }
+
     // Telemetry over the SAME native bridge (never console: Apple's widget
     // bundle no-ops console.* in production, and content-world mismatches
     // swallow console-forwarded lines). Fire-and-forget; the native side
-    // answers {"ok": true} which the promise ignores.
+    // answers {"ok": true} which the promise ignores. The telemetry gate
+    // below is rendered to the native `PasskeyBridge.telemetryEnabled`
+    // static by scripts/generate_passkeys_shim.sh — JS cannot read a Swift
+    // static let, so the generator substitutes the literal flag value.
     var telemetryEnabled = \(PasskeyBridge.telemetryEnabled);
     function telemetry(message) {
         if (!telemetryEnabled) return;
@@ -121,7 +125,7 @@ let PASSKEYS_JS_SOURCE = """
             id: c.id,
             rawId: b64urlDecode(c.rawId),
             type: "public-key",
-            authenticatorAttachment: c.authenticatorAttachment || "platform",
+            authenticatorAttachment: c.authenticatorAttachment || null,
             response: response,
             getClientExtensionResults: function() { return c.clientExtensionResults || {}; }
         };
@@ -346,18 +350,25 @@ let PASSKEYS_JS_SOURCE = """
     // capability surface the widget already assumes. Values match what the
     // bridge actually supports: platform authenticator yes (isUvPaa),
     // hybrid (QR/phone) yes since the bluetooth entitlement, conditional
-    // get (autofill) no.
+    // get (autofill) no. `userVerifyingPlatformAuthenticator` is a live
+    // `isUvPaa` probe rather than a hardcoded `true`: on a device with no
+    // platform authenticator the probe returns false, and a static `true`
+    // here would disagree with the probe the same widget also calls.
     if (typeof window.PublicKeyCredential.getClientCapabilities !== 'function') {
         window.PublicKeyCredential.getClientCapabilities = function() {
-            return Promise.resolve({
-                conditionalGet: false,
-                conditionalCreate: false,
-                hybridTransport: true,
-                passkeyPlatformAuthenticator: true,
-                userVerifyingPlatformAuthenticator: true,
-                relatedOrigins: false,
-                signalAvailable: true
-            });
+            return window.PublicKeyCredential
+                .isUserVerifyingPlatformAuthenticatorAvailable()
+                .then(function(uv) {
+                    return {
+                        conditionalGet: false,
+                        conditionalCreate: false,
+                        hybridTransport: true,
+                        passkeyPlatformAuthenticator: true,
+                        userVerifyingPlatformAuthenticator: !!uv,
+                        relatedOrigins: false,
+                        signalAvailable: true
+                    };
+                });
         };
     }
 })();

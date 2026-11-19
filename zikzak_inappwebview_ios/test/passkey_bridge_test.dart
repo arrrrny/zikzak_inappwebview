@@ -466,10 +466,17 @@ void main() {
       const bridgeName = 'zikzak_inappwebview';
       String normalize(String text) => text
           // Swift renders \\ as one backslash in the emitted JS; compare
-          // the emitted bytes, then swap both placeholder spellings.
+          // the emitted bytes, then swap both placeholder spellings. The
+          // `__PK_TELEMETRY_ENABLED__` placeholder is rendered to the Swift
+          // `PasskeyBridge.telemetryEnabled` interpolation, which reads as
+          // the literal `true`/`false` once Swift evaluates it — normalize
+          // both the placeholder and its rendered interpolation to the same
+          // token so the canonical and the rendered copies compare equal.
           .replaceAll(r'\\', r'\')
           .replaceAll(r'\(JAVASCRIPT_BRIDGE_NAME)', bridgeName)
-          .replaceAll(r'$javascriptBridgeName', bridgeName);
+          .replaceAll(r'$javascriptBridgeName', bridgeName)
+          .replaceAll('__PK_TELEMETRY_ENABLED__', 'PK_TELEMETRY_GATE')
+          .replaceAll(r'\(PasskeyBridge.telemetryEnabled)', 'PK_TELEMETRY_GATE');
 
       final canonical = normalize(
         extractDartBody(canonicalDart.readAsStringSync()),

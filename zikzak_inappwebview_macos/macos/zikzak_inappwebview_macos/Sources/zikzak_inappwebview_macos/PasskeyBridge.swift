@@ -840,6 +840,13 @@ enum PasskeyClientDataJSONFixer {
             return originalJSON
         }
         guard let crossRange = jsonString.range(of: "\"crossOrigin\":true") else {
+            // The dict check above confirmed `crossOrigin == true`, so a nil
+            // here means Apple's serialization changed shape (whitespace
+            // after the colon, a reordered key). Returning silently is the
+            // exact class of failure this fixer exists to remove — leave a
+            // gated trace so a future format change is observable instead of
+            // a silent no-op that resurfaces as the -900030 browser wall.
+            PasskeyBridge.pkDebug("[PasskeyBridge] clientDataJSON fixer: crossOrigin anchor not found in Apple JSON — topOrigin NOT injected")
             return originalJSON
         }
         // RFC 8259 string escaping for the injected value (defensive: the
@@ -857,7 +864,7 @@ enum PasskeyClientDataJSONFixer {
         guard let data = result.data(using: .utf8) else {
             return originalJSON
         }
-        print("[PasskeyBridge] clientDataJSON fixer: injected topOrigin=\(topOrigin)")
+        PasskeyBridge.pkDebug("[PasskeyBridge] clientDataJSON fixer: injected topOrigin=\(topOrigin)")
         return data as NSData
     }
 }

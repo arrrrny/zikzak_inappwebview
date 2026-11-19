@@ -34,6 +34,7 @@ close_idx = dart.index(chr(10) + Q3, body_start)
 body = dart[body_start:close_idx]
 assert '$javascriptBridgeName' in body, 'placeholder missing from canonical body'
 assert '(JAVASCRIPT_BRIDGE_NAME)' not in body, 'canonical must carry the placeholder, not Swift interpolation'
+assert '__PK_TELEMETRY_ENABLED__' in body, 'telemetry-gate placeholder missing from canonical body'
 
 NL = chr(10)
 header_lines = [
@@ -65,11 +66,21 @@ for target, is_ios in ((os.environ['TARGET_MACOS'], False), (os.environ['TARGET_
     lines.extend(doc_lines)
     lines.append('let PASSKEYS_JS_SOURCE = """')
     for line in body.split(NL):
-        # Named placeholder -> Swift interpolation, then escape the remaining
-        # backslashes so the emitted JS bytes match the canonical exactly.
-        line = line.replace('$javascriptBridgeName', BS + '(JAVASCRIPT_BRIDGE_NAME)')
+        # Escape every literal backslash FIRST, so the emitted JS bytes match
+        # the canonical exactly — then substitute the two named placeholders
+        # with their single-backslash Swift interpolation forms:
+        #   $javascriptBridgeName     -> \(JAVASCRIPT_BRIDGE_NAME)
+        #   __PK_TELEMETRY_ENABLED__   -> \(PasskeyBridge.telemetryEnabled)
+        # Substituting AFTER the escaping pass is what keeps each token's own
+        # leading backslash single; escaping first would turn `\(` into
+        # `\\(`, which does not compile in a Swift multiline string. The
+        # placeholder tokens carry no backslashes, so they survive the
+        # escaping pass untouched and are swapped in cleanly.
         parts = [p.replace(BS, BS + BS) for p in line.split(BS + '(JAVASCRIPT_BRIDGE_NAME)')]
-        lines.append((BS + '(JAVASCRIPT_BRIDGE_NAME)').join(parts))
+        line = (BS + '(JAVASCRIPT_BRIDGE_NAME)').join(parts)
+        line = line.replace('$javascriptBridgeName', BS + '(JAVASCRIPT_BRIDGE_NAME)')
+        line = line.replace('__PK_TELEMETRY_ENABLED__', BS + '(PasskeyBridge.telemetryEnabled)')
+        lines.append(line)
     lines.append('"""')
     if is_ios:
         lines.append('')
