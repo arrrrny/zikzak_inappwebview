@@ -106,6 +106,14 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     weak var fullscreenWindow: UIWindow? // Track the window that entered fullscreen
     var preventGestureDelay = false
     private var isDisposed = false
+    /// KVO keypaths THIS instance has registered (via [observe] in
+    /// `prepare`). `dispose` removes only registered ones: a teardown that
+    /// skips `prepare` (a platform view disposed before its channel ever
+    /// attached — the hidden order-agent webview during fast route churn)
+    /// used to throw an uncatchable NSRangeException ("Cannot remove an
+    /// observer … because it is not registered") and abort the app
+    /// (zik_zak device crash 2026-11-20).
+    private var registeredKvoKeypaths = Set<String>()
 
     /// One-shot callback fired on the FIRST terminal navigation event
     /// (`didFinish` or `didFail`). Used by `HeadlessInAppWebViewManager` to
@@ -493,49 +501,64 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         }
     }
 
+    /// Registers one KVO observation and remembers it for [unobserve].
+    /// Every KVO add/remove in this class MUST go through this pair so a
+    /// dispose without a prepare can never remove an unregistered observer
+    /// (NSRangeException → abort; see the property note above).
+    private func observe(
+        _ target: NSObject, forKeyPath keyPath: String,
+        options: NSKeyValueObservingOptions
+    ) {
+        target.addObserver(self, forKeyPath: keyPath, options: options, context: nil)
+        registeredKvoKeypaths.insert(keyPath)
+    }
+
+    /// Idempotent counterpart of [observe]: removes the observation only
+    /// when this instance actually registered it.
+    private func unobserve(_ target: NSObject, forKeyPath keyPath: String) {
+        guard registeredKvoKeypaths.remove(keyPath) != nil else { return }
+        target.removeObserver(self, forKeyPath: keyPath)
+    }
+
     public func prepare() {
         scrollView.addGestureRecognizer(self.longPressRecognizer)
         scrollView.addGestureRecognizer(self.recognizerForDisablingContextMenuOnLinks)
         scrollView.addGestureRecognizer(self.panGestureRecognizer)
-        scrollView.addObserver(
-            self, forKeyPath: #keyPath(UIScrollView.contentOffset), options: [.new, .old],
-            context: nil)
-        scrollView.addObserver(
-            self, forKeyPath: #keyPath(UIScrollView.zoomScale), options: [.new, .old], context: nil)
-        scrollView.addObserver(
-            self, forKeyPath: #keyPath(UIScrollView.contentSize), options: [.new, .old],
-            context: nil)
+        observe(
+            scrollView, forKeyPath: #keyPath(UIScrollView.contentOffset),
+            options: [.new, .old])
+        observe(
+            scrollView, forKeyPath: #keyPath(UIScrollView.zoomScale),
+            options: [.new, .old])
+        observe(
+            scrollView, forKeyPath: #keyPath(UIScrollView.contentSize),
+            options: [.new, .old])
 
-        addObserver(
+        observe(
             self,
             forKeyPath: #keyPath(WKWebView.estimatedProgress),
-            options: .new,
-            context: nil)
+            options: .new)
 
-        addObserver(
+        observe(
             self,
             forKeyPath: #keyPath(WKWebView.url),
-            options: [.new, .old],
-            context: nil)
+            options: [.new, .old])
 
-        addObserver(
+        observe(
             self,
             forKeyPath: #keyPath(WKWebView.title),
-            options: [.new, .old],
-            context: nil)
+            options: [.new, .old])
 
         if #available(iOS 15.0, *) {
-            addObserver(
+            observe(
                 self,
                 forKeyPath: #keyPath(WKWebView.cameraCaptureState),
-                options: [.new, .old],
-                context: nil)
+                options: [.new, .old])
 
-            addObserver(
+            observe(
                 self,
                 forKeyPath: #keyPath(WKWebView.microphoneCaptureState),
-                options: [.new, .old],
-                context: nil)
+                options: [.new, .old])
         }
 
         if #unavailable(iOS 16.0) {
@@ -558,10 +581,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         // fullscreen detection mechanism — including iframe-based video
         // fullscreen like YouTube. They are not dead code; do not remove.
         if #available(iOS 16.0, *) {
-            addObserver(self,
+            observe(self,
                 forKeyPath: #keyPath(WKWebView.fullscreenState),
-                options: [.new, .old],
-                context: nil)
+                options: [.new, .old])
         }
 
         // listen for videos playing in fullscreen
@@ -4529,19 +4551,19 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         channelDelegate?.dispose()
         channelDelegate = nil
         runWindowBeforeCreatedCallbacks()
-        removeObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress))
-        removeObserver(self, forKeyPath: #keyPath(WKWebView.url))
-        removeObserver(self, forKeyPath: #keyPath(WKWebView.title))
+        unobserve(self, forKeyPath: #keyPath(WKWebView.estimatedProgress))
+        unobserve(self, forKeyPath: #keyPath(WKWebView.url))
+        unobserve(self, forKeyPath: #keyPath(WKWebView.title))
         if #available(iOS 15.0, *) {
-            removeObserver(self, forKeyPath: #keyPath(WKWebView.cameraCaptureState))
-            removeObserver(self, forKeyPath: #keyPath(WKWebView.microphoneCaptureState))
+            unobserve(self, forKeyPath: #keyPath(WKWebView.cameraCaptureState))
+            unobserve(self, forKeyPath: #keyPath(WKWebView.microphoneCaptureState))
         }
         if #available(iOS 16.0, *) {
-            removeObserver(self, forKeyPath: #keyPath(WKWebView.fullscreenState))
+            unobserve(self, forKeyPath: #keyPath(WKWebView.fullscreenState))
         }
-        scrollView.removeObserver(self, forKeyPath: #keyPath(UIScrollView.contentOffset))
-        scrollView.removeObserver(self, forKeyPath: #keyPath(UIScrollView.zoomScale))
-        scrollView.removeObserver(self, forKeyPath: #keyPath(UIScrollView.contentSize))
+        unobserve(scrollView, forKeyPath: #keyPath(UIScrollView.contentOffset))
+        unobserve(scrollView, forKeyPath: #keyPath(UIScrollView.zoomScale))
+        unobserve(scrollView, forKeyPath: #keyPath(UIScrollView.contentSize))
         resumeTimers()
         stopLoading()
         disposeWebMessageChannels()
