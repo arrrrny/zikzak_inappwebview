@@ -18,10 +18,33 @@ public class ProxyManager: ChannelDelegate {
 
     private var plugin: InAppWebViewFlutterPlugin?
 
-    /// Per-profile proxy configurations keyed by persistentStoreIdentifier.
-    /// When a WebView is created with a custom data store, the proxy for its
-    /// identifier is applied to that data store.
+    /// Per-profile proxy configurations keyed by persistentStoreIdentifier
+    /// (mirrors the iOS ProxyManager). When a WebView is created with a
+    /// custom data store, the proxy for its identifier is applied to that
+    /// data store by `applyProxy(forIdentifier:to:)` — without the registry
+    /// the configuration only ever reached the default store, and isolated
+    /// profiles egressed directly.
     static var profileProxies: [String: ProxyConfiguration] = [:]
+
+    /// Data stores created for a persistent identifier, held weakly so the
+    /// registry never keeps a store alive. `setProxyOverride` writes the new
+    /// configuration onto every live store of the profile, which covers
+    /// stores created BEFORE the override: the creation-time apply reached
+    /// only stores made afterwards, WebKit applies `proxyConfigurations`
+    /// only to loads started after the write, and a reload alone reroutes
+    /// nothing — an already-open tab of an isolated profile kept egressing
+    /// on the old route no matter how many times the app reloaded it (the
+    /// "proxy applies only to new tabs" defect, zuraffa_browser#1066; iOS
+    /// parity zikzak_inappwebview#410).
+    private static var liveStores: [String: NSHashTable<WKWebsiteDataStore>] = [:]
+
+    /// Canonical registry key. `persistentUUID(from:)` trims an identifier
+    /// before mapping it to a store, so the registry must trim too: a padded
+    /// `persistentStoreIdentifier` and a padded `profileId` address the same
+    /// on-disk store, and an untrimmed key would make them miss each other.
+    private static func registryKey(_ identifier: String) -> String {
+        identifier.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
 
     init(plugin: InAppWebViewFlutterPlugin) {
         super.init(
@@ -40,10 +63,21 @@ public class ProxyManager: ChannelDelegate {
                 let profileId = arguments?["profileId"] as? String
                 do {
                     let proxyConfiguration = try resolveProxyConfiguration(settings)
-                    if let pid = profileId, !pid.isEmpty {
+                    if let pid = profileId.map(ProxyManager.registryKey), !pid.isEmpty {
                         ProxyManager.profileProxies[pid] = proxyConfiguration
+                        // Live stores of this profile get the new route now,
+                        // so a change reaches tabs whose data store already
+                        // exists — the reload the app issues re-routes only
+                        // because the store itself learned the route (issue
+                        // #1066; iOS parity zikzak_inappwebview#410). The
+                        // shared store is NOT touched: a per-profile route
+                        // must never leak onto the store every identifier-less
+                        // profile uses (bug #159's class).
+                        ProxyManager.applyProxyToLiveStores(
+                            forIdentifier: pid, configuration: proxyConfiguration)
+                    } else {
+                        WKWebsiteDataStore.default().proxyConfigurations = [proxyConfiguration]
                     }
-                    WKWebsiteDataStore.default().proxyConfigurations = [proxyConfiguration]
                     result(true)
                 } catch let error as ProxyConfigurationError {
                     result(FlutterError(code: error.code, message: error.message, details: nil))
@@ -58,11 +92,23 @@ public class ProxyManager: ChannelDelegate {
                 result(false)
             }
         case "clearProxyOverride":
+            // Symmetric with the set path: an empty identifier is not a
+            // scoped clear, so it wipes the registry like a bare clear does
+            // instead of removing a "" key that no entry ever uses.
             if let args = arguments as? [String: Any],
-               let profileId = args["profileId"] as? String {
-                ProxyManager.profileProxies.removeValue(forKey: profileId)
+               let profileId = args["profileId"] as? String,
+               !ProxyManager.registryKey(profileId).isEmpty {
+                let key = ProxyManager.registryKey(profileId)
+                ProxyManager.profileProxies.removeValue(forKey: key)
+                ProxyManager.liveStores.removeValue(forKey: key)?.allObjects.forEach {
+                    $0.proxyConfigurations = []
+                }
             } else {
                 ProxyManager.profileProxies.removeAll()
+                ProxyManager.liveStores.values.flatMap { $0.allObjects }.forEach {
+                    $0.proxyConfigurations = []
+                }
+                ProxyManager.liveStores.removeAll()
             }
             WKWebsiteDataStore.default().proxyConfigurations = []
             result(true)
@@ -71,11 +117,31 @@ public class ProxyManager: ChannelDelegate {
         }
     }
 
-    /// Applies the stored proxy configuration for [identifier] to [dataStore].
-    /// Called by the WebView factory when a custom data store is created.
+    /// Applies the stored proxy configuration for [identifier] to [dataStore]
+    /// and registers the store as live for that identifier, so a later
+    /// `setProxyOverride` can reach it (mirrors the iOS port; issue #410
+    /// design). Called by the WebView factory when a custom data store is
+    /// created.
     public static func applyProxy(forIdentifier identifier: String, to dataStore: WKWebsiteDataStore) {
-        guard let config = profileProxies[identifier] else { return }
+        let key = registryKey(identifier)
+        guard !key.isEmpty else { return }
+        registerLiveStore(dataStore, forKey: key)
+        guard let config = profileProxies[key] else { return }
         dataStore.proxyConfigurations = [config]
+    }
+
+    private static func registerLiveStore(_ dataStore: WKWebsiteDataStore, forKey key: String) {
+        let table = liveStores[key] ?? NSHashTable<WKWebsiteDataStore>.weakObjects()
+        table.add(dataStore)
+        liveStores[key] = table
+    }
+
+    private static func applyProxyToLiveStores(
+        forIdentifier identifier: String, configuration: ProxyConfiguration
+    ) {
+        liveStores[registryKey(identifier)]?.allObjects.forEach {
+            $0.proxyConfigurations = [configuration]
+        }
     }
 
     private func resolveProxyConfiguration(_ settings: ProxySettings) throws -> ProxyConfiguration {
