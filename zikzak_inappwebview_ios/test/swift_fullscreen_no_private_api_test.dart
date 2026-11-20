@@ -186,12 +186,21 @@ void main() {
   group('issue #395 R3 — fullscreenState KVO on iOS 16+', () {
     test('fullscreenState is observed, handled and unregistered', () {
       final code = stripSwiftNonCode(view);
+      // KVO registration/removal flows through the observe()/unobserve()
+      // helpers (a dispose without a prepare must never remove an
+      // unregistered observer → NSRangeException → abort). The helpers are
+      // the contract now, so the fullscreenState observer is asserted
+      // through them, not through a raw addObserver/removeObserver pair.
+      expect(code, contains('private func observe('),
+          reason: 'KVO registration must flow through the idempotent helper');
+      expect(code, contains('private func unobserve('),
+          reason: 'KVO removal must flow through the idempotent helper');
       expect(
           code,
           contains(
-              'addObserver(self,\n                forKeyPath: #keyPath(WKWebView.fullscreenState)'),
+              'observe(self,\n                forKeyPath: #keyPath(WKWebView.fullscreenState)'),
           reason: 'the fullscreenState KVO observer is registered on iOS 16+');
-      expect(code, contains('removeObserver(self, forKeyPath: #keyPath(WKWebView.fullscreenState))'),
+      expect(code, contains('unobserve(self, forKeyPath: #keyPath(WKWebView.fullscreenState))'),
           reason: 'dispose() must unregister the observer');
       expect(code, contains('.enteringFullscreen'));
       expect(code, contains('.exitingFullscreen'));
