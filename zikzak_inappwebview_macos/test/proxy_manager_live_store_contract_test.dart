@@ -120,12 +120,20 @@ String functionBody(String code, int start) {
 }
 
 /// Returns the text of the `switch` case starting at [start], up to the next
-/// `case "` marker (or the end of the source). [functionBody] stops at the
-/// first `{`, which for a case body is the first `if`/`do` block — not the
-/// whole case, so it cannot prove anything about the branches after it.
+/// `case "` marker, the enclosing switch's `default:`, or the end of the
+/// source — whichever comes first. [functionBody] stops at the first `{`,
+/// which for a case body is the first `if`/`do` block — not the whole case, so
+/// it cannot prove anything about the branches after it. Bounding at `default:`
+/// as well as at the next `case "` is what keeps a LAST-case span (no
+/// following `case "`) from swallowing the helper functions below the switch,
+/// whose identical tokens would otherwise satisfy every assertion.
 String caseSpan(String code, int start) {
   final next = code.indexOf('case "', start + 1);
-  return code.substring(start, next == -1 ? code.length : next);
+  final def = code.indexOf('default:', start + 1);
+  var end = code.length;
+  if (next != -1 && next < end) end = next;
+  if (def != -1 && def < end) end = def;
+  return code.substring(start, end);
 }
 
 /// Locates the macOS package root (`macos/zikzak_inappwebview_macos`)
@@ -298,11 +306,21 @@ void main() {
           reason:
               'a global clear (no profileId) must wipe the whole registry (issue #410)',
         );
+        // Assert the scoped live-store write by a shape only the clear
+        // produces. `liveStores[key]?.allObjects` addresses one profile's
+        // table; the set path goes through applyProxyToLiveStores and the
+        // global branch iterates liveStores.values, so neither satisfies
+        // this. A bare `contains('liveStores')` would also be satisfied by
+        // the helper functions below the switch — which is exactly why the
+        // earlier pin could not fail (see the caseSpan bound above).
         expect(
           clearBody,
-          contains('liveStores'),
+          contains('liveStores[key]?.allObjects'),
           reason:
-              'the clear must reach the live stores too — a cleared proxy that still sits on a running store is the same non-immediate bug in reverse (backlog #24)',
+              'the scoped clear must reach THIS profile\'s live stores and keep '
+              'its registry entry — a cleared proxy left on a running store is '
+              'the same non-immediate bug in reverse, and dropping the entry '
+              'orphans the store so the next set writes nothing (backlog #24)',
         );
         expect(
           clearBody,
@@ -326,11 +344,25 @@ void main() {
           reason:
               'a bare clear (no profileId) must reach every registered store, not only the default one (backlog #24)',
         );
+        // Tie the prune assertion to its receiver. A bare `contains('removeAll()')`
+        // is also satisfied by profileProxies.removeAll() in the scoped branch,
+        // so deleting liveStores.removeAll() alone would leave this green — the
+        // empty-table pruning its reason describes would then be pinned by
+        // nothing. Scan from the profileProxies prune forward: the liveStores
+        // prune must follow it in the global branch.
+        final globalStart = clearBody.indexOf(
+          'ProxyManager.profileProxies.removeAll()',
+        );
         expect(
-          clearBody,
-          contains('removeAll()'),
+          globalStart,
+          greaterThanOrEqualTo(0),
+          reason: 'the global registry prune is missing',
+        );
+        expect(
+          clearBody.substring(globalStart),
+          contains('liveStores.removeAll()'),
           reason:
-              'the released registry must not keep growing — a weak table that is never pruned is a leak of empty entries',
+              'the global clear must prune the registry it just released — a weak table that is never pruned is a leak of empty entries',
         );
       });
 

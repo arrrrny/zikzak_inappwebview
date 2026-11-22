@@ -58,7 +58,21 @@ public class ProxyManager: ChannelDelegate {
                 let profileId = arguments?["profileId"] as? String
                 do {
                     let proxyConfiguration = try resolveProxyConfiguration(settings)
-                    if let pid = profileId.map(ProxyManager.registryKey), !pid.isEmpty {
+                    if let pid = profileId.map(ProxyManager.registryKey) {
+                        // A profileId was supplied. Reject one that is blank
+                        // after the trim: canonicalising before the emptiness
+                        // test would otherwise drop a whitespace-only id into
+                        // the else below and stamp the route onto the shared
+                        // store — a fleet-wide proxy from a malformed id.
+                        // "Absent" (no profileId) is the only global set.
+                        guard !pid.isEmpty else {
+                            result(
+                                FlutterError(
+                                    code: "INVALID_PROFILE_ID",
+                                    message: "profileId must not be blank.",
+                                    details: nil))
+                            return
+                        }
                         ProxyManager.profileProxies[pid] = proxyConfiguration
                         // Live stores of this profile get the new route now,
                         // so a toggle reaches WebViews whose data store
@@ -93,7 +107,13 @@ public class ProxyManager: ChannelDelegate {
                !ProxyManager.registryKey(profileId).isEmpty {
                 let key = ProxyManager.registryKey(profileId)
                 ProxyManager.profileProxies.removeValue(forKey: key)
-                ProxyManager.liveStores.removeValue(forKey: key)?.allObjects.forEach {
+                // Keep the registry entry: the store is weak and still owned
+                // by the profile's live WebViews, and applyProxy only runs at
+                // store creation — so dropping the entry here would orphan the
+                // store and a later set for this profile would write nothing
+                // (the second proxy toggle regresses). Clear the configs only;
+                // a dead store reads nil here once its WebViews are gone.
+                ProxyManager.liveStores[key]?.allObjects.forEach {
                     $0.proxyConfigurations = []
                 }
             } else {
@@ -103,6 +123,15 @@ public class ProxyManager: ChannelDelegate {
                 }
                 ProxyManager.liveStores.removeAll()
             }
+            // The shared (identifier-less) store is cleared on BOTH branches,
+            // deliberately asymmetric with the set path above. zuraffa_browser
+            // issues a shared clear by calling clearProxyOverride with a
+            // non-empty sentinel profileId (browser_home.dart's
+            // _sharedProxyClearSentinel), chosen precisely because a bare clear
+            // would wipe the whole per-profile registry; it relies on this line
+            // to reset WKWebsiteDataStore.default(). Moving it into the else
+            // branch would turn that shared clear into a no-op. Keep it here
+            // unless the consumer is taught a dedicated shared-clear path.
             WKWebsiteDataStore.default().proxyConfigurations = []
             result(true)
         default:
