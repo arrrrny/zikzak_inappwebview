@@ -40,7 +40,7 @@ interface CreationArguments {
 }
 interface SourceArguments { source: string; }
 interface FileArguments { assetFilePath: string; }
-interface JsCall { handlerName: string; args: Object[]; }
+interface JsCall { handlerName: string; args: Object[]; callId: number; documentId: string; }
 interface WebEvent {
   url?: string;
   method?: string;
@@ -61,8 +61,23 @@ interface WebEvent {
 interface Completion { resolve: () => void; reject: (error: Error) => void; }
 
 const BRIDGE = `(() => {
-  const callHandler = (handlerName, ...args) =>
-    globalThis.__zikzakArkWeb.callHandler(JSON.stringify({handlerName,args})).then(JSON.parse);
+  const documentId = crypto.randomUUID();
+  let sequence = 0;
+  const pending = new Map();
+  const callHandler = (handlerName, ...args) => new Promise((resolve,reject) => {
+    const callId = ++sequence;
+    pending.set(callId,{resolve,reject});
+    try { globalThis.__zikzakArkWeb.callHandler(JSON.stringify({handlerName,args,callId,documentId})); }
+    catch(error) { pending.delete(callId); reject(error); }
+  });
+  globalThis.__zikzakArkWebReply = (owner,id,success,value) => {
+    if(owner!==documentId) return;
+    const operation=pending.get(id);
+    if(!operation) return;
+    pending.delete(id);
+    if(success) operation.resolve(JSON.parse(value));
+    else operation.reject(new Error(value));
+  };
   globalThis.zikzak_inappwebview = {callHandler};
   window.dispatchEvent(new Event('flutterInAppWebViewPlatformReady'));
 })();`;
@@ -184,9 +199,22 @@ export class ArkWebView extends PlatformView {
       });
     });
   }
-  async callHandler(message: string): Promise<string> {
+  callHandler(message: string): string {
     const call: JsCall = JSON.parse(message);
-    return await this.ask('onCallJsHandler', {handlerName: call.handlerName, args: call.args}) as string;
+    this.ask('onCallJsHandler', {handlerName: call.handlerName, args: call.args})
+      .then((value) => this.replyToJavaScript(call, true, value as string))
+      .catch((error: Error) => this.replyToJavaScript(call, false, error.message));
+    return '';
+  }
+  private async replyToJavaScript(call: JsCall, success: boolean, value: string): Promise<void> {
+    if (this.model.disposed) return;
+    try {
+      // Resolve in a new JS task: a handler may immediately call another
+      // native handler, which must not re-enter an active runJavaScript call.
+      await this.controller.runJavaScript(`setTimeout(()=>window.__zikzakArkWebReply?.(${JSON.stringify(call.documentId)},${call.callId},${success},${JSON.stringify(value)}),0)`);
+    } catch (error) {
+      console.error(`ArkWeb JavaScript reply failed: ${(error as Error).message}`);
+    }
   }
 
   navigation(request: WebResourceRequest): boolean {
@@ -343,7 +371,7 @@ struct ArkWebComponent {
           .backgroundColor(this.model.settings.transparentBackground ? Color.Transparent : Color.White)
           .runJavaScriptOnDocumentStart(this.model.documentScripts(0))
           .runJavaScriptOnDocumentEnd(this.model.documentScripts(1))
-          .javaScriptProxy({object: this.model.view, name: '__zikzakArkWeb', methodList: [], asyncMethodList: ['callHandler'], controller: this.model.view.controller})
+          .javaScriptProxy({object: this.model.view, name: '__zikzakArkWeb', methodList: ['callHandler'], controller: this.model.view.controller})
           .onControllerAttached(() => {
             const agent = this.model.settings.userAgent;
             if (agent != null) this.model.view.controller.setCustomUserAgent(agent);

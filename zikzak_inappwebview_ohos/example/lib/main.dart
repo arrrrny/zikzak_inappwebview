@@ -21,6 +21,7 @@ class _ArkWebExampleState extends State<ArkWebExample> {
     view.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(title: const Text('Zikzak ArkWeb')),
