@@ -1,0 +1,17 @@
+name: zikzak_arkweb_example
+publish_to: none
+environment:
+  sdk: '>=3.13.0 <4.0.0'
+dependencies:
+  flutter:
+    sdk: flutter
+  zikzak_inappwebview_ohos:
+    path: ../
+  zikzak_inappwebview_platform_interface: ^6.4.1
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+flutter:
+  uses-material-design: true
