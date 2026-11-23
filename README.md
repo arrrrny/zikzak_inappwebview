@@ -72,6 +72,15 @@ dependencies:
 
 ## 🚀 Getting Started
 
+### OpenHarmony (optional platform package)
+
+The unendorsed [`zikzak_inappwebview_ohos`](zikzak_inappwebview_ohos/README.md)
+package implements the standard inline-view/controller/cookie factories with
+the system ArkWeb engine. OHOS consumers add it alongside the umbrella package;
+existing platforms and their minimum Flutter versions are unchanged. See the
+package README for API 23+ requirements, native build validation and the explicit
+navigation/headless/popup limitations.
+
 Check out the [online documentation](https://arrrrny.github.io/zikzak_inappwebview/) for comprehensive guides and examples.
 
 ```dart

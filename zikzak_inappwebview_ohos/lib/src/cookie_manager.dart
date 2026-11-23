@@ -126,16 +126,26 @@ class OhosCookieManager extends PlatformCookieManager {
     String? domain,
     PlatformInAppWebViewController? iosBelow11WebViewController,
     PlatformInAppWebViewController? webViewController,
-  }) => setCookie(
-    url: url,
-    name: name,
-    value: '',
-    path: path,
-    domain: domain,
-    maxAge: 0,
-    isSecure: url.scheme == 'https',
-    isHttpOnly: true,
-  );
+  }) async {
+    final scope = domain ?? url.host;
+    // ArkWeb returns host-only domains without a leading dot. Adding Domain
+    // would address a different cookie, so preserve the native scope exactly.
+    await setCookie(
+      url: url,
+      name: name,
+      value: '',
+      path: path,
+      domain: scope.startsWith('.') ? scope : null,
+      maxAge: 0,
+      isSecure: url.scheme == 'https',
+      isHttpOnly: true,
+    );
+    return !(await getCookies(url: url)).any(
+      (cookie) =>
+          cookie.name == name && cookie.path == path && cookie.domain == scope,
+    );
+  }
+
   @override
   Future<bool> deleteCookies({
     required WebUri url,
@@ -148,12 +158,13 @@ class OhosCookieManager extends PlatformCookieManager {
     for (final cookie in cookies) {
       if (domain != null && cookie.domain != domain) continue;
       if ((cookie.path ?? '/') != path) continue;
-      await deleteCookie(
+      final deleted = await deleteCookie(
         url: url,
         name: cookie.name,
         path: cookie.path ?? '/',
         domain: cookie.domain,
       );
+      if (!deleted) return false;
     }
     return true;
   }
