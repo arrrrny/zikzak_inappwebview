@@ -6,6 +6,7 @@ import { common } from '@kit.AbilityKit';
 import { webview } from '@kit.ArkWeb';
 import { picker } from '@kit.CoreFileKit';
 import { cameraPicker, camera } from '@kit.CameraKit';
+import { UIContext, FrameCallback } from '@ohos.arkui.UIContext';
 
 interface WebSettings {
   javaScriptEnabled?: boolean;
@@ -60,8 +61,15 @@ interface WebEvent {
 }
 interface Completion { resolve: () => void; reject: (error: Error) => void; }
 
+class ConfigurationFrame extends FrameCallback {
+  private view: ArkWebView;
+  constructor(view: ArkWebView) { super(); this.view = view; }
+  onIdle(_timeLeftInNano: number): void { this.view.configurationApplied(); }
+}
+
 const BRIDGE = `(() => {
-  const documentId = crypto.randomUUID();
+  if(window!==window.top) return;
+  const documentId = Array.from(crypto.getRandomValues(new Uint32Array(4))).join('-');
   let sequence = 0;
   const pending = new Map();
   const callHandler = (handlerName, ...args) => new Promise((resolve,reject) => {
@@ -139,6 +147,7 @@ export class ArkWebView extends PlatformView {
   private configurationCompletions: Completion[] = [];
   private binding: FlutterPluginBinding;
   private onDispose: () => void;
+  private uiContext: UIContext | null = null;
 
   constructor(context: common.Context, binding: FlutterPluginBinding, id: number,
     args: CreationArguments, onDispose: () => void) {
@@ -159,6 +168,7 @@ export class ArkWebView extends PlatformView {
   onAttached(): void {
     this.attached = true;
   }
+  bindUIContext(context: UIContext): void { this.uiContext = context; }
   onPageEnd(url: string): void {
     // Controller attachment precedes ArkUI's initial src load. Releasing
     // imperative loads earlier lets that declarative blank page overwrite them.
@@ -181,6 +191,7 @@ export class ArkWebView extends PlatformView {
     return new Promise<void>((resolve, reject) => {
       this.configurationCompletions.push({resolve, reject});
       this.model.revision++;
+      this.uiContext?.postFrameCallback(new ConfigurationFrame(this));
     });
   }
   emit(method: string, data: WebEvent): void {
@@ -353,7 +364,7 @@ export class ArkWebView extends PlatformView {
 @Component
 struct ArkWebComponent {
   @ObjectLink model: ArkWebState;
-  onDidBuild(): void { this.model.view.configurationApplied(); }
+  aboutToAppear(): void { this.model.view.bindUIContext(this.getUIContext()); }
   build() {
     Column() {
       if (!this.model.disposed) {

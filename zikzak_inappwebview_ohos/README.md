@@ -25,7 +25,7 @@ requirements; newer interface releases remain subject to their own SDK floor.
 - GET request headers and native POST body loading. ArkWeb cannot attach custom
   headers to `postUrl`; such requests fail explicitly rather than becoming GETs.
 - Progress, title, history, console, HTTP and resource-error events.
-- JavaScript evaluation with decoded JSON results and asynchronous
+- Main-frame JavaScript evaluation with decoded JSON results and asynchronous
   `window.zikzak_inappwebview.callHandler` results.
 - Ordered document-start/end user scripts in the page content world, including
   origin rules and main-frame-only scripts; script changes apply before the
@@ -48,7 +48,7 @@ from this native callback, so POST and subframe requests continue natively and
 are not offered as cancellable asynchronous navigation events.
 
 Headless views, keep-alive/adopting popup windows, browser windows, isolated
-content worlds, DevTools protocol capture and proxy overrides are not
+content worlds, subframe JavaScript handler replies, DevTools protocol capture and proxy overrides are not
 implemented. Their inherited platform methods throw rather than report success.
 
 ## Validation
