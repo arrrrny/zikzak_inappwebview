@@ -121,5 +121,27 @@ void main() {
         reason: 'the scripts must reach the InAppWebView that injects them',
       );
     });
+
+    test('WPEPlatform buffer renderer imports EGL image and reads pixels back when pixel readback is required', () {
+      final source = _compact('linux/in_app_webview/in_app_webview.cc');
+
+      expect(
+        source,
+        contains('ReadPixelsFromEglImage(egl_image,buf_width,buf_height)'),
+        reason: 'WPEPlatform DMA-BUF buffers must use ReadPixelsFromEglImage when pixel readback is required',
+      );
+    });
+
+    test('EGL texture fallback logs CPU mode instead of SHM mode', () {
+      final source = _compact(
+        'linux/in_app_webview/inappwebview_egl_texture.cc',
+      );
+
+      expect(
+        source,
+        contains('pixelbufferfallback(CPUmode)'),
+        reason: 'the pixel fallback log should reflect CPU mode rather than SHM mode',
+      );
+    });
   });
 }
