@@ -30,8 +30,10 @@ requirements; newer interface releases remain subject to their own SDK floor.
 - Ordered document-start/end user scripts in the page content world, including
   origin rules and main-frame-only scripts; script changes apply before the
   configuration Future resolves. Isolated worlds are unsupported.
-- JavaScript, zoom, viewport, text zoom, user agent, mixed content, forced dark,
-  media gesture and transparent-background settings.
+- JavaScript, zoom, viewport, user agent, mixed content, forced dark,
+  media gesture and transparent-background settings. Text zoom is not mapped:
+  the interface has no `textZoom` (Android's accessibility knob) and ArkWeb's
+  declarative `Web` exposes no page-zoom attribute.
 - OS-native cookies, including HttpOnly attributes, host/domain/path scoping,
   same-name path variants, writing and deletion. Cookie persistence is owned by
   ArkWeb, not by a Dart-side mirror.

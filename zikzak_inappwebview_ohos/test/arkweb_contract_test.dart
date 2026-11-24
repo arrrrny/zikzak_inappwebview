@@ -209,4 +209,131 @@ void main() {
       );
     },
   );
+
+  test(
+    'setCookie forwards values the RFC 6265 validator would reject',
+    () async {
+      // `dart:io`'s `Cookie` throws FormatException for a comma, a backslash
+      // and every non-ASCII character. The engine accepts them, and every
+      // other platform hands them straight through, so the manager must not
+      // route the value through a validating formatter.
+      final sent = <MethodCall>[];
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(cookieChannel, (call) async {
+            sent.add(call);
+            return true;
+          });
+      final cookies = PlatformCookieManager(
+        const PlatformCookieManagerCreationParams(),
+      );
+      expect(
+        await cookies.setCookie(
+          url: WebUri('https://example.com/'),
+          name: 'token',
+          value: 'a,b;c\\d ünïcode',
+          isSecure: true,
+          isHttpOnly: true,
+          sameSite: HTTPCookieSameSitePolicy.LAX,
+        ),
+        isTrue,
+      );
+      final body =
+          jsonDecode(sent.single.arguments as String) as Map<String, dynamic>;
+      expect(body['cookie'], contains('token=a,b;c\\d ünïcode'));
+      expect(body['cookie'], contains('Path=/'));
+      expect(body['cookie'], contains('Secure'));
+      expect(body['cookie'], contains('HttpOnly'));
+      expect(body['cookie'], contains('SameSite=Lax'));
+    },
+  );
+
+  test('setCookie serialises expiresDate as an RFC 1123 date', () async {
+    final sent = <MethodCall>[];
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(cookieChannel, (call) async {
+          sent.add(call);
+          return true;
+        });
+    final cookies = PlatformCookieManager(
+      const PlatformCookieManagerCreationParams(),
+    );
+    await cookies.setCookie(
+      url: WebUri('https://example.com/'),
+      name: 'n',
+      value: 'v',
+      expiresDate: DateTime.utc(2027, 1, 2, 3, 4, 5).millisecondsSinceEpoch,
+    );
+    final body =
+        jsonDecode(sent.single.arguments as String) as Map<String, dynamic>;
+    expect(body['cookie'], contains('Expires=Sat, 02 Jan 2027 03:04:05 GMT'));
+  });
+
+  test(
+    'deleteCookie matches the stored row instead of inventing attributes',
+    () async {
+      // The row is Secure but the URL is http:// — deletion needs no TLS, so
+      // the delete must still address that exact jar entry. The old code
+      // derived `Secure` from the scheme and forced `HttpOnly`, mutating a
+      // different cookie (or missing it entirely).
+      final sent = <MethodCall>[];
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(cookieChannel, (call) async {
+            sent.add(call);
+            if (call.method == 'getAllCookies') {
+              return jsonEncode([
+                {
+                  'name': 'sid',
+                  'value': 'secret',
+                  'domain': 'example.com',
+                  'path': '/',
+                  'isSecure': true,
+                  'isHttpOnly': false,
+                  'isSessionCookie': true,
+                  'samesitePolicy': 2,
+                },
+              ]);
+            }
+            return true;
+          });
+      final cookies = PlatformCookieManager(
+        const PlatformCookieManagerCreationParams(),
+      );
+      await cookies.deleteCookie(
+        url: WebUri('http://example.com/'),
+        name: 'sid',
+        path: '/',
+      );
+      final setCall = sent.firstWhere((call) => call.method == 'setCookie');
+      final body =
+          jsonDecode(setCall.arguments as String) as Map<String, dynamic>;
+      final cookie = body['cookie'] as String;
+      expect(cookie, contains('Max-Age=0'));
+      expect(cookie, contains('Secure'), reason: 'the stored row is Secure');
+      expect(
+        cookie,
+        isNot(contains('HttpOnly')),
+        reason: 'the stored row is not HttpOnly',
+      );
+      expect(cookie, contains('SameSite=Strict'));
+    },
+  );
+
+  test(
+    'dispose releases the native view before refusing further calls',
+    () async {
+      final sent = <MethodCall>[];
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(viewChannel, (call) async {
+            sent.add(call);
+            return null;
+          });
+      final disposable = OhosInAppWebViewController(
+        const PlatformInAppWebViewControllerCreationParams(id: 12),
+      );
+      disposable.dispose();
+      await Future<void>.delayed(Duration.zero);
+      expect(sent.map((call) => call.method), contains('dispose'));
+      expect(() => disposable.reload(), throwsStateError);
+    },
+  );
 }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
@@ -252,6 +253,15 @@ class OhosInAppWebViewController extends PlatformInAppWebViewController {
   @override
   void dispose({bool isKeepAlive = false}) {
     if (_disposed) return;
+    // Release the native view first: `_invoke` refuses once `_disposed` is set,
+    // and the ArkTS side is the only place that unregisters the JS bridge and
+    // stops the controller. A controller disposed apart from its widget would
+    // otherwise leave the native WebView attached and still loading.
+    if (!isKeepAlive) {
+      unawaited(
+        _channel.invokeMethod<void>('dispose').catchError((Object _) {}),
+      );
+    }
     _disposed = true;
     _handlers.clear();
     _channel.setMethodCallHandler(null);

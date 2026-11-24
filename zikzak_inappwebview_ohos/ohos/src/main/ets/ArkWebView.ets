@@ -13,7 +13,6 @@ interface WebSettings {
   userAgent?: string;
   supportZoom?: boolean;
   useWideViewPort?: boolean;
-  textZoom?: number;
   mixedContentMode?: number;
   forceDark?: number;
   algorithmicDarkeningAllowed?: boolean;
@@ -165,6 +164,19 @@ export class ArkWebView extends PlatformView {
   getType(): string { return 'web'; }
   getView(): WrappedBuilder<[Params]> { return new WrappedBuilder(ArkWebBuilder); }
 
+  // `mixedContentModeToWire(value) => value?.index`, and the interface's enum
+  // order is ALWAYS_ALLOW = 0, NEVER_ALLOW = 1, COMPATIBILITY_MODE = 2. Index 1
+  // is the documented most-secure value, so it must map to `MixedMode.None` —
+  // treating every non-zero index as `Compatible` (the old ternary) silently
+  // downgraded the strictest setting to a permissive one.
+  private mixedMode(mode: number | undefined): MixedMode {
+    switch (mode) {
+      case 1: return MixedMode.None;
+      case 2: return MixedMode.Compatible;
+      default: return MixedMode.All;
+    }
+  }
+
   onAttached(): void {
     this.attached = true;
   }
@@ -188,10 +200,14 @@ export class ArkWebView extends PlatformView {
     for (const completion of completions) completion.resolve();
   }
   private updateConfiguration(): Promise<void> {
+    // Without a UI context there is no frame to wait for: registering a
+    // completion here would leave the Dart `await` pending forever, since the
+    // frame callback that resolves it is never posted.
+    if (this.uiContext == null) return Promise.resolve();
     return new Promise<void>((resolve, reject) => {
       this.configurationCompletions.push({resolve, reject});
       this.model.revision++;
-      this.uiContext?.postFrameCallback(new ConfigurationFrame(this));
+      this.uiContext!.postFrameCallback(new ConfigurationFrame(this));
     });
   }
   emit(method: string, data: WebEvent): void {
@@ -271,7 +287,19 @@ export class ArkWebView extends PlatformView {
   }
   private async handle(call: MethodCall, result: MethodResult): Promise<void> {
     try {
-      await this.ready();
+      // Only the load family waits for the initial document. ArkUI's
+      // declarative `Web({src: 'about:blank'})` load begins when the component
+      // builds, and an imperative load issued before that finishes is
+      // overwritten by it — which is why loads stay gated. Every other method
+      // answers straight from the controller: gating them would let a hanging
+      // initial navigation block `stopLoading`, i.e. the one call that could
+      // abort the very navigation it is waiting on. A controller that is not
+      // attached yet reports a native error through `result`.
+      if (call.method.startsWith('load') || call.method === 'postUrl' || call.method === 'startInitialLoad') {
+        await this.ready();
+      } else if (this.model.disposed) {
+        throw new Error('WebView was disposed');
+      }
       switch (call.method) {
         case 'startInitialLoad':
           if (!this.initialStarted) {
@@ -338,6 +366,12 @@ export class ArkWebView extends PlatformView {
           this.model.scripts = [];
           await this.updateConfiguration();
           break;
+        case 'dispose':
+          // The Dart controller can be disposed on its own, apart from the
+          // platform-view lifecycle; without this the native WebView stays
+          // attached and keeps loading.
+          this.dispose();
+          break;
         default: result.notImplemented(); return;
       }
       result.success(null);
@@ -374,8 +408,12 @@ struct ArkWebComponent {
           .zoomAccess(this.model.settings.supportZoom ?? true)
           .wideViewModeAccess(this.model.settings.useWideViewPort ?? true)
           .metaViewport(this.model.settings.useWideViewPort ?? true)
-          .textZoomRatio(this.model.settings.textZoom ?? 100)
-          .mixedMode(this.model.settings.mixedContentMode === 0 ? MixedMode.All : MixedMode.Compatible)
+          // ArkWeb exposes no declarative page-zoom attribute, and
+          // `textZoom` is not part of `InAppWebViewSettings` at all (the
+          // interface has `pageZoom`, whose CSS-`zoom` semantics differ from
+          // Android's accessibility `textZoom`). Neither is mapped here rather
+          // than silently pretending to be.
+          .mixedMode(this.mixedMode(this.model.settings.mixedContentMode))
           .darkMode(this.model.settings.forceDark === 2 ? WebDarkMode.On : WebDarkMode.Off)
           .forceDarkAccess(this.model.settings.algorithmicDarkeningAllowed ?? false)
           .mediaPlayGestureAccess(this.model.settings.mediaPlaybackRequiresUserGesture ?? true)
