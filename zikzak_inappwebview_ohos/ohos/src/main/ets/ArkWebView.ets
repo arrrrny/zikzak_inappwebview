@@ -52,6 +52,7 @@ interface WebEvent {
   message?: string;
   level?: number;
   description?: string;
+  errorCode?: number;
   statusCode?: number;
   origin?: string;
   resources?: string[];
@@ -436,7 +437,7 @@ struct ArkWebComponent {
             return false;
           })
           .onErrorReceive((event) => {
-            if (event != null) this.model.view.emit('onReceivedError', {url: event.request.getRequestUrl(), isMainFrame: event.request.isMainFrame(), description: event.error.getErrorInfo()});
+            if (event != null) this.model.view.emit('onReceivedError', {url: event.request.getRequestUrl(), isMainFrame: event.request.isMainFrame(), description: event.error.getErrorInfo(), errorCode: event.error.getErrorCode()});
           })
           .onHttpErrorReceive((event) => {
             if (event != null) this.model.view.emit('onReceivedHttpError', {url: event.request.getRequestUrl(), isMainFrame: event.request.isMainFrame(), statusCode: event.response.getResponseCode()});

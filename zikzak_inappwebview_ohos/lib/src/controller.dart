@@ -4,6 +4,51 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
+/// Maps ArkWeb's net-error stack codes (`WebNetErrorList`, which mirror
+/// Chromium's `net_error_list.h`) onto the cross-platform error taxonomy, so
+/// an app can tell a DNS failure from a TLS failure instead of string-matching
+/// `description`. Codes with no faithful equivalent stay
+/// [WebResourceErrorType.UNKNOWN].
+WebResourceErrorType _errorTypeFromCode(int? code) => switch (code) {
+  // Files and local access.
+  -6 => WebResourceErrorType.FILE_NOT_FOUND,
+  -10 => WebResourceErrorType.NO_PERMISSIONS_TO_READ_FILE,
+  // Timeouts.
+  -7 || -118 || -803 => WebResourceErrorType.TIMEOUT,
+  // Transport.
+  -21 || -100 || -101 || -103 => WebResourceErrorType.NETWORK_CONNECTION_LOST,
+  -102 || -104 || -109 => WebResourceErrorType.CANNOT_CONNECT_TO_HOST,
+  -105 || -137 => WebResourceErrorType.HOST_LOOKUP,
+  -106 || -138 => WebResourceErrorType.NOT_CONNECTED_TO_INTERNET,
+  // TLS.
+  -107 || -113 || -218 => WebResourceErrorType.FAILED_SSL_HANDSHAKE,
+  -110 || -502 => WebResourceErrorType.CLIENT_CERTIFICATE_REQUIRED,
+  -117 => WebResourceErrorType.CLIENT_CERTIFICATE_REJECTED,
+  -200 ||
+  -202 ||
+  -206 ||
+  -207 ||
+  -208 ||
+  -210 ||
+  -211 ||
+  -214 => WebResourceErrorType.SERVER_CERTIFICATE_UNTRUSTED,
+  -201 || -213 => WebResourceErrorType.SERVER_CERTIFICATE_HAS_BAD_DATE,
+  -501 => WebResourceErrorType.SECURE_CONNECTION_FAILED,
+  // URLs and redirects.
+  -300 => WebResourceErrorType.BAD_URL,
+  -301 || -302 => WebResourceErrorType.UNSUPPORTED_SCHEME,
+  -310 => WebResourceErrorType.TOO_MANY_REDIRECTS,
+  -311 || -312 => WebResourceErrorType.UNSAFE_RESOURCE,
+  // Authentication.
+  -323 => WebResourceErrorType.PROXY_AUTHENTICATION,
+  -338 => WebResourceErrorType.USER_AUTHENTICATION_FAILED,
+  -339 => WebResourceErrorType.UNSUPPORTED_AUTH_SCHEME,
+  -341 => WebResourceErrorType.USER_AUTHENTICATION_REQUIRED,
+  // Server responses.
+  -379 => WebResourceErrorType.BAD_SERVER_RESPONSE,
+  _ => WebResourceErrorType.UNKNOWN,
+};
+
 /// One Dart controller and event handler per native ArkWeb instance.
 class OhosInAppWebViewController extends PlatformInAppWebViewController {
   OhosInAppWebViewController(super.params) : super.implementation() {
@@ -68,7 +113,7 @@ class OhosInAppWebViewController extends PlatformInAppWebViewController {
           ),
           WebResourceError(
             description: data['description'] as String,
-            type: WebResourceErrorType.UNKNOWN,
+            type: _errorTypeFromCode(data['errorCode'] as int?),
           ),
         );
       case 'onReceivedHttpError':
