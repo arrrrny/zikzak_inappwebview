@@ -30,11 +30,13 @@ void main() {
     controller = PlatformInAppWebViewController(
       const PlatformInAppWebViewControllerCreationParams(id: 12),
     ) as OhosInAppWebViewController;
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(viewChannel, (_) async => null);
   });
   tearDown(() {
-    controller.dispose();
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(viewChannel, null);
+    controller.dispose();
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(cookieChannel, null);
   });
@@ -130,16 +132,175 @@ void main() {
         controller.evaluateJavascript(source: 'window.answer'),
         throwsA(isA<PlatformException>()),
       );
+      await expectLater(
+        controller.startInitialLoad(),
+        throwsA(isA<PlatformException>()),
+      );
     },
   );
 
   test(
     'disposed controllers cannot send commands to a reused native view',
     () async {
+      final calls = <String>[];
+      final initial = Completer<void>();
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(viewChannel, (call) async {
+            calls.add(call.method);
+            return {
+              'startInitialLoad': initial.future,
+              'dispose': Future<void>.value(),
+            }[call.method];
+          });
+      final startup = controller.startInitialLoad();
       controller.dispose();
+      controller.dispose();
+      initial.completeError(
+        PlatformException(code: 'ARKWEB_ERROR', message: 'disposed'),
+      );
+      await startup;
+      expect(calls, ['startInitialLoad', 'dispose']);
       expect(() => controller.reload(), throwsStateError);
     },
   );
+
+  test('resource errors distinguish DNS, timeout and TLS failures', () async {
+    controller.dispose();
+    final errors = <WebResourceErrorType?>[];
+    controller = OhosInAppWebViewController(
+      PlatformInAppWebViewControllerCreationParams(
+        id: 12,
+        webviewParams: PlatformInAppWebViewWidgetCreationParams(
+          onReceivedError: (_, _, error) => errors.add(error.type),
+        ),
+      ),
+    );
+    await nativeEvent('onReceivedError', {
+      'url': 'https://example.invalid/',
+      'description': 'DNS',
+      'errorCode': -105,
+    });
+    await nativeEvent('onReceivedError', {
+      'url': 'https://example.invalid/',
+      'description': 'timeout',
+      'errorCode': -118,
+    });
+    await nativeEvent('onReceivedError', {
+      'url': 'https://example.invalid/',
+      'description': 'TLS',
+      'errorCode': -107,
+    });
+    await nativeEvent('onReceivedError', {
+      'url': 'https://example.invalid/',
+      'description': 'new error',
+      'errorCode': -9999,
+    });
+    expect(errors, [
+      WebResourceErrorType.HOST_LOOKUP,
+      WebResourceErrorType.TIMEOUT,
+      WebResourceErrorType.FAILED_SSL_HANDSHAKE,
+      WebResourceErrorType.UNKNOWN,
+    ]);
+  });
+
+  test(
+    'bulk deletion preserves native scopes and reads inventory only twice',
+    () async {
+      final before = jsonEncode([
+        {
+          'name': 'session',
+          'value': 'host',
+          'domain': 'example.com',
+          'path': '/',
+          'isSecure': true,
+          'isHttpOnly': true,
+          'isSessionCookie': true,
+        },
+        {
+          'name': 'session',
+          'value': 'domain',
+          'domain': '.example.com',
+          'path': '/',
+          'isSecure': false,
+          'isHttpOnly': false,
+          'isSessionCookie': true,
+        },
+      ]);
+      final replies = [before, '[]'].iterator;
+      final writes = <String>[];
+      var reads = 0;
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+            cookieChannel,
+            (call) async => <String, Object? Function()>{
+              'getAllCookies': () {
+                reads++;
+                replies.moveNext();
+                return replies.current;
+              },
+              'setCookie': () {
+                writes.add(
+                  (jsonDecode(call.arguments as String) as Map)['cookie']
+                      as String,
+                );
+                return true;
+              },
+            }[call.method]!(),
+          );
+      final cookies = PlatformCookieManager(
+        const PlatformCookieManagerCreationParams(),
+      );
+      expect(
+        await cookies.deleteCookies(url: WebUri('https://example.com/')),
+        isTrue,
+      );
+      expect(reads, 2);
+      expect(writes, [
+        'session=; Path=/; Max-Age=0; Secure; HttpOnly',
+        'session=; Path=/; Domain=.example.com; Max-Age=0',
+      ]);
+    },
+  );
+
+  test('default-domain deletion detects an unchanged domain cookie', () async {
+    final inventory = jsonEncode([
+      {
+        'name': 'session',
+        'value': 'domain',
+        'domain': '.example.com',
+        'path': '/',
+        'isSecure': false,
+        'isHttpOnly': false,
+        'isSessionCookie': true,
+      },
+    ]);
+    final writes = <String>[];
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
+          cookieChannel,
+          (call) async => <String, Object? Function()>{
+            'getAllCookies': () => inventory,
+            'setCookie': () {
+              writes.add(
+                (jsonDecode(call.arguments as String) as Map)['cookie']
+                    as String,
+              );
+              return true;
+            },
+          }[call.method]!(),
+        );
+    final cookies = PlatformCookieManager(
+      const PlatformCookieManagerCreationParams(),
+    );
+    expect(
+      await cookies.deleteCookie(
+        url: WebUri('https://example.com/'),
+        name: 'session',
+      ),
+      isFalse,
+    );
+    expect(writes, ['session=; Path=/; Domain=.example.com; Max-Age=0']);
+  });
 
   test(
     'native cookie inventory preserves path variants and host-only scope',
@@ -213,10 +374,7 @@ void main() {
   test(
     'setCookie forwards values the RFC 6265 validator would reject',
     () async {
-      // `dart:io`'s `Cookie` throws FormatException for a comma, a backslash
-      // and every non-ASCII character. The engine accepts them, and every
-      // other platform hands them straight through, so the manager must not
-      // route the value through a validating formatter.
+      // Value validation belongs to the native engine, as on other platforms.
       final sent = <MethodCall>[];
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(cookieChannel, (call) async {
@@ -271,10 +429,8 @@ void main() {
   test(
     'deleteCookie matches the stored row instead of inventing attributes',
     () async {
-      // The row is Secure but the URL is http:// — deletion needs no TLS, so
-      // the delete must still address that exact jar entry. The old code
-      // derived `Secure` from the scheme and forced `HttpOnly`, mutating a
-      // different cookie (or missing it entirely).
+      // Preserve the stored flags even when they differ from the URL scheme.
+      // ArkWeb decides whether this expiration is accepted over HTTP.
       final sent = <MethodCall>[];
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(cookieChannel, (call) async {
@@ -315,63 +471,6 @@ void main() {
         reason: 'the stored row is not HttpOnly',
       );
       expect(cookie, contains('SameSite=Strict'));
-    },
-  );
-
-  test(
-    'dispose releases the native view before refusing further calls',
-    () async {
-      final sent = <MethodCall>[];
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(viewChannel, (call) async {
-            sent.add(call);
-            return null;
-          });
-      final disposable = OhosInAppWebViewController(
-        const PlatformInAppWebViewControllerCreationParams(id: 12),
-      );
-      disposable.dispose();
-      await Future<void>.delayed(Duration.zero);
-      expect(sent.map((call) => call.method), contains('dispose'));
-      expect(() => disposable.reload(), throwsStateError);
-    },
-  );
-
-  test(
-    'clearing a cookie scope reads the jar once per pass, not per cookie',
-    () async {
-      final reads = <String>[];
-      var rows = [
-        for (var index = 0; index < 4; index++)
-          {
-            'name': 'c$index',
-            'value': 'v$index',
-            'domain': 'example.com',
-            'path': '/',
-            'isSecure': false,
-            'isHttpOnly': false,
-            'isSessionCookie': true,
-          },
-      ];
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(cookieChannel, (call) async {
-            if (call.method == 'getAllCookies') {
-              reads.add(call.method);
-              return jsonEncode(rows);
-            }
-            rows = [];
-            return true;
-          });
-      final cookies = PlatformCookieManager(
-        const PlatformCookieManagerCreationParams(),
-      );
-      expect(
-        await cookies.deleteCookies(url: WebUri('https://example.com/')),
-        isTrue,
-      );
-      // One inventory fetch for the sweep plus one verification pass; the old
-      // per-cookie path cost a full re-read per cookie on top of those.
-      expect(reads, hasLength(2));
     },
   );
 }
