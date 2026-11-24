@@ -119,6 +119,28 @@ public class HeadlessInAppWebViewManager: ChannelDelegate {
         headlessInAppWebView.prepare(params: params as NSDictionary)
         headlessInAppWebView.onWebViewCreated()
 
+        guard let webView = flutterWebView.webView() else {
+            // No web view — fail run() immediately instead of leaving the
+            // readiness gate unarmed and the caller hanging forever.
+            completion()
+            return
+        }
+        // Every load — including a consumer's later loadUrl — is queued behind
+        // InAppWebView.performLoad's own WebContent readiness gate, so issuing
+        // makeInitialLoad and returning is safe.
+        let hasInitialLoad = FlutterWebViewController.hasInitialLoad(params: params as NSDictionary)
+        if !hasInitialLoad {
+            // Nothing was requested to load, so `load(...)` below starts no
+            // navigation and `firstNavigationCompleted` can never fire. Complete
+            // run() now, as Android always has ("nothing to wait for if no
+            // initial load was requested"), instead of hanging the caller's
+            // future for the life of the process (issue #460).
+            flutterWebView.makeInitialLoad(params: params as NSDictionary)
+            completion()
+            return
+        }
+
+        var gateFired = false
         // Readiness gate: WKWebView can silently DROP a navigation issued
         // while its content process is still booting (the initial about:blank
         // load from makeInitialLoad is in flight and the web process is
@@ -129,13 +151,6 @@ public class HeadlessInAppWebViewManager: ChannelDelegate {
         // terminal state (didFinish or didFail). Signal-driven on purpose:
         // no timeout constant — if no terminal event ever fires, that is a
         // wiring bug that must surface loudly, not be masked by a magic number.
-        guard let webView = flutterWebView.webView() else {
-            // No web view — fail run() immediately instead of leaving the
-            // readiness gate unarmed and the caller hanging forever.
-            completion()
-            return
-        }
-        var gateFired = false
         webView.firstNavigationCompleted = { [weak webView] in
             guard !gateFired else { return }
             gateFired = true

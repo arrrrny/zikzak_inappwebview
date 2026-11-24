@@ -149,6 +149,47 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView, Disposable
         }
     }
 
+    /// Whether [makeInitialLoad] will start a navigation at all.
+    ///
+    /// A WebView created with settings and callbacks but no initial
+    /// file/data/URL has nothing to load, so no navigation event can ever
+    /// fire. The headless manager arms its `run()` readiness gate on the
+    /// first navigation's terminal event, so without this check that gate
+    /// could never fire and `run()` hung forever (issue #460).
+    ///
+    /// Mirrors the branches `load(...)` actually navigates under — including
+    /// the `windowId` path, which runs window callbacks and loads nothing.
+    /// Keep the two in step; each cast also rejects the `NSNull` a Dart `null`
+    /// arrives as.
+    static func hasInitialLoad(params: NSDictionary) -> Bool {
+        if params["windowId"] as? Int64 != nil {
+            // makeInitialLoad only runs the window-before-created callbacks
+            // on this path — it issues no navigation.
+            return false
+        }
+        if params["initialFile"] as? String != nil {
+            return true
+        }
+        // load(...) force-unwraps these three, so a partial initialData takes
+        // no branch at all. Mirror load(...)'s baseUrl guard too: a present
+        // but unparseable baseUrl makes URL(string:) return nil, so load(...)
+        // falls through to initialUrlRequest and — with none set — starts no
+        // navigation. Treating that input as an initial load would arm the
+        // run() gate with nothing to fire it, i.e. the #460 hang again.
+        if let initialData = params["initialData"] as? [String: String?],
+            initialData["data"] != nil,
+            initialData["mimeType"] != nil,
+            initialData["encoding"] != nil,
+            URL(string: initialData["baseUrl"]! ?? "about:blank") != nil
+        {
+            return true
+        }
+        if params["initialUrlRequest"] as? [String: Any?] != nil {
+            return true
+        }
+        return false
+    }
+
     func load(
         initialUrlRequest: [String: Any?]?, initialFile: String?, initialData: [String: String?]?
     ) {
