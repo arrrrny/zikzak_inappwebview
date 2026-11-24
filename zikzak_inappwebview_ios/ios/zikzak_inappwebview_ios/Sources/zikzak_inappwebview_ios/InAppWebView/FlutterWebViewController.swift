@@ -171,12 +171,16 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView, Disposable
             return true
         }
         // load(...) force-unwraps these three, so a partial initialData takes
-        // no branch at all. baseUrl is not checked: load(...) defaults it to
-        // about:blank and `URL(string:)` accepts that.
+        // no branch at all. Mirror load(...)'s baseUrl guard too: a present
+        // but unparseable baseUrl makes URL(string:) return nil, so load(...)
+        // falls through to initialUrlRequest and — with none set — starts no
+        // navigation. Treating that input as an initial load would arm the
+        // run() gate with nothing to fire it, i.e. the #460 hang again.
         if let initialData = params["initialData"] as? [String: String?],
             initialData["data"] != nil,
             initialData["mimeType"] != nil,
-            initialData["encoding"] != nil
+            initialData["encoding"] != nil,
+            URL(string: initialData["baseUrl"]! ?? "about:blank") != nil
         {
             return true
         }

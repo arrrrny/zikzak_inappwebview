@@ -32,7 +32,7 @@ import 'package:zikzak_inappwebview/zikzak_inappwebview.dart';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('run() completes with no initial load, then loadUrl works', (
+  testWidgets('run() completes with no initial load, then loadData works', (
     tester,
   ) async {
     // Deliberately no initialUrlRequest / initialFile / initialData: settings
@@ -64,7 +64,7 @@ void main() {
       reason: 'run() must leave a usable controller behind',
     );
 
-    // Acceptance criterion 1: a blank headless WebView accepts a later loadUrl
+    // Acceptance criterion 1: a blank headless WebView accepts a later loadData
     // and actually executes the document.
     const page = '<html><body><h1 id="title">after-run</h1></body></html>';
     headless.webViewController!.loadData(data: page);
