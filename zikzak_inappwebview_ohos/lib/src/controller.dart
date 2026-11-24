@@ -306,6 +306,10 @@ class OhosInAppWebViewController extends PlatformInAppWebViewController {
   void dispose({bool isKeepAlive = false}) {
     if (_disposed) return;
     // The platform-view owner may already have removed its native handler.
+    // Swallowing is deliberately limited to that case: any other native
+    // dispose failure (e.g. a PlatformException) is intentionally left to
+    // surface rather than being hidden during teardown, so a real cleanup
+    // problem is not silently masked.
     if (!isKeepAlive) {
       unawaited(
         _channel
