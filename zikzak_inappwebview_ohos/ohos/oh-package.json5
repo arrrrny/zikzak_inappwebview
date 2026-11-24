@@ -1,0 +1,8 @@
+{
+  "name": "zikzak_inappwebview_ohos",
+  "version": "0.1.0",
+  "description": "ArkWeb implementation for Zikzak InAppWebView",
+  "main": "index.ets",
+  "license": "Apache-2.0",
+  "dependencies": { "@ohos/flutter_ohos": "file:./har/flutter.har" }
+}

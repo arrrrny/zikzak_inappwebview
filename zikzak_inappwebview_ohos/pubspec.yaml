@@ -1,0 +1,22 @@
+name: zikzak_inappwebview_ohos
+description: OpenHarmony implementation of zikzak_inappwebview using the system ArkWeb engine.
+version: 0.1.0
+repository: https://github.com/arrrrny/zikzak_inappwebview/tree/master/zikzak_inappwebview_ohos
+environment:
+  sdk: '>=3.13.0 <4.0.0'
+  flutter: '>=3.47.0'
+dependencies:
+  flutter:
+    sdk: flutter
+  zikzak_inappwebview_platform_interface: ^6.4.1
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+flutter:
+  plugin:
+    implements: zikzak_inappwebview
+    platforms:
+      ohos:
+        pluginClass: ZikzakInAppWebViewPlugin
+        dartPluginClass: OhosInAppWebViewPlatform
