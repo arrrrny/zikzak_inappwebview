@@ -336,4 +336,42 @@ void main() {
       expect(() => disposable.reload(), throwsStateError);
     },
   );
+
+  test(
+    'clearing a cookie scope reads the jar once per pass, not per cookie',
+    () async {
+      final reads = <String>[];
+      var rows = [
+        for (var index = 0; index < 4; index++)
+          {
+            'name': 'c$index',
+            'value': 'v$index',
+            'domain': 'example.com',
+            'path': '/',
+            'isSecure': false,
+            'isHttpOnly': false,
+            'isSessionCookie': true,
+          },
+      ];
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(cookieChannel, (call) async {
+            if (call.method == 'getAllCookies') {
+              reads.add(call.method);
+              return jsonEncode(rows);
+            }
+            rows = [];
+            return true;
+          });
+      final cookies = PlatformCookieManager(
+        const PlatformCookieManagerCreationParams(),
+      );
+      expect(
+        await cookies.deleteCookies(url: WebUri('https://example.com/')),
+        isTrue,
+      );
+      // One inventory fetch for the sweep plus one verification pass; the old
+      // per-cookie path cost a full re-read per cookie on top of those.
+      expect(reads, hasLength(2));
+    },
+  );
 }

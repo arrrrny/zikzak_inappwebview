@@ -193,19 +193,42 @@ class OhosCookieManager extends PlatformCookieManager {
     PlatformInAppWebViewController? iosBelow11WebViewController,
     PlatformInAppWebViewController? webViewController,
   }) async {
-    final cookies = await getCookies(url: url);
-    for (final cookie in cookies) {
-      if (domain != null && cookie.domain != domain) continue;
-      if ((cookie.path ?? '/') != path) continue;
-      final deleted = await deleteCookie(
+    // One inventory fetch for the whole sweep and one verification pass at the
+    // end: the rows are already known, so routing each one back through
+    // deleteCookie would re-read the entire jar per cookie and turn clearing n
+    // cookies into O(n²) native calls.
+    final targets = [
+      for (final cookie in await getCookies(url: url))
+        if ((domain == null || cookie.domain == domain) &&
+            (cookie.path ?? '/') == path)
+          cookie,
+    ];
+    for (final cookie in targets) {
+      final scope = cookie.domain ?? url.host;
+      final written = await setCookie(
         url: url,
         name: cookie.name,
+        value: '',
         path: cookie.path ?? '/',
-        domain: cookie.domain,
+        // Host-only domains come back without a leading dot; adding one would
+        // address a different jar entry.
+        domain: scope.startsWith('.') ? scope : null,
+        maxAge: 0,
+        isSecure: cookie.isSecure ?? false,
+        isHttpOnly: cookie.isHttpOnly ?? false,
+        sameSite: cookie.sameSite,
       );
-      if (!deleted) return false;
+      if (!written) return false;
     }
-    return true;
+    final remaining = await getCookies(url: url);
+    return !targets.any(
+      (target) => remaining.any(
+        (row) =>
+            row.name == target.name &&
+            row.path == target.path &&
+            row.domain == target.domain,
+      ),
+    );
   }
 
   @override
