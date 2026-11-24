@@ -62,7 +62,14 @@ class OhosInAppWebViewController extends PlatformInAppWebViewController {
       webviewParams?.controllerFromPlatform?.call(this) ?? this;
 
   /// The widget registers its controller and callbacks before native loading starts.
-  Future<void> startInitialLoad() => _invoke<void>('startInitialLoad');
+  Future<void> startInitialLoad() async {
+    try {
+      await _invoke<void>('startInitialLoad');
+    } catch (error, stack) {
+      // Removing the widget cancels a pending native bootstrap load.
+      if (!_disposed) Error.throwWithStackTrace(error, stack);
+    }
+  }
 
   Future<T?> _invoke<T>(String method, [Map<String, dynamic> args = const {}]) {
     if (_disposed) throw StateError('WebView has been disposed');
@@ -298,13 +305,12 @@ class OhosInAppWebViewController extends PlatformInAppWebViewController {
   @override
   void dispose({bool isKeepAlive = false}) {
     if (_disposed) return;
-    // Release the native view first: `_invoke` refuses once `_disposed` is set,
-    // and the ArkTS side is the only place that unregisters the JS bridge and
-    // stops the controller. A controller disposed apart from its widget would
-    // otherwise leave the native WebView attached and still loading.
+    // The platform-view owner may already have removed its native handler.
     if (!isKeepAlive) {
       unawaited(
-        _channel.invokeMethod<void>('dispose').catchError((Object _) {}),
+        _channel
+            .invokeMethod<void>('dispose')
+            .onError<MissingPluginException>((_, _) {}),
       );
     }
     _disposed = true;

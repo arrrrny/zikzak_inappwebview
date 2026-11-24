@@ -37,6 +37,18 @@ requirements; newer interface releases remain subject to their own SDK floor.
 - OS-native cookies, including HttpOnly attributes, host/domain/path scoping,
   same-name path variants, writing and deletion. Cookie persistence is owned by
   ArkWeb, not by a Dart-side mirror.
+  Deletion without a domain targets the URL host's host-only and domain-cookie
+  variants at the requested path; pass a domain to select a specific scope.
+  Expiration preserves the stored Secure/HttpOnly flags, and success is checked
+  against the native inventory. ArkWeb decides whether a cookie write is valid,
+  including the transport requirements for Secure cookies.
+- Mixed content defaults to blocked; explicit allow/never/compatibility policies
+  map to their ArkWeb equivalents. Text scaling/page zoom is not implemented.
+- Controller disposal stops the native view and unregisters its JavaScript proxy.
+  Stop/query/evaluation commands do not wait for a page-load completion; initial
+  and explicit document loads wait only for ArkUI's bootstrap blank document to
+  prevent it overwriting the requested page. Pre-mount settings/scripts are stored
+  for the first build; mounted updates wait for the configuration frame.
 - Media/geolocation callbacks (deny by default), system document selection and
   camera capture for file inputs.
 

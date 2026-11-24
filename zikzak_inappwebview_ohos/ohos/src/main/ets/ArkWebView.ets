@@ -165,19 +165,6 @@ export class ArkWebView extends PlatformView {
   getType(): string { return 'web'; }
   getView(): WrappedBuilder<[Params]> { return new WrappedBuilder(ArkWebBuilder); }
 
-  // `mixedContentModeToWire(value) => value?.index`, and the interface's enum
-  // order is ALWAYS_ALLOW = 0, NEVER_ALLOW = 1, COMPATIBILITY_MODE = 2. Index 1
-  // is the documented most-secure value, so it must map to `MixedMode.None` —
-  // treating every non-zero index as `Compatible` (the old ternary) silently
-  // downgraded the strictest setting to a permissive one.
-  private mixedMode(mode: number | undefined): MixedMode {
-    switch (mode) {
-      case 1: return MixedMode.None;
-      case 2: return MixedMode.Compatible;
-      default: return MixedMode.All;
-    }
-  }
-
   onAttached(): void {
     this.attached = true;
   }
@@ -201,14 +188,13 @@ export class ArkWebView extends PlatformView {
     for (const completion of completions) completion.resolve();
   }
   private updateConfiguration(): Promise<void> {
-    // Without a UI context there is no frame to wait for: registering a
-    // completion here would leave the Dart `await` pending forever, since the
-    // frame callback that resolves it is never posted.
-    if (this.uiContext == null) return Promise.resolve();
+    this.model.revision++;
+    // Before mounting, the first build consumes the model directly.
+    const context = this.uiContext;
+    if (context == null) return Promise.resolve();
     return new Promise<void>((resolve, reject) => {
       this.configurationCompletions.push({resolve, reject});
-      this.model.revision++;
-      this.uiContext!.postFrameCallback(new ConfigurationFrame(this));
+      context.postFrameCallback(new ConfigurationFrame(this));
     });
   }
   emit(method: string, data: WebEvent): void {
@@ -288,21 +274,10 @@ export class ArkWebView extends PlatformView {
   }
   private async handle(call: MethodCall, result: MethodResult): Promise<void> {
     try {
-      // Only the load family waits for the initial document. ArkUI's
-      // declarative `Web({src: 'about:blank'})` load begins when the component
-      // builds, and an imperative load issued before that finishes is
-      // overwritten by it — which is why loads stay gated. Every other method
-      // answers straight from the controller: gating them would let a hanging
-      // initial navigation block `stopLoading`, i.e. the one call that could
-      // abort the very navigation it is waiting on. A controller that is not
-      // attached yet reports a native error through `result`.
-      if (call.method.startsWith('load') || call.method === 'postUrl' || call.method === 'startInitialLoad') {
-        await this.ready();
-      } else if (this.model.disposed) {
-        throw new Error('WebView was disposed');
-      }
+      if (this.model.disposed) throw new Error('WebView was disposed');
       switch (call.method) {
         case 'startInitialLoad':
+          await this.ready();
           if (!this.initialStarted) {
             this.initialStarted = true;
             if (this.initial.initialUrlRequest != null) this.load(this.initial.initialUrlRequest);
@@ -311,20 +286,24 @@ export class ArkWebView extends PlatformView {
           }
           break;
         case 'loadUrl':
+          await this.ready();
           this.initialStarted = true;
           this.load(JSON.parse(call.args as string) as UrlRequest);
           break;
         case 'postUrl':
+          await this.ready();
           this.initialStarted = true;
           const post: UrlRequest = JSON.parse(call.args as string);
           post.method = 'POST';
           this.load(post);
           break;
         case 'loadData':
+          await this.ready();
           this.initialStarted = true;
           this.loadData(JSON.parse(call.args as string) as HtmlData);
           break;
         case 'loadFile':
+          await this.ready();
           this.initialStarted = true;
           this.loadAsset((JSON.parse(call.args as string) as FileArguments).assetFilePath);
           break;
@@ -335,14 +314,18 @@ export class ArkWebView extends PlatformView {
         case 'goBack': this.navigationGeneration++; this.controller.backward(); break;
         case 'goForward': this.navigationGeneration++; this.controller.forward(); break;
         case 'reload': this.navigationGeneration++; this.controller.refresh(); break;
-        case 'stopLoading': this.controller.stop(); break;
+        case 'stopLoading':
+          this.navigationGeneration++;
+          this.initialStarted = true;
+          this.controller.stop();
+          break;
         case 'evaluateJavascript':
           result.success(await this.controller.runJavaScript((JSON.parse(call.args as string) as SourceArguments).source));
           return;
         case 'setSettings': {
           const settings: WebSettings = JSON.parse(call.args as string);
           this.model.settings = settings;
-          if (settings.userAgent != null) this.controller.setCustomUserAgent(settings.userAgent);
+          if (this.attached && settings.userAgent != null) this.controller.setCustomUserAgent(settings.userAgent);
           await this.updateConfiguration();
           break;
         }
@@ -414,7 +397,8 @@ struct ArkWebComponent {
           // interface has `pageZoom`, whose CSS-`zoom` semantics differ from
           // Android's accessibility `textZoom`). Neither is mapped here rather
           // than silently pretending to be.
-          .mixedMode(this.mixedMode(this.model.settings.mixedContentMode))
+          .mixedMode(this.model.settings.mixedContentMode === 0 ? MixedMode.All :
+            this.model.settings.mixedContentMode === 2 ? MixedMode.Compatible : MixedMode.None)
           .darkMode(this.model.settings.forceDark === 2 ? WebDarkMode.On : WebDarkMode.Off)
           .forceDarkAccess(this.model.settings.algorithmicDarkeningAllowed ?? false)
           .mediaPlayGestureAccess(this.model.settings.mediaPlaybackRequiresUserGesture ?? true)

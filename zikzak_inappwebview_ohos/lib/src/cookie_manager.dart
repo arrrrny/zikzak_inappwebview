@@ -131,59 +131,7 @@ class OhosCookieManager extends PlatformCookieManager {
     String? domain,
     PlatformInAppWebViewController? iosBelow11WebViewController,
     PlatformInAppWebViewController? webViewController,
-  }) async {
-    final scope = domain ?? url.host;
-    // Match the STORED row rather than inventing attributes. Forcing
-    // `HttpOnly` (or deriving `Secure` from the URL's scheme) mutates a
-    // different jar entry on engines that key a cookie on its attributes, so
-    // the delete silently misses the cookie the caller can see.
-    //
-    // The lookup reads the RAW inventory (`getAllCookies`), not
-    // `getCookies(url:)`: that view drops `Secure` cookies for an `http://`
-    // URL, and deleting one of those is legal — deletion needs no TLS.
-    final inventory = await getAllCookies();
-    List<Cookie> rowsFor(String candidate) => inventory
-        .where(
-          (cookie) =>
-              cookie.name == name &&
-              (cookie.path ?? '/') == path &&
-              cookie.domain == candidate,
-        )
-        .toList();
-    // A direct call with no `domain` addresses the host-only variant; a cookie
-    // actually stored as `Domain=.example.com` needs the dotted scope, so fall
-    // back to it when the host-only scope has no row.
-    final stored = rowsFor(scope);
-    final resolvedScope = stored.isNotEmpty
-        ? scope
-        : (domain == null &&
-                  url.host.isNotEmpty &&
-                  rowsFor('.${url.host}').isNotEmpty
-              ? '.${url.host}'
-              : scope);
-    final attributes = stored.isNotEmpty
-        ? stored.first
-        : (rowsFor(resolvedScope).isNotEmpty
-              ? rowsFor(resolvedScope).first
-              : null);
-    await setCookie(
-      url: url,
-      name: name,
-      value: '',
-      path: path,
-      domain: resolvedScope.startsWith('.') ? resolvedScope : null,
-      maxAge: 0,
-      isSecure: attributes?.isSecure ?? (url.scheme == 'https'),
-      isHttpOnly: attributes?.isHttpOnly ?? false,
-      sameSite: attributes?.sameSite,
-    );
-    return !(await getAllCookies()).any(
-      (cookie) =>
-          cookie.name == name &&
-          cookie.path == path &&
-          cookie.domain == resolvedScope,
-    );
-  }
+  }) => _deleteMatching(url: url, name: name, path: path, domain: domain);
 
   @override
   Future<bool> deleteCookies({
@@ -192,42 +140,47 @@ class OhosCookieManager extends PlatformCookieManager {
     String? domain,
     PlatformInAppWebViewController? iosBelow11WebViewController,
     PlatformInAppWebViewController? webViewController,
+  }) => _deleteMatching(url: url, path: path, domain: domain);
+
+  Future<bool> _deleteMatching({
+    required WebUri url,
+    required String path,
+    String? name,
+    String? domain,
   }) async {
-    // One inventory fetch for the whole sweep and one verification pass at the
-    // end: the rows are already known, so routing each one back through
-    // deleteCookie would re-read the entire jar per cookie and turn clearing n
-    // cookies into O(n²) native calls.
-    final targets = [
-      for (final cookie in await getCookies(url: url))
-        if ((domain == null || cookie.domain == domain) &&
-            (cookie.path ?? '/') == path)
-          cookie,
-    ];
-    for (final cookie in targets) {
-      final scope = cookie.domain ?? url.host;
-      final written = await setCookie(
+    final host = url.host.toLowerCase();
+    final cookies = (await getAllCookies()).where((cookie) {
+      final scope = cookie.domain?.toLowerCase();
+      return (name == null || cookie.name == name) &&
+          (cookie.path ?? '/') == path &&
+          (domain != null
+              ? scope == domain.toLowerCase()
+              : scope == host || scope == '.$host');
+    }).toList();
+    if (cookies.isEmpty) return true;
+    for (final cookie in cookies) {
+      // ArkWeb reports host-only scopes without a leading dot. Preserve both
+      // native scope and attributes when expiring the stored cookie.
+      final scope = cookie.domain ?? '';
+      final deleted = await setCookie(
         url: url,
         name: cookie.name,
         value: '',
         path: cookie.path ?? '/',
-        // Host-only domains come back without a leading dot; adding one would
-        // address a different jar entry.
         domain: scope.startsWith('.') ? scope : null,
         maxAge: 0,
-        isSecure: cookie.isSecure ?? false,
-        isHttpOnly: cookie.isHttpOnly ?? false,
+        isSecure: cookie.isSecure,
+        isHttpOnly: cookie.isHttpOnly,
         sameSite: cookie.sameSite,
       );
-      if (!written) return false;
+      if (!deleted) return false;
     }
-    final remaining = await getCookies(url: url);
-    return !targets.any(
-      (target) => remaining.any(
-        (row) =>
-            row.name == target.name &&
-            row.path == target.path &&
-            row.domain == target.domain,
-      ),
+    final targets = cookies
+        .map((cookie) => (cookie.name, cookie.domain, cookie.path ?? '/'))
+        .toSet();
+    return !(await getAllCookies()).any(
+      (cookie) =>
+          targets.contains((cookie.name, cookie.domain, cookie.path ?? '/')),
     );
   }
 
