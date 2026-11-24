@@ -283,7 +283,7 @@ static gboolean inappwebview_egl_texture_populate(FlTextureGL* texture, uint32_t
       static bool first_fallback = true;
       if (first_fallback) {
         zikzak_inappwebview::debugLog(
-            "InAppWebViewEGLTexture: using pixel buffer fallback (SHM mode), size=" +
+            "InAppWebViewEGLTexture: using pixel buffer fallback (CPU mode), size=" +
             std::to_string(buf_width) + "x" + std::to_string(buf_height));
         first_fallback = false;
       }

@@ -735,8 +735,8 @@ class InAppWebView {
  private:
   static void OnFrameDisplayed(void* data);
 
-  // Read pixels from EGL image to CPU buffer
-  void ReadPixelsFromEglImage(void* egl_image, uint32_t width, uint32_t height);
+  // Read pixels from EGL image to CPU buffer (returns true if pixels were successfully read)
+  bool ReadPixelsFromEglImage(void* egl_image, uint32_t width, uint32_t height);
   // Deletes the readback FBO/texture while a GL context is current (no-op
   // for ids 0). Must be called with the context bound.
   void DestroyReadbackTargets();

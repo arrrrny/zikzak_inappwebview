@@ -1419,6 +1419,26 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
           g_clear_error(&error);
         }
       }
+    } else if (is_dma_buf && egl_display_ != nullptr && !egl_import_failed_ &&
+               pixel_readback_required) {
+      // DMA-BUF frame on the pixel fallback path: import the EGL image and read
+      // back pixels to CPU via GL/FBO (mirrors legacy arm's OnExportDmaBuf).
+      // This provides a reliable CPU readback route when GBM pixel import is
+      // unavailable on hybrid or multi-GPU systems (#442).
+      GError* error = nullptr;
+      void* egl_image = wpe_buffer_import_to_egl_image(buffer, &error);
+      if (egl_image != nullptr) {
+        if (ReadPixelsFromEglImage(egl_image, buf_width, buf_height)) {
+          current_buffer_width_ = buf_width;
+          current_buffer_height_ = buf_height;
+          buffer_handled = true;
+        }
+      } else {
+        egl_import_failed_ = true;
+        if (error != nullptr) {
+          g_clear_error(&error);
+        }
+      }
     }
     
     // === Priority 2: Direct SHM buffer access (no GBM required) ===
@@ -1540,18 +1560,18 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
 }
 #endif
 
-void InAppWebView::ReadPixelsFromEglImage(void* egl_image, uint32_t width, uint32_t height) {
+bool InAppWebView::ReadPixelsFromEglImage(void* egl_image, uint32_t width, uint32_t height) {
   // CRITICAL: Check for GL context before any GL operations
   // WPE WebKit calls this from its own thread which may not have a GL context
   if (!HasCurrentGLContext()) {
-    return;
+    return false;
   }
   
   EGLDisplay display = static_cast<EGLDisplay>(egl_display_);
   EGLImageKHR image = static_cast<EGLImageKHR>(egl_image);
 
   if (display == EGL_NO_DISPLAY || image == EGL_NO_IMAGE_KHR) {
-    return;
+    return false;
   }
 
   // Create texture from EGL image if we haven't already
@@ -1577,7 +1597,7 @@ void InAppWebView::ReadPixelsFromEglImage(void* egl_image, uint32_t width, uint3
     glEGLImageTargetTexture2DOES(GL_TEXTURE_2D, image);
   } else {
     glBindTexture(GL_TEXTURE_2D, 0);
-    return;
+    return false;
   }
 
   glBindFramebuffer(GL_FRAMEBUFFER, fbo_);
@@ -1587,7 +1607,7 @@ void InAppWebView::ReadPixelsFromEglImage(void* egl_image, uint32_t width, uint3
   if (status != GL_FRAMEBUFFER_COMPLETE) {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glBindTexture(GL_TEXTURE_2D, 0);
-    return;
+    return false;
   }
 
   size_t buffer_size = width * height * 4;  // RGBA
@@ -1618,6 +1638,7 @@ void InAppWebView::ReadPixelsFromEglImage(void* egl_image, uint32_t width, uint3
   // context is still current instead of leaking one FBO + texture per view.
   // (Early returns above leave them allocated for the next attempt.)
   DestroyReadbackTargets();
+  return true;
 }
 
 void InAppWebView::DestroyReadbackTargets() {
