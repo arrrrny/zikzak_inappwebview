@@ -1025,11 +1025,7 @@ public final class InAppWebView
     public void setIncognito(boolean enabled) {
         WebSettings settings = getSettings();
         if (enabled) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                CookieManager.getInstance().removeAllCookies(null);
-            } else {
-                CookieManager.getInstance().removeAllCookie();
-            }
+            CookieManager.getInstance().removeAllCookies(null);
 
             // Disable caching
             settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
