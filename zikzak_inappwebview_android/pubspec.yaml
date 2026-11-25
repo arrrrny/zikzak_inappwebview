@@ -82,3 +82,7 @@ flutter:
 
 
 
+
+dependency_overrides:
+  zikzak_inappwebview_platform_interface:
+    path: ../zikzak_inappwebview_platform_interface

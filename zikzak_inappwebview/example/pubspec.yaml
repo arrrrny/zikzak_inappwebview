@@ -99,3 +99,7 @@ flutter:
   # see https://flutter.dev/to/font-from-package
 
 
+
+dependency_overrides:
+  zikzak_inappwebview_platform_interface:
+    path: ../../zikzak_inappwebview_platform_interface
