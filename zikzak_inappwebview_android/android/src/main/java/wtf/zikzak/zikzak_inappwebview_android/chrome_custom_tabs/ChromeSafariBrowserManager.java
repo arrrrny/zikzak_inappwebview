@@ -97,7 +97,7 @@ public class ChromeSafariBrowserManager extends ChannelDelegateImpl {
     extras.putString("managerId", this.id);
     extras.putSerializable("headers", headers);
     extras.putString("referrer", referrer);
-    extras.putSerializable("otherLikelyURLs", otherLikelyURLs);
+    extras.putStringArrayList("otherLikelyURLs", otherLikelyURLs);
     extras.putSerializable("settings", settings);
     extras.putSerializable("actionButton", (Serializable) actionButton);
     extras.putSerializable("secondaryToolbar", (Serializable) secondaryToolbar);

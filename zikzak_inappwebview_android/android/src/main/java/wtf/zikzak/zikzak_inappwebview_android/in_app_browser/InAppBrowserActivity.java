@@ -26,6 +26,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.menu.MenuBuilder;
 
 import wtf.zikzak.zikzak_inappwebview_android.R;
+import wtf.zikzak.zikzak_inappwebview_android.BundleUtils;
 import wtf.zikzak.zikzak_inappwebview_android.Util;
 import wtf.zikzak.zikzak_inappwebview_android.find_interaction.FindInteractionController;
 import wtf.zikzak.zikzak_inappwebview_android.pull_to_refresh.PullToRefreshChannelDelegate;
@@ -91,14 +92,14 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
     manager = InAppBrowserManager.shared.get(managerId);
     if (manager == null || manager.plugin == null|| manager.plugin.messenger == null) return;
 
-    Map<String, Object> settingsMap = (Map<String, Object>) b.getSerializable("settings");
+    Map<String, Object> settingsMap = BundleUtils.getMap(b, "settings", Object.class);
     customSettings.parse(settingsMap);
 
     windowId = b.getInt("windowId");
 
     setContentView(R.layout.activity_web_view);
 
-    Map<String, Object> pullToRefreshInitialSettings = (Map<String, Object>) b.getSerializable("pullToRefreshInitialSettings");
+    Map<String, Object> pullToRefreshInitialSettings = BundleUtils.getMap(b, "pullToRefreshInitialSettings", Object.class);
     MethodChannel pullToRefreshLayoutChannel = new MethodChannel(manager.plugin.messenger, PullToRefreshLayout.METHOD_CHANNEL_NAME_PREFIX + id);
     PullToRefreshSettings pullToRefreshSettings = new PullToRefreshSettings();
     pullToRefreshSettings.parse(pullToRefreshInitialSettings);
@@ -123,9 +124,9 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
 
     fromActivity = b.getString("fromActivity");
 
-    Map<String, Object> contextMenu = (Map<String, Object>) b.getSerializable("contextMenu");
-    List<Map<String, Object>> initialUserScripts = (List<Map<String, Object>>) b.getSerializable("initialUserScripts");
-    List<Map<String, Object>> menuItemList = (List<Map<String, Object>>) b.getSerializable("menuItems");
+    Map<String, Object> contextMenu = BundleUtils.getMap(b, "contextMenu", Object.class);
+    List<Map<String, Object>> initialUserScripts = BundleUtils.getMapList(b, "initialUserScripts");
+    List<Map<String, Object>> menuItemList = BundleUtils.getMapList(b, "menuItems");
     for (Map<String, Object> menuItem : menuItemList) {
       menuItems.add(InAppBrowserMenuItem.fromMap(menuItem));
     }
@@ -167,7 +168,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
 
     if (!windowTransportWired) {
       String initialFile = b.getString("initialFile");
-      Map<String, Object> initialUrlRequest = (Map<String, Object>) b.getSerializable("initialUrlRequest");
+      Map<String, Object> initialUrlRequest = BundleUtils.getMap(b, "initialUrlRequest", Object.class);
       String initialData = b.getString("initialData");
       if (initialFile != null) {
         try {

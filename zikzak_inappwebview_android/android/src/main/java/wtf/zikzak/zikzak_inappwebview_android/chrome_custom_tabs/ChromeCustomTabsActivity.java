@@ -23,6 +23,7 @@ import androidx.browser.customtabs.CustomTabsSession;
 import androidx.browser.customtabs.EngagementSignalsCallback;
 
 import wtf.zikzak.zikzak_inappwebview_android.R;
+import wtf.zikzak.zikzak_inappwebview_android.BundleUtils;
 import wtf.zikzak.zikzak_inappwebview_android.types.AndroidResource;
 import wtf.zikzak.zikzak_inappwebview_android.types.CustomTabsActionButton;
 import wtf.zikzak.zikzak_inappwebview_android.types.CustomTabsMenuItem;
@@ -92,15 +93,15 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
     channelDelegate = new ChromeCustomTabsChannelDelegate(this, channel);
 
     initialUrl = b.getString("url");
-    initialHeaders = (Map<String, String>) b.getSerializable("headers");
+    initialHeaders = BundleUtils.getMap(b, "headers", String.class);
     initialReferrer = b.getString("referrer");
     initialOtherLikelyURLs = b.getStringArrayList("otherLikelyURLs");
 
     customSettings = new ChromeCustomTabsSettings();
-    customSettings.parse((HashMap<String, Object>) b.getSerializable("settings"));
-    actionButton = CustomTabsActionButton.fromMap((Map<String, Object>) b.getSerializable("actionButton"));
-    secondaryToolbar = CustomTabsSecondaryToolbar.fromMap((Map<String, Object>) b.getSerializable("secondaryToolbar"));
-    List<Map<String, Object>> menuItemList = (List<Map<String, Object>>) b.getSerializable("menuItemList");
+    customSettings.parse(BundleUtils.getMap(b, "settings", Object.class));
+    actionButton = CustomTabsActionButton.fromMap(BundleUtils.getMap(b, "actionButton", Object.class));
+    secondaryToolbar = CustomTabsSecondaryToolbar.fromMap(BundleUtils.getMap(b, "secondaryToolbar", Object.class));
+    List<Map<String, Object>> menuItemList = BundleUtils.getMapList(b, "menuItemList");
     for (Map<String, Object> menuItem : menuItemList) {
       menuItems.add(CustomTabsMenuItem.fromMap(menuItem));
     }
