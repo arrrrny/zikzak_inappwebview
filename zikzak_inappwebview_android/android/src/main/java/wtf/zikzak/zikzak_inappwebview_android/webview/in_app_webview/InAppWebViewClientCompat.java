@@ -11,7 +11,6 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.webkit.ClientCertRequest;
 import android.webkit.CookieManager;
-import android.webkit.CookieSyncManager;
 import android.webkit.HttpAuthHandler;
 import android.webkit.RenderProcessGoneDetail;
 import android.webkit.SslErrorHandler;
@@ -322,11 +321,7 @@ public class InAppWebViewClientCompat extends WebViewClientCompat {
         }
 
         // WebView not storing cookies reliable to local device storage
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            CookieManager.getInstance().flush();
-        } else {
-            CookieSyncManager.getInstance().sync();
-        }
+        CookieManager.getInstance().flush();
 
         String js = JavaScriptBridgeJS.PLATFORM_READY_JS_SOURCE;
 
