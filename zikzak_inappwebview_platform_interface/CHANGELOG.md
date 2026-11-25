@@ -1,3 +1,23 @@
+## 6.6.0 - 2026-11-25
+
+
+### Features
+
+- [OHOS] A new federated platform package, `zikzak_inappwebview_ohos`, implements the plugin against the system ArkWeb engine on HarmonyOS/OHOS (#463). It uses the same federated wiring as the other platforms (`dartPluginClass: OhosInAppWebViewPlatform`) and ships on its own version line (0.1.0), outside the lockstep 6.x packages; it is not yet listed in the umbrella's `platforms:` map, so a consumer opts in by depending on it directly. Review follow-ups landed in #464 and #465.
+
+### Bug Fixes
+
+- [Linux] The visible `InAppWebView` reads pixels back through an EGL image on the WPEPlatform backend, fixing the DMA-BUF readback path that left the texture stale (#442).
+- [iOS] A headless `run()` with no initial load now completes instead of hanging — the run is settled when there is nothing to load (#460).
+- [iOS] KVO teardown is idempotent: disposing a webview that was never prepared no longer aborts the app, and the fullscreen state is observed/unobserved through the helper pair (#459).
+- [macOS] A live proxy change is now applied to the per-profile cookie/data stores that already exist, not only to stores created afterwards (#461).
+- [macOS] The GUI creation-path initial load is dispatched through `makeInitialLoad`, so `initialData`/`initialUrl` are honored on the on-screen path exactly as they already were headless (#425, #458).
+- [macOS] The user-script Dart overrides are implemented to match what the Swift side already served, and the open panel honors the `webkitdirectory` attribute and fails fast in headless mode (#458).
+- [macOS/iOS] Passkey ceremonies are corrected end to end: iframe ceremonies resolve through the reply-capable `PasskeyBridge` handler (#446, #455); `crossOrigin` is assigned before `topOrigin` in the client data; Apple's `clientDataJSON` key order is preserved by string insertion rather than a dictionary rebuild; hybrid/cable transports map to `bluetooth` for cross-device passkeys; and the shared shim gains a `telemetryEnabled` static (#457).
+
+### Dependencies
+
+- Took the dependency upgrades the 6.5.0 release left behind (#454).
 ## 6.5.0 - 2026-11-18
 
 

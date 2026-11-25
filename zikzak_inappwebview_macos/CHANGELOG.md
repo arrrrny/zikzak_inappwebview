@@ -1,3 +1,23 @@
+## 6.6.0 - 2026-11-25
+
+
+### Features
+
+- [OHOS] A new federated platform package, `zikzak_inappwebview_ohos`, implements the plugin against the system ArkWeb engine on HarmonyOS/OHOS (#463). It uses the same federated wiring as the other platforms (`dartPluginClass: OhosInAppWebViewPlatform`) and ships on its own version line (0.1.0), outside the lockstep 6.x packages; it is not yet listed in the umbrella's `platforms:` map, so a consumer opts in by depending on it directly. Review follow-ups landed in #464 and #465.
+
+### Bug Fixes
+
+- [Linux] The visible `InAppWebView` reads pixels back through an EGL image on the WPEPlatform backend, fixing the DMA-BUF readback path that left the texture stale (#442).
+- [iOS] A headless `run()` with no initial load now completes instead of hanging — the run is settled when there is nothing to load (#460).
+- [iOS] KVO teardown is idempotent: disposing a webview that was never prepared no longer aborts the app, and the fullscreen state is observed/unobserved through the helper pair (#459).
+- [macOS] A live proxy change is now applied to the per-profile cookie/data stores that already exist, not only to stores created afterwards (#461).
+- [macOS] The GUI creation-path initial load is dispatched through `makeInitialLoad`, so `initialData`/`initialUrl` are honored on the on-screen path exactly as they already were headless (#425, #458).
+- [macOS] The user-script Dart overrides are implemented to match what the Swift side already served, and the open panel honors the `webkitdirectory` attribute and fails fast in headless mode (#458).
+- [macOS/iOS] Passkey ceremonies are corrected end to end: iframe ceremonies resolve through the reply-capable `PasskeyBridge` handler (#446, #455); `crossOrigin` is assigned before `topOrigin` in the client data; Apple's `clientDataJSON` key order is preserved by string insertion rather than a dictionary rebuild; hybrid/cable transports map to `bluetooth` for cross-device passkeys; and the shared shim gains a `telemetryEnabled` static (#457).
+
+### Dependencies
+
+- Took the dependency upgrades the 6.5.0 release left behind (#454).
 ## Unreleased
 
 - [macOS] A proxy change now reaches the per-profile data stores that already exist. `setProxyOverride` stored the resolved configuration in the `profileProxies` registry — read only at data-store CREATION, by the WebView factory — and wrote `WKWebsiteDataStore.default()`. A per-profile WebView owns a custom `WKWebsiteDataStore(forIdentifier:)` created once at WebView init, so editing a profile's proxy in a browser's settings recorded the new route for future stores and never applied it to the store in use; WebKit routes only loads started after the write, so every open tab kept its old route until the profile's WebViews were recreated (backlog arrrrny/zuraffa_browser_backlog#24: "proxy change on a profile is NOT IMMEDIATE AS IT MUST"). The macOS port now mirrors the iOS design of #410: a weak `liveStores` registry populated by `applyProxy(forIdentifier:to:)` — the only place a profile's store is created — rewritten by `setProxyOverride` and by the profile-scoped `clearProxyOverride`, with registry keys canonicalised through the same trim `persistentUUID(from:)` applies. A per-profile set still never stamps its route onto the shared store.

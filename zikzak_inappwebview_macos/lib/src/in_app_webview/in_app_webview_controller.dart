@@ -805,7 +805,9 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController {
     for (final injectionTime in UserScriptInjectionTime.values) {
       final userScripts = _userScripts[injectionTime];
       if (userScripts == null) continue;
-      userScripts.removeWhere((userScript) => userScript.groupName == groupName);
+      userScripts.removeWhere(
+        (userScript) => userScript.groupName == groupName,
+      );
     }
 
     Map<String, dynamic> args = <String, dynamic>{};
