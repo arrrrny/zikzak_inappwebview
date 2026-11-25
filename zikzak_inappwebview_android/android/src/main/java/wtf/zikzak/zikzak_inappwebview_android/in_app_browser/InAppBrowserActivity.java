@@ -127,8 +127,10 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
     Map<String, Object> contextMenu = BundleUtils.getMap(b, "contextMenu", Object.class);
     List<Map<String, Object>> initialUserScripts = BundleUtils.getMapList(b, "initialUserScripts");
     List<Map<String, Object>> menuItemList = BundleUtils.getMapList(b, "menuItems");
-    for (Map<String, Object> menuItem : menuItemList) {
-      menuItems.add(InAppBrowserMenuItem.fromMap(menuItem));
+    if (menuItemList != null) {
+      for (Map<String, Object> menuItem : menuItemList) {
+        menuItems.add(InAppBrowserMenuItem.fromMap(menuItem));
+      }
     }
 
     InAppWebViewSettings webViewSettings = new InAppWebViewSettings();

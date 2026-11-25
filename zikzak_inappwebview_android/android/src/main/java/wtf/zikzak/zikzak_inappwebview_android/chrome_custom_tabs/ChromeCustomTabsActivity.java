@@ -102,8 +102,10 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
     actionButton = CustomTabsActionButton.fromMap(BundleUtils.getMap(b, "actionButton", Object.class));
     secondaryToolbar = CustomTabsSecondaryToolbar.fromMap(BundleUtils.getMap(b, "secondaryToolbar", Object.class));
     List<Map<String, Object>> menuItemList = BundleUtils.getMapList(b, "menuItemList");
-    for (Map<String, Object> menuItem : menuItemList) {
-      menuItems.add(CustomTabsMenuItem.fromMap(menuItem));
+    if (menuItemList != null) {
+      for (Map<String, Object> menuItem : menuItemList) {
+        menuItems.add(CustomTabsMenuItem.fromMap(menuItem));
+      }
     }
 
     if (customSettings.noHistory && manager.plugin.noHistoryCustomTabsActivityCallbacks != null) {
