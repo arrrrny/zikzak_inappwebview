@@ -4,7 +4,7 @@ loop: outside-in
 profile: .specify/memory/tdd-profile.md
 spec_criteria: 6
 planned_at: 19b13d24
-updated_at: b3db92ed
+updated_at: 0a5ac008
 suite_baseline: green
 ---
 
@@ -19,7 +19,7 @@ The real entry point is the exact JavaScript extracted from `FIND_TEXT_HIGHLIGHT
 | A1  | A walk that throws after a partial highlight still posts the final partial count as done  | AC-1   | example          | DONE | `test/find_shadow_dom_contract_test.dart::failed walks still post final counts`     |
 | A2  | Navigation with a missing active highlight still posts the updated ordinal and count      | AC-2   | example          | DONE | `test/find_shadow_dom_contract_test.dart::missing highlights still post navigation counts` |
 | A3  | Navigation with zero matches posts an explicit zero-count result                           | AC-3   | example          | DONE | `test/find_shadow_dom_contract_test.dart::zero-match navigation posts counts`        |
-| A4  | A debounced scrollend rerun includes text mounted after the active query started          | AC-4   | example          | PENDING | `test/find_shadow_dom_contract_test.dart::scrollend rescans newly mounted matches`   |
+| A4  | A debounced scrollend rerun includes text mounted after the active query started          | AC-4   | example          | DONE | `test/find_shadow_dom_contract_test.dart::scrollend rescans newly mounted matches`   |
 | A5  | Clearing matches cancels a pending rescan and prevents old-query result posts             | AC-5   | example          | PENDING | `test/find_shadow_dom_contract_test.dart::clearing matches cancels pending rescans`  |
 | A6  | Open shadow-root and same-origin iframe text is found and cleared by the injected script   | AC-6   | characterization | BASELINE | `test/find_shadow_dom_contract_test.dart::nested roots are searched and cleared`     |
 

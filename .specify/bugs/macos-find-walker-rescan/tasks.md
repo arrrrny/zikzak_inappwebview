@@ -28,9 +28,9 @@ Tests are mandatory and must be observed failing before their implementation. Ru
 
 ## Phase 4: Virtualized-page rescans
 
-- [ ] T013 Add the debounced scrollend rescan regression test and record its red output. [A4]
-- [ ] T014 Retain the active query and rerun it once after a debounced scrollend; rerun the full suite green. [A4]
-- [ ] T015 Run the A4 acceptance test after implementation and record green evidence. [A4]
+- [X] T013 Add the debounced scrollend rescan regression test and record its red output. [A4]
+- [X] T014 Retain the active query and rerun it once after a debounced scrollend; rerun the full suite green. [A4]
+- [X] T015 Run the A4 acceptance test after implementation and record green evidence. [A4]
 - [ ] T016 Add the clear-cancels-rescan regression test and record its red output. [A5]
 - [ ] T017 Cancel pending rescans when matches are cleared and rerun the full suite green. [A5]
 - [ ] T018 Run the A5 acceptance test after implementation and record green evidence. [A5]

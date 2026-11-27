@@ -43,3 +43,11 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
 - green: `_findNext` now guards navigation with `_searchResultCount > 0` but always posts from `finally`; the single test passed and full suite `flutter test --no-pub --concurrency=2` -> 197 passed, 0 failed, 1:41
 - refactor: none needed; the existing ordinal wrap and scroll logic are unchanged
 - commit: `b3db92ed`
+
+## Cycle 5: A4 scrollend rescans newly mounted matches
+
+- test: `test/find_shadow_dom_contract_test.dart::scrollend rescans newly mounted matches` (new)
+- red: `flutter test --no-pub test/find_shadow_dom_contract_test.dart --plain-name "scrollend rescans newly mounted matches" --concurrency=2` -> `AssertionError [ERR_ASSERTION]: Expected values to be strictly equal: 0 !== 1` at `find_interaction_harness.js:306` (`timers.size`)
+- green: retained the normalized active keyword and added one capture-phase `scrollend` listener with a 150 ms debounce; the single test passed and full suite `flutter test --no-pub --concurrency=2` -> 198 passed, 0 failed, 1:55
+- refactor: none needed; the rescan calls the existing `_findAllAsync` entry point
+- commit: `0a5ac008`
