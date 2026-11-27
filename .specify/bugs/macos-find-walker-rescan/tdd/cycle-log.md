@@ -19,3 +19,11 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
 - green: restored the condition exactly; full suite `flutter test --no-pub --concurrency=2` -> 194 passed, 0 failed, 1:53
 - refactor: none needed; the harness is structural test support and no production source changed
 - commit: `6b73bb90`
+
+## Cycle 2: A1 failed walks still post final counts
+
+- test: `test/find_shadow_dom_contract_test.dart::failed walks still post final counts` (new)
+- red: `flutter test --no-pub test/find_shadow_dom_contract_test.dart --plain-name "failed walks still post final counts" --concurrency=2` -> `AssertionError [ERR_ASSERTION]: Expected values to be strictly equal: 0 !== 1` at `find_interaction_harness.js:247` (`messages.length`)
+- green: `FindInteractionJS.swift` moved `_isDoneCounting` and the result post into `finally`; the single test passed and full suite `flutter test --no-pub --concurrency=2` -> 195 passed, 0 failed, 1:40
+- refactor: none needed; the change is confined to `_findAllAsync`
+- commit: `d15341ea`

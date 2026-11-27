@@ -13,9 +13,9 @@ Tests are mandatory and must be observed failing before their implementation. Ru
 
 ## Phase 2: Exception-safe count delivery
 
-- [ ] T004 Add the failed-walk regression test and record its red output. [A1]
-- [ ] T005 Deliver final counts from `finally` and rerun the full suite green. [A1]
-- [ ] T006 Run the A1 acceptance test after implementation and record green evidence. [A1]
+- [X] T004 Add the failed-walk regression test and record its red output. [A1]
+- [X] T005 Deliver final counts from `finally` and rerun the full suite green. [A1]
+- [X] T006 Run the A1 acceptance test after implementation and record green evidence. [A1]
 
 ## Phase 3: Navigation result delivery
 
