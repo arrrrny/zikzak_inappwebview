@@ -34,42 +34,32 @@ void main() {
     source = sourceFile!.readAsStringSync();
   });
 
-  test(
-    'find walker descends into shadow roots (visible shadow-DOM text is matched, #1155)',
-    () {
-      // The element-node branch must recurse into `element.shadowRoot` when
-      // one exists, not only `element.childNodes`.
-      expect(
-        source,
-        matches(
-          RegExp(r'shadowRoot'),
-        ),
-        reason:
-            'FindInteractionJS.swift never references shadowRoot — text '
-            'rendered through a shadow DOM (GitHub JSON/blob viewer) is '
-            'invisible to the find walker, so a visible term is not matched '
-            '(#1155 symptom 1).',
-      );
-    },
-  );
+  test('find walker descends into shadow roots (visible shadow-DOM text is matched, #1155)', () {
+    // The element-node branch must recurse into `element.shadowRoot` when
+    // one exists, not only `element.childNodes`.
+    expect(
+      source,
+      matches(RegExp(r'shadowRoot')),
+      reason:
+          'FindInteractionJS.swift never references shadowRoot — text '
+          'rendered through a shadow DOM (GitHub JSON/blob viewer) is '
+          'invisible to the find walker, so a visible term is not matched '
+          '(#1155 symptom 1).',
+    );
+  });
 
-  test(
-    'find walker descends into same-origin iframe documents (#1155)',
-    () {
-      // The element-node branch must also cross into a same-origin iframe's
-      // `contentDocument` so text inside a nested browsing context is found.
-      expect(
-        source,
-        matches(
-          RegExp(r'contentDocument'),
-        ),
-        reason:
-            'FindInteractionJS.swift never references contentDocument — '
-            'text inside a same-origin iframe is invisible to the find '
-            'walker (#1155 symptom 1, nested-root case).',
-      );
-    },
-  );
+  test('find walker descends into same-origin iframe documents (#1155)', () {
+    // The element-node branch must also cross into a same-origin iframe's
+    // `contentDocument` so text inside a nested browsing context is found.
+    expect(
+      source,
+      matches(RegExp(r'contentDocument')),
+      reason:
+          'FindInteractionJS.swift never references contentDocument — '
+          'text inside a same-origin iframe is invisible to the find '
+          'walker (#1155 symptom 1, nested-root case).',
+    );
+  });
 
   test(
     'find-all posts the final match count after the walk completes (#1155)',
@@ -122,6 +112,10 @@ void main() {
 
   test('clearing matches cancels pending rescans', () async {
     await _runFinderHarness(source, 'clear-cancels-rescan');
+  });
+
+  test('frame safety keeps one listener and skips null documents', () async {
+    await _runFinderHarness(source, 'frame-safety');
   });
 }
 

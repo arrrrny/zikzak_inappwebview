@@ -148,13 +148,15 @@ function createEnvironment(script) {
   const messages = [];
   const timers = new Map();
   let nextTimerId = 1;
+  let now = 0;
 
   const context = {
     console,
     document,
     setTimeout(callback, delay) {
       const id = nextTimerId++;
-      timers.set(id, { callback, delay });
+      const duration = Number.isFinite(delay) ? Math.max(0, delay) : 0;
+      timers.set(id, { callback, dueAt: now + duration });
       return id;
     },
     clearTimeout(id) {
@@ -178,6 +180,22 @@ function createEnvironment(script) {
     document,
     messages,
     timers,
+    listenerCount(type) {
+      return (document.listeners.get(type) || []).length;
+    },
+    advanceBy(milliseconds) {
+      now += milliseconds;
+      while (true) {
+        const due = Array.from(timers.entries())
+          .filter(([, timer]) => timer.dueAt <= now)
+          .sort((left, right) => left[1].dueAt - right[1].dueAt);
+        if (due.length === 0) return;
+        for (const [id, timer] of due) {
+          if (!timers.delete(id)) continue;
+          timer.callback();
+        }
+      }
+    },
     flushTimers() {
       const pending = Array.from(timers.values());
       timers.clear();
@@ -206,22 +224,24 @@ function nestedRoots(script) {
   const host = env.document.createElement('div');
   env.document.body.appendChild(host);
   host.shadowRoot = new DocumentFragment();
-  host.shadowRoot.appendChild(env.document.createTextNode('gemini shadow'));
+  host.shadowRoot.appendChild(env.document.createTextNode('gemini shadow openai'));
 
   const iframe = env.document.createElement('iframe');
   env.document.body.appendChild(iframe);
   iframe.contentDocument = new Document();
-  iframe.contentDocument.body.appendChild(env.document.createTextNode('openai frame'));
+  iframe.contentDocument.body.appendChild(env.document.createTextNode('gemini frame openai'));
 
   env.bridge._findAllAsync('gemini');
-  assert.equal(env.messages.at(-1).numberOfMatches, 1);
+  const firstHighlights = Array.from(env.bridge._highlightNodes);
+  assert.equal(env.messages.at(-1).numberOfMatches, 2);
   assert.equal(countHighlights(host.shadowRoot), 1);
-  assert.equal(countHighlights(iframe.contentDocument.body), 0);
+  assert.equal(countHighlights(iframe.contentDocument.body), 1);
 
   env.bridge._findAllAsync('openai');
-  assert.equal(env.messages.at(-1).numberOfMatches, 1);
-  assert.equal(countHighlights(host.shadowRoot), 0);
+  assert.equal(env.messages.at(-1).numberOfMatches, 2);
+  assert.equal(countHighlights(host.shadowRoot), 1);
   assert.equal(countHighlights(iframe.contentDocument.body), 1);
+  assert.ok(firstHighlights.every((highlight) => highlight.parentNode === null));
   assert.equal(env.messages.length, 2);
 }
 
@@ -302,10 +322,13 @@ function scrollendRescan(script) {
 
   env.document.body.appendChild(env.document.createTextNode(' gemini'));
   env.document.dispatchScrollend();
+  env.advanceBy(149);
+  assert.equal(env.messages.length, 0);
   env.document.dispatchScrollend();
+  env.advanceBy(149);
+  assert.equal(env.messages.length, 0);
   assert.equal(env.timers.size, 1);
-
-  env.flushTimers();
+  env.advanceBy(1);
 
   assert.equal(env.messages.length, 1);
   assert.deepEqual(env.messages[0], {
@@ -336,6 +359,23 @@ function clearCancelsRescan(script) {
   assert.equal(env.messages.length, 0);
 }
 
+function frameSafety(script) {
+  const env = createEnvironment(script);
+  const listeners = env.document.listeners.get('scrollend') || [];
+  assert.equal(listeners.length, 1);
+  assert.equal(listeners[0].capture, true);
+
+  const iframe = env.document.createElement('iframe');
+  env.document.body.appendChild(iframe);
+  assert.equal(iframe.contentDocument, null);
+  env.document.body.appendChild(env.document.createTextNode('gemini'));
+
+  env.bridge._findAllAsync('gemini');
+
+  assert.equal(env.messages.at(-1).numberOfMatches, 1);
+  assert.equal(env.bridge._highlightNodes.length, 1);
+}
+
 const scenarios = {
   'nested-roots': nestedRoots,
   'failed-walk': failedWalk,
@@ -343,6 +383,7 @@ const scenarios = {
   'zero-match-navigation': zeroMatchNavigation,
   'scrollend-rescan': scrollendRescan,
   'clear-cancels-rescan': clearCancelsRescan,
+  'frame-safety': frameSafety,
 };
 const [scriptPath, scenario] = process.argv.slice(2);
 assert.ok(scriptPath, 'finder script path is required');
