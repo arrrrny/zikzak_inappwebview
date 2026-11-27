@@ -16,8 +16,8 @@ const String packageVersion = '6.6.0';
 
 /// Key third-party dependency versions that appear in README installation
 /// snippets and should stay in sync across the project.
-const String zorphyVersion = '2.4.6';
-const String zorphyAnnotationVersion = '2.4.6';
-const String zuraffaVersion = '7.5.0';
-const String zuraffaFlutterVersion = '7.5.0';
-const String zuraffaSessionVersion = '7.5.0';
+const String zorphyVersion = '2.5.1';
+const String zorphyAnnotationVersion = '2.5.1';
+const String zuraffaVersion = '7.6.1';
+const String zuraffaFlutterVersion = '7.6.1';
+const String zuraffaSessionVersion = '7.6.1';
