@@ -19,9 +19,9 @@ Tests are mandatory and must be observed failing before their implementation. Ru
 
 ## Phase 3: Navigation result delivery
 
-- [ ] T007 Add the missing-highlight navigation regression test and record its red output. [A2]
-- [ ] T008 Post navigation counts even when the active highlight is missing and rerun the full suite green. [A2]
-- [ ] T009 Run the A2 acceptance test after implementation and record green evidence. [A2]
+- [X] T007 Add the missing-highlight navigation regression test and record its red output. [A2]
+- [X] T008 Post navigation counts even when the active highlight is missing and rerun the full suite green. [A2]
+- [X] T009 Run the A2 acceptance test after implementation and record green evidence. [A2]
 - [ ] T010 Add the zero-match navigation boundary test and record its red output. [A3]
 - [ ] T011 Post zero-match navigation counts and rerun the full suite green. [A3]
 - [ ] T012 Run the A3 acceptance test after implementation and record green evidence. [A3]

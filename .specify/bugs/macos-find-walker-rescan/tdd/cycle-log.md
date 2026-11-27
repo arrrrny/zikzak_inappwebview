@@ -27,3 +27,11 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
 - green: `FindInteractionJS.swift` moved `_isDoneCounting` and the result post into `finally`; the single test passed and full suite `flutter test --no-pub --concurrency=2` -> 195 passed, 0 failed, 1:40
 - refactor: none needed; the change is confined to `_findAllAsync`
 - commit: `d15341ea`
+
+## Cycle 3: A2 missing highlights still post navigation counts
+
+- test: `test/find_shadow_dom_contract_test.dart::missing highlights still post navigation counts` (new)
+- red: `flutter test --no-pub test/find_shadow_dom_contract_test.dart --plain-name "missing highlights still post navigation counts" --concurrency=2` -> `AssertionError [ERR_ASSERTION]: Expected values to be strictly equal: 0 !== 1` at `find_interaction_harness.js:270` (`messages.length`)
+- green: `_findNext` now skips missing highlight entries and posts from `finally`; the single test passed and full suite `flutter test --no-pub --concurrency=2` -> 196 passed, 0 failed, 1:37
+- refactor: none needed; navigation and result delivery remain in the existing function
+- commit: `d6387885`
