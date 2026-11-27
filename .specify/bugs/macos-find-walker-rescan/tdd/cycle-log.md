@@ -51,3 +51,11 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
 - green: retained the normalized active keyword and added one capture-phase `scrollend` listener with a 150 ms debounce; the single test passed and full suite `flutter test --no-pub --concurrency=2` -> 198 passed, 0 failed, 1:55
 - refactor: none needed; the rescan calls the existing `_findAllAsync` entry point
 - commit: `0a5ac008`
+
+## Cycle 6: A5 clearing matches cancels pending rescans
+
+- test: `test/find_shadow_dom_contract_test.dart::clearing matches cancels pending rescans` (new)
+- red: `flutter test --no-pub test/find_shadow_dom_contract_test.dart --plain-name "clearing matches cancels pending rescans" --concurrency=2` -> `AssertionError [ERR_ASSERTION]: Expected values to be strictly equal: 1 !== 0` at `find_interaction_harness.js:329` (`timers.size` after `_clearMatches`)
+- green: `_clearMatches` now clears the pending timer and resets `_activeFindKeyword`; the single test passed and full suite `flutter test --no-pub --concurrency=2` -> 199 passed, 0 failed, 2:31
+- refactor: none needed; cancellation lives with the existing match-reset function
+- commit: `ff5648bb`
