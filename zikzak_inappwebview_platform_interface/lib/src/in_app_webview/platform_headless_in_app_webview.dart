@@ -116,8 +116,8 @@ class PlatformHeadlessInAppWebViewCreationParams
   ///Event fired when the native manager evicts this headless WebView to stay
   ///under its live-instance cap.
   ///
-  ///The native side recycles the least-recently-used instance when a new
-  ///`run()` would exceed the platform ceiling (iOS/Android `3`, macOS `5`). A
+  ///iOS and Android recycle the least-recently-used instance at the configured
+  ///cap (default `3`). macOS defaults to `5` and refuses a create when full. A
   ///recycled instance is torn down natively, so the owner must settle its own
   ///lifecycle here instead of discovering the eviction on its next per-instance
   ///call, which now targets a dead channel.

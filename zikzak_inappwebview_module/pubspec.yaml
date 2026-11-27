@@ -16,6 +16,10 @@ dependencies:
   zikzak_inappwebview:
     path: ../zikzak_inappwebview
 
+dependency_overrides:
+  zikzak_inappwebview_platform_interface:
+    path: ../zikzak_inappwebview_platform_interface
+
 # zuraffa dependencies — uncomment when zuraffa#389 ships:
 #  zuraffa:
 #    path: ../../zuraffa

@@ -51,10 +51,10 @@ public class HeadlessInAppWebViewManager extends ChannelDelegateImpl {
    * growing or failing: native instances outlive a Dart hot restart (the dead
    * isolate cannot dispose them), so a saturated cap would otherwise refuse
    * every later create for the rest of the process. The Dart-side
-   * HeadlessWebViewRegistry uses the same platform cap and can evict an idle
+   * HeadlessWebViewRegistry uses the same configured cap and can evict an idle
    * instance before the ceiling is ever reached.
    */
-  public static final int maxLiveWebViews = 3;
+  public static volatile int maxLiveWebViews = 3;
 
   public final Map<String, HeadlessInAppWebView> webViews = new HashMap<>();
 
@@ -85,6 +85,28 @@ public class HeadlessInAppWebViewManager extends ChannelDelegateImpl {
     final String id = idArgument instanceof String ? (String) idArgument : null;
 
     switch (call.method) {
+      case "setMaxLiveWebViews":
+        {
+          final Object capArgument = call.argument("maxLiveWebViews");
+          if (!(capArgument instanceof Integer) && !(capArgument instanceof Long)) {
+            result.error(
+                "headless_invalid_arguments",
+                "maxLiveWebViews must be an integer",
+                null);
+            return;
+          }
+          final long value = ((Number) capArgument).longValue();
+          if (value < 1 || value > Integer.MAX_VALUE) {
+            result.error(
+                "headless_invalid_arguments",
+                "maxLiveWebViews must be between 1 and Integer.MAX_VALUE",
+                null);
+            return;
+          }
+          maxLiveWebViews = (int) value;
+          result.success(true);
+        }
+        break;
       case "run":
         {
           if (id == null) {

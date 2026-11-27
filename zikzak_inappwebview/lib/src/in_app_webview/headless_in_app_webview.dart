@@ -2,6 +2,7 @@ import 'dart:collection';
 import 'dart:typed_data';
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:zikzak_inappwebview_platform_interface/zikzak_inappwebview_platform_interface.dart';
 
@@ -14,6 +15,49 @@ import 'network_capture/network_capture_manager.dart';
 
 ///{@macro zikzak_inappwebview_platform_interface.PlatformHeadlessInAppWebView}
 class HeadlessInAppWebView implements Disposable {
+  static int? _configuredMaxLiveWebViews;
+  static final Set<HeadlessInAppWebView> _liveInstances = {};
+  static bool _nativeCapConfigurationRequested = false;
+  static Future<Object?> _nativeCapConfiguration = Future.value(null);
+
+  /// Process-wide live headless cap; configure before the first [run].
+  static int get maxLiveWebViews =>
+      _configuredMaxLiveWebViews ?? _defaultMaxLiveWebViews;
+
+  static set maxLiveWebViews(int value) {
+    if (value < 1) {
+      throw ArgumentError.value(value, 'maxLiveWebViews', 'must be at least 1');
+    }
+    if (_liveInstances.isNotEmpty) {
+      throw StateError(
+        'HeadlessInAppWebView.maxLiveWebViews must be set before the first '
+        'headless run(). Dispose all live headless WebViews first.',
+      );
+    }
+    _configuredMaxLiveWebViews = value;
+    _nativeCapConfigurationRequested = true;
+    _nativeCapConfiguration = _configureNativeCap(value);
+  }
+
+  static int get _defaultMaxLiveWebViews {
+    if (kIsWeb) return 8;
+    if (defaultTargetPlatform == TargetPlatform.iOS ||
+        defaultTargetPlatform == TargetPlatform.android) {
+      return 3;
+    }
+    if (defaultTargetPlatform == TargetPlatform.macOS) return 5;
+    return 8;
+  }
+
+  static Future<Object?> _configureNativeCap(int value) async {
+    try {
+      await InAppWebViewPlatform.instance?.setHeadlessMaxLiveWebViews(value);
+      return null;
+    } catch (error) {
+      return error;
+    }
+  }
+
   /// Constructs a [HeadlessInAppWebView].
   ///
   ///{@macro zikzak_inappwebview_platform_interface.PlatformHeadlessInAppWebView}
@@ -663,10 +707,30 @@ class HeadlessInAppWebView implements Disposable {
   /// no-op instead of a second teardown of a dead channel.
   void _handleNativeEviction() {
     _lifecycle = DisposeLifecycle.released;
+    _liveInstances.remove(this);
   }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformHeadlessInAppWebView.run}
-  Future<void> run() => platform.run();
+  Future<void> run() async {
+    _liveInstances.add(this);
+    try {
+      if (!_nativeCapConfigurationRequested) {
+        _nativeCapConfigurationRequested = true;
+        _nativeCapConfiguration = _configureNativeCap(maxLiveWebViews);
+      }
+      final configurationError = await _nativeCapConfiguration;
+      if (configurationError != null) {
+        throw StateError(
+          'Unable to apply HeadlessInAppWebView.maxLiveWebViews: '
+          '$configurationError',
+        );
+      }
+      await platform.run();
+    } catch (_) {
+      _liveInstances.remove(this);
+      rethrow;
+    }
+  }
 
   ///{@macro zikzak_inappwebview_platform_interface.PlatformHeadlessInAppWebView.isRunning}
   bool isRunning() => platform.isRunning();
@@ -697,5 +761,8 @@ class HeadlessInAppWebView implements Disposable {
         ? DisposeLifecycle.keepAliveHeld
         : DisposeLifecycle.released;
     await platform.dispose(isKeepAlive: isKeepAlive);
+    if (!isKeepAlive && lastDisposeError == null) {
+      _liveInstances.remove(this);
+    }
   }
 }

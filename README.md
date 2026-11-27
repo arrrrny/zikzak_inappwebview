@@ -95,6 +95,26 @@ InAppWebView(
 )
 ```
 
+### Headless WebView live-instance cap
+
+The headless live-instance ceiling is a process-wide setting. Configure it before
+the first `HeadlessInAppWebView.run()`:
+
+```dart
+HeadlessInAppWebView.maxLiveWebViews = 6;
+```
+
+The default is **3** on iOS and Android, **5** on macOS, and **8** on other
+platforms. Values below `1` are rejected, and changing the cap after any headless
+view is live throws a `StateError`.
+
+Each live headless view owns a renderer or WebContent process. Raising the cap on
+low-memory devices can cause out-of-memory termination, so raise it only when the
+additional concurrent sessions are required. On iOS and Android, a create past
+the cap (for example, a fourth view with the default cap of `3`) evicts the
+least-recently-used live instance instead of failing; if no slot can be released,
+the create fails clearly. macOS keeps its existing full-cap refusal behavior.
+
 ## 📦 Migration from flutter_inappwebview
 
 Simply replace the import:

@@ -113,6 +113,15 @@ void main() {
         reason: 'R6: a failed native dispose must be inspectable by the caller',
       );
     });
+
+    test('the live cap is propagated through the shared manager channel',
+        () async {
+      await AndroidHeadlessInAppWebView.setMaxLiveWebViews(6);
+
+      expect(probe.calls, hasLength(1));
+      expect(probe.calls.single.method, 'setMaxLiveWebViews');
+      expect((probe.calls.single.arguments as Map)['maxLiveWebViews'], 6);
+    });
   });
 
   group('Android native headless lifecycle (issue #371 source contract)', () {
@@ -136,6 +145,19 @@ void main() {
         expect(manager, contains('result.error('), reason: 'R4: fail loudly');
       },
     );
+
+    test('the native cap is mutable and set through the manager channel', () {
+      final sources = javaSources();
+      final managerPath = sources.keys.firstWhere(
+        (p) => p.endsWith('HeadlessInAppWebViewManager.java'),
+      );
+      final manager = sources[managerPath]!;
+
+      expect(manager, contains('public static volatile int maxLiveWebViews = 3'));
+      expect(manager, contains('case "setMaxLiveWebViews":'));
+      expect(manager, contains('value < 1'));
+      expect(manager, contains('maxLiveWebViews = (int) value;'));
+    });
 
     test(
       'a create at the cap recycles the least-recently-used live instance '

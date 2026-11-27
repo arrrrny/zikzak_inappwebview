@@ -262,6 +262,9 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
     );
   }
 
+  /// Sets the process-wide cap; unsupported platforms do nothing.
+  Future<void> setHeadlessMaxLiveWebViews(int value) async {}
+
   /// Creates a new [PlatformWebStorageManager].
   ///
   /// This function should only be called by the app-facing package.

@@ -57,6 +57,10 @@ class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
   }
 
   @override
+  Future<void> setHeadlessMaxLiveWebViews(int value) =>
+      MacOSHeadlessInAppWebView.setMaxLiveWebViews(value);
+
+  @override
   PlatformInAppBrowser createPlatformInAppBrowser(
     PlatformInAppBrowserCreationParams params,
   ) {

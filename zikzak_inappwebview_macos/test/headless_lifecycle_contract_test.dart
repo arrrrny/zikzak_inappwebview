@@ -106,6 +106,17 @@ void main() {
         reason: 'R6: a failed native dispose must be inspectable by the caller',
       );
     });
+
+    test(
+      'the live cap is propagated through the shared manager channel',
+      () async {
+        await MacOSHeadlessInAppWebView.setMaxLiveWebViews(6);
+
+        expect(probe.calls, hasLength(1));
+        expect(probe.calls.single.method, 'setMaxLiveWebViews');
+        expect((probe.calls.single.arguments as Map)['maxLiveWebViews'], 6);
+      },
+    );
   });
 
   group('macOS native headless lifecycle (issue #371 source contract)', () {
@@ -142,6 +153,17 @@ void main() {
       final source = managerSwiftSource().values.single;
       expect(source, contains('maxLiveWebViews'), reason: 'R4');
       expect(source, contains('FlutterError'), reason: 'R4: fail loudly');
+    });
+
+    test('the native cap is mutable and set through the manager channel', () {
+      final source = managerSwiftSource().values.single;
+      expect(source, contains('static var maxLiveWebViews = 5'));
+      expect(source, contains('case "setMaxLiveWebViews":'));
+      expect(source, contains('value >= 1'));
+      expect(
+        source,
+        contains('HeadlessInAppWebViewManager.maxLiveWebViews = value'),
+      );
     });
   });
 }
