@@ -225,7 +225,35 @@ function nestedRoots(script) {
   assert.equal(env.messages.length, 2);
 }
 
-const scenarios = { 'nested-roots': nestedRoots };
+function failedWalk(script) {
+  const env = createEnvironment(script);
+  env.document.body.appendChild(env.document.createTextNode('gemini gemini'));
+  const createTextNode = env.document.createTextNode.bind(env.document);
+  let calls = 0;
+  env.document.createTextNode = (value) => {
+    calls++;
+    if (calls === 4) throw new Error('detached parent');
+    return createTextNode(value);
+  };
+
+  let failure;
+  try {
+    env.bridge._findAllAsync('gemini');
+  } catch (error) {
+    failure = error;
+  }
+
+  assert.equal(failure && failure.message, 'detached parent');
+  assert.equal(env.messages.length, 1);
+  assert.deepEqual(env.messages[0], {
+    activeMatchOrdinal: 0,
+    numberOfMatches: 1,
+    isDoneCounting: true,
+  });
+  assert.equal(env.bridge._highlightNodes.length, 1);
+}
+
+const scenarios = { 'nested-roots': nestedRoots, 'failed-walk': failedWalk };
 const [scriptPath, scenario] = process.argv.slice(2);
 assert.ok(scriptPath, 'finder script path is required');
 assert.ok(scenarios[scenario], `unknown scenario: ${scenario}`);

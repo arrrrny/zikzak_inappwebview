@@ -100,16 +100,19 @@ window.\(JAVASCRIPT_BRIDGE_NAME)._findAllAsyncForElement = function(element, key
 
 window.\(JAVASCRIPT_BRIDGE_NAME)._findAllAsync = function(keyword) {
   window.\(JAVASCRIPT_BRIDGE_NAME)._clearMatches();
-  window.\(JAVASCRIPT_BRIDGE_NAME)._findAllAsyncForElement(document.body, keyword.toLowerCase());
-  window.\(JAVASCRIPT_BRIDGE_NAME)._isDoneCounting = true;
+  try {
+    window.\(JAVASCRIPT_BRIDGE_NAME)._findAllAsyncForElement(document.body, keyword.toLowerCase());
+  } finally {
+    window.\(JAVASCRIPT_BRIDGE_NAME)._isDoneCounting = true;
 
-  window.webkit.messageHandlers["onFindResultReceived"].postMessage(
-      {
-          'activeMatchOrdinal': window.\(JAVASCRIPT_BRIDGE_NAME)._currentHighlight,
-          'numberOfMatches': window.\(JAVASCRIPT_BRIDGE_NAME)._searchResultCount,
-          'isDoneCounting': window.\(JAVASCRIPT_BRIDGE_NAME)._isDoneCounting
-      }
-  );
+    window.webkit.messageHandlers["onFindResultReceived"].postMessage(
+        {
+            'activeMatchOrdinal': window.\(JAVASCRIPT_BRIDGE_NAME)._currentHighlight,
+            'numberOfMatches': window.\(JAVASCRIPT_BRIDGE_NAME)._searchResultCount,
+            'isDoneCounting': window.\(JAVASCRIPT_BRIDGE_NAME)._isDoneCounting
+        }
+    );
+  }
 }
 
 window.\(JAVASCRIPT_BRIDGE_NAME)._clearMatchesForElement = function(element) {

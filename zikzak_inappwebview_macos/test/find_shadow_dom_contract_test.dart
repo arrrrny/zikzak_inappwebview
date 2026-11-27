@@ -103,6 +103,10 @@ void main() {
   test('nested roots are searched and cleared', () async {
     await _runFinderHarness(source, 'nested-roots');
   });
+
+  test('failed walks still post final counts', () async {
+    await _runFinderHarness(source, 'failed-walk');
+  });
 }
 
 /// The body of `window.<bridge>.<name> = function(...) { ... }`, brace-matched
