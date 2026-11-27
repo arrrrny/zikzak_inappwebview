@@ -277,10 +277,28 @@ function missingHighlight(script) {
   assert.equal(env.bridge._currentHighlight, 1);
 }
 
+function zeroMatchNavigation(script) {
+  const env = createEnvironment(script);
+  env.document.body.appendChild(env.document.createTextNode('alpha'));
+  env.bridge._findAllAsync('gemini');
+  env.messages.length = 0;
+
+  env.bridge._findNext(true);
+
+  assert.equal(env.messages.length, 1);
+  assert.deepEqual(env.messages[0], {
+    activeMatchOrdinal: 0,
+    numberOfMatches: 0,
+    isDoneCounting: true,
+  });
+  assert.equal(env.bridge._currentHighlight, 0);
+}
+
 const scenarios = {
   'nested-roots': nestedRoots,
   'failed-walk': failedWalk,
   'missing-highlight': missingHighlight,
+  'zero-match-navigation': zeroMatchNavigation,
 };
 const [scriptPath, scenario] = process.argv.slice(2);
 assert.ok(scriptPath, 'finder script path is required');

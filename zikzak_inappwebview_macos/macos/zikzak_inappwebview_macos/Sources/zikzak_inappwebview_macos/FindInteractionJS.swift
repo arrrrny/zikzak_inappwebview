@@ -181,34 +181,34 @@ window.\(JAVASCRIPT_BRIDGE_NAME)._clearMatches = function() {
 }
 
 window.\(JAVASCRIPT_BRIDGE_NAME)._findNext = function(forward) {
-  if (window.\(JAVASCRIPT_BRIDGE_NAME)._searchResultCount <= 0) return;
-
-  var idx = window.\(JAVASCRIPT_BRIDGE_NAME)._currentHighlight + (forward ? +1 : -1);
-  idx =
-    idx < 0
-      ? window.\(JAVASCRIPT_BRIDGE_NAME)._searchResultCount - 1
-      : idx >= window.\(JAVASCRIPT_BRIDGE_NAME)._searchResultCount
-      ? 0
-      : idx;
-  window.\(JAVASCRIPT_BRIDGE_NAME)._currentHighlight = idx;
-
   try {
-    // #1155: navigate the tracked highlight list, not document.getElementById —
-    // a shadow-root highlight is not reachable by id from the document.
-    var highlights = window.\(JAVASCRIPT_BRIDGE_NAME)._highlightNodes;
-    var scrollTo = highlights[idx];
-    if (scrollTo) {
-      for (var i = 0; i < highlights.length; i++) {
-        if (highlights[i]) {
-          highlights[i].style.backgroundColor = "#FFFF00";
-        }
-      }
-      scrollTo.style.backgroundColor = "#FF9732";
+    if (window.\(JAVASCRIPT_BRIDGE_NAME)._searchResultCount > 0) {
+      var idx = window.\(JAVASCRIPT_BRIDGE_NAME)._currentHighlight + (forward ? +1 : -1);
+      idx =
+        idx < 0
+          ? window.\(JAVASCRIPT_BRIDGE_NAME)._searchResultCount - 1
+          : idx >= window.\(JAVASCRIPT_BRIDGE_NAME)._searchResultCount
+          ? 0
+          : idx;
+      window.\(JAVASCRIPT_BRIDGE_NAME)._currentHighlight = idx;
 
-      scrollTo.scrollIntoView({
-        behavior: "auto",
-        block: "center"
-      });
+      // #1155: navigate the tracked highlight list, not document.getElementById —
+      // a shadow-root highlight is not reachable by id from the document.
+      var highlights = window.\(JAVASCRIPT_BRIDGE_NAME)._highlightNodes;
+      var scrollTo = highlights[idx];
+      if (scrollTo) {
+        for (var i = 0; i < highlights.length; i++) {
+          if (highlights[i]) {
+            highlights[i].style.backgroundColor = "#FFFF00";
+          }
+        }
+        scrollTo.style.backgroundColor = "#FF9732";
+
+        scrollTo.scrollIntoView({
+          behavior: "auto",
+          block: "center"
+        });
+      }
     }
   } finally {
     window.webkit.messageHandlers["onFindResultReceived"].postMessage(

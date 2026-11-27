@@ -111,6 +111,10 @@ void main() {
   test('missing highlights still post navigation counts', () async {
     await _runFinderHarness(source, 'missing-highlight');
   });
+
+  test('zero-match navigation posts counts', () async {
+    await _runFinderHarness(source, 'zero-match-navigation');
+  });
 }
 
 /// The body of `window.<bridge>.<name> = function(...) { ... }`, brace-matched
