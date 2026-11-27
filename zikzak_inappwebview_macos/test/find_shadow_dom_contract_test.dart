@@ -115,6 +115,10 @@ void main() {
   test('zero-match navigation posts counts', () async {
     await _runFinderHarness(source, 'zero-match-navigation');
   });
+
+  test('scrollend rescans newly mounted matches', () async {
+    await _runFinderHarness(source, 'scrollend-rescan');
+  });
 }
 
 /// The body of `window.<bridge>.<name> = function(...) { ... }`, brace-matched
