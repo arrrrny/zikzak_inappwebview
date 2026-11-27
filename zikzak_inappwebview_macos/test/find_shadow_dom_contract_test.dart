@@ -119,6 +119,10 @@ void main() {
   test('scrollend rescans newly mounted matches', () async {
     await _runFinderHarness(source, 'scrollend-rescan');
   });
+
+  test('clearing matches cancels pending rescans', () async {
+    await _runFinderHarness(source, 'clear-cancels-rescan');
+  });
 }
 
 /// The body of `window.<bridge>.<name> = function(...) { ... }`, brace-matched

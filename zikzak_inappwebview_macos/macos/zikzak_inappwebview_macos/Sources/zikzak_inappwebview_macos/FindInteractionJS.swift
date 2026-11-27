@@ -188,6 +188,11 @@ window.\(JAVASCRIPT_BRIDGE_NAME)._clearMatchesForElement = function(element) {
 }
 
 window.\(JAVASCRIPT_BRIDGE_NAME)._clearMatches = function() {
+  if (window.\(JAVASCRIPT_BRIDGE_NAME)._findScrollTimer !== null) {
+    clearTimeout(window.\(JAVASCRIPT_BRIDGE_NAME)._findScrollTimer);
+    window.\(JAVASCRIPT_BRIDGE_NAME)._findScrollTimer = null;
+  }
+  window.\(JAVASCRIPT_BRIDGE_NAME)._activeFindKeyword = "";
   window.\(JAVASCRIPT_BRIDGE_NAME)._searchResultCount = 0;
   window.\(JAVASCRIPT_BRIDGE_NAME)._currentHighlight = 0;
   window.\(JAVASCRIPT_BRIDGE_NAME)._isDoneCounting = false;

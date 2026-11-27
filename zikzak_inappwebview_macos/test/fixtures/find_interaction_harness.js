@@ -317,12 +317,32 @@ function scrollendRescan(script) {
   assert.equal(env.timers.size, 0);
 }
 
+function clearCancelsRescan(script) {
+  const env = createEnvironment(script);
+  env.document.body.appendChild(env.document.createTextNode('gemini'));
+  env.bridge._findAllAsync('gemini');
+  env.messages.length = 0;
+
+  env.document.dispatchScrollend();
+  assert.equal(env.timers.size, 1);
+  env.bridge._clearMatches();
+  assert.equal(env.timers.size, 0);
+  assert.equal(env.bridge._activeFindKeyword, '');
+
+  env.document.body.appendChild(env.document.createTextNode(' gemini'));
+  env.document.dispatchScrollend();
+  assert.equal(env.timers.size, 0);
+  env.flushTimers();
+  assert.equal(env.messages.length, 0);
+}
+
 const scenarios = {
   'nested-roots': nestedRoots,
   'failed-walk': failedWalk,
   'missing-highlight': missingHighlight,
   'zero-match-navigation': zeroMatchNavigation,
   'scrollend-rescan': scrollendRescan,
+  'clear-cancels-rescan': clearCancelsRescan,
 };
 const [scriptPath, scenario] = process.argv.slice(2);
 assert.ok(scriptPath, 'finder script path is required');
