@@ -253,7 +253,35 @@ function failedWalk(script) {
   assert.equal(env.bridge._highlightNodes.length, 1);
 }
 
-const scenarios = { 'nested-roots': nestedRoots, 'failed-walk': failedWalk };
+function missingHighlight(script) {
+  const env = createEnvironment(script);
+  env.document.body.appendChild(env.document.createTextNode('gemini gemini'));
+  env.bridge._findAllAsync('gemini');
+  env.messages.length = 0;
+  env.bridge._highlightNodes[1] = null;
+
+  let failure;
+  try {
+    env.bridge._findNext(true);
+  } catch (error) {
+    failure = error;
+  }
+
+  assert.equal(env.messages.length, 1);
+  assert.deepEqual(env.messages[0], {
+    activeMatchOrdinal: 1,
+    numberOfMatches: 2,
+    isDoneCounting: true,
+  });
+  assert.equal(failure, undefined);
+  assert.equal(env.bridge._currentHighlight, 1);
+}
+
+const scenarios = {
+  'nested-roots': nestedRoots,
+  'failed-walk': failedWalk,
+  'missing-highlight': missingHighlight,
+};
 const [scriptPath, scenario] = process.argv.slice(2);
 assert.ok(scriptPath, 'finder script path is required');
 assert.ok(scenarios[scenario], `unknown scenario: ${scenario}`);

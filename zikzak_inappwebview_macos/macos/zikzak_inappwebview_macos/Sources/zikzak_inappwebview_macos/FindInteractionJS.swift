@@ -192,21 +192,25 @@ window.\(JAVASCRIPT_BRIDGE_NAME)._findNext = function(forward) {
       : idx;
   window.\(JAVASCRIPT_BRIDGE_NAME)._currentHighlight = idx;
 
-  // #1155: navigate the tracked highlight list, not document.getElementById —
-  // a shadow-root highlight is not reachable by id from the document.
-  var highlights = window.\(JAVASCRIPT_BRIDGE_NAME)._highlightNodes;
-  var scrollTo = highlights[idx];
-  if (scrollTo) {
-    for (var i = 0; i < highlights.length; i++) {
-      highlights[i].style.backgroundColor = "#FFFF00";
+  try {
+    // #1155: navigate the tracked highlight list, not document.getElementById —
+    // a shadow-root highlight is not reachable by id from the document.
+    var highlights = window.\(JAVASCRIPT_BRIDGE_NAME)._highlightNodes;
+    var scrollTo = highlights[idx];
+    if (scrollTo) {
+      for (var i = 0; i < highlights.length; i++) {
+        if (highlights[i]) {
+          highlights[i].style.backgroundColor = "#FFFF00";
+        }
+      }
+      scrollTo.style.backgroundColor = "#FF9732";
+
+      scrollTo.scrollIntoView({
+        behavior: "auto",
+        block: "center"
+      });
     }
-    scrollTo.style.backgroundColor = "#FF9732";
-
-    scrollTo.scrollIntoView({
-      behavior: "auto",
-      block: "center"
-    });
-
+  } finally {
     window.webkit.messageHandlers["onFindResultReceived"].postMessage(
         {
             'activeMatchOrdinal': window.\(JAVASCRIPT_BRIDGE_NAME)._currentHighlight,

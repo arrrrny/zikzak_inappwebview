@@ -107,6 +107,10 @@ void main() {
   test('failed walks still post final counts', () async {
     await _runFinderHarness(source, 'failed-walk');
   });
+
+  test('missing highlights still post navigation counts', () async {
+    await _runFinderHarness(source, 'missing-highlight');
+  });
 }
 
 /// The body of `window.<bridge>.<name> = function(...) { ... }`, brace-matched
