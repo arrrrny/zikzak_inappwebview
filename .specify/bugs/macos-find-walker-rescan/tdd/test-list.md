@@ -4,7 +4,7 @@ loop: outside-in
 profile: .specify/memory/tdd-profile.md
 spec_criteria: 6
 planned_at: 19b13d24
-updated_at: ff5648bb
+updated_at: 92d5c85e
 suite_baseline: green
 ---
 
@@ -22,6 +22,7 @@ The real entry point is the exact JavaScript extracted from `FIND_TEXT_HIGHLIGHT
 | A4  | A debounced scrollend rerun includes text mounted after the active query started          | AC-4   | example          | DONE | `test/find_shadow_dom_contract_test.dart::scrollend rescans newly mounted matches`   |
 | A5  | Clearing matches cancels a pending rescan and prevents old-query result posts             | AC-5   | example          | DONE | `test/find_shadow_dom_contract_test.dart::clearing matches cancels pending rescans`  |
 | A6  | Open shadow-root and same-origin iframe text is found and cleared by the injected script   | AC-6   | characterization | BASELINE | `test/find_shadow_dom_contract_test.dart::nested roots are searched and cleared`     |
+| A7  | A null-document iframe is skipped and exactly one capture-phase scrollend listener exists   | AC-6, FR-5 | characterization | BASELINE | `test/find_shadow_dom_contract_test.dart::frame safety keeps one listener and skips null documents` |
 
 ## Inner loop: unit behaviors
 

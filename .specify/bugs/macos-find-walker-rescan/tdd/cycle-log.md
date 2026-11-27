@@ -59,3 +59,13 @@ Append only. Newest last. Every entry's `red` block is the evidence that the tes
 - green: `_clearMatches` now clears the pending timer and resets `_activeFindKeyword`; the single test passed and full suite `flutter test --no-pub --concurrency=2` -> 199 passed, 0 failed, 2:31
 - refactor: none needed; cancellation lives with the existing match-reset function
 - commit: `ff5648bb`
+
+## Cycle 7: independent-audit strengthening for A4, A6, and A7
+
+- audit: a fresh-context reviewer found that iframe cleanup was not exercised, the debounce delay was not timing-sensitive, and single-listener/null-document safety lacked behavioral coverage
+- tests: `92d5c85e` makes both nested roots retain highlights before rerun, adds a controllable clock with 149 ms/150 ms restart-boundary checks, and adds the A7 listener/null-document characterization
+- baseline: `flutter test --no-pub test/find_shadow_dom_contract_test.dart --concurrency=2` -> 10 passed against unchanged production source
+- deliberate mutants: disabling iframe cleanup failed with `2 !== 1`; changing 150 ms to 0 ms failed with `1 !== 0`; duplicating the listener failed with `2 !== 1`; removing the null-document guard failed with `TypeError: Cannot read properties of null (reading 'body')`
+- green: restored every mutant exactly; full suite `flutter test --no-pub --concurrency=2` -> 200 passed, 0 failed, 2:36
+- refactor: replaced unconditional timer flushing for A4 with a deterministic clock; no production behavior changed in this cycle
+- commit: `92d5c85e`

@@ -20,7 +20,7 @@ Given a completed search with zero matches, `_findNext` posts `activeMatchOrdina
 
 ### AC-4 — Newly mounted text is rescanned after scrolling
 
-Given an active non-empty query, appending newly mounted matching text and dispatching `scrollend` causes one debounced rerun of that query and a final result post whose count includes the new match.
+Given an active non-empty query, appending newly mounted matching text and dispatching `scrollend` causes no rerun before 150 ms after the latest event, then exactly one rerun whose final result count includes the new match.
 
 ### AC-5 — Clearing matches stops pending rescans
 

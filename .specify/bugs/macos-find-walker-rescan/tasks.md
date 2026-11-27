@@ -37,7 +37,14 @@ Tests are mandatory and must be observed failing before their implementation. Ru
 
 ## Phase 5: Verification and delivery
 
-- [ ] T019 Audit test-first evidence and run deliberate mutants for the highest-risk behaviors.
-- [ ] T020 Run package analysis, the full macOS suite, and a macOS Swift build.
-- [ ] T021 Restore setup-only dependency override files, review the final diff, and write the fix report.
+- [X] T019 Audit test-first evidence and run deliberate mutants for the highest-risk behaviors.
+- [X] T020 Run package analysis, the full macOS suite, and a macOS Swift build.
+- [X] T021 Restore setup-only dependency override files, review the final diff, and write the fix report.
 - [ ] T022 Push the branch, open the PR linked to issue #472, pass the evidence gate, and complete the pool task.
+
+## Phase 6: Independent-audit remediation
+
+- [X] T023 Strengthen A6 so both shadow-root and iframe highlights must be cleared on rerun.
+- [X] T024 Strengthen A4 with a controllable clock that proves the 150 ms window and restart boundary.
+- [X] T025 Add the A7 single-listener and null-document iframe characterization test. [A7]
+- [X] T026 Run deliberate mutants for iframe cleanup, debounce timing, duplicate listeners, and null-document access; restore each and rerun the suite green.
