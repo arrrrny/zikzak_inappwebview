@@ -12,6 +12,20 @@ window.\(JAVASCRIPT_BRIDGE_NAME)._isDoneCounting = false;
 // getElementsByClassName do NOT pierce a shadow root, so _findNext navigates
 // this list instead of querying the document.
 window.\(JAVASCRIPT_BRIDGE_NAME)._highlightNodes = [];
+window.\(JAVASCRIPT_BRIDGE_NAME)._activeFindKeyword = "";
+window.\(JAVASCRIPT_BRIDGE_NAME)._findScrollTimer = null;
+
+window.\(JAVASCRIPT_BRIDGE_NAME)._scheduleFindRescan = function() {
+  if (!window.\(JAVASCRIPT_BRIDGE_NAME)._activeFindKeyword) return;
+  if (window.\(JAVASCRIPT_BRIDGE_NAME)._findScrollTimer !== null) {
+    clearTimeout(window.\(JAVASCRIPT_BRIDGE_NAME)._findScrollTimer);
+  }
+  window.\(JAVASCRIPT_BRIDGE_NAME)._findScrollTimer = setTimeout(function() {
+    window.\(JAVASCRIPT_BRIDGE_NAME)._findScrollTimer = null;
+    window.\(JAVASCRIPT_BRIDGE_NAME)._findAllAsync(window.\(JAVASCRIPT_BRIDGE_NAME)._activeFindKeyword);
+  }, 150);
+};
+document.addEventListener("scrollend", window.\(JAVASCRIPT_BRIDGE_NAME)._scheduleFindRescan, true);
 
 window.\(JAVASCRIPT_BRIDGE_NAME)._findAllAsyncForElement = function(element, keyword) {
   if (element) {
@@ -100,16 +114,20 @@ window.\(JAVASCRIPT_BRIDGE_NAME)._findAllAsyncForElement = function(element, key
 
 window.\(JAVASCRIPT_BRIDGE_NAME)._findAllAsync = function(keyword) {
   window.\(JAVASCRIPT_BRIDGE_NAME)._clearMatches();
-  window.\(JAVASCRIPT_BRIDGE_NAME)._findAllAsyncForElement(document.body, keyword.toLowerCase());
-  window.\(JAVASCRIPT_BRIDGE_NAME)._isDoneCounting = true;
+  window.\(JAVASCRIPT_BRIDGE_NAME)._activeFindKeyword = keyword.toLowerCase();
+  try {
+    window.\(JAVASCRIPT_BRIDGE_NAME)._findAllAsyncForElement(document.body, window.\(JAVASCRIPT_BRIDGE_NAME)._activeFindKeyword);
+  } finally {
+    window.\(JAVASCRIPT_BRIDGE_NAME)._isDoneCounting = true;
 
-  window.webkit.messageHandlers["onFindResultReceived"].postMessage(
-      {
-          'activeMatchOrdinal': window.\(JAVASCRIPT_BRIDGE_NAME)._currentHighlight,
-          'numberOfMatches': window.\(JAVASCRIPT_BRIDGE_NAME)._searchResultCount,
-          'isDoneCounting': window.\(JAVASCRIPT_BRIDGE_NAME)._isDoneCounting
-      }
-  );
+    window.webkit.messageHandlers["onFindResultReceived"].postMessage(
+        {
+            'activeMatchOrdinal': window.\(JAVASCRIPT_BRIDGE_NAME)._currentHighlight,
+            'numberOfMatches': window.\(JAVASCRIPT_BRIDGE_NAME)._searchResultCount,
+            'isDoneCounting': window.\(JAVASCRIPT_BRIDGE_NAME)._isDoneCounting
+        }
+    );
+  }
 }
 
 window.\(JAVASCRIPT_BRIDGE_NAME)._clearMatchesForElement = function(element) {
@@ -170,6 +188,11 @@ window.\(JAVASCRIPT_BRIDGE_NAME)._clearMatchesForElement = function(element) {
 }
 
 window.\(JAVASCRIPT_BRIDGE_NAME)._clearMatches = function() {
+  if (window.\(JAVASCRIPT_BRIDGE_NAME)._findScrollTimer !== null) {
+    clearTimeout(window.\(JAVASCRIPT_BRIDGE_NAME)._findScrollTimer);
+    window.\(JAVASCRIPT_BRIDGE_NAME)._findScrollTimer = null;
+  }
+  window.\(JAVASCRIPT_BRIDGE_NAME)._activeFindKeyword = "";
   window.\(JAVASCRIPT_BRIDGE_NAME)._searchResultCount = 0;
   window.\(JAVASCRIPT_BRIDGE_NAME)._currentHighlight = 0;
   window.\(JAVASCRIPT_BRIDGE_NAME)._isDoneCounting = false;
@@ -178,32 +201,36 @@ window.\(JAVASCRIPT_BRIDGE_NAME)._clearMatches = function() {
 }
 
 window.\(JAVASCRIPT_BRIDGE_NAME)._findNext = function(forward) {
-  if (window.\(JAVASCRIPT_BRIDGE_NAME)._searchResultCount <= 0) return;
+  try {
+    if (window.\(JAVASCRIPT_BRIDGE_NAME)._searchResultCount > 0) {
+      var idx = window.\(JAVASCRIPT_BRIDGE_NAME)._currentHighlight + (forward ? +1 : -1);
+      idx =
+        idx < 0
+          ? window.\(JAVASCRIPT_BRIDGE_NAME)._searchResultCount - 1
+          : idx >= window.\(JAVASCRIPT_BRIDGE_NAME)._searchResultCount
+          ? 0
+          : idx;
+      window.\(JAVASCRIPT_BRIDGE_NAME)._currentHighlight = idx;
 
-  var idx = window.\(JAVASCRIPT_BRIDGE_NAME)._currentHighlight + (forward ? +1 : -1);
-  idx =
-    idx < 0
-      ? window.\(JAVASCRIPT_BRIDGE_NAME)._searchResultCount - 1
-      : idx >= window.\(JAVASCRIPT_BRIDGE_NAME)._searchResultCount
-      ? 0
-      : idx;
-  window.\(JAVASCRIPT_BRIDGE_NAME)._currentHighlight = idx;
+      // #1155: navigate the tracked highlight list, not document.getElementById —
+      // a shadow-root highlight is not reachable by id from the document.
+      var highlights = window.\(JAVASCRIPT_BRIDGE_NAME)._highlightNodes;
+      var scrollTo = highlights[idx];
+      if (scrollTo) {
+        for (var i = 0; i < highlights.length; i++) {
+          if (highlights[i]) {
+            highlights[i].style.backgroundColor = "#FFFF00";
+          }
+        }
+        scrollTo.style.backgroundColor = "#FF9732";
 
-  // #1155: navigate the tracked highlight list, not document.getElementById —
-  // a shadow-root highlight is not reachable by id from the document.
-  var highlights = window.\(JAVASCRIPT_BRIDGE_NAME)._highlightNodes;
-  var scrollTo = highlights[idx];
-  if (scrollTo) {
-    for (var i = 0; i < highlights.length; i++) {
-      highlights[i].style.backgroundColor = "#FFFF00";
+        scrollTo.scrollIntoView({
+          behavior: "auto",
+          block: "center"
+        });
+      }
     }
-    scrollTo.style.backgroundColor = "#FF9732";
-
-    scrollTo.scrollIntoView({
-      behavior: "auto",
-      block: "center"
-    });
-
+  } finally {
     window.webkit.messageHandlers["onFindResultReceived"].postMessage(
         {
             'activeMatchOrdinal': window.\(JAVASCRIPT_BRIDGE_NAME)._currentHighlight,

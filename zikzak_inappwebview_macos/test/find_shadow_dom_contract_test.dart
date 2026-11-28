@@ -1,20 +1,6 @@
-// Bug #1155 macOS find-in-page regression contract (source-level).
-//
-// The macOS find is a JavaScript DOM-walk bridge
-// (FindInteractionJS.swift). Two user-visible symptoms on the GitHub JSON
-// viewer (a shadow-DOM / nested-root SPA) trace to that walker:
-//
-//   1. A term that is plainly visible is never matched (`gemini` not found)
-//      because `_findAllAsyncForElement` recurses `element.childNodes` only —
-//      the light DOM — and never descends into `element.shadowRoot` or a
-//      same-origin iframe's `contentDocument`. Content rendered through a
-//      shadow root is invisible to the walker.
-//   2. The reported match count and the highlights `_findNext` cycles can
-//      disagree (`0/0` while arrows still move) because the two code paths
-//      read `_searchResultCount` at different moments.
-//
-// Executable on any host (no Xcode required) — the #316/#328/#331
-// source-contract precedent (see swift_platform_view_clipping_test.dart).
+// Bug #472 macOS find-in-page regression contracts.
+// The injected script runs in a dependency-free Node DOM harness; source-level
+// checks retain the #1155 nested-root contract.
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -48,42 +34,32 @@ void main() {
     source = sourceFile!.readAsStringSync();
   });
 
-  test(
-    'find walker descends into shadow roots (visible shadow-DOM text is matched, #1155)',
-    () {
-      // The element-node branch must recurse into `element.shadowRoot` when
-      // one exists, not only `element.childNodes`.
-      expect(
-        source,
-        matches(
-          RegExp(r'shadowRoot'),
-        ),
-        reason:
-            'FindInteractionJS.swift never references shadowRoot — text '
-            'rendered through a shadow DOM (GitHub JSON/blob viewer) is '
-            'invisible to the find walker, so a visible term is not matched '
-            '(#1155 symptom 1).',
-      );
-    },
-  );
+  test('find walker descends into shadow roots (visible shadow-DOM text is matched, #1155)', () {
+    // The element-node branch must recurse into `element.shadowRoot` when
+    // one exists, not only `element.childNodes`.
+    expect(
+      source,
+      matches(RegExp(r'shadowRoot')),
+      reason:
+          'FindInteractionJS.swift never references shadowRoot — text '
+          'rendered through a shadow DOM (GitHub JSON/blob viewer) is '
+          'invisible to the find walker, so a visible term is not matched '
+          '(#1155 symptom 1).',
+    );
+  });
 
-  test(
-    'find walker descends into same-origin iframe documents (#1155)',
-    () {
-      // The element-node branch must also cross into a same-origin iframe's
-      // `contentDocument` so text inside a nested browsing context is found.
-      expect(
-        source,
-        matches(
-          RegExp(r'contentDocument'),
-        ),
-        reason:
-            'FindInteractionJS.swift never references contentDocument — '
-            'text inside a same-origin iframe is invisible to the find '
-            'walker (#1155 symptom 1, nested-root case).',
-      );
-    },
-  );
+  test('find walker descends into same-origin iframe documents (#1155)', () {
+    // The element-node branch must also cross into a same-origin iframe's
+    // `contentDocument` so text inside a nested browsing context is found.
+    expect(
+      source,
+      matches(RegExp(r'contentDocument')),
+      reason:
+          'FindInteractionJS.swift never references contentDocument — '
+          'text inside a same-origin iframe is invisible to the find '
+          'walker (#1155 symptom 1, nested-root case).',
+    );
+  });
 
   test(
     'find-all posts the final match count after the walk completes (#1155)',
@@ -113,6 +89,34 @@ void main() {
       );
     },
   );
+
+  test('nested roots are searched and cleared', () async {
+    await _runFinderHarness(source, 'nested-roots');
+  });
+
+  test('failed walks still post final counts', () async {
+    await _runFinderHarness(source, 'failed-walk');
+  });
+
+  test('missing highlights still post navigation counts', () async {
+    await _runFinderHarness(source, 'missing-highlight');
+  });
+
+  test('zero-match navigation posts counts', () async {
+    await _runFinderHarness(source, 'zero-match-navigation');
+  });
+
+  test('scrollend rescans newly mounted matches', () async {
+    await _runFinderHarness(source, 'scrollend-rescan');
+  });
+
+  test('clearing matches cancels pending rescans', () async {
+    await _runFinderHarness(source, 'clear-cancels-rescan');
+  });
+
+  test('frame safety keeps one listener and skips null documents', () async {
+    await _runFinderHarness(source, 'frame-safety');
+  });
 }
 
 /// The body of `window.<bridge>.<name> = function(...) { ... }`, brace-matched
@@ -132,4 +136,47 @@ String? _functionBody(String source, String name) {
     }
   }
   return null;
+}
+
+String _finderScript(String source) {
+  const marker = 'let FIND_TEXT_HIGHLIGHT_JS_SOURCE = """';
+  final declaration = source.indexOf(marker);
+  expect(
+    declaration,
+    isNonNegative,
+    reason: 'finder script declaration not found',
+  );
+  final start = declaration + marker.length;
+  final end = source.indexOf('"""', start);
+  expect(
+    end,
+    greaterThan(start),
+    reason: 'finder script closing delimiter not found',
+  );
+  return source
+      .substring(start, end)
+      .replaceAll(r'\(JAVASCRIPT_BRIDGE_NAME)', 'zikzak_inappwebview');
+}
+
+Future<void> _runFinderHarness(String source, String scenario) async {
+  final harness = File('test/fixtures/find_interaction_harness.js');
+  expect(harness.existsSync(), isTrue, reason: 'missing ${harness.path}');
+  final temp = await Directory.systemTemp.createTemp('find-interaction-472-');
+  try {
+    final script = File('${temp.path}/finder.js');
+    await script.writeAsString(_finderScript(source));
+    final result = await Process.run('node', [
+      harness.absolute.path,
+      script.absolute.path,
+      scenario,
+    ], workingDirectory: Directory.current.path);
+    expect(
+      result.exitCode,
+      0,
+      reason:
+          'node exited ${result.exitCode}\n${result.stdout}\n${result.stderr}',
+    );
+  } finally {
+    await temp.delete(recursive: true);
+  }
 }
