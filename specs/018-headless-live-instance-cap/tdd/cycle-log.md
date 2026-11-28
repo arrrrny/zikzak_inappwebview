@@ -44,3 +44,22 @@ Package-wide `flutter test --concurrency=2` verification passed:
 - `flutter build macos --debug --no-pub` passed and produced `build/macos/Build/Products/Debug/example.app`.
 - `flutter build ios --release --no-codesign --no-pub` passed and produced `build/ios/iphoneos/Runner.app`.
 - `flutter build apk --debug --no-pub` was attempted but could not start Java compilation because the host has no Java runtime (`Unable to locate a Java Runtime`). Android Dart analysis and lifecycle/source-contract tests passed.
+
+## Cycle 2 — review fixes: lazy native apply, retryable configure, test reset (PR #477 review)
+
+### Red
+
+`cd zikzak_inappwebview && flutter test test/headless_cap_test.dart --concurrency=2`
+exited 1 before the fix: the new cases reference `debugResetMaxLiveWebViews`,
+which did not exist —
+`test/headless_cap_test.dart:63:26: Error: Member not found: 'HeadlessInAppWebView.debugResetMaxLiveWebViews'.`
+
+### Green
+
+The same command passed after the fix: `6` passed (2 new cases: the cap applies
+lazily when the platform registers after the setter, and a transient native
+configure error is retried by the next `run()` instead of sticking).
+
+Package-wide verification passed: umbrella `284`, module `28`, platform
+interface `314` (all `--concurrency=2`); umbrella analyze 0 warnings/errors,
+module analyze clean; `scripts/grep_gate.sh` PASS.

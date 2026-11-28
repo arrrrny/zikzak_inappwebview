@@ -35,8 +35,20 @@ class HeadlessInAppWebView implements Disposable {
       );
     }
     _configuredMaxLiveWebViews = value;
-    _nativeCapConfigurationRequested = true;
     _nativeCapConfiguration = _configureNativeCap(value);
+  }
+
+  /// Resets the process-wide cap statics (issue #474 review).
+  ///
+  /// Test isolation only: the cap statics are process-wide and otherwise leak
+  /// between cases, making a suite's pass/fail depend on case order. Test
+  /// frameworks invoke this from `tearDown` after each case.
+  @visibleForTesting
+  static void debugResetMaxLiveWebViews() {
+    _configuredMaxLiveWebViews = null;
+    _liveInstances.clear();
+    _nativeCapConfigurationRequested = false;
+    _nativeCapConfiguration = Future.value(null);
   }
 
   static int get _defaultMaxLiveWebViews {
@@ -49,9 +61,26 @@ class HeadlessInAppWebView implements Disposable {
     return 8;
   }
 
+  /// Applies the cap to the native manager once the platform is registered.
+  ///
+  /// When [InAppWebViewPlatform.instance] is still null (the setter ran before
+  /// the engine attached plugins), returns null WITHOUT marking the cap as
+  /// requested — [run] retries lazily, because it executes after the plugins
+  /// are up. A channel error is returned as a value for the caller to
+  /// observe, which keeps the cap unapplied so the next attempt can retry a
+  /// transient failure.
   static Future<Object?> _configureNativeCap(int value) async {
+    final platform = InAppWebViewPlatform.instance;
+    if (platform == null) {
+      return null;
+    }
+    // Mark the request eagerly, before the channel round trip: a run() that
+    // starts while this attempt is still in flight must await THIS attempt,
+    // not fire a duplicate. The run()-side handler below un-marks it when the
+    // attempt fails, so a transient error never sticks for the process.
+    _nativeCapConfigurationRequested = true;
     try {
-      await InAppWebViewPlatform.instance?.setHeadlessMaxLiveWebViews(value);
+      await platform.setHeadlessMaxLiveWebViews(value);
       return null;
     } catch (error) {
       return error;
@@ -715,11 +744,15 @@ class HeadlessInAppWebView implements Disposable {
     _liveInstances.add(this);
     try {
       if (!_nativeCapConfigurationRequested) {
-        _nativeCapConfigurationRequested = true;
         _nativeCapConfiguration = _configureNativeCap(maxLiveWebViews);
       }
       final configurationError = await _nativeCapConfiguration;
       if (configurationError != null) {
+        // The native configure failed this attempt; leave the cap unapplied so
+        // the next run() re-attempts instead of caching the failure for the
+        // rest of the process.
+        _nativeCapConfigurationRequested = false;
+        _nativeCapConfiguration = Future.value(null);
         throw StateError(
           'Unable to apply HeadlessInAppWebView.maxLiveWebViews: '
           '$configurationError',

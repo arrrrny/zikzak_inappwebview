@@ -14,6 +14,22 @@ class _FakeInAppWebViewPlatform extends InAppWebViewPlatform {
   }
 }
 
+class _FlakyInAppWebViewPlatform extends InAppWebViewPlatform {
+  int attempts = 0;
+  final List<String> events;
+
+  _FlakyInAppWebViewPlatform(this.events);
+
+  @override
+  Future<void> setHeadlessMaxLiveWebViews(int value) async {
+    attempts += 1;
+    if (attempts == 1) {
+      throw StateError('transient channel failure');
+    }
+    events.add('configure:$value');
+  }
+}
+
 class _FakeHeadlessPlatform extends PlatformHeadlessInAppWebView {
   final List<String> events;
 
@@ -44,6 +60,7 @@ void main() {
 
   tearDown(() {
     debugDefaultTargetPlatformOverride = null;
+    HeadlessInAppWebView.debugResetMaxLiveWebViews();
   });
 
   group('HeadlessInAppWebView live cap (issue 474)', () {
@@ -73,6 +90,33 @@ void main() {
         () => HeadlessInAppWebView.maxLiveWebViews = -1,
         throwsArgumentError,
       );
+    });
+
+    test('run configures the native cap when the platform registers late', () async {
+      final events = <String>[];
+      HeadlessInAppWebView.maxLiveWebViews = 6;
+      InAppWebViewPlatform.instance = _FakeInAppWebViewPlatform(events);
+      final headless = HeadlessInAppWebView.fromPlatform(
+        platform: _FakeHeadlessPlatform(events),
+      );
+
+      await headless.run();
+
+      expect(events, ['configure:6', 'run']);
+    });
+
+    test('a transient native configure error is retried by the next run', () async {
+      final events = <String>[];
+      InAppWebViewPlatform.instance = _FlakyInAppWebViewPlatform(events);
+      HeadlessInAppWebView.maxLiveWebViews = 6;
+      final headless = HeadlessInAppWebView.fromPlatform(
+        platform: _FakeHeadlessPlatform(events),
+      );
+
+      await expectLater(headless.run(), throwsStateError);
+      await headless.run();
+
+      expect(events, ['configure:6', 'run']);
     });
 
     test('propagates the cap and updates registry defaults', () async {

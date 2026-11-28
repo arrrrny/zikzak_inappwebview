@@ -17,6 +17,11 @@ dependencies:
     path: ../zikzak_inappwebview
 
 dependency_overrides:
+  # Dev-only resolution against sibling checkouts. This module is never
+  # published (publish_to: none), so the path overrides never reach a
+  # standalone consumer; `scripts/prepare_for_publish.sh` does not cover this
+  # package either. Anyone resolving this pubspec outside the monorepo layout
+  # will fail — that is by design for this dev-only tier.
   zikzak_inappwebview_platform_interface:
     path: ../zikzak_inappwebview_platform_interface
 
