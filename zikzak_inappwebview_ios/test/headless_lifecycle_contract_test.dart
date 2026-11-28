@@ -142,6 +142,15 @@ void main() {
 
       expect(headless.lastDisposeError, isNull);
     });
+
+    test('the live cap is propagated through the shared manager channel',
+        () async {
+      await IOSHeadlessInAppWebView.setMaxLiveWebViews(6);
+
+      expect(probe.calls, hasLength(1));
+      expect(probe.calls.single.method, 'setMaxLiveWebViews');
+      expect((probe.calls.single.arguments as Map)['maxLiveWebViews'], 6);
+    });
   });
 
   group('iOS native headless lifecycle (issue #371 source contract)', () {
@@ -178,6 +187,22 @@ void main() {
         manager,
         contains('FlutterError'),
         reason: 'R4: exceeding the cap must fail loudly, not silently grow',
+      );
+    });
+
+    test('the native cap is mutable and set through the manager channel', () {
+      final managers = managerSources();
+      final managerPath = managers.keys.firstWhere(
+        (p) => p.endsWith('HeadlessInAppWebViewManager.swift'),
+      );
+      final manager = managers[managerPath]!;
+
+      expect(manager, contains('static var maxLiveWebViews = 3'));
+      expect(manager, contains('case "setMaxLiveWebViews":'));
+      expect(manager, contains('value >= 1'));
+      expect(
+        manager,
+        contains('HeadlessInAppWebViewManager.maxLiveWebViews = value'),
       );
     });
 

@@ -8,9 +8,9 @@ public class HeadlessInAppWebViewManager: NSObject {
     ///
     /// Every headless WebView owns a WebContent process and its own navigation
     /// queue. Creating beyond the cap fails loudly instead of silently growing;
-    /// the Dart-side HeadlessWebViewRegistry uses the same platform cap and can
+    /// the Dart-side HeadlessWebViewRegistry uses the same configured cap and can
     /// evict an idle instance before the ceiling is ever reached.
-    static let maxLiveWebViews = 5
+    static var maxLiveWebViews = 5
 
     var registrar: FlutterPluginRegistrar
     var webViews: [String: HeadlessInAppWebView?] = [:]
@@ -32,6 +32,18 @@ public class HeadlessInAppWebViewManager: NSObject {
         let id = arguments?["id"] as? String
 
         switch call.method {
+            case "setMaxLiveWebViews":
+                guard let value = arguments?["maxLiveWebViews"] as? Int,
+                      value >= 1 else {
+                    result(FlutterError(
+                        code: "headless_invalid_arguments",
+                        message: "maxLiveWebViews must be an integer >= 1",
+                        details: nil))
+                    return
+                }
+                HeadlessInAppWebViewManager.maxLiveWebViews = value
+                result(true)
+                break
             case "run":
                 guard let id = id else {
                     result(FlutterError(code: "headless_invalid_arguments", message: "id is null", details: nil))

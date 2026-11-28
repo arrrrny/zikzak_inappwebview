@@ -16,11 +16,8 @@ class HeadlessWebViewRegistryConfig {
   /// every live instance is active the registration fails with a
   /// [HeadlessWebViewCapExceededException] instead of silently growing.
   ///
-  /// There is no platform-independent default on purpose: the native managers
-  /// hard-stop at `3` on iOS/Android and `5` on macOS, so a value picked here
-  /// could promise room the platform then refuses. Use
-  /// [HeadlessWebViewRegistryConfig.platformDefaults] for the platform-aware
-  /// ceilings.
+  /// The default comes from [HeadlessInAppWebView.maxLiveWebViews], keeping
+  /// the Dart ceiling synchronized with the native manager's hard stop.
   final int maxLiveInstances;
 
   /// How long an idle instance may stay registered before
@@ -42,29 +39,30 @@ class HeadlessWebViewRegistryConfig {
     this.slotAcquireTimeout = const Duration(seconds: 30),
   }) : assert(maxLiveInstances >= 1, 'a cap of zero can never be satisfied');
 
-  /// Platform-aware defaults (iOS/Android `3`, macOS `5`, everything else `8`).
+  /// Platform-aware defaults from [HeadlessInAppWebView.maxLiveWebViews].
   ///
   /// Uses `defaultTargetPlatform`, not `dart:io`, so this file stays compilable
   /// for Flutter Web.
   factory HeadlessWebViewRegistryConfig.platformDefaults() {
     final platform = defaultTargetPlatform;
+    final maxLiveInstances = HeadlessInAppWebView.maxLiveWebViews;
     if (!kIsWeb &&
         (platform == TargetPlatform.iOS ||
             platform == TargetPlatform.android)) {
-      return const HeadlessWebViewRegistryConfig(
-        maxLiveInstances: 3,
-        idleTtl: Duration(seconds: 180),
+      return HeadlessWebViewRegistryConfig(
+        maxLiveInstances: maxLiveInstances,
+        idleTtl: const Duration(seconds: 180),
       );
     }
     if (!kIsWeb && platform == TargetPlatform.macOS) {
-      return const HeadlessWebViewRegistryConfig(
-        maxLiveInstances: 5,
-        idleTtl: Duration(seconds: 300),
+      return HeadlessWebViewRegistryConfig(
+        maxLiveInstances: maxLiveInstances,
+        idleTtl: const Duration(seconds: 300),
       );
     }
-    return const HeadlessWebViewRegistryConfig(
-      maxLiveInstances: 8,
-      idleTtl: Duration(seconds: 300),
+    return HeadlessWebViewRegistryConfig(
+      maxLiveInstances: maxLiveInstances,
+      idleTtl: const Duration(seconds: 300),
     );
   }
 }

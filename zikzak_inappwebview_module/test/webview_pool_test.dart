@@ -534,4 +534,16 @@ void main() {
       }
     });
   });
+
+  group('WebViewPool process-wide cap (issue 474)', () {
+    test('platform defaults and pool follow the configured headless cap', () {
+      HeadlessInAppWebView.maxLiveWebViews = 7;
+
+      expect(WebViewPoolConfig.platformDefaults().maxLiveInstances, 7);
+
+      final pool = WebViewPool(instanceFactory: _Recorder().factory);
+      addTearDown(pool.dispose);
+      expect(pool.config.maxLiveInstances, 7);
+    });
+  });
 }

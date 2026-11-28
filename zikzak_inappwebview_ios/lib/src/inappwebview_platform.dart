@@ -192,6 +192,10 @@ class IOSInAppWebViewPlatform extends InAppWebViewPlatform {
     return IOSHeadlessInAppWebView(params);
   }
 
+  @override
+  Future<void> setHeadlessMaxLiveWebViews(int value) =>
+      IOSHeadlessInAppWebView.setMaxLiveWebViews(value);
+
   /// Creates a new [IOSHttpAuthCredentialDatabase].
   ///
   /// This function should only be called by the app-facing package.

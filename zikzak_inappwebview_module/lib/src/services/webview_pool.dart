@@ -40,23 +40,24 @@ class WebViewPoolConfig {
   /// iOS/Android get lower caps due to memory constraints;
   /// desktop/Web get higher caps.
   factory WebViewPoolConfig.platformDefaults() {
+    final maxLiveInstances = HeadlessInAppWebView.maxLiveWebViews;
     if (Platform.isIOS || Platform.isAndroid) {
-      return const WebViewPoolConfig(
-        maxLiveInstances: 3,
+      return WebViewPoolConfig(
+        maxLiveInstances: maxLiveInstances,
         maxPerDomain: 1,
         idleTtlSeconds: 180,
       );
     }
     if (Platform.isMacOS) {
-      return const WebViewPoolConfig(
-        maxLiveInstances: 5,
+      return WebViewPoolConfig(
+        maxLiveInstances: maxLiveInstances,
         maxPerDomain: 2,
         idleTtlSeconds: 300,
       );
     }
     // Web, Linux, Windows
-    return const WebViewPoolConfig(
-      maxLiveInstances: 8,
+    return WebViewPoolConfig(
+      maxLiveInstances: maxLiveInstances,
       maxPerDomain: 3,
       idleTtlSeconds: 300,
     );

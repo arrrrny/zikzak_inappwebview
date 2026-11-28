@@ -21,9 +21,9 @@ public class HeadlessInAppWebViewManager: ChannelDelegate {
     /// growing or failing: native instances outlive a Dart hot restart (the
     /// dead isolate cannot dispose them), so a saturated cap would otherwise
     /// refuse every later create for the rest of the process. The Dart-side
-    /// `HeadlessWebViewRegistry` uses the same platform cap and can evict an
+    /// `HeadlessWebViewRegistry` uses the same configured cap and can evict an
     /// idle instance before the ceiling is ever reached.
-    static let maxLiveWebViews = 3
+    static var maxLiveWebViews = 3
 
     var plugin: SwiftFlutterPlugin?
     var webViews: [String: HeadlessInAppWebView?] = [:]
@@ -49,6 +49,18 @@ public class HeadlessInAppWebViewManager: ChannelDelegate {
         let id = arguments?["id"] as? String
 
         switch call.method {
+            case "setMaxLiveWebViews":
+                guard let value = arguments?["maxLiveWebViews"] as? Int,
+                      value >= 1 else {
+                    result(FlutterError(
+                        code: "headless_invalid_arguments",
+                        message: "maxLiveWebViews must be an integer >= 1",
+                        details: nil))
+                    return
+                }
+                HeadlessInAppWebViewManager.maxLiveWebViews = value
+                result(true)
+                break
             case "run":
                 guard let id = id else {
                     result(FlutterError(code: "headless_invalid_arguments", message: "id is null", details: nil))

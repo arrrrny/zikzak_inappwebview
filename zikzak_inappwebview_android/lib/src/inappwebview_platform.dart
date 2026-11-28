@@ -196,6 +196,10 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
     return AndroidHeadlessInAppWebView(params);
   }
 
+  @override
+  Future<void> setHeadlessMaxLiveWebViews(int value) =>
+      AndroidHeadlessInAppWebView.setMaxLiveWebViews(value);
+
   /// Creates a new [AndroidHttpAuthCredentialDatabase].
   ///
   /// This function should only be called by the app-facing package.

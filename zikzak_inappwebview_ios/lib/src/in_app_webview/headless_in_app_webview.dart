@@ -204,6 +204,9 @@ class IOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     'wtf.zikzak/flutter_headless_inappwebview',
   );
 
+  static Future<void> setMaxLiveWebViews(int value) => _sharedChannel
+      .invokeMethod<void>('setMaxLiveWebViews', {'maxLiveWebViews': value});
+
   IOSInAppWebViewController? _webViewController;
 
   /// Constructs a [IOSHeadlessInAppWebView].
